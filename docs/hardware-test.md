@@ -14,7 +14,7 @@ Each step: what to do, then what must happen. ☐ is to tick.
 - ☐ *Another homebrew › sphaira*: the preview shows sphaira's icon and name; once added, the HOME menu has the same icon and name, and it starts sphaira.
 - ☐ A homebrew whose `.nro` has a PNG icon, or one of another size: its icon on the HOME menu (not a “?”).
 - ☐ The console set to another language (System Settings › System › Language): the icons stay.
-- ☐ *Change the icon* on one, a screenshot of the album: the HOME menu shows the screenshot's middle square.
+- ☐ *Change the icon* on one: the grid shows the album's screenshots at once, their thumbnails filling in, each with the game it was taken in (caps:a; *Taken outside a game* for the HOME menu's). A screenshot moved with R, then A: the HOME menu shows the square *After* showed.
 - ☐ *Delete*, then ZR within 8 seconds: back on the HOME menu, with the same icon.
 - ☐ Ⓐ on a forwarder: the sheet over the list, its icon and state at the top, its sections; a touch on the screen outside it closes it, as B does. A long list (*Pause after refused PINs*, a day's limit in *Play timer*) scrolls with the stick and with a finger, the value set checked.
 - ☐ *Details* on a protected one: a line per rule with its icon; Ⓐ on *Hours without the PIN* opens its hours, on *Publisher* its keyboard.

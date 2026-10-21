@@ -8,7 +8,7 @@
 // simulated SD card (sim_homebrew.hpp). PLAYGUARD_SIM_FORWARDERS=1 starts
 // with a few made already (PlayGuard's own, sphaira protected and seen
 // working, Star Atlas without the PIN), the signature patches forwarders
-// need, and two screenshots in the album: Console › Forwarders as it looks
+// need, and four screenshots in the album (sim_album.cpp): Console › Forwarders as it looks
 // once in use (the web simulator's "homebrew" preset).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "core/forwarder.h"
@@ -127,10 +127,7 @@ void seed_sample(const std::string& sd_root)
     static const unsigned char PATCH[] = { 'P', 'A', 'T', 'C', 'H', 'E', 'O', 'F' };
     for (const char* kind : { "fs_patches", "loader_patches" })
         write_file(sd_root + "/atmosphere/kip_patches/" + kind + "/0000000000000000.ips", PATCH, sizeof(PATCH));
-    write_file(sd_root + "/Nintendo/Album/2026/10/20/2026102018300000-57B4628D2267231D57E0FC1078C0596D.jpg",
-               SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS));
-    write_file(sd_root + "/Nintendo/Album/2026/10/19/2026101917050000-57B4628D2267231D57E0FC1078C0596D.jpg",
-               SIM_HB_ICON_PAINT, sizeof(SIM_HB_ICON_PAINT));
+    seed_album(sd_root);
     if (!forwarders::list().empty()) return;
     for (const Homebrew* h : SAMPLE) {
         forwarders::Made m;

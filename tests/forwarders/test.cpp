@@ -248,7 +248,23 @@ static void test_registry()
     b.icon = "sdmc:/Nintendo/Album/2026/10/20/2026102018300000-0.jpg";
     CHECK(forwarders::save(b));
     CHECK(forwarders::find(b.id, &found) && found.closed_days == 0x7F && found.closed_from == 1260 &&
-          found.closed_to == 420 && found.icon == b.icon);
+          found.closed_to == 420 && found.icon == b.icon && found.icon_x == forwarders::ICON_X_MIDDLE);
+    // Its square elsewhere along the screenshot: kept; out of range, the middle's.
+    b.icon_x = 75;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.icon_x == 75);
+    {
+        auto list = forwarders::list();
+        std::string text = forwarders::list_text(list);
+        const size_t key = text.find("\"icon_x\"");
+        REQUIRE(key != std::string::npos);
+        const size_t at = text.find("75", key);
+        REQUIRE(at != std::string::npos && at < key + 12);
+        text.replace(at, 2, "175");
+        bool middle = false;
+        for (const auto& m : forwarders::parse_list(text)) middle = middle || (m.id == b.id && m.icon_x == forwarders::ICON_X_MIDDLE);
+        CHECK(middle);
+    }
     CHECK(forwarders::parse_list(forwarders::list_text(forwarders::list())).size() == forwarders::list().size());
     CHECK(forwarders::parse_list("{not json").empty() && forwarders::parse_list("{}").empty());
     b.closed_days = 0;
@@ -256,7 +272,8 @@ static void test_registry()
     b.pin = false;
     b.gate.clear();
     CHECK(forwarders::save(b));
-    CHECK(forwarders::find(b.id, &found) && found.closed_days == 0 && found.icon.empty());
+    CHECK(forwarders::find(b.id, &found) && found.closed_days == 0 && found.icon.empty() &&
+          found.icon_x == forwarders::ICON_X_MIDDLE);   // no icon from the album: nowhere along one
 
     // Seen working through the gate: kept while protected.
     b.pin = true;
@@ -510,6 +527,26 @@ static void test_guard()
     CHECK(shots.size() == 2 && shots[0] == "/a/2026102018300000-X.jpg" && shots[1] == "/b/2026102009000000-Y.JPG");
     CHECK(shot_label("sdmc:/Nintendo/Album/2026/10/20/2026102018300000-57B4.jpg") == "2026-10-20 18:30");
     CHECK(shot_label("sdmc:/x/holiday.jpg").empty());
+    ShotTime t;
+    CHECK(shot_time("sdmc:/Nintendo/Album/2026/10/20/2026102018304200-57B4.jpg", t) && t.year == 2026 && t.month == 10 &&
+          t.day == 20 && t.hour == 18 && t.minute == 30 && t.second == 42);
+    CHECK(!shot_time("/a/20261020.jpg", t) && !shot_time("/a/2026132018300000-X.jpg", t) && !shot_time("/a/holiday.jpg", t));
+    CHECK(shot_stamp("/a/2026102018304201-57B4.jpg") == "2026102018304201" && shot_stamp("/a/20261020183042-X.jpg").empty());
+    // Days before: the same day, yesterday, over a month's end and a year's.
+    CHECK(shot_time("/a/2026102018300000-X.jpg", t));
+    CHECK(days_before(t, 2026, 10, 20) == 0 && days_before(t, 2026, 10, 21) == 1 && days_before(t, 2026, 11, 2) == 13);
+    CHECK(days_before(t, 2026, 10, 19) == -1);
+    CHECK(shot_time("/a/2025123123590000-X.jpg", t) && days_before(t, 2026, 1, 1) == 1);
+    // The same minute: their seconds tell them apart; other minutes, and
+    // names that are no time, do not.
+    const std::vector<bool> same = same_minute({ "/a/2026102018300000-X.jpg", "/a/2026102018304200-X.jpg",
+                                                 "/a/2026102018310000-X.jpg", "/a/holiday.jpg", "/b/holiday.jpg" });
+    CHECK(same == std::vector<bool>({ true, true, false, false, false }));
+    CHECK(same_minute({}).empty());
+    // The icon's square along its screenshot, by quarters, held at the edges.
+    CHECK(icon_x_step(50, -1) == 25 && icon_x_step(25, -1) == 0 && icon_x_step(0, -1) == 0);
+    CHECK(icon_x_step(50, 1) == 75 && icon_x_step(75, 1) == 100 && icon_x_step(100, 1) == 100);
+    CHECK(icon_x_step(30, -1) == 25 && icon_x_step(30, 1) == 50 && icon_x_step(-20, 1) == 25 && icon_x_step(300, -1) == 75);
 
     // Why a write failed.
     CHECK(write_hint(ENOSPC, 1u << 30) == WriteHint::Full);
@@ -643,6 +680,40 @@ static void test_icon()
     CHECK(nro::icon_usable(cropped));
     CHECK(colour_near(cropped, 8, 128, 30, 180, 30) && colour_near(cropped, 248, 128, 30, 180, 30));
     CHECK(forwarder_icon::from_screenshot({ 1, 2, 3 }).empty());
+    // Its square moved along it: at its left edge, then its right one.
+    for (int x = 0; x < 160; x++)
+        if (x >= 125)
+            for (int y = 0; y < 90; y++) {
+                uint8_t* p = &shot[((size_t)y * 160 + x) * 3];
+                p[0] = 30, p[1] = 30, p[2] = 220;
+            }
+    shot_jpg.clear();
+    REQUIRE(stbi_write_jpg_to_func(append, &shot_jpg, 160, 90, 3, shot.data(), 95));
+    const std::vector<uint8_t> left = forwarder_icon::from_screenshot(shot_jpg, 0);
+    CHECK(nro::icon_usable(left) && colour_near(left, 8, 128, 220, 30, 30) && colour_near(left, 248, 128, 30, 180, 30));
+    const std::vector<uint8_t> right = forwarder_icon::from_screenshot(shot_jpg, 100);
+    CHECK(nro::icon_usable(right) && colour_near(right, 8, 128, 30, 180, 30) && colour_near(right, 248, 128, 30, 30, 220));
+    CHECK(forwarder_icon::from_screenshot(shot_jpg, 250) == right && forwarder_icon::from_screenshot(shot_jpg, -5) == left);
+    // As pixels, at a grid cell's size.
+    const std::vector<uint8_t> cell = forwarder_icon::square_of(shot_jpg, 50, 48);
+    CHECK(cell.size() == 48u * 48 * 4 && std::abs(cell[(24 * 48 + 24) * 4 + 1] - 180) < 24 && cell[(24 * 48 + 24) * 4 + 3] == 255);
+    CHECK(forwarder_icon::square_of(shot_jpg, 50, 0).empty() && forwarder_icon::square_of({ 1, 2 }, 50, 48).empty());
+
+    // The thumbnail of its Exif data, as the console writes it: read back
+    // byte for byte; none, or one that does not hold together, is nothing.
+    const std::vector<uint8_t> thumb = jpeg(32, 18);
+    const std::vector<uint8_t> with = forwarder_icon::with_thumbnail(shot_jpg, thumb);
+    CHECK(with.size() > shot_jpg.size() && forwarder_icon::exif_thumbnail(with) == thumb);
+    CHECK(forwarder_icon::from_screenshot(with, 0) == left);   // the picture itself unchanged
+    CHECK(forwarder_icon::exif_thumbnail(shot_jpg).empty() && forwarder_icon::exif_thumbnail({}).empty());
+    CHECK(forwarder_icon::exif_thumbnail(with_exif(jpeg(256, 256))).empty());   // Exif, but no TIFF
+    std::vector<uint8_t> broken = with;
+    broken[4 + 2 + 6 + 14 + 2 + 8] = 0xF0;   // the thumbnail's place: past the segment
+    CHECK(forwarder_icon::exif_thumbnail(broken).empty());
+    broken = with;
+    broken.resize(40);
+    CHECK(forwarder_icon::exif_thumbnail(broken).empty());
+    CHECK(forwarder_icon::with_thumbnail(shot_jpg, {}) == shot_jpg);
 
     // A JPEG of another size, shrunk: 512 x 300 of blue.
     std::vector<uint8_t> blue(512 * 300 * 3);
