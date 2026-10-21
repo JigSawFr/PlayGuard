@@ -348,7 +348,7 @@
         "limit_note": "No limite, o console mostra \"Tempo esgotado\" e depois suspende o jogo ou apenas avisa, conforme \"Quando o tempo acabar\".",
         "unsaved": "O progresso não salvo pode ser perdido: deixe a criança salvar antes.",
         "profile_already": "O perfil \"{}\" já está aplicado.",
-        "bedtime_by_day": "Por dia da semana...",
+        "bedtime_by_day": "Por dia",
         "bedtime_by_day_title": "Alarme de hora de dormir, por dia",
         "bedtime_weekdays": "De segunda a sexta",
         "bedtime_weekend": "Sábado e domingo",

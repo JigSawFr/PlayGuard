@@ -348,7 +348,7 @@
         "limit_note": "Al limite la console mostra \"Tempo scaduto\", poi sospende il gioco o si limita ad avvisare, secondo \"Quando il tempo è scaduto\".",
         "unsaved": "I progressi non salvati potrebbero andare persi: lascia prima salvare il bambino.",
         "profile_already": "Il profilo «{}» è già applicato.",
-        "bedtime_by_day": "Per giorno della settimana...",
+        "bedtime_by_day": "Per giorno",
         "bedtime_by_day_title": "Sogni d'oro, per giorno",
         "bedtime_weekdays": "Da lunedì a venerdì",
         "bedtime_weekend": "Sabato e domenica",

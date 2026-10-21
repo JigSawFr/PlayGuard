@@ -348,7 +348,7 @@
         "limit_note": "Beim Limit zeigt die Konsole „Zeit ist um“ an und unterbricht dann das Spiel oder warnt nur, je nach „Wenn die Zeit um ist“.",
         "unsaved": "Nicht gespeicherter Fortschritt kann verloren gehen: Lassen Sie das Kind zuerst speichern.",
         "profile_already": "Das Profil „{}“ ist bereits aktiv.",
-        "bedtime_by_day": "Nach Wochentag...",
+        "bedtime_by_day": "Pro Tag",
         "bedtime_by_day_title": "Gute-Nacht-Alarm, nach Tag",
         "bedtime_weekdays": "Montag bis Freitag",
         "bedtime_weekend": "Samstag und Sonntag",

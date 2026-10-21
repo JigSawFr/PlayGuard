@@ -348,7 +348,7 @@
         "limit_note": "達到上限時，主機會顯示「時間到」，然後依照「時間到時」的設定中斷遊戲或僅提醒。",
         "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。",
         "profile_already": "設定檔「{}」已經套用。",
-        "bedtime_by_day": "依星期設定…",
+        "bedtime_by_day": "按星期",
         "bedtime_by_day_title": "就寢鬧鐘（依星期）",
         "bedtime_weekdays": "週一至週五",
         "bedtime_weekend": "週六和週日",

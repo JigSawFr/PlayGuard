@@ -233,8 +233,8 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 ### Alarme du coucher
 
-- L'heure de l'alarme (16:00 à 23:45, ou désactivée) et l'heure où le jeu est de nouveau permis (05:00 à 09:00), la même tous les jours.
-- Ou, depuis *Par jour de la semaine…* en fin de liste de l'alarme, du lundi au vendredi, le week-end ou un seul jour, les autres jours gardant la leur (chaque groupe de jours listé avec son heure). Quand les jours diffèrent, l'onglet indique *Varie selon le jour*, et la semaine de *Temps de jeu* montre l'alarme de chaque jour sous son nom.
+- L'heure de l'alarme (16:00 à 23:45, ou *Désactivé*) et l'heure où le jeu est de nouveau permis (05:00 à 09:00), la même tous les jours, réglées au stick : haut et bas d'un quart d'heure, L et R d'une heure.
+- Ou, avec Ⓨ *Par jour* dans la fenêtre de l'alarme, du lundi au vendredi, le week-end ou un seul jour, les autres jours gardant la leur (chaque groupe de jours listé avec son heure). Quand les jours diffèrent, l'onglet indique *Varie selon le jour*, et la semaine de *Temps de jeu* montre l'alarme de chaque jour sous son nom.
 - Sa place dans les réglages du minuteur, déduite des réglages de l'application mobile, est vérifiée sur une console (22.0.0) ; PlayGuard ne la modifie toujours que si la console indique ce qu'il y lit, vérifie la réponse de la console après la modification et remet les réglages précédents si elle diffère.
 
 ### Réglages du temps en plus et Avancé
