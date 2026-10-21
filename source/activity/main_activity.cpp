@@ -8,6 +8,7 @@
 #include "action/fw_gate.hpp"
 #include "action/game_notice.hpp"
 #include "action/hbmenu_lock.hpp"
+#include "action/nintendo_dns.hpp"
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
 #include "action/rescue.hpp"
@@ -184,6 +185,8 @@ void MainActivity::onContentAvailable()
     rescue::note_version();
     // The homebrew menu's lock and the forwarders made here (the bell).
     hbmenu_lock::at_start([]() { brls::Application::pushActivity(new ForwardersActivity()); });
+    // What Atmosphère's DNS.mitm redirects: the session log and the diagnostic report.
+    nintendo_dns::at_start();
     // Then, with nothing else in front: "What's new" after an update, else the
     // monthly "Support PlayGuard" reminder.
     support_flow::at_start(this);

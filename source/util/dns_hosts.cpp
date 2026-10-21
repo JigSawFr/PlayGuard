@@ -57,7 +57,7 @@ bool matches(const std::string& pattern, const std::string& host)
     return !p.empty() && glob(p, lower(host));
 }
 
-bool redirects(const std::string& text, const std::string& host)
+std::string redirecting_line(const std::string& text, const std::string& host)
 {
     std::istringstream lines(text);
     std::string line;
@@ -68,9 +68,14 @@ bool redirects(const std::string& text, const std::string& host)
         std::string address, name;
         if (!(words >> address)) continue;
         while (words >> name)
-            if (matches(name, host)) return true;
+            if (matches(name, host)) return trim(line);
     }
-    return false;
+    return "";
+}
+
+bool redirects(const std::string& text, const std::string& host)
+{
+    return !redirecting_line(text, host).empty();
 }
 
 bool mitm_disabled(const std::string& ini)
@@ -131,6 +136,55 @@ std::vector<std::string> candidates(const std::string& nand, int emummc_id)
     }
     files.push_back("atmosphere/hosts/default.txt");
     return files;
+}
+
+namespace
+{
+// "reachable" or "redirected", with the line that does it when `with_line`.
+std::string verdict(const Seen& seen, const char* host, bool with_line)
+{
+    const std::string line = seen.mitm_off || seen.file.empty() ? "" : redirecting_line(seen.text, host);
+    if (line.empty()) return "reachable";
+    return with_line ? "redirected (\"" + line + "\")" : "redirected";
+}
+
+std::string hosts_file(const Seen& seen)
+{
+    if (seen.mitm_off) return "not read (DNS.mitm off)";
+    return seen.file.empty() ? "none (Atmosphère's defaults only)" : seen.file;
+}
+}   // namespace
+
+std::string summary(const Seen& seen)
+{
+    return std::string("DNS.mitm ") + (seen.mitm_off ? "off" : "on") + ", hosts file " + hosts_file(seen) +
+           ": parental-control server " + verdict(seen, PCTL_HOST, false) + ", time server " +
+           verdict(seen, TIME_HOST, false);
+}
+
+std::string report(const Seen& seen, bool has_startup_log, const std::string& startup_log)
+{
+    std::string out = "=== atmosphere dns.mitm ===\n";
+    out += "read from   : the SD card's files, not a network test\n";
+    out += std::string("dns.mitm    : ") + (seen.mitm_off ? "off (system_settings.ini)" : "on") + "\n";
+    out += "hosts file  : " + hosts_file(seen) + "\n";
+    out += std::string("pctl server : ") + PCTL_HOST + " " + verdict(seen, PCTL_HOST, true) + "\n";
+    out += std::string("time server : ") + TIME_HOST + " " + verdict(seen, TIME_HOST, true) + "\n";
+    out += std::string("startup log : ") + STARTUP_LOG + (has_startup_log ? "" : " (none)") + "\n";
+    if (has_startup_log) {
+        // Its last lines, indented.
+        std::vector<std::string> kept;
+        std::istringstream lines(startup_log);
+        std::string line;
+        while (std::getline(lines, line)) {
+            if (!line.empty() && line.back() == '\r') line.pop_back();
+            kept.push_back(line);
+        }
+        const size_t first = kept.size() > STARTUP_LOG_LINES ? kept.size() - STARTUP_LOG_LINES : 0;
+        if (first > 0) out += "  (earlier lines left out)\n";
+        for (size_t i = first; i < kept.size(); i++) out += "  " + kept[i] + "\n";
+    }
+    return out + "\n";
 }
 
 }   // namespace dns_hosts
