@@ -150,6 +150,14 @@ cadran::Card::Card()
 void cadran::Card::setAccent(NVGcolor color) { this->border = color; }
 void cadran::Card::setFill(NVGcolor color) { this->fill = color; }
 
+void cadran::Card::follow_rows()
+{
+    bool shown = false;
+    for (brls::View* row : this->getChildren()) shown |= row->getVisibility() != brls::Visibility::GONE;
+    const brls::Visibility v = shown ? brls::Visibility::VISIBLE : brls::Visibility::GONE;
+    if (this->getVisibility() != v) this->setVisibility(v);
+}
+
 void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style, brls::FrameContext* ctx)
 {
     if (height < 1) return;   // every row hidden
@@ -451,6 +459,10 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
             }
             continue;
         }
+        // A cell set apart from the one above (a top margin, as Advanced
+        // under the extra time) starts a card of its own: in the same card,
+        // the margin is an empty band across it.
+        if (card && margin_top(cell) > 0) card = nullptr;
         if (!card) {
             card = new Card();
             card->setMarginTop(margin_top(cell));
@@ -460,6 +472,8 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
         move_to(cell, card);
         row(cell, icon_of(cell));
     }
+    for (brls::View* line : this->box->getChildren())
+        if (auto* c = dynamic_cast<Card*>(line)) c->follow_rows();
     this->sync();
 }
 

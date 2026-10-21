@@ -34,6 +34,9 @@ class Card : public brls::Box
     Card();
     void setAccent(NVGcolor color);
     void setFill(NVGcolor color);
+    // Gone with its last row (and back with its first), so that its top
+    // margin leaves no gap between the cards around it.
+    void follow_rows();
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
 
