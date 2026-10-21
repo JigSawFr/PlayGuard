@@ -101,12 +101,6 @@ class List
     // opens a screen keeps the app's own "›" at the end of its value.
     void apply(const std::vector<std::pair<const char*, const char*>>& icons);
 
-    // A tab's state in one line at its top, as the Play timer's week: a
-    // kicker (`kicker`, in capitals) and the line in the display face, under
-    // the read-only note when the tab has one. After apply(); the tab sets
-    // the line's text and colour as its state changes.
-    brls::Label* headline(const std::string& kicker);
-
     // The card holding this cell (after apply()).
     Card* card_of(const char* id) const;
 

@@ -604,9 +604,6 @@
         "dns_note": "Atmosphère의 DNS 리디렉션(atmosphere/hosts)이 닌텐도 자녀 보호 서버를 다른 곳으로 돌리고 있습니다. 스마트폰 앱이 동기화할 수 없으므로 여기에서 변경한 설정을 덮어쓰지 않습니다."
     },
     "security": {
-        "headline_none": "아직 PIN 없음: 누구나 설정을 바꿀 수 있습니다",
-        "headline_unlocked": "일시적으로 해제됨",
-        "headline_active": "PIN으로 보호됨",
         "section_status": "상태",
         "pin": "PIN",
         "restrictions": "제한 사용 중",
@@ -705,10 +702,6 @@
         "note_old_module": "PIN 없이는 여기서 아무것도 바꿀 수 없으며, PlayGuard는 평소처럼 열립니다. 컴퓨터에서 모듈을 업데이트하세요: PlayGuard {}의 playguard-rescue.zip을 SD 카드 루트에 압축 해제하고, RESCUE 파일을 다시 넣은 뒤 본체를 재시작하세요."
     },
     "tools": {
-        "headline_kicker": "이 본체",
-        "headline_ok": "확인할 항목 없음",
-        "headline_one": "확인할 항목 1개",
-        "headline": "확인할 항목 {}개",
         "section_diag": "진단",
         "section_reports": "보고서",
         "section_system": "시스템",
