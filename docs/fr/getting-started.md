@@ -1,7 +1,7 @@
 <!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
 # Prise en main
 
-De la carte SD à une console réglée pour votre enfant, en une dizaine de minutes, puis les tâches du quotidien. Retour au [README](../../README.fr.md).
+De la carte SD à une console réglée pour votre enfant, en une dizaine de minutes, puis les tâches du quotidien. Retour au [README](../../README.md).
 
 ## Avant de commencer
 

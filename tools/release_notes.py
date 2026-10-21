@@ -59,6 +59,8 @@ FIGURES = {
     "Bug Fixes": ("🐞", "fix", "fixes"),
     "Polish": ("✨", "polish", "polish"),
 }
+# The website (tools/build_site.py): the latest release's documentation at docs/.
+SITE_URL = "https://playguard.link/"
 MAX_SCREENS = 12
 HIDE, SHOW = "<!-- console:hide -->", "<!-- /console -->"
 
@@ -69,10 +71,10 @@ INSTALL = """## 📦 Install
 
 2. **Already installed?** Update from PlayGuard itself (*About › Update*), sphaira or the Homebrew App Store. The app alone: [`playguard.nro`]({dl}/playguard.nro){size_nro}.
 
-3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({repo}/blob/main/docs/troubleshooting.md#locked-out).
+3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({site}docs/troubleshooting/#locked-out).
 
 > [!NOTE]
-> Requires custom firmware (**Atmosphère**).{firmware} [Compatibility]({repo}#compatibility)"""
+> Requires custom firmware (**Atmosphère**).{firmware} [Compatibility]({site}docs/compatibility/)"""
 
 
 def strip_emoji(s: str) -> str:
@@ -286,7 +288,7 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
         out.append("## 🖼️ On screen\n\n" + folded("Screens that look different",
                                                    plural(len(shown), "screen") + ", before and after", "\n".join(rows)))
 
-    out.append(INSTALL.format(dl=dl, repo=repo, firmware=firmware, size_zip=size("playguard.zip"),
+    out.append(INSTALL.format(dl=dl, site=SITE_URL, firmware=firmware, size_zip=size("playguard.zip"),
                               size_nro=size("playguard.nro"), size_rescue=size("playguard-rescue.zip")))
 
     build = []

@@ -1,10 +1,12 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "app.hpp"
 
+#include <cctype>
 #include <cstdlib>
 
 #include "core/platform.h"
 #include "core/sim_env.h"
+#include "ui/live_prefs.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -82,6 +84,23 @@ void set_self_path(const char* argv0)
         s_self_path = path.substr(prefix.size() - 1);
 }
 const char* repo_url()         { return "https://github.com/JigSawFr/PlayGuard"; }
+const char* site_url()         { return "https://playguard.link/"; }
+
+std::string doc_url(const std::string& page, const std::string& anchor)
+{
+    // The site's folder of a language: its code in lower case, English at
+    // the root (and for a language the site does not have).
+    static const char* const FOLDERS[] = {"fr", "fr-ca", "de", "es", "es-419", "it", "nl", "pt",
+                                          "pt-br", "ru", "ja", "ko", "zh-hans", "zh-hant"};
+    std::string lang = live_prefs::locale();
+    for (char& c : lang) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    std::string url = site_url();
+    for (const char* folder : FOLDERS)
+        if (lang == folder) url += lang + "/";
+    url += (is_release() ? "docs/" : "docs/dev/") + page + "/";
+    if (!anchor.empty()) url += "#" + anchor;
+    return url;
+}
 
 bool in_focus()
 {

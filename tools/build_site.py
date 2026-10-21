@@ -331,6 +331,7 @@ def rewrite_links(body, source, lang, to_root, assets):
             if prefix == "docs/" and not DOCSET.tag and release_serves(name[:-3], lang):
                 prefix = "docs/dev/"
             return f"{to_root}{lang_dir(lang)}{prefix}{name[:-3]}/{anchor}"
+        # README.fr.md: the releases up to 1.2.0 had one, their French pages link to it.
         if path in ("README.md", "README.fr.md"):
             return f"{to_root}{lang_dir(lang)}{anchor}"
         # The console's in the page's language: main's only (a release keeps its own).
@@ -927,11 +928,20 @@ def doc_body(t, lang, to_root, page_name, assets):
         new = set()
     places = iter(range(count))
     badge = f' <span class="new-badge">{t("doc_new")}</span>'
+    # A translation's sections answer to the English anchors too (data-en,
+    # site.js): the app's links (app::doc_url) name the English ones.
+    english = english_headings(DOCSET.root, page_name) if translated and lang != "en-US" else []
+    if len(english) != count:
+        english = []
+
+    def heading(m):
+        at = next(places)
+        alias = f' data-en="{english[at]}"' if english and english[at] != m.group(2) else ""
+        return (f'<{m.group(1)} id="{m.group(2)}"{alias}>{m.group(3)}{badge if at in new else ""}'
+                f'<a class="anchor" href="#{m.group(2)}"'
+                f' aria-label="{t("anchor_link")}"></a></{m.group(1)}>')
     # A link to each section, to share it.
-    shown = re.sub(r'<(h[23]) id="([^"]+)">(.*?)</h[23]>',
-                   lambda m: f'<{m.group(1)} id="{m.group(2)}">{m.group(3)}{badge if next(places) in new else ""}'
-                             f'<a class="anchor" href="#{m.group(2)}"'
-                             f' aria-label="{t("anchor_link")}"></a></{m.group(1)}>', shown, flags=re.S)
+    shown = re.sub(r'<(h[23]) id="([^"]+)">(.*?)</h[23]>', heading, shown, flags=re.S)
     # The pages before and after this one, in the sidebar's order.
     names = [p for p, _ in DOCSET.pages]
     at = names.index(page_name)

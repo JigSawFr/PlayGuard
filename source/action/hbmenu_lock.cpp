@@ -328,7 +328,7 @@ void rescue_sheet(bool locked)
     side->setAlignItems(brls::AlignItems::CENTER);
     side->setMarginLeft(20);
     side->setShrink(0);
-    auto* qr = new QrView(std::string(app::repo_url()) + "/blob/main/docs/troubleshooting.md#homebrew-menu-locked", 168);
+    auto* qr = new QrView(app::doc_url("troubleshooting", "homebrew-menu-locked"), 168);
     side->addView(qr);
     brls::Label* caption = kit::label("playguard/hbmenu/rescue_qr"_i18n, 13.5f, "cadran/text3");
     caption->setHorizontalAlign(brls::HorizontalAlign::CENTER);
