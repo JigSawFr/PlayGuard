@@ -282,4 +282,20 @@ std::vector<std::string> list_files(const std::string& dir, const std::string& s
     return names;
 }
 
+std::vector<std::string> list_dirs(const std::string& dir)
+{
+    std::vector<std::string> names;
+    DIR* d = opendir(dir.c_str());
+    if (!d) return names;
+    while (dirent* e = readdir(d)) {
+        const std::string n = e->d_name;
+        if (n == "." || n == "..") continue;
+        struct stat st;
+        if (stat((dir + "/" + n).c_str(), &st) == 0 && S_ISDIR(st.st_mode)) names.push_back(n);
+    }
+    closedir(d);
+    std::sort(names.begin(), names.end());
+    return names;
+}
+
 }   // namespace paths

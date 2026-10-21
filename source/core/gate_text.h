@@ -22,6 +22,12 @@ typedef enum {
     GateText_Tried,        // "Refused today: %d" (printf: an int)
     GateText_FreeHours,    // "Without the PIN: %s" (printf: gate_hours_text's)
     GateText_Days,         // "Sun,Mon,…,Sat": the days' short names, Sunday first, by commas
+    GateText_Paused,       // paused after refusals (GatePauseRule)
+    GateText_PausedUntil,  // "It asks again at %s." (printf: "21:30")
+    GateText_PausedHint,
+    GateText_Closed,       // in its hours without any access (GATE_CLOSED_NAME)
+    GateText_ClosedHours,  // "Closed: %s" (printf: gate_hours_text's)
+    GateText_ClosedHint,
     GateText_Count,
 } GateText;
 

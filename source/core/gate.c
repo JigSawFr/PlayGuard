@@ -123,6 +123,8 @@ const char *gate_result_name(GateResult r)
         case GateResult_Pin: return "pin";
         case GateResult_Free: return "free";
         case GateResult_Refused: return "refused";
+        case GateResult_Paused: return "paused";
+        case GateResult_Closed: return "closed";
         default: return "error";
     }
 }
@@ -157,6 +159,8 @@ bool gate_log_parse(const char *line, size_t len, const char **when, size_t *whe
     else if (name_len == 4 && memcmp(rest, "free", 4) == 0) res = GateResult_Free;
     else if (name_len == 7 && memcmp(rest, "refused", 7) == 0) res = GateResult_Refused;
     else if (name_len == 5 && memcmp(rest, "error", 5) == 0) res = GateResult_Error;
+    else if (name_len == 6 && memcmp(rest, "paused", 6) == 0) res = GateResult_Paused;
+    else if (name_len == 6 && memcmp(rest, "closed", 6) == 0) res = GateResult_Closed;
     else return false;
     const char *path = tab2 + 1;
     const size_t path_len = len - (size_t)(path - line);
@@ -223,4 +227,208 @@ size_t gate_hours_text(const GateHours *h, const char *days, char *buf, size_t s
         return 0;
     }
     return (size_t)n;
+}
+
+// The pause file, line by line: `fn` with each line (without "\n", "\r").
+typedef bool (*LineFn)(const char *line, size_t n, void *ctx);
+static void each_line(const char *text, size_t len, LineFn fn, void *ctx)
+{
+    for (size_t at = 0; text && at < len;) {
+        const char *line = text + at;
+        size_t n = 0;
+        while (at + n < len && line[n] != '\n') n++;
+        at += n + 1;
+        size_t m = n;
+        if (m > 0 && line[m - 1] == '\r') m--;
+        if (!fn(line, m, ctx)) return;
+    }
+}
+
+// A decimal number up to `stop` (or the line's end when stop is 0).
+static bool decimal(const char **p, const char *end, char stop, uint64_t max, uint64_t *out)
+{
+    uint64_t v = 0;
+    const char *s = *p;
+    if (s >= end || *s == stop) return false;
+    for (; s < end && *s != stop; s++) {
+        if (*s < '0' || *s > '9') return false;
+        v = v * 10 + (uint64_t)(*s - '0');
+        if (v > max) return false;
+    }
+    if (stop && s >= end) return false;
+    *out = v;
+    *p = s < end ? s + 1 : s;
+    return true;
+}
+
+struct RuleCtx {
+    GatePauseRule rule;
+};
+static bool rule_line(const char *line, size_t n, void *ctx)
+{
+    const char *p = line, *end = line + n;
+    if (n < 5 || memcmp(line, "rule\t", 5) != 0) return true;
+    p += 5;
+    uint64_t tries, minutes;
+    if (decimal(&p, end, '\t', 1000, &tries) && decimal(&p, end, 0, 24 * 60, &minutes) && p == end) {
+        ((struct RuleCtx *)ctx)->rule.tries = (unsigned)tries;
+        ((struct RuleCtx *)ctx)->rule.minutes = (unsigned)minutes;
+    }
+    return false;
+}
+
+GatePauseRule gate_pause_rule(const char *text, size_t len)
+{
+    struct RuleCtx c = { { GATE_PAUSE_TRIES, GATE_PAUSE_MINUTES } };
+    each_line(text, len, rule_line, &c);
+    if (c.rule.minutes == 0) c.rule.tries = 0;   // a pause of nothing: none
+    return c.rule;
+}
+
+// A forwarder's line: its streak, its end, its .nro.
+static bool entry_of(const char *line, size_t n, unsigned *streak, uint64_t *until, const char **nro, size_t *nro_len)
+{
+    const char *p = line, *end = line + n;
+    uint64_t s, u;
+    if (n >= 5 && memcmp(line, "rule\t", 5) == 0) return false;
+    if (!decimal(&p, end, '\t', 1000000, &s) || !decimal(&p, end, '\t', UINT64_MAX / 10, &u) || p >= end) return false;
+    *streak = (unsigned)s;
+    *until = u;
+    *nro = p;
+    *nro_len = (size_t)(end - p);
+    return true;
+}
+
+struct FindCtx {
+    const char *nro;
+    size_t      nro_len;
+    bool        found;
+    unsigned    streak;
+    uint64_t    until;
+};
+static bool find_line(const char *line, size_t n, void *ctx)
+{
+    struct FindCtx *c = (struct FindCtx *)ctx;
+    unsigned s;
+    uint64_t u;
+    const char *p;
+    size_t pn;
+    if (entry_of(line, n, &s, &u, &p, &pn) && pn == c->nro_len && memcmp(p, c->nro, pn) == 0) {
+        c->found = true;
+        c->streak = s;
+        c->until = u;
+        return false;
+    }
+    return true;
+}
+
+bool gate_pause_find(const char *text, size_t len, const char *nro, unsigned *streak, uint64_t *until)
+{
+    if (!nro) return false;
+    struct FindCtx c = { nro, strlen(nro), false, 0, 0 };
+    each_line(text, len, find_line, &c);
+    if (streak) *streak = c.found ? c.streak : 0;
+    if (until) *until = c.found ? c.until : 0;
+    return c.found;
+}
+
+// Writes into an output buffer, tracking overflow.
+struct Out {
+    char  *buf;
+    size_t size, n;
+    bool   over;
+};
+static void put(struct Out *o, const char *s, size_t n)
+{
+    if (o->over || o->n + n >= o->size) {
+        o->over = true;
+        return;
+    }
+    memcpy(o->buf + o->n, s, n);
+    o->n += n;
+    o->buf[o->n] = '\0';
+}
+
+struct CopyCtx {
+    struct Out *out;
+    const char *skip;         // the .nro whose line goes (NULL: none)
+    size_t      skip_len;
+    bool        rule;         // copy the rule line
+};
+static bool copy_line(const char *line, size_t n, void *ctx)
+{
+    struct CopyCtx *c = (struct CopyCtx *)ctx;
+    unsigned s;
+    uint64_t u;
+    const char *p;
+    size_t pn;
+    if (n >= 5 && memcmp(line, "rule\t", 5) == 0) {
+        // Only one that reads as a rule.
+        struct RuleCtx r = { { 1001, 0 } };
+        rule_line(line, n, &r);
+        if (!c->rule || r.rule.tries > 1000) return true;
+    } else if (!entry_of(line, n, &s, &u, &p, &pn)) {
+        return true;   // nothing PlayGuard or the gate wrote
+    } else if (c->skip && pn == c->skip_len && memcmp(p, c->skip, pn) == 0) {
+        return true;
+    }
+    put(c->out, line, n);
+    put(c->out, "\n", 1);
+    return true;
+}
+
+static size_t finish(struct Out *o)
+{
+    if (o->over) {
+        if (o->size) o->buf[0] = '\0';
+        return 0;
+    }
+    return o->n;
+}
+
+size_t gate_pause_update(const char *text, size_t len, const char *nro, GateResult r, uint64_t now, char *out,
+                         size_t size)
+{
+    if (!out || size == 0 || !nro || !*nro || strpbrk(nro, "\t\r\n")) return 0;
+    out[0] = '\0';
+    struct Out o = { out, size, 0, false };
+    // Opened: its line goes; refused: written again below; anything else
+    // (paused, closed, the PIN screen not opened): as it was.
+    const bool rewrite = r == GateResult_Pin || r == GateResult_Free || r == GateResult_Refused;
+    struct CopyCtx c = { &o, rewrite ? nro : NULL, rewrite ? strlen(nro) : 0, true };
+    each_line(text, len, copy_line, &c);
+    if (r == GateResult_Refused) {
+        const GatePauseRule rule = gate_pause_rule(text, len);
+        unsigned streak = 0;
+        uint64_t until = 0;
+        gate_pause_find(text, len, nro, &streak, &until);
+        // A pause over: counted again from nothing.
+        if (until && until <= now) streak = 0, until = 0;
+        streak++;
+        if (rule.tries && streak >= rule.tries) {
+            until = now + (uint64_t)rule.minutes * 60u;
+            streak = 0;
+        }
+        char line[64];
+        const int n = snprintf(line, sizeof(line), "%u\t%llu\t", streak, (unsigned long long)until);
+        if (n > 0) put(&o, line, (size_t)n);
+        put(&o, nro, strlen(nro));
+        put(&o, "\n", 1);
+    }
+    return finish(&o);
+}
+
+size_t gate_pause_edit(const char *text, size_t len, const GatePauseRule *rule, const char *nro, char *out, size_t size)
+{
+    if (!out || size == 0) return 0;
+    out[0] = '\0';
+    struct Out o = { out, size, 0, false };
+    if (rule) {
+        char line[64];
+        const int n = snprintf(line, sizeof(line), "rule\t%u\t%u\n", rule->tries, rule->minutes);
+        if (n > 0) put(&o, line, (size_t)n);
+    }
+    struct CopyCtx c = { &o, nro, nro ? strlen(nro) : 0, rule == NULL };
+    each_line(text, len, copy_line, &c);
+    return finish(&o);
 }

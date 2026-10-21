@@ -1061,7 +1061,28 @@
         "group_open": "無需PIN碼",
         "group_elsewhere": "由其他應用程式建立",
         "group_gone": "已不在HOME選單",
-        "state_verified": "已驗證"
+        "state_verified": "已驗證",
+        "closed_set": "{}從不開啟：{}",
+        "closed_none": "{}不再有禁止使用的時段",
+        "pause_err": "PIN碼被拒後的暫停未變更",
+        "pause_set": "PIN碼被拒後：{}",
+        "pause_off": "從不",
+        "pause_rule": "連續{}次：暫停{}",
+        "pause_lifted": "{}再次要求PIN碼",
+        "icon_set": "{}已使用新圖示",
+        "icon_own": "其.nro的圖示",
+        "icon_none": "相簿中沒有截圖：請先截一張（擷取鈕），再回到這裡。",
+        "icon_title": "在HOME選單上的圖示",
+        "action_closed": "禁止使用的時段",
+        "action_lift": "解除暫停",
+        "action_icon": "更換圖示",
+        "closed_title": "禁止使用的時段（無論有無PIN碼）",
+        "state_paused": "暫停至{}",
+        "state_closed": "關閉 {}",
+        "pause_cell": "PIN碼被拒後暫停",
+        "pause_default": "預設",
+        "paused_line": "{}：至{}",
+        "paused_title": "一個轉發器因PIN碼被拒而暫停"
     },
     "hbmenu": {
         "section": "自製軟體選單",
@@ -1158,7 +1179,9 @@
         "setup_progress": "第{}步，共{}步",
         "verify_title": "從HOME選單啟動{}一次",
         "verify_how": "退出PlayGuard，在HOME選單點{}的圖示啟動並輸入PIN碼：選單開啟後，PlayGuard就知道這條返回途徑可用。然後回到這裡。",
-        "summary_doors": "無需PIN碼即可開啟：{}"
+        "summary_doors": "無需PIN碼即可開啟：{}",
+        "rescue_written": "寫於{}",
+        "rescue_print": "列印用：SD卡上的{}"
     },
     "about": {
         "section_changelog": "{} 更新內容",
@@ -1221,7 +1244,11 @@
         "before_delete_err": "無法事先儲存備份（{}）。\n\n仍要刪除所有設定嗎？",
         "delete_anyway": "仍要刪除",
         "bedtime_not_restored": "此備份中開啟了就寢鬧鐘：不會復原，如有需要請在「遊玩時間限制」中重新設定。",
-        "backed_up_on": "於{}備份的設定。"
+        "backed_up_on": "於{}備份的設定。",
+        "forwarders_body": "此備份中還有{}個已不在HOME選單上的轉發器：{}。要復原嗎？",
+        "forwarders_put_back": "復原",
+        "forwarders_lock_title": "自製軟體選單曾被鎖定",
+        "forwarders_lock": "製作此備份時它處於鎖定狀態。請在主機 › 轉發器中重新鎖定：先進行檢查。"
     },
     "update": {
         "checking": "正在檢查更新…",
@@ -1503,7 +1530,12 @@
             "gate_open": "已以PIN碼開啟轉發器",
             "gate_free": "在時段內免PIN碼開啟轉發器",
             "gate_refused": "轉發器被拒絕（未輸入PIN碼）",
-            "gate_hours": "轉發器的免PIN碼時段"
+            "gate_hours": "轉發器的免PIN碼時段",
+            "gate_paused": "轉發器暫停（PIN碼被拒次數過多）",
+            "gate_closed": "轉發器關閉（禁止使用的時段）",
+            "gate_closed_hours": "轉發器的禁止使用時段",
+            "gate_pause": "PIN碼被拒後暫停",
+            "gate_pause_lifted": "轉發器暫停已解除"
         },
         "sources": {
             "uniform": "每天相同上限",

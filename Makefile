@@ -134,6 +134,8 @@ rescue_FLAGS := -std=c11 -Isource/core
 gate_screen_SRC   := source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c tests/gate_screen/test.c
 gate_screen_FLAGS := -std=gnu11 -Isource/core -Iextern/stb -isystem extern/borealis/library/include
 gate_screen_LIBS  := -lm
+rescue_page_SRC   := source/util/rescue_page.cpp extern/qrcodegen/qrcodegen.cpp tests/rescue_page/test.cpp
+rescue_page_FLAGS := $(TEST_CXXFLAGS) -Isource -isystem extern/qrcodegen
 gate_SRC   := source/core/gate.c tests/gate/test.c
 gate_FLAGS := -std=gnu11 -Isource/core
 hbl_lock_SRC   := source/core/hbl_lock.c tests/hbl_lock/test.c
@@ -190,8 +192,8 @@ worker_threads_LIBS  := -pthread
 data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
 outside_change_logic_SRC   := source/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
-backup_SRC   := source/util/paths.cpp source/util/backup.cpp tests/backup/test.cpp
-backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
+backup_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/forwarders.cpp tests/backup/test.cpp
+backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/forwarders.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
 http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
 table_export_SRC   := source/util/paths.cpp source/util/zip_write.cpp source/util/table_export.cpp source/util/table_export_csv.cpp source/util/table_export_json.cpp source/util/table_export_xlsx.cpp source/util/table_export_pdf.cpp tests/table_export/test.cpp
 table_export_LIBS  := -lz
@@ -241,7 +243,7 @@ crash_dump_FLAGS := -std=c11 -Isource/util
 # The desktop and web simulators' console (source/sim/*.c, sim_state.h) and
 # their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
 # parts of the service layer they share with the console.
-sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
+sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/util/forwarders.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
 sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
                       $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c) source/util/playlog.c
 # Atomic coverage counters: the suite runs the same code from several threads
