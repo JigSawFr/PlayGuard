@@ -1158,8 +1158,8 @@ if ERRORS:
     key("Down", 4)             # past Region, Server, Enter a server name: Measure
     key("Return")
     time.sleep(1)
-    key("Down")                # Set the network clock to the console clock
-    shot("06_clock_offline")   # "No server answered", then the console clock offered
+    shot("06_clock_offline")   # the result's dialog: "No server answered", the console clock offered
+    key("Right")               # Use the console clock
     key("Return")
     shot("07_clock_copy_confirm")
     key("Right")               # Set the clock

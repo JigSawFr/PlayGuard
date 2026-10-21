@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 79a7afe38927 -->
+<!-- translated from docs/features.md, sha256 506969ff34bc -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -346,12 +346,12 @@ Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enr
 
 - **Horloges console et réseau**, fuseau horaire, précision. Quand la redirection DNS d'Atmosphère (`atmosphere/hosts`) envoie ailleurs le serveur d'heure de Nintendo (`aauth-lp1.ndas.srv.nintendo.net`), la console ne peut plus régler son horloge réseau elle-même : cet écran, l'entrée de la cloche et la carte d'*Aujourd'hui* le disent et renvoient à la mesure ci-dessous.
 - **Choix d'un serveur NTP public** (≈ 50 intégrés, par région, ou le vôtre).
-- **Mesure** sur 3 serveurs (médiane ; alerte orange en cas de désaccord), puis **réglage de l'horloge réseau** — une mesure reste utilisable 2 minutes, avec un décompte. La confirmation le dit : changer l'horloge remet à zéro le temps de jeu du jour, toute la limite redevient donc disponible.
+- **Mesure** sur 3 serveurs (médiane ; alerte orange en cas de désaccord) : une fenêtre affiche le résultat — l'avance ou le retard de l'horloge réseau, en grand, l'heure des serveurs face à celle de l'horloge réseau, la réponse de chaque serveur — et règle l'horloge réseau depuis là. Une mesure reste utilisable 2 minutes, avec un décompte sous *Régler l'horloge réseau*. La confirmation le dit : changer l'horloge remet à zéro le temps de jeu du jour, toute la limite redevient donc disponible.
 - **Vérification de l'horloge réseau au lancement** : une notification si elle a plus d'une minute d'écart ; elle ne règle jamais l'horloge.
 
 #### Aucun serveur ne répond
 
-Sur une console sans Internet, *Régler l'horloge réseau sur l'horloge de la console* apparaît sous le résultat (et sur la carte de l'horloge réseau d'*Aujourd'hui*, quand sa mesure échoue), derrière la même confirmation.
+Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé dans la fenêtre du résultat, *Régler l'horloge réseau sur l'horloge de la console* sous la mesure (et sur la carte de l'horloge réseau d'*Aujourd'hui*, quand sa mesure échoue), derrière la même confirmation.
 
 - PlayGuard n'a rien d'autre pour comparer l'horloge de la console : la confirmation affiche son heure et demande de la vérifier d'abord avec un téléphone ou une montre, et une horloge de console antérieure à 2026 (jamais réglée) est refusée.
 - Avec *Synchroniser l'horloge via Internet* désactivé, l'horloge de la console ne bouge pas, et activer le réglage ensuite ne la fait plus sauter ; s'il est activé, l'horloge de la console suit déjà l'horloge réseau, et la confirmation indique de le désactiver et de régler l'heure à la main si elle est fausse.

@@ -345,12 +345,12 @@ Two confirmations, irreversible; a backup of the settings is saved first.
 
 - **Console and network clocks**, time zone, accuracy. When Atmosphère's DNS redirection (`atmosphere/hosts`) sends Nintendo's time server (`aauth-lp1.ndas.srv.nintendo.net`) elsewhere, the console can no longer set its network clock itself: this screen, the bell's entry and *Today*'s card say so and point to the measurement below.
 - **Pick a public NTP server** (≈ 50 built in, by region, or your own).
-- **Measure** against 3 servers (median; an amber warning when they disagree), then **set the network clock** — a measurement stays usable for 2 minutes, with a countdown. The confirmation says it: changing the clock starts today's play time over, so the whole limit is available again.
+- **Measure** against 3 servers (median; an amber warning when they disagree): a dialog shows the result — how far the network clock is ahead or behind, in large, the servers' time beside the network clock's, each server's answer — and sets the network clock from there. A measurement stays usable for 2 minutes, with a countdown under *Set the network clock*. The confirmation says it: changing the clock starts today's play time over, so the whole limit is available again.
 - **A network-clock check at start-up**: a toast when it is more than a minute off; it never sets the clock.
 
 #### No server answers
 
-On a console without Internet, *Set the network clock to the console clock* appears under the result (and on *Today*'s network clock card, after its measurement fails), behind the same confirmation.
+On a console without Internet, *Use the console clock* is offered in the result's dialog, *Set the network clock to the console clock* under the measurement (and on *Today*'s network clock card, after its measurement fails), behind the same confirmation.
 
 - PlayGuard has nothing else to compare the console clock with: the confirmation shows its time and asks you to check it against a phone or a watch first, and a console clock before 2026 (never set) is refused.
 - With *Synchronize Clock via Internet* off, the console clock stays where it is, and turning the setting on afterwards no longer makes it jump; with it on, the console clock already follows the network clock, so the confirmation says to turn it off and set the time by hand if it is wrong.

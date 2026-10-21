@@ -174,17 +174,25 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
             Measurement m;
             m.server = hosts.front();
             m.at     = ref;
+            m.offset_known    = R_SUCCEEDED(s.network_rc);
+            m.network_seconds = m.offset_known ? s.network_time : 0;
             for (size_t i = 0; i < hosts.size(); i++) {
                 const auto& r = replies[i];
+                ServerLine line;
+                line.host = hosts[i];
+                line.ok   = r.ok;
                 if (r.ok) {
                     const int64_t now_est = (int64_t)r.unix_seconds +
                         std::chrono::duration_cast<std::chrono::seconds>(ref - r.received_at).count();
-                    const std::string diff = R_SUCCEEDED(s.network_rc) ? signed_seconds(now_est - (int64_t)s.network_time) : "?";
-                    m.report += brls::getStr("playguard/clock/result_line_ok", hosts[i], ui::time_text((uint64_t)now_est), diff);
+                    line.unix_seconds = (uint64_t)now_est;
+                    line.offset = m.offset_known ? signed_seconds(now_est - (int64_t)s.network_time) : "?";
+                    m.report += brls::getStr("playguard/clock/result_line_ok", hosts[i], ui::time_text((uint64_t)now_est), line.offset);
                 } else {
-                    m.report += brls::getStr("playguard/clock/result_line_err", hosts[i], ntp_error_text(r));
+                    line.error = ntp_error_text(r);
+                    m.report += brls::getStr("playguard/clock/result_line_err", hosts[i], line.error);
                     brls::Logger::info("NTP {}: {}", hosts[i], r.error);
                 }
+                m.lines.push_back(line);
                 m.report += "\n";
             }
             if (estimates.empty()) {
@@ -204,7 +212,8 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
             }
             m.unix_seconds = (uint64_t)median;
             m.spread       = estimates.back() - estimates.front();
-            const std::string diff = R_SUCCEEDED(s.network_rc) ? signed_seconds((int64_t)m.unix_seconds - (int64_t)s.network_time) : "?";
+            if (m.offset_known) m.offset = (int64_t)m.unix_seconds - (int64_t)s.network_time;
+            const std::string diff = m.offset_known ? signed_seconds(m.offset) : "?";
             m.report += brls::getStr("playguard/clock/result_summary", ui::time_text(m.unix_seconds), diff);
             if (m.spread > 5) m.warning = brls::getStr("playguard/clock/result_spread", (int)m.spread);
             done(m);
@@ -212,6 +221,20 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
     };
     // Its spinner is on screen: not behind the play log or the game icons.
     ui::in_background("NTP", run);
+}
+
+std::string offset_text(int64_t offset)
+{
+    // Within a second: the servers' answers are rounded to the second.
+    if (offset >= -1 && offset <= 1) return "playguard/clock/on_time"_i18n;
+    const uint64_t a = offset < 0 ? (uint64_t)(-(offset + 1)) + 1 : (uint64_t)offset;
+    std::string span;
+    if (a >= 86400) span = brls::getStr("playguard/clock/days", (unsigned long long)(a / 86400));
+    else if (a >= 3600) span = brls::getStr("playguard/common/hours_minutes", (int)(a / 3600), fmt::format("{:02}", (int)(a % 3600 / 60)));
+    else if (a >= 60) span = brls::getStr("playguard/common/min_sec", (int)(a / 60), (int)(a % 60));
+    else span = brls::getStr("playguard/common/sec", (int)a);
+    // The servers ahead of the network clock: it is behind.
+    return brls::getStr(offset > 0 ? "playguard/clock/behind" : "playguard/clock/ahead", span);
 }
 
 int64_t seconds_left(const Measurement& m)
