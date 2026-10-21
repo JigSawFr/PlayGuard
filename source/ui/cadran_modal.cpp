@@ -2,6 +2,7 @@
 #include "ui/cadran_modal.hpp"
 
 #include <algorithm>
+#include <fmt/format.h>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -400,6 +401,68 @@ brls::Box* cadran::wait_body(const std::string& text)
     box->addView(spinner);
     box->addView(label);
     return box;
+}
+
+void cadran::Progress::show(float fraction, const std::string& text)
+{
+    fraction = std::min(1.0f, std::max(0.0f, fraction));
+    this->bar->set(fraction);
+    this->percent->setText(fmt::format("{} %", (int)(fraction * 100 + 0.001f)));
+    this->detail->setText(text);
+}
+
+cadran::Progress cadran::progress_body(const std::string& heading, const std::string& title, const std::string& note)
+{
+    Progress p;
+    p.box = new brls::Box(brls::Axis::COLUMN);
+    p.box->setAlignItems(brls::AlignItems::STRETCH);
+    p.box->setPadding(26, 36, 20, 36);
+
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
+    p.image = new brls::Image();
+    p.image->setScalingType(brls::ImageScalingType::FIT);
+    p.image->setWidth(56);
+    p.image->setHeight(56);
+    p.image->setMarginRight(16);
+    ui::set_visible(p.image, false);
+    head->addView(p.image);
+    auto* titles = new brls::Box(brls::Axis::COLUMN);
+    titles->setGrow(1.0f);
+    titles->setShrink(1.0f);
+    p.heading = kit::label(heading, 18, "cadran/text3");
+    titles->addView(p.heading);
+    p.title = kit::label(title, 22, "cadran/text");
+    p.title->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
+    p.title->setMarginTop(2);
+    titles->addView(p.title);
+    head->addView(titles);
+    p.box->addView(head);
+
+    p.bar = new kit::Bar();
+    p.bar->setMarginTop(22);
+    p.box->addView(p.bar);
+    auto* numbers = new brls::Box(brls::Axis::ROW);
+    numbers->setAlignItems(brls::AlignItems::CENTER);
+    numbers->setMarginTop(10);
+    p.percent = kit::label("", 22, "cadran/text");
+    p.percent->setSingleLine(true);
+    p.percent->setMarginRight(14);
+    numbers->addView(p.percent);
+    p.detail = kit::label("", 18, "cadran/text3");
+    p.detail->setSingleLine(true);
+    p.detail->setGrow(1.0f);
+    p.detail->setShrink(1.0f);
+    p.detail->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+    numbers->addView(p.detail);
+    p.box->addView(numbers);
+
+    if (!note.empty()) {
+        brls::Label* label = kit::label(note, 18, "cadran/text3");
+        label->setMarginTop(16);
+        p.box->addView(label);
+    }
+    return p;
 }
 
 void cadran::prompt_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value)

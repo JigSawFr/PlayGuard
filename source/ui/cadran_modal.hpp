@@ -11,6 +11,8 @@
 #include <functional>
 #include <string>
 
+#include "ui/cadran_kit.hpp"
+
 namespace cadran
 {
 // Under a dressed dialog's content: its button row (a 56 px pill and 24 px
@@ -56,6 +58,26 @@ void style_button(brls::Button* button, Emphasis emphasis = Emphasis::NONE);
 // A dialog's body while something is under way: a spinner, and what is being
 // done under it, centred.
 brls::Box* wait_body(const std::string& text);
+
+// A dialog's body while something measurable is under way, left-aligned: a
+// head (an image, hidden until it is given one; what is under way, small;
+// a title cut to one line), a bar, the share done under its start and what it amounts to under
+// its end, a note under them (hidden when empty). What comes after (a
+// button) goes on `box`.
+struct Progress
+{
+    brls::Box*   box     = nullptr;
+    brls::Image* image   = nullptr;
+    brls::Label* heading = nullptr;
+    brls::Label* title   = nullptr;
+    kit::Bar*    bar     = nullptr;
+    brls::Label* percent = nullptr;
+    brls::Label* detail  = nullptr;
+
+    // `fraction` (0..1) on the bar and as "43 %", `detail` at the end.
+    void show(float fraction, const std::string& detail);
+};
+Progress progress_body(const std::string& heading, const std::string& title, const std::string& note = "");
 
 // A duration chosen with the stick, in place of the system number pad: up /
 // down 15 min, L / R 5 min (or a tap on the arrows), from 0 to 24:00, OK
