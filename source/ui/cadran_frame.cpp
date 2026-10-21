@@ -105,9 +105,11 @@ void cadran::install_theme()
         t->addColor("cadran/knob_line", nvgRGBA(0x0B, 0x14, 0x24, 40));
         t->addColor("cadran/bar", p == dark ? nvgRGB(0x33, 0x48, 0x6B) : nvgRGB(0xB9, 0xC6, 0xDA));
         t->addColor("cadran/bar_today", p == dark ? nvgRGB(0x5A, 0x71, 0x96) : nvgRGB(0x7E, 0x90, 0xAE));
-        // Behind a dialog or a picker: the navy, dimmed. A toast: a card of
-        // the second surface on the dark theme, navy on the light one.
-        t->addColor("brls/backdrop", p == dark ? nvgRGBA(3, 8, 18, 190) : nvgRGBA(0x0B, 0x14, 0x24, 115));
+        // Behind a dialog or a picker: the navy, dimmed enough that the screen
+        // under it does not read through around a dialog's text and QR codes.
+        // A toast: a card of the second surface on the dark theme, navy on
+        // the light one.
+        t->addColor("brls/backdrop", p == dark ? nvgRGBA(3, 8, 18, 225) : nvgRGBA(0x0B, 0x14, 0x24, 160));
         t->addColor("brls/notification/background", p == dark ? nvgRGBA(0x1A, 0x2A, 0x45, 250) : nvgRGBA(0x0B, 0x14, 0x24, 240));
         t->addColor("brls/notification/text", p == dark ? c(p->text) : nvgRGB(0xEE, 0xF2, 0xF8));
     }

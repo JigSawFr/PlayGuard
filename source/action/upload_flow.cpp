@@ -56,9 +56,9 @@ void remember(const log_upload::Result& r)
 void show_link(const log_upload::Result& r, bool report)
 {
     if (!report) {
-        brls::Box* code = cadran::kit::qr(r.url, 220, "playguard/upload/qr_list"_i18n, text::short_url(r.url), 300);
+        brls::Box* code = cadran::kit::qr(r.url, 220, "playguard/upload/qr_list"_i18n, log_upload::link_caption(r.url), 300);
         code->setAlignSelf(brls::AlignSelf::CENTER);
-        auto* dialog = ui::dialog(brls::getStr("playguard/upload/done_list", text::short_url(r.url)), code);
+        auto* dialog = ui::dialog("playguard/upload/done_list"_i18n, code);
         dialog->addButton("hints/ok"_i18n, []() {});
         dialog->open();
         return;
@@ -76,13 +76,13 @@ void show_link(const log_upload::Result& r, bool report)
     if (const char* name = diagnostic::storage_name(storage)) fields.storage = name;
     const std::string issue = log_upload::issue_url(app::repo_url(), r.url, fields);
 
-    std::string text = brls::getStr("playguard/upload/done", text::short_url(r.url));
-
+    // The link once, under its code: the text says which code is for whom,
+    // where the link is found again and how the report is deleted.
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
-    row->addView(cadran::kit::qr(r.url, 200, "playguard/upload/qr_report"_i18n, text::short_url(r.url), 300));
+    row->addView(cadran::kit::qr(r.url, 200, "playguard/upload/qr_report"_i18n, log_upload::link_caption(r.url), 300));
     row->addView(cadran::kit::qr(issue, 200, "playguard/upload/qr_issue"_i18n, "playguard/upload/qr_issue_note"_i18n, 300));
-    auto* dialog = ui::dialog(text, row);
+    auto* dialog = ui::dialog("playguard/upload/done"_i18n, row);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
 }
