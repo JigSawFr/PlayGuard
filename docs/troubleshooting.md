@@ -79,7 +79,12 @@ Its gate (`config/playguard/gate-….nro`) is no longer the file the forwarder w
 
 ### A forwarder shows "The software could not be started"
 
-The console refused to start it: a signature check is still in place. Forwarders need sys-patch's fs and loader patches, and every pattern sys-patch has for this firmware must have applied, not only one per module. *About › Help & diagnostics › Export a diagnostic report* lists, on its `game patches` line, sys-patch's version and each pattern left out (`not patched: fs:nocntchk_19.0.0+=Unpatched`, for instance); `sd:/config/sys-patch/log.ini` holds the same. Update sys-patch to a version that supports the firmware, restart the console, then try the forwarder again: it does not need making again.
+The console refused to start it: a signature check is still in place. In the order to look:
+
+- **sigpatch files beside sys-patch.** `.ips` files in `atmosphere/kip_patches/fs_patches`, `loader_patches` or `atmosphere/exefs_patches/es_patches` while sys-patch runs: two tools patching the same checks, the cause the sys-patch and sigpatch threads on GBAtemp give most. *Console › Game patches* warns of it, and Ⓐ there sets them aside (moved to `config/playguard/sigpatches-aside/`, never deleted; hekate's `bootloader/patches.ini` stays). Restart the console.
+- **A pattern sys-patch did not apply.** Forwarders need its fs and loader patches, every pattern it has for this firmware (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), not only one per module. *About › Help & diagnostics › Export a diagnostic report* lists, on its `game patches` line, sys-patch's version and each pattern left out; `sd:/config/sys-patch/log.ini` holds the same. Check that `config/sys-patch/config.ini` patches this system (`patch_emummc=1` on emuMMC) and turns none of them off; sys-patch's own maintainer says 23.0.x needs no newer sys-patch than 1.6.2.3.
+- **No restart since the patches changed.** sys-patch patches at boot.
+- **A forwarder made by an older PlayGuard.** The bell and *Console › Forwarders* offer to make again those built with an older loader.
 
 ### The bell or a tab shows an amber badge
 

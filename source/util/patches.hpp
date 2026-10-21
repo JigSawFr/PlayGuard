@@ -92,4 +92,27 @@ bool   patched(Module m);                               // SysPatch or File
 
 const char* module_name(Module m);   // for the diagnostic report
 
+// sigpatch files (.ips for es, fs or the loader) beside sys-patch: two
+// tools patching the same checks, which GBAtemp's sys-patch and sigpatch
+// threads give as a cause of forwarders that "could not be started".
+// hekate's patches.ini alone is not counted (it applies only through
+// hekate_ipl.ini's kip1patch lines).
+bool mixed(const Report& r);
+
+// The folders of those files, from the SD card root.
+constexpr const char* SIGPATCH_DIRS[] = { "atmosphere/kip_patches/fs_patches", "atmosphere/kip_patches/loader_patches",
+                                          "atmosphere/exefs_patches/es_patches" };
+
+// Whether set_aside() may run: sys-patch installed, started at boot and
+// logged at this boot, so it patches alone once the files are gone.
+bool can_set_aside(const Report& r);
+
+// Moves each of SIGPATCH_DIRS that holds .ips files from `root` into
+// `dest` (the same path under it), on the same SD card: nothing is
+// deleted, and moving them back undoes it. hekate's patches.ini stays
+// (hekate_ipl.ini may name it). *moved gets the folders moved. False, with
+// a short English reason, when one could not be moved (those moved before
+// stay moved, and listed).
+bool set_aside(const std::string& root, const std::string& dest, std::vector<std::string>* moved, std::string* error);
+
 }   // namespace patches

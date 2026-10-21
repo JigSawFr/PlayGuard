@@ -281,6 +281,10 @@ void ForwardersActivity::fixes()
             choices.push_back({ brls::getStr("playguard/forwarders/fix_protect", r.name),
                                 [this, copy]() { forwarder_flow::set_pin(copy, true, this->then_rebuild(copy.id)); }, "key" });
     }
+    // Built with an older loader: made again, in one go.
+    if (writable && !forwarder_flow::to_refresh().empty())
+        choices.push_back({ "playguard/forwarders/refresh"_i18n, [this]() { forwarder_flow::refresh(this->then_rebuild()); },
+                            "refresh" });
     // Made before they carried their rules: made again, in one go.
     if (writable && !forwarder_flow::to_remake().empty())
         choices.push_back({ "playguard/forwarders/fix_remake"_i18n, [this]() { forwarder_flow::remake(this->then_rebuild()); },

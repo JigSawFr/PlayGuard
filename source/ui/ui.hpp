@@ -299,6 +299,8 @@ bool        patches_warning(const patches::Report& report);
 // only changes with a reboot): Today and the Console tab no longer rescan it
 // each time they are opened.
 const patches::Report& patch_report();
+// After PlayGuard itself moved patch files (sigpatch_flow): read again.
+void                   reread_patch_report();
 std::string patches_text(const patches::Report& report, NVGcolor* color = nullptr);
 // Explanation under the Game patches line ("" when there is nothing to say);
 // *warn tells whether it is a warning (amber) or a plain note.

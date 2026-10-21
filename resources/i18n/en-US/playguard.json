@@ -807,7 +807,8 @@
         "upload": "Send a report online...",
         "upload_note": "Sends a report to a secret gist in your GitHub account (sign in first if needed) and shows its link with a QR code: give it to whoever helps you, or open a bug report with it.",
         "storage_note_emummc": "This is emuMMC: sysMMC has its own parental controls, which PlayGuard cannot see from here. Set them there too, or hide the hekate boot menu.",
-        "storage_note_sysmmc": "This is sysMMC, and an emuMMC is set up on this SD card: it has its own parental controls, which PlayGuard cannot see from here. Set them there too, or hide the hekate boot menu."
+        "storage_note_sysmmc": "This is sysMMC, and an emuMMC is set up on this SD card: it has its own parental controls, which PlayGuard cannot see from here. Set them there too, or hide the hekate boot menu.",
+        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
     },
     "games": {
         "open": "Check the installed games",
@@ -1124,7 +1125,12 @@
         "climb_detail": "{} PINs refused at the gate in the last seven days, {} the week before.",
         "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
         "patches_title": "This forwarder would not start yet",
-        "patches_anyway": "Add it anyway (it starts once the patches are in place)"
+        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
+        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
+        "refresh": "Make the forwarders again with this loader",
+        "refresh_confirm": "Make these forwarders again with the loader of this PlayGuard? {}. They keep their name, icon and PIN rules.",
+        "refresh_title": "Forwarders made with an older loader",
+        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
     },
     "hbmenu": {
         "section": "Homebrew menu",
@@ -1991,5 +1997,13 @@
         "change": "Change...",
         "remove": "Remove it",
         "removed": "Scheduled profile removed."
+    },
+    "sigpatch": {
+        "details": "What was found",
+        "set_aside": "Set the sigpatch files aside",
+        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
+        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
+        "failed": "The sigpatch files were not all moved: {}",
+        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
     }
 }

@@ -2,6 +2,7 @@
 #include "util/patches.hpp"
 
 #include <cstdio>
+#include <sys/stat.h>
 
 #include "util/paths.hpp"
 #include "util/text.hpp"
@@ -193,6 +194,37 @@ const char* module_name(Module m)
         case Module::Partial:   return "partial";
     }
     return "?";
+}
+
+bool mixed(const Report& r)
+{
+    if (!r.syspatch_installed) return false;
+    for (const std::string& f : r.files)
+        if (f == "es" || f == "fs" || f == "loader") return true;
+    return false;
+}
+
+bool can_set_aside(const Report& r)
+{
+    return mixed(r) && r.syspatch_at_boot && r.log_present && r.log_current;
+}
+
+bool set_aside(const std::string& root, const std::string& dest, std::vector<std::string>* moved, std::string* error)
+{
+    for (const char* dir : SIGPATCH_DIRS) {
+        const std::string from = join(root, dir);
+        if (!has_ips(from)) continue;
+        const std::string to = join(dest, dir);
+        const size_t slash = to.rfind('/');
+        struct stat st;
+        const bool taken = stat(to.c_str(), &st) == 0;   // never over an earlier set aside
+        if (taken || !paths::ensure_dir(to.substr(0, slash)) || std::rename(from.c_str(), to.c_str()) != 0) {
+            if (error) *error = std::string("cannot move ") + dir;
+            return false;
+        }
+        if (moved) moved->push_back(dir);
+    }
+    return true;
 }
 
 }   // namespace patches

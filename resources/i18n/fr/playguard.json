@@ -807,7 +807,8 @@
         "upload": "Envoyer un rapport en ligne...",
         "upload_note": "Envoie un rapport dans un gist secret de votre compte GitHub (connexion d'abord si besoin) et affiche son lien avec un QR code : donnez-le à qui vous aide, ou ouvrez un signalement de bug avec.",
         "storage_note_emummc": "Vous êtes sur l'emuMMC : la sysMMC a son propre contrôle parental, que PlayGuard ne peut pas voir d'ici. Réglez-le là aussi, ou masquez le menu de démarrage d'hekate.",
-        "storage_note_sysmmc": "Vous êtes sur la sysMMC, et une emuMMC est configurée sur cette carte SD : elle a son propre contrôle parental, que PlayGuard ne peut pas voir d'ici. Réglez-le là aussi, ou masquez le menu de démarrage d'hekate."
+        "storage_note_sysmmc": "Vous êtes sur la sysMMC, et une emuMMC est configurée sur cette carte SD : elle a son propre contrôle parental, que PlayGuard ne peut pas voir d'ici. Réglez-le là aussi, ou masquez le menu de démarrage d'hekate.",
+        "patches_note_mixed": "sys-patch est actif, et des fichiers sigpatches ({}) sont aussi sur la carte SD : deux outils patchent les mêmes vérifications, une cause connue de forwarders qui ne démarrent pas. Mettez-les de côté (Ⓐ), puis redémarrez la console."
     },
     "games": {
         "open": "Vérifier les jeux installés",
@@ -1124,7 +1125,12 @@
         "climb_detail": "{} codes PIN refusés à la porte ces sept derniers jours, {} la semaine d'avant.",
         "patches_incomplete": "La console ne lance un forwarder qu'avec des patchs de signature, et sys-patch {} ne les a pas tous appliqués pour ce firmware (non appliqués : {}). Mettez sys-patch à jour, puis redémarrez la console.",
         "patches_title": "Ce forwarder ne démarrerait pas encore",
-        "patches_anyway": "L'ajouter quand même (il démarrera une fois les patchs en place)"
+        "patches_anyway": "L'ajouter quand même (il démarrera une fois les patchs en place)",
+        "patches_mixed": "sys-patch est actif, mais des fichiers sigpatches ({}) sont aussi sur la carte SD : une cause connue de forwarders qui ne démarrent pas (« Le logiciel n'a pas pu être démarré »). Mettez-les de côté (Console › Patchs de jeux), puis redémarrez la console.",
+        "refresh": "Refaire les forwarders avec ce chargeur",
+        "refresh_confirm": "Refaire ces forwarders avec le chargeur de ce PlayGuard ? {}. Ils gardent leur nom, leur icône et leurs règles de code PIN.",
+        "refresh_title": "Des forwarders faits avec un ancien chargeur",
+        "refresh_detail": "{} : faits par un PlayGuard plus ancien. Refaits, ils lancent leur homebrew avec le chargeur de cette version."
     },
     "hbmenu": {
         "section": "Menu homebrew",
@@ -1991,5 +1997,13 @@
         "change": "Modifier...",
         "remove": "La retirer",
         "removed": "Profil programmé retiré."
+    },
+    "sigpatch": {
+        "details": "Ce qui a été trouvé",
+        "set_aside": "Mettre les sigpatches de côté",
+        "confirm": "Déplacer les fichiers sigpatches (.ips pour es, fs et le loader) dans {} ? Rien n'est supprimé : les remettre en place annule tout. sys-patch patche ensuite seul dès le prochain démarrage ; redémarrez la console.",
+        "hekate": "Le bootloader/patches.ini de hekate reste : si hekate_ipl.ini contient encore kip1patch=nosigchk, retirez cette ligne avant de démarrer avec le fss0 de hekate.",
+        "failed": "Les fichiers sigpatches n'ont pas tous été déplacés : {}",
+        "done": "Les fichiers sigpatches sont mis de côté. Redémarrez la console, puis relancez le forwarder."
     }
 }

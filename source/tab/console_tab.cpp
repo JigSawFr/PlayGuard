@@ -4,6 +4,7 @@
 #include "action/fw_gate.hpp"
 #include "action/notices.hpp"
 #include "action/sys_notes_flow.hpp"
+#include "action/sigpatch_flow.hpp"
 #include "action/sys_update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/forwarders_activity.hpp"
@@ -87,7 +88,18 @@ ConsoleTab::ConsoleTab()
     // look), the text by A.
     patches_icon = RowIcon::on_row(game_patches.getView(), RowIcon::Kind::Info);
     game_patches->registerClickAction([this](brls::View*) {
-        if (!this->patches_note.empty()) ui::info(this->patches_note);
+        // sigpatch files beside sys-patch: A also offers to set them aside
+        // (action/sigpatch_flow.hpp).
+        if (!sigpatch_flow::offered()) {
+            if (!this->patches_note.empty()) ui::info(this->patches_note);
+            return true;
+        }
+        const std::string note = this->patches_note;
+        ui::pick_actions("playguard/tools/patches"_i18n,
+                         { { "playguard/sigpatch/details"_i18n, [note]() { ui::info(note); }, "info" },
+                           { "playguard/sigpatch/set_aside"_i18n, [this]() {
+                                 sigpatch_flow::set_aside([this](bool) { this->refresh(); });
+                             }, "folder" } });
         return true;
     });
 

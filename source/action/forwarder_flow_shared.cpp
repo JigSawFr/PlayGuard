@@ -160,6 +160,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         else brls::Logger::warning("forwarders: {} unreadable, the .nro's icon instead", m.icon);
     }
     forwarders::Made made = m;
+    made.loader = loader_id();   // the loader it is built with now
     std::string gate_argv;
     Gate gate;
     if (made.pin) {

@@ -8,6 +8,7 @@
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/sigpatch_flow.hpp"
 #include "action/forwarders_logic.hpp"
 #include "app.hpp"
 #include "core/forwarder.h"
@@ -18,7 +19,9 @@
 #include "util/forwarder_icon.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
+#include "util/patches.hpp"
 #include "util/paths.hpp"
+#include "util/sha256.hpp"
 #include "util/text.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
@@ -86,6 +89,27 @@ bool loader_present()
 #endif
 }
 
+std::string loader_id()
+{
+#ifdef __SWITCH__
+    static std::string id;
+    static bool read = false;
+    if (!read) {
+        read = true;
+        std::string main, npdm;
+        if (paths::read_file(BRLS_ASSET("forwarder/main"), main) && paths::read_file(BRLS_ASSET("forwarder/main.npdm"), npdm)) {
+            Sha256 hash;
+            hash.update(main.data(), main.size());
+            hash.update(npdm.data(), npdm.size());
+            id = hash.hex().substr(0, 16);
+        }
+    }
+    return id;
+#else
+    return "";
+#endif
+}
+
 namespace
 {
 // The question before a forwarder is made, with what the HOME menu will
@@ -140,7 +164,11 @@ std::string patches_problem()
 {
     const patches::Report& report = ui::patch_report();
     switch (forwarders_logic::patches_state(report)) {
-        case forwarders_logic::Patches::Ready: return "";
+        case forwarders_logic::Patches::Ready:
+            // sigpatch files beside sys-patch: a cause GBAtemp gives of
+            // forwarders that do not start (patches::mixed).
+            return patches::mixed(report) ? brls::getStr("playguard/forwarders/patches_mixed", text::join(report.files, ", "))
+                                          : "";
         case forwarders_logic::Patches::Unknown: return "playguard/forwarders/patches_unknown"_i18n;
         case forwarders_logic::Patches::Incomplete:
             return brls::getStr("playguard/forwarders/patches_incomplete",
@@ -164,6 +192,13 @@ void patches_first(std::function<void()> go, std::function<void(bool)> done)
     const std::string problem = patches_problem();
     if (problem.empty()) return go();
     std::vector<ui::Choice> choices;
+    if (sigpatch_flow::offered())
+        // Set aside first: the forwarder is made after the restart, not now.
+        choices.emplace_back("playguard/sigpatch/set_aside"_i18n, [done]() {
+            sigpatch_flow::set_aside([done](bool) {
+                if (done) done(false);
+            });
+        }, "folder");
     choices.emplace_back("playguard/forwarders/patches_anyway"_i18n, go, "plus");
     choices.emplace_back("hints/cancel"_i18n, [done]() {
         if (done) done(false);
@@ -417,6 +452,38 @@ void protect_all(std::function<void(bool)> done)
                 [done]() {
                     if (done) done(false);
                 });
+}
+
+std::vector<forwarders_logic::Row> to_refresh()
+{
+    std::vector<forwarders_logic::Row> out;
+    const std::string current = loader_id();
+    if (current.empty()) return out;
+    for (const auto& r : made_rows(true)) {
+        forwarders::Made m;
+        if (r.state != forwarders_logic::State::NotInstalled && r.state != forwarders_logic::State::Elsewhere &&
+            forwarders::find(r.id, &m) && forwarders_logic::stale_loader(m.loader, current))
+            out.push_back(r);
+    }
+    return out;
+}
+
+void refresh(std::function<void(bool)> done)
+{
+    const std::vector<forwarders_logic::Row> todo = to_refresh();
+    if (todo.empty()) {
+        if (done) done(false);
+        return;
+    }
+    std::string names;
+    for (const auto& r : todo) names += (names.empty() ? "" : ", ") + r.name;
+    patches_first([todo, names, done]() {
+        ui::confirm(brls::getStr("playguard/forwarders/refresh_confirm", names), "playguard/forwarders/refresh"_i18n,
+                    [todo, done]() { install_many(todo, false, "add_forwarder", "playguard/forwarders/reinstalled_n", done); },
+                    [done]() {
+                        if (done) done(false);
+                    });
+    }, done);
 }
 
 void reinstall_all(std::function<void(bool)> done)

@@ -175,6 +175,11 @@ std::string hours_text(int days, int from, int to, const std::vector<std::string
     return d + " " + hm(from) + "–" + hm(to);
 }
 
+bool stale_loader(const std::string& made, const std::string& current)
+{
+    return !current.empty() && made != current;
+}
+
 std::string patch_gaps(const patches::Report& r)
 {
     std::string out;

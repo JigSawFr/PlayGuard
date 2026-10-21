@@ -31,6 +31,17 @@ std::string self_nro();
 // build from this repository).
 bool loader_present();
 
+// The forwarders' loader this build carries (romfs:/forwarder/main and
+// main.npdm), as 16 hex digits of their SHA-256; "" when unknown (the
+// desktop build). Kept in each forwarder made (forwarders::Made::loader).
+std::string loader_id();
+
+// Forwarders made with another loader than this build's (or before it was
+// kept: forwarders_logic::stale_loader), still on the HOME menu; made again
+// (confirmed first, and their patches checked) by refresh.
+std::vector<forwarders_logic::Row> to_refresh();
+void refresh(std::function<void(bool)> done);
+
 // Why a forwarder would not start on this console now (its signature
 // patches: forwarders_logic::patches_state), in the user's language, the
 // fix included; "" when they are in place.

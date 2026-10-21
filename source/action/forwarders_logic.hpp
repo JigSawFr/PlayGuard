@@ -87,6 +87,12 @@ Patches patches_state(const patches::Report& report);
 // none of its patterns as patched ("ldr"). Empty when nothing is known missing.
 std::string patch_gaps(const patches::Report& report);
 
+// Whether a forwarder built with the loader `made` ("" for one made before
+// PlayGuard kept it) is out of date against this build's `current` (""
+// when unknown, as on the desktop: then none is). sphaira's own forwarders
+// had to be made again after a loader update to start their .nro well.
+bool stale_loader(const std::string& made, const std::string& current);
+
 // Whether `nro` ("sdmc:/…") is a homebrew menu, which starts any other
 // .nro: hbmenu (sdmc:/hbmenu.nro, the one the album starts, or a copy of
 // it elsewhere) or sphaira, by their file names.

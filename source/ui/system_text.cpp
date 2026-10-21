@@ -106,10 +106,21 @@ std::string serial_text(const SysInfo& info, bool reveal)
     return masked + s.substr(s.size() - 2);
 }
 
+namespace
+{
+bool            s_patches_read = false;
+patches::Report s_patches;
+}   // namespace
+
+void reread_patch_report()
+{
+    s_patches_read = false;
+}
+
 const patches::Report& patch_report()
 {
-    static bool read = false;
-    static patches::Report report;
+    bool& read = s_patches_read;
+    patches::Report& report = s_patches;
     if (!read) {
         SysInfo si;
         sysinfo_get(&si);
@@ -128,7 +139,7 @@ const patches::Report& patch_report()
 bool patches_warning(const patches::Report& report)
 {
     const auto st = patches::status(report);
-    return st == patches::Status::FilesOnly || st == patches::Status::SysPatchIncomplete;
+    return st == patches::Status::FilesOnly || st == patches::Status::SysPatchIncomplete || patches::mixed(report);
 }
 
 static std::string join_list(const std::vector<std::string>& items)
@@ -163,6 +174,9 @@ std::string patches_note(const patches::Report& report, const SysInfo& info, boo
         case patches::Status::FilesOnly:
             return "playguard/tools/patches_note_files"_i18n;
         case patches::Status::SysPatch:
+            // sigpatch files beside it: two tools on the same checks, a
+            // cause of forwarders that do not start (patches::mixed).
+            if (patches::mixed(report)) return brls::getStr("playguard/tools/patches_note_mixed", join_list(report.files));
             *warn = false;
             return report.files.empty() ? std::string()
                                         : brls::getStr("playguard/tools/patches_note_redundant", join_list(report.files));
@@ -178,7 +192,10 @@ std::string patches_note(const patches::Report& report, const SysInfo& info, boo
                     return brls::getStr("playguard/tools/patches_note_skipped",
                                         std::string(info.emummc ? "patch_emummc" : "patch_sysmmc"));
                 case patches::Issue::NotPatched:
-                    return brls::getStr("playguard/tools/patches_note_unpatched", join_list(patches::unpatched(report)));
+                    return brls::getStr("playguard/tools/patches_note_unpatched", join_list(patches::unpatched(report))) +
+                           (patches::mixed(report)
+                                ? "\n" + brls::getStr("playguard/tools/patches_note_mixed", join_list(report.files))
+                                : std::string());
                 default: break;
             }
             break;

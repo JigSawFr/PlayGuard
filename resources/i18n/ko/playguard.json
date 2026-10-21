@@ -807,7 +807,8 @@
         "upload": "보고서 온라인으로 보내기...",
         "upload_note": "보고서를 GitHub 계정의 비밀 gist로 보내고(필요하면 먼저 로그인) 링크를 QR 코드와 함께 표시합니다. 도와주는 사람에게 전달하거나 버그 신고에 사용하세요.",
         "storage_note_emummc": "지금은 emuMMC입니다. sysMMC에는 별도의 자녀 보호 기능이 있으며, PlayGuard는 여기에서 볼 수 없습니다. 그쪽에서도 설정하거나 hekate 부팅 메뉴를 숨기세요.",
-        "storage_note_sysmmc": "지금은 sysMMC이며, 이 SD 카드에 emuMMC도 설정되어 있습니다. emuMMC에는 별도의 자녀 보호 기능이 있으며, PlayGuard는 여기에서 볼 수 없습니다. 그쪽에서도 설정하거나 hekate 부팅 메뉴를 숨기세요."
+        "storage_note_sysmmc": "지금은 sysMMC이며, 이 SD 카드에 emuMMC도 설정되어 있습니다. emuMMC에는 별도의 자녀 보호 기능이 있으며, PlayGuard는 여기에서 볼 수 없습니다. 그쪽에서도 설정하거나 hekate 부팅 메뉴를 숨기세요.",
+        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
     },
     "games": {
         "open": "설치된 게임 확인",
@@ -1124,7 +1125,12 @@
         "climb_detail": "지난 7일 동안 게이트에서 PIN {}회 거부, 그 전 주 {}회.",
         "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
         "patches_title": "This forwarder would not start yet",
-        "patches_anyway": "Add it anyway (it starts once the patches are in place)"
+        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
+        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
+        "refresh": "Make the forwarders again with this loader",
+        "refresh_confirm": "Make these forwarders again with the loader of this PlayGuard? {}. They keep their name, icon and PIN rules.",
+        "refresh_title": "Forwarders made with an older loader",
+        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
     },
     "hbmenu": {
         "section": "Homebrew 메뉴",
@@ -1991,5 +1997,13 @@
         "change": "변경...",
         "remove": "삭제",
         "removed": "예약된 프로필을 삭제했습니다."
+    },
+    "sigpatch": {
+        "details": "What was found",
+        "set_aside": "Set the sigpatch files aside",
+        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
+        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
+        "failed": "The sigpatch files were not all moved: {}",
+        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
     }
 }

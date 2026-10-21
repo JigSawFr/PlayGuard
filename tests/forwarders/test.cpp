@@ -225,7 +225,9 @@ static void test_registry()
     b.free_days = 0x3E, b.free_from = 960, b.free_to = 1140;
     b.free2_days = 0x41, b.free2_from = 540, b.free2_to = 1200;
     b.limit = b.carried = true;
+    b.loader = "0123456789abcdef";
     CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.loader == "0123456789abcdef");   // the loader it was built with
     CHECK(forwarders::find(b.id, &found) && found.free_days == 0x3E && found.free2_days == 0x41 &&
           found.free2_from == 540 && found.free2_to == 1200 && found.limit && found.carried);
     b.free_days = 0x41, b.free_from = 540, b.free_to = 1200;
@@ -567,6 +569,15 @@ static void test_gate()
     CHECK(s.free_n == 0 && !s.limit && s.has_pause && s.pause_tries == 0);
 }
 
+static void test_stale_loader()
+{
+    using forwarders_logic::stale_loader;
+    CHECK(!stale_loader("0123456789abcdef", "0123456789abcdef"));
+    CHECK(stale_loader("0123456789abcdef", "fedcba9876543210"));
+    CHECK(stale_loader("", "fedcba9876543210"));   // made before it was kept
+    CHECK(!stale_loader("", "") && !stale_loader("0123456789abcdef", ""));   // unknown here: none
+}
+
 static void test_patches()
 {
     using forwarders_logic::Patches;
@@ -696,5 +707,6 @@ int main()
     test_lock_check();
     test_guard();
     test_patches();
+    test_stale_loader();
     return CHECK_DONE("forwarders tests passed");
 }

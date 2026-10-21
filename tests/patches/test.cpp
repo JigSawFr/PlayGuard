@@ -210,6 +210,44 @@ int main()
         CHECK(r.es == Module::Failed);
     }
 
+    // sigpatch files beside sys-patch: mixed, and set aside (moved, not
+    // deleted; hekate's patches.ini and the nifm patches stay).
+    {
+        std::string root = fresh_root();
+        install_syspatch(root, true);
+        put(root, "config/sys-patch/log.ini", LOG_OK);
+        CHECK(!mixed(detect(root, "23.0.1", true)));
+        put(root, "atmosphere/exefs_patches/nfim_ctest/A.ips");
+        put(root, "bootloader/patches.ini");
+        CHECK(!mixed(detect(root, "23.0.1", true)));   // nifm and hekate's: not sigpatches beside it
+        put(root, "atmosphere/kip_patches/fs_patches/F.ips");
+        put(root, "atmosphere/kip_patches/loader_patches/L.ips");
+        put(root, "atmosphere/exefs_patches/es_patches/E.ips");
+        Report r = detect(root, "23.0.1", true);
+        CHECK(mixed(r) && can_set_aside(r));
+        CHECK(!can_set_aside(detect(root, "23.0.1", false)));   // its log from the other system
+        std::vector<std::string> moved;
+        std::string err;
+        CHECK(set_aside(root, root + "/aside", &moved, &err));
+        CHECK(moved.size() == 3);
+        CHECK(paths::file_exists(root + "/aside/atmosphere/kip_patches/fs_patches/F.ips"));
+        CHECK(paths::file_exists(root + "/aside/atmosphere/exefs_patches/es_patches/E.ips"));
+        CHECK(paths::file_exists(root + "/atmosphere/exefs_patches/nfim_ctest/A.ips"));
+        CHECK(paths::file_exists(root + "/bootloader/patches.ini"));
+        r = detect(root, "23.0.1", true);
+        CHECK(!mixed(r) && status(r) == Status::SysPatch);
+        // Nothing left: nothing moved. Again with files: never over the first.
+        moved.clear();
+        CHECK(set_aside(root, root + "/aside", &moved, &err) && moved.empty());
+        put(root, "atmosphere/kip_patches/fs_patches/G.ips");
+        CHECK(!set_aside(root, root + "/aside", &moved, &err) && !err.empty());
+        CHECK(paths::file_exists(root + "/atmosphere/kip_patches/fs_patches/G.ips"));
+        // Without sys-patch, files are the patches: never mixed.
+        std::string bare = fresh_root();
+        put(bare, "atmosphere/kip_patches/fs_patches/F.ips");
+        CHECK(!mixed(detect(bare, "23.0.1", true)));
+    }
+
     // An emuMMC set up on the card: only [emummc] enabled other than 0 counts.
     {
         std::string root = fresh_root();
