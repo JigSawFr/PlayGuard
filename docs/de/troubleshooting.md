@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
 # Fehlerbehebung
 
 Wieder Zugang zu einer gesperrten Konsole bekommen, die häufigen Probleme, einen Fehler melden, und der Entwicklermodus. Zurück zum [README](../../README.md).
@@ -23,6 +23,13 @@ PlayGuard selbst kann dann nicht starten. Installiere das optionale Wiederherste
 
 Das Sysmodul muss der Version von PlayGuard folgen: Entpacke bei jedem Update von PlayGuard die `playguard-rescue.zip` dieser Version erneut (oder *Aktualisieren* auf *Das Wiederherstellungs-Sysmodul ist veraltet* in der Benachrichtigungsglocke) und starte die Konsole dann neu. Ein älteres Sysmodul hinterlässt einen Bericht, den PlayGuard nicht prüfen kann: Der Wiederherstellungsbildschirm bietet dann nichts an, sagt, dass das Sysmodul älter ist, und ein erneutes `RESCUE` ergibt dasselbe, bis es aktualisiert ist.
 
+### Homebrew-Menü gesperrt
+
+*Konsole › Forwarder › Homebrew-Menü sperren* verhindert, dass das Album und ein mit R gestartetes Spiel das Homebrew-Menü öffnen. Wenn der Forwarder von PlayGuard und das geschützte Menü beide weg sind (in den Systemeinstellungen gelöscht, oder auf dem anderen System: Die Sperre liegt auf der SD-Karte und wird von sysMMC und emuMMC gelesen):
+
+- **Von einem Computer aus:** Lösche `atmosphere/config/override_config.ini` auf der SD-Karte (oder lege `config/playguard/override_config.ini.backup` zurück, die Datei, wie sie war) und starte die Konsole dann neu.
+- **Mit installiertem Rettungsmodul** (optional): Lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte neu; das Modul hebt die Sperre beim Start auf, und PlayGuard sagt es bei seinem nächsten Start. Ein Update von Atmosphère seit dem Sperren hebt sie auf dieselbe Weise auf.
+
 ### Konsole nicht modifiziert
 
 PlayGuard kann nicht helfen: Es braucht Atmosphère. Der offizielle Weg ist das Masterschlüssel-Verfahren des Nintendo-Supports.
@@ -41,7 +48,7 @@ PlayGuard kann nicht helfen: Es braucht Atmosphère. Der offizielle Weg ist das 
 ### Meine Limits haben sich von selbst geändert
 
 - **Die Smart-Geräte-App ist noch verknüpft.** Ihre nächste Synchronisierung überschreibt, was PlayGuard festgelegt hat: *Geheimzahl › Smart-Geräte-App trennen*.
-- **Ein anderes Werkzeug, oder ein Profil.** *Heute* zeigt eine bernsteinfarbene Karte für Limits, die von denen abweichen, die PlayGuard zuletzt gesehen hat, und *Verlauf › Änderungsverlauf* listet jede außerhalb von PlayGuard bemerkte Änderung auf. Ⓐ auf einer stellt den vorherigen Wert wieder her.
+- **Ein anderes Werkzeug, oder ein Profil.** *Heute* zeigt eine bernsteinfarbene Karte für Limits, die von denen abweichen, die PlayGuard zuletzt gesehen hat, und *Optionen › Änderungsverlauf* listet jede außerhalb von PlayGuard bemerkte Änderung auf. Ⓐ auf einer stellt den vorherigen Wert wieder her.
 - **Ein geplantes Profil**, das angewendet wurde, oder dessen ersetzte Limits nach Ende seines Zeitraums wiederhergestellt wurden (*Spielzeit › Profile › Geplantes Profil*).
 
 ### Das Kind hat über das Limit hinaus gespielt

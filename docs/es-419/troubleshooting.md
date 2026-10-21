@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
 # Solución de problemas
 
 Recuperar el acceso a una consola bloqueada, los problemas frecuentes, reportar un error y el modo desarrollador. Volver al [README](../../README.md).
@@ -23,6 +23,13 @@ En ese caso, PlayGuard ni siquiera puede iniciarse. Instale **de antemano** el s
 
 El módulo debe ir a la par de la versión de PlayGuard: con cada actualización de PlayGuard, vuelva a extraer el `playguard-rescue.zip` de esa versión (o use *Actualizar* en *El sysmodule de recuperación no está actualizado*, en la campana de notificaciones) y luego reinicie la consola. Un módulo más antiguo deja un informe que PlayGuard no puede verificar: la pantalla de recuperación entonces no ofrece nada, indica que el módulo es más antiguo, y volver a usar `RESCUE` da el mismo resultado hasta que se actualice.
 
+### Menú homebrew bloqueado
+
+*Consola › Forwarders › Bloquear el menú homebrew* impide que el álbum y un juego iniciado con R abran el menú homebrew. Si el forwarder de PlayGuard y el menú protegido ya no están (eliminados en la Configuración de la consola, o en el otro sistema: el bloqueo está en la tarjeta SD, y lo leen tanto la sysMMC como la emuMMC):
+
+- **Desde una computadora:** elimine `atmosphere/config/override_config.ini` de la tarjeta SD (o vuelva a poner `config/playguard/override_config.ini.backup`, el archivo como estaba) y luego reinicie la consola.
+- **Con el módulo de rescate instalado** (opcional): coloque un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y reinicie; el módulo quita el bloqueo al arrancar, y PlayGuard lo indica la siguiente vez que se inicia. Una actualización de Atmosphère desde que se bloqueó lo quita de la misma manera.
+
 ### Consola sin modificar
 
 PlayGuard no puede ayudar: necesita Atmosphère. El procedimiento de la clave maestra del soporte de Nintendo es la vía oficial.
@@ -41,7 +48,7 @@ PlayGuard no puede ayudar: necesita Atmosphère. El procedimiento de la clave ma
 ### Mis límites cambiaron solos
 
 - **La app para celular sigue vinculada.** Su próxima sincronización sobrescribe lo que configuró PlayGuard: *PIN › Desvincular la app para celular*.
-- **Otra herramienta, o un perfil.** *Hoy* muestra una tarjeta ámbar para los límites distintos de los que PlayGuard vio la última vez, y *Historial › Historial de cambios* enumera cada cambio visto fuera de PlayGuard. Ⓐ en uno restablece el valor anterior.
+- **Otra herramienta, o un perfil.** *Hoy* muestra una tarjeta ámbar para los límites distintos de los que PlayGuard vio la última vez, y *Preferencias › Historial de cambios* enumera cada cambio visto fuera de PlayGuard. Ⓐ en uno restablece el valor anterior.
 - **Un perfil programado** que se aplicó, o que se revirtió al terminar su período (*Tiempo de juego › Perfiles › Perfil programado*).
 
 ### El niño jugó más allá del límite

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 0adcb09f77ee -->
+<!-- translated from docs/features.md, sha256 1cf484ad9b39 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Es nuevo en PlayGuard? Empiece por [primeros pasos](getting-started.md). Volver al [README](../../README.md).
@@ -386,10 +386,34 @@ En una consola sin Internet, *Ajustar el reloj de red al reloj de la consola* ap
 
 *Forwarders ›*, una pantalla propia en *Homebrew*: un homebrew en el menú HOME, con su ícono y su nombre, que se inicia desde ahí como un juego (un forwarder de NRO, como los crea sphaira).
 
+- **Una tarjeta arriba** indica cómo está el menú homebrew: bloqueado o abierto, sus caminos de vuelta (el forwarder de PlayGuard, los menús protegidos, los que todavía no se iniciaron desde el menú HOME), lo que todavía lo abre sin el PIN y si el módulo de rescate está instalado. Ⓐ en ella enumera qué hacer, cada cosa a una pulsación (el siguiente paso hacia el bloqueo, proteger o eliminar un forwarder que lo abre sin el PIN, la comprobación, la hoja de rescate).
+- **La lista por grupos:** el de PlayGuard, los protegidos con el PIN, los que no lo están, los creados por otra app, los que ya no están en el menú HOME. Uno protegido tiene un candado en su ícono (una marca de verificación para un menú que se vio funcionar a través de su puerta de acceso), y uno creado aquí sin el PIN, un candado abierto en ámbar.
+- **Ⓨ** abre esta parte de la guía (un código QR). Después de eliminar u olvidar un forwarder, o de cambiar su horario sin el PIN, **ZR** lo restablece durante unos segundos (reinstalado con el mismo ID de programa, o el horario como estaba).
 - **PlayGuard** con una sola pulsación: su propio ícono y su nombre, y el forwarder inicia el `.nro` desde el que se abrió PlayGuard.
-- **Otro homebrew**: cualquier `.nro` de la carpeta `/switch` de la tarjeta SD (y una carpeta más abajo), con su nombre preguntado primero (el del `.nro`, para conservarlo o cambiarlo). Su ícono es el del `.nro`, convertido al JPEG de 256 × 256 que muestra el menú HOME cuando tiene otro tamaño o es un PNG (un control en su lugar cuando el `.nro` no tiene), como hace sphaira. Una ruta con un espacio se pasa al homebrew entre comillas.
+- **Otro homebrew**: cualquier `.nro` de la carpeta `/switch` de la tarjeta SD (y una carpeta más abajo), con su nombre preguntado primero (el del `.nro`, para conservarlo o cambiarlo), y luego se confirma con lo que mostrará el menú HOME: su ícono, su nombre y su editor. Su ícono es el del `.nro`, convertido al JPEG de 256 × 256 que muestra el menú HOME cuando tiene otro tamaño o es un PNG (un control en su lugar cuando el `.nro` no tiene), como hace sphaira. Una ruta con un espacio se pasa al homebrew entre comillas.
 - **Los forwarders del menú HOME**, cada uno con su ícono: los que creó PlayGuard (Ⓐ: detalles, cambiar el nombre, cambiar el editor, reinstalar, eliminar) y los de otra app (detalles, eliminar). Uno cuyo `.nro` ya no está lo indica; uno eliminado en la Configuración de la consola sigue en la lista hasta que se reinstala o se olvida. Reinstalar conserva su ID de programa, así que la entrada del menú HOME se reemplaza, no se duplica; un forwarder creado por otra herramienta para el mismo `.nro` también se reemplaza.
+- **Protegido con el PIN** (Ⓐ › *Proteger con el PIN*, para uno creado por PlayGuard que no sea el suyo): iniciado desde el menú HOME, el forwarder abre primero una pequeña puerta de acceso (`config/playguard/gate.nro`, unos cientos de kilobytes que PlayGuard escribe a partir de sus propios archivos), que muestra de inmediato la pantalla del PIN de la consola, y luego el homebrew una vez ingresado el PIN correcto; B ahí regresa al menú HOME. Alrededor de la pantalla del PIN, la de la puerta: el ícono y el nombre del homebrew, *Protected by PlayGuard* y cómo resultó (iniciando, en su horario libre, PIN no ingresado), en el idioma de la consola, sobre el azul noche de Cadran (`make gate-preview` la dibuja en una computadora). Conserva su ID de programa y su ícono, la fila indica *PIN* y queda en el historial de cambios. Necesita un PIN en la consola. *Dejar de pedir el PIN* lo pide primero, diga lo que diga *Proteger PlayGuard con el PIN*. Solo protege el ícono del menú HOME: el `.nro` todavía se inicia desde el menú homebrew, salvo que esté bloqueado (más abajo). Un forwarder protegido por un PlayGuard anterior inicia el propio PlayGuard como puerta, lo que sigue funcionando; *Reinstalar todos* lo pasa a la pequeña puerta.
+  - **Horario sin el PIN** (Ⓐ en uno protegido): todos los días, de lunes a viernes o el fin de semana, de una hora a otra (también pasada la medianoche); la fila indica cuándo. Configurarlo pide el PIN.
+  - **Cada intento queda en el historial de cambios**: abierto con el PIN, abierto en su horario o rechazado (B en la pantalla del PIN), a la hora en que ocurrió; los intentos de un mismo tipo, un mismo día, para un mismo forwarder forman una sola entrada, con sus horas. La puerta los anota en la tarjeta SD; PlayGuard los lee la siguiente vez que se inicia. *Historial › Mostrar › Homebrew y forwarders* muestra solo estos, los forwarders y el bloqueo.
+  - **La pantalla de la puerta dice más:** su horario sin el PIN mientras lo pide, y los rechazos del día hasta el momento (en ámbar) mientras lo pide y una vez rechazado, debajo de *Pide a un adulto que ingrese el PIN*.
 - **Íconos e idiomas:** un ícono de otro tamaño, un PNG, o un JPEG con datos EXIF o codificación progresiva (el menú HOME los muestra como un “?”) se convierte en un JPEG de 256 × 256 simple. Los datos de control del forwarder solo declaran el inglés americano, el idioma de su único ícono: así el ícono se muestra en una consola configurada en cualquier idioma.
+- **Proteger todos los forwarders con el PIN** y **Reinstalar todos** (el ícono y la versión de un `.nro` nuevo, la puerta tal como la trae este PlayGuard, uno eliminado del menú HOME restablecido): con una pulsación cada uno.
+- **Bloquear el menú homebrew** (*Menú homebrew*, al final de la pantalla): ni el álbum ni un juego iniciado manteniendo R vuelven a abrir el menú homebrew, así que un homebrew solo se inicia desde su forwarder, que puede pedir el PIN.
+  - **Paso a paso:** mientras no se pueda bloquear, Ⓐ enumera los pasos, numerados, el siguiente en ámbar y a una pulsación (*Siguiente paso*): un PIN, los parches de firma, el forwarder de PlayGuard, un menú homebrew protegido con el PIN (sphaira si está en `/switch`, si no hbmenu, creado ya protegido de una vez), iniciado una vez desde el menú HOME; la lista vuelve después de cada paso que crea un forwarder.
+  - Requiere dos caminos de vuelta a PlayGuard desde el menú HOME: su propio forwarder, y un forwarder de un menú homebrew (sphaira o hbmenu, según el nombre del `.nro`) protegido con el PIN, que mantiene todos los homebrew, incluida una tienda de homebrew, a un PIN de distancia. Y un PIN en la consola, y los parches de firma que necesitan los forwarders. Mientras tanto, Ⓐ indica lo que falta.
+  - El camino de vuelta del menú cuenta una vez que se vio funcionar: iniciado una vez desde el menú HOME, con el PIN ingresado en su puerta (lo indica el registro de la puerta, que se lee cuando PlayGuard se abre o bloquea). Un menú protegido que nunca se inició así aparece como tal.
+  - Al bloquear se muestran las comprobaciones como una lista (una marca de verificación turquesa para lo que está listo, un triángulo ámbar o coral para lo que no), y se pide mantener Ⓐ 2 segundos en *Bloquear* (o un dedo sobre el botón), mientras se llena una barra; si se suelta antes, nada cambia. Luego viene la **hoja de rescate**: cómo deshacerlo desde una computadora, o con el módulo de rescate cuando está instalado, y un código QR a la ayuda ([más abajo](troubleshooting.md#menú-homebrew-bloqueado)); *Comprobar el menú homebrew* también la ofrece.
+  - En emuMMC (o en una sysMMC con una emuMMC configurada), advierte que el bloqueo está en la tarjeta SD, así que ambos sistemas lo leen, mientras que los forwarders son de cada sistema: el otro sistema no tiene ninguno de estos caminos de vuelta.
+  - Mientras está bloqueado, se rechaza eliminar el forwarder de PlayGuard o el último menú protegido (o quitarle su PIN): desbloquee primero. Eliminar uno de varios menús protegidos pide confirmación, en coral, nombrando los que quedan.
+  - Antes de bloquear, ofrece proteger de una vez los forwarders creados por PlayGuard que todavía no están protegidos, e indica cuáles seguirían iniciando homebrew sin el PIN (un menú sin proteger, o uno creado por otra app), cuáles escriben en la tarjeta SD (un administrador de archivos, un instalador como Cyberfoil o Goldleaf, un servidor FTP: podrían cambiar el archivo del bloqueo) y cuándo está instalado uLaunch (inicia los homebrew a su manera, y el bloqueo no llega hasta ahí).
+  - El PIN rechazado tres veces o más en un mismo día en la puerta de un forwarder se indica en la campana (qué forwarder, el día, cuántas veces).
+  - Cuando falla la escritura de un archivo, el error dice por qué cuando puede saberlo: la tarjeta SD está llena, o no se puede escribir nada en ella (su interruptor de bloqueo, o el bit de archivo que corrige *Tools* de hekate).
+  - *Comprobar el menú homebrew* muestra lo que leerá Atmosphère (si el álbum y un juego iniciado con R abren el menú homebrew), los caminos de vuelta, los parches de firma, la versión de Atmosphère con la que se bloqueó y el módulo de rescate; el informe de diagnóstico incluye lo mismo.
+  - Son unas pocas líneas al final de `atmosphere/config/override_config.ini`, entre dos comentarios de PlayGuard; el resto del archivo se deja como está, y se guarda tal como estaba en `config/playguard/override_config.ini.backup`. Atmosphère lee el archivo cada vez que se inicia un programa: no hace falta reiniciar. Desbloquear quita esas líneas y vuelve a escribir los valores propios de Atmosphère para las claves que el resto del archivo no define (Atmosphère conserva lo que leyó hasta que se reinicia la consola).
+  - Bloquear y desbloquear piden el PIN, diga lo que diga *Proteger PlayGuard con el PIN*, y quedan en el historial de cambios. Mientras está bloqueado, PlayGuard comprueba cada vez que se inicia que los dos caminos de vuelta siguen ahí; la campana indica cuando falta uno. Un bloqueo quitado del archivo fuera de PlayGuard (desde una computadora, un homebrew) se indica en la campana y en el historial de cambios; PlayGuard nunca lo vuelve a poner por sí solo, ya que eliminar el archivo es el camino de vuelta desde una computadora. Eliminar un forwarder (Configuración de la consola › Gestión de datos, donde no se pide ningún PIN) nunca quita el bloqueo: solo elimina un camino de vuelta.
+  - Desde una computadora: elimine `atmosphere/config/override_config.ini` (o vuelva a poner el respaldo) y luego reinicie la consola.
+  - Con el módulo de rescate instalado (opcional, [sysmodule/README.md](../../sysmodule/README.md), en inglés), una solicitud `RESCUE` también lo quita al arrancar, igual que una actualización de Atmosphère desde que se bloqueó (sus parches de firma pueden ir con retraso, y ningún forwarder se inicia sin ellos): la siguiente vez que se inicia PlayGuard lo indica y ofrece volver a bloquearlo.
+- **Un forwarder eliminado fuera de PlayGuard** (en la Configuración de la consola): se indica una vez en el historial de cambios, y en la campana mientras dure, con *Volver a instalar* u *Olvidar* en su fila.
 - **Parches de firma:** la consola solo inicia un forwarder con parches de firma de fs y del loader (sys-patch, o archivos sigpatch): sin ellos, la pantalla lo indica arriba de la lista (*Consola › Parches de juegos* da los detalles). El `.nro` se queda donde está; eliminar un forwarder nunca lo toca.
 - **Tiempo de juego:** iniciado desde su ícono, un homebrew funciona como un juego: el temporizador lo cuenta y lo suspende como a cualquier juego cuando se acaba el tiempo, y *Actividad* lo muestra. PlayGuard sigue a la mano desde el menú de homebrew.
 - Cada cambio pide el PIN cuando *Proteger PlayGuard con el PIN* lo indica, se rechaza en modo de solo lectura y queda en el historial de cambios. Lo que creó PlayGuard se guarda por sistema (sysMMC / emuMMC), en `forwarders.json`.
@@ -401,24 +425,6 @@ En una consola sin Internet, *Ajustar el reloj de red al reloj de la consola* ap
 - **La compatibilidad** y luego el **almacenamiento** (emuMMC o sysMMC, con un ícono de información cuando el otro sistema tiene su propio control parental: Ⓐ lo explica).
 - Si Atmosphère **oculta el número de serie** (parcialmente oculto hasta Ⓐ; en emuMMC, cuando no lo oculta, un ícono de advertencia en la fila de arriba, que Ⓐ explica).
 - **Parches de juegos** (sys-patch o archivos sigpatch, con la recomendación de sys-patch cuando solo se usan archivos: un ícono de información, o uno de advertencia cuando hay algo que revisar, que Ⓐ explica).
-
-## Historial — cambios y respaldos
-
-*[Probarlo en el simulador ›](https://playguard.link/simulator/?tab=preferences)*
-
-### Historial de cambios
-
-- Los 500 cambios más recientes que hizo PlayGuard (límites, nivel de restricción, PIN, desbloqueos, desvinculación, el reloj, restauraciones, pausar o reanudar la cuenta regresiva …) y lo que vio cambiar fuera de él, agrupados por día (*Hoy*, *Ayer*, y luego el día y la fecha), con la hora y el origen; un límite cambiado para un solo día nombra ese día.
-- Un cambio que la consola **rechazó** también aparece, en ámbar, con el error de la consola y lo que se intentó (nunca se restablece: nada cambió).
-- *Mostrar* conserva un solo tipo (tiempo de juego, restricciones, seguridad y aplicación, visto fuera de PlayGuard, rechazado por la consola); *Exportar lo que se muestra* lo escribe en `exports/` como CSV, JSON, XLSX o PDF.
-- Ⓐ en un cambio lo muestra y, para un valor, **restablece el anterior**, con el mismo desbloqueo y el mismo PIN que cualquier cambio, e indica si cambió desde entonces.
-- Cada cambio guarda la versión de PlayGuard que lo hizo; un cambio registrado por una versión más reciente de PlayGuard aparece como *Otro cambio*.
-
-### Respaldos
-
-- **Respaldar / restaurar la configuración** en la tarjeta SD: nivel de restricción, ajustes personalizados, modo RV, sistema de clasificación, límites diarios, la alarma de “Se acabó el tiempo” (con las acciones avanzadas activadas) y, como registro, el bloque sin procesar del temporizador de juego; nunca el PIN.
-- Una restauración solo enumera lo que cambiaría (si no hay nada que cambiar, simplemente lo dice, sin desbloquear ni escribir nada), e indica cuando el respaldo tenía una alarma de hora de dormir activada (no se vuelve a escribir).
-- Usted elige cuántos respaldos conservar.
 
 ## Preferencias
 
@@ -433,6 +439,24 @@ En una consola sin Internet, *Ajustar el reloj de red al reloj de la consola* ap
   - Un **recordatorio mensual para apoyar PlayGuard** (activado de forma predeterminada, nunca durante el primer mes ni justo después de una actualización; *No volver a mostrar* en el recordatorio o este interruptor lo desactivan para siempre, actualizaciones incluidas).
 - Una opción que afecta a una sola función está junto a ella: el tiempo extra en *Tiempo de juego*, la reactivación del control parental en *PIN*, la comprobación del reloj en *Consola › Reloj de red*. Las actualizaciones y *Ayuda y diagnóstico* están en *Información*.
 
+### Cambios y respaldos
+
+Al final de *Preferencias* (la pestaña Historial de las versiones anteriores).
+
+#### Historial de cambios
+
+- Los 500 cambios más recientes que hizo PlayGuard (límites, nivel de restricción, PIN, desbloqueos, desvinculación, el reloj, restauraciones, pausar o reanudar la cuenta regresiva …) y lo que vio cambiar fuera de él, agrupados por día (*Hoy*, *Ayer*, y luego el día y la fecha), con la hora y el origen; un límite cambiado para un solo día nombra ese día.
+- Un cambio que la consola **rechazó** también aparece, en ámbar, con el error de la consola y lo que se intentó (nunca se restablece: nada cambió).
+- *Mostrar* conserva un solo tipo (tiempo de juego, restricciones, seguridad y aplicación, visto fuera de PlayGuard, rechazado por la consola); *Exportar lo que se muestra* lo escribe en `exports/` como CSV, JSON, XLSX o PDF.
+- Ⓐ en un cambio lo muestra y, para un valor, **restablece el anterior**, con el mismo desbloqueo y el mismo PIN que cualquier cambio, e indica si cambió desde entonces.
+- Cada cambio guarda la versión de PlayGuard que lo hizo; un cambio registrado por una versión más reciente de PlayGuard aparece como *Otro cambio*.
+
+#### Respaldos
+
+- **Respaldar / restaurar la configuración** en la tarjeta SD: nivel de restricción, ajustes personalizados, modo RV, sistema de clasificación, límites diarios, la alarma de “Se acabó el tiempo” (con las acciones avanzadas activadas) y, como registro, el bloque sin procesar del temporizador de juego; nunca el PIN.
+- Una restauración solo enumera lo que cambiaría (si no hay nada que cambiar, simplemente lo dice, sin desbloquear ni escribir nada), e indica cuando el respaldo tenía una alarma de hora de dormir activada (no se vuelve a escribir).
+- Usted elige cuántos respaldos conservar.
+
 ## Información
 
 *[Probarlo en el simulador ›](https://playguard.link/simulator/?tab=about)*
@@ -441,7 +465,7 @@ En una consola sin Internet, *Ajustar el reloj de red al reloj de la consola* ap
 
 - El PlayGuard instalado: versión (en ámbar cuando hay una más reciente; Ⓐ abre sus **notas de la versión**), modo de inicio y carpeta de datos.
 - **Buscar actualizaciones** ahora; *Buscar actualizaciones cada día* al iniciar.
-- *Actualizar con*: en PlayGuard, que descarga la versión, la verifica, se reemplaza a sí mismo y se reinicia, o con sphaira, Homebrew App Store o a mano (se pregunta en la primera actualización si no se eligió nada).
+- *Actualizar con*: en PlayGuard, que descarga la versión, la verifica, se reemplaza a sí mismo y se reinicia, o con sphaira, Homebrew App Store o a mano (se pregunta en la primera actualización si no se eligió nada). Si se instaló desde el Homebrew App Store o el App Store de sphaira, la tienda es la vía recomendada ahí, para que lleve el control de la versión; cuando su catálogo todavía no tiene la nueva versión (la publica tras una revisión, a menudo unos días después), PlayGuard lo indica y ofrece actualizar en su lugar.
 - Mientras se conoce una versión más reciente, PlayGuard se abre en **PlayGuard X.Y.Z está disponible** (su fecha y sus notas): *Actualizar*, o *Más tarde* por 1 día, 1 semana o 30 días como máximo.
 - Las notas de la versión son las del propio PlayGuard, en la misma pantalla que las de Atmosphère y hekate en *Consola*: a partir de sus versiones en GitHub, una pestaña por versión (la instalada, las más recientes, las más antiguas), cada una con sus puntos destacados como tarjetas y todos sus cambios, guardadas en la tarjeta SD para leerlas sin conexión (las de la versión instalada también están en la aplicación, para cuando todavía no se obtuvo nada).
 - Después de una actualización, PlayGuard se abre una vez en **Novedades de la X.Y.Z** (los mismos puntos destacados, y luego los códigos QR).
