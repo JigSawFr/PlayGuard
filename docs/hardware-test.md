@@ -26,6 +26,11 @@ Each step: what to do, then what must happen. ☐ is to tick.
 - ☐ *Hours without the PIN* now included: it starts without the PIN, the gate saying so; its row and the gate's screen name the hours.
 - ☐ *Hours it never opens* now included: the gate says *Not at this time* and the hours, even with a PIN on the console; outside them, the PIN again.
 - ☐ *Pause after refused PINs › Never*: refused ten times, no pause.
+- ☐ *Hours without the PIN › Monday to Friday, and the weekend apart*: on a weekday in its span, no PIN; at the weekend, the weekend's span.
+- ☐ *Close it once today's play time is used up*, a play timer with no time left today: the gate says *Today's play time is used up*, even with a PIN entered; time added (PlayGuard or the parent's app), it asks for the PIN again.
+- ☐ From a computer, `config/playguard/gate_rules.txt` written with a line giving sphaira every hour: the gate still asks for the PIN (its rules are in the forwarder).
+- ☐ From a computer, `config/playguard/gate-….nro` replaced by another `.nro` (hbmenu's): sphaira's forwarder ends with error 2347-0100 and does not start it; PlayGuard's next start writes the gate back.
+- ☐ A forwarder protected by the previous PlayGuard: the bell says to make it again; *Make again*, then its hours without the PIN work.
 
 ## 3. Locking the homebrew menu
 
@@ -47,6 +52,7 @@ Each step: what to do, then what must happen. ☐ is to tick.
 
 ## 5. Backups
 
+- ☐ *History › Tries this week*: the refusals of section 2, by day.
 - ☐ *History › Save a backup* with forwarders made: the file (`config/playguard/backups/`) has a `forwarders` part.
 - ☐ A forwarder deleted in System Settings, the backup restored: PlayGuard offers to put it back; once put back, it is on the HOME menu, protected as it was.
 

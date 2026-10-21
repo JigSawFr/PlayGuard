@@ -28,6 +28,8 @@ typedef enum {
     GateText_Closed,       // in its hours without any access (GATE_CLOSED_NAME)
     GateText_ClosedHours,  // "Closed: %s" (printf: gate_hours_text's)
     GateText_ClosedHint,
+    GateText_Limit,        // the day's play time used up (GateRules.limit)
+    GateText_LimitHint,
     GateText_Count,
 } GateText;
 

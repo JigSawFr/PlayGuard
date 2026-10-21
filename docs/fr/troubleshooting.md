@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 306702d36598 -->
+<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.fr.md).
@@ -73,6 +73,10 @@ La console fait tourner un firmware plus récent que le plus récent testé : Pl
 ### Un jeu ne démarre pas, ou affiche un « ! » sur le menu HOME
 
 *Console › Vérifier les jeux installés* dit ce qui ne va pas pour chacun et quoi faire ; les sauvegardes restent toujours ([jeux installés](features.md#jeux-installés)).
+
+### Un forwarder protégé affiche l'erreur 2347-0100
+
+Sa porte (`config/playguard/gate-….nro`) n'est plus le fichier avec lequel le forwarder a été fait : elle a été modifiée ou remplacée sur la carte SD, et le forwarder ne la lance pas. Ouvrez PlayGuard depuis son propre forwarder : il réécrit la porte au démarrage ; *Console › Forwarders › Tout réinstaller* refait chaque forwarder avec elle.
 
 ### La cloche ou un onglet affiche une pastille orange
 

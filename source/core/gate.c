@@ -5,8 +5,66 @@
 #include <stdio.h>
 #include <string.h>
 
+// The span of a "--gate-free=" or "--gate-closed=" token: "<days hex>,<from>,<to>".
+static bool number(const char **p, const char *end, char stop, unsigned base, unsigned max, unsigned *out);
+static bool valid(const GateHours *h);
+static bool span_of(const char *s, const char *end, GateHours *out)
+{
+    unsigned days, from, to;
+    // `number` wants a stop after each: the last one ends at `end`, read with a sentinel.
+    char last[8];
+    const char *p = s;
+    if (!number(&p, end, ',', 16, 0x7F, &days) || !number(&p, end, ',', 10, 1440, &from)) return false;
+    const size_t n = (size_t)(end - p);
+    if (n == 0 || n >= sizeof(last) - 1) return false;
+    memcpy(last, p, n);
+    last[n] = ';';
+    const char *q = last;
+    if (!number(&q, last + n + 1, ';', 10, 1440, &to)) return false;
+    const GateHours h = { (uint8_t)days, (uint16_t)from, (uint16_t)to };
+    if (!valid(&h)) return false;
+    *out = h;
+    return true;
+}
+
+// One rules token, [s, end): read into *r.
+static void rule_token(const char *s, const char *end, GateRules *r)
+{
+    const size_t n = (size_t)(end - s);
+#define IS(lit) (n >= sizeof(lit) - 1 && memcmp(s, lit, sizeof(lit) - 1) == 0)
+    if (n == sizeof("--gate-rules") - 1 && IS("--gate-rules")) r->carried = true;
+    else if (n == sizeof("--gate-limit") - 1 && IS("--gate-limit")) r->limit = true;
+    else if (IS("--gate-free=")) {
+        if (r->free_n < GATE_SPANS && span_of(s + sizeof("--gate-free=") - 1, end, &r->free[r->free_n])) r->free_n++;
+    } else if (IS("--gate-closed=")) {
+        if (r->closed_n < GATE_SPANS && span_of(s + sizeof("--gate-closed=") - 1, end, &r->closed[r->closed_n]))
+            r->closed_n++;
+    } else if (IS("--gate-pause=")) {
+        const char *p = s + sizeof("--gate-pause=") - 1;
+        unsigned tries, minutes;
+        char last[12];
+        if (!number(&p, end, ',', 10, 1000, &tries)) return;
+        const size_t m = (size_t)(end - p);
+        if (m == 0 || m >= sizeof(last) - 1) return;
+        memcpy(last, p, m);
+        last[m] = ';';
+        const char *q = last;
+        if (!number(&q, last + m + 1, ';', 10, 100000, &minutes)) return;
+        r->has_pause = true;
+        r->pause_tries = minutes ? tries : 0;
+        r->pause_minutes = r->pause_tries ? minutes : 0;
+    }
+#undef IS
+}
+
 bool gate_argv_parse(const char *raw, char *nro, size_t nro_size, const char **argv)
 {
+    return gate_argv_rules(raw, nro, nro_size, argv, NULL);
+}
+
+bool gate_argv_rules(const char *raw, char *nro, size_t nro_size, const char **argv, GateRules *rules)
+{
+    if (rules) memset(rules, 0, sizeof(*rules));
     if (!raw || !nro || nro_size == 0 || !argv) return false;
     nro[0] = '\0';
     *argv = NULL;
@@ -24,6 +82,14 @@ bool gate_argv_parse(const char *raw, char *nro, size_t nro_size, const char **a
     const size_t flag_len = strlen(flag);
     if (strncmp(p, flag, flag_len) != 0) return false;
     const char *rest = p + flag_len;
+    // The rules, each "--gate-…" word, before the homebrew's path.
+    GateRules scratch;
+    while (strncmp(rest, "--gate-", 7) == 0) {
+        const char *word_end = strchr(rest, ' ');
+        if (!word_end) return false;   // nothing after them: no homebrew
+        rule_token(rest, word_end, rules ? rules : &scratch);
+        rest = word_end + 1;
+    }
     // Its path: its first word, or what its quotes hold.
     const char *start = rest, *end;
     if (*rest == '"') {
@@ -50,6 +116,13 @@ bool gate_hours_free(const GateHours *h, int wday, int minute)
     // Past midnight: the evening of a day of `days`, or the morning after one.
     const int before = (wday + 6) % 7;
     return ((h->days >> wday & 1) && minute >= h->from) || ((h->days >> before & 1) && minute < h->to);
+}
+
+bool gate_spans_hold(const GateHours *spans, unsigned n, int wday, int minute)
+{
+    for (unsigned i = 0; spans && i < n; i++)
+        if (gate_hours_free(&spans[i], wday, minute)) return true;
+    return false;
 }
 
 static bool valid(const GateHours *h)
@@ -117,6 +190,35 @@ bool gate_rule_find(const char *text, size_t len, const char *nro, GateHours *ou
     return false;
 }
 
+size_t gate_rules_format(const GateRules *r, char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    buf[0] = '\0';
+    if (!r) return 0;
+    size_t used = 0;
+    bool fits = true;
+#define ADD(...)                                                                       \
+    do {                                                                               \
+        const int k = snprintf(buf + used, size - used, __VA_ARGS__);                  \
+        if (k < 0 || (size_t)k >= size - used) fits = false;                           \
+        else used += (size_t)k;                                                        \
+    } while (0)
+    ADD(" --gate-rules");
+    for (unsigned i = 0; fits && i < r->free_n && i < GATE_SPANS; i++)
+        if (valid(&r->free[i])) ADD(" --gate-free=%02x,%u,%u", r->free[i].days, r->free[i].from, r->free[i].to);
+    for (unsigned i = 0; fits && i < r->closed_n && i < GATE_SPANS; i++)
+        if (valid(&r->closed[i]))
+            ADD(" --gate-closed=%02x,%u,%u", r->closed[i].days, r->closed[i].from, r->closed[i].to);
+    if (fits && r->has_pause) ADD(" --gate-pause=%u,%u", r->pause_tries, r->pause_tries ? r->pause_minutes : 0);
+    if (fits && r->limit) ADD(" --gate-limit");
+#undef ADD
+    if (!fits) {
+        buf[0] = '\0';
+        return 0;
+    }
+    return used;
+}
+
 const char *gate_result_name(GateResult r)
 {
     switch (r) {
@@ -125,6 +227,7 @@ const char *gate_result_name(GateResult r)
         case GateResult_Refused: return "refused";
         case GateResult_Paused: return "paused";
         case GateResult_Closed: return "closed";
+        case GateResult_Limit: return "limit";
         default: return "error";
     }
 }
@@ -161,6 +264,7 @@ bool gate_log_parse(const char *line, size_t len, const char **when, size_t *whe
     else if (name_len == 5 && memcmp(rest, "error", 5) == 0) res = GateResult_Error;
     else if (name_len == 6 && memcmp(rest, "paused", 6) == 0) res = GateResult_Paused;
     else if (name_len == 6 && memcmp(rest, "closed", 6) == 0) res = GateResult_Closed;
+    else if (name_len == 5 && memcmp(rest, "limit", 5) == 0) res = GateResult_Limit;
     else return false;
     const char *path = tab2 + 1;
     const size_t path_len = len - (size_t)(path - line);
@@ -227,6 +331,24 @@ size_t gate_hours_text(const GateHours *h, const char *days, char *buf, size_t s
         return 0;
     }
     return (size_t)n;
+}
+
+size_t gate_spans_text(const GateHours *spans, unsigned n, const char *days, char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    buf[0] = '\0';
+    size_t used = 0;
+    for (unsigned i = 0; spans && i < n; i++) {
+        char one[200];
+        if (!gate_hours_text(&spans[i], days, one, sizeof(one))) continue;
+        const int k = snprintf(buf + used, size - used, "%s%s", used ? ", " : "", one);
+        if (k < 0 || (size_t)k >= size - used) {
+            buf[0] = '\0';
+            return 0;
+        }
+        used += (size_t)k;
+    }
+    return used;
 }
 
 // The pause file, line by line: `fn` with each line (without "\n", "\r").
@@ -389,6 +511,12 @@ static size_t finish(struct Out *o)
 size_t gate_pause_update(const char *text, size_t len, const char *nro, GateResult r, uint64_t now, char *out,
                          size_t size)
 {
+    return gate_pause_update_with(text, len, nro, r, now, NULL, out, size);
+}
+
+size_t gate_pause_update_with(const char *text, size_t len, const char *nro, GateResult r, uint64_t now,
+                              const GatePauseRule *carried, char *out, size_t size)
+{
     if (!out || size == 0 || !nro || !*nro || strpbrk(nro, "\t\r\n")) return 0;
     out[0] = '\0';
     struct Out o = { out, size, 0, false };
@@ -398,7 +526,7 @@ size_t gate_pause_update(const char *text, size_t len, const char *nro, GateResu
     struct CopyCtx c = { &o, rewrite ? nro : NULL, rewrite ? strlen(nro) : 0, true };
     each_line(text, len, copy_line, &c);
     if (r == GateResult_Refused) {
-        const GatePauseRule rule = gate_pause_rule(text, len);
+        const GatePauseRule rule = carried ? *carried : gate_pause_rule(text, len);
         unsigned streak = 0;
         uint64_t until = 0;
         gate_pause_find(text, len, nro, &streak, &until);

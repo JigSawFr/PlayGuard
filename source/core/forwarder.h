@@ -39,6 +39,7 @@ typedef struct {
     const char *argv;       // its argv, its path first
     const char *gate_path;  // NULL, or PlayGuard's .nro, asking for the PIN first (FwdInput)
     const char *gate_argv;
+    const uint8_t *gate_sha256;   // NULL, or the gate's SHA-256: the loader refuses another (FwdInput)
     const char *name;       // the HOME menu's name
     const char *author;
     const void *nacp;

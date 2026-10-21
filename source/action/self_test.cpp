@@ -85,7 +85,9 @@ void forwarders_part(std::vector<Item>& out)
             case State::Ready:
                 what += "on the HOME menu";
                 if (r.pin) what += r.verified ? ", protected, seen working through its gate" : ", protected, not started through its gate yet";
-                out.push_back({ S, r.pin && !r.verified ? Res::Warn : Res::Pass, what });
+                // Made before it carried its rules: its free hours wait for it to be made again.
+                if (r.pin && !r.carried) what += ", made before it carried its rules (Make again)";
+                out.push_back({ S, r.pin && (!r.verified || !r.carried) ? Res::Warn : Res::Pass, what });
                 break;
             case State::NotInstalled: out.push_back({ S, Res::Fail, what + "no longer on the HOME menu" }); break;
             case State::NroMissing: out.push_back({ S, Res::Fail, what + "its .nro is missing (" + nro::sd_path(r.nro) + ")" }); break;

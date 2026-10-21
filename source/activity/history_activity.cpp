@@ -2,6 +2,7 @@
 #include "activity/history_activity.hpp"
 
 #include "action/export_flow.hpp"
+#include "action/forwarder_flow.hpp"
 #include "action/history_flow.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
@@ -52,6 +53,13 @@ void HistoryActivity::onContentAvailable()
         this->export_shown();
         return true;
     });
+    // The forwarders' gate: its week, once it has tried something.
+    week_cell->setDetailText(ui::opens());
+    week_cell->registerClickAction([](brls::View*) {
+        forwarder_flow::show_week();
+        return true;
+    });
+    ui::set_visible(week_cell.getView(), forwarder_flow::has_week());
     this->empty_card = cadran::kit::empty("history");
     this->empty_card.box->setMarginTop(16);
     if (auto* root = dynamic_cast<brls::Box*>(empty->getParent())) root->addView(this->empty_card.box);

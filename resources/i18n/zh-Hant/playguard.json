@@ -592,6 +592,9 @@
         "dns_note": "Atmosphère 的 DNS 重新導向（atmosphere/hosts）將任天堂的家長監護伺服器導向別處：手機應用程式無法同步，因此不會覆蓋在此所做的設定。"
     },
     "security": {
+        "headline_none": "尚未設定PIN碼：任何人都能變更設定",
+        "headline_unlocked": "暫時已解鎖",
+        "headline_active": "已受PIN碼保護",
         "section_status": "狀態",
         "pin": "PIN碼",
         "restrictions": "限制已啟用",
@@ -692,6 +695,10 @@
         "note_old_module": "沒有 PIN碼 無法在此變更任何內容，PlayGuard 會照常開啟。請在電腦上更新該模組：將 PlayGuard {} 的 playguard-rescue.zip 解壓縮到 SD 卡根目錄，放回 RESCUE 檔案，然後重新啟動主機。"
     },
     "tools": {
+        "headline_kicker": "本主機",
+        "headline_ok": "無需檢查",
+        "headline_one": "1 項待檢查",
+        "headline": "{} 項待檢查",
         "section_diag": "診斷",
         "section_system": "系統",
         "export": "匯出診斷報告",
@@ -1039,7 +1046,6 @@
         "hours_to": "到",
         "hours_set": "{}不需PIN碼即可啟動：{}",
         "hours_none": "{}任何時候都會詢問PIN碼",
-        "hours_err": "無法儲存時段",
         "state_pin_hours": "PIN碼（{}除外）",
         "day_sun": "日",
         "day_mon": "一",
@@ -1081,7 +1087,36 @@
         "pause_cell": "PIN碼被拒後暫停",
         "pause_default": "預設",
         "paused_line": "{}：至{}",
-        "paused_title": "一個轉發器因PIN碼被拒而暫停"
+        "paused_title": "一個轉發器因PIN碼被拒而暫停",
+        "state_limit": "今天的時間用完後關閉",
+        "state_remake": "需重新製作",
+        "action_limit_on": "今天的遊戲時間用完後關閉",
+        "action_limit_off": "今天的遊戲時間用完後也允許開啟",
+        "limit_on": "今天的時間用完後關閉",
+        "limit_off": "今天的時間用完後也能開啟",
+        "limit_set": "{}會在今天的遊戲時間用完後關閉",
+        "limit_unset": "{}不再在今天的遊戲時間用完後關閉",
+        "hours_apart": "週一至週五，週末另外設定",
+        "hours_from_of": "{}：開始",
+        "hours_to_of": "{}：結束",
+        "remake": "重新製作",
+        "remake_confirm": "重新製作這些受保護的轉發器？{}。它們的規則（時段、暫停）將寫入轉發器本身，SD卡無法更改；啟動前也會檢查門禁檔案。",
+        "remade_n": "已重新製作：{}",
+        "fix_remake": "重新製作之前保護的轉發器",
+        "remake_title": "受保護的轉發器需重新製作",
+        "remake_detail": "{}：由舊版PlayGuard製作。在重新製作之前，無需PIN碼的時段不會生效（會要求PIN碼），在SD卡上被更改的門禁仍會啟動。",
+        "state_pin_rules": "PIN碼，有自己的規則",
+        "week_cell": "本週嘗試",
+        "week_title": "本週門禁的嘗試",
+        "week_sub": "最近七天，含今天",
+        "week_opened": "已開啟：{}",
+        "week_refused": "被拒絕：{}（{}）",
+        "week_none_refused": "沒有被拒絕的PIN碼",
+        "week_blocked": "未開啟（暫停、關閉、時間用完）：{}",
+        "week_empty": "最近七天沒有嘗試任何轉發器。",
+        "week_note": "本週被拒絕：{}；前一週：{}。",
+        "climb_title": "被拒絕的PIN碼比平時多",
+        "climb_detail": "最近七天門禁拒絕了{}次PIN碼，前一週為{}次。"
     },
     "hbmenu": {
         "section": "自製軟體選單",
@@ -1538,7 +1573,9 @@
             "gate_closed": "轉發器關閉（禁止使用的時段）",
             "gate_closed_hours": "轉發器的禁止使用時段",
             "gate_pause": "PIN碼被拒後暫停",
-            "gate_pause_lifted": "轉發器暫停已解除"
+            "gate_pause_lifted": "轉發器暫停已解除",
+            "gate_limit": "轉發器關閉（今天的遊戲時間已用完）",
+            "gate_limit_set": "今天的遊戲時間用完後關閉轉發器"
         },
         "sources": {
             "uniform": "每天相同上限",
