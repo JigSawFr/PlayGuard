@@ -592,6 +592,9 @@
         "dns_note": "Atmosphère の DNS リダイレクト（atmosphere/hosts）が任天堂のみまもり設定サーバーをほかへ向けています。スマホアプリは同期できないため、ここでの設定は上書きされません。"
     },
     "security": {
+        "headline_none": "暗証番号が未設定：誰でも設定を変更できます",
+        "headline_unlocked": "一時的に解除中",
+        "headline_active": "暗証番号で保護されています",
         "section_status": "状態",
         "pin": "暗証番号",
         "restrictions": "制限が有効",
@@ -692,6 +695,10 @@
         "note_old_module": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。パソコンでモジュールを更新してください：PlayGuard {}のplayguard-rescue.zipをSDカードのルートに展開し、RESCUEファイルを置き直してから本体を再起動します。"
     },
     "tools": {
+        "headline_kicker": "このゲーム機",
+        "headline_ok": "確認することはありません",
+        "headline_one": "確認が必要な項目：1件",
+        "headline": "確認が必要な項目：{}件",
         "section_diag": "診断",
         "section_system": "システム",
         "export": "診断レポートをエクスポート",
