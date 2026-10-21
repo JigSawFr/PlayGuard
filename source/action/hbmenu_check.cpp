@@ -185,6 +185,16 @@ std::string yes_no(bool v)
     return v ? "playguard/hbmenu/yes"_i18n : "playguard/hbmenu/no"_i18n;
 }
 
+// The check's third button: Lock while it is not, else Update the module.
+bool lock_offered(const State& st)
+{
+    return !st.lock_block && !app::read_only();
+}
+bool update_offered(const State& st)
+{
+    return !lock_offered(st) && st.module == "outdated" && rescue::bundled() && !app::read_only();
+}
+
 // The rescue module's line: whether it is installed and, when it is not
 // the one this PlayGuard comes with, which version it came with and which
 // one replaces it.
@@ -192,8 +202,8 @@ std::string module_text(const State& st)
 {
     if (st.module == "none") return "playguard/hbmenu/check_none"_i18n;
     if (st.module == "current") return "playguard/hbmenu/check_current"_i18n;
-    const std::string how = rescue::bundled() ? "playguard/hbmenu/module_how_update"_i18n
-                                              : brls::getStr("playguard/hbmenu/module_how_zip", app::version());
+    const std::string how = update_offered(st) ? "playguard/hbmenu/module_how_update"_i18n
+                                               : brls::getStr("playguard/hbmenu/module_how_zip", app::version());
     return st.module_version.empty()
         ? brls::getStr("playguard/hbmenu/check_outdated_unknown", app::version(), how)
         : brls::getStr("playguard/hbmenu/check_outdated", st.module_version, app::version(), how);
@@ -231,13 +241,13 @@ void show_check(std::function<void(bool)> done)
         if (done) done(changed);
     };
     auto* dialog = ui::box_dialog(ui::checklist_body("playguard/hbmenu/check"_i18n, lines));
-    // Not locked: the way to the lock, step by step. Locked (or read-only):
-    // the rescue sheet. An outdated module's update alone above them.
-    if (!st.lock_block && !app::read_only())
-        dialog->addButton("playguard/hbmenu/lock"_i18n, [finish]() { brls::sync([finish]() { lock(finish); }); });
-    else dialog->addButton("playguard/hbmenu/rescue"_i18n, []() { brls::sync([]() { show_rescue(); }); });
+    // The rescue sheet and OK; alone above them, the way to the lock while it
+    // is not locked, else an outdated module's update.
+    dialog->addButton("playguard/hbmenu/rescue"_i18n, []() { brls::sync([]() { show_rescue(); }); });
     dialog->addButton("hints/ok"_i18n, []() {});
-    if (st.module == "outdated" && rescue::bundled() && !app::read_only())
+    if (lock_offered(st))
+        dialog->addButton("playguard/hbmenu/lock"_i18n, [finish]() { brls::sync([finish]() { lock(finish); }); });
+    else if (update_offered(st))
         dialog->addButton("playguard/hbmenu/module_update"_i18n,
                           [finish]() { brls::sync([finish]() { rescue::update_now(finish); }); });
     dialog->setCancelable(true);
