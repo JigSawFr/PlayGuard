@@ -104,8 +104,9 @@ std::string until_label(uint64_t posix);
 void lift_pause(const forwarders_logic::Row& row, std::function<void(bool)> done);
 
 // Its HOME menu icon from a screenshot (`shot`, "sdmc:/Nintendo/Album/…"),
-// or its .nro's again (""): made again, the same program ID.
-void set_icon(const forwarders_logic::Row& row, const std::string& shot, std::function<void(bool)> done);
+// its square at `x` (0 the left edge, 100 the right one), or its .nro's
+// again (""): made again, the same program ID.
+void set_icon(const forwarders_logic::Row& row, const std::string& shot, int x, std::function<void(bool)> done);
 // Of `made` (a settings backup's), those not on the HOME menu now; and
 // those installed again, as they were (protected, their hours, their icon).
 std::vector<forwarders::Made> missing_from(const std::vector<forwarders::Made>& made);
@@ -113,6 +114,12 @@ void put_back_all(const std::vector<forwarders::Made>& made, std::function<void(
 
 // The album's screenshots, the newest first (30 at most), as "sdmc:/…".
 std::vector<std::string> album_shots();
+// One of them as its file holds it; empty when it cannot be read. And the
+// icon `row`'s .nro carries, as its forwarder is made with it (a stand-in
+// when it has none); empty when the .nro cannot be read. Plain file reads:
+// either can run off the UI thread.
+std::vector<uint8_t> shot_bytes(const std::string& shot);
+std::vector<uint8_t> own_icon(const forwarders_logic::Row& row);
 
 // "Sat–Sun 09:00–20:00", in the UI's language; both spans of `hours`.
 std::string hours_label(int days, int from, int to);

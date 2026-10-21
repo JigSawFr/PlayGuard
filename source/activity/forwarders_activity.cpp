@@ -6,6 +6,7 @@
 #include "action/forwarder_flow.hpp"
 #include "action/game_icons.hpp"
 #include "action/hbmenu_lock.hpp"
+#include "activity/icon_sheet.hpp"
 #include "app.hpp"
 #include "tab/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
@@ -774,22 +775,16 @@ void ForwardersActivity::pick_pause()
 void ForwardersActivity::pick_icon(const Row& row)
 {
     const Row r = row;
-    const std::vector<std::string> shots = forwarder_flow::album_shots();
     // Its .nro's own first, then the album's screenshots, the newest first.
-    std::vector<std::string> names = { "playguard/forwarders/icon_own"_i18n };
-    for (const std::string& p : shots) {
-        const std::string label = forwarders_logic::shot_label(p);
-        names.push_back(label.empty() ? forwarders_logic::file_title(p) : label);
-    }
+    std::vector<std::string> shots = forwarder_flow::album_shots();
     if (shots.empty()) {
         ui::notice("eye", ui::Check::Info, "playguard/forwarders/action_icon"_i18n, "playguard/forwarders/icon_none"_i18n);
         return;
     }
     std::weak_ptr<bool> weak = this->alive;
-    ui::pick("playguard/forwarders/icon_title"_i18n, names, r.custom_icon ? -1 : 0, [this, weak, r, shots](int index) {
-        if (weak.expired() || index < 0 || (size_t)index > shots.size()) return;
-        if (index == 0 && !r.custom_icon) return;
-        forwarder_flow::set_icon(r, index == 0 ? "" : shots[(size_t)index - 1], this->then_rebuild(r.id));
+    icon_sheet::open(r, std::move(shots), [this, weak, r](const std::string& shot, int x) {
+        if (weak.expired()) return;
+        forwarder_flow::set_icon(r, shot, x, this->then_rebuild(r.id));
     });
 }
 
