@@ -208,6 +208,11 @@ void add_cancel(brls::Dialog* dialog, std::function<void()> cancel);
 void pick(const std::string& title, const std::vector<std::string>& values, int selected,
           std::function<void(int)> on_pick, bool checked = true, const std::vector<std::string>& details = {},
           const std::vector<std::string>& icons = {});
+// The same as tiles, `columns` to a row, each its Cadran icon (`icons`, a
+// name) large above its label: a few values that read better side by side
+// (the tabs of Start on).
+void pick_grid(const std::string& title, const std::vector<std::string>& values, const std::vector<std::string>& icons,
+               int selected, std::function<void(int)> on_pick, int columns = 4);
 // The same with several rows checked: those `marks` sets (true). Choosing a
 // row closes the list as pick() does: to toggle one, the caller opens it
 // again with the row's mark changed and the focus on it (`focus`).
