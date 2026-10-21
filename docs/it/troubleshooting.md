@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 86382aa8effc -->
+<!-- translated from docs/troubleshooting.md, sha256 498fbfed802c -->
 # Risoluzione dei problemi
 
 Riprendere il controllo di una console bloccata, i problemi comuni, segnalare un bug, e la modalità sviluppatore. Torna al [README](../../README.md).
@@ -23,6 +23,13 @@ In questo caso PlayGuard stesso non può avviarsi. Installa il sysmodule di ripr
 
 Il modulo deve seguire la versione di PlayGuard: a ogni aggiornamento di PlayGuard, estrai di nuovo il `playguard-rescue.zip` di quella versione (oppure *Aggiorna* sulla voce *Il sysmodule di ripristino non è aggiornato* della campanella delle notifiche), poi riavvia la console. Un modulo più vecchio lascia un rapporto che PlayGuard non può verificare: la schermata di recupero allora non propone nulla, dice che il modulo è più vecchio, e rifare `RESCUE` dà lo stesso risultato finché non viene aggiornato.
 
+### Menu homebrew bloccato
+
+*Console › Forwarder › Blocca il menu homebrew* impedisce all'album e a un gioco avviato con R di aprire il menu homebrew. Se il forwarder di PlayGuard e il menu protetto sono spariti entrambi (eliminati nelle Impostazioni di sistema, o sull'altro sistema: il blocco è sulla scheda SD, letto sia dal sysMMC sia dall'emuMMC):
+
+- **Da un computer:** elimina `atmosphere/config/override_config.ini` sulla scheda SD (o rimetti `config/playguard/override_config.ini.backup`, il file com'era), poi riavvia la console.
+- **Con il sysmodule di ripristino installato** (facoltativo): metti un file vuoto `config/playguard/RESCUE` sulla scheda SD e riavvia; il modulo toglie il blocco all'avvio, e PlayGuard lo segnala al suo avvio successivo. Un aggiornamento di Atmosphère dopo il blocco lo toglie allo stesso modo.
+
 ### Console non modificata
 
 PlayGuard non può aiutare: richiede Atmosphère. La procedura della master key dell'assistenza Nintendo è la via ufficiale.
@@ -41,7 +48,7 @@ PlayGuard non può aiutare: richiede Atmosphère. La procedura della master key 
 ### I miei limiti sono cambiati da soli
 
 - **L'app Filtro famiglia è ancora collegata.** La sua prossima sincronizzazione sovrascrive ciò che PlayGuard ha impostato: *PIN › Scollega l'app Filtro famiglia*.
-- **Un altro strumento, o un profilo.** *Oggi* mostra un riquadro ambra per i limiti diversi da quelli che PlayGuard ha visto per ultimi, e *Cronologia › Cronologia delle modifiche* elenca ogni modifica vista fuori da PlayGuard. Ⓐ su una di esse rimette il valore precedente.
+- **Un altro strumento, o un profilo.** *Oggi* mostra un riquadro ambra per i limiti diversi da quelli che PlayGuard ha visto per ultimi, e *Preferenze › Cronologia delle modifiche* elenca ogni modifica vista fuori da PlayGuard. Ⓐ su una di esse rimette il valore precedente.
 - **Un profilo programmato** messo in vigore, o rimesso com'era una volta finito il suo periodo (*Tempo di gioco › Profili › Profilo programmato*).
 
 ### Il bambino ha giocato oltre il limite

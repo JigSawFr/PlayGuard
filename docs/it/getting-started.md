@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 629d9dfda705 -->
+<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
 # Per iniziare
 
 Dalla scheda SD a una console configurata per tuo figlio, in una decina di minuti, poi le attività di tutti i giorni. Torna al [README](../../README.md).
@@ -73,8 +73,8 @@ Una console senza Internet: quando nessun server risponde, PlayGuard propone inv
 | Passare dal periodo scolastico alle vacanze | *Tempo di gioco › Profili*; *Profilo programmato* per un periodo scelto in anticipo. |
 | Vedere chi ha giocato a cosa | *Attività*: per gioco, per utente, oggi, 7 giorni, da sempre; esportazione o un codice QR. |
 | Bloccare tutti i giochi per ora | *PIN › Blocca tutti i giochi*. Una volta disattivato, i limiti precedenti tornano. |
-| Annullare una modifica | **ZR** *Annulla* subito dopo, o *Cronologia › Cronologia delle modifiche* in qualsiasi momento. |
-| Conservare una copia delle impostazioni | *Cronologia › Esegui il backup delle impostazioni* (mai il PIN). |
+| Annullare una modifica | **ZR** *Annulla* subito dopo, o *Preferenze › Cronologia delle modifiche* in qualsiasi momento. |
+| Conservare una copia delle impostazioni | *Preferenze › Esegui il backup delle impostazioni* (mai il PIN). |
 | Sapere cosa richiede la tua attenzione | La campanella (Ⓨ): ciò che va fatto in ambra, ciò che è bene sapere con una "i". |
 
 ## E poi
