@@ -16,6 +16,14 @@ static char g_nextNroPath[FS_MAX_PATH] = {0};
 // stores first launched nro argv + path.
 static char g_defaultArgv[2048] = {0};
 static char g_defaultNroPath[FS_MAX_PATH] = {0};
+// PlayGuard: the PIN gate a protected forwarder starts first, and its
+// SHA-256 (nextNroSha256): the gate is on the SD card, its hash in this
+// forwarder's RomFS on the console's storage; another file there is not
+// started (error 2347-0100).
+static char g_gatePath[FS_MAX_PATH] = {0};
+static u8 g_gateSha256[SHA256_HASH_SIZE] = {0};
+static bool g_gatePinned = false;
+#define GATE_CHANGED MAKERESULT(Module_HomebrewLoader, 100)
 
 static const char g_noticeText[] = { "PlayGuard forwarder (sphaira hbl)" };
 
@@ -387,6 +395,10 @@ void NX_NORETURN loadNro(void) {
             readRomfsFile(&s, &romfs_header, romfs_files, romfs_header.fileTableSize, dir, "redirectProgramId", &redirect_program_id, sizeof(redirect_program_id)) &&
             readRomfsFile(&s, &romfs_header, romfs_files, romfs_header.fileTableSize, dir, "redirectPath", redirect_path, sizeof(redirect_path) - 1);
 
+        g_gatePinned = has_return &&
+            readRomfsFile(&s, &romfs_header, romfs_files, romfs_header.fileTableSize, dir, "nextNroSha256", g_gateSha256, sizeof(g_gateSha256));
+        if (g_gatePinned) strcpy(g_gatePath, g_nextNroPath);
+
         fsStorageClose(&s);
 
         if (has_redirect && R_FAILED(rc = restoreProgramPath(redirect_storage, redirect_program_id, redirect_path)))
@@ -437,6 +449,13 @@ void NX_NORETURN loadNro(void) {
 
         fsFileClose(&f);
         fsFsClose(&fs);
+
+        // The gate as PlayGuard made this forwarder with it, or nothing.
+        if (g_gatePinned && strcmp(g_nextNroPath, g_gatePath) == 0) {
+            u8 digest[SHA256_HASH_SIZE];
+            sha256CalculateHash(digest, start, bytes_read);
+            if (memcmp(digest, g_gateSha256, sizeof(digest)) != 0) diagAbortWithResult(GATE_CHANGED);
+        }
     }
 
     rw_size = header->segments[2].size + header->bss_size;

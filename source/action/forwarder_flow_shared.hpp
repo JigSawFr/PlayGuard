@@ -4,12 +4,15 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <array>
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <vector>
 
 #include "action/forwarders_logic.hpp"
 #include "util/forwarders.hpp"
+#include "util/gate_tally.hpp"
 #include "util/nro.hpp"
 
 namespace forwarder_flow::detail
@@ -29,14 +32,26 @@ std::string history_label(const std::string& name, uint64_t id);
 // desktop has none).
 bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string& error);
 
-// The gate a protected forwarder starts first: config/playguard/gate.nro,
-// written from the romfs when this build carries it (again when PlayGuard
-// was updated); else PlayGuard's own .nro (the desktop, or the card refused
-// the write), which is a gate too (main.cpp).
-std::string gate_nro();
+// The gate a protected forwarder starts first: config/playguard/gate-<its
+// SHA-256's first 16 hex digits>.nro, written from the romfs when this build
+// carries it, its hash for the forwarder's loader to check (`pinned`); a
+// new PlayGuard's gate is another file, so a forwarder made before keeps
+// its own until it is made again. gate.nro too, for those made before the
+// hash. Else PlayGuard's own .nro (the desktop, or the card refused the
+// write), which is a gate too (main.cpp), not pinned: it changes with each
+// update.
+struct Gate
+{
+    std::string                path;   // "sdmc:/…"
+    std::array<uint8_t, 32>    sha256{};
+    bool                       pinned = false;
+};
+Gate gate_nro();
+// The gate files PlayGuard wrote that no forwarder starts any more: gone.
+void tidy_gates();
 
 // Builds and installs `m` from its .nro; says how it went (`done_text`, the
-// change history's `kind`), only when it fails with `quiet`. Protected with
+// change history's `kind`, nullptr for none), only when it fails with `quiet`. Protected with
 // the PIN, it goes through the gate as it is now (gate_nro).
 bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwarder", const std::string& done_text = "",
              bool quiet = false);
@@ -64,5 +79,8 @@ void write_rules();
 // The gate's pause file (GATE_PAUSE_NAME), its text ("" when there is none).
 std::string pause_path();
 std::string read_pause();
+// The week's tries (util/gate_tally.hpp): nand_dir()/gate_tally.json.
+std::string       tally_path();
+gate_tally::Tally read_tally();
 
 }   // namespace forwarder_flow::detail

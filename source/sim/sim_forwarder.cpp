@@ -143,6 +143,7 @@ void seed_sample(const std::string& sd_root)
             m.pin = true;
             m.gate = std::string("sdmc:") + SAMPLE[0]->path;
             m.verified = true;
+            m.carried = true;
         }
         forwarders::save(m);
     }

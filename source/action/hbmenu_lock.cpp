@@ -369,6 +369,12 @@ void at_start(std::function<void()> open)
     diagnostic::set_homebrew_lock(&report);
     take_report(open);
     tell_refusals(forwarder_flow::at_start());
+    // Many more refused PINs this week than the week before: the bell, its week a press away.
+    const std::string climb = forwarder_flow::week_climb();
+    if (climb.empty()) notices::clear("gate_climb");
+    else
+        notices::set("gate_climb", notices::Level::Info, "playguard/forwarders/climb_title"_i18n, climb,
+                     "playguard/forwarders/week_cell"_i18n, []() { forwarder_flow::show_week(); });
     const bool is_locked = locked();
     // PlayGuard held the lock and the file no longer says so: taken away
     // outside PlayGuard (a computer, a file manager). Told, recorded once;
@@ -415,6 +421,15 @@ void at_start(std::function<void()> open)
     else
         notices::set("gate_paused", notices::Level::Info, "playguard/forwarders/paused_title"_i18n, paused,
                      "playguard/hbmenu/open"_i18n, open);
+    // Protected before they carried their rules and their gate's hash: made
+    // again from the bell (or Console › Forwarders).
+    std::string old;
+    for (const auto& r : forwarder_flow::to_remake()) old += (old.empty() ? "" : ", ") + r.name;
+    if (old.empty()) notices::clear("gate_remake");
+    else
+        notices::set("gate_remake", notices::Level::Action, "playguard/forwarders/remake_title"_i18n,
+                     brls::getStr("playguard/forwarders/remake_detail", old), "playguard/forwarders/remake"_i18n,
+                     []() { forwarder_flow::remake([](bool) {}); });
     if (gone.empty()) notices::clear("forwarder_gone");
     else
         notices::set("forwarder_gone", notices::Level::Info, "playguard/hbmenu/gone"_i18n,

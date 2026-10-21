@@ -214,8 +214,77 @@ static void test_pause(void)
     CHECK(gate_log_parse(line, strlen(line) - 1, &when, &wn, &r, &nro, &nn) && r == GateResult_Closed);
 }
 
+static void test_carried(void)
+{
+    char nro[64];
+    const char *argv = NULL;
+    GateRules r;
+    // Each kind of token, then the homebrew's path and its own argv.
+    static const char RAW[] = "sdmc:/config/playguard/gate-1a2b.nro --pin-gate --gate-rules --gate-free=3e,960,1140 "
+                              "--gate-free=41,540,1200 --gate-closed=7f,1260,420 --gate-pause=3,30 --gate-limit "
+                              "\"sdmc:/switch/x y.nro\" -v";
+    CHECK(gate_argv_rules(RAW, nro, sizeof(nro), &argv, &r));
+    CHECK(strcmp(nro, "sdmc:/switch/x y.nro") == 0 && strcmp(argv, "\"sdmc:/switch/x y.nro\" -v") == 0);
+    CHECK(r.carried && r.limit && r.free_n == 2 && r.closed_n == 1 && r.has_pause);
+    CHECK(r.free[0].days == 0x3E && r.free[0].from == 960 && r.free[0].to == 1140 && r.free[1].days == 0x41);
+    CHECK(r.closed[0].from == 1260 && r.closed[0].to == 420 && r.pause_tries == 3 && r.pause_minutes == 30);
+    // The plain parser skips them; the same homebrew.
+    CHECK(gate_argv_parse(RAW, nro, sizeof(nro), &argv) && strcmp(nro, "sdmc:/switch/x y.nro") == 0);
+    // Weekdays 16:00-19:00 or the weekend 9:00-20:00.
+    CHECK(gate_spans_hold(r.free, r.free_n, 3, 1000) && !gate_spans_hold(r.free, r.free_n, 3, 600));
+    CHECK(gate_spans_hold(r.free, r.free_n, 6, 600) && !gate_spans_hold(r.free, 0, 6, 600));
+    // Round trip.
+    char tokens[256];
+    const size_t n = gate_rules_format(&r, tokens, sizeof(tokens));
+    CHECK(n > 0 && strcmp(tokens, " --gate-rules --gate-free=3e,960,1140 --gate-free=41,540,1200 "
+                                  "--gate-closed=7f,1260,420 --gate-pause=3,30 --gate-limit") == 0);
+    char again[320];
+    snprintf(again, sizeof(again), "sdmc:/g.nro --pin-gate%s sdmc:/x.nro", tokens);
+    GateRules back;
+    CHECK(gate_argv_rules(again, nro, sizeof(nro), &argv, &back) && memcmp(&back, &r, sizeof(r)) == 0);
+    // A forwarder made before: none carried; nothing after the rules: not a gate's.
+    CHECK(gate_argv_rules("sdmc:/g.nro --pin-gate sdmc:/x.nro", nro, sizeof(nro), &argv, &r) && !r.carried && !r.free_n);
+    CHECK(!gate_argv_rules("sdmc:/g.nro --pin-gate --gate-rules", nro, sizeof(nro), &argv, &r));
+    // A span it cannot read, an unknown word, too many spans: skipped, the rest kept.
+    CHECK(gate_argv_rules("sdmc:/g.nro --pin-gate --gate-rules --gate-free=zz,1,2 --gate-free=7f,600,600 --gate-new=1 "
+                          "--gate-free=7f,0,1440,9 --gate-pause=4 sdmc:/x.nro",
+                          nro, sizeof(nro), &argv, &r));
+    CHECK(r.carried && r.free_n == 0 && !r.has_pause && strcmp(nro, "sdmc:/x.nro") == 0);
+    CHECK(gate_argv_rules("sdmc:/g.nro --pin-gate --gate-free=7f,0,60 --gate-free=7f,60,120 --gate-free=7f,120,180 "
+                          "--gate-free=7f,180,240 --gate-free=7f,240,300 sdmc:/x.nro",
+                          nro, sizeof(nro), &argv, &r) && r.free_n == GATE_SPANS && !r.carried);
+    // A pause of nothing is none; none at all, never.
+    CHECK(gate_argv_rules("sdmc:/g.nro --pin-gate --gate-rules --gate-pause=5,0 sdmc:/x.nro", nro, sizeof(nro), &argv, &r) &&
+          r.has_pause && r.pause_tries == 0);
+    const GateRules off = { true, { { 0 } }, 0, { { 0 } }, 0, true, 0, 0, false };
+    CHECK(gate_rules_format(&off, tokens, sizeof(tokens)) && strcmp(tokens, " --gate-rules --gate-pause=0,0") == 0);
+    CHECK(gate_rules_format(&r, tokens, 8) == 0 && tokens[0] == 0);
+    // The pause by the carried rule, not the file's.
+    static const char FILE_RULE[] = "rule\t10\t60\n";
+    const GatePauseRule two = { 2, 5 };
+    char next[256];
+    gate_pause_update_with(FILE_RULE, sizeof(FILE_RULE) - 1, "sdmc:/x.nro", GateResult_Refused, 1000, &two, next, sizeof(next));
+    char after[256];
+    gate_pause_update_with(next, strlen(next), "sdmc:/x.nro", GateResult_Refused, 1001, &two, after, sizeof(after));
+    uint64_t until = 0;
+    CHECK(gate_pause_find(after, strlen(after), "sdmc:/x.nro", NULL, &until) && until == 1001 + 300);
+    // The limit in the log; spans as text.
+    char line[128];
+    const char *when, *lnro;
+    size_t wn, nn;
+    GateResult res;
+    CHECK(gate_log_format("2026-10-20 21:00", GateResult_Limit, "sdmc:/a.nro", line, sizeof(line)) &&
+          strstr(line, "\tlimit\t"));
+    CHECK(gate_log_parse(line, strlen(line) - 1, &when, &wn, &res, &lnro, &nn) && res == GateResult_Limit);
+    char text[256];
+    static const char DAYS[] = "Sun,Mon,Tue,Wed,Thu,Fri,Sat";
+    CHECK(gate_spans_text(back.free, back.free_n, DAYS, text, sizeof(text)) &&
+          strcmp(text, "Mon\xE2\x80\x93" "Fri 16:00\xE2\x80\x93" "19:00, Sat\xE2\x80\x93" "Sun 09:00\xE2\x80\x93" "20:00") == 0);
+}
+
 int main(void)
 {
+    test_carried();
     test_pause();
     test_counts();
     test_argv();

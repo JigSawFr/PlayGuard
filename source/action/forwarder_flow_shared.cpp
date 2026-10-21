@@ -2,6 +2,7 @@
 #include "action/forwarder_flow_shared.hpp"
 
 #include <algorithm>
+#include <cstdio>
 #include <borealis.hpp>
 
 #include "action/forwarder_flow.hpp"
@@ -14,6 +15,7 @@
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/paths.hpp"
+#include "util/sha256.hpp"
 
 using namespace brls::literals;
 
@@ -90,22 +92,50 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
 }
 
 
-// The gate a protected forwarder starts first: config/playguard/gate.nro,
-// written from the romfs when this build carries it (again when PlayGuard
-// was updated); else PlayGuard's own .nro (the desktop, or the card refused
-// the write), which is a gate too (main.cpp).
-std::string gate_nro()
+Gate gate_nro()
 {
+    Gate g;
     std::string bundled;
     if (paths::read_file(BRLS_ASSET("gate/gate.nro"), bundled) && !bundled.empty()) {
-        const std::string path = paths::data_dir() + "/" + GATE_NRO_NAME;
-        std::string on_card, err;
-        if ((paths::read_file(path, on_card) && on_card == bundled) ||
-            (paths::ensure_dir(paths::data_dir()) && paths::atomic_write(path, bundled, &err)))
-            return nro::sdmc_path(path);
-        brls::Logger::warning("forwarders: {} not written ({}): PlayGuard is the gate", GATE_NRO_NAME, err);
+        Sha256 h;
+        h.update(bundled.data(), bundled.size());
+        g.sha256 = h.digest();
+        std::string hex;
+        for (size_t i = 0; i < 8; i++) hex += fmt::format("{:02x}", g.sha256[i]);
+        const std::string pinned = paths::data_dir() + "/gate-" + hex + ".nro";
+        const std::string plain = paths::data_dir() + "/" + GATE_NRO_NAME;
+        // Written when missing or not this one (a file changed on the card is
+        // put back: the loader would refuse it).
+        const auto put = [&bundled](const std::string& path, std::string* err) {
+            std::string on_card;
+            return (paths::read_file(path, on_card) && on_card == bundled) ||
+                   (paths::ensure_dir(paths::data_dir()) && paths::atomic_write(path, bundled, err));
+        };
+        std::string err;
+        if (put(pinned, &err)) {
+            g.path = nro::sdmc_path(pinned);
+            g.pinned = true;
+            if (!put(plain, &err)) brls::Logger::warning("forwarders: {} not written ({})", GATE_NRO_NAME, err);
+            return g;
+        }
+        brls::Logger::warning("forwarders: the gate not written ({}): PlayGuard is the gate", err);
     }
-    return self_nro();
+    g.path = self_nro();
+    return g;
+}
+
+void tidy_gates()
+{
+    const std::string current = gate_nro().path;
+    std::vector<std::string> used = { current };
+    for (const forwarders::Made& m : forwarders::list())
+        if (m.pin) used.push_back(m.gate);
+    for (const std::string& f : paths::list_files(paths::data_dir(), ".nro")) {
+        if (f.rfind("gate-", 0) != 0) continue;
+        const std::string sdmc = nro::sdmc_path(paths::data_dir() + "/" + f);
+        if (std::find(used.begin(), used.end(), sdmc) != used.end()) continue;
+        if (std::remove((paths::data_dir() + "/" + f).c_str()) == 0) brls::Logger::info("forwarders: {} no longer used", f);
+    }
 }
 
 // Builds and installs `m` from its .nro; says how it went (`done_text`, the
@@ -131,21 +161,28 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
     }
     forwarders::Made made = m;
     std::string gate_argv;
+    Gate gate;
     if (made.pin) {
-        made.gate = gate_nro();
+        gate = gate_nro();
+        made.gate = gate.path;
         if (made.gate.empty() || !nro_exists(made.gate)) {
             ui::error("playguard/forwarders/add_err"_i18n, "playguard/forwarders/self_unknown"_i18n);
             return false;
         }
-        gate_argv = forwarder_gate::argv_for(made.gate, made.argv);
+        // Its rules in the gate's argv, in the forwarder (core/gate.h's
+        // GateRules): the SD card's files no longer say them.
+        gate_argv = forwarder_gate::argv_for(made.gate, forwarder_gate::rules_of(made, pause_rule()), made.argv);
+        made.carried = true;
     } else {
         made.gate.clear();
-        made.free_days = 0;
+        made.free_days = made.free2_days = 0;
+        made.limit = made.carried = false;
         made.verified = false;   // seen working through the gate: again once protected again
     }
     const ForwarderSpec spec = {
         made.nro.c_str(), made.argv.c_str(), made.pin ? made.gate.c_str() : nullptr,
-        made.pin ? gate_argv.c_str() : nullptr, made.name.c_str(), made.author.c_str(),
+        made.pin ? gate_argv.c_str() : nullptr, made.pin && gate.pinned ? gate.sha256.data() : nullptr,
+        made.name.c_str(), made.author.c_str(),
         info.nacp.size() >= nro::NACP_SIZE ? info.nacp.data() : nullptr, info.icon.data(), info.icon.size(),
     };
     u64 id = 0;
@@ -155,7 +192,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         made.gone = false;   // on the HOME menu again
         std::string werr;
         if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
-        history_flow::record_event(kind, "", history_label(made.name, id));
+        if (kind) history_flow::record_event(kind, "", history_label(made.name, id));
         write_rules();
     } else {
         brls::Logger::warning("forwarders: {} not installed ({})", made.nro, ui::rc_text(rc, false));
