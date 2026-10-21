@@ -404,7 +404,7 @@ Op een console zonder internet verschijnt *Netwerkklok instellen op de consolekl
 
 ## Geschiedenis — wijzigingen en back-ups
 
-*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=history)*
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### Wijzigingsgeschiedenis
 

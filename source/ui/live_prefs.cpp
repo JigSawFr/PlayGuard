@@ -25,7 +25,7 @@ int shown_tab()
         { "tab/dashboard", ui::tab::dashboard },   { "tab/play_timer", ui::tab::play_timer },
         { "tab/activity", ui::tab::activity },     { "tab/restrictions", ui::tab::restrictions },
         { "tab/security", ui::tab::security },     { "tab/console", ui::tab::console },
-        { "tab/history", ui::tab::history },       { "tab/preferences", ui::tab::preferences },
+        { "tab/preferences", ui::tab::preferences },
         { "tab/about", ui::tab::about },
     };
     const std::string screen = TabBase::shown_screen();

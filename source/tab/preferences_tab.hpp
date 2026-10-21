@@ -1,7 +1,9 @@
 // PreferencesTab — PlayGuard itself: language, theme, text size, visual
 // effects, start tab and the intro; the kinds of notifications and the
-// monthly "Support PlayGuard" reminder. A setting that shapes one feature lives in that feature's tab;
-// the updates and Help & diagnostics are in About.
+// monthly "Support PlayGuard" reminder; then what PlayGuard changed (the
+// change history) and the settings backups. A setting that shapes one
+// feature lives in that feature's tab; the updates and Help & diagnostics
+// are in About.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -30,4 +32,9 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::BooleanCell, notices_summary, "pf_notices_summary");
     BRLS_BIND(brls::BooleanCell, notices_reminders, "pf_notices_reminders");
     BRLS_BIND(brls::BooleanCell, notices_ack_remind, "pf_notices_ack_remind");
+    BRLS_BIND(brls::DetailCell,  history,        "hs_history");
+    BRLS_BIND(brls::DetailCell,  backup_save,    "hs_backup_save");
+    BRLS_BIND(brls::DetailCell,  backup_restore, "hs_backup_restore");
+    BRLS_BIND(brls::DetailCell,  backup_keep,    "hs_backup_keep");
+    BRLS_BIND(brls::Label,       backup_note,    "hs_backup_note");
 };

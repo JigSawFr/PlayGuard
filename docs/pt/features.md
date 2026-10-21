@@ -404,7 +404,7 @@ Numa consola sem Internet, *Acertar o relógio de rede pelo relógio da consola*
 
 ## Histórico — alterações e cópias de segurança
 
-*[Experimentar no simulador ›](https://playguard.link/simulator/?tab=history)*
+*[Experimentar no simulador ›](https://playguard.link/simulator/?tab=preferences)*
 
 ### Histórico de alterações
 

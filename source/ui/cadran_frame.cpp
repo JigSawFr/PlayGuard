@@ -457,8 +457,8 @@ void cadran::style_rail(brls::View* tab_frame)
     brls::Box* list = first ? first->getParent() : nullptr;
     if (!list) return;
     list->setPadding(6, 8, 10, 16);
-    // main.xml's order: Today | timer, activity, restrictions, PIN | console | history, preferences, about.
-    static const char* icons[] = { "today", "", "timer", "activity", "shield", "lock", "", "chip", "", "history", "settings", "info" };
+    // main.xml's order: Today | timer, activity, restrictions, PIN | console | preferences, about.
+    static const char* icons[] = { "today", "", "timer", "activity", "shield", "lock", "", "chip", "", "settings", "info" };
     std::vector<brls::SidebarItem*> items;
     int position = 0;
     for (brls::View* v : list->getChildren()) {
@@ -466,7 +466,7 @@ void cadran::style_rail(brls::View* tab_frame)
         position++;
         auto* item = dynamic_cast<brls::SidebarItem*>(v);
         if (!item) {   // a separator: its line is drawn at mid-height
-            // 13 px: the nine items and three separators fit between the
+            // 13 px: the items and the three separators fit between the
             // header and the footer (559 of 563 px), so the rail never
             // scrolls, nor moves from one tab to the next.
             v->setHeight(13);

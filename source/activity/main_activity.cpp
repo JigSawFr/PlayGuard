@@ -230,7 +230,7 @@ void MainActivity::update_notice_hint()
     if (!sidebar) return;
     static const std::pair<int, const char*> TABS[] = {
         { ui::tab::dashboard, "dashboard" }, { ui::tab::play_timer, "play_timer" }, { ui::tab::activity, "activity" },
-        { ui::tab::security, "security" },   { ui::tab::console, "console" },       { ui::tab::history, "history" },
+        { ui::tab::security, "security" },   { ui::tab::console, "console" },       { ui::tab::preferences, "preferences" },
         { ui::tab::about, "about" },
     };
     for (const auto& t : TABS)

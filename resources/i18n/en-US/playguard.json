@@ -15,7 +15,6 @@
         "clock": "Network clock",
         "security": "PIN",
         "console": "Console",
-        "history": "History",
         "preferences": "Preferences",
         "about": "About"
     },
