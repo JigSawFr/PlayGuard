@@ -46,7 +46,7 @@ RestrictionsTab::RestrictionsTab()
         if (level == PctlSafetyLevel_None) levels->addView(this->tiles.back().box);
         else row->addView(this->tiles.back().box);
     }
-    static_cast<brls::Label*>(this->getView("rs_kicker"))->setText(cadran::upper("playguard/restrictions/section_level"_i18n));
+    cadran::kit::set_kicker(static_cast<brls::Label*>(this->getView("rs_kicker")), "playguard/restrictions/section_level"_i18n);
     this->list.apply({ { "rs_age", "calendar" }, { "rs_sns", "user" }, { "rs_comm", "phone" }, { "rs_vr", "eye" },
                        { "rs_org", "flag" }, { "rs_free_comm", "gamepad" }, { "rs_blocked", "list" } });
 

@@ -6,11 +6,13 @@
 #define _POSIX_C_SOURCE 200809L
 #include "sim_games.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 #include "../core/sim_env.h"
+#include "../core/time_ops.h"
 #include "sim_icons.h"
 #include "sim_state.h"
 
@@ -48,6 +50,14 @@ const SimGame *sim_game(u64 id)
     return NULL;
 }
 
+const SimGame *sim_game_running(void)
+{
+    if (sim_env_flag("PLAYGUARD_SIM_IDLE") || sim_env_flag("PLAYGUARD_SIM_NO_GAME")) return NULL;
+    for (size_t i = 0; i < SIM_GAME_COUNT; i++)
+        if (SIM_GAMES[i].played) return &SIM_GAMES[i];
+    return NULL;
+}
+
 u32 sim_played_today_min(void)
 {
     u32 total = 0;
@@ -55,7 +65,9 @@ u32 sim_played_today_min(void)
     return total;
 }
 
-u64 sim_played_today_s(void)
+// The made-up log's minutes, and PLAYGUARD_SIM_SKIP's played all along; past
+// midnight, since midnight: the same at every run.
+static u64 made_up_played_s(void)
 {
     const u64 played = (u64)sim_played_today_min() * 60;
     const u64 skip = sim_skip_s();
@@ -65,6 +77,70 @@ u64 sim_played_today_s(void)
     if (!localtime_r(&from, &a) || !localtime_r(&to, &b)) return played + skip;
     if (a.tm_year == b.tm_year && a.tm_yday == b.tm_yday) return played + skip;
     return (u64)(b.tm_hour * 3600 + b.tm_min * 60 + b.tm_sec);
+}
+
+// PLAYGUARD_SIM_KEEP: sim_start_now() at this run's last count (0 before its
+// first), under the state's lock. A run counts from its own first count on:
+// the time the page was closed, the console was off.
+static u64 s_counted_at;
+// A longer step between two counts is a jump (PLAYGUARD_SIM_NOW changed, the
+// computer asleep), not time played.
+#define SIM_COUNT_STEP_MAX_S (10 * 60)
+
+// The kept count (SimSpent): the real time that passes, while a game runs and
+// the console counts, and PLAYGUARD_SIM_SKIP's steps, while a game runs; from
+// the made-up log's minutes the first time, from 0 on a new day. A console
+// that suspends the game at the limit counts no further than it; the clock
+// set back stops the count until it passes the time it was set back from.
+static u64 kept_played_s(void)
+{
+    u64 user;
+    LocalTime now;
+    if (!time_local_now(&user, &now)) return made_up_played_s();
+    const s64 day = (s64)now.year * 10000 + now.month * 100 + now.day;
+    const u64 since_midnight = (u64)now.hour * 3600 + now.minute * 60 + now.second;
+    const bool idle = sim_env_flag("PLAYGUARD_SIM_IDLE");
+    const bool counting = !idle && !sim_env_flag("PLAYGUARD_SIM_NOT_COUNTING");
+    const u64 start = sim_start_now(), skip = sim_skip_s(), first = made_up_played_s();
+
+    SimState *s = sim_begin();
+    SimSpent *sp = &s->spent;
+    u64 add = 0;
+    if (counting && s_counted_at && start > s_counted_at && start - s_counted_at <= SIM_COUNT_STEP_MAX_S)
+        add += start - s_counted_at;
+    if (!idle && skip > sp->skip_s) add += skip - sp->skip_s;
+    // Two threads that read the time before taking the lock: the later
+    // reading stays, unless the time went back (PLAYGUARD_SIM_NOW).
+    if (start >= s_counted_at || s_counted_at - start > SIM_COUNT_STEP_MAX_S) s_counted_at = start;
+    sp->skip_s = skip;
+    if (!sp->day) {
+        sp->day = day;
+        sp->spent_s = first;   // PLAYGUARD_SIM_SKIP's steps in it already
+    } else if (day > sp->day) {
+        sp->day = day;
+        sp->spent_s = add < since_midnight ? add : since_midnight;
+    } else if (user >= sp->hold_until) {
+        sp->day = day;
+        // Only the time since the clock passed it.
+        if (sp->hold_until && add > user - sp->hold_until) add = user - sp->hold_until;
+        sp->hold_until = 0;
+        // Suspended at the limit: today's limit while the timer counts it down.
+        const SimConsole *c = &s->console;
+        u16 days[7];
+        pt_decode(c->block, days);
+        const u16 limit = days[now.wday % 7];
+        const bool stops = c->block[0] != 0 && !c->temp_unlocked && pt_suspends(c->block) && limit != PT_DAY_NOLIMIT;
+        const u64 most = stops ? (u64)limit * 60 : UINT64_MAX;
+        if (sp->spent_s < most) sp->spent_s = add < most - sp->spent_s ? sp->spent_s + add : most;
+    }
+    const u64 spent = sp->spent_s;
+    sim_end();
+    return spent;
+}
+
+u64 sim_played_today_s(void)
+{
+    return sim_keeping() ? kept_played_s() : made_up_played_s();
 }
 
 unsigned char *sim_game_icon(u64 id, size_t *size)

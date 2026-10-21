@@ -19,8 +19,10 @@ when what the page does while PlayGuard runs does not work:
 - the steps: keys pressed, then the steps link replayed; the tour; a report
   link to the bug form;
 - the CJK font: waited for in Japanese, added after the start in English;
-- keep=1: the simulated console's settings file is still there after a
-  reload;
+- keep=1: the data folder is still there after a reload;
+- the console's line under the screen: the game and its time left, the
+  limit passed and the game suspended; with keep=1, Restart the console
+  locks it again;
 - on a phone (an iPhone, touch): the pad under the screen in portrait, on
   either side of it in landscape, everything on the screen, no field iOS
   zooms into (under 16px); a "Script error." not of the page's (iOS'
@@ -345,6 +347,50 @@ def live(new_page):
             print("ok   CJK font added after the start")
 
 
+# The console's line under the screen (playguard_web_console()): the game
+# running and its time left, then, an hour later, the limit reached and the
+# game suspended, with its notice. With keep=1, Restart the console ends a
+# temporary unlock and starts PlayGuard again.
+@scenario
+def console(new_page):
+    page = new_page()
+    line = "document.getElementById('console-line')"
+    if open_page(page, FIXED, "console"):
+        try:
+            page.wait_for_function(f"!{line}.hidden", timeout=5000)
+        except Exception:
+            fail("console: no line under the screen")
+            return
+        shown = page.inner_text("#console-text")
+        if "Star Kart Racers running" not in shown or "left" not in shown:
+            fail(f"console: not the game and its time left ({shown})")
+        page.click("#time-buttons button:last-child")   # +1 h: the limit passed
+        if not wait_logged(page, "console: time's up, Star Kart Racers suspended", 5):
+            fail(f"console: the limit passed, no suspension ({page.inner_text('#console-text')})")
+        elif page.evaluate(f"{line}.dataset.tone") != "stop" or page.is_hidden("#toast"):
+            fail("console: the suspension not shown as one")
+        elif not page.is_hidden("#console-restart"):
+            fail("console: Restart the console offered without keep=1")
+        else:
+            print("ok   console line")
+    page = new_page()
+    if open_page(page, FIXED + "&keep=1&unlocked=1", "console (kept)"):
+        try:
+            page.wait_for_function(f"{line}.dataset.tone === 'free'", timeout=5000)
+        except Exception:
+            fail(f"console: not unlocked ({page.inner_text('#console-line')})")
+            return
+        # The page reloads itself once the folder is written.
+        with page.expect_navigation(timeout=15000):
+            page.click("#console-restart")
+        try:
+            page.wait_for_function("document.body && document.body.dataset.playguard === 'ready'", timeout=START_S * 1000)
+            page.wait_for_function(f"!{line}.hidden && {line}.dataset.tone !== 'free'", timeout=5000)
+            print("ok   console restarted, locked again")
+        except Exception:
+            fail(f"console: still unlocked after a restart ({page.inner_text('#console-line')})")
+
+
 # The steps: two presses noted, their link replays them. A start on a tab
 # of its own (tab=).
 @scenario
@@ -396,18 +442,21 @@ def japanese(new_page):
             print("ok   japanese")
 
 
-# keep=1: the simulated console's settings survive a reload.
+# keep=1: the data folder survives a reload. A file of the test's own, since
+# PlayGuard writes sim_console.bin again at each start: only one written
+# before the reload says the page kept the folder.
 @scenario
 def keep(new_page):
     page = new_page()
     if open_page(page, FIXED + "&keep=1", "keep"):
+        page.evaluate("Module.FS.writeFile('/playguard_data/smoke_kept', 'kept')")
         time.sleep(4)   # the page writes IndexedDB every 3 s
         page.evaluate("saveData()")
         time.sleep(1)
         if open_page(page, FIXED + "&keep=1", "keep (again)"):
-            kept = page.evaluate("Module.FS.readdir('/playguard_data').includes('sim_console.bin')")
-            if not kept:
-                fail("keep: sim_console.bin is not there after a reload")
+            kept = page.evaluate("Module.FS.readdir('/playguard_data')")
+            if "smoke_kept" not in kept or "sim_console.bin" not in kept:
+                fail(f"keep: the data folder was not kept across a reload ({kept})")
             else:
                 print("ok   keep")
 

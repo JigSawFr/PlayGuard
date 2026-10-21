@@ -414,7 +414,6 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
 
 void cadran::List::section(brls::Header* header)
 {
-    brls::Theme theme = brls::Application::getTheme();
     header->setLineBottom(0);
     header->setPaddingTop(0);
     header->setPaddingBottom(0);
@@ -422,13 +421,9 @@ void cadran::List::section(brls::Header* header)
     header->setMarginBottom(10);
     if (margin_top(header) > 0) header->setMarginTop(26);
     if (!header->getChildren().empty()) header->getChildren()[0]->setVisibility(brls::Visibility::GONE);   // the bar
-    for (const char* part : { "brls/header/title", "brls/header/subtitle" }) {
-        if (auto* text = dynamic_cast<brls::Label*>(header->getView(part))) {
-            // 16 px in the second ink: read from across the room.
-            text->setFontSize(kit::TEXT_KICKER);
-            text->setTextColor(theme["cadran/text2"]);
-        }
-    }
+    // A kicker: read from across the room (its capitals: sync()).
+    for (const char* part : { "brls/header/title", "brls/header/subtitle" })
+        kit::set_kicker(dynamic_cast<brls::Label*>(header->getView(part)));
 }
 
 void cadran::List::row(brls::DetailCell* cell, const char* icon, bool alone)
@@ -490,6 +485,23 @@ cadran::Card* cadran::List::wrap(const char* id)
     this->box->addView(card, at);
     move_to(line, card);
     return card;
+}
+
+brls::Label* cadran::List::headline(const std::string& kicker)
+{
+    if (!this->box) return nullptr;
+    auto* head = new brls::Box(brls::Axis::COLUMN);
+    head->setAlignItems(brls::AlignItems::STRETCH);
+    head->setMarginBottom(18);
+    brls::Label* title = kit::label(upper(kicker), kit::TEXT_KICKER, "cadran/text2");
+    title->setMarginBottom(6);
+    head->addView(title);
+    brls::Label* line = kit::display("", 28);
+    head->addView(line);
+    brls::View* note = this->tab->getView("tab_ro_note");
+    const int at = note ? index_in(this->box, note) : -1;
+    this->box->addView(head, at < 0 ? 0 : at + 1);
+    return line;
 }
 
 cadran::Card* cadran::List::card_of(const char* id) const

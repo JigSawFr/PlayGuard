@@ -3,11 +3,16 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <emscripten.h>
 
+#include <cstdio>
 #include <cstring>
 
 #include <borealis.hpp>
 
+#include "core/pctl_ops.h"
 #include "core/sim_env.h"
+#include "core/time_ops.h"
+#include "sim/sim_games.h"
+#include "sim/sim_state.h"
 
 // A PLAYGUARD_SIM_* variable changed without a restart: the ones read at each
 // call (web/params.json's `live` entries) take it at their next read. An
@@ -44,4 +49,38 @@ extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_cjk_font(const char* path)
 extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_busy()
 {
     return brls::Application::isInputBlocks() ? 1 : 0;
+}
+
+// What the simulated console does now, for the page's line under the screen
+// (SimLogic.consoleLine, web/sim_logic.js): the game running, the time spent
+// today and left (below 0 past the limit, while the console only warns),
+// whether it restricts, and whether it lives on (PLAYGUARD_SIM_KEEP). JSON,
+// valid until the next call. With PLAYGUARD_SIM_KEEP, each call counts the
+// time that passed (sim_games.c), however long PlayGuard's screens leave the
+// timer unread.
+extern "C" EMSCRIPTEN_KEEPALIVE const char* playguard_web_console()
+{
+    static char out[512];
+    PtState pt;
+    pctl_play_timer_query(&pt);
+    LocalTime now{};
+    const int wd = time_local_now(nullptr, &now) ? now.wday % 7 : 0;
+    const bool limited = pt.valid && pt.enabled && pt.day_min[wd] != PT_DAY_NOLIMIT;
+    const SimGame* game = sim_game_running();
+    std::snprintf(out, sizeof(out),
+                  "{\"game\":\"%s\",\"spent\":%llu,\"limit\":%d,\"left\":%lld,\"restricted\":%s,"
+                  "\"alarm_only\":%s,\"unlocked\":%s,\"living\":%s}",
+                  game ? game->name : "", static_cast<unsigned long long>(sim_played_today_s()),
+                  limited ? static_cast<int>(pt.day_min[wd]) : -1,
+                  static_cast<long long>(pt.remaining_ns / 1000000000LL), pt.restricted ? "true" : "false",
+                  pt.alarm_only ? "true" : "false", pt.temporary_unlocked ? "true" : "false",
+                  sim_keeping() ? "true" : "false");
+    return out;
+}
+
+// The page's Restart the console (PLAYGUARD_SIM_KEEP only): the console comes
+// back locked; the page then reloads, PlayGuard starting again on it.
+extern "C" EMSCRIPTEN_KEEPALIVE void playguard_web_console_restart()
+{
+    sim_restart();
 }

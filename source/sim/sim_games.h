@@ -39,11 +39,17 @@ extern const size_t SIM_GAME_COUNT;
 // The game with this ID, NULL when the console has none.
 const SimGame *sim_game(u64 id);
 
+// The game running, the one the time played goes to (the Activity tab's
+// first); NULL when none runs (PLAYGUARD_SIM_IDLE, PLAYGUARD_SIM_NO_GAME).
+const SimGame *sim_game_running(void);
+
 // Minutes the made-up activity log says were played today, all games together.
 u32 sim_played_today_min(void);
 // Seconds played today: those minutes, and PLAYGUARD_SIM_SKIP's played all
 // along unless no game runs (PLAYGUARD_SIM_IDLE); past midnight, since
-// midnight. The play timer counts them, and the Activity tab's first game.
+// midnight. With PLAYGUARD_SIM_KEEP, the console's own count instead, kept
+// (SimSpent, sim_games.c). The play timer counts them, and the Activity
+// tab's first game.
 u64 sim_played_today_s(void);
 
 // The game's icon (a copy to free), NULL when it has none.

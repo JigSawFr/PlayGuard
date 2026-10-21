@@ -14,6 +14,7 @@ using namespace brls::literals;
 
 // The tab last shown (tabs are deleted when another one is opened).
 static TabBase* s_shown = nullptr;
+static std::string s_main_screen;   // main_screen()
 
 TabBase::TabBase(const std::string& xml_res, bool refreshes)
 {
@@ -81,6 +82,8 @@ void TabBase::willAppear(bool resetState)
 {
     brls::Box::willAppear(resetState);
     s_shown = this;
+    for (brls::View* v = this; v; v = v->hasParent() ? v->getParent() : nullptr)
+        if (v->getId() == "main_tabs") s_main_screen = this->screen;
     frame_stats_flow::set_screen(this->screen);
     this->update_ro_note();
     this->refresh();
@@ -98,6 +101,11 @@ bool TabBase::shown() const
 std::string TabBase::shown_screen()
 {
     return s_shown ? s_shown->screen : "";
+}
+
+std::string TabBase::main_screen()
+{
+    return s_main_screen;
 }
 
 void TabBase::refresh_shown()

@@ -17,7 +17,7 @@
 
 #include "action/game_check_text.hpp"
 #include "core/gamecheck.h"
-#include "ui/cadran_kit.hpp"
+#include "ui/cadran_modal.hpp"
 
 namespace game_verify_flow
 {
@@ -28,12 +28,9 @@ struct State
     std::atomic<bool> cancel{ false };
     bool open = true;   // the dialog is on screen (main thread only)
     brls::Dialog* dialog = nullptr;
-    brls::Image* image = nullptr;
-    brls::Label* title = nullptr;   // "Checking the data", with the game's place in a batch
-    brls::Label* name = nullptr;
-    cadran::kit::Bar* bar = nullptr;
-    brls::Label* percent = nullptr;
-    brls::Label* detail = nullptr;
+    // Its heading "Checking the data", with the game's place in a batch;
+    // its title the game's name.
+    cadran::Progress body;
     std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
 };
 

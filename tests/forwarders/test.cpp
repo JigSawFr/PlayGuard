@@ -221,9 +221,19 @@ static void test_registry()
     b.free_to = 1200;
     CHECK(forwarders::save(b));
     CHECK(forwarders::find(b.id, &found) && found.free_days == 0x41 && found.free_from == 540 && found.free_to == 1200);
+    // A second span (the weekend's), the day's limit, the rules carried: kept.
+    b.free_days = 0x3E, b.free_from = 960, b.free_to = 1140;
+    b.free2_days = 0x41, b.free2_from = 540, b.free2_to = 1200;
+    b.limit = b.carried = true;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.free_days == 0x3E && found.free2_days == 0x41 &&
+          found.free2_from == 540 && found.free2_to == 1200 && found.limit && found.carried);
+    b.free_days = 0x41, b.free_from = 540, b.free_to = 1200;
+    b.free2_days = 0;
+    b.limit = b.carried = false;
     b.free_to = 540;
     CHECK(forwarders::save(b));
-    CHECK(forwarders::find(b.id, &found) && found.free_days == 0);
+    CHECK(forwarders::find(b.id, &found) && found.free_days == 0 && found.free2_days == 0 && !found.limit);
     b.pin = false;
     b.gate.clear();
     b.free_days = 0;
@@ -534,6 +544,26 @@ static void test_gate()
     CHECK(!parse(self + " --pin-gate /x.nro", nro, argv) && argv.empty());   // not on the SD card
     CHECK(!parse(self + " --pin-gate \"sdmc:/x.nro", nro, argv));           // unclosed quote
     CHECK(!parse("\"sdmc:/play guard.nro --pin-gate sdmc:/x.nro", nro, argv));
+
+    // The rules a forwarder carries: both free spans, the closed hours, the
+    // pause, the day's limit; the homebrew's argv still found after them.
+    forwarders::Made m;
+    m.pin = true;
+    m.free_days = 0x3E, m.free_from = 960, m.free_to = 1140;
+    m.free2_days = 0x41, m.free2_from = 540, m.free2_to = 1200;
+    m.closed_days = 0x7F, m.closed_from = 1260, m.closed_to = 420;
+    m.limit = true;
+    const GateRules r = forwarder_gate::rules_of(m, GatePauseRule{ 5, 15 });
+    CHECK(r.carried && r.free_n == 2 && r.closed_n == 1 && r.limit && r.pause_tries == 5 && r.pause_minutes == 15);
+    const std::string carried = argv_for("sdmc:/config/playguard/gate-0123456789abcdef.nro", r, "\"sdmc:/a b.nro\" -x");
+    CHECK(carried == "sdmc:/config/playguard/gate-0123456789abcdef.nro --pin-gate --gate-rules --gate-free=3e,960,1140 "
+                     "--gate-free=41,540,1200 --gate-closed=7f,1260,420 --gate-pause=5,15 --gate-limit \"sdmc:/a b.nro\" -x");
+    CHECK(parse(carried, nro, argv) && nro == "sdmc:/a b.nro" && argv == "\"sdmc:/a b.nro\" -x");
+    // A second span without a first is none; a pause of nothing, none.
+    m.free_days = 0;
+    m.limit = false;
+    const GateRules s = forwarder_gate::rules_of(m, GatePauseRule{ 5, 0 });
+    CHECK(s.free_n == 0 && !s.limit && s.has_pause && s.pause_tries == 0);
 }
 
 static void test_patches()

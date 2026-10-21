@@ -73,6 +73,10 @@ The console runs a firmware newer than the newest one tested: PlayGuard checks w
 
 *Console › Check the installed games* says what is wrong with each one and what to do; save data always stays ([installed games](features.md#installed-games)).
 
+### A protected forwarder shows error 2347-0100
+
+Its gate (`config/playguard/gate-….nro`) is no longer the file the forwarder was made with: it was changed or replaced on the SD card, so the forwarder does not start it. Open PlayGuard from its own forwarder: it writes the gate back at start; *Console › Forwarders › Install them all again* makes every forwarder again with it.
+
 ### The bell or a tab shows an amber badge
 
 Something needs you: Ⓨ opens the list, and Ⓐ on an entry does the fix or opens where it is made ([notifications](features.md#notifications--what-needs-you-from-any-tab)).
@@ -119,6 +123,7 @@ Press Ⓨ seven times on *About › Version*; the developer tools appear at the 
 
 - a **read-only** switch — with it on, the app cannot change anything: the safe way to investigate a new firmware (the firmware screen offers it directly);
 - the diagnostic report on screen (Ⓨ saves it, Ⓧ sends it online), and a shortcut to export it from the Play timer tab;
+- **Console self-test**: what PlayGuard checks on this console by itself before [the console checklist](hardware-test.md) is gone through by hand — the PIN, the signature patches, the data folder, each forwarder PlayGuard made (on the HOME menu, protected, seen working through its gate), the gate on the SD card, what Atmosphère reads of the homebrew menu's lock, the ways back, the rescue module. It changes nothing, and writes its result as Markdown to `config/playguard/self-test.md`, to paste in the pull request;
 - **Install another build** in place, to test a fix before it is released ([below](#installing-another-build));
 - **Compare the play-timer block** (only while the phone app is linked and can sync — not with a hosts file blocking Nintendo; also in *PIN*), to decode settings PlayGuard does not show yet: save the raw block as a reference, change one setting in the phone app, come back — PlayGuard lists the values that changed (saved in `logs/reports/` on request). Different bedtimes per day, set from the phone app, could be confirmed this way. Attach that file to an issue, or send it with the report (*Send a report online*).
 - **Record the play timer**: every 30 s while PlayGuard is open, one line of what the play timer reports (time left, time spent, the raw settings block…) in `logs/play_timer/log.csv`, a spreadsheet-ready file, plus a line right after each change PlayGuard makes, saying which (its last column, `event`), and a note when the clock moved more than the time that went by. Left open over midnight, or until the time is up, it shows what one report cannot: when the time spent resets, what the console says near the end. The switch is remembered; it only records in developer mode. What is known so far is in [parental-controls.md](parental-controls.md).
