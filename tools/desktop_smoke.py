@@ -635,6 +635,13 @@ def go_to(label, direction="Down", most=25):
         fail(f"no line {label!r} reached with {direction} (the focus on {focused()!r})")
 
 
+def tap(x, y):
+    """A touch at (x, y): the desktop build reads the left mouse button as one."""
+    time.sleep(KEY_BEFORE)
+    subprocess.run(["xdotool", "mousemove", str(x), str(y), "mousedown", "1", "sleep", "0.05", "mouseup", "1"], env=env)
+    time.sleep(KEY_AFTER)
+
+
 def screen(name):
     """A screenshot of the screen without the footer (its clock follows the
     host), as <out-dir>/name.png."""
@@ -1205,7 +1212,10 @@ if FORWARDERS:
     shot("02_actions_elsewhere")
     key("Return")              # Details
     shot("03_details_elsewhere")
-    key("Return")              # OK
+    tap(640, 160)              # above the sheet: a touch outside it closes it
+    key("Right")               # after a touch, a first press only shows the focus again
+    if focused() != "Save Keeper":
+        fail("a touch outside the details did not close them: the focus on " + repr(focused()))
     key("Down")                # PlayGuard, to add
     key("Return")
     shot("04_add_self")        # the confirmation, with its .nro
