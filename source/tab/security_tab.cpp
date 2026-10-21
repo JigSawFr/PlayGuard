@@ -126,6 +126,7 @@ SecurityTab::SecurityTab()
                        { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" }, { "sc_relock", "lock" },
                        { "sc_auto_relock", "refresh" }, { "sc_console_lock", "gamepad" }, { "pr_active", "phone" },
                        { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
+    this->headline = this->list.headline("playguard/cadran/today/pc_title"_i18n);
     if (cadran::Card* danger = this->list.card_of("sc_delete"))
         danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
 }
@@ -185,6 +186,15 @@ void SecurityTab::refresh()
     const bool writable = !app::read_only();
     const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
     const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
+    // The three tiles in one line: what matters first (no PIN, then unlocked).
+    if (this->headline) {
+        const bool no_pin = s.pin_length_ok && s.pin_length == 0;
+        ui::set_text(this->headline, no_pin     ? "playguard/security/headline_none"_i18n
+                                     : unlocked ? "playguard/security/headline_unlocked"_i18n
+                                     : has_pin  ? "playguard/security/headline_active"_i18n
+                                                : "playguard/common/unavailable"_i18n);
+        this->headline->setTextColor(cadran::kit::color(no_pin || unlocked ? "cadran/amber" : "cadran/text"));
+    }
     // Read-only: the actions stay in sight, greyed (A says why).
     ui::set_visible_all({ { show_pin.getView(), has_pin },
                           { unlock.getView(), has_pin && !unlocked },
