@@ -52,6 +52,8 @@ struct Row
     bool        custom_icon = false;   // its icon from the album (forwarders::Made::icon)
     std::string icon;                  // that screenshot, "sdmc:/Nintendo/Album/…"
     int         icon_x = forwarders::ICON_X_MIDDLE;   // where its square sits (forwarders::Made::icon_x)
+    // How the HOME menu starts it (forwarders::Made::ask_user, …).
+    bool        ask_user = false, screenshots = true, video = true;
 };
 
 // One row per forwarder on the HOME menu and per one remembered that is no

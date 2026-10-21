@@ -45,6 +45,7 @@ typedef struct {
     const void *nacp;
     const void *icon;
     size_t      icon_size;
+    uint32_t    options;    // how the HOME menu starts it: FWD_ASK_USER, … (forwarder_pack.h); 0 the defaults
 } ForwarderSpec;
 
 // Builds the forwarder and installs it on the SD card, replacing the one

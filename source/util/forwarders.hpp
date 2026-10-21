@@ -66,6 +66,12 @@ struct Made
     // Where its square sits along the screenshot: 0 its left edge, 100 its
     // right one (forwarder_icon::from_screenshot).
     int         icon_x = ICON_X_MIDDLE;
+    // How the HOME menu starts it, as sphaira's forwarder options: a user
+    // picked at launch (its play time then that user's in the Activity),
+    // screenshots and videos allowed (core/forwarder_pack.h's FWD_*).
+    bool        ask_user = false;
+    bool        screenshots = true;
+    bool        video = true;
 };
 
 // Every one remembered, in the file's order. A damaged file reads as none;

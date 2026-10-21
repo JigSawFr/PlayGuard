@@ -30,6 +30,12 @@ extern "C" {
 #define FWD_AUTHOR_MAX     0xFF     // its publisher
 #define FWD_ID_PREFIX      0x05     // the program ID's top byte, as sphaira gives them
 
+// How the HOME menu starts it (fwd_patch_nacp's `options`), as sphaira's
+// forwarder options: the defaults 0.
+#define FWD_ASK_USER       0x1      // a user picked at launch (its play time is that user's)
+#define FWD_NO_SCREENSHOT  0x2      // the Capture button takes no screenshot
+#define FWD_NO_VIDEO       0x4      // nor a video
+
 // NcmContentType of each content.
 #define FWD_CONTENT_META    0
 #define FWD_CONTENT_PROGRAM 1
@@ -91,6 +97,7 @@ typedef struct {
     const void *exefs_npdm; // romfs:/forwarder/main.npdm
     size_t      npdm_size;
     bool        force_debug;// Atmosphère 1.8.0+: its new ForceDebug bit, as sphaira sets it
+    uint32_t    options;    // FWD_ASK_USER, FWD_NO_SCREENSHOT, FWD_NO_VIDEO
     // Encrypts a 0xC00-byte NCA header in place (AES-XTS, the console's
     // header key), before the NCA is hashed. NULL leaves it plain (tests).
     void      (*seal)(void *ctx, uint8_t *header);
@@ -114,8 +121,9 @@ FwdError forwarder_pack(const FwdInput *in, FwdPackage *out);
 // `force_debug`, the debug flags as sphaira sets them on Atmosphère 1.8.0+.
 bool fwd_patch_npdm(uint8_t *npdm, size_t size, uint64_t id, bool force_debug);
 // The NACP for the HOME menu: `name` and `author` in every language (when not
-// empty), the IDs it names set to `id`, no save data, no account needed.
-void fwd_patch_nacp(uint8_t *nacp, const char *name, const char *author, uint64_t id);
+// empty), the IDs it names set to `id`, no save data; no account needed,
+// screenshots and videos allowed, unless `options` (FWD_*) says otherwise.
+void fwd_patch_nacp(uint8_t *nacp, const char *name, const char *author, uint64_t id, uint32_t options);
 
 typedef struct {
     const char *name;   // in the root folder, without its "/"

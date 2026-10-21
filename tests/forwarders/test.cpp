@@ -277,6 +277,30 @@ static void test_registry()
     CHECK(forwarders::find(b.id, &found) && found.closed_days == 0 && found.icon.empty() &&
           found.icon_x == forwarders::ICON_X_MIDDLE);   // no icon from the album: nowhere along one
 
+    // Its launch options: the defaults when not written (made before they
+    // were kept), each kept; only those off the defaults in the file.
+    CHECK(forwarders::find(b.id, &found) && !found.ask_user && found.screenshots && found.video);
+    CHECK(forwarders::list_text(forwarders::list()).find("ask_user") == std::string::npos);
+    b.ask_user = true;
+    b.screenshots = false;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && found.ask_user && !found.screenshots && found.video);
+    {
+        const std::string text = forwarders::list_text(forwarders::list());
+        CHECK(text.find("\"ask_user\":true") != std::string::npos && text.find("\"screenshots\":false") != std::string::npos &&
+              text.find("\"video\"") == std::string::npos);
+        bool kept = false;
+        for (const auto& m : forwarders::parse_list(text)) kept = kept || (m.id == b.id && m.ask_user && !m.screenshots && m.video);
+        CHECK(kept);
+    }
+    b.ask_user = false;
+    b.screenshots = true;
+    b.video = false;
+    CHECK(forwarders::save(b));
+    CHECK(forwarders::find(b.id, &found) && !found.ask_user && found.screenshots && !found.video);
+    b.video = true;
+    CHECK(forwarders::save(b));
+
     // Seen working through the gate: kept while protected.
     b.pin = true;
     b.gate = "sdmc:/config/playguard/gate.nro";
@@ -343,6 +367,9 @@ static void test_merge()
     gone.id = 4;
     gone.nro = gone.argv = "sdmc:/switch/gone.nro";
     gone.name = "zeta";
+    gone.ask_user = true;     // its launch options, on its row even off the HOME menu
+    gone.video = false;
+    own.screenshots = false;
     moved.id = 5;
     moved.nro = moved.argv = "sdmc:/switch/moved/moved.nro";
     std::vector<Installed> on;
@@ -362,6 +389,9 @@ static void test_merge()
     CHECK(rows[3].version == "1.4.0" && rows[3].author == "JigSawFr");
     CHECK(rows[4].id == 4 && rows[4].state == State::NotInstalled && rows[4].name == "zeta" && !rows[4].self);
     CHECK(!rows[3].pin && !rows[2].pin);
+    CHECK(rows[4].ask_user && rows[4].screenshots && !rows[4].video);
+    CHECK(!rows[3].ask_user && !rows[3].screenshots && rows[3].video);
+    CHECK(!rows[2].ask_user && rows[2].screenshots && rows[2].video && rows[0].screenshots && rows[0].video);
     // Protected with the PIN: its gate gone, it would not start either.
     forwarders::Made locked = gone;
     locked.pin = true;

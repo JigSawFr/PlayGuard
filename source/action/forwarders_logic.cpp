@@ -49,6 +49,9 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
             r.custom_icon = !m->icon.empty();
             r.icon = m->icon;
             r.icon_x = m->icon_x;
+            r.ask_user = m->ask_user;
+            r.screenshots = m->screenshots;
+            r.video = m->video;
             r.state = !nro_exists(m->nro)            ? State::NroMissing
                       : m->pin && !nro_exists(m->gate) ? State::GateMissing
                                                        : State::Ready;
@@ -83,6 +86,9 @@ std::vector<Row> merge(const std::vector<forwarders::Made>& made, const std::vec
         r.custom_icon = !m.icon.empty();
         r.icon = m.icon;
         r.icon_x = m.icon_x;
+        r.ask_user = m.ask_user;
+        r.screenshots = m.screenshots;
+        r.video = m.video;
         r.state = State::NotInstalled;
         rows.push_back(r);
     }

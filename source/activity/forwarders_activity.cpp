@@ -583,6 +583,24 @@ void ForwardersActivity::actions(const Row& row)
         choices.push_back({ "playguard/forwarders/action_rename"_i18n, [this, r]() { this->rename(r); }, "pencil", "", own });
         choices.push_back({ "playguard/forwarders/action_author"_i18n, [this, r]() { this->change_author(r); }, "user", "", own });
         choices.push_back({ "playguard/forwarders/action_icon"_i18n, [this, r]() { this->pick_icon(r); }, "sparkle", "", own });
+        // How the HOME menu starts it: each switch made again with the PIN.
+        const auto option = [this, r](void (*flip)(forwarder_flow::Options&)) {
+            return [this, r, flip]() {
+                forwarder_flow::Options o = { r.ask_user, r.screenshots, r.video };
+                flip(o);
+                forwarder_flow::set_options(r, o, this->then_rebuild(r.id));
+            };
+        };
+        const std::string launch = "playguard/forwarders/sheet_launch"_i18n;
+        choices.push_back(ui::Choice("playguard/forwarders/action_ask_user"_i18n,
+                                     option([](forwarder_flow::Options& o) { o.ask_user = !o.ask_user; }), "user", "", launch)
+                              .switched(r.ask_user));
+        choices.push_back(ui::Choice("playguard/forwarders/action_screenshots"_i18n,
+                                     option([](forwarder_flow::Options& o) { o.screenshots = !o.screenshots; }), "eye", "", launch)
+                              .switched(r.screenshots));
+        choices.push_back(ui::Choice("playguard/forwarders/action_video"_i18n,
+                                     option([](forwarder_flow::Options& o) { o.video = !o.video; }), "tv", "", launch)
+                              .switched(r.video));
         if (!r.self)
             choices.push_back(ui::Choice("playguard/forwarders/action_pin"_i18n,
                                          [this, r]() { this->pin(r, !r.pin); }, "key",
@@ -680,6 +698,11 @@ void ForwardersActivity::details(const Row& r)
     const std::string facts = "playguard/forwarders/sheet_forwarder"_i18n;
     lines.push_back({ "playguard/forwarders/author"_i18n, open([this, r]() { this->change_author(r); }), "user",
                       r.author.empty() ? unknown : r.author, facts });
+    if (r.state != State::Elsewhere) {
+        const std::string launch = forwarder_flow::options_label({ r.ask_user, r.screenshots, r.video });
+        lines.push_back({ "playguard/forwarders/sheet_launch"_i18n, nullptr, "user",
+                          launch.empty() ? "playguard/forwarders/options_default"_i18n : launch, facts });
+    }
     lines.push_back({ "playguard/tools/version"_i18n, nullptr, "tag", r.version.empty() ? unknown : r.version, facts });
     lines.push_back({ ".nro", nullptr, "file", r.nro.empty() ? unknown : nro::sd_path(r.nro), facts });
     lines.push_back({ "playguard/forwarders/program_id"_i18n, nullptr, "chip", forwarders::hex_id(r.id), facts });

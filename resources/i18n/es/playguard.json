@@ -1108,6 +1108,15 @@
         "sheet_install": "Instalar y eliminar",
         "action_pin": "Pedir el PIN",
         "action_limit": "Cerrado al agotarse el tiempo de juego de hoy",
+        "sheet_launch": "Al iniciar",
+        "action_ask_user": "Elegir un usuario al iniciar",
+        "action_screenshots": "Capturas de pantalla",
+        "action_video": "Captura de vídeo",
+        "option_ask_user": "Usuario elegido al iniciar",
+        "option_no_screenshots": "Sin capturas de pantalla",
+        "option_no_video": "Sin captura de vídeo",
+        "options_default": "Sin usuario, capturas permitidas",
+        "options_set": "{} creado de nuevo con sus opciones de inicio",
         "detail_paused": "En pausa",
         "closed_title": "Horas en que nunca se abre, con PIN o sin él",
         "state_paused": "en pausa hasta las {}",
@@ -1618,7 +1627,8 @@
             "gate_pause": "Pausa tras PIN rechazados",
             "gate_pause_lifted": "Pausa de un forwarder quitada",
             "gate_limit": "Forwarder cerrado (tiempo de juego de hoy agotado)",
-            "gate_limit_set": "Forwarder cerrado tras el tiempo de juego de hoy"
+            "gate_limit_set": "Forwarder cerrado tras el tiempo de juego de hoy",
+            "forwarder_options": "Opciones de inicio de un forwarder cambiadas"
         },
         "sources": {
             "uniform": "Mismo límite todos los días",

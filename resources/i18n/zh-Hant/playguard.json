@@ -1108,6 +1108,15 @@
         "sheet_install": "安裝與刪除",
         "action_pin": "詢問 PIN 碼",
         "action_limit": "今天的遊戲時間用完後關閉",
+        "sheet_launch": "啟動時",
+        "action_ask_user": "啟動時選擇使用者",
+        "action_screenshots": "擷圖",
+        "action_video": "影片錄製",
+        "option_ask_user": "啟動時選擇使用者",
+        "option_no_screenshots": "不允許擷圖",
+        "option_no_video": "不允許錄製影片",
+        "options_default": "不詢問使用者，允許擷圖",
+        "options_set": "已依啟動選項重新製作 {}",
         "detail_paused": "已暫停",
         "closed_title": "禁止使用的時段（無論有無PIN碼）",
         "state_paused": "暫停至{}",
@@ -1618,7 +1627,8 @@
             "gate_pause": "PIN碼被拒後暫停",
             "gate_pause_lifted": "轉發器暫停已解除",
             "gate_limit": "轉發器關閉（今天的遊戲時間已用完）",
-            "gate_limit_set": "今天的遊戲時間用完後關閉轉發器"
+            "gate_limit_set": "今天的遊戲時間用完後關閉轉發器",
+            "forwarder_options": "轉發器啟動選項已變更"
         },
         "sources": {
             "uniform": "每天相同上限",
