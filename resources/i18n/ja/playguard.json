@@ -1367,7 +1367,11 @@
         "presses_left": "あと{}回押すと開発者モードになります。",
         "presses_left_one": "あと1回押すと開発者モードになります。",
         "report_upload": "オンラインで送信",
-        "glow": "背景のグロー"
+        "glow": "背景のグロー",
+        "self_test": "本体のセルフテスト",
+        "self_test_written": "{}に保存しました：プルリクエストに貼り付けてください。",
+        "self_test_not_written": "保存できませんでした：{}",
+        "self_test_tally": "成功{}、注意{}、失敗{}、未確認{}"
     },
     "dev_build": {
         "open": "別のビルドをインストール",

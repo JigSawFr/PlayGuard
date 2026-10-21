@@ -1367,7 +1367,11 @@
         "presses_left": "Noch {} Mal drücken, um den Entwicklermodus zu aktivieren.",
         "presses_left_one": "Noch 1 Mal drücken, um den Entwicklermodus zu aktivieren.",
         "report_upload": "Online senden",
-        "glow": "Hintergrundschein"
+        "glow": "Hintergrundschein",
+        "self_test": "Selbsttest der Konsole",
+        "self_test_written": "Gespeichert in {}: in den Pull-Request einfügen.",
+        "self_test_not_written": "Nicht gespeichert: {}",
+        "self_test_tally": "{} bestanden, {} zu beachten, {} fehlgeschlagen, {} nicht geprüft"
     },
     "dev_build": {
         "open": "Anderen Build installieren",

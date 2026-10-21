@@ -1367,7 +1367,11 @@
         "presses_left": "Faltan {} pulsaciones para activar el modo desarrollador.",
         "presses_left_one": "Falta 1 pulsación para activar el modo desarrollador.",
         "report_upload": "Enviar en línea",
-        "glow": "Halo de fondo"
+        "glow": "Halo de fondo",
+        "self_test": "Autoprueba de la consola",
+        "self_test_written": "Guardado en {}: pégalo en la pull request.",
+        "self_test_not_written": "No guardado: {}",
+        "self_test_tally": "{} correctas, {} a tener en cuenta, {} fallidas, {} sin comprobar"
     },
     "dev_build": {
         "open": "Instalar otra compilación",

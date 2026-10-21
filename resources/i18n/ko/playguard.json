@@ -1367,7 +1367,11 @@
         "presses_left": "{}번 더 누르면 개발자 모드가 켜집니다.",
         "presses_left_one": "1번 더 누르면 개발자 모드가 켜집니다.",
         "report_upload": "온라인으로 보내기",
-        "glow": "배경 광채"
+        "glow": "배경 광채",
+        "self_test": "본체 자체 테스트",
+        "self_test_written": "{}에 저장했습니다: 풀 리퀘스트에 붙여 넣으세요.",
+        "self_test_not_written": "저장하지 못함: {}",
+        "self_test_tally": "통과 {}, 참고 {}, 실패 {}, 확인 안 함 {}"
     },
     "dev_build": {
         "open": "다른 빌드 설치",

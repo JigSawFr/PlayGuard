@@ -1367,7 +1367,11 @@
         "presses_left": "Nog {} keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "presses_left_one": "Nog 1 keer drukken om de ontwikkelaarsmodus aan te zetten.",
         "report_upload": "Online versturen",
-        "glow": "Achtergrondgloed"
+        "glow": "Achtergrondgloed",
+        "self_test": "Zelftest van de console",
+        "self_test_written": "Opgeslagen in {}: plak het in de pull request.",
+        "self_test_not_written": "Niet opgeslagen: {}",
+        "self_test_tally": "{} geslaagd, {} om te weten, {} mislukt, {} niet gecontroleerd"
     },
     "dev_build": {
         "open": "Andere build installeren",

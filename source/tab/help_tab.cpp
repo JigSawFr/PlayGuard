@@ -3,6 +3,7 @@
 
 #include <fmt/format.h>
 
+#include "action/self_test.hpp"
 #include "action/cleanup_flow.hpp"
 #include "action/dev_build_flow.hpp"
 #include "action/github_login_flow.hpp"
@@ -186,6 +187,11 @@ HelpTab::HelpTab()
         brls::Application::pushActivity(new DiagnosticActivity());
         return true;
     });
+    // What PlayGuard checks on this console by itself, for docs/hardware-test.md.
+    dev_self_test->registerClickAction([](brls::View*) {
+        self_test::open();
+        return true;
+    });
     dev_pt_block->registerClickAction([](brls::View*) {
         pt_block_flow::open();
         return true;
@@ -216,7 +222,7 @@ HelpTab::HelpTab()
                                          { "hp_logs_keep_mb", "save" }, { "hp_dev_mode", "code" }, { "hp_dev_read_only", "eye" },
                                          { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" }, { "hp_dev_glow", "sparkle" },
                                          { "hp_dev_clear_cache", "trash" }, { "hp_dev_clear_logs", "trash" },
-                                         { "hp_dev_report", "file" }, { "hp_dev_pt_block", "timer" }, { "hp_dev_gate", "shield" },
+                                         { "hp_dev_report", "file" }, { "hp_dev_self_test", "check" }, { "hp_dev_pt_block", "timer" }, { "hp_dev_gate", "shield" },
                                          { "hp_dev_forget", "refresh" }, { "hp_dev_build", "download" },
                                          { "hp_dev_migrations", "folder" } });
 }

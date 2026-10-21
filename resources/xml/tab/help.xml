@@ -48,6 +48,7 @@
             <brls:DetailCell id="hp_dev_clear_cache" title="@i18n/playguard/dev/clear_cache"/>
             <brls:DetailCell id="hp_dev_clear_logs" title="@i18n/playguard/dev/clear_logs"/>
             <brls:DetailCell id="hp_dev_report" title="@i18n/playguard/dev/report"/>
+            <brls:DetailCell id="hp_dev_self_test" title="@i18n/playguard/dev/self_test"/>
             <brls:DetailCell id="hp_dev_pt_block" title="@i18n/playguard/dev/pt_block"/>
             <brls:DetailCell id="hp_dev_gate" title="@i18n/playguard/dev/gate"/>
             <brls:DetailCell id="hp_dev_forget" title="@i18n/playguard/dev/forget"/>

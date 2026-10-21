@@ -1367,7 +1367,11 @@
         "presses_left": "再按{}次即可開啟開發者模式。",
         "presses_left_one": "再按1次即可開啟開發者模式。",
         "report_upload": "線上傳送",
-        "glow": "背景光暈"
+        "glow": "背景光暈",
+        "self_test": "主機自我檢測",
+        "self_test_written": "已寫入{}：請貼到拉取請求中。",
+        "self_test_not_written": "未寫入：{}",
+        "self_test_tally": "通過{}，需注意{}，失敗{}，未檢查{}"
     },
     "dev_build": {
         "open": "安裝其他建置",

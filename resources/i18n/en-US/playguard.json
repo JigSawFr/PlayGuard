@@ -1367,7 +1367,11 @@
         "presses_left": "{} more presses to turn on developer mode.",
         "presses_left_one": "1 more press to turn on developer mode.",
         "report_upload": "Send online",
-        "glow": "Background glow"
+        "glow": "Background glow",
+        "self_test": "Console self-test",
+        "self_test_written": "Written to {}: paste it in the pull request.",
+        "self_test_not_written": "Not written: {}",
+        "self_test_tally": "{} passed, {} to know, {} failed, {} not checked"
     },
     "dev_build": {
         "open": "Install another build",
