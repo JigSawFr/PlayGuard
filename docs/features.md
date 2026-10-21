@@ -373,13 +373,13 @@ On a console without Internet, *Set the network clock to the console clock* appe
 | **Firmware or SD card** | The game is fine, the console is not |
 
 - **Checking data:** what the data check found is kept with the game until another version is installed: corrupt, it moves to *Reinstall* as *Corrupt (checked)*, with the date and the console's code; intact, it leaves the list. *Check these games* checks the whole of *To check* one game after the other in one dialog (*game 2 of 5*), then says how many are corrupt, intact or could not be checked, with removing the corrupt ones at hand.
-- **Several games at once:** Ⓨ picks games (a check mark in front), and *Several games at once*, above the sections, picks a whole section; then one action for all of them: check their data, or remove them (their list saved first, one question, one PIN).
+- **Several games at once:** Ⓨ picks games (a check mark in front); from the first one picked, a line above the sections says how many, and A on it picks a whole section too, then one action for all of them: check their data, or remove them (their list saved first, one question, one PIN).
 - **Under *Reinstall*,** their list can be saved (JSON and text, in the exports folder: name, title ID, version, problem), and all of them removed at once after one question and one PIN: the list is saved first, then the games are removed so an installer no longer counts them as installed.
 - **The actions:** when one action is the fix, it is the dialog's first button; the others follow: accept the installed version again (when the console asks for a removed update), remove only the update or an add-on, check the data for corruption (the console's own check, with its progress and Cancel), or remove the game.
 - Versions are shown as the game shows them (*version 1.4.0*, *update #4*); after a repair, a toast says whether the game works again. Save data always stays; every change is in the change history.
 - **When it checks:** the last check shows at once; then only the games whose entry changed are checked again (every game once a day, after a firmware update, or with Ⓧ *Check again*), each shown as soon as it is checked.
 - Several broken games at once points to the SD card or to a game installed from the other storage (sysMMC / emuMMC).
-- *View*, above the sections, shows the games as a **list** or as **covers** (icon, name and problem; the choice is kept), as *All games* does.
+- Ⓡ shows the games as a **list** or as **covers** (icon, name and problem; the choice is kept), as *All games* does.
 
 ### Forwarders
 
