@@ -471,7 +471,7 @@
         "age_value": "Up to {} years",
         "sns": "Restrict posting to social media",
         "comm": "Restrict communicating with others",
-        "custom_only": "To change these settings, choose the \"Custom\" level.",
+        "custom_only": "Changing one of them sets the \"Custom\" level, starting from these settings.",
         "section_other": "Other",
         "vr": "Restrict VR mode",
         "org": "Rating organisation",
@@ -506,7 +506,9 @@
         "blocked_title": "{} rates them above {}",
         "blocked_none": "{}: no installed game is rated above {}.",
         "blocked_no_age": "This level does not restrict games by age.",
-        "blocked_note": "From the last check of the installed games. A game the rating organisation does not rate is not counted, nor the exceptions set in the companion app."
+        "blocked_note": "From the last check of the installed games. A game the rating organisation does not rate is not counted, nor the exceptions set in the companion app.",
+        "section_level_settings": "This level's settings",
+        "to_custom": "The restriction level will become \"Custom\", starting from the settings of \"{}\" with this change:"
     },
     "clock": {
         "section_now": "Clocks",
@@ -1849,7 +1851,17 @@
         "clock_detail_dns": "Atmosphère's DNS blocks Nintendo's time server, so the console cannot set it itself: set it from a time server.",
         "week_more": "{} a day more than the week before.",
         "week_less": "{} a day less than the week before.",
-        "week_same": "About the same as the week before."
+        "week_same": "About the same as the week before.",
+        "short": {
+            "pin_missing": "Not set up",
+            "pin_weak": "Easy to guess",
+            "pin_lock_off": "Opens without it",
+            "alarm_off": "Alarm off",
+            "clock": "Not accurate",
+            "games": "Some cannot start",
+            "patches": "Need a look",
+            "sd_space": "Almost full"
+        }
     },
     "cadran": {
         "date": "{0}, {3} {2}",
@@ -1893,7 +1905,7 @@
             "ok": "ok",
             "clock_fix": "Measure and set it now",
             "clock_fine": "the timer counts right",
-            "serial_hidden": "Serial number hidden",
+            "serial_hidden": "Serial number blanked",
             "next_time_up": "If play goes on, time is up around {}",
             "next_bedtime": "Bedtime alarm at {}, in {}",
             "next_bedtime_now": "Bedtime: games allowed again at {}",
@@ -1935,7 +1947,8 @@
             "steps_count": "{} of {}",
             "tl_bed_first": "bedtime comes first",
             "bed_off_value": "Off",
-            "bed_set": "Set it"
+            "bed_set": "Set it",
+            "fine_pill": "{} checks fine"
         },
         "pill": {
             "pc_on": "Parental controls on",
@@ -1971,7 +1984,8 @@
             "over_key": "over the limit",
             "played_day": "{}: {} played of {}",
             "played_day_free": "{}: {} played, no limit",
-            "bonus": "{}: {} planned for that day"
+            "bonus": "{}: {} planned for that day",
+            "last_week_day": "Last {}"
         },
         "activity": {
             "export": "Export",
@@ -1986,7 +2000,8 @@
             "see_all": "See all time",
             "trend_up": "+{}/day vs last week",
             "trend_down": "-{}/day vs last week",
-            "trend_same": "same as last week"
+            "trend_same": "same as last week",
+            "grew": "+{} vs last week"
         },
         "restrictions": {
             "choose": "Choose this level",
@@ -1998,7 +2013,9 @@
             "none": "software of any rating, social media and communication allowed",
             "to_settings": "Its settings",
             "games": "Games blocked",
-            "games_none": "none"
+            "games_none": "none",
+            "current": "Current",
+            "allowed": "Allowed"
         },
         "clock": {
             "console": "Console",

@@ -16,20 +16,27 @@ namespace
 {
 const uint8_t AGES[] = { 0, 3, 4, 6, 7, 8, 10, 12, 13, 14, 15, 16, 17, 18 };
 
-// The check on the level in force.
+// The level in force: a check and the word, on teal. Said in words, not as
+// a ring: the teal ring is the focus's (a level focused is not the one in
+// force).
 brls::Box* badge()
 {
     brls::Theme theme = brls::Application::getTheme();
     auto* box = new brls::Box(brls::Axis::ROW);
-    box->setWidth(26);
     box->setHeight(26);
     box->setShrink(0);
     box->setCornerRadius(13);
+    box->setPaddingLeft(7);
+    box->setPaddingRight(10);
     box->setBackgroundColor(theme["cadran/teal_fill"]);
     box->setAlignItems(brls::AlignItems::CENTER);
-    box->setJustifyContent(brls::JustifyContent::CENTER);
     box->setMarginLeft(6);
-    box->addView(cadran::kit::icon("check", 15, "cadran/navy"));
+    CadranIcon* check = cadran::kit::icon("check", 15, "cadran/navy");
+    check->setMarginRight(4);
+    box->addView(check);
+    brls::Label* words = cadran::kit::label("playguard/cadran/restrictions/current"_i18n, cadran::kit::TEXT_META, "cadran/navy");
+    words->setSingleLine(true);
+    box->addView(words);
     return box;
 }
 }   // namespace
@@ -60,16 +67,15 @@ RestrictionsTab::RestrictionsTab()
     });
 
     age->registerClickAction([this](brls::View*) {
-        if (!this->st.settings_ok) return true;
         if (ui::refuse_read_only()) return true;
         std::vector<std::string> names;
         int selected = 0;
         for (size_t i = 0; i < sizeof(AGES); i++) {
             names.push_back(ui::age_text(AGES[i]));
-            if (AGES[i] == this->st.settings.rating_age) selected = (int)i;
+            if (AGES[i] == this->shown.rating_age) selected = (int)i;
         }
         ui::pick("playguard/restrictions/age"_i18n, names, selected, [this](int index) {
-            PctlCustomSettings s = this->st.settings;
+            PctlCustomSettings s = this->shown;
             const uint8_t before = s.rating_age;
             s.rating_age = AGES[index];
             // 0 is no limit: any other change from it is stricter.
@@ -80,12 +86,12 @@ RestrictionsTab::RestrictionsTab()
     });
 
     sns->init("playguard/restrictions/sns"_i18n, false, [this](bool on) {
-        PctlCustomSettings s = this->st.settings;
+        PctlCustomSettings s = this->shown;
         s.sns_post_restriction = on;
         this->write_custom(s, on ? "" : "playguard/restrictions/confirm_sns_off"_i18n);
     });
     comm->init("playguard/restrictions/comm"_i18n, false, [this](bool on) {
-        PctlCustomSettings s = this->st.settings;
+        PctlCustomSettings s = this->shown;
         s.free_communication_restriction = on;
         this->write_custom(s, on ? "" : "playguard/restrictions/confirm_comm_off"_i18n);
     });
@@ -252,15 +258,17 @@ void RestrictionsTab::choose_level(int index)
         body += "\n\n" + "playguard/restrictions/none_body"_i18n;
     body = pt_flow::with_link_note(body, &this->st);
     const int before = this->st.safety_level_ok ? (int)this->st.safety_level : -1;
-    ui::confirm(body, "playguard/play_timer/confirm_set"_i18n, [this, index, before]() {
-                    Result rc = pctl_set_safety_level((uint32_t)index);
-                    if (R_SUCCEEDED(rc) && before >= 0) history_flow::record_values("level", { before }, { index });
-                    if (R_FAILED(rc))
-                        history_flow::record_failure("level", rc, before >= 0 ? std::vector<int>{ before } : std::vector<int>{},
-                                                     { index });
-                    ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
-                    this->refresh();
-                });
+    const auto apply = [this, index, before]() {
+        Result rc = pctl_set_safety_level((uint32_t)index);
+        if (R_SUCCEEDED(rc) && before >= 0) history_flow::record_values("level", { before }, { index });
+        if (R_FAILED(rc))
+            history_flow::record_failure("level", rc, before >= 0 ? std::vector<int>{ before } : std::vector<int>{}, { index });
+        ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
+        this->refresh();
+    };
+    // No restriction at all lifts every one: confirmed in coral.
+    if (index == PctlSafetyLevel_None) ui::confirm_danger(body, "playguard/play_timer/confirm_set"_i18n, apply);
+    else ui::confirm(body, "playguard/play_timer/confirm_set"_i18n, apply);
 }
 
 std::string RestrictionsTab::settings_text(const PctlCustomSettings& s) const
@@ -273,18 +281,49 @@ std::string RestrictionsTab::settings_text(const PctlCustomSettings& s) const
 
 void RestrictionsTab::write_custom(const PctlCustomSettings& s, const std::string& loosens)
 {
-    if (!loosens.empty()) {
-        ui::confirm(pt_flow::with_link_note(loosens, &this->st), "playguard/play_timer/confirm_set"_i18n,
-                    [this, s]() { this->write_custom(s); }, [this]() { this->refresh(); });
+    // Under a preset: the level becomes Custom, from its settings; asked
+    // first, with what the change allows when it does.
+    const bool to_custom = !this->custom_now;
+    if (to_custom || !loosens.empty()) {
+        std::string body = loosens;
+        if (to_custom) {
+            body = brls::getStr("playguard/restrictions/to_custom",
+                                this->st.safety_level_ok ? ui::level_name(this->st.safety_level) : "—") +
+                   (loosens.empty() ? "" : "\n\n" + loosens) + "\n\n" + this->settings_text(s);
+        }
+        ui::confirm(pt_flow::with_link_note(body, &this->st), "playguard/play_timer/confirm_set"_i18n,
+                    [this, s, to_custom]() { this->apply_custom(s, to_custom); }, [this]() { this->refresh(); });
         return;
     }
-    Result rc = pctl_set_custom_settings(&s);
-    if (R_SUCCEEDED(rc) && this->st.settings_ok)
-        history_flow::record_values("custom", history_flow::custom_values(this->st.settings), history_flow::custom_values(s));
-    if (R_FAILED(rc))
-        history_flow::record_failure("custom", rc,
-                                     this->st.settings_ok ? history_flow::custom_values(this->st.settings) : std::vector<int>{},
-                                     history_flow::custom_values(s));
+    this->apply_custom(s, false);
+}
+
+void RestrictionsTab::apply_custom(const PctlCustomSettings& s, bool to_custom)
+{
+    const int before = this->st.safety_level_ok ? (int)this->st.safety_level : -1;
+    Result rc = 0;
+    if (to_custom) {
+        rc = pctl_set_safety_level(PctlSafetyLevel_Custom);
+        if (R_SUCCEEDED(rc) && before >= 0) history_flow::record_values("level", { before }, { (int)PctlSafetyLevel_Custom });
+        if (R_FAILED(rc))
+            history_flow::record_failure("level", rc, before >= 0 ? std::vector<int>{ before } : std::vector<int>{},
+                                         { (int)PctlSafetyLevel_Custom });
+    }
+    // Custom's own settings until now, which the level switched to holds.
+    const bool had = this->st.settings_ok && !to_custom;
+    if (R_SUCCEEDED(rc)) {
+        rc = pctl_set_custom_settings(&s);
+        if (R_SUCCEEDED(rc) && had)
+            history_flow::record_values("custom", history_flow::custom_values(this->st.settings), history_flow::custom_values(s));
+        if (R_FAILED(rc)) {
+            history_flow::record_failure("custom", rc, had ? history_flow::custom_values(this->st.settings) : std::vector<int>{},
+                                         history_flow::custom_values(s));
+            // Not left on Custom's older settings, which may allow more than
+            // the preset did: the level before, again.
+            if (to_custom && before >= 0 && R_SUCCEEDED(pctl_set_safety_level((uint32_t)before)))
+                history_flow::record_values("level", { (int)PctlSafetyLevel_Custom }, { before });
+        }
+    }
     ui::notify_result(rc, "playguard/restrictions/saved"_i18n, "playguard/restrictions/save_err"_i18n);
     this->refresh();   // re-reads, so a refused change flips the switch back
 }
@@ -304,15 +343,22 @@ void RestrictionsTab::refresh()
     PctlCustomSettings preset = {};
     const bool preset_ok = !custom && this->st.safety_level_ok && this->st.safety_level != PctlSafetyLevel_Custom &&
                            R_SUCCEEDED(pctl_get_level_settings(this->st.safety_level, &preset));
-    ui::set_visible(custom_header.getView(), custom);
-    ui::set_visible(age.getView(), custom);
-    ui::set_visible(sns.getView(), custom);
-    ui::set_visible(comm.getView(), custom);
+    // Under a preset, its settings: changing one makes the level Custom
+    // (write_custom), the note under them says so.
+    this->custom_now = custom;
+    const bool settings = custom || preset_ok;
+    if (settings) this->shown = custom ? this->st.settings : preset;
+    custom_header->setTitle(custom ? "playguard/restrictions/section_custom"_i18n
+                                   : "playguard/restrictions/section_level_settings"_i18n);
+    ui::set_visible(custom_header.getView(), settings);
+    ui::set_visible(age.getView(), settings);
+    ui::set_visible(sns.getView(), settings);
+    ui::set_visible(comm.getView(), settings);
     ui::set_visible(custom_note.getView(), !custom);
-    if (this->st.settings_ok) {
-        age->setDetailText(ui::age_text(this->st.settings.rating_age));
-        sns->setOn(this->st.settings.sns_post_restriction, false);
-        comm->setOn(this->st.settings.free_communication_restriction, false);
+    if (settings) {
+        age->setDetailText(ui::age_text(this->shown.rating_age));
+        sns->setOn(this->shown.sns_post_restriction, false);
+        comm->setOn(this->shown.free_communication_restriction, false);
     }
 
     ui::set_visible(vr.getView(), this->st.stereo_vision_ok);
@@ -342,18 +388,20 @@ void RestrictionsTab::refresh()
 
 namespace
 {
-// What a line is about in `name`; its state as `icon` (a padlock in coral
-// when `restricts`, a check in teal) and `words` beside it ("—" when not
-// `known`, the icon then hidden; a count; "" for none).
+// What a line is about in `name`; its state: a padlock in coral when
+// `restricts`, else "Allowed" in words (a check could read as "protected");
+// `words` beside the padlock (a count), "—" when not `known`.
 void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::string& what, bool known,
           bool restricts, const std::string& words = "")
 {
     name->setText(what);
-    state->setText(known ? words : "\u2014");
+    const std::string said = !words.empty() ? words : restricts ? "" : "playguard/cadran/restrictions/allowed"_i18n;
+    state->setText(known ? said : "\u2014");
+    state->setTextColor(brls::Application::getTheme()[known && !restricts && words.empty() ? "cadran/text2" : "cadran/text"]);
     ui::set_visible(state, !state->getFullText().empty());
-    icon->setIcon(restricts ? "lock" : "check");
-    icon->setColor(brls::Application::getTheme()[restricts ? "cadran/coral_fill" : "cadran/teal_fill"]);
-    icon->setVisibility(known ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    icon->setIcon("lock");
+    icon->setColor(brls::Application::getTheme()["cadran/coral_fill"]);
+    icon->setVisibility(known && restricts ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
 }
 }   // namespace
 
@@ -376,7 +424,8 @@ void RestrictionsTab::show_tiles(bool custom)
         // the focus's alone.
         t.box->setBackgroundColor(selected ? theme["cadran/teal_soft"] : theme["cadran/surf"]);
         t.box->setBorderColor(theme["cadran/line"]);
-        t.badge->setVisibility(selected ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
+        // Gone, not only hidden: its words would take the title's room.
+        t.badge->setVisibility(selected ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         if (t.level == PctlSafetyLevel_Custom && t.to_settings != custom) {
             t.to_settings = custom;
             t.box->updateActionHint(brls::BUTTON_A, custom ? "playguard/cadran/restrictions/to_settings"_i18n

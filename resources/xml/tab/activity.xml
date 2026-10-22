@@ -82,7 +82,6 @@
 
             <brls:Header title="@i18n/playguard/activity/section_totals" marginBottom="8"/>
             <brls:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
-            <brls:DetailCell id="ac_account_default" title="@i18n/playguard/activity/account_default"/>
             <PlayDaysView id="ac_days" width="auto" height="auto" marginTop="8" marginBottom="16"/>
             <brls:Header title="@i18n/playguard/activity/section_summary" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ac_per_day" focusable="false" title="@i18n/playguard/activity/summary/per_day"/>
@@ -93,6 +92,7 @@
             <brls:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
             <brls:DetailCell id="ac_qr" title="@i18n/playguard/activity/qr"/>
+            <brls:DetailCell id="ac_account_default" title="@i18n/playguard/activity/account_default"/>
             <brls:Box id="ac_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
                 <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>

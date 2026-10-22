@@ -30,6 +30,8 @@ class CadranWeekView : public brls::Box
     void show(const uint16_t days[7], const uint16_t live[7]);
     // The time played on each weekday's last occurrence (today's included),
     // in minutes, drawn inside its bar against its limit; `ok` false: none.
+    // Past the limit, the bar full, the part over it at its top in coral.
+    // The days after today are last week's: their fill fainter.
     void show_played(const uint32_t minutes[7], bool ok);
     // Each day's bedtime alarm, under its name ("21:00", "—"), when the days
     // differ; all empty: none shown, and the week is as tall as before.
@@ -49,6 +51,9 @@ class CadranWeekView : public brls::Box
     int  focused_day() const { return this->focused; }
 
     static brls::View* create();
+    // Whether `day` (0 = Sunday) comes after today in the week laid out from
+    // Monday: what it shows played is last week's.
+    static bool last_week(int day);
 
   private:
     class Column;
@@ -59,6 +64,7 @@ class CadranWeekView : public brls::Box
         CadranDigits* value = nullptr;
         brls::Box*    bar   = nullptr;
         brls::Box*    fill  = nullptr;   // the time played, from the bar's foot
+        brls::Box*    within = nullptr;  // in the fill, from its foot: the part within the limit, when past it
         brls::Label*  day   = nullptr;
         CadranIcon*   down  = nullptr;
         brls::Box*    bed   = nullptr;   // the bedtime: a moon and the time

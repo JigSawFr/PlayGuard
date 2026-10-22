@@ -87,6 +87,12 @@ static void test_tabs()
     CHECK(s.count_of({ "games", "clock" }) == 2);
     CHECK(s.count_of({ "pin_weak", "pairing" }) == 0);   // ignored, for information
     CHECK(s.count_of({}) == 0);
+    // What the badge says: the first one to do, in the bell's order; none
+    // for entries ignored or for information.
+    CHECK(s.first_of({ "games", "clock" }) == s.first_of({ "clock", "games" }));
+    CHECK(!s.first_of({ "games", "clock" }).empty());
+    CHECK(s.first_of({ "pin_weak", "pairing" }).empty());
+    CHECK(s.first_of({}).empty());
 }
 
 static void test_fixed_order()

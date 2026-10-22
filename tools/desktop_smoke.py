@@ -65,7 +65,8 @@ itself, and keep them in the cache.
 
 The "cadran" scenario tours the boards on top of the tabs: every tab, then
 the child screen and back with the PIN, a day of the week edited with the
-stick and saved, a restriction level's confirmation, the text size, the
+stick and saved, a restriction level's confirmation and the one a preset's
+setting changed asks (the level becoming Custom), the text size, the
 network clock's screen, a game's screen from its card and the notification
 bell's list. The "cadranstates" one shows Cadran's Today and
 Play timer in the states "alarm" and "outside" set up, together: the time
@@ -1707,6 +1708,12 @@ if CADRAN:
     key("Right", 2)            # Teen
     key("Return")
     shot("16_level_confirm")
+    key("Escape")
+    # A setting of the preset in force changed: the level would become
+    # Custom from it, asked first; cancelled, the switch back as it was.
+    go_to("Restrict posting to social media")
+    key("Return")
+    shot("16_to_custom")
     key("Escape")
 
     # Preferences › Text size: its three choices.

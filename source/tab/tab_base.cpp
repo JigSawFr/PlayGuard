@@ -41,7 +41,13 @@ void TabBase::mark(brls::Box* row, std::vector<std::string> ids)
 {
     TabBadge* badge = TabBadge::on_row(row);
     if (!badge) return;
-    this->marks.push_back({ row, badge, std::move(ids) });
+    // Before the badge, in its colour.
+    auto* reason = cadran::kit::label("", cadran::kit::TEXT_BODY, "cadran/amber");
+    reason->setSingleLine(true);
+    reason->setAlignSelf(brls::AlignSelf::CENTER);
+    reason->setVisibility(brls::Visibility::GONE);
+    row->addView(reason, row->getChildren().size() - 1);
+    this->marks.push_back({ row, badge, reason, std::move(ids) });
     if (!this->notice_listener) this->notice_listener = notices::listen([this]() { this->update_marks(); });
     this->update_marks();
 }
@@ -51,10 +57,16 @@ void TabBase::update_marks()
     for (const auto& m : this->marks) {
         const int count = notices::count_of(m.ids);
         m.badge->set_count(count);
-        // A row whose value is only its "›": the badge says the way in.
+        // A row whose value is only its "›": the badge says the way in, and
+        // what it is for takes the value's place.
+        std::string reason;
         if (auto* cell = dynamic_cast<brls::DetailCell*>(m.row))
-            if (cadran::kit::without_chevron(cell->detail->getFullText()).empty())
+            if (cadran::kit::without_chevron(cell->detail->getFullText()).empty()) {
                 cell->detail->setVisibility(count > 0 ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+                if (count > 0) reason = notices::reason_of(m.ids);
+            }
+        ui::set_text(m.reason, reason);
+        ui::set_visible(m.reason, !reason.empty());
     }
 }
 

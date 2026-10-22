@@ -361,9 +361,13 @@ void PlayTimerTab::show_played_key(int day)
     std::string text = "playguard/cadran/week/played_key"_i18n;
     if (day >= 0 && day < 7) {
         const std::string played = ui::fmt_played((uint16_t)std::min<uint32_t>(this->played_min[day], 24 * 60));
+        // A day after today: what was played on it last week, said so.
+        const std::string name = CadranWeekView::last_week(day)
+                                     ? brls::getStr("playguard/cadran/week/last_week_day", ui::day_name(day))
+                                     : ui::day_name(day);
         text = this->pending[day] == PT_DAY_NOLIMIT
-                   ? brls::getStr("playguard/cadran/week/played_day_free", ui::day_name(day), played)
-                   : brls::getStr("playguard/cadran/week/played_day", ui::day_name(day), played, ui::fmt_played(this->pending[day]));
+                   ? brls::getStr("playguard/cadran/week/played_day_free", name, played)
+                   : brls::getStr("playguard/cadran/week/played_day", name, played, ui::fmt_played(this->pending[day]));
     }
     ui::set_text(played_text, text);
 }

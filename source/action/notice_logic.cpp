@@ -219,6 +219,13 @@ int Store::count_of(const std::vector<std::string>& ids) const
     return n;
 }
 
+std::string Store::first_of(const std::vector<std::string>& ids) const
+{
+    for (const Item& item : this->sorted(false))
+        if (item.level == Level::Action && std::find(ids.begin(), ids.end(), item.id) != ids.end()) return item.id;
+    return "";
+}
+
 bool shown_kind(const std::string& id, const Shown& shown)
 {
     if (text::starts_with(id, "sys_")) return shown.system;

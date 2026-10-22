@@ -100,10 +100,17 @@ CadranWeekView::CadranWeekView()
         c.bar->setAxis(brls::Axis::COLUMN);
         c.bar->setJustifyContent(brls::JustifyContent::FLEX_END);
         c.bar->setAlignItems(brls::AlignItems::STRETCH);
-        c.fill = new brls::Box();
+        c.fill = new brls::Box(brls::Axis::COLUMN);
         c.fill->setCornerRadius(12);
         c.fill->setHeight(0);
+        c.fill->setJustifyContent(brls::JustifyContent::FLEX_END);
+        c.fill->setAlignItems(brls::AlignItems::STRETCH);
         c.fill->setVisibility(brls::Visibility::GONE);
+        c.within = new brls::Box();
+        c.within->setCornerRadius(12);
+        c.within->setHeight(0);
+        c.within->setVisibility(brls::Visibility::GONE);
+        c.fill->addView(c.within);
         c.bar->addView(c.fill);
         c.box->addView(c.bar);
         c.day = new brls::Label();
@@ -311,15 +318,31 @@ void CadranWeekView::render()
         c.bar->setBackgroundColor(focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
         c.bar->setBorderColor(theme["cadran/amber_fill"]);
         c.bar->setBorderThickness(changed ? 2 : 0);
-        // What was played that day, against its limit: up to the top, coral
-        // once the limit is reached. Nothing on a day without one.
+        // What was played that day, against its limit: up to the top. Past
+        // it, the bar full: the part within the limit as below it, the part
+        // over it in coral at the top, as much of the bar as of the time
+        // played (a third at least, to be seen). Nothing on a day without
+        // a limit. Last week's days fainter.
         const bool fills = this->valid && this->played_ok && m != PT_DAY_NOLIMIT && m > 0 && this->played[d] > 0;
         if (fills) {
             c.fill->setHeight(std::max(6.0f, bar * std::min(1.0f, (float)this->played[d] / (float)m)));
             // On the focused bar (teal itself), the teal darkened.
             NVGcolor shade = theme["cadran/navy"];
             shade.a = 0.35f;
-            c.fill->setBackgroundColor(over ? theme["cadran/coral_fill"] : focused ? shade : theme["cadran/teal_fill"]);
+            NVGcolor played = focused ? shade : theme["cadran/teal_fill"];
+            NVGcolor past = theme["cadran/coral_fill"];
+            // Fainter: towards the bar's own colour, still opaque (the part
+            // within the limit is drawn over the coral).
+            if (last_week(d) && !focused) {
+                const NVGcolor under = theme["cadran/bar"];
+                played = nvgLerpRGBA(under, played, 0.45f);
+                past = nvgLerpRGBA(under, past, 0.45f);
+            }
+            const float within = over ? std::min(2.0f / 3.0f, (float)m / (float)this->played[d]) : 1.0f;
+            c.fill->setBackgroundColor(over ? past : played);
+            c.within->setHeight(bar * within);
+            c.within->setBackgroundColor(played);
+            c.within->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         }
         c.fill->setVisibility(fills ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         c.day->setTextColor(d == today ? theme["cadran/teal"] : theme["cadran/text3"]);
@@ -329,6 +352,13 @@ void CadranWeekView::render()
         c.up->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
         c.down->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
     }
+}
+
+bool CadranWeekView::last_week(int day)
+{
+    // Monday first: Sunday (0) is the week's last day.
+    const auto place = [](int d) { return (d + 6) % 7; };
+    return place(day) > place(ui::today_weekday());
 }
 
 brls::View* CadranWeekView::create() { return new CadranWeekView(); }

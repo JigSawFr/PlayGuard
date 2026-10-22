@@ -471,7 +471,7 @@
         "age_value": "{}岁及以下",
         "sns": "限制发布到社交媒体",
         "comm": "限制与他人交流",
-        "custom_only": "如需更改这些设置，请选择“自定义”等级。",
+        "custom_only": "更改其中任一项会切换到“自定义”等级，并以这些设置为基础。",
         "section_other": "其他",
         "vr": "限制VR模式",
         "org": "分级机构",
@@ -506,7 +506,9 @@
         "blocked_title": "{} 评级高于 {} 岁",
         "blocked_none": "{}：没有评级高于 {} 岁的已安装游戏。",
         "blocked_no_age": "此限制等级不按年龄限制游戏。",
-        "blocked_note": "根据最近一次已安装游戏检查。评级机构未评级的游戏不计入，手机应用中设置的例外也不计入。"
+        "blocked_note": "根据最近一次已安装游戏检查。评级机构未评级的游戏不计入，手机应用中设置的例外也不计入。",
+        "section_level_settings": "此等级的设置",
+        "to_custom": "限制等级将变为“自定义”，以“{}”的设置为基础并加上此更改："
     },
     "clock": {
         "section_now": "时钟",
@@ -1849,7 +1851,17 @@
         "clock_detail_dns": "Atmosphère 的 DNS 拦截了任天堂的时间服务器，主机无法自行校准：请通过时间服务器校准。",
         "week_more": "比上周每天多 {}。",
         "week_less": "比上周每天少 {}。",
-        "week_same": "与上周大致相当。"
+        "week_same": "与上周大致相当。",
+        "short": {
+            "pin_missing": "未设置",
+            "pin_weak": "容易被猜到",
+            "pin_lock_off": "无需 PIN 即可打开",
+            "alarm_off": "提醒已关闭",
+            "clock": "不准确",
+            "games": "部分无法启动",
+            "patches": "需要检查",
+            "sd_space": "快满了"
+        }
     },
     "cadran": {
         "date": "{3}{2}日 {0}",
@@ -1935,7 +1947,8 @@
             "steps_count": "{} / {}",
             "tl_bed_first": "就寝在先",
             "bed_off_value": "已关闭",
-            "bed_set": "设置"
+            "bed_set": "设置",
+            "fine_pill": "{} 项检查正常"
         },
         "pill": {
             "pc_on": "家长控制已开启",
@@ -1971,7 +1984,8 @@
             "over_key": "超出限制",
             "played_day": "{}：已玩 {} / {}",
             "played_day_free": "{}：已玩 {}（不限）",
-            "bonus": "{}：当天计划加时 {}"
+            "bonus": "{}：当天计划加时 {}",
+            "last_week_day": "上周{}"
         },
         "activity": {
             "export": "导出",
@@ -1986,7 +2000,8 @@
             "see_all": "查看累计",
             "trend_up": "比上周每天 +{}",
             "trend_down": "比上周每天 -{}",
-            "trend_same": "与上周相当"
+            "trend_same": "与上周相当",
+            "grew": "比上周 +{}"
         },
         "restrictions": {
             "choose": "选择此级别",
@@ -1998,7 +2013,9 @@
             "none": "所有年龄的软件，允许社交媒体与交流",
             "to_settings": "查看设置",
             "games": "被限制的游戏",
-            "games_none": "无"
+            "games_none": "无",
+            "current": "当前",
+            "allowed": "允许"
         },
         "clock": {
             "console": "主机",

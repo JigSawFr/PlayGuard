@@ -34,9 +34,9 @@ class RestrictionsTab : public TabBase
         brls::Box*       badge = nullptr;
         CadranDigits*    age   = nullptr;
         brls::Label*     note  = nullptr;
-        // Each line: what it is about, then at the right its state as an
-        // icon (a padlock: restricted; a check: allowed), with a count or
-        // "—" in words where there is one.
+        // Each line: what it is about, then at the right its state: a
+        // padlock when restricted (with a count where there is one), else
+        // "Allowed" in words; "—" when unknown.
         brls::Label*     sns       = nullptr;
         brls::Label*     sns_state = nullptr;
         CadranIcon*      sns_icon  = nullptr;
@@ -53,6 +53,10 @@ class RestrictionsTab : public TabBase
     cadran::List list;
     std::vector<Tile> tiles;
     PctlStatus st = {};   // what the last refresh read
+    // The settings the lines under the tiles show: Custom's in force, else
+    // the preset's, a change made from them (it then makes the level Custom).
+    PctlCustomSettings shown = {};
+    bool custom_now = false;   // the level in force is Custom
     int age_now = -1;     // the age the level in force restricts to (0 none), -1 unknown
 
     Tile make_tile(uint32_t level, bool last);
@@ -60,8 +64,13 @@ class RestrictionsTab : public TabBase
     // preset restricts, then sets it.
     void choose_level(int level);
     // `loosens`: what the change allows; asked first when not empty (B or
-    // Cancel puts the switch back). Tightening applies at once.
+    // Cancel puts the switch back). Tightening applies at once. Under a
+    // preset, it is asked first in any case: the level becomes Custom, from
+    // the preset's settings with this change.
     void write_custom(const PctlCustomSettings& s, const std::string& loosens = "");
+    // Writes them; `to_custom`: sets the level to Custom first (1036 applies
+    // only there), back to the one before when the settings are refused.
+    void apply_custom(const PctlCustomSettings& s, bool to_custom);
     // "Restrict software by age rating: Up to 12 years (PEGI)" and the two others.
     std::string settings_text(const PctlCustomSettings& s) const;
     void show_tiles(bool custom);

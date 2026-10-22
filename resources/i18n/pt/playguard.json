@@ -471,7 +471,7 @@
         "age_value": "Até {} anos",
         "sns": "Restringir publicações nas redes sociais",
         "comm": "Restringir a comunicação com outros",
-        "custom_only": "Para alterar estas definições, escolha o nível \"Personalizado\".",
+        "custom_only": "Alterar uma delas passa para o nível \"Personalizado\", a partir destas definições.",
         "section_other": "Outros",
         "vr": "Restringir o modo VR",
         "org": "Organismo de classificação",
@@ -506,7 +506,9 @@
         "blocked_title": "{} classifica-os acima de {}",
         "blocked_none": "{}: nenhum jogo instalado está classificado acima de {}.",
         "blocked_no_age": "Este nível não restringe os jogos por idade.",
-        "blocked_note": "Segundo a última verificação dos jogos instalados. Um jogo que a organização de classificação não classifica não é contado, nem as exceções definidas na aplicação para smartphones."
+        "blocked_note": "Segundo a última verificação dos jogos instalados. Um jogo que a organização de classificação não classifica não é contado, nem as exceções definidas na aplicação para smartphones.",
+        "section_level_settings": "Definições deste nível",
+        "to_custom": "O nível de restrição passará a \"Personalizado\", a partir das definições de \"{}\" com esta alteração:"
     },
     "clock": {
         "section_now": "Relógios",
@@ -1849,7 +1851,17 @@
         "clock_detail_dns": "O DNS do Atmosphère bloqueia o servidor de hora da Nintendo, por isso a consola não o consegue acertar sozinha: acerte-o a partir de um servidor de hora.",
         "week_more": "Mais {} por dia do que na semana anterior.",
         "week_less": "Menos {} por dia do que na semana anterior.",
-        "week_same": "Mais ou menos como na semana anterior."
+        "week_same": "Mais ou menos como na semana anterior.",
+        "short": {
+            "pin_missing": "Não configurado",
+            "pin_weak": "Fácil de adivinhar",
+            "pin_lock_off": "Abre sem ele",
+            "alarm_off": "Alarme desligado",
+            "clock": "Não é preciso",
+            "games": "Alguns não arrancam",
+            "patches": "A verificar",
+            "sd_space": "Quase cheio"
+        }
     },
     "cadran": {
         "date": "{1}, {2} de {3}",
@@ -1893,7 +1905,7 @@
             "ok": "ok",
             "clock_fix": "Medir e acertar agora",
             "clock_fine": "o temporizador conta bem",
-            "serial_hidden": "Número de série oculto",
+            "serial_hidden": "Número de série ocultado",
             "next_time_up": "Se continuar a jogar, o tempo esgota-se por volta das {}",
             "next_bedtime": "Alarme de hora de dormir às {}, daqui a {}",
             "next_bedtime_now": "Hora de dormir: pode voltar a jogar às {}",
@@ -1935,7 +1947,8 @@
             "steps_count": "{} de {}",
             "tl_bed_first": "a hora de dormir vem primeiro",
             "bed_off_value": "Desativado",
-            "bed_set": "Defini-lo"
+            "bed_set": "Defini-lo",
+            "fine_pill": "{} verificações em ordem"
         },
         "pill": {
             "pc_on": "Controlo parental ativo",
@@ -1971,7 +1984,8 @@
             "over_key": "limite ultrapassado",
             "played_day": "{}: {} jogado de {}",
             "played_day_free": "{}: {} jogado, sem limite",
-            "bonus": "{}: {} previsto para esse dia"
+            "bonus": "{}: {} previsto para esse dia",
+            "last_week_day": "{} passado"
         },
         "activity": {
             "export": "Exportar",
@@ -1986,7 +2000,8 @@
             "see_all": "Ver desde sempre",
             "trend_up": "+{}/dia vs semana anterior",
             "trend_down": "-{}/dia vs semana anterior",
-            "trend_same": "como na semana anterior"
+            "trend_same": "como na semana anterior",
+            "grew": "+{} vs semana anterior"
         },
         "restrictions": {
             "choose": "Escolher este nível",
@@ -1998,7 +2013,9 @@
             "none": "software para todas as idades, redes sociais e comunicação permitidas",
             "to_settings": "As suas definições",
             "games": "Jogos bloqueados",
-            "games_none": "nenhum"
+            "games_none": "nenhum",
+            "current": "Atual",
+            "allowed": "Permitido"
         },
         "clock": {
             "console": "Consola",
