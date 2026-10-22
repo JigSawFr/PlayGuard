@@ -343,13 +343,21 @@ jobs:
           restore-keys: apt-desktop-
       # Without the recommended packages (ImageMagick's ghostscript and fonts,
       # for one): man-db's index is not rebuilt (2 s of every install, for no
-      # reader); autoclean drops the packages a newer version replaced. The
+      # reader), nor the initramfs (the -dev packages bring udev and
+      # libsystemd0 upgraded, and their trigger rebuilt it: 15 to 55 s of every
+      # install on 2026-10-22, for a runner that never boots again); dpkg does
+      # not wait on each write to reach the disk (--force-unsafe-io: the
+      # runner is thrown away after the job); autoclean drops the packages a
+      # newer version replaced. The
       # shards install the same list (the X and GL libraries, xvfb, xdotool…)
       # from this cache.
       - name: Dependencies
         run: |
           sudo rm -f /var/lib/man-db/auto-update
-          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives"
+          initramfs=$(command -v update-initramfs || echo /usr/sbin/update-initramfs)
+          sudo dpkg-divert --quiet --local --rename --add "$initramfs"
+          sudo ln -sf /bin/true "$initramfs"
+          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives -o Dpkg::Options::=--force-unsafe-io"
           mkdir -p .apt-archives/partial
           sudo apt-get update
           sudo apt-get install $archives -y --no-install-recommends cmake ccache libgl1-mesa-dev libgl1-mesa-dri \
@@ -397,9 +405,9 @@ jobs:
 
   # Clicks through every screen of that build headlessly: catches borealis
   # XML / view errors without a console. The scenarios run in parallel
-  # shards of about the same length, under 5 minutes each under software GL
+  # shards of about the same length, about 4 minutes each under software GL
   # (the default tour is split in two, `smoke` and `games`; the text check in
-  # three, five languages each, is the longest and sets the pace). The
+  # four, four languages each at most). The
   # desktop-smoke job below gathers them under one name for the release job
   # and branch rules.
   desktop-smoke-shard:
@@ -411,7 +419,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Every shard under the languages' (about 290 s), by the scenarios'
+          # Every shard under 250 s, by the scenarios'
           # times on a runner (s, main on 2026-10-22): smoke 144, games 148,
           # cadran 142, gate 103, hbmenu 102, homebrew 101, devbuild 79,
           # forwarders 64, outside 59, cadranlarge 35, library 27, update 25,
@@ -429,17 +437,20 @@ jobs:
             scenarios: devbuild library update errors sysnotes forwarders
           # Every Cadran tab, a few common dialogs and the child screen in
           # the 15 languages, normal and larger text: no text cut short
-          # (tools/cut_text_check.py, tests/cut_text/), five languages a
-          # shard (about 5 minutes each).
+          # (tools/cut_text_check.py, tests/cut_text/): about 58 s a language
+          # (both sizes), four a shard.
           - shard: languages-1
             scenarios: cuttext
-            languages: en-US fr fr-CA de es
+            languages: en-US fr fr-CA de
           - shard: languages-2
             scenarios: cuttext
-            languages: es-419 it nl pt pt-BR
+            languages: es es-419 it nl
           - shard: languages-3
             scenarios: cuttext
-            languages: ru ja ko zh-Hans zh-Hant
+            languages: pt pt-BR ru ja
+          - shard: languages-4
+            scenarios: cuttext
+            languages: ko zh-Hans zh-Hant
     env:
       ARTIFACT: playguard-${{ needs.meta.outputs.label }}-screenshots-${{ matrix.shard }}
     steps:
@@ -463,10 +474,14 @@ jobs:
       # (the libraries the program links come with their -dev packages):
       # xauth is what xvfb-run needs, libgl1-mesa-dri is llvmpipe
       # (LIBGL_ALWAYS_SOFTWARE=1), dbus the session the app's portals ask for.
+      # No man-db index nor initramfs rebuilt, as there.
       - name: Dependencies
         run: |
           sudo rm -f /var/lib/man-db/auto-update
-          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives"
+          initramfs=$(command -v update-initramfs || echo /usr/sbin/update-initramfs)
+          sudo dpkg-divert --quiet --local --rename --add "$initramfs"
+          sudo ln -sf /bin/true "$initramfs"
+          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives -o Dpkg::Options::=--force-unsafe-io"
           mkdir -p .apt-archives/partial
           sudo apt-get update
           sudo apt-get install $archives -y --no-install-recommends libgl1-mesa-dev libgl1-mesa-dri \
