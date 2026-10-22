@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
+<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
 # Risoluzione dei problemi
 
 Riprendere il controllo di una console bloccata, i problemi comuni, segnalare un bug, e la modalità sviluppatore. Torna al [README](../../README.md).
@@ -78,6 +78,23 @@ La console usa un firmware più recente del più recente testato: PlayGuard cont
 
 Il suo cancello (`config/playguard/gate-….nro`) non è più il file con cui è stato creato il forwarder: è stato modificato o sostituito sulla scheda SD, quindi il forwarder non lo avvia. Apri PlayGuard dal suo forwarder: riscrive il cancello all'avvio; *Console › Forwarder › Reinstalla tutti* rifà ogni forwarder con esso.
 
+### Un forwarder protetto si chiude subito ("si è verificato un errore")
+
+Prima di qualsiasi schermata di PlayGuard, senza codice di errore (il rapporto di Atmosphère in `atmosphere/crash_reports/` nomina il modulo `forwarder`, risultato `2000-0000`): è stato creato da un PlayGuard il cui cancello era stato compilato senza le sue risorse, che il loader del forwarder ha rifiutato. Aggiorna PlayGuard, poi ricrealo: la campanella e *Console › Forwarder* lo propongono per ogni forwarder creato con un loader più vecchio.
+
+### Un forwarder protetto resta sulla schermata del suo cancello dopo il PIN
+
+Il PIN accettato, la schermata con l'icona dell'homebrew resta e non succede altro: il suo cancello disegnava quella schermata con un solo buffer, e aspettava per sempre di disegnare la successiva. Aggiorna PlayGuard, poi ricrealo: la campanella e *Console › Forwarder* lo propongono per ogni forwarder creato con un cancello più vecchio.
+
+### Un forwarder mostra "Impossibile avviare il software"
+
+La console si è rifiutata di avviarlo: un controllo di firma è ancora attivo. Nell'ordine in cui guardare:
+
+- **File sigpatch accanto a sys-patch.** File `.ips` in `atmosphere/kip_patches/fs_patches`, `loader_patches` o `atmosphere/exefs_patches/es_patches` mentre sys-patch è in esecuzione: due strumenti che patchano gli stessi controlli, la causa che le discussioni su sys-patch e sigpatch di GBAtemp indicano più spesso. *Console › Patch dei giochi* lo segnala, e Ⓐ lì li mette da parte (spostati in `config/playguard/sigpatches-aside/`, mai eliminati; il `bootloader/patches.ini` di hekate resta). Riavvia la console.
+- **Un pattern che sys-patch non ha applicato.** I forwarder hanno bisogno delle sue patch di fs e del loader, ogni pattern che ha per questo firmware (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), non solo uno per modulo. *Informazioni › Aiuto e diagnostica › Esporta un rapporto di diagnostica* elenca, sulla sua riga `game patches`, la versione di sys-patch e ogni pattern tralasciato; `sd:/config/sys-patch/log.ini` contiene lo stesso. Controlla che `config/sys-patch/config.ini` patchi questo sistema (`patch_emummc=1` su emuMMC) e non ne disattivi nessuno; lo stesso manutentore di sys-patch dice che 23.0.x non richiede un sys-patch più recente di 1.6.2.3.
+- **Nessun riavvio da quando le patch sono cambiate.** sys-patch applica le patch all'avvio.
+- **Un forwarder creato da un PlayGuard più vecchio.** La campanella e *Console › Forwarder* propongono di ricreare quelli creati con un loader più vecchio.
+
 ### La campanella o una scheda mostra un badge ambra
 
 Qualcosa richiede la tua attenzione: Ⓨ apre l'elenco, e Ⓐ su una voce applica la soluzione o apre dove si applica ([notifiche](features.md#notifiche--ciò-che-richiede-la-tua-attenzione-da-qualsiasi-scheda)).
@@ -86,7 +103,7 @@ Qualcosa richiede la tua attenzione: Ⓨ apre l'elenco, e Ⓐ su una voce applic
 
 Un errore mostra il codice del sistema (per esempio `0x0001088E`) con ciò che se ne sa: cosa fare per i codici il cui significato è documentato, altrimenti un rapporto aiuta.
 
-1. *Informazioni › Aiuto e diagnostica › Esporta un rapporto di diagnostica* salva un file di testo in `sd:/config/playguard/logs/reports/`: firmware, versione di Atmosphère, quanto è durato l'avvio e quanto le schermate lente (la cronologia delle modifiche, *Tutti i giochi*, il controllo dei giochi installati, le schede che si aggiornano da sole), orologi, memoria, stato dell'oscuramento del numero di serie e delle patch dei giochi, il risultato grezzo di ogni richiesta al filtro famiglia, e i registri: come si è conclusa l'ultima sessione, la memoria e lo spazio libero sulla scheda SD, i file di crash più recenti e le ultime 80 righe registrate. **Non contiene mai il PIN né il numero di serie.**
+1. *Informazioni › Aiuto e diagnostica › Esporta un rapporto di diagnostica* salva un file di testo in `sd:/config/playguard/logs/reports/`: firmware, versione di Atmosphère, quanto è durato l'avvio e quanto le schermate lente (la cronologia delle modifiche, *Tutti i giochi*, il controllo dei giochi installati, le schede che si aggiornano da sole), orologi, memoria, stato dell'oscuramento del numero di serie e delle patch dei giochi, cosa fa il reindirizzamento DNS di Atmosphère con i server del filtro famiglia e dell'ora di Nintendo (letto dal suo file hosts sulla scheda SD, non un test di rete, con la fine del `atmosphere/logs/dns_mitm_startup.log` di Atmosphère), il risultato grezzo di ogni richiesta al filtro famiglia, e i registri: come si è conclusa l'ultima sessione, la memoria e lo spazio libero sulla scheda SD, i file di crash più recenti e le ultime 80 righe registrate. **Non contiene mai il PIN né il numero di serie.**
 2. [Apri una issue](https://github.com/JigSawFr/PlayGuard/issues/new) e allegalo.
 
 ### Inviare un rapporto online
@@ -98,7 +115,7 @@ Con la console online, *Informazioni › Aiuto e diagnostica › Invia un rappor
   - i registri di questa sessione e di quella precedente (`logs/sessions/`; se uno è lungo: il suo inizio e i suoi ultimi 64 KiB);
   - i file di debug: il riferimento del blocco del timer, la fine della registrazione del tempo di gioco mentre *Registra il tempo di gioco* è attivo, le ultime 20 modifiche della cronologia (senza nomi di giochi, utenti o profili, e solo con la data), e le impostazioni di PlayGuard.
 - **Accesso:** se non hai effettuato l'accesso, PlayGuard propone prima di accedere; *Account GitHub*, subito sotto una volta effettuato l'accesso, permette di uscire; quando GitHub rifiuta il gist, PlayGuard propone di accedere di nuovo.
-- **Dopo:** mostra il link e due codici QR: il rapporto, e il modulo di segnalazione bug con il link, le tue versioni, come è stato avviato PlayGuard (sopra un gioco o dall'Album; aggiungi il menu) e il sistema (sysMMC o emuMMC) già compilati. Ogni link viene conservato in `logs/uploads/` come collegamento Internet (`.url`) che un computer apre nel suo browser.
+- **Dopo:** mostra due codici QR, con il link sotto il primo, il suo id in gruppi di quattro da leggere ad alta voce o digitare: il rapporto, per chi ti sta già aiutando, e il modulo di segnalazione bug con il link, le tue versioni, come è stato avviato PlayGuard (sopra un gioco o dall'Album; aggiungi il menu) e il sistema (sysMMC o emuMMC) già compilati, da scansionare per segnalare un bug. Il link resta anche nelle notifiche, e ognuno viene conservato in `logs/uploads/` come collegamento Internet (`.url`) che un computer apre nel suo browser.
 
 > [!WARNING]
 > Chiunque abbia il link può leggere il rapporto, finché non elimini il gist su GitHub, e una segnalazione di bug aperta con esso è pubblica: la conferma lo dice.
@@ -140,20 +157,20 @@ Premi Ⓨ sette volte su *Informazioni › Versione*; gli strumenti per sviluppa
 
 - una delle ultime 20 versioni pubblicate (pre-release comprese, etichettate);
 - uno degli ultimi 20 commit di `main`;
-- la build più recente di una pull request aperta da un branch di questo repository (mai da un fork: il suo codice non è ancora stato revisionato). A sulla scheda delle pull request, quando è mostrata, le ordina nell'altro senso (prima la build più recente, o per numero).
+- la build più recente di una pull request aperta da un branch di questo repository (mai da un fork: il suo codice non è ancora stato revisionato). A sulla scheda delle pull request, quando è mostrata, le ordina nell'altro senso (prima la build più recente, o per numero): il suggerimento di A dice quale.
 
-**Ogni build** mostra il suo titolo (l'oggetto di un commit o di una pull request; il messaggio completo di un commit è la sua descrizione) sopra delle etichette: il tipo di modifica (*Novità*, *Correzione*, *Docs*…) e il suo ambito, *Incompatibile*, la pull request da cui proviene un commit, l'esito dei controlli (*CI OK*, *CI fallita*, *CI in corso*), pre-release, *installata* o *nuova*; a destra, quanto è vecchia e il suo commit. Una build apre prima la sua pagina: etichette (il suo tipo, i suoi controlli, installata o nuova), una scheda di dati (compilazione, dimensione, commit, checksum, quando GitHub la elimina), **Installa**, **Vedi su GitHub** (la sua pagina come codice QR per un telefono), poi le note di una versione o la descrizione di una pull request, rese dal Markdown di GitHub (titoli, elenchi, caselle di controllo, codice, citazioni e avvisi, tabelle).
+**Ogni build** mostra il suo titolo (l'oggetto di un commit o di una pull request; il messaggio completo di un commit è la sua descrizione) sopra delle etichette: il tipo di modifica (*Novità*, *Correzione*, *Docs*…) e il suo ambito, *Incompatibile*, la pull request da cui proviene un commit, l'esito dei controlli (*CI OK*, *CI fallita*, *CI in corso*), pre-release, *installata* o *nuova*; a destra, quanto è vecchia (in minuti, ore, poi giorni) e il suo commit. Una build apre prima la sua pagina: etichette (il suo tipo, i suoi controlli, installata o nuova), una scheda di dati (compilazione, dimensione, commit, checksum, quando GitHub la elimina), **Installa**, **Vedi su GitHub** (la sua pagina come codice QR per un telefono), un avviso quando i suoi controlli sono ancora in corso, poi le note di una versione o la descrizione di una pull request, rese dal Markdown di GitHub (titoli, elenchi, caselle di controllo, codice, citazioni e avvisi, tabelle).
 
 **Lettura sicura:** tutto ciò che viene da GitHub è mostrato come testo semplice: nessun link viene aperto, nessun HTML o script viene eseguito, e i caratteri invisibili che potrebbero camuffare un titolo (inversioni da destra a sinistra, caratteri a larghezza zero, caratteri di controllo, UTF-8 non valido) vengono rimossi.
 
 **Accesso.** Le versioni pubblicate non richiedono nulla; le altre sono gli artefatti del workflow di build, che GitHub dà solo agli utenti che hanno effettuato l'accesso. **Account GitHub** effettua l'accesso con un codice e un codice QR da scansionare con un telefono. Le sole autorizzazioni chieste sono leggere i file del workflow di build (Actions) e creare gist, per *Invia un rapporto online*; per il resto il token può leggere solo ciò che è pubblico. È conservato in `github_token`, mai inviato con un rapporto, e *Account GitHub* permette di uscire. Con l'accesso effettuato, Ⓨ (*Cerca*) accetta il numero di una pull request (aperta o chiusa) o un commit (da 7 a 40 cifre esadecimali) e ne trova la build, solo da un branch di questo repository.
 
-**Installazione:** PlayGuard scarica la build, la verifica (dimensione, lo SHA-256 registrato da GitHub, l'intestazione NRO), la mette al posto del proprio `.nro` e si riavvia con essa (il PIN viene chiesto prima, ogni volta che ne è impostato uno).
+**Installazione:** PlayGuard scarica la build, la verifica (dimensione, lo SHA-256 registrato da GitHub, l'intestazione NRO), la mette al posto del proprio `.nro` e si riavvia con essa (il PIN viene chiesto prima, ogni volta che ne è impostato uno). La sua finestra dice a quale passaggio si trova, la dimensione e la velocità del download, e quale build sostituisce; Annulla sparisce quando la build viene messa al suo posto.
 
-- L'elenco viene conservato per 10 minuti e mostrato subito, con la sua età (Ⓧ lo recupera di nuovo); mentre viene recuperato, una barra mostra l'avanzamento.
+- L'elenco viene conservato per 10 minuti e mostrato subito, con la sua età (Ⓧ lo recupera di nuovo, e così fa la schermata ogni 3 minuti mentre i controlli di una build sono in corso); mentre viene recuperato, una barra mostra l'avanzamento.
 - Un download interrotto (rete persa) riprende da dove si era fermato la volta successiva che si installa la stessa build.
 - Gli artefatti scadono dopo 90 giorni.
 
-**Tornare indietro.** La build sostituita viene conservata (`playguard.nro.previous`): **Torna alla build precedente** nello stesso elenco le scambia di nuovo, dopo il PIN. Se una build installata da qui (o dall'aggiornamento *In PlayGuard*) va in crash prima della sua prima schermata, l'avvio successivo di PlayGuard propone di tornare alla build precedente su una semplice schermata di testo, prima che venga caricata qualsiasi altra cosa (A torna indietro, B la avvia comunque), senza il PIN, perché ad andare in crash potrebbe essere proprio la schermata del PIN. Lo stesso elenco permette di tornare a qualsiasi versione pubblicata in qualsiasi momento.
+**Tornare indietro.** La build sostituita viene conservata (`playguard.nro.previous`): **Torna alla build precedente** nello stesso elenco le scambia di nuovo, dopo il PIN; indica quella build con la sua versione, la sua pull request e il suo commit. Se una build installata da qui (o dall'aggiornamento *In PlayGuard*) va in crash prima della sua prima schermata, l'avvio successivo di PlayGuard propone di tornare alla build precedente su una semplice schermata di testo, prima che venga caricata qualsiasi altra cosa (A torna indietro, B la avvia comunque), senza il PIN, perché ad andare in crash potrebbe essere proprio la schermata del PIN. Lo stesso elenco permette di tornare a qualsiasi versione pubblicata in qualsiasi momento.
 
 **Quale build è in esecuzione:** *Informazioni › Versione* mostra il commit in modalità sviluppatore. L'intestazione di ogni schermata mostra la versione in esecuzione accanto al titolo: quella di una versione pubblicata in un'etichetta grigia (`1.2.0`), quella di qualsiasi altra build in un'etichetta ambra seguita dal suo commit, così una build di prova non viene mai scambiata per la versione pubblicata.
