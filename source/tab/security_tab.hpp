@@ -1,5 +1,8 @@
-// SecurityTab — PIN (set / show), temporary unlock, the companion
-// phone app link, delete everything.
+// SecurityTab — where the console stands as tiles (the PIN, restrictions,
+// the temporary unlock, the homebrew menu), then the PIN (set / show),
+// protecting PlayGuard and the homebrew menu (a line to Console ›
+// Forwarders), temporary unlock, the companion phone app link, delete
+// everything. "Block all games" is in Play timer.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -11,18 +14,24 @@ class SecurityTab : public TabBase
   public:
     SecurityTab();
     static brls::View* create();
+    void willAppear(bool resetState = false) override;
 
   protected:
     void refresh() override;
 
   private:
     cadran::List list;
+    // The homebrew menu's lock, read from the SD card when the tab appears
+    // (back from Console › Forwarders too), not at each 5 s refresh.
+    bool hbmenu_locked = false;
     // Set or change the PIN (the system PIN screen), recorded in the history.
     void change_pin();
 
     BRLS_BIND(brls::DetailCell, pin,            "sc_pin");
     BRLS_BIND(brls::DetailCell, restrictions,   "sc_restrictions");
     BRLS_BIND(brls::DetailCell, temp,           "sc_temp");
+    BRLS_BIND(brls::DetailCell, hbmenu,         "sc_hbmenu");
+    BRLS_BIND(brls::DetailCell, hbmenu_lock,    "sc_hbmenu_lock");
     BRLS_BIND(brls::Header,     actions_header, "sc_actions_header");
     BRLS_BIND(brls::DetailCell, set_pin,        "sc_set_pin");
     BRLS_BIND(brls::DetailCell, pin_lock_cell,  "sc_pin_lock");
@@ -31,9 +40,6 @@ class SecurityTab : public TabBase
     BRLS_BIND(brls::DetailCell, unlock,         "sc_unlock");
     BRLS_BIND(brls::BooleanCell, auto_relock,   "sc_auto_relock");
     BRLS_BIND(brls::BooleanCell, pin_ask_again, "sc_pin_ask_again");
-    BRLS_BIND(brls::Header,     lock_header,    "sc_lock_header");
-    BRLS_BIND(brls::DetailCell, console_lock_cell, "sc_console_lock");
-    BRLS_BIND(brls::Label,      console_lock_note, "sc_console_lock_note");
     BRLS_BIND(brls::DetailCell, pr_active,      "pr_active");
     BRLS_BIND(brls::DetailCell, pr_updated,     "pr_updated");
     BRLS_BIND(brls::DetailCell, pr_decode,      "pr_decode");

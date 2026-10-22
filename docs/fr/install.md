@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # Installation
 
 Comment installer, mettre à jour et supprimer PlayGuard, et ce qu'il écrit sur la carte SD. Une fois installé : [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -20,13 +20,13 @@ Ouvrez ensuite PlayGuard **par-dessus un jeu**, avec le compte d'un parent ([pou
 
 ## Mettre à jour
 
-- **Dans PlayGuard :** *À propos › Mettre à jour avec* choisit comment — dans PlayGuard même (il télécharge la version, la vérifie, se remplace et redémarre), sphaira, le Homebrew App Store ou à la main. Avec *Rechercher les mises à jour chaque jour* activé, PlayGuard s'ouvre sur la nouvelle version quand il y en a une.
+- **Dans PlayGuard :** *Préférences › Mettre à jour avec* choisit comment — dans PlayGuard même (il télécharge la version, la vérifie, se remplace et redémarre), sphaira, le Homebrew App Store ou à la main. Avec *Rechercher les mises à jour chaque jour* activé, PlayGuard s'ouvre sur la nouvelle version quand il y en a une.
 - **Le module système de récupération** suit la version de PlayGuard : après chaque mise à jour, extrayez à nouveau le `playguard-rescue.zip` de cette version (ou *Mettre à jour* sur l'entrée *Le sysmodule de récupération n'est pas à jour* de la cloche), puis redémarrez la console.
 - Les réglages, l'historique, les profils et les sauvegardes restent : ils sont dans `sd:/config/playguard/`, pas à côté de l'application.
 
 ## Le supprimer
 
-Supprimez `sd:/switch/playguard/` (l'application) et, pour retirer aussi ses fichiers, `sd:/config/playguard/` ; avec le module système de récupération, aussi `sd:/atmosphere/contents/4200000000505247/`. Les limites, le code PIN et les restrictions sont ceux de la console : ils **restent sur la console**. Pour les retirer aussi, passez d'abord par *Code PIN › Supprimer tout le contrôle parental*.
+Supprimez `sd:/switch/playguard/` (l'application) et, pour retirer aussi ses fichiers, `sd:/config/playguard/` ; avec le module système de récupération, aussi `sd:/atmosphere/contents/4200000000505247/`. Les limites, le code PIN et les restrictions sont ceux de la console : ils **restent sur la console**. Pour les retirer aussi, passez d'abord par *Sécurité › Supprimer tout le contrôle parental*.
 
 ## Fichiers sur la carte SD
 

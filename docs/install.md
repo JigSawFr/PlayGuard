@@ -19,13 +19,13 @@ Then open PlayGuard **over a game**, with a parent's user ([why](compatibility.m
 
 ## Updating
 
-- **In PlayGuard:** *About › Update with* picks how — in PlayGuard itself (it downloads the release, checks it, replaces itself and restarts), sphaira, the Homebrew App Store or by hand. With *Check for updates every day* on, PlayGuard opens on the new release when there is one.
+- **In PlayGuard:** *Preferences › Update with* picks how — in PlayGuard itself (it downloads the release, checks it, replaces itself and restarts), sphaira, the Homebrew App Store or by hand. With *Check for updates every day* on, PlayGuard opens on the new release when there is one.
 - **The recovery sysmodule** follows PlayGuard's version: after each update, extract that release's `playguard-rescue.zip` again (or *Update* on the bell's *The recovery sysmodule is out of date*), then restart the console.
 - Settings, history, profiles and backups stay: they are in `sd:/config/playguard/`, not next to the app.
 
 ## Removing it
 
-Delete `sd:/switch/playguard/` (the app) and, to remove its files too, `sd:/config/playguard/`; with the recovery sysmodule, also `sd:/atmosphere/contents/4200000000505247/`. The limits, the PIN and the restrictions are the console's own: they **stay on the console**. To remove them as well, use *PIN › Delete all parental controls* first.
+Delete `sd:/switch/playguard/` (the app) and, to remove its files too, `sd:/config/playguard/`; with the recovery sysmodule, also `sd:/atmosphere/contents/4200000000505247/`. The limits, the PIN and the restrictions are the console's own: they **stay on the console**. To remove them as well, use *Security › Delete all parental controls* first.
 
 ## Files on the SD card
 

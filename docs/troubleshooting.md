@@ -10,7 +10,7 @@ PlayGuard only sees the parental controls of the system it runs on: **emuMMC and
 
 You know the PIN, but the previous owner's phone app is still linked (unlinking fails, or a factory reset asks for their account).
 
-*PIN › Unlink the companion app*, then, if you want no parental controls at all, *Delete all parental controls*. Both work offline, on emuMMC as on sysMMC.
+*Security › Unlink the companion app*, then, if you want no parental controls at all, *Delete all parental controls*. Both work offline, on emuMMC as on sysMMC.
 
 ### PIN forgotten
 
@@ -42,18 +42,18 @@ PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key proce
 - **The network clock was never set.** *Console › Network clock › Measure the time difference*, then set it ([network clock](features.md#network-clock)).
 - **The clock was set back.** After a jump back, the count stops until the clock passes the old time; nothing to do.
 - **A limit was just written.** Start a game for a minute, then check again.
-- **Parental controls are temporarily unlocked.** Play time may not be counted then: *PIN › Turn parental controls back on*.
+- **Parental controls are temporarily unlocked.** Play time may not be counted then: *Security › Turn parental controls back on*.
 
 ### My limits changed by themselves
 
-- **The phone app is still linked.** Its next sync overwrites what PlayGuard set: *PIN › Unlink the companion app*.
-- **Another tool, or a profile.** *Today* shows an amber card for limits that differ from the ones PlayGuard last saw, and *Preferences › Change history* lists each change seen outside PlayGuard. Ⓐ on one puts the previous value back.
+- **The phone app is still linked.** Its next sync overwrites what PlayGuard set: *Security › Unlink the companion app*.
+- **Another tool, or a profile.** *Today* shows an amber card for limits that differ from the ones PlayGuard last saw, and *History › Changes made with PlayGuard* lists each change seen outside PlayGuard. Ⓐ on one puts the previous value back.
 - **A scheduled profile:** put in force when its period began, or the limits it replaced put back once it ended (*Play timer › Profiles › Scheduled profile*).
 
 ### The child played past the limit
 
 - **The console only warns.** *Play timer › When the time is up*: pick *Suspend the software*.
-- **Parental controls were left unlocked.** While they are, today's limit is on hold: the header's pill says so on every tab; *PIN › Turn parental controls back on*. A restart of the console locks them too.
+- **Parental controls were left unlocked.** While they are, today's limit is on hold: the header's pill says so on every tab; *Security › Turn parental controls back on*. A restart of the console locks them too.
 - **The clock was set back.** The count stops until the clock passes the old time ([what counts](features.md#what-counts-as-play-time)).
 - **The other system.** emuMMC and sysMMC each have their own parental controls: set them on both, or hide the hekate boot menu ([compatibility](compatibility.md#emummc-and-sysmmc)).
 
@@ -67,7 +67,7 @@ The console runs a firmware newer than the newest one tested: PlayGuard checks w
 
 ### PlayGuard asks for the PIN all the time, or never
 
-*PIN › Protect PlayGuard with the PIN*: *Before a change* (the default) asks once, before the first change, and the PIN holds until PlayGuard closes. *Ask for the PIN again after 5 minutes* asks again after them. *Show the PIN* always asks.
+*Security › Protect PlayGuard with the PIN*: *Before a change* (the default) asks once, before the first change, and the PIN holds until PlayGuard closes. *Ask for the PIN again after 5 minutes* asks again after them. *Show the PIN* always asks.
 
 ### A game does not start, or shows a "!" on the HOME menu
 
@@ -142,7 +142,7 @@ Press Ⓨ seven times on *About › Version*; the developer tools appear at the 
 - the diagnostic report on screen (Ⓨ saves it, Ⓧ sends it online), and a shortcut to export it from the Play timer tab;
 - **Console self-test**: what PlayGuard checks on this console by itself before [the console checklist](hardware-test.md) is gone through by hand — the PIN, the signature patches, the data folder, each forwarder PlayGuard made (on the HOME menu, protected, seen working through its gate), the gate on the SD card, what Atmosphère reads of the homebrew menu's lock, the ways back, the rescue module. It changes nothing, and writes its result as Markdown to `config/playguard/self-test.md`, to paste in the pull request;
 - **Install another build** in place, to test a fix before it is released ([below](#installing-another-build));
-- **Compare the play-timer block** (only while the phone app is linked and can sync — not with a hosts file blocking Nintendo; also in *PIN*), to decode settings PlayGuard does not show yet: save the raw block as a reference, change one setting in the phone app, come back — PlayGuard lists the values that changed (saved in `logs/reports/` on request). Different bedtimes per day, set from the phone app, could be confirmed this way. Attach that file to an issue, or send it with the report (*Send a report online*).
+- **Compare the play-timer block** (only while the phone app is linked and can sync — not with a hosts file blocking Nintendo; also in *Security*), to decode settings PlayGuard does not show yet: save the raw block as a reference, change one setting in the phone app, come back — PlayGuard lists the values that changed (saved in `logs/reports/` on request). Different bedtimes per day, set from the phone app, could be confirmed this way. Attach that file to an issue, or send it with the report (*Send a report online*).
 - **Record the play timer**: every 30 s while PlayGuard is open, one line of what the play timer reports (time left, time spent, the raw settings block…) in `logs/play_timer/log.csv`, a spreadsheet-ready file, plus a line right after each change PlayGuard makes, saying which (its last column, `event`), and a note when the clock moved more than the time that went by. Left open over midnight, or until the time is up, it shows what one report cannot: when the time spent resets, what the console says near the end. The switch is remembered; it only records in developer mode. What is known so far is in [parental-controls.md](parental-controls.md).
 - **Clear the cache** and **Delete the log files**, each after a confirmation saying how many files and how much space: the cache (`cache/` and each system's `nand/<system>/cache/`: game names and icons, the Activity's last figures, the build list) is read again from the console when needed; the log files are the crash files, the session logs (but this run's, still being written), the saved reports and the play-timer recording, while `uploads/` (the removal links of the reports sent online) and the block reference stay. Settings, history, backups, profiles and exports are never touched.
 - **Run the migrations again**: the moves of the earlier layouts — the data folder next to the `.nro`, the logs before their subfolders, what every system shared — each on a line to check or uncheck (all checked at first; A toggles one), then *Run the N chosen* and a confirmation listing them with what each moves. They run now, whatever `migrations.json` records (each one otherwise runs once, at the first start of a build that needs it; the level it records is never lowered); a file already in place is never replaced. A dialog says how many entries moved; each step is in the session log.

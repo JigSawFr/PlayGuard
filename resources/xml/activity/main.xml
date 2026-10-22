@@ -34,6 +34,10 @@
             <SecurityTab/>
         </brls:Tab>
 
+        <brls:Tab label="@i18n/playguard/tabs/history">
+            <HistoryTab/>
+        </brls:Tab>
+
         <brls:Separator/>
 
         <brls:Tab label="@i18n/playguard/tabs/console">

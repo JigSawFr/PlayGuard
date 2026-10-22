@@ -356,10 +356,10 @@ static void test_preferences()
         config::load();
         CHECK(config::get().start_tab == "console");
     }
-    // The History tab, now in Preferences.
+    // The History tab, a tab again.
     write_config(R"({"start_tab": "history"})");
     config::load();
-    CHECK(config::get().start_tab == "preferences");
+    CHECK(config::get().start_tab == "history");
     write_config(R"({"extra_amounts": "15,30,60", "backup_keep": "all"})");
     config::load();
     CHECK(config::get().extra_amounts == std::vector<int>({ 15, 30, 60 }) && config::get().backup_keep == 0);

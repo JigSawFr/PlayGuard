@@ -48,7 +48,7 @@ RestrictionsTab::RestrictionsTab()
     }
     cadran::kit::set_kicker(static_cast<brls::Label*>(this->getView("rs_kicker")), "playguard/restrictions/section_level"_i18n);
     this->list.apply({ { "rs_age", "calendar" }, { "rs_sns", "user" }, { "rs_comm", "phone" }, { "rs_vr", "eye" },
-                       { "rs_org", "flag" }, { "rs_free_comm", "gamepad" }, { "rs_blocked", "list" } });
+                       { "rs_org", "flag" }, { "rs_blocked", "list" } });
 
     custom_note->setSingleLine(false);
     note->setSingleLine(false);
@@ -332,10 +332,6 @@ void RestrictionsTab::refresh()
                                  (brls::DetailCell*)comm.getView(), (brls::DetailCell*)vr.getView(),
                                  (brls::DetailCell*)org.getView() })
         ui::show_writable(c, writable);
-    free_comm->setDetailText(this->st.free_comm_count_ok
-        ? (this->st.free_comm_count == 1 ? "playguard/restrictions/free_comm_value_one"_i18n
-                                         : brls::getStr("playguard/restrictions/free_comm_value", (int)this->st.free_comm_count))
-        : na);
     this->list.sync();
     this->show_tiles(custom);
 }

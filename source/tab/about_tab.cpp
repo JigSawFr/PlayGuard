@@ -9,7 +9,6 @@
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "util/paths.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/funding.hpp"
 
@@ -44,14 +43,6 @@ AboutTab::AboutTab()
         update_flow::check_now();
         return true;
     });
-    update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
-        config::get().update_daily = on;
-        ui::save_config();
-    });
-    update_via->registerClickAction([this](brls::View*) {
-        update_flow::choose_method([this]() { this->refresh(); });
-        return true;
-    });
 
     help->setDetailText(ui::opens());
     help->registerClickAction([](brls::View*) {
@@ -59,13 +50,23 @@ AboutTab::AboutTab()
         return true;
     });
 
-    // The credits and the funding links do not change: set once.
-    author->setDetailText("JigSawFr");
-    upstream->setDetailText("playguard/about/credit_upstream_value"_i18n);
-    fixes->setDetailText("anbingxi");
-    ui_lib->setDetailText("borealis (Apache 2.0)");
-    license->setDetailText("GPLv3");
-    source->setDetailText(app::repo_url());
+    // Who made it, what it builds on, its licence, and its source as a QR
+    // code: one dialog (they were six lines). The funding links do not
+    // change either: set once.
+    credits->setDetailText(ui::opens("GPLv3"));
+    credits->registerClickAction([](brls::View*) {
+        const auto line = [](const char* title, const std::string& value) {
+            return brls::getStr("playguard/common/line", brls::getStr(title), value);
+        };
+        const std::string text = line("playguard/about/credit_author", "JigSawFr") + "\n" +
+                                 line("playguard/about/credit_upstream", "playguard/about/credit_upstream_value"_i18n) + "\n" +
+                                 line("playguard/about/credit_fixes", "anbingxi") + "\n" +
+                                 line("playguard/about/credit_ui", "borealis (Apache 2.0)") + "\n" +
+                                 line("playguard/tools/license", "GPLv3") + "\n" +
+                                 line("playguard/tools/source", app::repo_url());
+        ui::qr_dialog(text, app::repo_url());
+        return true;
+    });
     funding->addView(funding::cards(180, true));
     // The mark, the name and the version first.
     if (brls::Box* column = this->list.content()) {
@@ -102,11 +103,8 @@ AboutTab::AboutTab()
         hero->addView(text);
         column->addView(hero, 0);
     }
-    this->list.apply({ { "ab_version", "info" }, { "ab_mode", "gamepad" }, { "ab_data", "folder" },
-                       { "ab_update", "download" }, { "ab_update_daily", "calendar" }, { "ab_update_via", "server" },
-                       { "ab_help", "tools" },
-                       { "ab_author", "user" }, { "ab_upstream", "flag" }, { "ab_fixes", "check" }, { "ab_ui", "contrast" },
-                       { "ab_license", "file" }, { "ab_source", "code" } });
+    this->list.apply({ { "ab_version", "info" }, { "ab_update", "download" }, { "ab_help", "tools" },
+                       { "ab_credits", "user" } });
 }
 
 void AboutTab::count_version_press()
@@ -135,10 +133,6 @@ void AboutTab::refresh()
 {
     const auto& cfg = config::get();
     update_cell->setDetailText(cfg.update_checked.empty() ? "" : brls::getStr("playguard/tools/update_last", cfg.update_checked));
-    update_daily->setOn(cfg.update_daily, false);
-    update_via->setDetailText(update_flow::method_text());
-    SysInfo si;
-    sysinfo_get(&si);
     std::string flags;
     if (app::read_only()) flags += " · " + "playguard/tools/flag_read_only"_i18n;
     if (app::dev_mode()) flags += " · " + "playguard/tools/flag_dev"_i18n;
@@ -148,8 +142,6 @@ void AboutTab::refresh()
     bool newer = false;
     version->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::PlayGuard, &newer) + commit + flags));
     version->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    mode->setDetailText(si.applet_mode ? "playguard/tools/mode_applet"_i18n : "playguard/tools/mode_app"_i18n);
-    data->setDetailText(paths::data_dir());
     this->list.sync();
     if (this->version_line) {
         const std::string version = app::commit().empty() ? app::version() : app::version() + " · " + app::commit();

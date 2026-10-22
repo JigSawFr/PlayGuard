@@ -28,18 +28,9 @@ class AboutTab : public TabBase
     void count_version_press();
 
     BRLS_BIND(brls::DetailCell,  version,          "ab_version");
-    BRLS_BIND(brls::DetailCell,  mode,             "ab_mode");
-    BRLS_BIND(brls::DetailCell,  data,             "ab_data");
     BRLS_BIND(brls::DetailCell,  update_cell,      "ab_update");
-    BRLS_BIND(brls::BooleanCell, update_daily,     "ab_update_daily");
-    BRLS_BIND(brls::DetailCell,  update_via,       "ab_update_via");
     BRLS_BIND(brls::DetailCell,  help,             "ab_help");
-    BRLS_BIND(brls::DetailCell,  author,           "ab_author");
-    BRLS_BIND(brls::DetailCell,  upstream,         "ab_upstream");
-    BRLS_BIND(brls::DetailCell,  fixes,            "ab_fixes");
-    BRLS_BIND(brls::DetailCell,  ui_lib,           "ab_ui");
-    BRLS_BIND(brls::DetailCell,  license,          "ab_license");
-    BRLS_BIND(brls::DetailCell,  source,           "ab_source");
+    BRLS_BIND(brls::DetailCell,  credits,          "ab_credits");
     BRLS_BIND(brls::Label,       support_note,     "ab_support_note");
     BRLS_BIND(brls::Box,         funding,          "ab_funding");
 };

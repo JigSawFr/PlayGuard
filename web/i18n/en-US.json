@@ -92,7 +92,7 @@
   "capture": "Screenshots"
  },
  "params": {
-  "tab": {"label": "Opens on", "options": {"": "Today", "play_timer": "Play timer", "activity": "Activity", "restrictions": "Restrictions", "security": "PIN", "console": "Console", "preferences": "Preferences", "about": "About"}},
+  "tab": {"label": "Opens on", "options": {"": "Today", "play_timer": "Play timer", "activity": "Activity", "restrictions": "Restrictions", "security": "Security", "history": "History", "console": "Console", "preferences": "Preferences", "about": "About"}},
   "keep": {"label": "Keep the state between visits", "help": "PlayGuard's data and the simulated console's settings (PIN, limits, clocks) stay in this browser; the console settings of this panel then count for a first start only. With it the console lives on: its time played today counts in real time and stays too, and Restart the console ends a temporary unlock."},
   "not_set_up": {"label": "Never set up (no PIN)"},
   "unlocked": {"label": "Temporarily unlocked"},

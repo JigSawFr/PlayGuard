@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 db71c88bd2a7 -->
+<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
 # Prise en main
 
 De la carte SD à une console réglée pour votre enfant, en une dizaine de minutes, puis les tâches du quotidien. Retour au [README](../../README.md).
@@ -27,7 +27,7 @@ Ouvrez PlayGuard **par-dessus un jeu** (maintenez R en lançant un jeu, avec hbm
 
 ## 3. Suivre *Premiers pas*
 
-Au premier lancement, le guide *Premiers pas* s'ouvre (plus tard : *À propos › Aide et diagnostic › Premiers pas*). *Aujourd'hui* montre les mêmes étapes dans une carte tant qu'elles ne sont pas faites (*1 sur 3*) :
+Au premier lancement, le guide *Premiers pas* s'ouvre (plus tard : *Préférences › Premiers pas*). *Aujourd'hui* montre les mêmes étapes dans une carte tant qu'elles ne sont pas faites (*1 sur 3*) :
 
 1. **Le code PIN.** Celui de la console elle-même, que le menu HOME demande pour lancer un jeu au-delà de la limite ou pour changer les réglages. Évitez 0000, 1234 ou 2580 : PlayGuard signale un code PIN que n'importe qui essaierait en premier.
 2. **Une limite quotidienne.** La même tous les jours, ou une pour la semaine et une pour le week-end. Changez un jour en particulier plus tard dans *Temps de jeu*.
@@ -35,7 +35,7 @@ Au premier lancement, le guide *Premiers pas* s'ouvre (plus tard : *À propos �
 
 ## 4. Dissocier l'application mobile
 
-Encore associée à l'application *Contrôle parental* de Nintendo (ou une console d'occasion associée à celle de quelqu'un d'autre) ? *Code PIN › Dissocier l'application mobile*. Sinon, la prochaine synchronisation de l'application écrase ce que vous avez réglé dans PlayGuard. Cela fonctionne hors ligne.
+Encore associée à l'application *Contrôle parental* de Nintendo (ou une console d'occasion associée à celle de quelqu'un d'autre) ? *Sécurité › Dissocier l'application mobile*. Sinon, la prochaine synchronisation de l'application écrase ce que vous avez réglé dans PlayGuard. Cela fonctionne hors ligne.
 
 ## 5. Régler l'horloge réseau
 
@@ -49,7 +49,7 @@ Une console sans Internet : quand aucun serveur ne répond, PlayGuard propose de
 
 ## 7. Protéger PlayGuard lui-même
 
-*Code PIN › Protéger PlayGuard par le code PIN* :
+*Sécurité › Protéger PlayGuard par le code PIN* :
 
 - **Avant une modification** (par défaut) — tout le monde peut regarder, seul le parent modifie ;
 - **Pour ouvrir PlayGuard** — un écran verrouillé au lancement ;
@@ -72,9 +72,9 @@ Une console sans Internet : quand aucun serveur ne répond, PlayGuard propose de
 | Changer la limite d'un jour | *Temps de jeu* : Ⓐ sur le jour, ↑/↓, puis **+** pour enregistrer. |
 | Passer de la période scolaire aux vacances | *Temps de jeu › Profils* ; *Profil programmé* pour une période choisie à l'avance. |
 | Voir qui a joué à quoi | *Activité* : par jeu, par compte, aujourd'hui, 7 jours, depuis toujours ; export ou QR code. |
-| Bloquer tous les jeux pour l'instant | *Code PIN › Bloquer tous les jeux*. Une fois désactivé, les limites précédentes reviennent. |
-| Annuler une modification | **ZR** *Annuler* juste après, ou *Préférences › Historique des modifications* à tout moment. |
-| Garder une copie des réglages | *Préférences › Sauvegarder les réglages* (jamais le code PIN). |
+| Bloquer tous les jeux pour l'instant | *Temps de jeu › Bloquer tous les jeux*. Une fois désactivé, les limites précédentes reviennent. |
+| Annuler une modification | **ZR** *Annuler* juste après, ou *Historique › Historique des modifications* à tout moment. |
+| Garder une copie des réglages | *Historique › Sauvegarder les réglages* (jamais le code PIN). |
 | Savoir ce qui demande votre attention | La cloche (Ⓨ) : ce qu'il faut faire en orange, ce qu'il faut savoir avec un « i ». |
 
 ## Ensuite

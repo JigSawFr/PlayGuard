@@ -249,7 +249,7 @@ def tabs(new_page):
     page = new_page()
     if open_page(page, FIXED, "tabs"):
         shot(page, "overview")
-        for name in ["play_timer", "activity", "restrictions", "security", "console", "preferences", "about"]:
+        for name in ["play_timer", "activity", "restrictions", "security", "history", "console", "preferences", "about"]:
             steps(page, "down")
             shot(page, name if name in ("play_timer", "activity", "console") else f"tabs_{name}")
         if page.evaluate("document.body.dataset.playguard") != "ready":

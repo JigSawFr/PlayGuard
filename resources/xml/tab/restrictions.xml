@@ -2,8 +2,10 @@
 
 <!-- Restrictions: the levels side by side as tiles, each with what it
      restricts, the one in force in teal (tab/restrictions_tab.cpp adds
-     them to rs_tiles); Custom's settings (editable), VR mode, the rating
-     organisation (same as System Settings) and the games a level blocks. -->
+     them to rs_tiles); Custom's settings (editable); the rating
+     organisation (same as System Settings) and the games a level blocks;
+     VR mode. The games allowed to communicate are in the diagnostic report
+     until their list is understood. -->
 
 <brls:Box
     width="auto"
@@ -34,12 +36,12 @@
             <brls:BooleanCell id="rs_sns"/>
             <brls:BooleanCell id="rs_comm"/>
             <brls:Label id="rs_custom_note" text="@i18n/playguard/restrictions/custom_only" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header title="@i18n/playguard/restrictions/section_other" marginTop="24" marginBottom="8"/>
-            <brls:BooleanCell id="rs_vr"/>
+            <brls:Header title="@i18n/playguard/restrictions/section_rating" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="rs_org" title="@i18n/playguard/restrictions/org"/>
-            <brls:DetailCell id="rs_free_comm" focusable="false" title="@i18n/playguard/restrictions/free_comm"/>
             <brls:DetailCell id="rs_blocked" title="@i18n/playguard/restrictions/blocked"/>
             <brls:Label id="rs_blocked_note" text="@i18n/playguard/restrictions/blocked_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <brls:Header title="@i18n/playguard/restrictions/section_other" marginTop="24" marginBottom="8"/>
+            <brls:BooleanCell id="rs_vr"/>
             <brls:Label id="rs_note" text="@i18n/playguard/restrictions/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
         </brls:Box>
