@@ -137,7 +137,6 @@ void sanitize(Config& c)
     if (c.ntp_server.size() > MAX_HOST) c.ntp_server.clear();
     // The network clock and the console part of Tools are in Console now.
     if (c.start_tab == "clock" || c.start_tab == "tools") c.start_tab = "console";
-    if (c.start_tab == "history") c.start_tab = "preferences";   // the History tab is now in Preferences
     bool tab_ok = false;
     for (const char* t : START_TABS) tab_ok |= c.start_tab == t;
     if (!tab_ok) c.start_tab = "dashboard";

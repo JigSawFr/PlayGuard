@@ -92,7 +92,7 @@
   "capture": "스크린샷"
  },
  "params": {
-  "tab": {"label": "처음 여는 탭", "options": {"": "오늘", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "PIN", "console": "본체", "preferences": "환경 설정", "about": "정보"}},
+  "tab": {"label": "처음 여는 탭", "options": {"": "오늘", "play_timer": "플레이 타이머", "activity": "플레이 기록", "restrictions": "제한", "security": "보안", "history": "변경 기록", "console": "본체", "preferences": "환경 설정", "about": "정보"}},
   "keep": {"label": "방문 사이에 상태 유지", "help": "PlayGuard 데이터와 시뮬레이션 본체의 설정(PIN, 제한, 시계)이 이 브라우저에 남습니다. 이 패널의 본체 설정은 처음 시작할 때만 적용됩니다. 본체가 계속 살아 있습니다. 오늘의 플레이 시간도 실시간으로 세어져 유지되고, ‘본체 다시 시작’은 일시 해제를 끝냅니다."},
   "not_set_up": {"label": "설정한 적 없음(PIN 없음)"},
   "unlocked": {"label": "일시적으로 해제됨"},

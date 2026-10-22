@@ -108,14 +108,21 @@ void show_bars(const std::vector<brls::View*>& bars, const T* values, float most
 ActivityTab::ActivityTab()
     : TabBase("xml/tab/activity.xml"), list(this)
 {
-    this->list.apply({ { "ac_account_default", "user" }, { "ac_games", "list" }, { "ac_qr", "phone" } });
+    this->list.apply({ { "ac_account_default", "user" }, { "ac_games", "list" } });
     this->build_cards();
     period_chip->registerClickAction([this](brls::View*) {
         this->choose_period();
         return true;
     });
+    // The figures to the SD card, or the week's summary as a QR code for a
+    // phone: one chip, both a press away.
     export_chip->registerClickAction([this](brls::View*) {
-        this->export_to_sd();
+        ui::pick_actions("playguard/cadran/activity/share"_i18n,
+                         { ui::Choice("playguard/activity/share_sd"_i18n, [this]() { this->export_to_sd(); }, "download"),
+                           ui::Choice("playguard/activity/qr"_i18n, []() {
+                               if (const auto data = shown_stats()) week_qr::show(*data, account_label(chosen_account()));
+                               else ui::notify("playguard/activity/export_not_ready"_i18n);
+                           }, "phone") });
         return true;
     });
     this->build_chips();
@@ -147,12 +154,6 @@ ActivityTab::ActivityTab()
     games->registerClickAction([this](brls::View*) {
         // Every game of the period, as a list or as covers, on its own screen.
         brls::Application::pushActivity(new GamesActivity(this->period, s_cache.account));
-        return true;
-    });
-    qr->setDetailText(ui::opens());
-    qr->registerClickAction([](brls::View*) {
-        if (const auto data = shown_stats()) week_qr::show(*data, account_label(chosen_account()));
-        else ui::notify("playguard/activity/export_not_ready"_i18n);
         return true;
     });
     this->period = config::get().activity_period;

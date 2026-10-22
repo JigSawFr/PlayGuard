@@ -15,24 +15,21 @@
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
 #include "view/row_icon.hpp"
+#include "view/tab_badge.hpp"
 
 using namespace brls::literals;
 
 ConsoleTab::ConsoleTab()
     : TabBase("xml/tab/console.xml"), list(this)
 {
-
-    clock->setDetailText(ui::opens());
     clock->registerClickAction([](brls::View*) {
         ClockTab::open_screen();
         return true;
     });
-    games->setDetailText(ui::opens());
     games->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new GameCheckActivity());
         return true;
     });
-    forwarders->setDetailText(ui::opens());
     forwarders->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new ForwardersActivity());
         return true;
@@ -117,8 +114,22 @@ ConsoleTab::ConsoleTab()
         head->addView(push);
         head->addView(fw_warn);
     }
-    this->list.apply({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" },
-                       { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
+    // The screens of their own as tiles under them, each one's count of
+    // things to do (mark()) in its corner rather than under its title.
+    if (brls::Box* tools = this->list.tiles({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" } }, false)) {
+        tools->setMarginBottom(20);
+        for (brls::DetailCell* cell : { (brls::DetailCell*)clock.getView(), (brls::DetailCell*)games.getView() }) {
+            TabBadge* badge = TabBadge::on_row(cell);
+            auto* head = cell->getChildren().empty() ? nullptr : dynamic_cast<brls::Box*>(cell->getChildren()[0]);
+            if (!badge || !head) continue;
+            cell->removeView(badge, false);
+            auto* push = new brls::Box();
+            push->setGrow(1.0f);
+            head->addView(push);
+            head->addView(badge);
+        }
+    }
+    this->list.apply({ { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
                        { "cn_serial", "tag" }, { "cn_patches", "shield" } });
 }
 

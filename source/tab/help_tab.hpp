@@ -1,7 +1,7 @@
 // HelpTab — About › Help & diagnostics, a screen of its own: first
 // steps, the diagnostic report (export, send online, and the GitHub account
-// it is sent with, shown once signed in) and how many reports and crash files
-// are kept, then the developer tools (shown after seven
+// it is sent with, shown once signed in), how PlayGuard was launched and its
+// data folder, and how many reports and crash files are kept, then the developer tools (shown after seven
 // presses on About › Version; among them, clearing the cache and the log
 // files). History and backups have their own tab, the console too.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -27,6 +27,8 @@ class HelpTab : public TabBase
     BRLS_BIND(brls::Label,       export_note, "hp_export_note");
     BRLS_BIND(brls::DetailCell,  upload,      "hp_upload");
     BRLS_BIND(brls::DetailCell,  github,      "hp_github");
+    BRLS_BIND(brls::DetailCell,  mode,        "hp_mode");
+    BRLS_BIND(brls::DetailCell,  data,        "hp_data");
     BRLS_BIND(brls::Label,       upload_note, "hp_upload_note");
     BRLS_BIND(brls::DetailCell,  logs_keep,   "hp_logs_keep");
     BRLS_BIND(brls::DetailCell,  logs_keep_days, "hp_logs_keep_days");

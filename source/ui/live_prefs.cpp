@@ -24,7 +24,8 @@ int shown_tab()
     static const std::pair<const char*, int> tabs[] = {
         { "tab/dashboard", ui::tab::dashboard },   { "tab/play_timer", ui::tab::play_timer },
         { "tab/activity", ui::tab::activity },     { "tab/restrictions", ui::tab::restrictions },
-        { "tab/security", ui::tab::security },     { "tab/console", ui::tab::console },
+        { "tab/security", ui::tab::security },     { "tab/history", ui::tab::history },
+        { "tab/console", ui::tab::console },
         { "tab/preferences", ui::tab::preferences },
         { "tab/about", ui::tab::about },
     };

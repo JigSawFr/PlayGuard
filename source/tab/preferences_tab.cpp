@@ -3,16 +3,13 @@
 
 #include <vector>
 
-#include "action/backup_flow.hpp"
-#include "action/history_flow.hpp"
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
-#include "activity/history_activity.hpp"
-#include "app.hpp"
+#include "action/update_flow.hpp"
+#include "activity/onboarding_activity.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "util/paths.hpp"
 
 using namespace brls::literals;
 
@@ -29,11 +26,6 @@ int index_of(const char* const (&list)[N], const std::string& value)
 std::string tab_name(const std::string& tab)
 {
     return brls::getStr("playguard/tabs/" + tab);
-}
-
-std::string keep_text(int keep)
-{
-    return keep == 0 ? "playguard/tools/backup_keep_all"_i18n : brls::getStr("playguard/tools/backup_keep_n", keep);
 }
 }   // namespace
 
@@ -68,9 +60,9 @@ PreferencesTab::PreferencesTab()
         std::vector<std::string> labels;
         for (const char* t : config::START_TABS) labels.push_back(tab_name(t));
         // Each tab's icon, as the sidebar draws it (ui/cadran_frame.cpp).
-        const std::vector<std::string> icons = { "today", "timer", "activity", "shield",
-                                                 "lock",  "chip",  "settings", "info" };
-        static_assert(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]) == 8, "an icon for each tab");
+        const std::vector<std::string> icons = { "today", "timer",   "activity", "shield", "lock",
+                                                 "history", "chip", "settings", "info" };
+        static_assert(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]) == 9, "an icon for each tab");
         ui::pick_grid("playguard/tools/start_tab"_i18n, labels, icons, index_of(config::START_TABS, config::get().start_tab), [this](int i) {
             config::get().start_tab = config::START_TABS[i];
             ui::save_config();
@@ -111,45 +103,28 @@ PreferencesTab::PreferencesTab()
         ui::save_config();
     });
 
-    // What PlayGuard changed, and the settings backups.
-    backup_note->setSingleLine(false);
-    history->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new HistoryActivity());
+    // How PlayGuard updates (checking now is in About, by the version).
+    update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
+        config::get().update_daily = on;
+        ui::save_config();
+    });
+    update_via->registerClickAction([this](brls::View*) {
+        update_flow::choose_method([this]() { this->refresh(); });
         return true;
     });
-    // Saving a backup only writes to the SD card: also offered in read-only mode.
-    backup_note->setText(brls::getStr("playguard/tools/backup_note", paths::backups_dir()));
-    backup_save->registerClickAction([this](brls::View*) {
-        backup_flow::save_now();
-        this->refresh();
-        return true;
-    });
-    backup_restore->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        backup_flow::choose_and_restore([this]() { this->refresh(); });
-        return true;
-    });
-    backup_keep->registerClickAction([this](brls::View*) {
-        std::vector<std::string> labels;
-        int selected = 0;
-        for (size_t i = 0; i < sizeof(config::BACKUP_KEEP) / sizeof(config::BACKUP_KEEP[0]); i++) {
-            labels.push_back(keep_text(config::BACKUP_KEEP[i]));
-            if (config::BACKUP_KEEP[i] == config::get().backup_keep) selected = (int)i;
-        }
-        ui::pick("playguard/tools/backup_keep"_i18n, labels, selected, [this](int i) {
-            config::get().backup_keep = config::BACKUP_KEEP[i];
-            ui::save_config();
-            this->refresh();
-        });
+    // The guide again (also at the top of About › Help & diagnostics).
+    first_steps->setDetailText(ui::opens());
+    first_steps->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new OnboardingActivity());
         return true;
     });
 
     this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
                        { "pf_start_tab", "home" } }, false);
-    this->list.tiles({ { "hs_backup_save", "save" }, { "hs_backup_restore", "restore" } }, false);
     this->list.apply({ { "pf_effects", "sparkle" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
                        { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
-                       { "pf_support_reminder", "heart" }, { "hs_history", "history" }, { "hs_backup_keep", "folder" } });
+                       { "pf_support_reminder", "heart" }, { "pf_update_daily", "calendar" }, { "pf_update_via", "server" },
+                       { "pf_first_steps", "sparkle" } });
 }
 
 void PreferencesTab::refresh()
@@ -166,14 +141,8 @@ void PreferencesTab::refresh()
     notices_reminders->setOn(cfg.notices_reminders, false);
     notices_ack_remind->setOn(cfg.notices_ack_remind, false);
     support_reminder->setOn(cfg.support_reminder, false);
-    backup_keep->setDetailText(keep_text(cfg.backup_keep));
-    const size_t backups = backup_flow::count();
-    backup_restore->setDetailText(backups ? brls::getStr("playguard/tools/backup_count", (int)backups) : "");
-    const size_t changes = history_flow::count();
-    history->setDetailText(ui::opens(changes == 1 ? "playguard/history/count_one"_i18n
-                                         : changes ? brls::getStr("playguard/history/count", (int)changes) : ""));
-    // Read-only: restoring would write; it stays in sight, greyed.
-    ui::show_writable(backup_restore, !app::read_only());
+    update_daily->setOn(cfg.update_daily, false);
+    update_via->setDetailText(update_flow::method_text());
     this->list.sync();
     cadran::set_pill("");
 }

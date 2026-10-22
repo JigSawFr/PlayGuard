@@ -26,7 +26,7 @@ Open PlayGuard **over a game** (hold R while starting a game, with hbmenu, sphai
 
 ## 3. Follow *First steps*
 
-On the first start, the *First steps* guide comes up (later: *About › Help & diagnostics › First steps*). *Today* shows the same steps as a card until they are done (*1 of 3*):
+On the first start, the *First steps* guide comes up (later: *Preferences › First steps*). *Today* shows the same steps as a card until they are done (*1 of 3*):
 
 1. **The PIN.** The console's own PIN, asked by the HOME menu to start a game past the limit or to change the settings. Avoid 0000, 1234 or 2580: PlayGuard flags a PIN anyone would try first.
 2. **A daily limit.** The same every day, or one for weekdays and one for the weekend. Change any single day later on *Play timer*.
@@ -34,7 +34,7 @@ On the first start, the *First steps* guide comes up (later: *About › Help & d
 
 ## 4. Unlink the phone app
 
-Still linked to Nintendo's *Parental Controls* app (or a second-hand console linked to someone else's)? *PIN › Unlink the companion app*. Otherwise the app's next sync overwrites what you set in PlayGuard. It works offline.
+Still linked to Nintendo's *Parental Controls* app (or a second-hand console linked to someone else's)? *Security › Unlink the companion app*. Otherwise the app's next sync overwrites what you set in PlayGuard. It works offline.
 
 ## 5. Set the network clock
 
@@ -48,7 +48,7 @@ A console without Internet: when no server answers, PlayGuard offers to set the 
 
 ## 7. Protect PlayGuard itself
 
-*PIN › Protect PlayGuard with the PIN*:
+*Security › Protect PlayGuard with the PIN*:
 
 - **Before a change** (the default) — anyone can look, only the parent changes something;
 - **To open PlayGuard** — a lock screen at start;
@@ -71,9 +71,9 @@ A console without Internet: when no server answers, PlayGuard offers to set the 
 | Change one day's limit | *Play timer*: Ⓐ on the day, ↑/↓, then **+** to save. |
 | Switch between term time and holidays | *Play timer › Profiles*; *Scheduled profile* for a period picked ahead. |
 | See who played what | *Activity*: per game, per account, today, 7 days, all time; export or a QR code. |
-| Block every game for now | *PIN › Block all games*. Turned off, the previous limits come back. |
-| Undo a change | **ZR** *Undo* right after it, or *Preferences › Change history* any time. |
-| Keep a copy of the settings | *Preferences › Back up the settings* (never the PIN). |
+| Block every game for now | *Play timer › Block all games*. Turned off, the previous limits come back. |
+| Undo a change | **ZR** *Undo* right after it, or *History › Changes made with PlayGuard* any time. |
+| Keep a copy of the settings | *History › Back up the settings* (never the PIN). |
 | Know what needs you | The bell (Ⓨ): what to do in amber, what to know with an "i". |
 
 ## Next

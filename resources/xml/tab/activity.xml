@@ -35,7 +35,7 @@
                     </brls:Box>
                     <brls:Box id="ac_export" focusable="true" hideHighlightBackground="true" highlightCornerRadius="22" shrink="0" axis="row" alignItems="center" height="44" paddingLeft="18" paddingRight="18" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
                         <CadranIcon icon="download" width="18" height="18" marginRight="10"/>
-                        <brls:Label text="@i18n/playguard/cadran/activity/export" fontSize="16" singleLine="true"/>
+                        <brls:Label text="@i18n/playguard/cadran/activity/share" fontSize="16" singleLine="true"/>
                     </brls:Box>
                 </brls:Box>
 
@@ -92,7 +92,6 @@
             <brls:DetailCell id="ac_session" focusable="false" title="@i18n/playguard/activity/summary/session"/>
             <brls:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
-            <brls:DetailCell id="ac_qr" title="@i18n/playguard/activity/qr"/>
             <brls:Box id="ac_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
                 <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
                 <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>

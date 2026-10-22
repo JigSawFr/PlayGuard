@@ -78,7 +78,7 @@ The real app, against a simulated console, in your browser:
 3. Launch PlayGuard **over a game**, with a **parent's user**, and follow *First steps*.
 
 > [!TIP]
-> Still linked to Nintendo's phone app? Use *PIN › Unlink the companion app*, or its next sync overwrites what you set.
+> Still linked to Nintendo's phone app? Use *Security › Unlink the companion app*, or its next sync overwrites what you set.
 
 **Compatibility:** firmware 22.0.0 → 23.0.1 tested (Atmosphère 1.11–1.12). Older firmware and details: [compatibility](https://playguard.link/docs/compatibility/). **No Switch 2.**
 

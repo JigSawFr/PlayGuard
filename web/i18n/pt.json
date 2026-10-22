@@ -92,7 +92,7 @@
   "capture": "Capturas"
  },
  "params": {
-  "tab": {"label": "Abre em", "options": {"": "Hoje", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "PIN", "console": "Consola", "preferences": "Preferências", "about": "Sobre"}},
+  "tab": {"label": "Abre em", "options": {"": "Hoje", "play_timer": "Tempo de jogo", "activity": "Atividade", "restrictions": "Restrições", "security": "Segurança", "history": "Histórico", "console": "Consola", "preferences": "Preferências", "about": "Sobre"}},
   "keep": {"label": "Guardar o estado entre visitas", "help": "Os dados do PlayGuard e as definições da consola simulada (PIN, limites, relógios) ficam neste navegador; as definições de consola deste painel só contam no primeiro arranque. Assim a consola continua viva: o tempo de jogo de hoje conta em tempo real e também fica, e «Reiniciar a consola» termina um desbloqueio temporário."},
   "not_set_up": {"label": "Nunca configurado (sem PIN)"},
   "unlocked": {"label": "Desbloqueado temporariamente"},
