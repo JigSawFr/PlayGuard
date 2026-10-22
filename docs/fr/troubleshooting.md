@@ -78,6 +78,10 @@ La console fait tourner un firmware plus récent que le plus récent testé : Pl
 
 Sa porte (`config/playguard/gate-….nro`) n'est plus le fichier avec lequel le forwarder a été fait : elle a été modifiée ou remplacée sur la carte SD, et le forwarder ne la lance pas. Ouvrez PlayGuard depuis son propre forwarder : il réécrit la porte au démarrage ; *Console › Forwarders › Tout réinstaller* refait chaque forwarder avec elle.
 
+### Un forwarder protégé se ferme aussitôt (« une erreur est survenue »)
+
+Avant tout écran de PlayGuard, sans code d'erreur (le rapport d'Atmosphère dans `atmosphere/crash_reports/` nomme le module `forwarder`, résultat `2000-0000`) : il a été fait par un PlayGuard dont la porte était construite sans ses ressources, que le chargeur du forwarder refusait. Mettez PlayGuard à jour, puis refaites-le : la cloche et *Console › Forwarders* le proposent pour chaque forwarder fait avec un ancien chargeur.
+
 ### Un forwarder affiche « Le logiciel n'a pas pu être démarré »
 
 La console a refusé de le lancer : une vérification de signature est toujours en place. Dans l'ordre :

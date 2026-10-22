@@ -19,6 +19,12 @@ SOURCES     := source ../source/core ../extern/stb
 INCLUDES    := ../source/core ../extern/stb ../extern/borealis/library/include
 # Its screen's brand font, from PlayGuard's resources, in its romfs.
 ROMFS       := build/romfs
+# A NACP too: elf2nro writes the assets (the romfs with them) only when it
+# has an icon, a NACP or a romfs image, not for --romfsdir alone; without
+# them the gate had no romfs, and nothing after its code.
+APP_TITLE   := PlayGuard gate
+APP_AUTHOR  := JigSawFr
+APP_VERSION := 1.0.0
 
 # Only these: ../source/core also holds the app's service layer.
 CFILES      := main.c gate.c gate_nx.c gate_screen.c gate_text.c pg_stb.c
@@ -42,7 +48,7 @@ export LD := $(CC)
 export OFILES   := $(CFILES:.c=.o)
 export INCLUDE  := $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) $(foreach dir,$(LIBDIRS),-I$(dir)/include) -I$(CURDIR)/$(BUILD)
 export LIBPATHS := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
-export NROFLAGS := --romfsdir=$(CURDIR)/$(ROMFS)
+export NROFLAGS := --romfsdir=$(CURDIR)/$(ROMFS) --nacp=$(OUTPUT).nacp
 
 .PHONY: all clean $(BUILD)
 
@@ -67,7 +73,7 @@ DEPENDS := $(OFILES:.o=.d)
 
 all: $(OUTPUT).nro
 
-$(OUTPUT).nro: $(OUTPUT).elf
+$(OUTPUT).nro: $(OUTPUT).elf $(OUTPUT).nacp
 $(OUTPUT).elf: $(OFILES)
 
 -include $(DEPENDS)

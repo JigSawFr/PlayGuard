@@ -675,8 +675,10 @@ jobs:
             echo "::error title=Toolchain::libnx $libnx is older than 4.12.0"
             exit 1
           fi
-          # libnx's 21.0.0 marker (LNY2 after MOD0), which hbmenu checks.
-          python3 tools/check_nro.py playguard.nro sysmodule/out/playguard-rescue.elf
+          # libnx's 21.0.0 marker (LNY2 after MOD0), which hbmenu checks; the
+          # .nro files after --romfs with their RomFS in their assets (the PIN
+          # gate's font, and something after its code for the forwarders' loader).
+          python3 tools/check_nro.py sysmodule/out/playguard-rescue.elf --romfs playguard.nro gate/out/gate.nro
       - name: compat.json
         run: python3 tools/gen_compat.py . compat.json
       - name: Build identity

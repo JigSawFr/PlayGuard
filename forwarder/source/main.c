@@ -2,7 +2,8 @@
 // HOME menu (source/core/forwarder.h). It reads the .nro to start from its
 // RomFS (nextNroPath, nextArgv) and loads it as hbloader would. sphaira's
 // hbl (ITotalJustice, GPLv3), itself nx-hbloader (ISC, see
-// ../LICENSE-nx-hbloader.md); only the loader's notice text differs.
+// ../LICENSE-nx-hbloader.md); PlayGuard's gate check and its NRO size check
+// (the whole NRO, not 0x80 bytes more) aside, only the notice text differs.
 #include <switch.h>
 #include <string.h>
 
@@ -440,12 +441,14 @@ void NX_NORETURN loadNro(void) {
             diagAbortWithResult(rc);
         }
 
+        // PlayGuard: the whole NRO, header->size (its NroStart and header
+        // included), not 0x80 bytes more than that: an NRO with nothing
+        // after its code (no icon, NACP or romfs) was refused with 0.
         u64 bytes_read;
-        if (R_FAILED(rc = fsFileRead(&f, 0, start, g_heapSize, FsReadOption_None, &bytes_read)) ||
-            header->magic != NROHEADER_MAGIC ||
-            bytes_read < sizeof(*start) + sizeof(*header) + header->size) {
+        if (R_FAILED(rc = fsFileRead(&f, 0, start, g_heapSize, FsReadOption_None, &bytes_read)))
             diagAbortWithResult(rc);
-        }
+        if (header->magic != NROHEADER_MAGIC || header->size < sizeof(*start) + sizeof(*header) || bytes_read < header->size)
+            diagAbortWithResult(MAKERESULT(Module_HomebrewLoader, 4));
 
         fsFileClose(&f);
         fsFsClose(&fs);
