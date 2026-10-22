@@ -20,9 +20,10 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    timeout-minutes: 10
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{ steps.release.outputs.release_created || steps.retry.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name || steps.retry.outputs.tag_name }}
     steps:
       # A token of the "PlayGuard Release" GitHub App, not GITHUB_TOKEN: the
       # app is on the tag ruleset's bypass list (GITHUB_TOKEN cannot create
@@ -35,8 +36,24 @@ jobs:
           # GitHub takes either as the JWT's issuer); "app-id" is deprecated.
           client-id: ${{ vars.RELEASE_APP_CLIENT_ID || vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+      # GitHub's GraphQL API now and then answers "Something went wrong while
+      # executing your query" (2026-10-22, on f11c5fa): one more try a minute
+      # later rather than a red main until the next push. release-please
+      # reads its state from GitHub (the release pull request's label, the
+      # releases made), so the second try starts from where the first stopped.
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
+        continue-on-error: true
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - name: Wait before trying again
+        if: steps.release.outcome == 'failure'
+        run: sleep 60
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: retry
+        if: steps.release.outcome == 'failure'
         with:
           token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
