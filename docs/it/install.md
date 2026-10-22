@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # Installazione
 
 Come installare, aggiornare e rimuovere PlayGuard, e cosa scrive sulla scheda SD. Una volta installato: [Per iniziare](getting-started.md). Torna al [README](../../README.md).
@@ -20,13 +20,13 @@ Poi apri PlayGuard **sopra un gioco**, con l'utente di un genitore ([perché](co
 
 ## Aggiornare
 
-- **In PlayGuard:** *Informazioni › Aggiorna con* sceglie come — in PlayGuard stesso (scarica la versione, la verifica, si sostituisce e si riavvia), sphaira, l'Homebrew App Store o manualmente. Con *Cerca aggiornamenti ogni giorno* attivo, PlayGuard si apre sulla nuova versione quando ce n'è una.
+- **In PlayGuard:** *Preferenze › Aggiorna con* sceglie come — in PlayGuard stesso (scarica la versione, la verifica, si sostituisce e si riavvia), sphaira, l'Homebrew App Store o manualmente. Con *Cerca aggiornamenti ogni giorno* attivo, PlayGuard si apre sulla nuova versione quando ce n'è una.
 - **Il sysmodule di ripristino** segue la versione di PlayGuard: dopo ogni aggiornamento, estrai di nuovo il `playguard-rescue.zip` di quella versione (oppure *Aggiorna* sulla voce *Il sysmodule di ripristino non è aggiornato* della campanella), poi riavvia la console.
 - Impostazioni, cronologia, profili e backup restano: sono in `sd:/config/playguard/`, non accanto all'app.
 
 ## Rimuoverlo
 
-Elimina `sd:/switch/playguard/` (l'app) e, per rimuovere anche i suoi file, `sd:/config/playguard/`; con il sysmodule di ripristino, anche `sd:/atmosphere/contents/4200000000505247/`. I limiti, il PIN e le limitazioni sono quelli della console: **restano sulla console**. Per rimuovere anche loro, usa prima *PIN › Elimina il filtro famiglia*.
+Elimina `sd:/switch/playguard/` (l'app) e, per rimuovere anche i suoi file, `sd:/config/playguard/`; con il sysmodule di ripristino, anche `sd:/atmosphere/contents/4200000000505247/`. I limiti, il PIN e le limitazioni sono quelli della console: **restano sulla console**. Per rimuovere anche loro, usa prima *Sicurezza › Elimina il filtro famiglia*.
 
 ## File sulla scheda SD
 

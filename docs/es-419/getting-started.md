@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 db71c88bd2a7 -->
+<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
 # Primeros pasos
 
 De la tarjeta SD a una consola configurada para su hijo, en unos diez minutos, y luego las tareas de todos los días. Volver al [README](../../README.md).
@@ -27,7 +27,7 @@ Abra PlayGuard **sobre un juego** (mantenga presionado R al iniciar un juego, co
 
 ## 3. Siga *Primeros pasos*
 
-En el primer inicio aparece la guía *Primeros pasos* (más adelante: *Información › Ayuda y diagnóstico › Primeros pasos*). *Hoy* muestra los mismos pasos como una tarjeta hasta que se completan (*1 de 3*):
+En el primer inicio aparece la guía *Primeros pasos* (más adelante: *Preferencias › Primeros pasos*). *Hoy* muestra los mismos pasos como una tarjeta hasta que se completan (*1 de 3*):
 
 1. **El PIN.** El propio PIN de la consola, que el menú HOME pide para iniciar un juego después del límite o para cambiar la configuración. Evite 0000, 1234 o 2580: PlayGuard señala un PIN que cualquiera probaría primero.
 2. **Un límite diario.** El mismo todos los días, o uno entre semana y otro para el fin de semana. Cualquier día se puede cambiar después en *Tiempo de juego*.
@@ -35,7 +35,7 @@ En el primer inicio aparece la guía *Primeros pasos* (más adelante: *Informaci
 
 ## 4. Desvincular la app para celular
 
-¿Sigue vinculada a la app *Control parental* de Nintendo (o es una consola de segunda mano vinculada a la de otra persona)? *PIN › Desvincular la app para celular*. Si no, la próxima sincronización de la app sobrescribe lo que configure en PlayGuard. Funciona sin conexión.
+¿Sigue vinculada a la app *Control parental* de Nintendo (o es una consola de segunda mano vinculada a la de otra persona)? *Seguridad › Desvincular la app para celular*. Si no, la próxima sincronización de la app sobrescribe lo que configure en PlayGuard. Funciona sin conexión.
 
 ## 5. Ajustar el reloj de red
 
@@ -49,7 +49,7 @@ Una consola sin Internet: cuando ningún servidor responde, PlayGuard ofrece aju
 
 ## 7. Proteger el propio PlayGuard
 
-*PIN › Proteger PlayGuard con el PIN*:
+*Seguridad › Proteger PlayGuard con el PIN*:
 
 - **Antes de un cambio** (lo predeterminado): cualquiera puede mirar, solo el adulto cambia algo;
 - **Para abrir PlayGuard**: una pantalla de bloqueo al iniciar;
@@ -72,9 +72,9 @@ Una consola sin Internet: cuando ningún servidor responde, PlayGuard ofrece aju
 | Cambiar el límite de un día | *Tiempo de juego*: Ⓐ en el día, ↑/↓, y luego **+** para guardar. |
 | Pasar del período escolar a las vacaciones | *Tiempo de juego › Perfiles*; *Perfil programado* para un período elegido de antemano. |
 | Ver quién jugó a qué | *Actividad*: por juego, por cuenta, hoy, 7 días, en total; exportación o un código QR. |
-| Bloquear todos los juegos por ahora | *PIN › Bloquear todos los juegos*. Al desactivarlo, vuelven los límites anteriores. |
-| Deshacer un cambio | **ZR** *Deshacer* justo después, o *Preferencias › Historial de cambios* en cualquier momento. |
-| Guardar una copia de la configuración | *Preferencias › Respaldar la configuración* (nunca el PIN). |
+| Bloquear todos los juegos por ahora | *Tiempo de juego › Bloquear todos los juegos*. Al desactivarlo, vuelven los límites anteriores. |
+| Deshacer un cambio | **ZR** *Deshacer* justo después, o *Historial › Cambios hechos con PlayGuard* en cualquier momento. |
+| Guardar una copia de la configuración | *Historial › Respaldar la configuración* (nunca el PIN). |
 | Saber qué requiere su atención | La campana (Ⓨ): lo que hay que hacer en ámbar, lo que conviene saber con una “i”. |
 
 ## Siguiente

@@ -819,7 +819,7 @@
         "upload_note": "將報告傳送到你 GitHub 帳號中的私密 gist（如有需要請先登入），並顯示其連結與 QR 碼：交給協助你的人，或用它提交錯誤回報。",
         "storage_note_emummc": "目前為emuMMC：sysMMC有自己的家長監護設定，PlayGuard在此無法看到。請在那邊也進行設定，或隱藏hekate的開機選單。",
         "storage_note_sysmmc": "目前為sysMMC，且此SD卡上已設定emuMMC：它有自己的家長監護設定，PlayGuard在此無法看到。請在那邊也進行設定，或隱藏hekate的開機選單。",
-        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
+        "patches_note_mixed": "sys-patch已啟用，而SD卡上還有Sigpatch檔案（{}）：兩個工具在修補相同的檢查，這是轉發器無法啟動的已知原因。請將它們移到一旁（A），然後重新啟動主機。"
     },
     "games": {
         "open": "檢查已安裝的遊戲",
@@ -1165,14 +1165,14 @@
         "week_note": "本週被拒絕：{}；前一週：{}。",
         "climb_title": "被拒絕的PIN碼比平時多",
         "climb_detail": "最近七天門禁拒絕了{}次PIN碼，前一週為{}次。",
-        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
-        "patches_title": "This forwarder would not start yet",
-        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
-        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
-        "refresh": "Make the forwarders again with this loader",
-        "refresh_confirm": "Make these forwarders again with the new loader? {}: made again, they start their homebrew with this build's loader and keep their name, icon and PIN rules.",
-        "refresh_title": "Forwarders made with an older loader",
-        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
+        "patches_incomplete": "主機只有在套用簽章修補後才能啟動轉發器，而sys-patch {}沒有為此韌體套用全部修補（未修補：{}）。請更新sys-patch，然後重新啟動主機。",
+        "patches_title": "此轉發器暫時還無法啟動",
+        "patches_anyway": "仍然新增（修補就位後即可啟動）",
+        "patches_mixed": "sys-patch已啟用，但SD卡上還有Sigpatch檔案（{}）：這是轉發器無法啟動的已知原因。請將它們移到一旁（「主機」›「遊戲修補」），然後重新啟動主機。",
+        "refresh": "用此載入器重新製作轉發器",
+        "refresh_confirm": "用新的載入器重新製作這些轉發器？{}：重新製作後，它們會用此版本的載入器啟動各自的Homebrew，並保留名稱、圖示和PIN碼規則。",
+        "refresh_title": "用舊載入器製作的轉發器",
+        "refresh_detail": "{}：由舊版PlayGuard製作。重新製作後，它們會用此版本的載入器啟動各自的Homebrew。"
     },
     "hbmenu": {
         "section": "自製軟體選單",
@@ -2081,10 +2081,10 @@
         "removed": "已移除排定的設定檔。"
     },
     "sigpatch": {
-        "set_aside": "Set the sigpatch files aside",
-        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
-        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
-        "failed": "The sigpatch files were not all moved: {}",
-        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
+        "set_aside": "將Sigpatch檔案移到一旁",
+        "confirm": "將Sigpatch檔案（用於es、fs和loader的.ips）移到{}？不會刪除任何檔案：移回原處即可復原。之後從下次啟動起由sys-patch單獨套用修補；請重新啟動主機。",
+        "hekate": "hekate的bootloader/patches.ini會保留：如果hekate_ipl.ini中仍有kip1patch=nosigchk，請在用hekate的fss0啟動前刪除該行。",
+        "failed": "未能移動全部Sigpatch檔案：{}",
+        "done": "Sigpatch檔案已移到一旁。請重新啟動主機，然後再試一次轉發器。"
     }
 }

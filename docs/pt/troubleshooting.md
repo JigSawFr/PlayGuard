@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
+<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
 # Resolução de problemas
 
 Voltar a entrar numa consola bloqueada, os problemas comuns, comunicar um erro e o modo de programador. Voltar ao [README](../../README.md).
@@ -11,7 +11,7 @@ O PlayGuard só vê o controlo parental do sistema em que corre: **o emuMMC e o 
 
 Sabe o PIN, mas a aplicação móvel do antigo dono continua associada (a desvinculação falha, ou uma reposição de fábrica pede a conta dele).
 
-*PIN › Desvincular a aplicação móvel* e depois, se não quiser controlo parental nenhum, *Eliminar todo o controlo parental*. Ambos funcionam offline, tanto no emuMMC como no sysMMC.
+*Segurança › Desvincular a aplicação móvel* e depois, se não quiser controlo parental nenhum, *Eliminar todo o controlo parental*. Ambos funcionam offline, tanto no emuMMC como no sysMMC.
 
 ### PIN esquecido
 
@@ -43,18 +43,18 @@ O PlayGuard não pode ajudar: precisa do Atmosphère. O procedimento da chave me
 - **O relógio de rede nunca foi acertado.** *Consola › Relógio de rede › Medir a diferença horária*, e depois acerte-o ([relógio de rede](features.md#relógio-de-rede)).
 - **O relógio foi atrasado.** Depois de um salto para trás, a contagem para até o relógio passar a hora antiga; não há nada a fazer.
 - **Acabou de ser escrito um limite.** Inicie um jogo durante um minuto e verifique de novo.
-- **O controlo parental está desbloqueado temporariamente.** O tempo de jogo pode então não ser contado: *PIN › Reativar o controlo parental*.
+- **O controlo parental está desbloqueado temporariamente.** O tempo de jogo pode então não ser contado: *Segurança › Reativar o controlo parental*.
 
 ### Os meus limites mudaram sozinhos
 
-- **A aplicação móvel continua associada.** A sua próxima sincronização substitui o que o PlayGuard definiu: *PIN › Desvincular a aplicação móvel*.
-- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu da última vez, e *Preferências › Histórico de alterações* lista cada alteração vista fora do PlayGuard. Ⓐ numa delas repõe o valor anterior.
+- **A aplicação móvel continua associada.** A sua próxima sincronização substitui o que o PlayGuard definiu: *Segurança › Desvincular a aplicação móvel*.
+- **Outra ferramenta, ou um perfil.** *Hoje* mostra um cartão âmbar para limites diferentes dos que o PlayGuard viu da última vez, e *Histórico › Alterações do PlayGuard* lista cada alteração vista fora do PlayGuard. Ⓐ numa delas repõe o valor anterior.
 - **Um perfil agendado** posto em vigor, ou reposto quando o seu período terminou (*Tempo de jogo › Perfis › Perfil agendado*).
 
 ### A criança jogou para além do limite
 
 - **A consola só avisa.** *Tempo de jogo › Quando o tempo acabar*: escolha *Suspender o software*.
-- **O controlo parental ficou desbloqueado.** Enquanto está, o limite de hoje fica em pausa: a etiqueta do cabeçalho indica-o em todos os separadores; *PIN › Reativar o controlo parental*. Um reinício da consola também o bloqueia.
+- **O controlo parental ficou desbloqueado.** Enquanto está, o limite de hoje fica em pausa: a etiqueta do cabeçalho indica-o em todos os separadores; *Segurança › Reativar o controlo parental*. Um reinício da consola também o bloqueia.
 - **O relógio foi atrasado.** A contagem para até o relógio passar a hora antiga ([o que conta](features.md#o-que-conta-como-tempo-de-jogo)).
 - **O outro sistema.** O emuMMC e o sysMMC têm cada um o seu próprio controlo parental: defina-o nos dois, ou esconda o menu de arranque do hekate ([compatibilidade](compatibility.md#emummc-e-sysmmc)).
 
@@ -68,7 +68,7 @@ A consola tem um firmware mais recente do que o mais recente testado: o PlayGuar
 
 ### O PlayGuard pede o PIN a toda a hora, ou nunca
 
-*PIN › Proteger o PlayGuard com o PIN*: *Antes de uma alteração* (a predefinição) pede-o uma vez, antes da primeira alteração, e o PIN vale até o PlayGuard fechar. *Pedir o PIN novamente após 5 minutos* volta a pedi-lo depois desse tempo. *Mostrar o PIN* pede-o sempre.
+*Segurança › Proteger o PlayGuard com o PIN*: *Antes de uma alteração* (a predefinição) pede-o uma vez, antes da primeira alteração, e o PIN vale até o PlayGuard fechar. *Pedir o PIN novamente após 5 minutos* volta a pedi-lo depois desse tempo. *Mostrar o PIN* pede-o sempre.
 
 ### Um jogo não arranca, ou mostra um "!" no menu HOME
 
@@ -143,7 +143,7 @@ Prima Ⓨ sete vezes em *Sobre › Versão*; as ferramentas de programador apare
 - o relatório de diagnóstico no ecrã (Ⓨ guarda-o, Ⓧ envia-o online), e um atalho para o exportar a partir do separador Tempo de jogo;
 - **Autoteste da consola**: o que o PlayGuard verifica sozinho nesta consola antes de [a lista de verificação na consola](../hardware-test.md) (em inglês) ser percorrida à mão — o PIN, os patches de assinatura, a pasta de dados, cada forwarder criado pelo PlayGuard (no menu HOME, protegido, visto a funcionar através da sua porta), a porta no cartão SD, o que o Atmosphère lê do bloqueio do menu homebrew, os caminhos de volta, o sysmodule de recuperação. Não altera nada, e escreve o resultado em Markdown em `config/playguard/self-test.md`, para colar no pull request;
 - **Instalar outra compilação** no lugar da atual, para testar uma correção antes de ser publicada ([abaixo](#instalar-outra-compilação));
-- **Comparar o bloco do temporizador** (só enquanto a aplicação móvel está associada e consegue sincronizar — não com um ficheiro hosts que bloqueie a Nintendo; também em *PIN*), para decifrar definições que o PlayGuard ainda não mostra: guarde o bloco em bruto como referência, altere uma definição na aplicação móvel, volte — o PlayGuard lista os valores que mudaram (guardados em `logs/reports/` a pedido). Horas de dormir diferentes por dia, definidas na aplicação móvel, poderiam ser confirmadas assim. Anexe esse ficheiro a uma issue, ou envie-o com o relatório (*Enviar um relatório online*).
+- **Comparar o bloco do temporizador** (só enquanto a aplicação móvel está associada e consegue sincronizar — não com um ficheiro hosts que bloqueie a Nintendo; também em *Segurança*), para decifrar definições que o PlayGuard ainda não mostra: guarde o bloco em bruto como referência, altere uma definição na aplicação móvel, volte — o PlayGuard lista os valores que mudaram (guardados em `logs/reports/` a pedido). Horas de dormir diferentes por dia, definidas na aplicação móvel, poderiam ser confirmadas assim. Anexe esse ficheiro a uma issue, ou envie-o com o relatório (*Enviar um relatório online*).
 - **Registar o temporizador de jogo**: a cada 30 s enquanto o PlayGuard está aberto, uma linha com o que o temporizador de jogo indica (tempo restante, tempo gasto, o bloco de definições em bruto…) em `logs/play_timer/log.csv`, um ficheiro pronto para uma folha de cálculo, mais uma linha logo depois de cada alteração feita pelo PlayGuard, a dizer qual (a última coluna, `event`), e uma nota quando o relógio avançou mais do que o tempo que passou. Deixado aberto durante a meia-noite, ou até o tempo acabar, mostra o que um só relatório não consegue: quando o tempo gasto é reposto, o que a consola diz perto do fim. O interruptor é memorizado; só regista no modo de programador. O que já se sabe está em [parental-controls.md](../parental-controls.md) (em inglês).
 - **Limpar a cache** e **Eliminar os ficheiros de registo**, cada um depois de uma confirmação que diz quantos ficheiros e quanto espaço: a cache (`cache/` e o `nand/<sistema>/cache/` de cada sistema: nomes e ícones dos jogos, os últimos números da Atividade, a lista de compilações) é lida de novo da consola quando for preciso; os ficheiros de registo são os ficheiros de falha, os registos de sessão (exceto o desta sessão, ainda a ser escrito), os relatórios guardados e o registo do temporizador de jogo, enquanto `uploads/` (as ligações de remoção dos relatórios enviados online) e a referência do bloco ficam. As definições, o histórico, as cópias de segurança, os perfis e as exportações nunca são tocados.
 - **Executar de novo as migrações**: as mudanças das organizações anteriores — a pasta de dados ao lado do `.nro`, os registos de antes das suas subpastas, o que todos os sistemas partilhavam — cada uma numa linha para marcar ou desmarcar (todas marcadas de início; A alterna uma), depois *Executar as N escolhidas* e uma confirmação que as enumera com o que cada uma move. São executadas logo, diga o `migrations.json` o que disser (de outro modo, cada uma só é executada uma vez, no primeiro arranque de uma compilação que precise dela; o nível que regista nunca desce); um ficheiro já no lugar nunca é substituído. Uma janela indica quantos elementos foram movidos; cada passo fica no registo de sessão.

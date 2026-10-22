@@ -57,6 +57,13 @@ bool ask();
 // Asks for the PIN unless it still holds (entered since PlayGuard opened, or
 // in the last 5 minutes with "Ask for the PIN again"), whatever the mode.
 bool confirm();
+// Before PlayGuard hands the console over to a homebrew store (sphaira, the
+// App Store), which starts any homebrew and changes the SD card: the change
+// check as before a change ("Before a change" asks; the read-only mode does
+// not refuse it, an update being its way out), and the PIN whatever the mode
+// while the homebrew menu is locked (`menu_locked`), the store being a way
+// around the lock. On a refusal it says why.
+bool before_handing_over(bool menu_locked);
 // Before showing the PIN: asks for it now, in every mode, ignoring the grace
 // and the lock screen. True when it may be shown (the read right after does
 // not ask again). On a refusal it says why.

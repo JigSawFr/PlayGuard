@@ -9,6 +9,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # The merge queue (build.yml says why): a required check must report there too.
+  merge_group:
   schedule:
     - cron: '23 6 * * 4'
 

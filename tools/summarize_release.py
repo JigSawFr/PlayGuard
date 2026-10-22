@@ -158,6 +158,11 @@ def pull_requests(notes: str) -> str:
     return PRS.format(descriptions="\n\n---\n\n".join(out)) if out else ""
 
 
+# What check() refuses: a Markdown link or image, a URL, an HTML tag or
+# entity, an @mention.
+UNSAFE = re.compile(r"\]\(|https?://|www\.|<[A-Za-z/!]|&[#A-Za-z0-9]+;|(?<![\w`])@[A-Za-z0-9]")
+
+
 def nothing(answer: str) -> bool:
     return answer.strip().strip("`*.\"' ").upper() == "NONE"
 
@@ -172,6 +177,11 @@ def check(summary: str) -> str:
         raise ValueError("the answer has a # or ## heading")
     if not 100 <= len(summary) <= MAX_SUMMARY:
         raise ValueError(f"the answer is {len(summary)} characters long")
+    # Published unread, from pull request descriptions anyone can write: no
+    # way out of the page in it (a link, an image, HTML), nor a mention that
+    # pings someone. The hand-written summaries use none either.
+    if UNSAFE.search(summary):
+        raise ValueError(f"the answer has a link, an image, HTML or a mention ({UNSAFE.search(summary).group(0)!r})")
     return summary
 
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 db71c88bd2a7 -->
+<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
 # Einstieg
 
 Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa zehn Minuten, dann die alltäglichen Aufgaben. Zurück zum [README](../../README.md).
@@ -27,7 +27,7 @@ Entpacke `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/
 
 ## 3. *Erste Schritte* folgen
 
-Beim ersten Start erscheint die Anleitung *Erste Schritte* (später: *Info › Hilfe & Diagnose › Erste Schritte*). *Heute* zeigt dieselben Schritte als Karte, bis sie erledigt sind (*1 von 3*):
+Beim ersten Start erscheint die Anleitung *Erste Schritte* (später: *Optionen › Erste Schritte*). *Heute* zeigt dieselben Schritte als Karte, bis sie erledigt sind (*1 von 3*):
 
 1. **Die Geheimzahl.** Die eigene Geheimzahl der Konsole, die das HOME-Menü abfragt, um ein Spiel über das Limit hinaus zu starten oder die Einstellungen zu ändern. Vermeide 0000, 1234 oder 2580: PlayGuard meldet eine Geheimzahl, die jeder zuerst ausprobieren würde.
 2. **Ein Tageslimit.** Jeden Tag gleich, oder eines für die Wochentage und eines für das Wochenende. Ändere jeden einzelnen Tag später in *Spielzeit*.
@@ -35,7 +35,7 @@ Beim ersten Start erscheint die Anleitung *Erste Schritte* (später: *Info › H
 
 ## 4. Die Smart-Geräte-App trennen
 
-Noch mit der App „Nintendo Switch-Altersbeschränkungen“ verknüpft (oder eine gebrauchte Konsole, die mit der App von jemand anderem verknüpft ist)? *Geheimzahl › Smart-Geräte-App trennen*. Sonst überschreibt die nächste Synchronisierung der App, was du in PlayGuard festgelegt hast. Es funktioniert offline.
+Noch mit der App „Nintendo Switch-Altersbeschränkungen“ verknüpft (oder eine gebrauchte Konsole, die mit der App von jemand anderem verknüpft ist)? *Sicherheit › Smart-Geräte-App trennen*. Sonst überschreibt die nächste Synchronisierung der App, was du in PlayGuard festgelegt hast. Es funktioniert offline.
 
 ## 5. Die Netzwerkuhr stellen
 
@@ -49,7 +49,7 @@ Eine Konsole ohne Internet: Wenn kein Server antwortet, bietet PlayGuard an, die
 
 ## 7. PlayGuard selbst schützen
 
-*Geheimzahl › PlayGuard mit der Geheimzahl schützen*:
+*Sicherheit › PlayGuard mit der Geheimzahl schützen*:
 
 - **Vor einer Änderung** (der Standard) — jeder kann schauen, nur der Elternteil ändert etwas;
 - **Beim Öffnen von PlayGuard** — ein Sperrbildschirm beim Start;
@@ -72,9 +72,9 @@ Eine Konsole ohne Internet: Wenn kein Server antwortet, bietet PlayGuard an, die
 | Das Limit eines Tages zu ändern | *Spielzeit*: Ⓐ auf dem Tag, ↑/↓, dann **+** zum Speichern. |
 | Zwischen Schulzeit und Ferien zu wechseln | *Spielzeit › Profile*; *Geplantes Profil* für einen im Voraus gewählten Zeitraum. |
 | Zu sehen, wer was gespielt hat | *Aktivität*: pro Spiel, pro Benutzerkonto, heute, 7 Tage, insgesamt; Export oder ein QR-Code. |
-| Vorerst alle Spiele zu sperren | *Geheimzahl › Alle Spiele sperren*. Ausgeschaltet kommen die vorherigen Limits zurück. |
-| Eine Änderung rückgängig zu machen | **ZR** *Rückgängig* direkt danach, oder jederzeit *Optionen › Änderungsverlauf*. |
-| Eine Kopie der Einstellungen zu behalten | *Optionen › Einstellungen sichern* (nie die Geheimzahl). |
+| Vorerst alle Spiele zu sperren | *Spielzeit › Alle Spiele sperren*. Ausgeschaltet kommen die vorherigen Limits zurück. |
+| Eine Änderung rückgängig zu machen | **ZR** *Rückgängig* direkt danach, oder jederzeit *Verlauf › Änderungen durch PlayGuard*. |
+| Eine Kopie der Einstellungen zu behalten | *Verlauf › Einstellungen sichern* (nie die Geheimzahl). |
 | Zu wissen, was dich braucht | Die Glocke (Ⓨ): was zu tun ist in Bernstein, was zu wissen ist mit einem „i“. |
 
 ## Weiter

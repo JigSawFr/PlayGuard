@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
+<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
 # Problemen oplossen
 
 Weer toegang krijgen tot een vergrendelde console, de veelvoorkomende problemen, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
@@ -11,7 +11,7 @@ PlayGuard ziet alleen het ouderlijk toezicht van het systeem waarop het draait: 
 
 Je kent de pincode, maar de app op de telefoon van de vorige eigenaar is nog gekoppeld (ontkoppelen mislukt, of een fabrieksreset vraagt om diens account).
 
-*Pincode › Smartphone-app ontkoppelen*, en daarna, als je helemaal geen ouderlijk toezicht wilt, *Ouderlijk toezicht wissen*. Beide werken offline, op emuMMC net als op sysMMC.
+*Beveiliging › Smartphone-app ontkoppelen*, en daarna, als je helemaal geen ouderlijk toezicht wilt, *Ouderlijk toezicht wissen*. Beide werken offline, op emuMMC net als op sysMMC.
 
 ### Pincode vergeten
 
@@ -43,18 +43,18 @@ PlayGuard kan niet helpen: het heeft Atmosphère nodig. De master-key-procedure 
 - **De netwerkklok is nooit ingesteld.** *Console › Netwerkklok › Tijdsverschil meten*, en stel hem daarna in ([netwerkklok](features.md#netwerkklok)).
 - **De klok is teruggezet.** Na een sprong terug stopt de telling tot de klok het oude tijdstip voorbij is; je hoeft niets te doen.
 - **Er is net een limiet geschreven.** Start een game voor een minuut en kijk dan opnieuw.
-- **Ouderlijk toezicht is tijdelijk ontgrendeld.** Speeltijd wordt dan mogelijk niet geteld: *Pincode › Ouderlijk toezicht weer inschakelen*.
+- **Ouderlijk toezicht is tijdelijk ontgrendeld.** Speeltijd wordt dan mogelijk niet geteld: *Beveiliging › Ouderlijk toezicht weer inschakelen*.
 
 ### Mijn limieten zijn vanzelf veranderd
 
-- **De app op de telefoon is nog gekoppeld.** De volgende synchronisatie overschrijft wat PlayGuard heeft ingesteld: *Pincode › Smartphone-app ontkoppelen*.
-- **Een ander hulpmiddel, of een profiel.** *Vandaag* toont een oranje kaart voor limieten die afwijken van wat PlayGuard het laatst zag, en *Voorkeuren › Wijzigingsgeschiedenis* toont elke wijziging die buiten PlayGuard is gezien. Ⓐ op een wijziging zet de vorige waarde terug.
+- **De app op de telefoon is nog gekoppeld.** De volgende synchronisatie overschrijft wat PlayGuard heeft ingesteld: *Beveiliging › Smartphone-app ontkoppelen*.
+- **Een ander hulpmiddel, of een profiel.** *Vandaag* toont een oranje kaart voor limieten die afwijken van wat PlayGuard het laatst zag, en *Geschiedenis › Wijzigingen via PlayGuard* toont elke wijziging die buiten PlayGuard is gezien. Ⓐ op een wijziging zet de vorige waarde terug.
 - **Een gepland profiel** dat is toegepast, of teruggezet zodra zijn periode voorbij was (*Speeltijdtimer › Profielen › Gepland profiel*).
 
 ### Het kind speelde langer dan de limiet
 
 - **De console waarschuwt alleen.** *Speeltijdtimer › Als de tijd om is*: kies *Software onderbreken*.
-- **Ouderlijk toezicht bleef ontgrendeld.** Zolang dat zo is, is de limiet van vandaag gepauzeerd: de pil in de kopregel zegt dat op elk tabblad; *Pincode › Ouderlijk toezicht weer inschakelen*. Een herstart van de console vergrendelt het ook.
+- **Ouderlijk toezicht bleef ontgrendeld.** Zolang dat zo is, is de limiet van vandaag gepauzeerd: de pil in de kopregel zegt dat op elk tabblad; *Beveiliging › Ouderlijk toezicht weer inschakelen*. Een herstart van de console vergrendelt het ook.
 - **De klok is teruggezet.** De telling stopt tot de klok het oude tijdstip voorbij is ([wat telt](features.md#wat-telt-als-speeltijd)).
 - **Het andere systeem.** emuMMC en sysMMC hebben elk hun eigen ouderlijk toezicht: stel het op beide in, of verberg het opstartmenu van hekate ([compatibiliteit](compatibility.md#emummc-en-sysmmc)).
 
@@ -68,7 +68,7 @@ De console draait een firmware die nieuwer is dan de nieuwste geteste: PlayGuard
 
 ### PlayGuard vraagt steeds om de pincode, of nooit
 
-*Pincode › PlayGuard beveiligen met de pincode*: *Vóór een wijziging* (de standaard) vraagt er één keer om, vóór de eerste wijziging, en de pincode geldt tot PlayGuard wordt gesloten. *Na 5 minuten opnieuw om de pincode vragen* vraagt er daarna opnieuw om. *Pincode tonen* vraagt er altijd om.
+*Beveiliging › PlayGuard beveiligen met de pincode*: *Vóór een wijziging* (de standaard) vraagt er één keer om, vóór de eerste wijziging, en de pincode geldt tot PlayGuard wordt gesloten. *Na 5 minuten opnieuw om de pincode vragen* vraagt er daarna opnieuw om. *Pincode tonen* vraagt er altijd om.
 
 ### Een game start niet, of toont een "!" in het HOME-menu
 
@@ -143,7 +143,7 @@ Druk zeven keer op Ⓨ op *Info › Versie*; de ontwikkelaarstools verschijnen o
 - het diagnoserapport op het scherm (Ⓨ slaat het op, Ⓧ verstuurt het online), en een snelkoppeling om het te exporteren vanuit het tabblad Speeltijdtimer;
 - **Zelftest van de console**: wat PlayGuard zelf op deze console controleert voordat [de consolechecklist](../hardware-test.md) (in het Engels) met de hand wordt doorlopen — de pincode, de signaturepatches, de gegevensmap, elke forwarder die PlayGuard heeft gemaakt (in het HOME-menu, beveiligd, werkend gezien via zijn poort), de poort op de SD-kaart, wat Atmosphère leest van de vergrendeling van het homebrew-menu, de wegen terug, de herstel-sysmodule. Hij wijzigt niets, en schrijft zijn resultaat als Markdown naar `config/playguard/self-test.md`, om in de pull request te plakken;
 - **Andere build installeren** ter plekke, om een oplossing te testen voordat die wordt uitgebracht ([hieronder](#een-andere-build-installeren));
-- **Speeltijdblok vergelijken** (alleen zolang de app op de telefoon gekoppeld is en kan synchroniseren — niet met een hosts-bestand dat Nintendo blokkeert; ook in *Pincode*), om instellingen te ontcijferen die PlayGuard nog niet toont: sla het ruwe blok op als referentie, wijzig één instelling in de app op de telefoon, kom terug — PlayGuard toont de waarden die zijn veranderd (op verzoek opgeslagen in `logs/reports/`). Verschillende bedtijden per dag, ingesteld via de app op de telefoon, kunnen zo worden bevestigd. Voeg dat bestand toe aan een issue, of verstuur het met het rapport (*Rapport online versturen*).
+- **Speeltijdblok vergelijken** (alleen zolang de app op de telefoon gekoppeld is en kan synchroniseren — niet met een hosts-bestand dat Nintendo blokkeert; ook in *Beveiliging*), om instellingen te ontcijferen die PlayGuard nog niet toont: sla het ruwe blok op als referentie, wijzig één instelling in de app op de telefoon, kom terug — PlayGuard toont de waarden die zijn veranderd (op verzoek opgeslagen in `logs/reports/`). Verschillende bedtijden per dag, ingesteld via de app op de telefoon, kunnen zo worden bevestigd. Voeg dat bestand toe aan een issue, of verstuur het met het rapport (*Rapport online versturen*).
 - **Speeltijdtimer vastleggen**: elke 30 s zolang PlayGuard open is, één regel met wat de speeltijdtimer meldt (resterende tijd, gespeelde tijd, het ruwe instellingenblok…) in `logs/play_timer/log.csv`, een bestand dat klaar is voor een spreadsheet, plus een regel direct na elke wijziging die PlayGuard doet, met welke (de laatste kolom, `event`), en een opmerking als de klok meer verschoof dan de tijd die verstreek. Laat je het open over middernacht heen, of tot de tijd om is, dan toont het wat één rapport niet kan: wanneer de gespeelde tijd wordt teruggezet, wat de console tegen het einde zegt. De schakelaar wordt onthouden; hij legt alleen vast in ontwikkelaarsmodus. Wat tot nu toe bekend is, staat in [parental-controls.md](../parental-controls.md) (in het Engels).
 - **Cache wissen** en **Logbestanden verwijderen**, elk na een bevestiging die zegt hoeveel bestanden en hoeveel ruimte: de cache (`cache/` en `nand/<system>/cache/` van elk systeem: namen en icoontjes van games, de laatste cijfers van Activiteit, de lijst van builds) wordt opnieuw van de console gelezen als dat nodig is; de logbestanden zijn de crashbestanden, de sessielogs (behalve dat van deze sessie, dat nog wordt geschreven), de opgeslagen rapporten en de opname van de speeltijdtimer, terwijl `uploads/` (de verwijderlinks van de online verstuurde rapporten) en de referentie van het blok blijven staan. Instellingen, geschiedenis, back-ups, profielen en exports worden nooit aangeraakt.
 - **Migraties opnieuw uitvoeren**: de verplaatsingen van de eerdere indelingen — de gegevensmap naast de `.nro`, de logs van vóór hun submappen, wat alle systemen deelden — elk op een regel om aan of uit te vinken (eerst allemaal aangevinkt; A wisselt er één om), dan *De N gekozen uitvoeren* en een bevestiging die ze opsomt met wat elk verplaatst. Ze worden meteen uitgevoerd, wat `migrations.json` ook vastlegt (anders wordt elk maar één keer uitgevoerd, bij de eerste start van een build die het nodig heeft; het vastgelegde niveau wordt nooit verlaagd); een bestand dat al op zijn plaats staat, wordt nooit vervangen. Een venster zegt hoeveel items zijn verplaatst; elke stap staat in het sessielog.

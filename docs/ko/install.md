@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # 설치
 
 PlayGuard를 설치, 업데이트, 삭제하는 방법과 PlayGuard가 SD 카드에 저장하는 파일을 설명합니다. 설치한 뒤에는 [시작하기](getting-started.md)를 보세요. 처음으로 돌아가기: [README](../../README.md).
@@ -20,13 +20,13 @@ PlayGuard를 설치, 업데이트, 삭제하는 방법과 PlayGuard가 SD 카드
 
 ## 업데이트
 
-- **PlayGuard에서:** *정보 › 업데이트 방법*에서 방법을 고릅니다. PlayGuard 자체에서(버전을 내려받아 확인하고 자신을 교체한 뒤 다시 시작), sphaira, Homebrew App Store, 수동 중 하나입니다. *매일 업데이트 확인*을 켜 두면 새 버전이 있을 때 PlayGuard가 그 버전 화면으로 열립니다.
+- **PlayGuard에서:** *환경 설정 › 업데이트 방법*에서 방법을 고릅니다. PlayGuard 자체에서(버전을 내려받아 확인하고 자신을 교체한 뒤 다시 시작), sphaira, Homebrew App Store, 수동 중 하나입니다. *매일 업데이트 확인*을 켜 두면 새 버전이 있을 때 PlayGuard가 그 버전 화면으로 열립니다.
 - **복구 sysmodule**은 PlayGuard 버전에 맞춰야 합니다. 업데이트할 때마다 그 버전의 `playguard-rescue.zip`을 다시 압축 해제하고(또는 벨의 *복구 sysmodule이 최신이 아닙니다*에서 *업데이트*), 본체를 다시 시작하세요.
 - 설정, 변경 기록, 프로필, 백업은 그대로 남습니다. 앱 옆이 아니라 `sd:/config/playguard/`에 있기 때문입니다.
 
 ## 삭제
 
-`sd:/switch/playguard/`(앱)를 삭제하고, 앱의 파일까지 지우려면 `sd:/config/playguard/`도 삭제하세요. 복구 sysmodule을 설치했다면 `sd:/atmosphere/contents/4200000000505247/`도 삭제합니다. 플레이 시간 제한, PIN, 제한 설정은 본체 자체의 것이므로 **본체에 그대로 남습니다**. 이것들도 없애려면 먼저 *PIN › 자녀 보호 기능 모두 삭제*를 하세요.
+`sd:/switch/playguard/`(앱)를 삭제하고, 앱의 파일까지 지우려면 `sd:/config/playguard/`도 삭제하세요. 복구 sysmodule을 설치했다면 `sd:/atmosphere/contents/4200000000505247/`도 삭제합니다. 플레이 시간 제한, PIN, 제한 설정은 본체 자체의 것이므로 **본체에 그대로 남습니다**. 이것들도 없애려면 먼저 *보안 › 자녀 보호 기능 모두 삭제*를 하세요.
 
 ## SD 카드의 파일
 

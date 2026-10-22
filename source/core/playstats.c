@@ -38,6 +38,12 @@ static char s_icon_dir[sizeof(((IconStore *)0)->dir)];
 static IconStore s_icons;
 static bool s_icons_tried;
 
+// The names and the icons above are read on borealis' task thread
+// (play_data, game_icons) and on the UI thread (a game's icon in a dialog,
+// playstats_icons): this keeps them whole between the two. Held only around
+// them, never across a service call, so the UI thread never waits on a read.
+static Mutex s_cache_lock;
+
 static atomic_bool s_cancel;
 
 void playstats_cancel(void)
@@ -106,6 +112,7 @@ static Result read_events(u64 since, PlayLogEvent **events, size_t *count, bool 
     return playstats_collect_events(query_events, start, total, since, PLAYSTATS_EVENTS_MAX, events, count, capped);
 }
 
+// With s_cache_lock held.
 static void open_icon_store(u8 lang)
 {
     if (s_icons_tried || !s_icon_dir[0] || !lang) return;
@@ -121,7 +128,9 @@ void playstats_set_icon_dir(const char *dir)
 
 void playstats_remember(const PlayStats *known)
 {
+    mutexLock(&s_cache_lock);
     playnames_seed(&s_names, known);
+    mutexUnlock(&s_cache_lock);
     s_known_count = 0;
     for (u32 i = 0; known && i < known->count && i < PLAYSTATS_MAX; i++) s_known[s_known_count++] = known->games[i].app_id;
 }
@@ -129,16 +138,19 @@ void playstats_remember(const PlayStats *known)
 // Keeps the icon of control data read for something else (one read a game).
 static void keep_icon(u64 id, const NsApplicationControlData *cd, u64 size)
 {
-    if (size > sizeof(cd->nacp)) icon_store_put(&s_icons, id, cd->icon, (size_t)(size - sizeof(cd->nacp)));
+    if (size <= sizeof(cd->nacp)) return;
+    mutexLock(&s_cache_lock);
+    icon_store_put(&s_icons, id, cd->icon, (size_t)(size - sizeof(cd->nacp)));
+    mutexUnlock(&s_cache_lock);
 }
 
 static void read_name(GameStat *g, NsApplicationControlData **cd, u32 nacp_index)
 {
+    mutexLock(&s_cache_lock);
     const char *known = playnames_find(&s_names, g->app_id);
-    if (known) {
-        nacp_copy_utf8(g->name, sizeof(g->name), known);
-        return;
-    }
+    if (known) nacp_copy_utf8(g->name, sizeof(g->name), known);
+    mutexUnlock(&s_cache_lock);
+    if (known) return;
     for (u32 i = 0; i < s_unnamed_count; i++)
         if (s_unnamed[i] == g->app_id) return;
     if (!*cd) *cd = (NsApplicationControlData *)malloc(sizeof(NsApplicationControlData));
@@ -146,7 +158,9 @@ static void read_name(GameStat *g, NsApplicationControlData **cd, u32 nacp_index
     if (*cd && nacp_read_control(g->app_id, *cd, false, &size)) {
         keep_icon(g->app_id, *cd, size);
         if (nacp_name(&(*cd)->nacp, sizeof((*cd)->nacp), nacp_index, g->name, sizeof(g->name))) {
+            mutexLock(&s_cache_lock);
             playnames_add(&s_names, g->app_id, g->name);
+            mutexUnlock(&s_cache_lock);
             return;
         }
     }
@@ -323,8 +337,10 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     // from the same read).
     u32 nacp_index = 0;
     out->names_lang = nacp_console_language(&nacp_index);
+    mutexLock(&s_cache_lock);
     playnames_use_language(&s_names, out->names_lang);
     open_icon_store(out->names_lang);
+    mutexUnlock(&s_cache_lock);
     NsApplicationControlData *cd = NULL;
     for (u32 i = 0; i < out->count && !playstats_cancelled(); i++) read_name(&out->games[i], &cd, nacp_index);
     free(cd);
@@ -340,6 +356,7 @@ void playstats_icons(PlayIcon *icons, size_t count)
     if (!count) return;
     u32 nacp_index = 0;
     const u8 lang = nacp_console_language(&nacp_index);
+    mutexLock(&s_cache_lock);
     open_icon_store(lang);
     // Kept on the SD card by an earlier read: no ns at all.
     size_t missing = 0;
@@ -347,8 +364,11 @@ void playstats_icons(PlayIcon *icons, size_t count)
         icons[i].jpeg = icon_store_get(&s_icons, icons[i].app_id, &icons[i].size);
         if (!icons[i].jpeg) missing++;
     }
+    mutexUnlock(&s_cache_lock);
     if (!missing || playstats_cancelled() || R_FAILED(nsInitialize())) return;
+    mutexLock(&s_cache_lock);
     playnames_use_language(&s_names, lang);
+    mutexUnlock(&s_cache_lock);
     NsApplicationControlData *cd = (NsApplicationControlData *)malloc(sizeof(NsApplicationControlData));
     if (cd) {
         for (size_t i = 0; i < count && !playstats_cancelled(); i++) {
@@ -361,12 +381,13 @@ void playstats_icons(PlayIcon *icons, size_t count)
             if (!icons[i].jpeg) break;   // out of memory: the rest stay without an icon
             memcpy(icons[i].jpeg, cd->icon, size);
             icons[i].size = size;
-            icon_store_put(&s_icons, icons[i].app_id, icons[i].jpeg, size);
             // Its name from the same read, for the next fetch.
             char name[PLAYSTATS_NAME_LEN];
-            if (!playnames_find(&s_names, icons[i].app_id) &&
-                nacp_name(&cd->nacp, sizeof(cd->nacp), nacp_index, name, sizeof(name)))
-                playnames_add(&s_names, icons[i].app_id, name);
+            const bool named = nacp_name(&cd->nacp, sizeof(cd->nacp), nacp_index, name, sizeof(name));
+            mutexLock(&s_cache_lock);
+            icon_store_put(&s_icons, icons[i].app_id, icons[i].jpeg, size);
+            if (named && !playnames_find(&s_names, icons[i].app_id)) playnames_add(&s_names, icons[i].app_id, name);
+            mutexUnlock(&s_cache_lock);
         }
         free(cd);
     }

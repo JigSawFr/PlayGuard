@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # インストール
 
 PlayGuard のインストール、アップデート、削除の方法と、PlayGuard が SD カードに書き込むファイルについて説明します。インストールしたら、[はじめに](getting-started.md)へ。トップページは [README](../../README.md)。
@@ -20,13 +20,13 @@ PlayGuard のインストール、アップデート、削除の方法と、Play
 
 ## アップデート
 
-- **PlayGuard で：** *情報 › アップデート方法* で方法を選びます。PlayGuard 内で（リリースをダウンロードして確認し、自分を置き換えて再起動します）、sphaira、Homebrew App Store、手動のどれかです。*毎日アップデートを確認* がオンなら、新しいリリースがあるとき、PlayGuard はそのリリースの画面で開きます。
+- **PlayGuard で：** *オプション › アップデート方法* で方法を選びます。PlayGuard 内で（リリースをダウンロードして確認し、自分を置き換えて再起動します）、sphaira、Homebrew App Store、手動のどれかです。*毎日アップデートを確認* がオンなら、新しいリリースがあるとき、PlayGuard はそのリリースの画面で開きます。
 - **リカバリー sysmodule** は PlayGuard のバージョンに合わせます。アップデートのたびに、そのリリースの `playguard-rescue.zip` を展開し直し（またはベルの *リカバリー sysmodule が最新ではありません* で *更新*）、本体を再起動してください。
 - 設定、履歴、プリセット、バックアップはそのまま残ります。アプリの隣ではなく、`sd:/config/playguard/` にあるからです。
 
 ## 削除
 
-`sd:/switch/playguard/`（アプリ）を削除します。アプリのファイルも消すなら `sd:/config/playguard/` も、リカバリー sysmodule を入れていれば `sd:/atmosphere/contents/4200000000505247/` も削除します。上限、暗証番号、制限は本体自身のものなので、**本体に残ります**。それらも消すには、先に *暗証番号 › みまもり設定をすべて削除* を使ってください。
+`sd:/switch/playguard/`（アプリ）を削除します。アプリのファイルも消すなら `sd:/config/playguard/` も、リカバリー sysmodule を入れていれば `sd:/atmosphere/contents/4200000000505247/` も削除します。上限、暗証番号、制限は本体自身のものなので、**本体に残ります**。それらも消すには、先に *セキュリティ › みまもり設定をすべて削除* を使ってください。
 
 ## SD カード上のファイル
 
