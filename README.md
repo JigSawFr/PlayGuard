@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="images/store/banner.png" alt="PlayGuard" width="640">
+<img src="images/store/banner.png" alt="PlayGuard" width="100%">
 
 ### Nintendo Switch parental controls, right on the console
 
-**No phone app · No Nintendo account · No internet**
+**No&nbsp;phone&nbsp;app · No&nbsp;Nintendo&nbsp;account · No&nbsp;internet**
 
 [![build](https://github.com/JigSawFr/PlayGuard/actions/workflows/build.yml/badge.svg)](https://github.com/JigSawFr/PlayGuard/actions/workflows/build.yml)
 [![latest release](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FJigSawFr%2FPlayGuard%2Fmain%2F.release-please-manifest.json&query=%24%5B%27.%27%5D&prefix=v&label=release&color=blue)](https://github.com/JigSawFr/PlayGuard/releases/latest)
@@ -12,11 +12,11 @@
 [![license: GPLv3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
 
 [**Download**](https://github.com/JigSawFr/PlayGuard/releases/latest) ·
-[**Try it in your browser**](https://playguard.link/simulator/) ·
+[**Try&nbsp;it&nbsp;in&nbsp;your&nbsp;browser**](https://playguard.link/simulator/) ·
 [**Documentation**](https://playguard.link/) ·
-[**Locked out?**](https://playguard.link/docs/troubleshooting/#locked-out)
+[**Locked&nbsp;out?**](https://playguard.link/docs/troubleshooting/#locked-out)
 
-<img src="images/video/playguard-tour.gif" alt="PlayGuard in 30 seconds" width="720">
+<img src="images/video/playguard-tour.gif" alt="PlayGuard in 30 seconds" width="100%">
 
 </div>
 
@@ -29,14 +29,12 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 
 ## ✨ Features
 
-| | |
-|---|---|
-| ⏱️ **Play-time limit** | Every day or one per day, extra time or *no more play today* in one press. |
-| 📊 **Activity** | Time per game and per account, charts, exports. |
-| 🔒 **Restrictions and PIN** | Age rating, temporary unlock, *Block all games* in one switch. |
-| 🕒 **Console** | A network clock that counts right offline, homebrew on the HOME menu behind the PIN. |
-| ↩️ **History, backups, notifications** | Every change logged and undoable. |
-| 🌍 **Everywhere** | Every console language, light and dark themes. |
+- ⏱️ **Play-time limit** — every day or one per day, extra time or *no more play today* in one press.
+- 📊 **Activity** — time per game and per account, charts, exports.
+- 🔒 **Restrictions and PIN** — age rating, temporary unlock, *Block all games* in one switch.
+- 🕒 **Console** — a network clock that counts right offline, homebrew on the HOME menu behind the PIN.
+- ↩️ **History, backups, notifications** — every change logged and undoable.
+- 🌍 **Everywhere** — every console language, light and dark themes.
 
 → Everything else: [**features**](https://playguard.link/docs/features/).
 
@@ -44,13 +42,23 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 <summary><b>📸 Screenshots</b></summary>
 <br>
 
-| Today | Play timer |
-|:---:|:---:|
-| <img src="images/screenshots/dashboard.png" alt="Today" width="420"> | <img src="images/screenshots/play_timer.png" alt="Play timer" width="420"> |
-| **Activity** | **Restrictions** |
-| <img src="images/screenshots/activity.png" alt="Activity" width="420"> | <img src="images/screenshots/restrictions.png" alt="Restrictions" width="420"> |
-| **PIN** | **Console** |
-| <img src="images/screenshots/security.png" alt="PIN" width="420"> | <img src="images/screenshots/console.png" alt="Console" width="420"> |
+<p align="center">
+  <img src="images/screenshots/dashboard.png" alt="Today" width="49%">
+  <img src="images/screenshots/play_timer.png" alt="Play timer" width="49%">
+  <br><sub><b>Today</b> · <b>Play timer</b></sub>
+</p>
+
+<p align="center">
+  <img src="images/screenshots/activity.png" alt="Activity" width="49%">
+  <img src="images/screenshots/restrictions.png" alt="Restrictions" width="49%">
+  <br><sub><b>Activity</b> · <b>Restrictions</b></sub>
+</p>
+
+<p align="center">
+  <img src="images/screenshots/security.png" alt="PIN" width="49%">
+  <img src="images/screenshots/console.png" alt="Console" width="49%">
+  <br><sub><b>PIN</b> · <b>Console</b></sub>
+</p>
 
 </details>
 
@@ -58,8 +66,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 
 The real app, against a simulated console, in your browser:
 
-| [Unlocked for now](https://playguard.link/simulator/?unlocked=1) | [Time's up](https://playguard.link/simulator/?restricted=1) | [First start, no PIN](https://playguard.link/simulator/?not_set_up=1) | [On the TV, larger text](https://playguard.link/simulator/?docked=1) |
-|:---:|:---:|:---:|:---:|
+[Unlocked for now](https://playguard.link/simulator/?unlocked=1) · [Time's up](https://playguard.link/simulator/?restricted=1) · [First start, no PIN](https://playguard.link/simulator/?not_set_up=1) · [On the TV, larger text](https://playguard.link/simulator/?docked=1)
 
 ## 📦 Install
 
