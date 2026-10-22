@@ -4,8 +4,9 @@
      or draw, in a section per way out (repaired here, reinstalled, the
      firmware or SD card), A on one for the cause, the fix and the offer to
      remove it. Above them, one short line: the note and the status small,
-     the note only while no game is listed. The sections are built by
-     source/activity/game_check_activity.cpp. -->
+     the note only while no game is listed; with none, a card in their place
+     (how many look fine, when they were checked, Check again). The sections
+     and the card are built by source/activity/game_check_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">

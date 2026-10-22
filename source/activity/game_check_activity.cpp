@@ -68,6 +68,18 @@ void GameCheckActivity::onContentAvailable()
     list->addView(this->selection);
     ui::set_visible(this->selection, false);
     cadran::List::row(this->selection, "check", true);
+    // No game with a problem: a card instead of the line above the list.
+    this->all_clear = cadran::kit::empty("check");
+    this->all_clear.box->setMarginTop(6);
+    this->check_again = cadran::kit::chip("playguard/games/check_again"_i18n, 44);
+    this->check_again->setMarginTop(18);
+    this->check_again->registerClickAction([this](brls::View*) {
+        this->refresh(true, 0);
+        return true;
+    });
+    this->all_clear.box->addView(this->check_again);
+    list->addView(this->all_clear.box);
+    ui::set_visible(this->all_clear.box, false);
     // A section per way out, under its title and what to do; each hidden
     // while it has no game.
     for (GameCategory category : GROUPS) this->build_group(category);
@@ -173,7 +185,7 @@ void GameCheckActivity::refresh(bool all, u64 also)
         return;
     }
     this->checking = true;
-    this->status_text("playguard/games/searching"_i18n);
+    this->checking_text("playguard/games/searching"_i18n);
     std::weak_ptr<bool> weak = this->alive;
     const auto list = [this, weak, all, also]() {
         auto records = std::make_shared<std::vector<GameRecord>>(GAMECHECK_MAX);
@@ -272,7 +284,7 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         game_cache::put(&this->cache, game);
         this->check_done = done;
         if (redraw) this->show();
-        else this->status_text(brls::getStr("playguard/games/checking", (int)this->check_done, (int)this->check_total));
+        else this->checking_text(brls::getStr("playguard/games/checking", (int)this->check_done, (int)this->check_total));
     };
     std::weak_ptr<bool> weak = this->alive;
     ui::in_background("games check", [this, weak, run, full]() {
@@ -316,6 +328,17 @@ void GameCheckActivity::status_text(const std::string& text, NVGcolor color)
     status->setText(text);
     status->setTextColor(color);
     ui::set_visible(status.getView(), !text.empty());
+}
+
+void GameCheckActivity::checking_text(const std::string& text)
+{
+    if (this->all_clear.box->getVisibility() != brls::Visibility::VISIBLE) {
+        this->status_text(text);
+        return;
+    }
+    this->all_clear.title->setText(text);
+    this->all_clear.text->setText("");
+    this->status_text("");
 }
 
 void GameCheckActivity::status_text(const std::string& text)
@@ -429,6 +452,12 @@ void GameCheckActivity::show()
     this->selection->setTextColor(brls::Application::getTheme()["brls/list/listItem_value_color"]);
     ui::set_visible(this->selection, !this->selected.empty());
 
+    // The card while no game has a problem, a check under way included (its
+    // count then in the card's title).
+    const bool clear = broken.empty() && R_SUCCEEDED(this->list_rc);
+    if (!clear && brls::Application::getCurrentFocus() == this->check_again) this->park_focus();
+    ui::set_visible(this->all_clear.box, clear);
+
     // Nothing had the focus before the first game with a problem; and never
     // the focus left in a section that went (its last game repaired). While
     // the games are checked, until the user moves it, the focus stays on the
@@ -444,6 +473,9 @@ void GameCheckActivity::show()
         this->auto_focus = first;
         brls::Application::giveFocus(first);
     }
+    // Nothing else to focus then (not under a dialog, which keeps its own).
+    if (clear && brls::Application::getCurrentFocus() != this->check_again && ui::has_focus(this))
+        brls::Application::giveFocus(this->check_again);
     // The check over (this was its last show): the focus is the user's.
     if (!this->checking) this->auto_focus = nullptr;
     // Never a stop of its own: only while the games are rebuilt.
@@ -451,10 +483,11 @@ void GameCheckActivity::show()
 
     // The line above the list: the check under way, an error, or the result
     // and when it was made.
-    if (this->checking && this->check_total) {
-        this->status_text(brls::getStr("playguard/games/checking", (int)this->check_done, (int)this->check_total));
-    } else if (this->checking) {
-        this->status_text("playguard/games/searching"_i18n);
+    if (this->checking) {
+        const std::string text = this->check_total ? brls::getStr("playguard/games/checking", (int)this->check_done,
+                                                                  (int)this->check_total)
+                                                   : "playguard/games/searching"_i18n;
+        this->checking_text(text);
     } else if (R_FAILED(this->list_rc)) {
         this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), cadran::kit::color("cadran/coral"));
     } else {
@@ -464,9 +497,14 @@ void GameCheckActivity::show()
         if (this->cache.checked_at > 0) time_local_now(&now, nullptr);
         const std::string age = game_check_text::age_text(this->cache.checked_at, (int64_t)now, w);
         const std::string truncated = this->cache.truncated ? brls::getStr("playguard/games/truncated", (int)count) : "";
-        this->status_text(game_check_text::result_line(found, broken.empty(), age,
-                                                       { truncated, app::dev_mode() ? this->timing : "" }),
-                          broken.empty() ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text3"));
+        const std::vector<std::string> notes = { truncated, app::dev_mode() ? this->timing : "" };
+        if (clear) {
+            this->all_clear.title->setText(found);
+            this->all_clear.text->setText(game_check_text::result_line(age, true, "", notes));
+            this->status_text("");
+        } else {
+            this->status_text(game_check_text::result_line(found, false, age, notes), cadran::kit::color("cadran/text3"));
+        }
     }
     // What this screen is for, while there is no game above which it would
     // push the games down.
@@ -631,7 +669,9 @@ brls::View* GameCheckActivity::first_game() const
 // first game then has the focus (ui::keep_focus).
 void GameCheckActivity::onResume()
 {
-    ui::keep_focus(this, this->first_game());
+    brls::View* fallback = this->first_game();
+    if (!fallback && this->all_clear.box->getVisibility() == brls::Visibility::VISIBLE) fallback = this->check_again;
+    ui::keep_focus(this, fallback);
 }
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const
