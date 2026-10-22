@@ -66,6 +66,9 @@ int info_count();      // the parental controls' entries for information
 int console_count();   // the console's entries to do
 int tab_count(const std::string& tab);   // the entries to do of a tab (notice_logic::tab_of): its sidebar badge
 int count_of(const std::vector<std::string>& ids);   // the entries to do among `ids`: a row's badge in its tab
+// What the first entry to do among `ids` is about, in a few words, said by
+// its row's badge ("" when none is to do).
+std::string reason_of(const std::vector<std::string>& ids);
 
 // Called (UI thread) after every change of what the bell shows.
 int  listen(std::function<void()> fn);

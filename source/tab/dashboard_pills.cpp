@@ -80,6 +80,22 @@ void DashboardTab::build_pills()
         ui::info("playguard/cadran/today/home_title"_i18n + "\n\n" + "playguard/dashboard/home_counts"_i18n);
         return true;
     });
+    // Ⓐ: the pills it stands for, in its place; the focus on the first one.
+    this->fine_pill = this->make_pill("", "cadran/teal_fill");
+    this->fine_pill.rank = 1;
+    this->fine_pill.box->registerClickAction([this](brls::View*) {
+        this->fine_open = true;
+        this->order_pills();
+        const Pill* folded[] = { &this->compat_pill, &this->pairing_pill, &this->serial_pill, &this->dns_pill,
+                                 &this->patches_pill };
+        for (brls::View* v : pills->getChildren())
+            for (const Pill* p : folded)
+                if (p->box == v && p->on && p->rank > 0) {
+                    brls::Application::giveFocus(v);
+                    return true;
+                }
+        return true;
+    });
 }
 
 void DashboardTab::show_pills()
@@ -95,7 +111,7 @@ void DashboardTab::show_pills()
         const std::string dot = issue ? kit::dot_of(color) : "cadran/teal_fill";
         p.dot->set(dot.c_str());
         p.rank = dot == "cadran/teal_fill" ? 1 : dot == "cadran/text3" ? 2 : 0;
-        ui::set_visible(p.box, !text.empty());
+        p.on = !text.empty();
     };
     // The firmware's compatibility: the firmware with it when all is fine.
     NVGcolor c = cadran::kit::color("cadran/text2");
@@ -125,10 +141,11 @@ void DashboardTab::show_pills()
                                                    : "playguard/cadran/today/dns_open"_i18n);
     this->dns_pill.dot->set(sync || time ? "cadran/teal_fill" : "cadran/text3");
     this->dns_pill.rank = sync || time ? 1 : 2;
+    this->dns_pill.on = true;
     this->counted_pill.rank = 0;
     this->home_pill.rank = 0;
-    ui::set_visible(this->counted_pill.box, !si.applet_mode);
-    ui::set_visible(this->home_pill.box, this->home_counts() && si.applet_mode);
+    this->counted_pill.on = !si.applet_mode;
+    this->home_pill.on = this->home_counts() && si.applet_mode;
     this->order_pills();
 }
 
@@ -139,6 +156,18 @@ void DashboardTab::order_pills()
     std::vector<Pill*> all = { &this->compat_pill, &this->pairing_pill, &this->serial_pill, &this->dns_pill,
                                &this->patches_pill, &this->counted_pill, &this->home_pill };
     std::stable_sort(all.begin(), all.end(), [](const Pill* a, const Pill* b) { return a->rank < b->rank; });
+    // The fine ones folded into one pill, unless unfolded or alone (a
+    // summary of one would say no less).
+    int fine = 0;
+    for (const Pill* p : all)
+        if (p->on && p->rank > 0) fine++;
+    const bool fold = !this->fine_open && fine > 1;
+    ui::set_text(this->fine_pill.text, brls::getStr("playguard/cadran/today/fine_pill", fine));
+    std::vector<std::pair<brls::View*, bool>> shown;
+    for (const Pill* p : all) shown.push_back({ p->box, p->on && (p->rank == 0 || !fold) });
+    shown.push_back({ this->fine_pill.box, fold });
+    for (const auto& [view, visible] : shown) ui::set_visible(view, visible);
+    all.push_back(&this->fine_pill);
     std::vector<brls::View*> wanted;
     for (const Pill* p : all)
         if (p->box) wanted.push_back(p->box);

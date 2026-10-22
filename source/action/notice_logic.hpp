@@ -91,6 +91,9 @@ class Store
     int console_count() const;  // the console's Action entries
     int tab_count(const std::string& tab) const;   // the Action entries of tab_of() `tab`: its number in the sidebar
     int count_of(const std::vector<std::string>& ids) const;   // the Action entries among `ids`: a row's badge
+    // The first Action entry among `ids` counted (in the bell's order): what
+    // a row's badge is for, said by it. "" when none.
+    std::string first_of(const std::vector<std::string>& ids) const;
 
   private:
     struct Slot

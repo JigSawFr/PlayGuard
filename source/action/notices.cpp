@@ -303,6 +303,13 @@ int count_of(const std::vector<std::string>& ids)
     return s_store.count_of(ids);
 }
 
+std::string reason_of(const std::vector<std::string>& ids)
+{
+    const std::string id = s_store.first_of(ids);
+    if (id.empty()) return "";
+    return brls::getStr("playguard/notices/short/" + id);
+}
+
 int listen(std::function<void()> fn)
 {
     const int id = s_next_listener++;
