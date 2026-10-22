@@ -107,7 +107,7 @@ Not in the companion app either; noted here because parents ask for them.
 
 | Request | Status |
 |---|---|
-| A limit per user account | Not possible with the console's play timer: one limit for the whole console. A replacement sysmodule does it ([compared](compatibility.md#playguard-or-a-replacement-sysmodule)) |
+| A limit per user account | Not possible with the console's play timer: one limit for the whole console. A replacement sysmodule does it ([compared](compatibility.md)) |
 | A warning a few minutes before the end, on the console | The console's own warnings; PlayGuard does not change them |
 | A start time before which the console cannot be used | Covered by the bedtime's "allowed again" time; per day is gap 2 |
 | Settings changed while the console is off, applied later | Not applicable: PlayGuard changes the console directly |
