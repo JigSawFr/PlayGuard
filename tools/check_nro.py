@@ -11,7 +11,13 @@ on 21.0.0 and later. The offset of MOD0 is the word at 4 of the image (crt0's
 Reads an .nro (its file is the memory image) or an .elf (mapped through its
 program headers). An .nso is compressed: check the .elf it was made from.
 
-Usage: tools/check_nro.py <file.nro|file.elf>...   (exit 1 when one fails)
+The .nro files after --romfs must also carry a RomFS in their assets (ASET
+after the NRO's code). elf2nro writes the assets only when it has an icon, a
+NACP or a romfs image, not for --romfsdir alone: PlayGuard's PIN gate was once
+built that way, without its font and with nothing after its code, which the
+forwarders' loader refused (gate/Makefile).
+
+Usage: tools/check_nro.py <file.nro|file.elf>... [--romfs <file.nro>...]   (exit 1 when one fails)
 """
 import struct
 import sys
@@ -59,13 +65,32 @@ def check(path):
     return None
 
 
+def check_romfs(path):
+    """An .nro's assets: its RomFS there, inside the file."""
+    data = open(path, "rb").read()
+    if len(data) < 0x80 or data[0x10:0x14] != b"NRO0":
+        return "not an .nro"
+    size, = struct.unpack_from("<I", data, 0x18)
+    if len(data) < size + 0x38 or data[size:size + 4] != b"ASET":
+        return "no assets after its code (0x%x bytes, the file 0x%x): no RomFS" % (size, len(data))
+    offset, length = struct.unpack_from("<QQ", data, size + 0x28)
+    if length == 0 or size + offset + length > len(data):
+        return "no RomFS in its assets"
+    print("%s: RomFS of 0x%x bytes in its assets" % (path, length))
+    return None
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__.strip().splitlines()[-1])
         return 2
     failed = False
+    romfs = False
     for path in sys.argv[1:]:
-        error = check(path)
+        if path == "--romfs":
+            romfs = True
+            continue
+        error = check(path) or (check_romfs(path) if romfs else None)
         if error:
             print("%s: %s" % (path, error), file=sys.stderr)
             failed = True
