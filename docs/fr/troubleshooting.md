@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0091fc72a094 -->
+<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.md).
