@@ -59,6 +59,7 @@ class DashboardTab : public TabBase
         cadran::kit::Mark* dot = nullptr;
         brls::Label*     text = nullptr;
         int              rank = 1;   // 0 needs the parent (amber, coral), 1 fine (teal), 2 for the record (grey)
+        bool             on   = false;   // has something to say (shown, unless folded into fine_pill)
     };
     cadran::List list;
     // The firmware's compatibility, the phone app, the serial number, the
@@ -71,6 +72,11 @@ class DashboardTab : public TabBase
     // which keeps counting.
     Pill counted_pill;
     Pill home_pill;
+    // What is fine and what is only said, folded into one pill ("✓ 4 checks
+    // fine") under the ones that need the parent; Ⓐ unfolds them, for as
+    // long as the tab is open.
+    Pill fine_pill;
+    bool fine_open = false;
     // What changed outside PlayGuard: a card of its own above the ring, its
     // lines rebuilt when the notice's text changes.
     brls::Box*  outside_card  = nullptr;

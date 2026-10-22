@@ -54,7 +54,9 @@ class TabBase : public brls::Box
 
     // `row` (a DetailCell) is where the notification bell's entries `ids`
     // are fixed: while some are to do, their number on a badge by its title,
-    // as the sidebar has by the tab's name. Marked in the order of the tab.
+    // as the sidebar has by the tab's name, and on a row with no value of its
+    // own, what it is for in a few words ("Easy to guess"). Marked in the
+    // order of the tab.
     void mark(brls::Box* row, std::vector<std::string> ids);
 
   private:
@@ -65,6 +67,7 @@ class TabBase : public brls::Box
     {
         brls::Box*               row;
         TabBadge*                badge;
+        brls::Label*             reason;   // what the badge is for, on a row with no value of its own
         std::vector<std::string> ids;
     };
     std::vector<Mark> marks;

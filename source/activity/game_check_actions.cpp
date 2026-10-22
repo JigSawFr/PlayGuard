@@ -229,8 +229,10 @@ void GameCheckActivity::removal_summary(const Removal& r)
     box->setPadding(26, 36, 20, 36);
     box->addView(cadran::kit::label(r.cancel ? "playguard/games/remove_stopped"_i18n : "playguard/games/remove_finished"_i18n,
                                     18, "cadran/text3"));
-    brls::Label* title = cadran::kit::label(brls::getStr("playguard/games/remove_summary", (int)r.removed,
-                                                         (int)r.games.size()), 22, "cadran/text");
+    const std::string summary = r.removed == 1
+                                    ? brls::getStr("playguard/games/remove_summary_one", (int)r.games.size())
+                                    : brls::getStr("playguard/games/remove_summary", (int)r.removed, (int)r.games.size());
+    brls::Label* title = cadran::kit::label(summary, 22, "cadran/text");
     title->setMarginTop(2);
     box->addView(title);
     if (!r.failed.empty()) {
@@ -264,7 +266,9 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
         this->removing = false;
         auto report = [removal, total]() {
             if (removal->removed == total) {
-                ui::notify(brls::getStr("playguard/games/removed_all", (int)removal->removed, removal->path));
+                ui::notify(removal->removed == 1
+                               ? brls::getStr("playguard/games/removed_all_one", removal->path)
+                               : brls::getStr("playguard/games/removed_all", (int)removal->removed, removal->path));
                 return;
             }
             removal_summary(*removal);
@@ -285,10 +289,14 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
     removal->body.heading->setText(total == 1 ? "playguard/games/remove_title"_i18n
                                               : brls::getStr("playguard/games/remove_title_n", (int)at + 1, (int)total));
     removal->body.title->setText(game_name(g));
-    std::string detail = removal->removed ? brls::getStr("playguard/games/remove_done_n", (int)removal->removed) : "";
-    if (!removal->failed.empty())
-        detail += (detail.empty() ? "" : " · ") +
-                  brls::getStr("playguard/games/remove_failed_n", (int)removal->failed.size());
+    const u32 removed = removal->removed;
+    const size_t failed = removal->failed.size();
+    std::string detail = removed == 1 ? "playguard/games/remove_done_one"_i18n
+                         : removed    ? brls::getStr("playguard/games/remove_done", (int)removed)
+                                      : "";
+    if (failed)
+        detail += (detail.empty() ? "" : " · ") + (failed == 1 ? "playguard/games/remove_failed_one"_i18n
+                                                               : brls::getStr("playguard/games/remove_failed", (int)failed));
     removal->body.show((float)at / (float)total, detail);
     if (!removal->failed.empty()) removal->body.detail->setTextColor(cadran::kit::color("cadran/coral"));
     // On the UI thread, as the PIN it may ask for: the first game once the
