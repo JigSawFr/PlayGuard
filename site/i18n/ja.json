@@ -57,6 +57,7 @@
  "install_3": "保護者のユーザーで、ソフトの上から起動してください。",
  "tab_store": "アプリストア",
  "tab_manual": "手動 (.zip)",
+ "store_pending": "まだ利用できません：PlayGuard の掲載は承認待ちです。当面は手動でインストールしてください。",
  "start_title": "クイックスタート",
  "start_1": "PlayGuard を開くと、「{{app:onboarding/title}}」のガイドで暗証番号と 1 日の制限を設定できます。",
  "start_2": "まだスマホアプリと連携していますか？「{{app:tabs/security}} › {{app:pairing/unlink}}」を。そのままだと次の同期で設定が上書きされます。",

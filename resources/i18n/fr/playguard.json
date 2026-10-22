@@ -1157,7 +1157,7 @@
         "patches_anyway": "L'ajouter quand même (il démarrera une fois les patchs en place)",
         "patches_mixed": "sys-patch est actif, mais des fichiers sigpatches ({}) sont aussi sur la carte SD : une cause connue de forwarders qui ne démarrent pas (« Le logiciel n'a pas pu être démarré »). Mettez-les de côté (Console › Patchs de jeux), puis redémarrez la console.",
         "refresh": "Refaire les forwarders avec ce chargeur",
-        "refresh_confirm": "Refaire ces forwarders avec le chargeur de ce PlayGuard ? {}. Ils gardent leur nom, leur icône et leurs règles de code PIN.",
+        "refresh_confirm": "Refaire ces forwarders avec le nouveau chargeur ? {} : refaits, ils démarrent leur homebrew avec le chargeur de cette version et gardent leur nom, leur icône et leurs règles de code PIN.",
         "refresh_title": "Des forwarders faits avec un ancien chargeur",
         "refresh_detail": "{} : faits par un PlayGuard plus ancien. Refaits, ils lancent leur homebrew avec le chargeur de cette version."
     },

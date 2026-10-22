@@ -231,7 +231,6 @@ void tint_rail(const std::vector<brls::SidebarItem*>& items, brls::SidebarItem* 
     for (brls::SidebarItem* it : items) {
         const bool on = it == active;
         it->setBackgroundColor(on ? theme["cadran/rail_active"] : theme["cadran/none"]);
-        if (brls::View* accent = it->getView("brls/sidebar/item_accent")) accent->setVisibility(brls::Visibility::GONE);
         const NVGcolor color = on ? theme["cadran/teal"] : theme["cadran/text2"];
         for (brls::View* c : it->getChildren()) {
             if (auto* label = dynamic_cast<brls::Label*>(c)) label->setTextColor(color);
@@ -501,7 +500,14 @@ void cadran::style_rail(brls::View* tab_frame)
         item->setPaddingRight(RAIL_ITEM_PAD);
         item->setMarginBottom(4);
         item->setAlignItems(brls::AlignItems::CENTER);
-        if (brls::View* accent = item->getView("brls/sidebar/item_accent")) accent->setVisibility(brls::Visibility::GONE);
+        // The library shows its accent again on each change of tab: without
+        // a size or a colour, that moves nothing (the pill says it instead).
+        if (auto* accent = dynamic_cast<brls::Rectangle*>(item->getView("brls/sidebar/item_accent"))) {
+            accent->setWidth(0);
+            accent->setMargins(0, 0, 0, 0);
+            accent->setColor(theme["cadran/none"]);
+            accent->setVisibility(brls::Visibility::GONE);
+        }
         if (auto* label = dynamic_cast<brls::Label*>(item->getView("brls/sidebar/item_label"))) {
             chrome(label, 17);
             label->setMarginTop(0);
@@ -515,8 +521,13 @@ void cadran::style_rail(brls::View* tab_frame)
     }
     for (brls::SidebarItem* item : items) {
         item->getActiveEvent()->subscribe([items, item](brls::View*) {
-            // Next frame: the library colours every item of the group first.
-            brls::sync([items, item]() { tint_rail(items, item); });
+            // In this frame, not the next (the frame would be drawn in the
+            // library's colours first, the text flashing at each move): the
+            // tab left is made inactive here, before the library recolours it
+            // after this event, which then leaves it as it is.
+            for (brls::SidebarItem* it : items)
+                if (it != item) it->setActive(false);
+            tint_rail(items, item);
         });
     }
     if (!items.empty()) tint_rail(items, items[0]);   // the first tab is already active

@@ -57,6 +57,7 @@
  "install_3": "Launch it over a game, with a parent's user.",
  "tab_store": "App store",
  "tab_manual": "By hand (.zip)",
+ "store_pending": "Not available yet: PlayGuard's listing is still awaiting approval. Install it by hand for now.",
  "start_title": "Quick start",
  "start_1": "Open PlayGuard: the “{{app:onboarding/title}}” guide sets the PIN and the daily limit.",
  "start_2": "Still linked to the phone app? “{{app:tabs/security}} › {{app:pairing/unlink}}”, or its next sync overwrites what you set.",

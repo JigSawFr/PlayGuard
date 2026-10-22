@@ -12,7 +12,7 @@ Want to look around first? [Try PlayGuard in your browser](https://playguard.lin
 
 ## 1. Install it
 
-Search for *PlayGuard* in the Homebrew App Store or sphaira, or extract `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) to the root of the SD card ([install](install.md)).
+Extract `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) to the root of the SD card ([install](install.md)). PlayGuard is not in the Homebrew App Store or sphaira yet: its listing is still awaiting approval.
 
 > [!TIP]
 > Also extract `playguard-rescue.zip`, the optional recovery sysmodule. It does nothing until you need it, and it is the only way back in if a 0-minute limit blocks everything and the PIN is forgotten ([Locked out?](troubleshooting.md#locked-out)).

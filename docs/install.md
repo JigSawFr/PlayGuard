@@ -4,11 +4,14 @@ How to install, update and remove PlayGuard, and what it writes on the SD card. 
 
 ## Where to get it
 
+> [!WARNING]
+> PlayGuard is **not in the Homebrew App Store (nor sphaira's) yet**: its listing is still awaiting approval. Install it by hand for now.
+
 Pick one:
 
-- **Homebrew App Store** / **sphaira's App Store** (same catalogue) — Search for *PlayGuard* once the listing is approved. New releases are picked up automatically, after a review: often a few days after GitHub. PlayGuard knows it was installed from there and recommends updating through the store.
+- **Manual** (recommended for now) — Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`.
 - **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira.
-- **Manual** — Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`.
+- **Homebrew App Store** / **sphaira's App Store** (same catalogue) — **Not listed yet.** Once the listing is approved, search for *PlayGuard*. New releases are then picked up automatically, after a review: often a few days after GitHub. PlayGuard knows it was installed from there and recommends updating through the store.
 
 The optional **recovery sysmodule** (`playguard-rescue.zip`) is a separate download: extract it to the root of the SD card too, then restart the console. It lands in `atmosphere/contents/4200000000505247/` and only acts when a `RESCUE` file asks it to — see [Locked out?](troubleshooting.md#locked-out).
 

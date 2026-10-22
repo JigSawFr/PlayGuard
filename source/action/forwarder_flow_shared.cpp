@@ -197,6 +197,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
         if (kind) history_flow::record_event(kind, "", history_label(made.name, id));
         write_rules();
+        hbmenu_lock::forwarder_notices();   // made again: off the bell
     } else {
         brls::Logger::warning("forwarders: {} not installed ({})", made.nro, ui::rc_text(rc, false));
     }
