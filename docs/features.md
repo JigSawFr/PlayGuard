@@ -105,7 +105,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 
 - Each section lists its entries in a fixed order, whichever check finished first.
 - **In the sidebar**, an amber badge by a tab's name counts its entries to do, where they are fixed: the Security tab (no PIN, a weak PIN, PlayGuard without its PIN, temporarily unlocked), the Play timer (the alarm off, the console not counting), Today (changes made outside PlayGuard, extra time to put back), the Console (its entries above, and the network clock). Ignored entries and those for information are not counted.
-- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Check the installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them.
+- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Check the installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them. A row with no value of its own says what the badge is for, in amber, before it (*Easy to guess*, *Not accurate*).
 - **Ⓐ** on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
 - **Ⓧ** marks an entry for information as read; **Ⓨ** marks them all. An entry marked as read stays read at the next start, until its text changes.
 - **Ignoring:** a few entries to do can be ignored with Ⓧ, after a confirmation and the PIN: a PIN anyone would try first, PlayGuard opening without the PIN, the "time's up" alarm off, the SD card almost full (never no PIN, unlocked controls, the clock, the play timer not counting or PlayGuard's own files). An ignored entry is no longer counted, and is listed last under *Ignored*, where Ⓐ counts it again. It comes back by itself 30 days later (unless *Count ignored warnings again after 30 days* is off), once what it says is fixed and then happens again, or, for the PIN, for a new PIN of another length.
@@ -142,6 +142,7 @@ Under it, what stops play first:
   - another, opened over a game, that the time spent in PlayGuard counts, Ⓐ saying how;
   - a game left open on the HOME menu shows as an amber pill (*still counts*, Ⓐ saying why), when the pill about PlayGuard opened over a game does not say it already.
 - The pills put what needs the parent first (amber, with a triangle), then what is on (teal, with a check), then the rest (grey, with a dot): the shape says it as well as the colour.
+- What is fine and what is only said fold into one pill after those that need the parent (*✓ 3 checks fine*); Ⓐ on it shows them, for as long as the tab is open.
 - Under the pills, the extra time still to put back (Ⓐ puts it back) and the "time's up" alarm while it is off (Ⓐ turns it back on).
 
 ### First steps
@@ -207,7 +208,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 - By touch, a day tapped is edited, then a tap on its top or bottom changes it by 15 min.
 - The changes are saved together, with **+** or *Save*, as in the per-day editor (the confirmation lists the days changed, before → after); *Discard* puts them back.
-- Inside each day's bar, the time played on its last occurrence (today's included, every account), in coral once the limit was reached, its limit too, and a key under the week says so (*over the limit*).
+- Inside each day's bar, the time played on its last occurrence (today's included, every account). Past the limit, the bar is full and its top in coral, as much of it as the time over the limit is of the time played; a key under the week says so (*over the limit*), and the limit too is in coral. The days after today show last week's play, fainter (focused: *Last Friday: 2 h 10 played of 2 h*).
 - A day changed and not saved yet has its limit in amber and its bar ringed in amber; under the week, the focused day's figures (*Thursday: 1 h 20 played of 2 h*).
 - Above the week, in amber, a limit reached and what the console does then, or the console not counting play time.
 - `0` minutes means *no play that day*; *Remove the play-time limit* turns the timer off.
@@ -253,13 +254,13 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=activity)*
 
-Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account by default* (every account, or one).
+Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account by default* (every account, or one; at the bottom of the tab, with *All games*).
 
 ### At the top
 
 - The accounts as chips, the period and *Export or share*.
 - Today, the last 7 days and all time as figures. Under the last 7 days, how they compare with the 7 before, per day: ▲ *+20 min/day vs last week* in amber, ▼ less in teal, *same as last week* within 5 minutes.
-- The four games most played as cards (Ⓐ opens one); over the last 7 days, the one played most more than the week before says by how much, from half an hour (▲ *+2 h*).
+- The four games most played as cards (Ⓐ opens one); over the last 7 days, the one played most more than the week before says by how much, from half an hour (▲ *+2 h vs last week*).
 - Nothing played over the period: a card says so, with *See all time* when there is something to see.
 
 ### Charts and summary
@@ -291,8 +292,8 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **The restriction level:** Young child, Child, Teen and Custom side by side as tiles, each with what it restricts (a padlock for restricted, a check for allowed, and the installed games it blocks; Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); *None* under them. What a level restricts (age limit, posting, communication) is said again before it is set.
-- **In Custom:** age rating, social-media posting, communication with others.
+- **The restriction level:** Young child, Child, Teen and Custom side by side as tiles, each with what it restricts (a padlock for restricted, *Allowed* in words otherwise, and the installed games it blocks; Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); *None* under them. The level in force says *✓ Current*; the teal ring is only where the focus is. What a level restricts (age limit, posting, communication) is said again before it is set; *None* asks in coral, as it lifts every restriction.
+- **The level's settings:** age rating, social-media posting, communication with others. Under a preset, they are its own: changing one makes the level *Custom*, from the preset's settings with that change, asked first (the settings listed).
 - **Under *Age rating*,** the **rating organisation** (PEGI, ESRB, USK, CERO …): the list says the countries each one rates for (PEGI: most of Europe, ESRB: the United States, Canada and Latin America, USK: Germany, PEGI BBFC: the United Kingdom…).
 - **Installed games it blocks** (under *Age rating* too): how many of the installed games the level in force blocks by their age rating (*3 of 15*), Ⓐ listing them with their rating (*PEGI 16*); each level's tile says it too (*Games blocked · 3*).
   - The ratings are each game's own (its control data, read by the check of the installed games at start-up or from *Console › Check the installed games*), by the organisation the console uses.

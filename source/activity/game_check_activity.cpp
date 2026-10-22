@@ -41,7 +41,7 @@ void GameCheckActivity::onContentAvailable()
     hint->setSingleLine(false);
     // A list or covers, as All games: Ⓡ, out of the way of the games.
     this->grid = config::get().check_grid;
-    this->getContentView()->registerAction(view_label(!this->grid), brls::BUTTON_RB, [this](brls::View*) {
+    this->view_action = this->getContentView()->registerAction(view_label(!this->grid), brls::BUTTON_RB, [this](brls::View*) {
         this->switch_view();
         return true;
     });
@@ -491,7 +491,8 @@ void GameCheckActivity::show()
     } else if (R_FAILED(this->list_rc)) {
         this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), cadran::kit::color("cadran/coral"));
     } else {
-        const std::string found = broken.empty() ? brls::getStr("playguard/games/none", (int)count)
+        const std::string found = broken.empty() ? (count == 1 ? "playguard/games/none_one"_i18n
+                                                               : brls::getStr("playguard/games/none", (int)count))
                                                  : brls::getStr("playguard/games/section_count", (int)broken.size(), (int)count);
         u64 now = 0;
         if (this->cache.checked_at > 0) time_local_now(&now, nullptr);
@@ -507,8 +508,10 @@ void GameCheckActivity::show()
         }
     }
     // What this screen is for, while there is no game above which it would
-    // push the games down.
+    // push the games down; no "A on a game" then, nor Ⓡ for covers.
+    note->setText(clear ? "playguard/games/note_clear"_i18n : "playguard/games/note"_i18n);
     ui::set_visible(note.getView(), broken.empty());
+    this->show_view_action(!clear);
     hint->setText(brls::getStr("playguard/games/many", ui::storage_short(si)));
     ui::set_visible(hint.getView(), broken.size() >= MANY);
     this->load_icons();
@@ -555,6 +558,28 @@ void GameCheckActivity::show_tiles(Group& group, size_t count)
         brls::Application::giveFocus(to);
         if (was_auto) this->auto_focus = to;
     }
+}
+
+void GameCheckActivity::show_view_action(bool shown)
+{
+    if (shown == (this->view_action != 0)) return;
+    // Not while borealis goes through the actions (one of them may have
+    // led here): next frame.
+    std::weak_ptr<bool> weak = this->alive;
+    brls::sync([this, weak, shown]() {
+        if (weak.expired() || shown == (this->view_action != 0)) return;
+        if (shown) {
+            this->view_action = this->getContentView()->registerAction(view_label(!this->grid), brls::BUTTON_RB,
+                                                                       [this](brls::View*) {
+                                                                           this->switch_view();
+                                                                           return true;
+                                                                       });
+        } else {
+            this->getContentView()->unregisterAction(this->view_action);
+            this->view_action = 0;
+        }
+        brls::Application::getGlobalHintsUpdateEvent()->fire();
+    });
 }
 
 void GameCheckActivity::set_view_hint()
