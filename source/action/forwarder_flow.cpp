@@ -516,7 +516,7 @@ void refresh(std::function<void(bool)> done)
     std::string names;
     for (const auto& r : todo) names += (names.empty() ? "" : ", ") + r.name;
     patches_first([todo, names, done]() {
-        ui::confirm(brls::getStr("playguard/forwarders/refresh_confirm", names), "playguard/forwarders/refresh"_i18n,
+        ui::confirm(brls::getStr("playguard/forwarders/refresh_confirm", names), "playguard/forwarders/remake"_i18n,
                     [todo, done]() { install_many(todo, false, "add_forwarder", "playguard/forwarders/reinstalled_n", done); },
                     [done]() {
                         if (done) done(false);

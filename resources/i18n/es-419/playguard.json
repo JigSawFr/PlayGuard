@@ -1157,7 +1157,7 @@
         "patches_anyway": "Add it anyway (it starts once the patches are in place)",
         "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
         "refresh": "Make the forwarders again with this loader",
-        "refresh_confirm": "Make these forwarders again with the loader of this PlayGuard? {}. They keep their name, icon and PIN rules.",
+        "refresh_confirm": "Make these forwarders again with the new loader? {}: made again, they start their homebrew with this build's loader and keep their name, icon and PIN rules.",
         "refresh_title": "Forwarders made with an older loader",
         "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
     },

@@ -439,7 +439,7 @@ void at_start(std::function<void()> open)
     if (stale.empty()) notices::clear("forwarder_loader");
     else
         notices::set("forwarder_loader", notices::Level::Action, "playguard/forwarders/refresh_title"_i18n,
-                     brls::getStr("playguard/forwarders/refresh_detail", stale), "playguard/forwarders/refresh"_i18n,
+                     brls::getStr("playguard/forwarders/refresh_detail", stale), "playguard/forwarders/remake"_i18n,
                      []() { forwarder_flow::refresh([](bool) {}); });
     if (gone.empty()) notices::clear("forwarder_gone");
     else
