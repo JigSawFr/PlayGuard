@@ -589,7 +589,7 @@ jobs:
       - name: Compiler messages as annotations
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
       # Not for a release: it builds without any cache. The reproducibility
-      # check's second build never uses it either (below).
+      # check's second build never takes from it either (below).
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: ${{ !inputs.tag }}
         with:
@@ -627,7 +627,7 @@ jobs:
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
           # The optional recovery sysmodule, as its own asset (sysmodule/).
           make dist-rescue
-          # This build's hit rate, for the summary (the second build below has no cache).
+          # This build's hit rate, for the summary (the second build below takes nothing from it).
           ccache --print-stats > ccache-stats.txt
           ccache --show-stats
           # The same commit gives the same zips (CONTRIBUTING.md, "Reproducible
@@ -643,13 +643,16 @@ jobs:
           }
           # The second build starts from a clean tree (make clean: no object,
           # no CMake cache, the gate, the forwarders' loader and the sysmodule
-          # rebuilt too) and without ccache: two real compilations, not the
-          # same objects packed twice.
+          # rebuilt too) and takes nothing from ccache (CCACHE_RECACHE: every
+          # file compiled again): two real compilations, not the same objects
+          # packed twice. Still through ccache, as the first: its CCACHE_BASEDIR
+          # makes the debug info's paths relative, which the .nro's build ID
+          # hashes (a release disables ccache for both).
           if [ "$REPRO" = 1 ]; then
             keep repro/first
             make clean
-            CCACHE_DISABLE=1 make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-            CCACHE_DISABLE=1 make dist-rescue
+            CCACHE_RECACHE=1 make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
+            CCACHE_RECACHE=1 make dist-rescue
             keep repro/second
             if ! python3 tools/repro_diff.py repro/first repro/second; then
               echo "::error title=Reproducible zips::the second build differs from the first (what differs is above; both builds are in the repro-diff artifact)"
