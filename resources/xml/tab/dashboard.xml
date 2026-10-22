@@ -40,7 +40,6 @@
                         <brls:Box id="dash_actions" axis="row" alignItems="center" alignSelf="stretch" marginTop="14" marginBottom="12">
                             <brls:Button id="dash_relock" style="primary" text="@i18n/playguard/security/banner_action" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
                             <brls:Button id="dash_setup" style="primary" text="@i18n/playguard/cadran/today/setup" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" grow="1.0" visibility="gone"/>
-                            <brls:Button id="dash_extra" style="primary" text="@i18n/playguard/cadran/today/extra" fontSize="19" height="56" cornerRadius="28" highlightCornerRadius="30" paddingLeft="22" paddingRight="22" marginRight="12"/>
                             <brls:Box id="dash_chips" axis="row" alignItems="center"/>
                         </brls:Box>
                         <brls:Box id="dash_actions2" axis="row" alignItems="center" alignSelf="stretch">

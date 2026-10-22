@@ -1976,7 +1976,6 @@
             "summary": "平日{}・週末{}",
             "profile": "プリセット・{}",
             "edit": "変更",
-            "done": "完了",
             "pick": "時間を指定",
             "edit_day": "曜日を変更",
             "pick_day": "時間を指定、または制限なし",
@@ -1994,7 +1993,8 @@
             "played_day": "{}：{}／{} プレイ",
             "played_day_free": "{}：{} プレイ（上限なし）",
             "bonus": "{}：この日だけ{}延長予定",
-            "last_week_day": "先週の{}"
+            "last_week_day": "先週の{}",
+            "done_day": "{}を確定"
         },
         "activity": {
             "share": "書き出し・共有",

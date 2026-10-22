@@ -1976,7 +1976,6 @@
             "summary": "{} durante a semana · {} ao fim de semana",
             "profile": "Perfil · {}",
             "edit": "Editar",
-            "done": "Concluído",
             "pick": "Duração exata",
             "edit_day": "editar um dia",
             "pick_day": "duração exata ou sem limite",
@@ -1994,7 +1993,8 @@
             "played_day": "{}: {} jogado de {}",
             "played_day_free": "{}: {} jogado, sem limite",
             "bonus": "{}: {} previsto para esse dia",
-            "last_week_day": "{} passado"
+            "last_week_day": "{} passado",
+            "done_day": "Concluir {}"
         },
         "activity": {
             "share": "Exportar ou partilhar",

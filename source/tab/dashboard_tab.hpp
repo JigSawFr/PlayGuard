@@ -141,7 +141,6 @@ class DashboardTab : public TabBase
     BRLS_BIND(brls::Box,    actions,     "dash_actions");
     BRLS_BIND(brls::Button, relock,      "dash_relock");
     BRLS_BIND(brls::Button, setup,       "dash_setup");
-    BRLS_BIND(brls::Button, extra,       "dash_extra");
     BRLS_BIND(brls::Box,    chips,       "dash_chips");
     BRLS_BIND(brls::Button, stop,        "dash_stop");
     BRLS_BIND(brls::Button, child,       "dash_child");

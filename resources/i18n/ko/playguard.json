@@ -1976,7 +1976,6 @@
             "summary": "평일 {} · 주말 {}",
             "profile": "프로필 · {}",
             "edit": "변경",
-            "done": "완료",
             "pick": "정확한 시간",
             "edit_day": "요일 변경",
             "pick_day": "정확한 시간 또는 제한 없음",
@@ -1994,7 +1993,8 @@
             "played_day": "{}: {} / {} 플레이",
             "played_day_free": "{}: {} 플레이 (제한 없음)",
             "bonus": "{}: 이날 {} 추가 예정",
-            "last_week_day": "지난주 {}"
+            "last_week_day": "지난주 {}",
+            "done_day": "{} 완료"
         },
         "activity": {
             "share": "내보내기 또는 공유",

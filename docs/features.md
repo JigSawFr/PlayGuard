@@ -41,7 +41,7 @@ The app is organised in tabs, like System Settings; each has its section below.
 
 PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-white palette (with the theme), cards instead of lists. Each tab opens on what matters most (a ring, tiles, cards, chips), its other settings underneath.
 
-- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *Today › Turn back on*. Secondary text is never under 15 px, to read from the couch on a TV.
+- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *Today › Turn back on*. Secondary text is never under 15 px, to read from the couch on a TV. The footer's clock shows the hours and minutes (*16:00*).
 - **Dialogs** are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something).
   - The choices open as a card above the hints, the current one on a soft teal with its check. The teal ring is the focus's alone, everywhere: a level, an account, a choice in force keeps the soft fill.
   - A long dialog fades at its foot while more follows, and its warning (a game about to be suspended) comes first, in an amber card.
@@ -127,7 +127,7 @@ Under it, what stops play first:
 
 ### The actions
 
-- **Extra time**, with its amounts one press away: an amount focused moves the time up on the line (*with 15 min more*), or says on the bedtime alarm's mark that it still comes first; the first one stands out in teal once 15 min or less are left, or none.
+- **Extra time**, its amounts in one row (+15 min, +30 min, +1 h), each one press away, then **…** for any other (a duration, another day): an amount focused moves the time up on the line (*with 15 min more*), or says on the bedtime alarm's mark that it still comes first; the first one stands out in teal once 15 min or less are left, or none.
 - **Stop for today**, **Show the child**.
 - **Today's limit…**: today's limit picked there and then, written after one confirmation.
 - **The profile in force**, by its name, once a profile is saved (*Profiles…* when none matches): Ⓐ lists them, the one in force ticked, to put another in force after one confirmation (the days that change), or *Manage the profiles…*.
@@ -204,7 +204,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 | Ⓡ | Copy it to the weekend |
 | Ⓨ | No limit |
 | Ⓧ | An exact time (*Enter a duration…*: ↑/↓ by 15 min, by the hour once held, Ⓛ/Ⓡ by 5 min, OK focused) |
-| Ⓐ or Ⓑ | End the edit |
+| Ⓐ or Ⓑ | End the edit (Ⓐ says which day: *Done with Monday*; nothing is saved yet) |
 
 - By touch, a day tapped is edited, then a tap on its top or bottom changes it by 15 min.
 - The changes are saved together, with **+** or *Save*, as in the per-day editor (the confirmation lists the days changed, before → after); *Discard* puts them back.
@@ -359,7 +359,7 @@ Two confirmations, irreversible; a backup of the settings is saved first.
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**At the top**, what the console runs as tiles (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles (*Network clock*, *Check the installed games*, *Forwarders*), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
+**At the top**, the tools as tiles (*Network clock*, *Check the installed games*, *Forwarders*, each with what needs a look in its corner), then what the console runs as tiles (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
 ### Network clock
 

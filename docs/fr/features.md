@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 ca638de42393 -->
+<!-- translated from docs/features.md, sha256 6a43a8ef1b46 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -42,7 +42,7 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 
 L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets, une palette bleu nuit ou blanc froid (selon le thème), des cartes au lieu des listes. Chaque onglet s'ouvre sur l'essentiel (un anneau, des tuiles, des cartes, des puces), ses autres réglages en dessous.
 
-- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Aujourd'hui › Réactiver*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé.
+- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Aujourd'hui › Réactiver*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé. L'horloge du pied de page affiche les heures et les minutes (*16:00*).
 - **Les dialogues** sont des cartes aux boutons en pilules, la confirmation en turquoise (en corail quand elle supprime ou arrête quelque chose).
   - Les choix s'ouvrent en carte au-dessus des aides, le choix actuel sur un turquoise léger avec sa coche. Le contour turquoise n'est qu'au focus, partout : un niveau, un compte, un choix en vigueur garde le fond léger.
   - Un long dialogue s'estompe en bas tant que la suite continue, et son avertissement (une partie sur le point d'être suspendue) vient en premier, dans une carte orange.
@@ -128,7 +128,7 @@ Dessous, ce qui arrêtera le jeu en premier :
 
 ### Les actions
 
-- **Temps en plus**, avec ses montants à portée d'un appui : un montant sélectionné déplace la fin du temps sur la ligne (*avec 15 min de plus*), ou dit sur la marque de l'alarme du coucher qu'elle arrive d'abord ; le premier ressort en sarcelle dès qu'il reste 15 min ou moins, ou plus rien.
+- **Temps en plus**, ses montants sur une rangée (+15 min, +30 min, +1 h), chacun à portée d'un appui, puis **…** pour tout autre (une durée, un autre jour) : un montant sélectionné déplace la fin du temps sur la ligne (*avec 15 min de plus*), ou dit sur la marque de l'alarme du coucher qu'elle arrive d'abord ; le premier ressort en sarcelle dès qu'il reste 15 min ou moins, ou plus rien.
 - **Arrêter pour aujourd'hui**, **Montrer à l'enfant**.
 - **Limite d'aujourd'hui…** : la limite du jour choisie sur place, écrite après une confirmation.
 - **Le profil en vigueur**, par son nom, dès qu'un profil est enregistré (*Profils…* quand aucun ne correspond) : Ⓐ les liste, celui en vigueur coché, pour en appliquer un autre après une confirmation (les jours qui changent), ou *Gérer les profils…*.
@@ -205,7 +205,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 | Ⓡ | Le copier sur le week-end |
 | Ⓨ | Pas de limite |
 | Ⓧ | Une durée exacte (*Saisir une durée…* : ↑/↓ par 15 min, par heure une fois maintenus, Ⓛ/Ⓡ par 5 min, OK sélectionné) |
-| Ⓐ ou Ⓑ | Terminer la modification |
+| Ⓐ ou Ⓑ | Terminer la modification (Ⓐ dit quel jour : *Fini pour lundi* ; rien n'est encore enregistré) |
 
 - Au toucher, un jour touché passe en modification, puis toucher son haut ou son bas le change de 15 min.
 - Les modifications s'enregistrent ensemble, avec **+** ou *Enregistrer*, comme dans l'éditeur par jour (la confirmation liste les jours modifiés, avant → après) ; *Annuler* les remet.
@@ -360,7 +360,7 @@ Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enr
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=console)*
 
-**En haut**, ce que fait tourner la console en tuiles (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les outils en tuiles (*Horloge réseau*, *Vérifier les jeux installés*, *Forwarders*), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
+**En haut**, les outils en tuiles (*Horloge réseau*, *Vérifier les jeux installés*, *Forwarders*, chacun avec ce qui demande un coup d'œil dans son coin), puis ce que fait tourner la console en tuiles (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
 
 ### Horloge réseau
 

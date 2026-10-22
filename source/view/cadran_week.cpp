@@ -224,8 +224,12 @@ void CadranWeekView::set_edit(bool on)
 {
     if (this->edit == on) return;
     this->edit = on;
-    for (const Col& c : this->cols)
-        c.box->updateActionHint(brls::BUTTON_A, on ? "playguard/cadran/week/done"_i18n : "playguard/cadran/week/edit"_i18n);
+    // Editing, A names the day whose edit it ends ("Done with Monday"): the
+    // changes are saved with + or Save, not by it.
+    for (int d = 0; d < 7; d++)
+        this->cols[d].box->updateActionHint(
+            brls::BUTTON_A, on ? brls::getStr("playguard/cadran/week/done_day", brls::getStr(fmt::format("playguard/days_lower/{}", d)))
+                               : "playguard/cadran/week/edit"_i18n);
     brls::Application::getGlobalHintsUpdateEvent()->fire();
     this->render();
     if (this->on_mode) this->on_mode(on);

@@ -1976,7 +1976,6 @@
             "summary": "{} on weekdays · {} at the weekend",
             "profile": "Profile · {}",
             "edit": "Edit",
-            "done": "Done",
             "pick": "Exact time",
             "edit_day": "edit a day",
             "pick_day": "exact time or no limit",
@@ -1994,7 +1993,8 @@
             "played_day": "{}: {} played of {}",
             "played_day_free": "{}: {} played, no limit",
             "bonus": "{}: {} planned for that day",
-            "last_week_day": "Last {}"
+            "last_week_day": "Last {}",
+            "done_day": "Done with {}"
         },
         "activity": {
             "share": "Export or share",

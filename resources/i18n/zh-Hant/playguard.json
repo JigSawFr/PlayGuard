@@ -1976,7 +1976,6 @@
             "summary": "平日 {} · 週末 {}",
             "profile": "設定檔 · {}",
             "edit": "修改",
-            "done": "完成",
             "pick": "精確時長",
             "edit_day": "修改某天",
             "pick_day": "精確時長或無限制",
@@ -1994,7 +1993,8 @@
             "played_day": "{}：已玩 {} / {}",
             "played_day_free": "{}：已玩 {}（不限）",
             "bonus": "{}：當天排定延長 {}",
-            "last_week_day": "上週{}"
+            "last_week_day": "上週{}",
+            "done_day": "完成{}"
         },
         "activity": {
             "share": "匯出或分享",
