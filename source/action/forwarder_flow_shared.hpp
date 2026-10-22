@@ -55,8 +55,21 @@ void tidy_gates();
 // the PIN, it goes through the gate as it is now (gate_nro).
 bool install(const forwarders::Made& m, bool self, const char* kind = "add_forwarder", const std::string& done_text = "",
              bool quiet = false);
-// Each of `rows` made again (`pin`: protected too), one after the other,
-// quietly; one toast for them all. `kind` for each in the change history.
+// One forwarder of a batch: what install() is given for it.
+struct Job
+{
+    forwarders::Made made;
+    bool             self = false;
+    const char*      kind = nullptr;   // the change history's, nullptr for none
+};
+// Each of `jobs` made quietly, one a frame, so the screen keeps drawing:
+// more than one in a dialog (the one under way, its place in the batch, the
+// bar, how many were made and not; Cancel, B too, stops after the one under
+// way). The PIN, when one is to be asked, once before the first. UI thread
+// only; `finished(made, total)` on it once over, stopped or not.
+void install_batch(std::vector<Job> jobs, std::function<void(int made, int total)> finished);
+// Each of `rows` made again (`pin`: protected too), as install_batch; one
+// toast for them all. `kind` for each in the change history.
 void install_many(const std::vector<forwarders_logic::Row>& rows, bool pin, const char* kind,
                   const std::string& done_text, std::function<void(bool)> done);
 

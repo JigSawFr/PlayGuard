@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <memory>
 #include <borealis.hpp>
 
 #include "action/forwarder_flow.hpp"
@@ -13,10 +14,12 @@
 #include "core/forwarder.h"
 #include "core/forwarder_pack.h"
 #include "core/gate.h"
+#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/paths.hpp"
+#include "util/perf.hpp"
 #include "util/sha256.hpp"
 
 using namespace brls::literals;
@@ -145,6 +148,9 @@ void tidy_gates()
 // the PIN, it goes through the gate as it is now (gate_nro).
 bool install(const forwarders::Made& m, bool self, const char* kind, const std::string& done_text, bool quiet)
 {
+    // In the diagnostic report's timings: the whole of it (the .nro read,
+    // its icon, the gate), and the package built and written (below).
+    perf::Timed timed("forwarder install");
     // Made again without the PIN in place of one protected with it (the
     // same .nro and argv: the same ID): the PIN first, whatever "Protect
     // PlayGuard with the PIN" says, as set_pin's turning it off asks.
@@ -199,7 +205,11 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         (made.ask_user ? FWD_ASK_USER : 0u) | (made.screenshots ? 0u : FWD_NO_SCREENSHOT) | (made.video ? 0u : FWD_NO_VIDEO),
     };
     u64 id = 0;
-    const Result rc = forwarder_install(&spec, &id);
+    Result rc;
+    {
+        perf::Timed built("forwarder build and write");
+        rc = forwarder_install(&spec, &id);
+    }
     if (R_SUCCEEDED(rc)) {
         made.id = id;
         made.gone = false;   // on the HOME menu again
@@ -217,21 +227,106 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
     return R_SUCCEEDED(rc);
 }
 
-// Each of `rows` made again (`pin`: protected too), one after the other,
-// quietly; one toast for them all. `kind` for each in the change history.
+namespace
+{
+constexpr int OPEN_MS = 300;   // the batch's dialog opening, before the first
+
+struct Batch
+{
+    std::vector<Job> jobs;
+    std::function<void(int, int)> finished;
+    int made = 0, failed = 0;
+    bool cancel = false;
+    bool open = false;   // its dialog on screen
+    brls::Dialog* dialog = nullptr;
+    cadran::Progress body;
+};
+
+void batch_next(std::shared_ptr<Batch> batch, size_t at)
+{
+    const size_t total = batch->jobs.size();
+    if (at == total || batch->cancel) {
+        const auto finish = [batch, total]() {
+            if (batch->finished) batch->finished(batch->made, (int)total);
+        };
+        if (batch->open) {
+            batch->open = false;
+            batch->dialog->close(finish);
+        } else {
+            finish();
+        }
+        return;
+    }
+    if (batch->dialog) {
+        batch->body.heading->setText(brls::getStr("playguard/forwarders/batch_title", (int)at + 1, (int)total));
+        batch->body.title->setText(batch->jobs[at].made.name);
+        std::string detail = batch->made ? brls::getStr("playguard/forwarders/batch_made", batch->made) : "";
+        if (batch->failed)
+            detail += (detail.empty() ? "" : " · ") + brls::getStr("playguard/forwarders/batch_failed", batch->failed);
+        batch->body.show((float)at / (float)total, detail);
+        if (batch->failed) batch->body.detail->setTextColor(cadran::kit::color("cadran/coral"));
+    }
+    // On the UI thread, as the PIN install() may ask for; a frame between
+    // two, so the dialog shows each one.
+    auto step = [batch, at]() {
+        if (!batch->cancel) {
+            const Job& j = batch->jobs[at];
+            if (install(j.made, j.self, j.kind, "", true)) batch->made++;
+            else batch->failed++;
+        }
+        batch_next(batch, at + 1);
+    };
+    if (at || !batch->dialog) brls::sync(step);
+    else brls::delay(OPEN_MS, step);
+}
+}   // namespace
+
+void install_batch(std::vector<Job> jobs, std::function<void(int made, int total)> finished)
+{
+    if (jobs.empty()) {
+        if (finished) finished(0, 0);
+        return;
+    }
+    // Read-only mode and the PIN: asked once, for them all, before the
+    // dialog (each install checks again, within the PIN's grace).
+    const Result rc = core_change_allowed();
+    if (R_FAILED(rc)) {
+        ui::notify_result(rc, "", "playguard/forwarders/add_err"_i18n);
+        if (finished) finished(0, (int)jobs.size());
+        return;
+    }
+    auto batch = std::make_shared<Batch>();
+    batch->jobs = std::move(jobs);
+    batch->finished = std::move(finished);
+    if (batch->jobs.size() > 1) {
+        batch->body = cadran::progress_body("", "");
+        ui::set_visible(batch->body.image, false);
+        batch->dialog = new brls::Dialog(batch->body.box);
+        ui::add_cancel(batch->dialog, [batch]() {
+            batch->cancel = true;
+            batch->open = false;   // the dialog closes itself
+        });
+        batch->dialog->open();
+        batch->open = true;
+    }
+    batch_next(batch, 0);
+}
+
 void install_many(const std::vector<forwarders_logic::Row>& rows, bool pin, const char* kind,
                   const std::string& done_text, std::function<void(bool)> done)
 {
-    int ok = 0;
+    std::vector<Job> jobs;
     for (const auto& r : rows) {
         forwarders::Made m = made_of(r);
         if (m.nro.empty()) continue;
         if (pin) m.pin = true;
         if (m.name.empty()) m.name = r.name;
-        if (install(m, r.self || m.nro == self_nro(), kind, "", true)) ok++;
+        jobs.push_back({ m, r.self || m.nro == self_nro(), kind });
     }
-    if (ok > 0) ui::notify(brls::getStr(done_text, ok), ui::Toast::Done);
-    if (done) done(ok > 0);
+    install_batch(std::move(jobs), [done_text, done](int made, int) {
+        if (made > 0) ui::notify(brls::getStr(done_text, made), ui::Toast::Done);
+        if (done) done(made > 0);
+    });
 }
 
 // The forwarder `row` remembered, or as the row says it (made here before

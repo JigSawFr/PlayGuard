@@ -583,11 +583,13 @@ void put_back_all(const std::vector<forwarders::Made>& made, std::function<void(
         if (done) done(false);
         return;
     }
-    int ok = 0;
+    std::vector<Job> jobs;
     for (const forwarders::Made& m : made)
-        if (install(m, m.nro == self_nro(), m.pin ? "protect_forwarder" : "add_forwarder", "", true)) ok++;
-    if (ok > 0) ui::notify(brls::getStr("playguard/forwarders/reinstalled_n", ok), ui::Toast::Done);
-    if (done) done(ok > 0);
+        jobs.push_back({ m, m.nro == self_nro(), m.pin ? "protect_forwarder" : "add_forwarder" });
+    install_batch(std::move(jobs), [done](int ok, int) {
+        if (ok > 0) ui::notify(brls::getStr("playguard/forwarders/reinstalled_n", ok), ui::Toast::Done);
+        if (done) done(ok > 0);
+    });
 }
 
 std::vector<std::string> album_shots()

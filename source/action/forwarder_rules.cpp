@@ -192,13 +192,16 @@ void set_pause_rule(unsigned tries, unsigned minutes, std::function<void(bool)> 
         return;
     }
     // The forwarders that carry it: made again with it.
-    int failed = 0;
+    std::vector<Job> jobs;
     for (forwarders::Made& m : forwarders::list())
-        if (m.pin && m.carried && !install(m, m.nro == self_nro(), nullptr, "", true)) failed++;
-    if (failed) brls::Logger::warning("forwarders: {} not made again with the new pause", failed);
-    history_flow::record_event("gate_pause", "", pause_label(rule.tries, rule.minutes));
-    ui::notify(brls::getStr("playguard/forwarders/pause_set", pause_label(rule.tries, rule.minutes)), ui::Toast::Done);
-    if (done) done(failed == 0);
+        if (m.pin && m.carried) jobs.push_back({ m, m.nro == self_nro(), nullptr });
+    install_batch(std::move(jobs), [rule, done](int made, int total) {
+        const int failed = total - made;
+        if (failed) brls::Logger::warning("forwarders: {} not made again with the new pause", failed);
+        history_flow::record_event("gate_pause", "", pause_label(rule.tries, rule.minutes));
+        ui::notify(brls::getStr("playguard/forwarders/pause_set", pause_label(rule.tries, rule.minutes)), ui::Toast::Done);
+        if (done) done(failed == 0);
+    });
 }
 
 std::string until_label(uint64_t posix)
