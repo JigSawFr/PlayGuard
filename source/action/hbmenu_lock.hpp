@@ -74,6 +74,9 @@ void unlock(std::function<void(bool)> done);
 // PlayGuard made that is no longer on the HOME menu told once (the change
 // history, the bell). `open` opens Console › Forwarders, from the bell.
 void at_start(std::function<void()> open);
+// The bell's entries for the forwarders to make again, as they are now: at
+// start, and again once one is made (forwarder_flow's install).
+void forwarder_notices();
 
 // What Atmosphère will read and what the lock rests on, in a dialog
 // (Console › Forwarders › Check the homebrew menu). Not locked, it offers
