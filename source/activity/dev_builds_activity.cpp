@@ -94,9 +94,9 @@ void DevBuildsActivity::onContentAvailable()
 {
     note->setSingleLine(false);
     loading_text->setSingleLine(false);
-    // The version only: the running commit is marked in the list, and named
-    // in the confirmation (and a commit here would change every screenshot).
-    note->setText(brls::getStr("playguard/dev_build/note", app::version()));
+    // Not the running build: the header's badge names it already, the list
+    // marks it, and the build's page and the download name it again.
+    note->setText("playguard/dev_build/note"_i18n);
     const std::pair<brls::Button*, dev_builds::Kind> buttons[] = { { tab_release.getView(), KINDS[0] },
                                                                    { tab_main.getView(), KINDS[1] },
                                                                    { tab_pulls.getView(), KINDS[2] } };
@@ -136,6 +136,18 @@ void DevBuildsActivity::onContentAvailable()
         dev_build_flow::open(true);
         return true;
     });
+    // A build whose checks are still running: the list is fetched again now
+    // and then while it is on screen (nothing over it), so its tag follows.
+    this->refresh_timer.setPeriod(REFRESH_MS);
+    this->refresh_timer.setCallback([this]() {
+        if (!ui::has_focus(this)) return;
+        for (const dev_builds::Build& b : this->cache.builds)
+            if (b.ci == dev_builds::Ci::Running) {
+                dev_build_flow::refresh();
+                return;
+            }
+    });
+    this->refresh_timer.start();
     this->fill();
     // The screen opens on the first build, not on the tabs above it.
     if (!list->getChildren().empty() && list->getChildren()[0]->getVisibility() == brls::Visibility::VISIBLE)
@@ -197,9 +209,15 @@ void DevBuildsActivity::fill()
     };
     tab_release->setText(brls::getStr("playguard/dev_build/section_release", count_text(releases.size(), newer_count(releases))));
     tab_main->setText(brls::getStr("playguard/dev_build/section_main", count_text(mains.size(), newer_count(mains))));
-    tab_pulls->setText(brls::getStr("playguard/dev_build/section_pulls", (int)pulls,
-                                    order() == dev_builds::Order::Number ? "playguard/dev_build/order_number"_i18n
-                                                                         : "playguard/dev_build/order_newest"_i18n));
+    tab_pulls->setText(brls::getStr("playguard/dev_build/section_pulls", (int)pulls));
+    // The order in A's hint, on the pull requests' tab when it is shown (what
+    // A does there): not in the tab, which it made too wide.
+    tab_pulls->updateActionHint(brls::BUTTON_A, this->tab != dev_builds::Kind::PullRequest
+                                                    ? "hints/ok"_i18n
+                                                    : brls::getStr("playguard/dev_build/sort_hint",
+                                                                   order() == dev_builds::Order::Number
+                                                                       ? "playguard/dev_build/order_newest"_i18n
+                                                                       : "playguard/dev_build/order_number"_i18n));
     tab_release->setStyle(this->tab == dev_builds::Kind::Release ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);
     tab_main->setStyle(this->tab == dev_builds::Kind::Main ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);
     tab_pulls->setStyle(this->tab == dev_builds::Kind::PullRequest ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);

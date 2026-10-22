@@ -25,6 +25,10 @@ void started();
 // Install another build did), the notification bell says so, once.
 void note_went_back();
 
+// The running build's name: "1.3.0 (#318, c3fadd3)" (a pull request's),
+// "1.3.0 (8b1e468)", "1.3.0" (a release's).
+std::string running_label();
+
 // A build was installed in place of the running one: the running one's
 // name is kept as the previous build's, and the next start is checked.
 void installed(const std::string& installed_label);

@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 
 #include "action/dev_build_flow.hpp"
+#include "action/rollback_flow.hpp"
 #include "app.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
@@ -106,10 +107,11 @@ void DevBuildActivity::onContentAvailable()
                  days < 7 ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text"));
     }
 
-    std::string running = app::version();
-    if (!app::commit().empty()) running += " (" + app::commit() + ")";
+    const std::string running = rollback_flow::running_label();
     std::string note = brls::getStr("playguard/dev_build/replaces", running);
     if (b.kind != dev_builds::Kind::Release) note += " " + "playguard/dev_build/untested"_i18n;
+    // Built, but its tests and checks have not finished: they may still fail.
+    if (b.ci == dev_builds::Ci::Running) note += "\n\n" + "playguard/dev_build/ci_running_note"_i18n;
     warning->setText(note);
 
     install->registerClickAction([b](brls::View*) {

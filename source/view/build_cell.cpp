@@ -4,7 +4,6 @@
 #include "action/dev_build_flow.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
-#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -64,13 +63,7 @@ std::string build_title(const dev_builds::Build& b)
         case dev_builds::Kind::Release: return brls::getStr("playguard/dev_build/release", b.version);
         case dev_builds::Kind::PullRequest:
         case dev_builds::Kind::Main:
-        case dev_builds::Kind::Commit: {
-            // A list kept by 1.1.0, which gave only pull requests a title.
-            // Every list fetched from 1.2.0 on has them: this can go in 1.3.0.
-            if (b.title.empty()) return b.commit;
-            const std::string subject = text::capitalise_ascii(dev_builds::parse_subject(b.title).text);
-            return subject.empty() ? b.title : subject;
-        }
+        case dev_builds::Kind::Commit: return dev_build_flow::subject(b);
     }
     return b.commit;
 }

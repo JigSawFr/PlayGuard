@@ -282,7 +282,8 @@ static void test_find_and_runs()
         const dev_builds::Age a = dev_builds::age_of(iso, now);
         return a.unit == unit && a.count == count;
     };
-    CHECK(age("2026-10-01T11:00:01Z", dev_builds::Age::Now, 0) && age("2026-10-02T00:00:00Z", dev_builds::Age::Now, 0));   // a time to come
+    CHECK(age("2026-10-01T11:59:01Z", dev_builds::Age::Now, 0) && age("2026-10-02T00:00:00Z", dev_builds::Age::Now, 0));   // a time to come
+    CHECK(age("2026-10-01T11:59:00Z", dev_builds::Age::Minutes, 1) && age("2026-10-01T11:00:01Z", dev_builds::Age::Minutes, 59));
     CHECK(age("2026-10-01T11:00:00Z", dev_builds::Age::Hours, 1) && age("2026-09-29T12:00:01Z", dev_builds::Age::Hours, 47));
     CHECK(age("2026-09-29T12:00:00Z", dev_builds::Age::Days, 2) && age("2025-10-01T12:00:00Z", dev_builds::Age::Days, 365));
     CHECK(age("x", dev_builds::Age::None, 0) && age("2026-10-01 12:00:00Z", dev_builds::Age::None, 0));
