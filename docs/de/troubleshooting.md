@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
+<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
 # Fehlerbehebung
 
 Wieder Zugang zu einer gesperrten Konsole bekommen, die häufigen Probleme, einen Fehler melden, und der Entwicklermodus. Zurück zum [README](../../README.md).
@@ -78,6 +78,23 @@ Auf der Konsole läuft eine Firmware, die neuer ist als die neueste getestete: P
 
 Sein Tor (`config/playguard/gate-….nro`) ist nicht mehr die Datei, mit der der Forwarder erstellt wurde: Es wurde auf der SD-Karte verändert oder ersetzt, also startet der Forwarder es nicht. Öffne PlayGuard über seinen eigenen Forwarder: Es schreibt das Tor beim Start zurück; *Konsole › Forwarder › Alle neu installieren* erstellt damit jeden Forwarder neu.
 
+### Ein geschützter Forwarder schließt sich sofort („Ein Fehler ist aufgetreten“)
+
+Vor jedem Bildschirm von PlayGuard, ohne Fehlercode (der Bericht von Atmosphère in `atmosphere/crash_reports/` nennt das Modul `forwarder`, Ergebnis `2000-0000`): Er wurde von einem PlayGuard erstellt, dessen Tor ohne seine Ressourcen gebaut war, was der Loader des Forwarders abgelehnt hat. Aktualisiere PlayGuard und erstelle ihn dann neu: Die Glocke und *Konsole › Forwarder* bieten das für jeden Forwarder an, der mit einem älteren Loader erstellt wurde.
+
+### Ein geschützter Forwarder bleibt nach der Geheimzahl auf dem Bildschirm seines Tors
+
+Die Geheimzahl wurde angenommen, der Bildschirm mit dem Symbol des Homebrews bleibt, und sonst passiert nichts: Sein Tor hat diesen Bildschirm mit einem einzigen Puffer gezeichnet und ewig darauf gewartet, den nächsten zu zeichnen. Aktualisiere PlayGuard und erstelle ihn dann neu: Die Glocke und *Konsole › Forwarder* bieten das für jeden Forwarder an, der mit einem älteren Tor erstellt wurde.
+
+### Ein Forwarder zeigt „Die Software konnte nicht gestartet werden“
+
+Die Konsole hat sich geweigert, ihn zu starten: Eine Signaturprüfung ist noch aktiv. In der Reihenfolge, in der du nachsehen solltest:
+
+- **sigpatch-Dateien neben sys-patch.** `.ips`-Dateien in `atmosphere/kip_patches/fs_patches`, `loader_patches` oder `atmosphere/exefs_patches/es_patches`, während sys-patch läuft: zwei Werkzeuge, die dieselben Prüfungen patchen, die Ursache, die die Threads zu sys-patch und sigpatches auf GBAtemp am häufigsten nennen. *Konsole › Spiel-Patches* warnt davor, und Ⓐ dort legt sie beiseite (verschoben nach `config/playguard/sigpatches-aside/`, nie gelöscht; die `bootloader/patches.ini` von hekate bleibt). Starte die Konsole neu.
+- **Ein Muster, das sys-patch nicht angewendet hat.** Forwarder brauchen seine Patches für fs und loader, jedes Muster, das es für diese Firmware hat (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), nicht nur eines pro Modul. *Info › Hilfe & Diagnose › Diagnosebericht exportieren* führt in seiner Zeile `game patches` die Version von sys-patch und jedes ausgelassene Muster auf; `sd:/config/sys-patch/log.ini` enthält dasselbe. Prüfe, dass `config/sys-patch/config.ini` dieses System patcht (`patch_emummc=1` auf emuMMC) und keines davon ausschaltet; der Maintainer von sys-patch selbst sagt, dass 23.0.x kein neueres sys-patch als 1.6.2.3 braucht.
+- **Kein Neustart, seit sich die Patches geändert haben.** sys-patch patcht beim Booten.
+- **Ein Forwarder, den ein älteres PlayGuard erstellt hat.** Die Glocke und *Konsole › Forwarder* bieten an, die mit einem älteren Loader gebauten neu zu erstellen.
+
 ### Die Glocke oder ein Tab zeigt ein bernsteinfarbenes Abzeichen
 
 Etwas braucht dich: Ⓨ öffnet die Liste, und Ⓐ auf einem Eintrag führt die Lösung aus oder öffnet, wo sie gemacht wird ([Benachrichtigungen](features.md#benachrichtigungen--was-dich-braucht-aus-jedem-tab)).
@@ -86,7 +103,7 @@ Etwas braucht dich: Ⓨ öffnet die Liste, und Ⓐ auf einem Eintrag führt die 
 
 Ein Fehler zeigt den Code des Systems (etwa `0x0001088E`) mit dem, was über ihn bekannt ist: was zu tun ist bei den Codes, deren Bedeutung dokumentiert ist, sonst hilft ein Bericht.
 
-1. *Info › Hilfe & Diagnose › Diagnosebericht exportieren* speichert eine Textdatei in `sd:/config/playguard/logs/reports/`: Firmware, Atmosphère-Version, wie lange der Start und die langsamen Bildschirme gedauert haben (der Änderungsverlauf, *Alle Spiele*, die Prüfung der installierten Spiele, die Tabs, die sich selbst aktualisieren), Uhren, Speicher, Status der Anonymisierung der Seriennummer und der Spiel-Patches, das rohe Ergebnis jeder Abfrage des Jugendschutzes, und die Protokolle: wie der letzte Lauf endete, der verbleibende Arbeitsspeicher und Platz auf der SD-Karte, die neuesten Absturzdateien und die letzten 80 protokollierten Zeilen. **Er enthält nie die Geheimzahl oder die Seriennummer.**
+1. *Info › Hilfe & Diagnose › Diagnosebericht exportieren* speichert eine Textdatei in `sd:/config/playguard/logs/reports/`: Firmware, Atmosphère-Version, wie lange der Start und die langsamen Bildschirme gedauert haben (der Änderungsverlauf, *Alle Spiele*, die Prüfung der installierten Spiele, die Tabs, die sich selbst aktualisieren), Uhren, Speicher, Status der Anonymisierung der Seriennummer und der Spiel-Patches, was die DNS-Umleitung von Atmosphère mit den Jugendschutz- und Zeitservern von Nintendo macht (aus seiner Hosts-Datei auf der SD-Karte gelesen, kein Netzwerktest, mit dem Ende von Atmosphères eigener `atmosphere/logs/dns_mitm_startup.log`), das rohe Ergebnis jeder Abfrage des Jugendschutzes, und die Protokolle: wie der letzte Lauf endete, der verbleibende Arbeitsspeicher und Platz auf der SD-Karte, die neuesten Absturzdateien und die letzten 80 protokollierten Zeilen. **Er enthält nie die Geheimzahl oder die Seriennummer.**
 2. [Eröffne ein Issue](https://github.com/JigSawFr/PlayGuard/issues/new) (auf Englisch oder Französisch) und hänge ihn an.
 
 ### Einen Bericht online senden
@@ -98,7 +115,7 @@ Mit der Konsole online sendet *Info › Hilfe & Diagnose › Bericht online send
   - die Protokolle dieses Laufs und des vorherigen (`logs/sessions/`; bei einem langen: sein Anfang und seine letzten 64 KiB);
   - die Debug-Dateien: die Referenz des Spielzeit-Blocks, das Ende der Spielzeit-Aufzeichnung, solange *Spielzeit aufzeichnen* an ist, die letzten 20 Änderungen des Änderungsverlaufs (ohne Namen von Spielen, Benutzern oder Profilen, und nur mit ihrem Datum) und die Einstellungen von PlayGuard.
 - **Anmelden:** Bist du abgemeldet, bietet PlayGuard zuerst die Anmeldung an; *GitHub-Konto*, direkt darunter, sobald du angemeldet bist, meldet dich ab; lehnt GitHub den Gist ab, bietet PlayGuard eine erneute Anmeldung an.
-- **Danach:** Es zeigt den Link und zwei QR-Codes: den Bericht und das Formular für Fehlerberichte mit dem Link, deinen Versionen, wie PlayGuard gestartet wurde (über ein Spiel oder aus dem Album; füge das Menü hinzu) und dem System (sysMMC oder emuMMC) schon ausgefüllt. Jeder Link wird in `logs/uploads/` als Internetverknüpfung (`.url`) aufbewahrt, die ein Computer in seinem Browser öffnet.
+- **Danach:** Es zeigt zwei QR-Codes, mit dem Link unter dem ersten, seine ID in Vierergruppen zum Vorlesen oder Abtippen: den Bericht, für den, der dir schon hilft, und das Formular für Fehlerberichte mit dem Link, deinen Versionen, wie PlayGuard gestartet wurde (über ein Spiel oder aus dem Album; füge das Menü hinzu) und dem System (sysMMC oder emuMMC) schon ausgefüllt, zum Scannen, um einen Fehler zu melden. Der Link bleibt auch in den Benachrichtigungen, und jeder wird in `logs/uploads/` als Internetverknüpfung (`.url`) aufbewahrt, die ein Computer in seinem Browser öffnet.
 
 > [!WARNING]
 > Jeder mit dem Link kann den Bericht lesen, bis du den Gist auf GitHub löschst, und ein damit eröffneter Fehlerbericht ist öffentlich: Die Bestätigung sagt das.
@@ -140,20 +157,20 @@ Drücke siebenmal Ⓨ auf *Info › Version*; die Entwicklerwerkzeuge erscheinen
 
 - eine der letzten 20 Versionen (Vorabversionen eingeschlossen, markiert);
 - einer der letzten 20 Commits von `main`;
-- der neueste Build eines offenen Pull Requests aus einem Branch dieses Repositorys (nie aus einem Fork: dessen Code wurde noch nicht geprüft). A auf dem Tab der Pull Requests, wenn er angezeigt wird, sortiert sie andersherum (neuester Build zuerst, oder nach Nummer).
+- der neueste Build eines offenen Pull Requests aus einem Branch dieses Repositorys (nie aus einem Fork: dessen Code wurde noch nicht geprüft). A auf dem Tab der Pull Requests, wenn er angezeigt wird, sortiert sie andersherum (neuester Build zuerst, oder nach Nummer): Der Tastenhinweis von A sagt, wie.
 
-**Jeder Build** zeigt seinen Titel (der Betreff eines Commits oder eines Pull Requests; die ganze Nachricht eines Commits ist seine Beschreibung) über Etiketten: die Art der Änderung (*Funktion*, *Fehlerbehebung*, *Doku*…) und ihr Bereich, *Inkompatibel*, der Pull Request, aus dem ein Commit stammt, wie seine Prüfungen endeten (*CI OK*, *CI fehlgeschlagen*, *CI läuft*), Vorabversion, *installiert* oder *neu*; rechts, wie alt er ist, und sein Commit. Ein Build öffnet zuerst seine Seite: Etiketten (seine Art, seine Prüfungen, installiert oder neu), eine Karte mit Fakten (erstellt, Größe, Commit, Prüfsumme, wann GitHub ihn löscht), **Installieren**, **Auf GitHub ansehen** (seine Seite als QR-Code für ein Handy), dann die Hinweise einer Version oder die Beschreibung eines Pull Requests, aus dem Markdown von GitHub dargestellt (Überschriften, Listen, Aufgabenkästchen, Code, Zitate und Hinweisboxen, Tabellen).
+**Jeder Build** zeigt seinen Titel (der Betreff eines Commits oder eines Pull Requests; die ganze Nachricht eines Commits ist seine Beschreibung) über Etiketten: die Art der Änderung (*Funktion*, *Fehlerbehebung*, *Doku*…) und ihr Bereich, *Inkompatibel*, der Pull Request, aus dem ein Commit stammt, wie seine Prüfungen endeten (*CI OK*, *CI fehlgeschlagen*, *CI läuft*), Vorabversion, *installiert* oder *neu*; rechts, wie alt er ist (in Minuten, Stunden, dann Tagen), und sein Commit. Ein Build öffnet zuerst seine Seite: Etiketten (seine Art, seine Prüfungen, installiert oder neu), eine Karte mit Fakten (erstellt, Größe, Commit, Prüfsumme, wann GitHub ihn löscht), **Installieren**, **Auf GitHub ansehen** (seine Seite als QR-Code für ein Handy), eine Warnung, wenn seine Prüfungen noch laufen, dann die Hinweise einer Version oder die Beschreibung eines Pull Requests, aus dem Markdown von GitHub dargestellt (Überschriften, Listen, Aufgabenkästchen, Code, Zitate und Hinweisboxen, Tabellen).
 
 **Sicher zu lesen:** Alles, was von GitHub kommt, wird als einfacher Text angezeigt: Kein Link wird geöffnet, kein HTML oder Skript ausgeführt, und unsichtbare Zeichen, die einen Titel tarnen könnten (Rechts-nach-links-Umschaltungen, Zeichen ohne Breite, Steuerzeichen, ungültiges UTF-8), werden entfernt.
 
 **Anmelden.** Die Versionen brauchen nichts; die anderen sind die Artefakte des Build-Workflows, die GitHub nur angemeldeten Benutzern gibt. **GitHub-Konto** meldet dich mit einem Code und einem QR-Code zum Scannen mit einem Handy an. Die einzigen angefragten Berechtigungen sind, die Dateien des Build-Workflows zu lesen (Actions) und Gists zu erstellen, für *Bericht online senden*; ansonsten kann das Token nur lesen, was öffentlich ist. Es wird in `github_token` aufbewahrt, nie mit einem Bericht gesendet, und *GitHub-Konto* meldet dich ab. Angemeldet nimmt Ⓨ (*Suchen*) die Nummer eines Pull Requests (offen oder geschlossen) oder einen Commit (7 bis 40 Hexadezimalziffern) und findet seinen Build, nur aus einem Branch dieses Repositorys.
 
-**Installieren:** PlayGuard lädt den Build herunter, prüft ihn (Größe, die von GitHub erfasste SHA-256, den NRO-Header), setzt ihn an die Stelle seiner eigenen `.nro` und startet damit neu (vorher wird die Geheimzahl abgefragt, wann immer eine festgelegt ist).
+**Installieren:** PlayGuard lädt den Build herunter, prüft ihn (Größe, die von GitHub erfasste SHA-256, den NRO-Header), setzt ihn an die Stelle seiner eigenen `.nro` und startet damit neu (vorher wird die Geheimzahl abgefragt, wann immer eine festgelegt ist). Sein Fenster sagt, bei welchem Schritt es ist, die Größe und Geschwindigkeit des Downloads und welchen Build er ersetzt; Abbrechen verschwindet, sobald der Build an seine Stelle gesetzt wird.
 
-- Die Liste wird 10 Minuten lang aufbewahrt und sofort angezeigt, mit ihrem Alter (Ⓧ ruft sie erneut ab); während sie abgerufen wird, zeigt ein Balken den Fortschritt.
+- Die Liste wird 10 Minuten lang aufbewahrt und sofort angezeigt, mit ihrem Alter (Ⓧ ruft sie erneut ab, ebenso der Bildschirm alle 3 Minuten, solange die Prüfungen eines Builds laufen); während sie abgerufen wird, zeigt ein Balken den Fortschritt.
 - Ein abgebrochener Download (Netzwerk verloren) geht beim nächsten Installieren desselben Builds dort weiter, wo er aufgehört hat.
 - Artefakte verfallen nach 90 Tagen.
 
-**Zurückkehren.** Der ersetzte Build wird aufbewahrt (`playguard.nro.previous`): **Zurück zum vorherigen Build** in derselben Liste tauscht sie wieder, nach der Geheimzahl. Stürzt ein von hier (oder über *Aktualisieren mit › In PlayGuard*) installierter Build vor seinem ersten Bildschirm ab, bietet der nächste Start von PlayGuard auf einem einfachen Textbildschirm an, zum vorherigen Build zurückzukehren, bevor irgendetwas anderes geladen wird (A kehrt zurück, B startet ihn trotzdem), ohne die Geheimzahl, da der Bildschirm der Geheimzahl selbst das sein kann, was abstürzt. Dieselbe Liste kehrt jederzeit zu jeder Version zurück.
+**Zurückkehren.** Der ersetzte Build wird aufbewahrt (`playguard.nro.previous`): **Zurück zum vorherigen Build** in derselben Liste tauscht sie wieder, nach der Geheimzahl; sie nennt diesen Build mit seiner Version, seinem Pull Request und seinem Commit. Stürzt ein von hier (oder über *Aktualisieren mit › In PlayGuard*) installierter Build vor seinem ersten Bildschirm ab, bietet der nächste Start von PlayGuard auf einem einfachen Textbildschirm an, zum vorherigen Build zurückzukehren, bevor irgendetwas anderes geladen wird (A kehrt zurück, B startet ihn trotzdem), ohne die Geheimzahl, da der Bildschirm der Geheimzahl selbst das sein kann, was abstürzt. Dieselbe Liste kehrt jederzeit zu jeder Version zurück.
 
 **Welcher Build läuft:** *Info › Version* zeigt im Entwicklermodus den Commit. Die Kopfzeile jedes Bildschirms zeigt die laufende Version neben dem Titel: die einer Version in einem grauen Etikett (`1.2.0`), die jedes anderen Builds in einem bernsteinfarbenen Etikett, gefolgt von seinem Commit, damit ein Test-Build nie für die Version gehalten wird.
