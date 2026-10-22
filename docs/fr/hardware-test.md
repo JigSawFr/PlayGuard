@@ -1,4 +1,4 @@
-<!-- translated from docs/hardware-test.md, sha256 1ae3738bc1e6 -->
+<!-- translated from docs/hardware-test.md, sha256 8263acf73db0 -->
 # Tester sur une console : forwarders et menu homebrew
 
 Ce que les simulateurs desktop et web ne peuvent pas montrer : le vrai menu HOME de la console, son écran du code PIN, Atmosphère qui lit `override_config.ini`, le module rescue au démarrage. À dérouler sur une console après une modification de *Console › Forwarders* (les fichiers `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), en notant dans la pull request ce qui a été vérifié, et sur quels firmware et Atmosphère.

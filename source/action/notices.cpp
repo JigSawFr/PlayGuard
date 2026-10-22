@@ -368,8 +368,8 @@ void note_security(const PctlStatus& s, bool writable)
     // The console lock on for a week or more.
     toggle(notice_logic::console_lock_long(cfg.console_lock, cfg.console_lock_since, ui::today_date()),
            "console_lock_long", Level::Info, brls::getStr("playguard/notices/console_lock_long", cfg.console_lock_since),
-           "playguard/notices/console_lock_long_detail"_i18n, open_label("security"),
-           []() { open_tab(ui::tab::security); });
+           "playguard/notices/console_lock_long_detail"_i18n, open_label("play_timer"),
+           []() { open_tab(ui::tab::play_timer, "pt_console_lock"); });
 }
 
 // What the play timer counts on: its limits back to usual, its alarm, the
@@ -618,9 +618,9 @@ void sweep()
     note_pin_strength(s);
 }
 
-void open_tab(int position)
+void open_tab(int position, const std::string& row)
 {
-    if (MainActivity* main = ui::main_activity()) main->open_tab(position);
+    if (MainActivity* main = ui::main_activity()) main->open_tab(position, row);
 }
 
 }   // namespace notices

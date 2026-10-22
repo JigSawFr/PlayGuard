@@ -1,15 +1,18 @@
-<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
+<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
 # 설치
 
 PlayGuard를 설치, 업데이트, 삭제하는 방법과 PlayGuard가 SD 카드에 저장하는 파일을 설명합니다. 설치한 뒤에는 [시작하기](getting-started.md)를 보세요. 처음으로 돌아가기: [README](../../README.md).
 
 ## 받는 곳
 
+> [!WARNING]
+> PlayGuard는 **아직 Homebrew App Store(sphaira의 App Store도)에 없습니다**. 등록이 아직 승인을 기다리고 있습니다. 지금은 직접 설치하세요.
+
 다음 중 하나를 고르세요.
 
-- **Homebrew App Store** / **sphaira의 App Store**(같은 카탈로그) — 등록이 승인되면 *PlayGuard*를 검색하세요. 새 버전은 검토를 거친 뒤 자동으로 반영되며, 보통 GitHub보다 며칠 늦습니다. PlayGuard는 그곳에서 설치되었다는 것을 알고 스토어를 통해 업데이트하도록 권장합니다.
+- **수동 설치**(지금은 이 방법을 권장) — [최신 버전](https://github.com/JigSawFr/PlayGuard/releases/latest)에서 `playguard.zip`을 내려받아 SD 카드의 **루트**에 압축을 푸세요. 앱은 `sd:/switch/playguard/`에, 앱의 파일은 `sd:/config/playguard/`에 들어갑니다.
 - **sphaira › GitHub** — 배포 zip에 항목(`/config/sphaira/github/playguard.json`)이 이미 들어 있습니다. 처음 설치한 뒤에는 sphaira의 *GitHub*에서 업데이트하세요.
-- **수동 설치** — [최신 버전](https://github.com/JigSawFr/PlayGuard/releases/latest)에서 `playguard.zip`을 내려받아 SD 카드의 **루트**에 압축을 푸세요. 앱은 `sd:/switch/playguard/`에, 앱의 파일은 `sd:/config/playguard/`에 들어갑니다.
+- **Homebrew App Store** / **sphaira의 App Store**(같은 카탈로그) — **아직 등록되지 않았습니다.** 등록이 승인되면 *PlayGuard*를 검색하세요. 그러면 새 버전은 검토를 거친 뒤 자동으로 반영되며, 보통 GitHub보다 며칠 늦습니다. PlayGuard는 그곳에서 설치되었다는 것을 알고 스토어를 통해 업데이트하도록 권장합니다.
 
 선택 사항인 **복구 sysmodule**(`playguard-rescue.zip`)은 따로 내려받습니다. 이것도 SD 카드의 루트에 압축을 푼 뒤 본체를 다시 시작하세요. `atmosphere/contents/4200000000505247/`에 들어가며, `RESCUE` 파일이 요청할 때만 작동합니다. [본체가 잠겼나요?](troubleshooting.md#본체가-잠겼나요)를 참고하세요.
 
@@ -33,7 +36,7 @@ PlayGuard를 설치, 업데이트, 삭제하는 방법과 PlayGuard가 SD 카드
 - **`profiles/`** — 저장한 플레이 시간 제한 프로필
 - **`exports/`** — 플레이 기록 내보내기 파일
 - **`nand/<system>/`** — 시스템마다 따로 저장되는 파일입니다. 시스템마다 자녀 보호 기능이 따로 있습니다. sysMMC는 `sysmmc/`, emuMMC는 `emummc/`입니다. 안에는 다음이 있습니다. `history.json`은 변경 기록입니다(최근 500개, 본체가 거부한 변경도 포함. 읽을 수 없는 파일은 덮어쓰지 않고 `history.json.bad`로, 그 이전 파일은 `.bad.1`로 보관하며 PlayGuard가 한 번 알려 줍니다). `state.json`은 *모든 소프트웨어 차단*, 추가 시간, 대기 중인 재잠금, 펌웨어 선택을 위해 기억해 두는 내용입니다([config.md](../config.md#state-kept-between-launches), 영어). `watch.json`은 PlayGuard가 마지막으로 본 본체 상태로, PlayGuard 밖에서 바뀐 것을 알아내는 데 씁니다([config.md](../config.md#watchjson), 영어. 삭제해도 문제없습니다). `backups/`는 설정 백업입니다(PIN은 절대 들어가지 않습니다). `cache/`는 마지막으로 읽은 플레이 기록(모든 사용자, 그리고 열어 본 각 사용자)으로, 다음에 시작할 때 기록을 다시 읽는 동안 바로 표시됩니다. 이 폴더들이 생기기 전 버전의 파일은 PlayGuard가 처음 시작하는 시스템으로 옮겨집니다
-- **`cache/`** — 게임 아이콘(`icons/`, 최대 16 MB, 본체 언어가 바뀌면 비워짐)으로, 모든 시스템이 함께 씁니다. 시작할 때마다 게임마다 이름과 아이콘을 다시 읽지 않기 위한 것입니다. Atmosphère, hekate, 펌웨어의 릴리스 노트(`sys_notes.json`, *본체*용)와 PlayGuard 자체의 릴리스 노트(*정보*용)도 있습니다. 개발자 모드에서는 *다른 빌드 설치*의 목록(`dev_builds.json`)도 있습니다
+- **`cache/`** — 게임 아이콘(`icons/`, 최대 16 MB, 본체 언어가 바뀌면 비워짐)으로, 모든 시스템이 함께 씁니다. 시작할 때마다 게임마다 이름과 아이콘을 다시 읽지 않기 위한 것입니다. Atmosphère, hekate, sys-patch, 펌웨어의 릴리스 노트(`sys_notes.json`, *본체*용)와 PlayGuard 자체의 릴리스 노트(*정보*용)도 있습니다. 개발자 모드에서는 *다른 빌드 설치*의 목록(`dev_builds.json`)도 있습니다
 - **`github_token`** — *보고서 온라인으로 보내기*와, 개발자 모드에서는 *다른 빌드 설치*에 쓰는 GitHub 로그인 정보입니다. 로그아웃하면 삭제됩니다(*정보 › 도움말 및 진단 › GitHub 계정*, 로그인한 뒤에 표시)
 - **`previous_build.json`**, **`boot_check.json`** — 빌드를 그 자리에 설치한 뒤에 쓰입니다. 교체된 빌드의 이름(`.nro` 옆에 `playguard.nro.previous`로 보관)과 다음 시작 확인용 파일(첫 화면이 뜨면 삭제)입니다
 - **`rescue_report.txt`** — 복구 sysmodule이 작동한 뒤 남기는 파일로, PlayGuard가 시작할 때 표시할 때까지 남아 있습니다(읽을 수 없는 파일은 삭제되고 PlayGuard가 알려 줍니다)

@@ -44,7 +44,9 @@ void TabBase::mark(brls::Box* row, std::vector<std::string> ids)
     // Before the badge, in its colour.
     auto* reason = cadran::kit::label("", cadran::kit::TEXT_BODY, "cadran/amber");
     reason->setSingleLine(true);
-    reason->setAlignSelf(brls::AlignSelf::CENTER);
+    // Placed as its row places it: centred on a row's height, under the
+    // title of a tile (a column), at its left.
+    reason->setHorizontalAlign(brls::HorizontalAlign::LEFT);
     reason->setVisibility(brls::Visibility::GONE);
     row->addView(reason, row->getChildren().size() - 1);
     this->marks.push_back({ row, badge, reason, std::move(ids) });

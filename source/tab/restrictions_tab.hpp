@@ -84,6 +84,5 @@ class RestrictionsTab : public TabBase
     BRLS_BIND(brls::DetailCell,  org,           "rs_org");
     BRLS_BIND(brls::DetailCell,  blocked,       "rs_blocked");
     BRLS_BIND(brls::Label,       blocked_note,  "rs_blocked_note");
-    BRLS_BIND(brls::DetailCell,  free_comm,     "rs_free_comm");
     BRLS_BIND(brls::Label,       note,          "rs_note");
 };

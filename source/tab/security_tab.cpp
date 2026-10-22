@@ -2,12 +2,13 @@
 #include "tab/security_tab.hpp"
 
 #include "action/console_actions.hpp"
-#include "action/console_lock.hpp"
+#include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pairing_state.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
+#include "activity/forwarders_activity.hpp"
 #include "app.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/cadran_kit.hpp"
@@ -26,22 +27,10 @@ SecurityTab::SecurityTab()
     this->mark(pin_lock_cell.getView(), { "pin_lock_off" });
     pr_note->setSingleLine(false);
     pin_lock_note->setSingleLine(false);
-    console_lock_note->setSingleLine(false);
-    console_lock_cell->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        PtState pt;
-        pctl_play_timer_query(&pt);
-        if (!pt.fw_supported) {
-            ui::error("", NXM_RC_FW_UNSUPPORTED);
-            return true;
-        }
-        PctlStatus s;
-        pctl_status_fetch(&s);
-        if (!(s.pin_length_ok && s.pin_length > 0)) {   // nothing gates play without a PIN
-            ui::info("playguard/console_lock/needs_pin"_i18n);
-            return true;
-        }
-        console_lock::set(!console_lock::active(), pt, [this]() { this->refresh(); });
+    // The homebrew menu's lock is made on Console › Forwarders, after its
+    // checks: a line to it here, by the PIN that guards it.
+    hbmenu_lock->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ForwardersActivity());
         return true;
     });
     // Deleting everything is the one irreversible action here: its line is
@@ -112,13 +101,19 @@ SecurityTab::SecurityTab()
         console_actions::delete_all("", [this]() { this->refresh(); });
         return true;
     });
-    this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" } }, true);
+    this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" }, { "sc_hbmenu", "home" } }, true);
     this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
-                       { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" },
-                       { "sc_auto_relock", "refresh" }, { "sc_console_lock", "gamepad" }, { "pr_active", "phone" },
+                       { "sc_hbmenu_lock", "home" }, { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" },
+                       { "sc_auto_relock", "refresh" }, { "pr_active", "phone" },
                        { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
     if (cadran::Card* danger = this->list.card_of("sc_delete"))
         danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
+}
+
+void SecurityTab::willAppear(bool resetState)
+{
+    this->hbmenu_locked = hbmenu_lock::locked();
+    TabBase::willAppear(resetState);
 }
 
 void SecurityTab::change_pin()
@@ -151,6 +146,12 @@ void SecurityTab::refresh()
     this->list.state("sc_pin", !s.pin_length_ok ? nullptr : s.pin_length ? OK : WARN);
     this->list.state("sc_restrictions", !s.restriction_enabled_ok ? nullptr : s.restriction_enabled ? OK : WARN);
     this->list.state("sc_temp", !s.temp_unlocked_ok ? nullptr : s.temp_unlocked ? WARN : OK);
+    // Open is how most consoles are, and fine without forwarders: no warning,
+    // only a check once it is locked.
+    const std::string hb_state = this->hbmenu_locked ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n;
+    ui::set_detail(hbmenu, hb_state);
+    this->list.state("sc_hbmenu", this->hbmenu_locked ? OK : nullptr);
+    hbmenu_lock->setDetailText(ui::opens(hb_state));
 
     // Companion app: while linked, its next sync overwrites what is set here,
     // unless Atmosphère's DNS blocks its server (then the note says so).
@@ -168,11 +169,6 @@ void SecurityTab::refresh()
     ui::set_text(pin_lock_note, pin_lock::note_text());
     pin_ask_again->setOn(config::get().pin_ask_again, false);
 
-    const bool locked = console_lock::active();
-    ui::set_detail(console_lock_cell, locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
-    console_lock_cell->setDetailTextColor(locked ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    ui::set_text(console_lock_note, locked ? "playguard/console_lock/note_on"_i18n : "playguard/console_lock/note_off"_i18n);
-
     const bool writable = !app::read_only();
     const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
     const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
@@ -184,8 +180,7 @@ void SecurityTab::refresh()
                           // The block comparison needs the app to sync.
                           { pr_decode.getView(), syncs } });
     for (brls::DetailCell* c : { (brls::DetailCell*)set_pin.getView(), (brls::DetailCell*)show_pin.getView(),
-                                 (brls::DetailCell*)unlock.getView(),
-                                 (brls::DetailCell*)console_lock_cell.getView(), (brls::DetailCell*)pr_unlink.getView(),
+                                 (brls::DetailCell*)unlock.getView(), (brls::DetailCell*)pr_unlink.getView(),
                                  (brls::DetailCell*)auto_relock.getView() })
         ui::show_writable(c, writable);
     auto_relock->setOn(config::get().auto_relock, false);

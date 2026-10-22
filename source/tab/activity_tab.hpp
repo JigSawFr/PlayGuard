@@ -1,11 +1,11 @@
-// ActivityTab — the accounts as chips, the period and the export, three
+// ActivityTab — the accounts as chips, the period and the export / share, three
 // figures (today, the last seven days with their bars, all time) from the
 // console's play data, the four games most played over the period as cards
 // with their week as a sparkline (A: the game's own screen). Under them the
 // chart, the summary over the chosen period (util/activity_summary.hpp), the
 // way to every game of the period (activity/games_activity: a list or
-// covers), the week as a QR code and when the week was played. The export
-// goes to the SD card (CSV, JSON, XLSX or PDF). Read-only, so also in read-only
+// covers) and when the week was played. The export / share chip writes to
+// the SD card (CSV, JSON, XLSX or PDF) or shows the week as a QR code. Read-only, so also in read-only
 // mode. The data comes from play_data (read off the main thread, shared with
 // Today, and kept on the SD card for the next run): what is known
 // shows at once, and is read again in the background when over a minute old,
@@ -130,7 +130,6 @@ class ActivityTab : public TabBase
     BRLS_BIND(brls::DetailCell, busy_hours,  "ac_busy_hours");
     BRLS_BIND(brls::DetailCell, late,        "ac_late");
     BRLS_BIND(brls::DetailCell, games,       "ac_games");
-    BRLS_BIND(brls::DetailCell, qr,          "ac_qr");
     BRLS_BIND(brls::Box,        progress,    "ac_progress");
     BRLS_BIND(brls::Label,      capped,      "ac_capped");
     BRLS_BIND(brls::Label,      status,      "ac_status");

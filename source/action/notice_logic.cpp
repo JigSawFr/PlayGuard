@@ -57,13 +57,11 @@ std::string tab_of(const std::string& id)
     // The network clock is a screen of the Console tab, and Today
     // says the changes seen outside and the limits to put back.
     if (group_of(id) == Group::Console || id == "clock" || id == "clock_off") return "console";
-    if (id == "pin_missing" || id == "pin_weak" || id == "pin_lock_off" || id == "pairing" ||
-        id == "console_lock_long")
-        return "security";
-    if (id == "alarm_off" || id == "not_counting" || id == "over_limit") return "play_timer";
+    if (id == "pin_missing" || id == "pin_weak" || id == "pin_lock_off" || id == "pairing") return "security";
+    if (id == "alarm_off" || id == "not_counting" || id == "over_limit" || id == "console_lock_long") return "play_timer";
     if (id == "outside" || id == "extra_restore") return "dashboard";
     if (id == "week" || id == "new_account") return "activity";
-    if (id == "backup") return "preferences";
+    if (id == "backup") return "history";
     if (id == "update" || id == "installed" || id == "crash" || id == "upload") return "about";
     return "";
 }

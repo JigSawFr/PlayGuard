@@ -92,7 +92,7 @@
   "capture": "Captures"
  },
  "params": {
-  "tab": {"label": "Ouvre sur", "options": {"": "Aujourd'hui", "play_timer": "Temps de jeu", "activity": "Activité", "restrictions": "Restrictions", "security": "NIP", "console": "Console", "preferences": "Préférences", "about": "À propos"}},
+  "tab": {"label": "Ouvre sur", "options": {"": "Aujourd'hui", "play_timer": "Temps de jeu", "activity": "Activité", "restrictions": "Restrictions", "security": "Sécurité", "history": "Historique", "console": "Console", "preferences": "Préférences", "about": "À propos"}},
   "keep": {"label": "Conserver l’état entre les visites", "help": "Les données de PlayGuard et les paramètres de la console simulée (NIP, limites, horloges) restent dans ce navigateur; les paramètres de console de ce panneau ne comptent alors qu’au premier lancement. La console continue alors de vivre : son temps de jeu du jour compte en temps réel et reste lui aussi, et « Redémarrer la console » met fin à un déverrouillage temporaire."},
   "not_set_up": {"label": "Jamais configuré (pas de NIP)"},
   "unlocked": {"label": "Déverrouillé temporairement"},

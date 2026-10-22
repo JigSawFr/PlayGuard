@@ -477,8 +477,8 @@ void cadran::style_rail(brls::View* tab_frame)
     brls::Box* list = first ? first->getParent() : nullptr;
     if (!list) return;
     list->setPadding(6, 8, 10, 16);
-    // main.xml's order: Today | timer, activity, restrictions, PIN | console | preferences, about.
-    static const char* icons[] = { "today", "", "timer", "activity", "shield", "lock", "", "chip", "", "settings", "info" };
+    // main.xml's order: Today | timer, activity, restrictions, security, history | console | preferences, about.
+    static const char* icons[] = { "today", "", "timer", "activity", "shield", "lock", "history", "", "chip", "", "settings", "info" };
     std::vector<brls::SidebarItem*> items;
     int position = 0;
     for (brls::View* v : list->getChildren()) {

@@ -3,9 +3,10 @@
 <!-- Play timer: the timer's warnings, the week's summary with the profile
      and "same limit every day" chips, the week as the editor (the time played
      in its bars) with its keys, the changes not saved yet, then bedtime,
-     time's up and removal as chips (pt_top); under them the day's actions,
-     when play is allowed again, the extra-time settings and a line to
-     Advanced (activity/play_timer_advanced.xml). -->
+     time's up and removal as chips (pt_top); under them weekdays and
+     weekend and a line to Today's actions, "Block all games", when play is
+     allowed again, the extra-time settings and a line to Advanced
+     (activity/play_timer_advanced.xml). -->
 
 <brls:Box
     width="auto"
@@ -74,10 +75,12 @@
             </brls:Box>
             <brls:Label id="pt_fw_note" text="@i18n/playguard/play_timer/fw_too_old" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header id="pt_limit_header" title="@i18n/playguard/play_timer/section_limit" marginBottom="8"/>
-            <brls:DetailCell id="pt_extra" title="@i18n/playguard/dashboard/extra"/>
-            <brls:DetailCell id="pt_stop" title="@i18n/playguard/dashboard/stop"/>
             <brls:DetailCell id="pt_split" title="@i18n/playguard/play_timer/split"/>
+            <brls:DetailCell id="pt_today" title="@i18n/playguard/play_timer/today_link"/>
             <brls:Label id="pt_limit_note" text="@i18n/playguard/play_timer/limit_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <brls:Header id="pt_lock_header" title="@i18n/playguard/console_lock/section" marginTop="24" marginBottom="8"/>
+            <brls:DetailCell id="pt_console_lock" title="@i18n/playguard/console_lock/title"/>
+            <brls:Label id="pt_console_lock_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header id="pt_bedtime_header" title="@i18n/playguard/play_timer/section_bedtime" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="pt_bedtime_reset" title="@i18n/playguard/play_timer/bedtime_reset"/>
             <brls:Label id="pt_bedtime_note" text="@i18n/playguard/play_timer/bedtime_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>

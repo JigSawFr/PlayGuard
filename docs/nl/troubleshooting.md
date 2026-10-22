@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
+<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
 # Problemen oplossen
 
 Weer toegang krijgen tot een vergrendelde console, de veelvoorkomende problemen, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
@@ -78,6 +78,23 @@ De console draait een firmware die nieuwer is dan de nieuwste geteste: PlayGuard
 
 Zijn poort (`config/playguard/gate-….nro`) is niet meer het bestand waarmee de forwarder is gemaakt: hij is op de SD-kaart gewijzigd of vervangen, dus de forwarder start hem niet. Open PlayGuard via zijn eigen forwarder: die schrijft de poort bij het starten terug; *Console › Forwarders › Alles opnieuw installeren* maakt elke forwarder er opnieuw mee.
 
+### Een beveiligde forwarder sluit meteen ("Er is een fout opgetreden")
+
+Vóór enig scherm van PlayGuard, zonder foutcode (het rapport van Atmosphère in `atmosphere/crash_reports/` noemt de module `forwarder`, resultaat `2000-0000`): hij is gemaakt door een PlayGuard waarvan de poort zonder zijn assets was gebouwd, wat de loader van de forwarder weigerde. Werk PlayGuard bij en maak hem dan opnieuw: de bel en *Console › Forwarders* bieden dat aan voor elke forwarder die met een oudere loader is gemaakt.
+
+### Een beveiligde forwarder blijft na de pincode op het scherm van zijn poort staan
+
+De pincode is geaccepteerd, het scherm met het icoon van de homebrew blijft staan en er gebeurt niets meer: zijn poort tekende dat scherm met één enkele buffer, en wachtte eindeloos om het volgende te tekenen. Werk PlayGuard bij en maak hem dan opnieuw: de bel en *Console › Forwarders* bieden dat aan voor elke forwarder die met een oudere poort is gemaakt.
+
+### Een forwarder toont "De software kan niet worden gestart"
+
+De console weigerde hem te starten: er is nog een handtekeningcontrole actief. In de volgorde waarin je moet kijken:
+
+- **sigpatch-bestanden naast sys-patch.** `.ips`-bestanden in `atmosphere/kip_patches/fs_patches`, `loader_patches` of `atmosphere/exefs_patches/es_patches` terwijl sys-patch draait: twee hulpmiddelen die dezelfde controles patchen, de oorzaak die de topics over sys-patch en sigpatches op GBAtemp het vaakst noemen. *Console › Gamepatches* waarschuwt ervoor, en Ⓐ daar zet ze opzij (verplaatst naar `config/playguard/sigpatches-aside/`, nooit verwijderd; `bootloader/patches.ini` van hekate blijft). Start de console opnieuw op.
+- **Een patroon dat sys-patch niet heeft toegepast.** Forwarders hebben zijn patches voor fs en loader nodig, elk patroon dat het voor deze firmware heeft (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), niet maar één per module. *Info › Hulp en diagnose › Een diagnoserapport exporteren* vermeldt op zijn regel `game patches` de versie van sys-patch en elk overgeslagen patroon; `sd:/config/sys-patch/log.ini` bevat hetzelfde. Controleer dat `config/sys-patch/config.ini` dit systeem patcht (`patch_emummc=1` op emuMMC) en er geen enkele uitschakelt; de maintainer van sys-patch zelf zegt dat 23.0.x geen nieuwere sys-patch nodig heeft dan 1.6.2.3.
+- **Geen herstart sinds de patches zijn gewijzigd.** sys-patch patcht bij het opstarten.
+- **Een forwarder die door een oudere PlayGuard is gemaakt.** De bel en *Console › Forwarders* bieden aan om die met een oudere loader opnieuw te maken.
+
 ### De bel of een tabblad toont een oranje badge
 
 Er moet iets gebeuren: Ⓨ opent de lijst, en Ⓐ op een melding voert de oplossing uit of opent de plek waar je het oplost ([meldingen](features.md#meldingen--wat-je-aandacht-vraagt-vanuit-elk-tabblad)).
@@ -86,7 +103,7 @@ Er moet iets gebeuren: Ⓨ opent de lijst, en Ⓐ op een melding voert de oploss
 
 Een fout toont de code van het systeem (zoals `0x0001088E`) met wat erover bekend is: wat je moet doen bij de codes waarvan de betekenis bekend is, anders helpt een rapport.
 
-1. *Info › Hulp en diagnose › Een diagnoserapport exporteren* slaat een tekstbestand op in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère-versie, hoe lang het opstarten duurde en hoe lang de trage schermen duurden (de wijzigingsgeschiedenis, *Alle games*, de controle van de geïnstalleerde games, de tabbladen die zichzelf vernieuwen), klokken, opslag, de status van het afschermen van het serienummer en van de gamepatches, het ruwe resultaat van elke opvraging van het ouderlijk toezicht, en de logs: hoe de laatste sessie eindigde, het geheugen en de ruimte op de SD-kaart die nog vrij zijn, de nieuwste crashbestanden en de laatste 80 gelogde regels. **Het bevat nooit de pincode of het serienummer.**
+1. *Info › Hulp en diagnose › Een diagnoserapport exporteren* slaat een tekstbestand op in `sd:/config/playguard/logs/reports/`: firmware, Atmosphère-versie, hoe lang het opstarten duurde en hoe lang de trage schermen duurden (de wijzigingsgeschiedenis, *Alle games*, de controle van de geïnstalleerde games, de tabbladen die zichzelf vernieuwen), klokken, opslag, de status van het afschermen van het serienummer en van de gamepatches, wat de DNS-omleiding van Atmosphère doet met de servers van Nintendo voor ouderlijk toezicht en tijd (gelezen uit zijn hosts-bestand op de SD-kaart, geen netwerktest, met het einde van Atmosphères eigen `atmosphere/logs/dns_mitm_startup.log`), het ruwe resultaat van elke opvraging van het ouderlijk toezicht, en de logs: hoe de laatste sessie eindigde, het geheugen en de ruimte op de SD-kaart die nog vrij zijn, de nieuwste crashbestanden en de laatste 80 gelogde regels. **Het bevat nooit de pincode of het serienummer.**
 2. [Open een issue](https://github.com/JigSawFr/PlayGuard/issues/new) en voeg het toe.
 
 ### Een rapport online versturen
@@ -98,7 +115,7 @@ Met de console online verstuurt *Info › Hulp en diagnose › Rapport online ve
   - de logs van deze sessie en de vorige (`logs/sessions/`; bij een lang log: het begin en de laatste 64 KiB);
   - de debugbestanden: de referentie van het speeltijdblok, het einde van de opname van de speeltijdtimer zolang *Speeltijdtimer vastleggen* aan staat, de laatste 20 wijzigingen uit de wijzigingsgeschiedenis (zonder namen van games, accounts of profielen, en met alleen hun datum), en de instellingen van PlayGuard.
 - **Aanmelden:** ben je afgemeld, dan biedt PlayGuard eerst aan om je aan te melden; *GitHub-account*, eronder zodra je bent aangemeld, meldt je af; als GitHub de gist weigert, biedt PlayGuard aan om opnieuw aan te melden.
-- **Daarna:** het toont de link en twee QR-codes: het rapport, en het formulier voor een bugmelding met de link, je versies, hoe PlayGuard werd gestart (boven een game of vanuit het album; voeg het menu toe) en het systeem (sysMMC of emuMMC) al ingevuld. Elke link wordt in `logs/uploads/` bewaard als internetsnelkoppeling (`.url`) die een computer in zijn browser opent.
+- **Daarna:** het toont twee QR-codes, met de link onder de eerste, zijn id in groepjes van vier om voor te lezen of over te typen: het rapport, voor wie je al helpt, en het formulier voor een bugmelding met de link, je versies, hoe PlayGuard werd gestart (boven een game of vanuit het album; voeg het menu toe) en het systeem (sysMMC of emuMMC) al ingevuld, om te scannen om een bug te melden. De link blijft ook in de meldingen staan, en elke link wordt in `logs/uploads/` bewaard als internetsnelkoppeling (`.url`) die een computer in zijn browser opent.
 
 > [!WARNING]
 > Iedereen met de link kan het rapport lezen, tot je de gist op GitHub verwijdert, en een bugmelding die ermee wordt geopend, is openbaar: de bevestiging zegt dat.
@@ -140,20 +157,20 @@ Druk zeven keer op Ⓨ op *Info › Versie*; de ontwikkelaarstools verschijnen o
 
 - een van de laatste 20 releases (inclusief voorlopige versies, met een label);
 - een van de laatste 20 commits van `main`;
-- de nieuwste build van een open pull request vanuit een branch van deze repository (nooit vanuit een fork: die code is nog niet nagekeken). A op het tabblad van de pull requests, als dat wordt getoond, sorteert ze andersom (nieuwste build eerst, of op nummer).
+- de nieuwste build van een open pull request vanuit een branch van deze repository (nooit vanuit een fork: die code is nog niet nagekeken). A op het tabblad van de pull requests, als dat wordt getoond, sorteert ze andersom (nieuwste build eerst, of op nummer): de knophint van A zegt welke.
 
-**Elke build** toont zijn titel (het onderwerp van een commit of pull request; het volledige bericht van een commit is de beschrijving) boven labels: het soort wijziging (*Functie*, *Oplossing*, *Docs*…) en het bereik ervan, *Incompatibel*, de pull request waar een commit vandaan komt, hoe de controles afliepen (*CI OK*, *CI mislukt*, *CI bezig*), voorlopige versie, *geïnstalleerd* of *nieuw*; hoe oud hij is en zijn commit rechts. Een build opent eerst zijn pagina: labels (het soort, de controles, geïnstalleerd of nieuw), een kaart met gegevens (gebouwd, grootte, commit, checksum, wanneer GitHub hem verwijdert), **Installeren**, **Bekijken op GitHub** (de pagina als QR-code voor een telefoon), en dan de opmerkingen van een release of de beschrijving van een pull request, opgemaakt vanuit de Markdown van GitHub (koppen, lijsten, selectievakjes, code, citaten en waarschuwingen, tabellen).
+**Elke build** toont zijn titel (het onderwerp van een commit of pull request; het volledige bericht van een commit is de beschrijving) boven labels: het soort wijziging (*Functie*, *Oplossing*, *Docs*…) en het bereik ervan, *Incompatibel*, de pull request waar een commit vandaan komt, hoe de controles afliepen (*CI OK*, *CI mislukt*, *CI bezig*), voorlopige versie, *geïnstalleerd* of *nieuw*; hoe oud hij is (in minuten, uren en dan dagen) en zijn commit rechts. Een build opent eerst zijn pagina: labels (het soort, de controles, geïnstalleerd of nieuw), een kaart met gegevens (gebouwd, grootte, commit, checksum, wanneer GitHub hem verwijdert), **Installeren**, **Bekijken op GitHub** (de pagina als QR-code voor een telefoon), een waarschuwing als de controles nog bezig zijn, en dan de opmerkingen van een release of de beschrijving van een pull request, opgemaakt vanuit de Markdown van GitHub (koppen, lijsten, selectievakjes, code, citaten en waarschuwingen, tabellen).
 
 **Veilig om te lezen:** alles wat van GitHub komt, wordt als platte tekst getoond: er wordt geen link geopend, geen HTML of script uitgevoerd, en onzichtbare tekens die een titel zouden kunnen vermommen (overschrijvingen van rechts naar links, tekens met nulbreedte, besturingstekens, ongeldige UTF-8) worden verwijderd.
 
 **Aanmelden.** De releases hebben niets nodig; de andere zijn de artefacten van de build-workflow, die GitHub alleen aan aangemelde gebruikers geeft. **GitHub-account** meldt aan met een code en een QR-code om met een telefoon te scannen. De enige gevraagde rechten zijn het lezen van de bestanden van de build-workflow (Actions) en het maken van gists, voor *Rapport online versturen*; verder kan het token alleen lezen wat openbaar is. Het wordt bewaard in `github_token`, nooit met een rapport meegestuurd, en *GitHub-account* meldt af. Aangemeld neemt Ⓨ (*Zoeken*) het nummer van een pull request (open of gesloten) of een commit (7 tot 40 hexadecimale tekens) en vindt de build ervan, alleen vanuit een branch van deze repository.
 
-**Installeren:** PlayGuard downloadt de build, controleert hem (grootte, de SHA-256 die GitHub vastlegt, de NRO-header), zet hem in de plaats van zijn eigen `.nro` en herstart ermee (eerst wordt de pincode gevraagd als er een is ingesteld).
+**Installeren:** PlayGuard downloadt de build, controleert hem (grootte, de SHA-256 die GitHub vastlegt, de NRO-header), zet hem in de plaats van zijn eigen `.nro` en herstart ermee (eerst wordt de pincode gevraagd als er een is ingesteld). Het venster zegt bij welke stap het is, de grootte en snelheid van de download, en welke build hij vervangt; Annuleren verdwijnt zodra de build op zijn plaats wordt gezet.
 
-- De lijst wordt 10 minuten bewaard en meteen getoond, met hoe oud hij is (Ⓧ haalt hem opnieuw op); terwijl hij wordt opgehaald, toont een balk hoe ver het is.
+- De lijst wordt 10 minuten bewaard en meteen getoond, met hoe oud hij is (Ⓧ haalt hem opnieuw op, en het scherm doet dat elke 3 minuten zolang de controles van een build bezig zijn); terwijl hij wordt opgehaald, toont een balk hoe ver het is.
 - Een afgebroken download (netwerk weggevallen) gaat verder waar hij stopte de volgende keer dat dezelfde build wordt geïnstalleerd.
 - Artefacten verlopen na 90 dagen.
 
-**Teruggaan.** De vervangen build blijft bewaard (`playguard.nro.previous`): **Terug naar de vorige build** in dezelfde lijst wisselt ze weer om, na de pincode. Als een build die hier (of via een update in PlayGuard zelf) is geïnstalleerd, crasht vóór zijn eerste scherm, biedt de volgende start van PlayGuard aan om terug te gaan naar de vorige build, op een eenvoudig tekstscherm, voordat er iets anders wordt geladen (A gaat terug, B start hem toch), zonder pincode, omdat juist het pincodescherm zelf kan crashen. Met dezelfde lijst kun je altijd terug naar elke release.
+**Teruggaan.** De vervangen build blijft bewaard (`playguard.nro.previous`): **Terug naar de vorige build** in dezelfde lijst wisselt ze weer om, na de pincode; het noemt die build bij zijn versie, zijn pull request en zijn commit. Als een build die hier (of via een update in PlayGuard zelf) is geïnstalleerd, crasht vóór zijn eerste scherm, biedt de volgende start van PlayGuard aan om terug te gaan naar de vorige build, op een eenvoudig tekstscherm, voordat er iets anders wordt geladen (A gaat terug, B start hem toch), zonder pincode, omdat juist het pincodescherm zelf kan crashen. Met dezelfde lijst kun je altijd terug naar elke release.
 
 **Welke build draait:** *Info › Versie* toont de commit in ontwikkelaarsmodus. De kopregel van elk scherm toont de draaiende versie naast de titel: die van een release in een grijs label (`1.2.0`), die van elke andere build in een oranje label gevolgd door de commit, zodat een testbuild nooit voor de release wordt aangezien.

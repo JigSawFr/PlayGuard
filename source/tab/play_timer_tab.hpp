@@ -2,8 +2,9 @@
 // every day" chips, the week as the editor (CadranWeekView: A on a day edits
 // it with the stick, the changes are saved together, as in the per-day
 // editor; the time played in its bars), then bedtime, time's up and the
-// removal as chips. Under them: extra time today, stop for today, weekdays
-// and weekend, when play is allowed again after bedtime, the extra-time
+// removal as chips. Under them: weekdays and weekend, a line to Today (extra
+// time, no more play today), "Block all games" (every day's limit at 0),
+// when play is allowed again after bedtime, the extra-time
 // settings (amounts offered, the usual limit put back the next day by
 // itself) and a line to the advanced (debug-class) actions.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -47,10 +48,12 @@ class PlayTimerTab : public TabBase
     BRLS_BIND(brls::Box,         top,             "pt_top");
     BRLS_BIND(brls::Label,       fw_note,         "pt_fw_note");
     BRLS_BIND(brls::Header,      limit_header,    "pt_limit_header");
-    BRLS_BIND(brls::DetailCell,  extra,           "pt_extra");
-    BRLS_BIND(brls::DetailCell,  stop,            "pt_stop");
     BRLS_BIND(brls::DetailCell,  split,           "pt_split");
+    BRLS_BIND(brls::DetailCell,  today,           "pt_today");
     BRLS_BIND(brls::Label,       limit_note,      "pt_limit_note");
+    BRLS_BIND(brls::Header,      lock_header,     "pt_lock_header");
+    BRLS_BIND(brls::DetailCell,  console_lock_cell, "pt_console_lock");
+    BRLS_BIND(brls::Label,       console_lock_note, "pt_console_lock_note");
     BRLS_BIND(brls::Header,      bedtime_header,  "pt_bedtime_header");
     BRLS_BIND(brls::DetailCell,  bedtime_reset,   "pt_bedtime_reset");
     BRLS_BIND(brls::Label,       bedtime_note,    "pt_bedtime_note");

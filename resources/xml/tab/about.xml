@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- About: the installed PlayGuard and help with it. The app (version —
-     Ⓐ opens every version's release notes, on a screen of their own; seven
-     presses of a hidden Ⓨ turn the developer tools on, at the end of Help &
-     diagnostics, below —, launch mode, data folder); all of its updates
-     (check now, every day, how); a line to Help & diagnostics
-     (tab/help.xml, on a screen of its own); the credits; how to support it
-     (QR codes of the funding links, Ⓐ shows one larger), and "Made in
-     France". -->
+<!-- About: the installed PlayGuard and help with it. Its card first (the
+     mark, the name, the version), then the version (Ⓐ opens every version's
+     release notes, on a screen of their own; seven presses of a hidden Ⓨ
+     turn the developer tools on, at the end of Help & diagnostics, below)
+     and checking for updates now (every day and how: Preferences); a line
+     to Help & diagnostics (tab/help.xml, on a screen of its own, with the
+     launch mode and the data folder); the credits and the licence, in one
+     dialog; how to support it (QR codes of the funding links, Ⓐ shows one
+     larger), and "Made in France". -->
 
 <brls:Box
     width="auto"
@@ -30,20 +31,9 @@
 
             <brls:Header title="@i18n/playguard/tools/section_about" marginBottom="8"/>
             <brls:DetailCell id="ab_version" title="@i18n/playguard/tools/version"/>
-            <brls:DetailCell id="ab_mode" focusable="false" title="@i18n/playguard/tools/mode"/>
-            <brls:DetailCell id="ab_data" focusable="false" title="@i18n/playguard/tools/data"/>
-            <brls:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="ab_update" title="@i18n/playguard/tools/update"/>
-            <brls:BooleanCell id="ab_update_daily"/>
-            <brls:DetailCell id="ab_update_via" title="@i18n/playguard/tools/update_via"/>
             <brls:DetailCell id="ab_help" title="@i18n/playguard/prefs/help" marginTop="24"/>
-            <brls:Header title="@i18n/playguard/about/section_credits" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="ab_author" focusable="false" title="@i18n/playguard/about/credit_author"/>
-            <brls:DetailCell id="ab_upstream" focusable="false" title="@i18n/playguard/about/credit_upstream"/>
-            <brls:DetailCell id="ab_fixes" focusable="false" title="@i18n/playguard/about/credit_fixes"/>
-            <brls:DetailCell id="ab_ui" focusable="false" title="@i18n/playguard/about/credit_ui"/>
-            <brls:DetailCell id="ab_license" focusable="false" title="@i18n/playguard/tools/license"/>
-            <brls:DetailCell id="ab_source" title="@i18n/playguard/tools/source"/>
+            <brls:DetailCell id="ab_credits" title="@i18n/playguard/about/credits_open" marginTop="24"/>
             <brls:Header title="@i18n/playguard/about/section_support" marginTop="24" marginBottom="8"/>
             <brls:Label id="ab_support_note" text="@i18n/playguard/about/support_note" fontSize="20" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Box id="ab_funding" width="auto" height="auto" axis="row" justifyContent="spaceEvenly" marginTop="8"/>

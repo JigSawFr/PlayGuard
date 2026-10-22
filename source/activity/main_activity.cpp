@@ -32,9 +32,8 @@
 
 using namespace brls::literals;
 
-// Nine tabs and three separators do not fit the 720p sidebar at borealis'
-// sizes (70 px items, 30 px separators): "Tools" and "About" fell below the
-// edge (559 px between the header and the footer: 20 + 9 × 54 + 3 × 16 = 554).
+// Ten tabs and three separators do not fit the 720p sidebar at borealis'
+// sizes (70 px items, 30 px separators): the last tabs fell below the edge.
 // Tighter items there only; detail cells keep the shared 70 px.
 static void compact_sidebar(brls::View* tab_frame)
 {
@@ -237,8 +236,8 @@ void MainActivity::update_notice_hint()
     if (!sidebar) return;
     static const std::pair<int, const char*> TABS[] = {
         { ui::tab::dashboard, "dashboard" }, { ui::tab::play_timer, "play_timer" }, { ui::tab::activity, "activity" },
-        { ui::tab::security, "security" },   { ui::tab::console, "console" },       { ui::tab::preferences, "preferences" },
-        { ui::tab::about, "about" },
+        { ui::tab::security, "security" },   { ui::tab::history, "history" },       { ui::tab::console, "console" },
+        { ui::tab::preferences, "preferences" }, { ui::tab::about, "about" },
     };
     for (const auto& t : TABS)
         if (TabBadge* badge = TabBadge::of(sidebar->getItem(t.first))) badge->set_count(notices::tab_count(t.second));

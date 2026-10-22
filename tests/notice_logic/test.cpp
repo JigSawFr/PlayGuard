@@ -61,9 +61,9 @@ static void test_tabs()
         CHECK(tab_of(id) == "console");
     for (const char* id : { "pin_missing", "pin_weak", "pin_lock_off" }) CHECK(tab_of(id) == "security");
     CHECK(tab_of("unlocked") == "");
-    for (const char* id : { "alarm_off", "not_counting" }) CHECK(tab_of(id) == "play_timer");
+    for (const char* id : { "alarm_off", "not_counting", "console_lock_long" }) CHECK(tab_of(id) == "play_timer");
     CHECK(tab_of("outside") == "dashboard" && tab_of("extra_restore") == "dashboard");
-    CHECK(tab_of("backup") == "preferences");
+    CHECK(tab_of("backup") == "history");
     CHECK(tab_of("new") == "");
 
     // A tab counts its entries to do only: not those for information, put

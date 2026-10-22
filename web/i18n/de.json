@@ -92,7 +92,7 @@
   "capture": "Screenshots"
  },
  "params": {
-  "tab": {"label": "Öffnet mit", "options": {"": "Heute", "play_timer": "Spielzeit", "activity": "Aktivität", "restrictions": "Einschränkungen", "security": "Geheimzahl", "console": "Konsole", "preferences": "Optionen", "about": "Info"}},
+  "tab": {"label": "Öffnet mit", "options": {"": "Heute", "play_timer": "Spielzeit", "activity": "Aktivität", "restrictions": "Einschränkungen", "security": "Sicherheit", "history": "Verlauf", "console": "Konsole", "preferences": "Optionen", "about": "Info"}},
   "keep": {"label": "Zustand zwischen Besuchen behalten", "help": "Die Daten von PlayGuard und die Einstellungen der simulierten Konsole (Geheimzahl, Limits, Uhren) bleiben in diesem Browser; die Konsolen-Einstellungen dieses Bereichs gelten dann nur beim ersten Start. Damit lebt die Konsole weiter: Ihre heutige Spielzeit zählt in Echtzeit und bleibt ebenfalls, und „Konsole neu starten“ beendet eine vorübergehende Aufhebung."},
   "not_set_up": {"label": "Nie eingerichtet (keine Geheimzahl)"},
   "unlocked": {"label": "Vorübergehend entsperrt"},

@@ -6,6 +6,7 @@
 #include <fmt/format.h>
 #include <vector>
 
+#include "action/console_lock.hpp"
 #include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
@@ -83,8 +84,8 @@ PlayTimerTab::PlayTimerTab()
     // The keys and the bars' key on two lines when the text is larger.
     kit::wrap(this->getView("cpt_keys_idle"));
     kit::wrap(this->getView("pt_chips"));
-    this->list.apply({ { "pt_extra", "plus" }, { "pt_stop", "stop" },
-                       { "pt_split", "calendar" }, { "pt_bedtime_reset", "moon" }, { "pt_extra_amounts", "plus" },
+    this->list.apply({ { "pt_split", "calendar" }, { "pt_today", "today" }, { "pt_console_lock", "gamepad" },
+                       { "pt_bedtime_reset", "moon" }, { "pt_extra_amounts", "plus" },
                        { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" } });
 
     // The week: edited here, saved together (+ or Save), as in the per-day editor.
@@ -162,14 +163,31 @@ PlayTimerTab::PlayTimerTab()
     this->mark(advanced.getView(), { "alarm_off" });
     this->enable_auto_refresh(5000);
 
-    extra->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        pt_flow::add_extra_time(this->pt, [this]() { this->refresh(); });
+    // Extra time and no more play today are Today's: a line to it.
+    ui::set_detail(today, ui::opens("playguard/tabs/dashboard"_i18n));
+    today->registerClickAction([](brls::View* view) {
+        ui::go_to_tab(view, ui::tab::dashboard);
         return true;
     });
-    stop->registerClickAction([this](brls::View*) {
+    // Every day's limit at 0 (action/console_lock), the previous ones back
+    // when it is turned off.
+    this->mark(console_lock_cell.getView(), { "console_lock_long" });
+    console_lock_note->setSingleLine(false);
+    console_lock_cell->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
+        PtState pt;   // read again: the tab's is up to 5 s old
+        pctl_play_timer_query(&pt);
+        if (!pt.fw_supported) {
+            ui::error("", NXM_RC_FW_UNSUPPORTED);
+            return true;
+        }
+        PctlStatus s;
+        pctl_status_fetch(&s);
+        if (!(s.pin_length_ok && s.pin_length > 0)) {   // nothing gates play without a PIN
+            ui::info("playguard/console_lock/needs_pin"_i18n);
+            return true;
+        }
+        console_lock::set(!console_lock::active(), pt, [this]() { this->refresh(); });
         return true;
     });
     ui::set_detail(split, ui::opens());
@@ -226,20 +244,23 @@ void PlayTimerTab::refresh()
     ui::note_unlocked(this->pt.temporary_unlocked_valid, this->pt.temporary_unlocked);
     ui::set_visible(fw_note.getView(), !fw_ok);
     for (brls::View* v : { (brls::View*)limit_header.getView(), (brls::View*)split.getView(),
-                           (brls::View*)limit_note.getView() })
+                           (brls::View*)today.getView(), (brls::View*)limit_note.getView(),
+                           (brls::View*)lock_header.getView(), (brls::View*)console_lock_cell.getView(),
+                           (brls::View*)console_lock_note.getView() })
         ui::set_visible(v, fw_ok);
     // When the time is up: only with something set (pt_configured), the
     // only time the choice means anything.
     ui::set_visible(time_up_chip.getView(), fw_ok && this->pt.valid && pt_configured(this->pt.block));
     const int wd = ui::today_weekday();
-    ui::set_visible(extra.getView(), pt_logic::can_add_extra_time(this->pt, wd, false));
-    ui::set_visible(stop.getView(), pt_logic::can_stop_today(this->pt, wd, false));
     // Read-only: the actions that write stay in sight, greyed (A says why).
-    for (brls::DetailCell* c : { (brls::DetailCell*)extra.getView(), (brls::DetailCell*)stop.getView(),
-                                 (brls::DetailCell*)split.getView(), (brls::DetailCell*)bedtime_reset.getView(),
+    for (brls::DetailCell* c : { (brls::DetailCell*)split.getView(), (brls::DetailCell*)console_lock_cell.getView(),
+                                 (brls::DetailCell*)bedtime_reset.getView(),
                                  (brls::DetailCell*)extra_amounts.getView(), (brls::DetailCell*)extra_auto.getView() })
         ui::show_writable(c, writable);
-    ui::set_detail(extra, pt_flow::extra_today_text(this->pt));
+    const bool locked = console_lock::active();
+    ui::set_detail(console_lock_cell, locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
+    console_lock_cell->setDetailTextColor(locked ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    ui::set_text(console_lock_note, locked ? "playguard/console_lock/note_on"_i18n : "playguard/console_lock/note_off"_i18n);
     for (brls::View* v : { (brls::View*)bedtime_header.getView(), (brls::View*)bedtime_reset.getView(),
                            (brls::View*)bedtime_note.getView() })
         ui::set_visible(v, fw_ok);

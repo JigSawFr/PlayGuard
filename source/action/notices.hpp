@@ -102,7 +102,8 @@ void note_write(const char* what, bool ok, const std::string& error = "");
 // next refresh_status, not at most once a minute as otherwise.
 void sd_written();
 
-// Opens tab `position` (ui::tab) of the main screen, under the list.
-void open_tab(int position);
+// Opens tab `position` (ui::tab) of the main screen, under the list, the
+// focus on its line `row` when given.
+void open_tab(int position, const std::string& row = "");
 
 }   // namespace notices

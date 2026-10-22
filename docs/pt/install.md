@@ -1,15 +1,18 @@
-<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
+<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
 # Instalação
 
 Como instalar, atualizar e remover o PlayGuard, e o que ele escreve no cartão SD. Depois de instalado: [como começar](getting-started.md). Voltar ao [README](../../README.md).
 
 ## Onde o obter
 
+> [!WARNING]
+> O PlayGuard **ainda não está na Homebrew App Store (nem na do sphaira)**: a sua ficha ainda aguarda aprovação. Por agora, instale-o manualmente.
+
 À escolha:
 
-- **Homebrew App Store** / **App Store do sphaira** (o mesmo catálogo) — Procure *PlayGuard* depois de a ficha ser aprovada. As novas versões são obtidas automaticamente, depois de uma revisão: muitas vezes alguns dias depois do GitHub. O PlayGuard sabe que foi instalado a partir dali e recomenda atualizar através da loja.
+- **Manualmente** (recomendado por agora) — Transfira o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) e extraia-o para a **raiz** do cartão SD. A aplicação fica em `sd:/switch/playguard/` e os seus ficheiros em `sd:/config/playguard/`.
 - **sphaira › GitHub** — O zip da versão já contém a entrada (`/config/sphaira/github/playguard.json`): depois de uma primeira instalação, atualize a partir de *GitHub* no sphaira.
-- **Manualmente** — Transfira o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) e extraia-o para a **raiz** do cartão SD. A aplicação fica em `sd:/switch/playguard/` e os seus ficheiros em `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store do sphaira** (o mesmo catálogo) — **Ainda não disponível.** Depois de a ficha ser aprovada, procure *PlayGuard*. As novas versões passam então a ser obtidas automaticamente, depois de uma revisão: muitas vezes alguns dias depois do GitHub. O PlayGuard sabe que foi instalado a partir dali e recomenda atualizar através da loja.
 
 O **sysmodule de recuperação** opcional (`playguard-rescue.zip`) transfere-se à parte: extraia-o também para a raiz do cartão SD e depois reinicie a consola. Fica em `atmosphere/contents/4200000000505247/` e só atua quando um ficheiro `RESCUE` o pede — veja [Consola bloqueada?](troubleshooting.md#consola-bloqueada).
 
@@ -33,7 +36,7 @@ Todos em `sd:/config/playguard/` (a aplicação em si fica em `sd:/switch/playgu
 - **`profiles/`** — Perfis de limites de tempo de jogo guardados
 - **`exports/`** — Exportações da atividade
 - **`nand/<sistema>/`** — O que pertence a um sistema, cada um com o seu próprio controlo parental: `sysmmc/` para o sysMMC, `emummc/` para o emuMMC. Lá dentro: `history.json` o histórico de alterações (as 500 mais recentes, incluindo as que a consola recusou; se não puder ser lido, é guardado como `history.json.bad`, o anterior como `.bad.1`, em vez de ser substituído, e o PlayGuard avisa uma vez); `state.json` o que *Bloquear todos os jogos*, o tempo extra, um novo bloqueio pendente e a escolha do firmware precisam de lembrar ([config.md](../config.md#state-kept-between-launches), em inglês); `watch.json` o que o PlayGuard viu da consola da última vez, para dizer o que mudou fora dele ([config.md](../config.md#watchjson), em inglês; eliminá-lo não faz mal); `backups/` as cópias de segurança das definições (nunca contêm o PIN); `cache/` a última atividade de jogo lida (todas as contas, e cada conta consultada), mostrada logo no arranque seguinte enquanto o registo é lido de novo. Os ficheiros de uma versão anterior a estas pastas vão para o primeiro sistema em que o PlayGuard arranca
-- **`cache/`** — Os ícones dos jogos (`icons/`, 16 MB no máximo, esvaziada quando o idioma da consola muda), partilhados por todos os sistemas, para que os nomes e ícones não sejam lidos de novo de cada jogo a cada arranque; as notas da versão do Atmosphère, do hekate e do firmware (`sys_notes.json`, para *Consola*) e as do próprio PlayGuard (para *Sobre*); no modo de programador, a lista de *Instalar outra compilação* (`dev_builds.json`)
+- **`cache/`** — Os ícones dos jogos (`icons/`, 16 MB no máximo, esvaziada quando o idioma da consola muda), partilhados por todos os sistemas, para que os nomes e ícones não sejam lidos de novo de cada jogo a cada arranque; as notas da versão do Atmosphère, do hekate, do sys-patch e do firmware (`sys_notes.json`, para *Consola*) e as do próprio PlayGuard (para *Sobre*); no modo de programador, a lista de *Instalar outra compilação* (`dev_builds.json`)
 - **`github_token`** — A sessão GitHub de *Enviar um relatório online* e, no modo de programador, de *Instalar outra compilação*; eliminado ao terminar a sessão (*Sobre › Ajuda e diagnóstico › Conta GitHub*, mostrado depois de iniciar sessão)
 - **`previous_build.json`**, **`boot_check.json`** — Depois de uma compilação ser instalada no lugar da atual: o nome da compilação substituída (guardada junto do `.nro` como `playguard.nro.previous`) e a verificação do arranque seguinte (eliminado assim que o seu primeiro ecrã aparece)
 - **`rescue_report.txt`** — Deixado pelo sysmodule de recuperação depois de atuar, até o PlayGuard o mostrar ao arrancar (se não o puder ler, é removido, e o PlayGuard avisa)

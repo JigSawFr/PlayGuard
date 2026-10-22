@@ -20,6 +20,7 @@
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "core/sysinfo.h"
 #include "tab/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -220,7 +221,8 @@ HelpTab::HelpTab()
     // skin would dress it without).
     cadran::List list(this, true);
     list.tiles({ { "hp_first_steps", "sparkle" }, { "hp_upload", "upload" } }, false);
-    list.apply({ { "hp_export", "file" }, { "hp_github", "user" }, { "hp_logs_keep", "folder" }, { "hp_logs_keep_days", "calendar" },
+    list.apply({ { "hp_export", "file" }, { "hp_github", "user" }, { "hp_mode", "gamepad" }, { "hp_data", "folder" },
+                 { "hp_logs_keep", "folder" }, { "hp_logs_keep_days", "calendar" },
                  { "hp_logs_keep_mb", "save" }, { "hp_dev_mode", "code" }, { "hp_dev_read_only", "eye" },
                  { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" }, { "hp_dev_glow", "sparkle" },
                  { "hp_dev_clear_cache", "trash" }, { "hp_dev_clear_logs", "trash" },
@@ -232,6 +234,11 @@ HelpTab::HelpTab()
 void HelpTab::refresh()
 {
     const auto& cfg = config::get();
+    // How PlayGuard was opened and where it keeps its files (About before).
+    SysInfo si;
+    sysinfo_get(&si);
+    mode->setDetailText(si.applet_mode ? "playguard/tools/mode_applet"_i18n : "playguard/tools/mode_app"_i18n);
+    data->setDetailText(paths::data_dir());
     logs_keep->setDetailText(logs_keep_text(cfg.logs_keep));
     logs_keep_days->setDetailText(logs_days_text(cfg.logs_keep_days));
     logs_keep_mb->setDetailText(logs_mb_text(cfg.logs_keep_mb));

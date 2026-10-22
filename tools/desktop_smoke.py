@@ -2,7 +2,7 @@
 """Headless UI smoke test of the desktop build (simulated backend).
 
 Starts build-desktop/playguard on an X display (Xvfb), opens every tab, the
-extra-time picker, the per-day editor (a day's picker and the stepper of an
+per-day editor (a day's picker and the stepper of an
 exact duration), the time-up choice, a bedtime alarm change, the settings
 backup and the change history (filtered, then not), and fails if the app
 dies on the way (borealis throws on unknown XML attributes, missing views,
@@ -830,7 +830,7 @@ if not LOADING and not LOCK:
     if not m or int(m.group(1)) < 2000:
         fail("the first screen came before the end of the intro: " + (ready[0].strip() if ready else "no line"))
 
-tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "console", "preferences", "about"]
+tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "history", "console", "preferences", "about"]
 
 
 def steps(a, b):
@@ -1226,8 +1226,8 @@ if FORWARDERS:
             return []
     self_id = "050537e2542e2000"   # forwarder_id() of sdmc:/switch/playguard/playguard.nro
     key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock
-    key("Down", 2)             # Forwarders, under Homebrew
+    key("Right")               # Network clock, the first tool
+    key("Right", 2)            # past Check the installed games: Forwarders
     shot("00_console")
     key("Return")
     shot("01_forwarders")      # Save Keeper (another app's), PlayGuard to add, no signature patches
@@ -1331,8 +1331,8 @@ if HBMENU:
     if len(recorded("hbmenu_lock_removed")) != 1 or os.path.exists(hbmenu_state):
         fail("the lock taken away outside PlayGuard was not told")
     key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock
-    key("Down", 2)             # Forwarders, under Homebrew
+    key("Right")               # Network clock, the first tool
+    key("Right", 2)            # past Check the installed games: Forwarders
     key("Return")
     key("Down", 4)             # PlayGuard's line, Another homebrew, Install them all again, Lock the homebrew menu
     key("Return")
@@ -1461,8 +1461,8 @@ if HOMEBREW:
         except OSError:
             return ""
     key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock
-    key("Down", 2)             # Forwarders, under Homebrew
+    key("Right")               # Network clock, the first tool
+    key("Right", 2)            # past Check the installed games: Forwarders
     key("Return")
     shot("01_in_use")          # the card, the groups, the badges, sphaira paused
     key("Down")                # sphaira
@@ -1563,8 +1563,7 @@ if LIBRARY:
                 for l in open(os.path.join(OUT, "app.log"), errors="replace") if "games list: " in l]
     key("Down", steps("dashboard", "activity"))
     key("Right")               # Every account, the first chip
-    key_to_end("Down", hold=0.15)   # the end of the tab, the focus on its last line
-    go_to("All games", "Up")
+    go_to("All games")
     key("Return")
     shot("01_games")           # the covers, the first one's figures on top
     if not listed() or not listed()[-1].startswith("50 of ") or not listed()[-1].endswith("(grid)"):
@@ -2026,16 +2025,12 @@ if not GAMES:
         shot(f"{i:02d}_{tab}_end")
         key("Left")       # back to the sidebar
 
-    # Play timer: the extra-time picker, then the per-day editor from Weekdays
-    # and weekend (its Monday–Friday picker first), a day's picker there and
-    # an exact duration with the stepper, discarded.
+    # Play timer: the per-day editor from Weekdays and weekend (its
+    # Monday–Friday picker first), a day's picker there and an exact
+    # duration with the stepper, discarded. (Extra time is Today's.)
     key("Up", steps("play_timer", tabs[-1]))   # from the last tab back to Play timer
     key("Right")               # the profile chip
-    key("Down", 3)             # the week, the bedtime chip: Extra time today...
-    key("Return")
-    shot("20_extra_time")
-    key("Escape")
-    key("Down", 2)             # past No more play today: Weekdays and weekend
+    key("Down", 3)             # the week, the bedtime chip: Weekdays and weekend
     key("Return")
     shot("21_split")           # the editor, Monday–Friday picker open
     key("Escape")              # no value: no weekend picker either
@@ -2057,7 +2052,7 @@ if not GAMES:
 
     # When the time is up: its two choices (on "Suspend the software"), and the
     # confirmation of the other one, cancelled.
-    key("Up", 3)               # No more play today, Extra time today: the bedtime chip
+    key("Up")                  # the bedtime chip
     key("Right")               # When the time is up
     key("Return")
     shot("23_time_up_picker")
@@ -2103,7 +2098,7 @@ if not GAMES:
 
     # Play timer › Advanced: its own screen, the switch next to the actions it
     # shows; turned on, then off again (backups restore the alarm only with it on).
-    key("Down", 7)             # past the day's lines, Allowed again at, the extra-time amounts and switch: Advanced
+    go_to("Advanced")          # past the week's lines, Allowed again at, the extra-time amounts and switch
     key("Return")
     shot("23_advanced")
     def advanced_saved(on):
@@ -2125,18 +2120,18 @@ if not GAMES:
         fail("the advanced actions switch was not saved off")
     key("Escape")              # back to the Play timer tab
 
-    # Settings backup: save one, open the list and the restore summary (cancelled).
+    # Settings backup (History): save one, open the list and the restore summary (cancelled).
     key("Left")                # back to the sidebar
-    key("Down", steps("play_timer", "preferences"))
-    key("Right")               # Language, the first tile
-    key("Down", 9)             # past the effects, the intro and the notifications: Changes made with PlayGuard, then Back up the settings, the first tile
+    key("Down", steps("play_timer", "history"))
+    key("Right")               # Changes made with PlayGuard, under the tiles
+    go_to("Back up the settings")
     backups = os.path.join(nand_dir, "backups")
     before = len(os.listdir(backups)) if os.path.isdir(backups) else 0
     key("Return")              # Back up the settings
     shot("24_backup_saved")
     if (len(os.listdir(backups)) if os.path.isdir(backups) else 0) != before + 1:
         fail("Return on 'Back up the settings' saved no backup (wrong cell focused?)")
-    key("Right")               # Restore a backup...
+    key("Down")                # Restore a backup...
     key("Return")
     shot("25_backup_list")
     key("Return")
@@ -2155,7 +2150,7 @@ if not GAMES:
                 return True
             time.sleep(0.25)
         return False
-    key("Up")                  # Changes made with PlayGuard
+    go_to("Changes made with PlayGuard", "Up")
     key("Return")
     shot("27_history")
     if not history_listed("2 of 2 changes"):
@@ -2226,8 +2221,8 @@ os.remove(github_token)
 key("Escape")              # back to About
 key("Left")                # back to the sidebar
 key("Up", steps("console", "about"))
-key("Right")               # Network clock
-key("Down")                # Check the installed games
+key("Right")               # Network clock, the first tool
+key("Right")               # Check the installed games, the tile beside it
 os.remove(games_cache)     # made by the start-up check: this screen's first check, game by game
 key("Return")
 time.sleep(0.8)
@@ -2372,11 +2367,10 @@ exports = os.path.join(run_dir, "playguard_data", "exports")
 def pdfs():
     return {f for f in (os.listdir(exports) if os.path.isdir(exports) else []) if f.endswith(".pdf")}
 pdfs_before = pdfs()   # the run folder is kept between local runs
-key("Left")                # back to the sidebar
+key("Left", 2)             # past Network clock, the tile left of the games': back to the sidebar
 key("Up", steps("activity", "console"))
 key("Right")               # Every account, the first chip
-key_to_end("Down", hold=0.15)   # the end of the tab, the focus on its last line
-go_to("All games", "Up")
+go_to("All games")
 key("Return")              # the covers, on the first game
 shot("28_activity_games")
 key("Return")
@@ -2389,7 +2383,9 @@ shot("28c_activity_games_list")
 key("y")                   # covers again (the config keeps the choice)
 key("Escape")
 key_to_end("Up", hold=0.15)   # the top: the accounts' chips
-key_to_end("Right")        # the row's last chip: Export
+key_to_end("Right")        # the row's last chip: Export or share
+key("Return")
+go_to("Save to the SD card...")   # the formats (the other line: the week as a QR code)
 key("Return")
 go_to("PDF")
 key("Return")

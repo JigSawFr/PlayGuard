@@ -368,12 +368,6 @@ bool restore_pending(const PtState& pt)
     return pt_logic::restore_action(extra_record(), ui::today_date(), pt, app::read_only()) == pt_logic::Restore::Offer;
 }
 
-std::string extra_today_text(const PtState& pt)
-{
-    const int extra = extra_today_minutes(pt);
-    return extra > 0 ? "+" + ui::fmt_minutes((uint16_t)extra) : "";
-}
-
 int extra_today_minutes(const PtState& pt)
 {
     return pt_logic::extra_today_min(extra_record(), ui::today_date(), ui::today_weekday(), pt);
