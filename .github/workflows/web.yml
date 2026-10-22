@@ -10,6 +10,9 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  # The merge queue (build.yml says why): the site built once more on top of
+  # main, its links checked, nothing published (pages.yml leaves it out).
+  merge_group:
   # By hand (Actions › web › Run workflow): `all` builds the simulator, takes
   # every screenshot and renders every tour again, whatever changed.
   workflow_dispatch:
@@ -23,12 +26,13 @@ on:
 permissions:
   contents: read
 
-# A new push to a pull request cancels the build of the commit it replaces.
+# A new push to a pull request cancels the build of the commit it replaces; the
+# merge queue's runs, one group each, are cancelled by the queue itself.
 # main's builds run one at a time, in order: each starts from the last one's
 # site (below), a release's screenshots too.
 concurrency:
-  group: web-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: web-${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && github.ref || 'main' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
 
 env:
   # Emscripten, pinned: a new one is a pull request of its own (its ports, its
@@ -50,7 +54,7 @@ jobs:
     runs-on: ubuntu-26.04
     # Taking every screenshot in both themes and rendering the tours (a
     # release, or by hand): up to an hour and a half.
-    timeout-minutes: ${{ github.event_name == 'pull_request' && 30 || 120 }}
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 30 || 120 }}
     permissions:
       contents: read
       pages: read     # the site's address (its custom domain)
@@ -82,7 +86,9 @@ jobs:
       - name: What to build
         env:
           FORCE: ${{ inputs.screens == 'all' }}
-          IS_PR: ${{ github.event_name == 'pull_request' }}
+          # The merge queue as a pull request: a release pull request in it
+          # does not take every screenshot again (main does, once merged).
+          IS_PR: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
           REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -124,8 +130,10 @@ jobs:
           path: ~/.emscripten_cache
           key: emscripten-${{ env.EMSDK_VERSION }}
       # The compiler's own cache (ccache): the files a change leaves alone
-      # are not compiled again.
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # are not compiled again. Main's, saved by main's builds only (below):
+      # a pull request's would only serve itself and push main's out of the
+      # repository's 10 GB.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: env.BUILD_SIMULATOR == '1'
         with:
           path: ~/.cache/ccache
@@ -142,8 +150,30 @@ jobs:
       # Japanese, Korean and Chinese in the simulator: a CJK font cut out of
       # Noto Sans CJK with fontTools (tools/web_cjk_font.py); the website's
       # documentation is Markdown (tools/build_site.py).
+      # The packages as downloaded by main's last build (68 MB, the CJK font
+      # 61 MB of it): an Ubuntu mirror served them at 78 kB/s once, 14 minutes
+      # of the run (2026-10-22). apt takes them from there and fetches only
+      # what moved since; main's builds save them (build.yml says why only
+      # main's).
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .apt-archives
+          key: apt-web-${{ github.sha }}
+          restore-keys: apt-web-
       - name: Noto Sans CJK, fontTools and Python-Markdown
-        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
+        run: |
+          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives -o Dpkg::Options::=--force-unsafe-io"
+          mkdir -p .apt-archives/partial
+          sudo apt-get update -q
+          sudo apt-get install $archives -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
+          sudo apt-get autoclean $archives > /dev/null
+          sudo chown -R "$USER" .apt-archives
+          rm -f .apt-archives/lock
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: .apt-archives
+          key: apt-web-${{ github.sha }}
       - name: The simulator
         if: env.BUILD_SIMULATOR == '1'
         env:
@@ -159,6 +189,11 @@ jobs:
           make web JOBS="$(nproc)" CMAKE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
           ccache --show-stats || true
           test -f build-web/simulator/cjk.otf || { echo "::error::no CJK font in the web build"; exit 1; }
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: env.BUILD_SIMULATOR == '1' && github.ref == 'refs/heads/main'
+        with:
+          path: ~/.cache/ccache
+          key: ccache-web-${{ env.EMSDK_VERSION }}-${{ github.sha }}
       # The simulator in headless Chromium (tools/web_smoke.py): it must reach
       # its first screen in each kind of start, move the time on and take a
       # live setting without a restart, add the CJK font, keep its state with

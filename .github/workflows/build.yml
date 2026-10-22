@@ -4,6 +4,10 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  # The merge queue: a pull request is built once more on top of main and of
+  # the pull requests queued before it, so two that are green apart cannot
+  # turn main red together (as #326 and #327 did, merged a minute apart).
+  merge_group:
   workflow_dispatch:
   # Weekly, on main: a runner image or Docker Hub change shows up here before
   # it fails a pull request (the visual check depends on the image's mesa).
@@ -32,8 +36,9 @@ permissions:
   contents: read
 
 # A new push to a pull request cancels the run on the commit it replaces. Everything else
-# (main, a release build called by release-please.yml) gets a group of its own and is
-# never cancelled or held back by another run.
+# (main, the merge queue, a release build called by release-please.yml) gets a group of
+# its own and is never cancelled or held back by another run (the queue cancels its own
+# runs when a pull request leaves it).
 concurrency:
   group: build-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
@@ -43,12 +48,18 @@ concurrency:
 # every screen. Moving to the next one is a pull request of its own, with a look
 # at the screenshots. Every job writes a summary on the run page
 # (tools/ci_summary.py), and names its artifacts after the build (the `meta` job).
+#
+# The Actions cache (10 GB for the repository, the oldest entries evicted
+# first) is written by main's builds only: a pull request or the merge queue
+# reads main's caches (restore-keys) but never saves its own, which only it
+# could read back and which would push main's out.
 
 jobs:
   # What is being built: the version (CMakeLists.txt), the commit (a pull
   # request's head, as the artifacts API names the run), and a label for the
   # artifact names, `<version>-<ref>-<commit>`: 1.0.0-pr92-1f0a059,
-  # 1.0.0-main-2bd4996, 1.0.0-release-2bd4996. Its summary heads the run page.
+  # 1.0.0-main-2bd4996, 1.0.0-release-2bd4996, 1.0.0-queue-5c1e2aa (the merge
+  # queue). Its summary heads the run page.
   meta:
     runs-on: ubuntu-26.04
     timeout-minutes: 5
@@ -73,10 +84,12 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           REF_NAME: ${{ github.ref_name }}
+          EVENT: ${{ github.event_name }}
         run: |
           version=$(sed -n 's/^set(VERSION_\(MAJOR\|MINOR\|ALTER\) "\([0-9]*\)").*/\2/p' CMakeLists.txt | paste -sd.)
           if [ -n "$TAG" ]; then ref=release
           elif [ -n "$PR" ]; then ref="pr$PR"
+          elif [ "$EVENT" = merge_group ]; then ref=queue
           else ref=$(printf '%s' "$REF_NAME" | tr -c 'A-Za-z0-9._' '-' | tr -s '-' | cut -c1-40); fi
           sha7=$(printf '%s' "$HEAD_SHA" | cut -c1-7)
           { echo "version=$version"; echo "ref=$ref"; echo "sha=$HEAD_SHA"; echo "label=$version-$ref-$sha7"; } | tee -a "$GITHUB_OUTPUT"
@@ -109,8 +122,9 @@ jobs:
   #   scripts.
   # host-tests always runs (the resources, CONTRIBUTING.md and docs/config.md
   # checks). A skipped job counts as passed for the branch rules, and
-  # desktop-smoke accepts its shards skipped. Every push, schedule, release
-  # or run by hand, and a pull request whose files cannot be listed: all true.
+  # desktop-smoke accepts its shards skipped. Every push, schedule, release,
+  # merge queue or run by hand, and a pull request whose files cannot be
+  # listed: all true.
   changes:
     runs-on: ubuntu-26.04
     timeout-minutes: 5
@@ -329,13 +343,21 @@ jobs:
           restore-keys: apt-desktop-
       # Without the recommended packages (ImageMagick's ghostscript and fonts,
       # for one): man-db's index is not rebuilt (2 s of every install, for no
-      # reader); autoclean drops the packages a newer version replaced. The
+      # reader), nor the initramfs (the -dev packages bring udev and
+      # libsystemd0 upgraded, and their trigger rebuilt it: 15 to 55 s of every
+      # install on 2026-10-22, for a runner that never boots again); dpkg does
+      # not wait on each write to reach the disk (--force-unsafe-io: the
+      # runner is thrown away after the job); autoclean drops the packages a
+      # newer version replaced. The
       # shards install the same list (the X and GL libraries, xvfb, xdotool…)
       # from this cache.
       - name: Dependencies
         run: |
           sudo rm -f /var/lib/man-db/auto-update
-          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives"
+          initramfs=$(command -v update-initramfs || echo /usr/sbin/update-initramfs)
+          sudo dpkg-divert --quiet --local --rename --add "$initramfs"
+          sudo ln -sf /bin/true "$initramfs"
+          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives -o Dpkg::Options::=--force-unsafe-io"
           mkdir -p .apt-archives/partial
           sudo apt-get update
           sudo apt-get install $archives -y --no-install-recommends cmake ccache libgl1-mesa-dev libgl1-mesa-dri \
@@ -345,6 +367,7 @@ jobs:
           sudo chown -R "$USER" .apt-archives
           rm -f .apt-archives/lock
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.ref == 'refs/heads/main'
         with:
           path: .apt-archives
           key: apt-desktop-${{ github.sha }}
@@ -364,6 +387,7 @@ jobs:
           ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
           tar -cf desktop-build.tar build-desktop/playguard build-desktop/resources
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.ref == 'refs/heads/main'
         with:
           path: .ccache
           key: ccache-desktop-${{ github.sha }}
@@ -381,10 +405,11 @@ jobs:
 
   # Clicks through every screen of that build headlessly: catches borealis
   # XML / view errors without a console. The scenarios run in parallel
-  # shards of about the same length, under 3 minutes each under software GL
+  # shards of about the same length, about 4 minutes each under software GL
   # (the default tour is split in two, `smoke` and `games`; the text check in
-  # three, five languages each). The desktop-smoke job below gathers them
-  # under one name for the release job and branch rules.
+  # five, three languages each). The
+  # desktop-smoke job below gathers them under one name for the release job
+  # and branch rules.
   desktop-smoke-shard:
     name: desktop-smoke (${{ matrix.shard }})
     needs: [ meta, desktop-build ]
@@ -394,33 +419,50 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # About 160 s of scenarios a shard (its job about 4 minutes, setup
+          # and visual check included), by their times on a runner (s, this
+          # workflow's run of 2026-10-22): cadran 156, smoke 151, games 146,
+          # gate 111, hbmenu 104, homebrew 102, devbuild 80, forwarders 64,
+          # outside 59, cadranlarge 34, update 25, errors 25, sysnotes 24,
+          # library 18, rescue 15, bedtime 9, the others 8 or less. Each
+          # scenario starts the program anew: any of them can go to any shard.
+          # 13 shards with the languages: about 20 jobs for the run, half the
+          # 40 a Pro account runs at once.
           - shard: default
-            scenarios: smoke
+            scenarios: smoke forged
           - shard: games
-            scenarios: games
-          # The other scenarios in three shards of about 170 s each, by their
-          # times on a runner (s): cadran 125, gate 93, devbuild 79, outside 62,
-          # forwarders 40, hbmenu 45, homebrew 30 (locally; to check on a runner), library 27, update
-          # 25, errors 23, sysnotes 22, the others 15 or less (bedtime 10).
+            scenarios: games bedtime
           - shard: cadran
-            scenarios: cadran rescue cadranlarge cadranunlocked forged lock loading
+            scenarios: cadran lock loading
           - shard: states
-            scenarios: gate outside alarm cadranstates rollback bedtime hbmenu homebrew
+            scenarios: gate cadranlarge alarm cadranstates
+          - shard: hbmenu
+            scenarios: hbmenu outside
+          - shard: homebrew
+            scenarios: homebrew library rescue cadranunlocked
           - shard: developer
-            scenarios: devbuild library update errors sysnotes forwarders
+            scenarios: devbuild forwarders
+          - shard: system
+            scenarios: update errors sysnotes rollback
           # Every Cadran tab, a few common dialogs and the child screen in
           # the 15 languages, normal and larger text: no text cut short
-          # (tools/cut_text_check.py, tests/cut_text/), five languages a
-          # shard (about 5 minutes each).
+          # (tools/cut_text_check.py, tests/cut_text/): about 59 s a language
+          # (both sizes), three a shard.
           - shard: languages-1
             scenarios: cuttext
-            languages: en-US fr fr-CA de es
+            languages: en-US fr fr-CA
           - shard: languages-2
             scenarios: cuttext
-            languages: es-419 it nl pt pt-BR
+            languages: de es es-419
           - shard: languages-3
             scenarios: cuttext
-            languages: ru ja ko zh-Hans zh-Hant
+            languages: it nl pt
+          - shard: languages-4
+            scenarios: cuttext
+            languages: pt-BR ru ja
+          - shard: languages-5
+            scenarios: cuttext
+            languages: ko zh-Hans zh-Hant
     env:
       ARTIFACT: playguard-${{ needs.meta.outputs.label }}-screenshots-${{ matrix.shard }}
     steps:
@@ -444,10 +486,14 @@ jobs:
       # (the libraries the program links come with their -dev packages):
       # xauth is what xvfb-run needs, libgl1-mesa-dri is llvmpipe
       # (LIBGL_ALWAYS_SOFTWARE=1), dbus the session the app's portals ask for.
+      # No man-db index nor initramfs rebuilt, as there.
       - name: Dependencies
         run: |
           sudo rm -f /var/lib/man-db/auto-update
-          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives"
+          initramfs=$(command -v update-initramfs || echo /usr/sbin/update-initramfs)
+          sudo dpkg-divert --quiet --local --rename --add "$initramfs"
+          sudo ln -sf /bin/true "$initramfs"
+          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives -o Dpkg::Options::=--force-unsafe-io"
           mkdir -p .apt-archives/partial
           sudo apt-get update
           sudo apt-get install $archives -y --no-install-recommends libgl1-mesa-dev libgl1-mesa-dri \
@@ -590,7 +636,7 @@ jobs:
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
       # Not for a release: it builds without any cache. The reproducibility
       # check's second build never takes from it either (below).
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: ${{ !inputs.tag }}
         with:
           path: .ccache
@@ -609,9 +655,9 @@ jobs:
           # version badge shows it as stable; every other build as a development one.
           PLAYGUARD_RELEASE: ${{ inputs.tag && '1' || '0' }}
           # The reproducibility check (below) on main, a release, a schedule
-          # or a run by hand; not on a pull request, for the time a second
-          # full compilation takes.
-          REPRO: ${{ github.event_name != 'pull_request' && '1' || '0' }}
+          # or a run by hand; not on a pull request nor in the merge queue,
+          # for the time a second full compilation takes.
+          REPRO: ${{ (github.event_name != 'pull_request' && github.event_name != 'merge_group') && '1' || '0' }}
         run: |
           # The checkout belongs to another user than the container's root: git
           # refuses it without this, and CMake reads the commit the app shows.
@@ -664,6 +710,11 @@ jobs:
           # Only what these builds used goes back to the cache (a hit refreshes
           # an object's date), not 350 MB of builds gone by.
           ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !inputs.tag && github.ref == 'refs/heads/main' }}
+        with:
+          path: .ccache
+          key: ccache-switch-${{ github.sha }}
       - name: Both builds, when they differ
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
