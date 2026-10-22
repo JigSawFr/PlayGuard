@@ -453,6 +453,9 @@ jobs:
           sudo apt-get install $archives -y --no-install-recommends libgl1-mesa-dev libgl1-mesa-dri \
             libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev libwayland-dev \
             libdbus-1-dev libcurl4-openssl-dev zlib1g-dev xvfb xauth xdotool imagemagick dbus
+          # The screens are drawn by this mesa (llvmpipe), not pinned: an
+          # Ubuntu update of it can move every screen, so the run says which.
+          echo "mesa: $(dpkg-query -W -f='${Version}' libgl1-mesa-dri)" | tee -a "$GITHUB_STEP_SUMMARY"
       # Each scenario writes its screenshots (and a contact sheet of them) to
       # smoke/ (the default one) or smoke-<scenario>/. Every scenario of the
       # shard runs; the step fails at the end if one did. smoke-results.tsv
@@ -585,9 +588,8 @@ jobs:
         run: apt-get update -qq && apt-get install -y -qq --no-install-recommends ccache ca-certificates
       - name: Compiler messages as annotations
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
-      # Not for a release: its two builds compile everything, so the
-      # reproducibility check below compares two real compilations, not
-      # objects both builds took from main's cache.
+      # Not for a release: it builds without any cache. The reproducibility
+      # check's second build never takes from it either (below).
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: ${{ !inputs.tag }}
         with:
@@ -607,9 +609,8 @@ jobs:
           # version badge shows it as stable; every other build as a development one.
           PLAYGUARD_RELEASE: ${{ inputs.tag && '1' || '0' }}
           # The reproducibility check (below) on main, a release, a schedule
-          # or a run by hand: on a pull request the second build takes every
-          # object from the first's ccache, which proves little for a minute
-          # or two of the run.
+          # or a run by hand; not on a pull request, for the time a second
+          # full compilation takes.
           REPRO: ${{ github.event_name != 'pull_request' && '1' || '0' }}
         run: |
           # The checkout belongs to another user than the container's root: git
@@ -626,7 +627,7 @@ jobs:
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
           # The optional recovery sysmodule, as its own asset (sysmodule/).
           make dist-rescue
-          # This build's hit rate, for the summary (the second build below hits every time).
+          # This build's hit rate, for the summary (the second build below takes nothing from it).
           ccache --print-stats > ccache-stats.txt
           ccache --show-stats
           # The same commit gives the same zips (CONTRIBUTING.md, "Reproducible
@@ -640,10 +641,18 @@ jobs:
             cp build/dksh/*.dksh "$1/dksh/"
             (cd build/resources && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$1/resources.sha256"
           }
+          # The second build starts from a clean tree (make clean: no object,
+          # no CMake cache, the gate, the forwarders' loader and the sysmodule
+          # rebuilt too) and takes nothing from ccache (CCACHE_RECACHE: every
+          # file compiled again): two real compilations, not the same objects
+          # packed twice. Still through ccache, as the first: its CCACHE_BASEDIR
+          # makes the debug info's paths relative, which the .nro's build ID
+          # hashes (a release disables ccache for both).
           if [ "$REPRO" = 1 ]; then
             keep repro/first
-            make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-            make dist-rescue
+            make clean
+            CCACHE_RECACHE=1 make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
+            CCACHE_RECACHE=1 make dist-rescue
             keep repro/second
             if ! python3 tools/repro_diff.py repro/first repro/second; then
               echo "::error title=Reproducible zips::the second build differs from the first (what differs is above; both builds are in the repro-diff artifact)"
@@ -693,7 +702,7 @@ jobs:
             git submodule status
             cat toolchain.txt
           } > build-info.txt
-          sha256sum playguard.nro playguard.zip playguard-rescue.zip compat.json > SHA256SUMS.txt
+          sha256sum playguard.nro playguard.zip playguard-rescue.zip compat.json build-info.txt > SHA256SUMS.txt
           cat build-info.txt
           unzip -l playguard.zip
           unzip -l playguard-rescue.zip
@@ -851,6 +860,8 @@ jobs:
             dist/playguard.zip
             dist/playguard-rescue.zip
             dist/compat.json
+            dist/build-info.txt
+            dist/SHA256SUMS.txt
       # The release exists (release-please created it with the tag): the
       # assets are added to it. --clobber: a re-run replaces its own files.
       - name: Attach to the GitHub release

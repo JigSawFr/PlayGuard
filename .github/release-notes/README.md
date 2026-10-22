@@ -72,7 +72,8 @@ as the icons it may use
 model (default `anthropic/claude-sonnet-5.5`). It is published without being
 read first, so it ends with "Summary written automatically."; the run page
 shows it. It goes on the release page only: the app bundles a file from here,
-not this. No key, an error or an answer of the wrong shape: no summary, a
+not this. No key, an error or an answer of the wrong shape (a link, an image, HTML or
+an @mention among them: pull request descriptions could steer it): no summary, a
 warning on the run, and the release goes on. A hand-written file always wins.
 
 A release need not have a summary. Notes with no change a user notices
