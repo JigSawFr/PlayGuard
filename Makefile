@@ -370,6 +370,7 @@ clean:
 	@rm -rf $(BUILD) $(DESKTOP) $(WEB) out out-rescue $(TARGET).zip playguard-rescue.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
 	@$(MAKE) --no-print-directory -C sysmodule clean 2>/dev/null || true
 	@$(MAKE) --no-print-directory -C forwarder clean 2>/dev/null || true
+	@$(MAKE) --no-print-directory -C gate clean 2>/dev/null || true
 
 nxlink: all
 	nxlink $(BUILD)/$(TARGET).nro
