@@ -36,17 +36,6 @@ void copy(char* to, size_t size, const std::string& from)
     std::snprintf(to, size, "%s", from.c_str());
 }
 
-bool write_all(int fd, const char* data, size_t size)
-{
-    while (size > 0) {
-        const ssize_t n = ::write(fd, data, size);
-        if (n <= 0) return false;
-        data += n;
-        size -= (size_t)n;
-    }
-    return true;
-}
-
 // snprintf at the end of g_text.
 size_t g_len = 0;
 #if defined(__GNUC__)
@@ -117,7 +106,7 @@ const char* write(std::time_t now, const char* summary, const char* details, boo
             if (errno == EEXIST) continue;
             return g_name;
         }
-        const bool ok = write_all(fd, g_text, g_len);
+        const bool ok = session_log::write_all(fd, g_text, g_len);
         ::close(fd);
         if (ok) std::snprintf(g_name, sizeof(g_name), "%s", name);
         return g_name;

@@ -431,6 +431,13 @@ void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)
 {
     const forwarders_logic::Row r = row;
     const auto go = [r, done]() {
+        // Protected: the PIN first, whatever "Protect PlayGuard with the
+        // PIN" says, as lifting its protection asks (set_pin).
+        if (r.pin && !pin_lock::confirm()) {
+            ui::refuse(pin_lock::refusal_text());
+            if (done) done(false);
+            return;
+        }
         const Result rc = forwarder_remove(r.id);
         if (R_SUCCEEDED(rc)) {
             std::string err;

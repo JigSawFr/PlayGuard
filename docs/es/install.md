@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # Instalación
 
 Cómo instalar, actualizar y desinstalar PlayGuard, y qué escribe en la tarjeta SD. Una vez instalado: [guía de inicio](getting-started.md). Volver al [README](../../README.md).
@@ -20,13 +20,13 @@ Después, abre PlayGuard **sobre un juego**, con el usuario de un padre o una ma
 
 ## Actualizar
 
-- **En PlayGuard:** *Acerca de › Actualizar con* elige cómo: en el propio PlayGuard (descarga la versión, la comprueba, se sustituye y se reinicia), sphaira, la Homebrew App Store o a mano. Con *Buscar actualizaciones cada día* activado, PlayGuard se abre en la nueva versión cuando hay una.
+- **En PlayGuard:** *Preferencias › Actualizar con* elige cómo: en el propio PlayGuard (descarga la versión, la comprueba, se sustituye y se reinicia), sphaira, la Homebrew App Store o a mano. Con *Buscar actualizaciones cada día* activado, PlayGuard se abre en la nueva versión cuando hay una.
 - **El sysmodule de recuperación** sigue la versión de PlayGuard: tras cada actualización, vuelve a extraer el `playguard-rescue.zip` de esa versión (o *Actualizar* en *El sysmodule de recuperación no está actualizado*, en la campana) y reinicia la consola.
 - Los ajustes, el historial, los perfiles y las copias de seguridad se conservan: están en `sd:/config/playguard/`, no junto a la aplicación.
 
 ## Desinstalarlo
 
-Borra `sd:/switch/playguard/` (la aplicación) y, para quitar también sus archivos, `sd:/config/playguard/`; con el sysmodule de recuperación, también `sd:/atmosphere/contents/4200000000505247/`. Los límites, el PIN y las restricciones son los de la propia consola: **se quedan en la consola**. Para quitarlos también, usa antes *PIN › Eliminar todo el control parental*.
+Borra `sd:/switch/playguard/` (la aplicación) y, para quitar también sus archivos, `sd:/config/playguard/`; con el sysmodule de recuperación, también `sd:/atmosphere/contents/4200000000505247/`. Los límites, el PIN y las restricciones son los de la propia consola: **se quedan en la consola**. Para quitarlos también, usa antes *Seguridad › Eliminar todo el control parental*.
 
 ## Archivos en la tarjeta SD
 

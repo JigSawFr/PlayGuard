@@ -257,11 +257,12 @@ std::string hours_label(int days, int from, int to)
 
 std::vector<forwarders_logic::Refusals> take_log()
 {
-    // Each try the gate logged since: into the change history, then gone.
+    // Each try the gate logged since: into the change history, then gone
+    // (only then: a crash before the history is written keeps them for the
+    // next start).
     const std::string path = paths::data_dir() + "/" + GATE_LOG_NAME;
     std::string text;
     if (!paths::read_file(path, text)) return {};
-    std::remove(path.c_str());
     std::vector<forwarders::Made> made = forwarders::list();
     // Counted by day, for the week's tries (util/gate_tally.hpp).
     gate_tally::Tally tally = read_tally();
@@ -335,6 +336,7 @@ std::vector<forwarders_logic::Refusals> take_log()
     std::string err;
     if (!paths::ensure_dir(paths::nand_dir()) || !paths::atomic_write(tally_path(), gate_tally::text(tally), &err))
         brls::Logger::warning("forwarders: the week's tries not kept ({})", err);
+    std::remove(path.c_str());
     return forwarders_logic::repeated_refusals(refused);
 }
 

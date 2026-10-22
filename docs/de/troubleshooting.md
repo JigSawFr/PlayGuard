@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
+<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
 # Fehlerbehebung
 
 Wieder Zugang zu einer gesperrten Konsole bekommen, die häufigen Probleme, einen Fehler melden, und der Entwicklermodus. Zurück zum [README](../../README.md).
@@ -11,7 +11,7 @@ PlayGuard sieht nur den Jugendschutz des Systems, auf dem es läuft: **emuMMC un
 
 Du kennst die Geheimzahl, aber die Smart-Geräte-App des Vorbesitzers ist noch verknüpft (das Trennen schlägt fehl, oder ein Zurücksetzen auf Werkseinstellungen verlangt dessen Konto).
 
-*Geheimzahl › Smart-Geräte-App trennen*, dann, wenn du gar keinen Jugendschutz mehr willst, *Alle Altersbeschränkungen löschen*. Beides funktioniert offline, auf emuMMC wie auf sysMMC.
+*Sicherheit › Smart-Geräte-App trennen*, dann, wenn du gar keinen Jugendschutz mehr willst, *Alle Altersbeschränkungen löschen*. Beides funktioniert offline, auf emuMMC wie auf sysMMC.
 
 ### Geheimzahl vergessen
 
@@ -43,18 +43,18 @@ PlayGuard kann nicht helfen: Es braucht Atmosphère. Der offizielle Weg ist das 
 - **Die Netzwerkuhr wurde nie gestellt.** *Konsole › Netzwerkuhr › Zeitabweichung messen*, dann stelle sie ([Netzwerkuhr](features.md#netzwerkuhr)).
 - **Die Uhr wurde zurückgestellt.** Nach einem Sprung zurück hält die Zählung an, bis die Uhr die alte Uhrzeit überschreitet; nichts zu tun.
 - **Ein Limit wurde gerade geschrieben.** Starte ein Spiel für eine Minute, dann prüfe erneut.
-- **Der Jugendschutz ist vorübergehend aufgehoben.** Die Spielzeit wird dann möglicherweise nicht gezählt: *Geheimzahl › Altersbeschränkungen wieder aktivieren*.
+- **Der Jugendschutz ist vorübergehend aufgehoben.** Die Spielzeit wird dann möglicherweise nicht gezählt: *Sicherheit › Altersbeschränkungen wieder aktivieren*.
 
 ### Meine Limits haben sich von selbst geändert
 
-- **Die Smart-Geräte-App ist noch verknüpft.** Ihre nächste Synchronisierung überschreibt, was PlayGuard festgelegt hat: *Geheimzahl › Smart-Geräte-App trennen*.
-- **Ein anderes Werkzeug, oder ein Profil.** *Heute* zeigt eine bernsteinfarbene Karte für Limits, die von denen abweichen, die PlayGuard zuletzt gesehen hat, und *Optionen › Änderungsverlauf* listet jede außerhalb von PlayGuard bemerkte Änderung auf. Ⓐ auf einer stellt den vorherigen Wert wieder her.
+- **Die Smart-Geräte-App ist noch verknüpft.** Ihre nächste Synchronisierung überschreibt, was PlayGuard festgelegt hat: *Sicherheit › Smart-Geräte-App trennen*.
+- **Ein anderes Werkzeug, oder ein Profil.** *Heute* zeigt eine bernsteinfarbene Karte für Limits, die von denen abweichen, die PlayGuard zuletzt gesehen hat, und *Verlauf › Änderungen durch PlayGuard* listet jede außerhalb von PlayGuard bemerkte Änderung auf. Ⓐ auf einer stellt den vorherigen Wert wieder her.
 - **Ein geplantes Profil**, das angewendet wurde, oder dessen ersetzte Limits nach Ende seines Zeitraums wiederhergestellt wurden (*Spielzeit › Profile › Geplantes Profil*).
 
 ### Das Kind hat über das Limit hinaus gespielt
 
 - **Die Konsole warnt nur.** *Spielzeit › Wenn die Zeit um ist*: Wähle *Software unterbrechen*.
-- **Der Jugendschutz blieb aufgehoben.** Solange er es ist, ist das heutige Limit ausgesetzt: Die Kapsel in der Kopfzeile sagt das in jedem Tab; *Geheimzahl › Altersbeschränkungen wieder aktivieren*. Ein Neustart der Konsole aktiviert ihn ebenfalls wieder.
+- **Der Jugendschutz blieb aufgehoben.** Solange er es ist, ist das heutige Limit ausgesetzt: Die Kapsel in der Kopfzeile sagt das in jedem Tab; *Sicherheit › Altersbeschränkungen wieder aktivieren*. Ein Neustart der Konsole aktiviert ihn ebenfalls wieder.
 - **Die Uhr wurde zurückgestellt.** Die Zählung hält an, bis die Uhr die alte Uhrzeit überschreitet ([was zählt](features.md#was-als-spielzeit-zählt)).
 - **Das andere System.** emuMMC und sysMMC haben jeweils ihren eigenen Jugendschutz: Stelle ihn auf beiden ein oder blende das Bootmenü von hekate aus ([Kompatibilität](compatibility.md#emummc-und-sysmmc)).
 
@@ -68,7 +68,7 @@ Auf der Konsole läuft eine Firmware, die neuer ist als die neueste getestete: P
 
 ### PlayGuard fragt ständig nach der Geheimzahl, oder nie
 
-*Geheimzahl › PlayGuard mit der Geheimzahl schützen*: *Vor einer Änderung* (der Standard) fragt einmal, vor der ersten Änderung, und die Geheimzahl gilt, bis PlayGuard geschlossen wird. *Geheimzahl nach 5 Minuten erneut abfragen* fragt danach erneut. *Geheimzahl anzeigen* fragt immer.
+*Sicherheit › PlayGuard mit der Geheimzahl schützen*: *Vor einer Änderung* (der Standard) fragt einmal, vor der ersten Änderung, und die Geheimzahl gilt, bis PlayGuard geschlossen wird. *Geheimzahl nach 5 Minuten erneut abfragen* fragt danach erneut. *Geheimzahl anzeigen* fragt immer.
 
 ### Ein Spiel startet nicht, oder zeigt ein „!“ im HOME-Menü
 
@@ -143,7 +143,7 @@ Drücke siebenmal Ⓨ auf *Info › Version*; die Entwicklerwerkzeuge erscheinen
 - den Diagnosebericht auf dem Bildschirm (Ⓨ speichert ihn, Ⓧ sendet ihn online) und eine Abkürzung, um ihn aus dem Tab Spielzeit zu exportieren;
 - **Selbsttest der Konsole**: was PlayGuard auf dieser Konsole von selbst prüft, bevor [die Konsolen-Checkliste](../hardware-test.md) (auf Englisch) von Hand durchgegangen wird — die Geheimzahl, die Signatur-Patches, den Datenordner, jeden von PlayGuard erstellten Forwarder (im HOME-Menü, geschützt, durch sein Tor funktionierend gesehen), das Tor auf der SD-Karte, was Atmosphère von der Sperre des Homebrew-Menüs liest, die Rückwege, das Rettungsmodul. Er ändert nichts und schreibt sein Ergebnis als Markdown nach `config/playguard/self-test.md`, zum Einfügen in den Pull Request;
 - **Anderen Build installieren** an Ort und Stelle, um eine Korrektur zu testen, bevor sie veröffentlicht wird ([unten](#einen-anderen-build-installieren));
-- **Spielzeit-Block vergleichen** (nur solange die Smart-Geräte-App verknüpft ist und synchronisieren kann — nicht mit einer Hosts-Datei, die Nintendo blockiert; auch in *Geheimzahl*), um Einstellungen zu entschlüsseln, die PlayGuard noch nicht anzeigt: Speichere den rohen Block als Referenz, ändere eine Einstellung in der Smart-Geräte-App, komm zurück — PlayGuard listet die Werte auf, die sich geändert haben (auf Wunsch in `logs/reports/` gespeichert). Unterschiedliche Schlafenszeiten pro Tag, in der Smart-Geräte-App eingestellt, könnten so bestätigt werden. Hänge diese Datei an ein Issue an oder sende sie mit dem Bericht (*Bericht online senden*).
+- **Spielzeit-Block vergleichen** (nur solange die Smart-Geräte-App verknüpft ist und synchronisieren kann — nicht mit einer Hosts-Datei, die Nintendo blockiert; auch in *Sicherheit*), um Einstellungen zu entschlüsseln, die PlayGuard noch nicht anzeigt: Speichere den rohen Block als Referenz, ändere eine Einstellung in der Smart-Geräte-App, komm zurück — PlayGuard listet die Werte auf, die sich geändert haben (auf Wunsch in `logs/reports/` gespeichert). Unterschiedliche Schlafenszeiten pro Tag, in der Smart-Geräte-App eingestellt, könnten so bestätigt werden. Hänge diese Datei an ein Issue an oder sende sie mit dem Bericht (*Bericht online senden*).
 - **Spielzeit aufzeichnen**: alle 30 s, solange PlayGuard offen ist, eine Zeile mit dem, was der Timer meldet (verbleibende Zeit, gespielte Zeit, der rohe Einstellungsblock…), in `logs/play_timer/log.csv`, einer Datei, die sich in einer Tabellenkalkulation öffnen lässt, dazu eine Zeile direkt nach jeder Änderung von PlayGuard, die sagt, welche (ihre letzte Spalte, `event`), und ein Vermerk, wenn sich die Uhr um mehr bewegt hat als die vergangene Zeit. Über Mitternacht offen gelassen, oder bis die Zeit um ist, zeigt es, was ein einzelner Bericht nicht kann: wann die gespielte Zeit zurückgesetzt wird, was die Konsole kurz vor dem Ende sagt. Der Schalter wird gemerkt; er zeichnet nur im Entwicklermodus auf. Was bisher bekannt ist, steht in [parental-controls.md](../parental-controls.md) (auf Englisch).
 - **Cache leeren** und **Protokolldateien löschen**, jeweils nach einer Bestätigung, die sagt, wie viele Dateien und wie viel Platz: Der Cache (`cache/` und das `nand/<system>/cache/` jedes Systems: Spielnamen und -symbole, die letzten Zahlen der Aktivität, die Build-Liste) wird bei Bedarf erneut von der Konsole gelesen; die Protokolldateien sind die Absturzdateien, die Sitzungsprotokolle (außer dem dieses Laufs, der noch geschrieben wird), die gespeicherten Berichte und die Spielzeit-Aufzeichnung, während `uploads/` (die Löschlinks der online gesendeten Berichte) und die Referenz des Blocks bleiben. Einstellungen, Verlauf, Sicherungen, Profile und Exporte werden nie angerührt.
 - **Migrationen erneut ausführen**: die Verschiebungen der früheren Anordnungen — der Datenordner neben der `.nro`, die Protokolle vor ihren Unterordnern, was alle Systeme gemeinsam hatten — jede auf einer Zeile zum An- oder Abhaken (anfangs alle angehakt; A schaltet eine um), dann *Die N gewählten ausführen* und eine Bestätigung, die sie mit dem auflistet, was jede verschiebt. Sie laufen sofort, egal was `migrations.json` festhält (sonst läuft jede nur einmal, beim ersten Start eines Builds, der sie braucht; die dort festgehaltene Stufe wird nie gesenkt); eine Datei, die schon an ihrem Platz ist, wird nie ersetzt. Ein Dialog sagt, wie viele Einträge verschoben wurden; jeder Schritt steht im Sitzungsprotokoll.

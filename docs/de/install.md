@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # Installation
 
 Wie du PlayGuard installierst, aktualisierst und entfernst, und was es auf die SD-Karte schreibt. Nach der Installation: [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -20,13 +20,13 @@ Das optionale **Wiederherstellungs-Sysmodul** (`playguard-rescue.zip`) wird sepa
 
 ## Aktualisieren
 
-- **In PlayGuard:** *Info › Aktualisieren mit* wählt, wie — in PlayGuard selbst (es lädt die Version herunter, prüft sie, ersetzt sich selbst und startet neu), sphaira, der Homebrew App Store oder von Hand. Mit *Täglich nach Updates suchen* an öffnet PlayGuard mit der neuen Version, wenn es eine gibt.
+- **In PlayGuard:** *Optionen › Aktualisieren mit* wählt, wie — in PlayGuard selbst (es lädt die Version herunter, prüft sie, ersetzt sich selbst und startet neu), sphaira, der Homebrew App Store oder von Hand. Mit *Täglich nach Updates suchen* an öffnet PlayGuard mit der neuen Version, wenn es eine gibt.
 - **Das Wiederherstellungs-Sysmodul** folgt der Version von PlayGuard: Entpacke nach jedem Update die `playguard-rescue.zip` dieser Version erneut (oder *Aktualisieren* auf *Das Wiederherstellungs-Sysmodul ist veraltet* in der Glocke) und starte die Konsole dann neu.
 - Einstellungen, Verlauf, Profile und Sicherungen bleiben erhalten: Sie liegen in `sd:/config/playguard/`, nicht neben der App.
 
 ## Entfernen
 
-Lösche `sd:/switch/playguard/` (die App) und, um auch ihre Dateien zu entfernen, `sd:/config/playguard/`; mit dem Wiederherstellungs-Sysmodul auch `sd:/atmosphere/contents/4200000000505247/`. Die Limits, die Geheimzahl und die Einschränkungen gehören der Konsole selbst: Sie **bleiben auf der Konsole**. Um auch sie zu entfernen, verwende vorher *Geheimzahl › Alle Altersbeschränkungen löschen*.
+Lösche `sd:/switch/playguard/` (die App) und, um auch ihre Dateien zu entfernen, `sd:/config/playguard/`; mit dem Wiederherstellungs-Sysmodul auch `sd:/atmosphere/contents/4200000000505247/`. Die Limits, die Geheimzahl und die Einschränkungen gehören der Konsole selbst: Sie **bleiben auf der Konsole**. Um auch sie zu entfernen, verwende vorher *Sicherheit › Alle Altersbeschränkungen löschen*.
 
 ## Dateien auf der SD-Karte
 

@@ -38,6 +38,20 @@ static bool local_time(int *wday, int *minute, char *when, size_t size)
     return true;
 }
 
+// The network clock (System Settings cannot set it): its POSIX time, its
+// day of the week and its minute of the day. False when it cannot be read.
+static bool network_time(u64 *t, int *wday, int *minute)
+{
+    TimeCalendarTime cal;
+    TimeCalendarAdditionalInfo info;
+    if (R_FAILED(timeGetCurrentTime(TimeType_NetworkSystemClock, t)) ||
+        R_FAILED(timeToCalendarTimeWithMyRule(*t, &cal, &info)))
+        return false;
+    *wday = (int)info.wday;
+    *minute = cal.hour * 60 + cal.minute;
+    return true;
+}
+
 // `nro`'s hours in `file` (GATE_RULES_NAME: free, GATE_CLOSED_NAME: none);
 // false when it has none.
 static bool hours_of(const char *file, const char *nro, GateHours *h)
@@ -449,8 +463,16 @@ bool gate_nx_run(void)
     // Each try; once refused, Ⓐ tries again (until a pause starts).
     for (bool first = true;; first = false) {
         if (!first) timed = local_time(&wday, &minute, when, sizeof(when));
-        u64 now = 0;
+        u64 now = 0, net = 0;
         const bool clocked = R_SUCCEEDED(timeGetCurrentTime(TimeType_LocalSystemClock, &now));
+        // The console clock moved away from the network clock (System
+        // Settings sets the one, not the other): each rule at its strictest.
+        // No free hours, closed by either clock, and the pause timed by the
+        // network clock, so setting the time forward does not end it.
+        int net_wday = -1, net_minute = -1;
+        const bool netted = network_time(&net, &net_wday, &net_minute);
+        const bool moved = clocked && gate_clocks_differ(now, netted, net);
+        if (moved) now = net;
         const size_t pause_len = pause_read();
         uint64_t until = 0;
         gate_pause_find(pause_text, pause_len, nro, NULL, &until);
@@ -470,7 +492,8 @@ bool gate_nx_run(void)
         // Its hours without any access first (the PIN changes nothing then),
         // then the day's time used up, then a pause after refusals, then its
         // free hours; else the PIN.
-        if (timed && gate_spans_hold(closed_spans, closed_n, wday, minute)) {
+        if ((timed && gate_spans_hold(closed_spans, closed_n, wday, minute)) ||
+            (moved && gate_spans_hold(closed_spans, closed_n, net_wday, net_minute))) {
             r = GateResult_Closed;
             note[0] = '\0';
             if (gate_spans_text(closed_spans, closed_n, days, span, sizeof(span)))
@@ -480,9 +503,13 @@ bool gate_nx_run(void)
         } else if (clocked && until > now) {
             r = GateResult_Paused;
             paused_note(sc.language, until, now, note, sizeof(note));
-        } else if (timed && gate_spans_hold(free_spans, free_n, wday, minute)) {
+        } else if (timed && !moved && gate_spans_hold(free_spans, free_n, wday, minute)) {
             r = GateResult_Free;
         } else {
+            // Its free hours would hold by one clock: why the PIN all the same.
+            if (moved && ((timed && gate_spans_hold(free_spans, free_n, wday, minute)) ||
+                          gate_spans_hold(free_spans, free_n, net_wday, net_minute)))
+                snprintf(note, sizeof(note), "%s", gate_text(sc.language, GateText_ClockDiffers));
             watch_kick();
             screen_show(&sc, GateScreen_Asking, note, refused > 0, false);
             watch_pause();

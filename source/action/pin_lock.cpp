@@ -111,6 +111,13 @@ bool confirm()
     return ask();
 }
 
+bool before_handing_over(bool menu_locked)
+{
+    if (menu_locked ? confirm() : check()) return true;
+    ui::refuse(refusal_text());
+    return false;
+}
+
 bool before_show_pin()
 {
     if (!ask()) {
