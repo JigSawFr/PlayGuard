@@ -37,6 +37,7 @@ static const Lines DE = { {
     "Ohne Geheimzahl bis %s Uhr.",
     "in %d Min.",
     "Fehlercode: %s",
+    "Keine freien Zeiten: Die Uhr der Konsole weicht von der Netzwerkuhr ab.",
 } };
 
 static const Lines EN_US = { {
@@ -68,6 +69,7 @@ static const Lines EN_US = { {
     "Without the PIN until %s.",
     "in %d min",
     "Error code: %s",
+    "No free hours: the console clock differs from the network clock.",
 } };
 
 static const Lines ES = { {
@@ -99,6 +101,7 @@ static const Lines ES = { {
     "Sin el PIN hasta las %s.",
     "en %d min",
     "Código de error: %s",
+    "Sin horario libre: el reloj de la consola no coincide con el de la red.",
 } };
 
 static const Lines ES_419 = { {
@@ -130,6 +133,7 @@ static const Lines ES_419 = { {
     "Sin el PIN hasta las %s.",
     "en %d min",
     "Código de error: %s",
+    "Sin horario libre: el reloj de la consola no coincide con el de la red.",
 } };
 
 static const Lines FR = { {
@@ -161,6 +165,7 @@ static const Lines FR = { {
     "Sans code PIN jusqu'à %s.",
     "dans %d min",
     "Code d'erreur : %s",
+    "Pas d'horaires libres : l'horloge de la console diffère de l'horloge réseau.",
 } };
 
 static const Lines FR_CA = { {
@@ -192,6 +197,7 @@ static const Lines FR_CA = { {
     "Sans NIP jusqu'à %s.",
     "dans %d min",
     "Code d'erreur : %s",
+    "Pas d'heures libres : l'horloge de la console diffère de l'horloge réseau.",
 } };
 
 static const Lines IT = { {
@@ -223,6 +229,7 @@ static const Lines IT = { {
     "Senza PIN fino alle %s.",
     "tra %d min",
     "Codice errore: %s",
+    "Niente orari liberi: l'orologio della console non coincide con quello di rete.",
 } };
 
 static const Lines JA = { {
@@ -254,6 +261,7 @@ static const Lines JA = { {
     "%sまで暗証番号は不要です。",
     "%d分後",
     "エラーコード：%s",
+    "自由な時間帯は使えません：本体の時計がネットワーク時計とずれています。",
 } };
 
 static const Lines KO = { {
@@ -285,6 +293,7 @@ static const Lines KO = { {
     "%s까지 PIN이 필요 없습니다.",
     "%d분 후",
     "오류 코드: %s",
+    "자유 시간 없음: 본체 시계가 네트워크 시계와 다릅니다.",
 } };
 
 static const Lines NL = { {
@@ -316,6 +325,7 @@ static const Lines NL = { {
     "Zonder pincode tot %s.",
     "over %d min",
     "Foutcode: %s",
+    "Geen vrije uren: de klok van de console wijkt af van de netwerkklok.",
 } };
 
 static const Lines PT = { {
@@ -347,6 +357,7 @@ static const Lines PT = { {
     "Sem o PIN até às %s.",
     "daqui a %d min",
     "Código de erro: %s",
+    "Sem horas livres: o relógio da consola difere do relógio da rede.",
 } };
 
 static const Lines PT_BR = { {
@@ -378,6 +389,7 @@ static const Lines PT_BR = { {
     "Sem o PIN até %s.",
     "em %d min",
     "Código de erro: %s",
+    "Sem horário livre: o relógio do console difere do relógio da rede.",
 } };
 
 static const Lines RU = { {
@@ -409,6 +421,7 @@ static const Lines RU = { {
     "Без PIN-кода до %s.",
     "через %d мин",
     "Код ошибки: %s",
+    "Свободных часов нет: часы консоли расходятся с сетевыми.",
 } };
 
 static const Lines ZH_HANS = { {
@@ -440,6 +453,7 @@ static const Lines ZH_HANS = { {
     "%s前无需PIN。",
     "%d分钟后",
     "错误代码：%s",
+    "自由时段不适用：主机时钟与网络时钟不一致。",
 } };
 
 static const Lines ZH_HANT = { {
@@ -471,6 +485,7 @@ static const Lines ZH_HANT = { {
     "%s前無需PIN碼。",
     "%d分鐘後",
     "錯誤代碼：%s",
+    "自由時段不適用：主機時鐘與網路時鐘不一致。",
 } };
 
 // libnx's SetLanguage order (ja, en-US, fr, de, it, es, zh-CN, ko, nl, pt, ru,
