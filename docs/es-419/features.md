@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 c9719f1eb7be -->
+<!-- translated from docs/features.md, sha256 ca638de42393 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Es nuevo en PlayGuard? Empiece por [primeros pasos](getting-started.md). Volver al [README](../../README.md).
@@ -106,7 +106,7 @@ Las informativas: una compilación de la que se volvió atrás, un firmware no p
 
 - Cada sección enumera sus entradas en un orden fijo, sin importar qué comprobación terminó primero.
 - **En la barra lateral**, una insignia ámbar junto al nombre de una pestaña cuenta sus entradas pendientes, ahí donde se resuelven: la pestaña Seguridad (sin PIN, un PIN débil, PlayGuard sin su PIN, desbloqueado temporalmente), Tiempo de juego (la alarma desactivada, la consola que no cuenta), Hoy (cambios hechos fuera de PlayGuard, tiempo extra por restablecer), la Consola (sus entradas de arriba, y el reloj de red). Las entradas ignoradas y las informativas no se cuentan.
-- Dentro de la pestaña, la misma insignia está en la fila donde se resuelve cada una (*Reloj de red*, *Comprobar los juegos instalados*, *Almacenamiento*, *Parches de juegos*; *Definir o cambiar el PIN*, *Proteger PlayGuard con el PIN*; *Avanzado* de Tiempo de juego para la alarma), y la pestaña se abre en la primera de ellas.
+- Dentro de la pestaña, la misma insignia está en la fila donde se resuelve cada una (*Reloj de red*, *Comprobar los juegos instalados*, *Almacenamiento*, *Parches de juegos*; *Definir o cambiar el PIN*, *Proteger PlayGuard con el PIN*; *Avanzado* de Tiempo de juego para la alarma), y la pestaña se abre en la primera de ellas. Una fila sin valor propio indica antes, en ámbar, para qué es la insignia (*Fácil de adivinar*, *Impreciso*).
 - **Ⓐ** en una entrada aplica la solución (*Activarla*, *Ajustarlo*, *Actualizar*…) o abre la pestaña donde se hace. Una entrada desaparece sola una vez que se resuelve lo que indica.
 - **Ⓧ** marca una entrada informativa como leída; **Ⓨ** las marca todas. Una entrada marcada como leída sigue leída en el siguiente inicio, hasta que su texto cambie.
 - **Ignorar:** algunas entradas pendientes se pueden ignorar con Ⓧ, tras una confirmación y el PIN: un PIN que cualquiera probaría primero, PlayGuard que se abre sin el PIN, la alarma de “Se acabó el tiempo” desactivada, la tarjeta SD casi llena (nunca la falta de PIN, el control desbloqueado, el reloj, el temporizador de juego que no cuenta ni los archivos propios de PlayGuard). Una entrada ignorada deja de contarse y aparece al final, en *Ignorados*, donde Ⓐ la vuelve a contar. Vuelve sola 30 días después (salvo que *Volver a contar los avisos ignorados después de 30 días* esté desactivado), cuando lo que indica se resuelve y luego vuelve a ocurrir, o, para el PIN, con un PIN nuevo de otra longitud.
@@ -143,6 +143,7 @@ Debajo, lo que detiene el juego primero:
   - otra, al abrirlo sobre un juego, que el tiempo que se pasa en PlayGuard cuenta, y Ⓐ explica cómo;
   - un juego que se deja abierto en el menú HOME aparece como una píldora ámbar (*sigue contando*, y Ⓐ explica por qué), cuando la píldora de PlayGuard abierto sobre un juego no lo indica ya.
 - Las píldoras muestran primero lo que requiere la intervención del adulto (ámbar, con un triángulo), luego lo que está activado (turquesa, con una marca de verificación) y después el resto (gris, con un punto): la forma lo indica tanto como el color.
+- Lo que está bien y lo que solo se informa se agrupan en una sola píldora después de las que requieren la intervención del adulto (*✓ 3 comprobaciones correctas*); Ⓐ sobre ella las muestra, mientras la pestaña siga abierta.
 - Debajo de las píldoras, el tiempo extra que falta restablecer (Ⓐ lo restablece) y la alarma de “Se acabó el tiempo” mientras está desactivada (Ⓐ la vuelve a activar).
 
 ### Primeros pasos
@@ -208,7 +209,7 @@ Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: l
 
 - En la pantalla táctil, al tocar un día se edita, y luego un toque en su parte de arriba o de abajo lo cambia en 15 min.
 - Los cambios se guardan juntos, con **+** o *Guardar*, como en el editor por día (la confirmación enumera los días cambiados, antes → después); *Descartar* los deshace.
-- Dentro de la barra de cada día, el tiempo jugado la última vez que tocó ese día (incluido hoy, todas las cuentas), en coral una vez alcanzado el límite, también su límite, y una leyenda debajo de la semana lo indica (*límite superado*).
+- Dentro de la barra de cada día, el tiempo jugado la última vez que tocó ese día (incluido hoy, todas las cuentas). Pasado el límite, la barra está llena y su parte superior en coral, en la misma proporción que el tiempo por encima del límite respecto del tiempo jugado; una leyenda debajo de la semana lo indica (*límite superado*), y el límite también está en coral. Los días posteriores a hoy muestran el juego de la semana pasada, más tenue (seleccionado: *El viernes pasado: 2 h 10 jugado de 2 h*).
 - Un día cambiado y todavía sin guardar tiene su límite en ámbar y su barra rodeada de ámbar; debajo de la semana, los datos del día seleccionado (*jueves: 1 h 20 jugado de 2 h*).
 - Encima de la semana, en ámbar, un límite alcanzado y lo que hace entonces la consola, o la consola que no cuenta el tiempo de juego.
 - `0` minutos significa *no jugar ese día*; *Quitar el límite de tiempo de juego* desactiva el temporizador.
@@ -254,13 +255,13 @@ Con el texto más grande, la pestaña Hoy sigue cabiendo en una sola pantalla: l
 
 *[Probarlo en el simulador ›](https://playguard.link/simulator/?tab=activity)*
 
-Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir del propio registro de actividad de la consola, para todas las cuentas o para **una cuenta de usuario** (las cuentas como chips arriba, cuando la consola tiene varias). PlayGuard se abre en la última cuenta que se mostró, o en la elegida en *Cuenta predeterminada* (todas las cuentas, o una).
+Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir del propio registro de actividad de la consola, para todas las cuentas o para **una cuenta de usuario** (las cuentas como chips arriba, cuando la consola tiene varias). PlayGuard se abre en la última cuenta que se mostró, o en la elegida en *Cuenta predeterminada* (todas las cuentas, o una; al final de la pestaña, con *Todos los juegos*).
 
 ### Arriba
 
 - Las cuentas como chips, el período y *Exportar o compartir*.
 - Hoy, los últimos 7 días y el total como cifras. Debajo de los últimos 7 días, la comparación con los 7 anteriores, por día: ▲ *+20 min/día vs. semana anterior* en ámbar, ▼ menos en turquesa, *como la semana anterior* con un margen de 5 minutos.
-- Los cuatro juegos más jugados como tarjetas (Ⓐ abre uno); en los últimos 7 días, el que más aumentó respecto de la semana anterior indica cuánto, a partir de media hora (▲ *+2 h*).
+- Los cuatro juegos más jugados como tarjetas (Ⓐ abre uno); en los últimos 7 días, el que más aumentó respecto de la semana anterior indica cuánto, a partir de media hora (▲ *+2 h vs. semana anterior*).
 - Si no se jugó nada en el período, una tarjeta lo indica, con *Ver el total* cuando hay algo que ver.
 
 ### Gráficos y resumen
@@ -292,8 +293,8 @@ Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir d
 
 *[Probarlo en el simulador ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **El nivel de restricción:** Niños pequeños, Niños, Adolescentes y Personalizado, uno al lado del otro como mosaicos, cada uno con lo que restringe (un candado para lo restringido, una marca de verificación para lo permitido, y los juegos instalados que bloquea; Ⓐ lo aplica; en *Personalizado* ya vigente, Ⓐ lleva a sus opciones de abajo); *Ninguno* debajo. Lo que restringe un nivel (límite de edad, publicaciones, comunicación) se vuelve a indicar antes de aplicarlo.
-- **En Personalizado:** clasificación por edad, publicaciones en redes sociales, comunicación con otros usuarios.
+- **El nivel de restricción:** Niños pequeños, Niños, Adolescentes y Personalizado, uno al lado del otro como mosaicos, cada uno con lo que restringe (un candado para lo restringido, *Permitido* escrito en los demás casos, y los juegos instalados que bloquea; Ⓐ lo aplica; en *Personalizado* ya vigente, Ⓐ lleva a sus opciones de abajo); *Ninguno* debajo. El nivel vigente indica *✓ Actual*; el contorno turquesa solo está donde está el foco. Lo que restringe un nivel (límite de edad, publicaciones, comunicación) se vuelve a indicar antes de aplicarlo; *Ninguno* lo pregunta en coral, ya que quita todas las restricciones.
+- **Las opciones del nivel:** clasificación por edad, publicaciones en redes sociales, comunicación con otros usuarios. Con un nivel predefinido, son las suyas: cambiar una convierte el nivel en *Personalizado*, a partir de las opciones del nivel predefinido con ese cambio, después de preguntar (con las opciones enumeradas).
 - **En *Clasificación por edad*,** el **sistema de clasificación** (PEGI, ESRB, USK, CERO …): la lista indica los países para los que clasifica cada uno (PEGI: la mayor parte de Europa, ESRB: Estados Unidos, Canadá y Latinoamérica, USK: Alemania, PEGI BBFC: Reino Unido…).
 - **Juegos instalados que bloquea** (también en *Clasificación por edad*): cuántos de los juegos instalados bloquea el nivel vigente por su clasificación por edad (*3 de 15*), y Ⓐ los enumera con su clasificación (*PEGI 16*); el mosaico de cada nivel también lo indica (*Juegos bloqueados · 3*).
   - Las clasificaciones son las de cada juego (sus datos de control, leídos por la comprobación de los juegos instalados al iniciar o desde *Consola › Comprobar los juegos instalados*), según el sistema de clasificación que usa la consola.

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 c9719f1eb7be -->
+<!-- translated from docs/features.md, sha256 ca638de42393 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -106,7 +106,7 @@ Ter informatie: een build waarvan is teruggegaan, een firmware die niet met deze
 
 - Elke sectie toont haar meldingen in een vaste volgorde, welke controle ook als eerste klaar was.
 - **In de zijbalk** telt een oranje badge naast de naam van een tabblad de meldingen die te doen zijn, op de plek waar ze worden opgelost: het tabblad Beveiliging (geen pincode, een zwakke pincode, PlayGuard zonder pincode, tijdelijk ontgrendeld), de Speeltijdtimer (het alarm uit, de console die niet telt), *Vandaag* (wijzigingen buiten PlayGuard, extra tijd om terug te zetten), de Console (de meldingen hierboven, en de netwerkklok). Genegeerde meldingen en meldingen ter informatie worden niet geteld.
-- In het tabblad staat dezelfde badge op de regel waar elke melding wordt opgelost (*Netwerkklok*, *Geïnstalleerde games controleren*, *Opslag*, *Gamepatches*; *Pincode instellen of wijzigen*, *PlayGuard beveiligen met de pincode*; *Geavanceerd* van de Speeltijdtimer voor het alarm), en het tabblad opent op de eerste daarvan.
+- In het tabblad staat dezelfde badge op de regel waar elke melding wordt opgelost (*Netwerkklok*, *Geïnstalleerde games controleren*, *Opslag*, *Gamepatches*; *Pincode instellen of wijzigen*, *PlayGuard beveiligen met de pincode*; *Geavanceerd* van de Speeltijdtimer voor het alarm), en het tabblad opent op de eerste daarvan. Een regel zonder eigen waarde zegt ervoor, in oranje, waarvoor de badge is (*Makkelijk te raden*, *Niet nauwkeurig*).
 - **Ⓐ** op een melding voert de oplossing uit (*Inschakelen*, *Instellen*, *Bijwerken*…) of opent het tabblad waar je het oplost. Een melding verdwijnt vanzelf zodra wat ze meldt is opgelost.
 - **Ⓧ** markeert een melding ter informatie als gelezen; **Ⓨ** markeert ze allemaal. Een melding die als gelezen is gemarkeerd, blijft gelezen bij de volgende start, tot de tekst ervan verandert.
 - **Negeren:** een paar meldingen die te doen zijn, kun je met Ⓧ negeren, na een bevestiging en de pincode: een pincode die iedereen als eerste zou proberen, PlayGuard dat zonder pincode opent, het alarm "Tijd is om" uit, een bijna volle SD-kaart (nooit: geen pincode, ontgrendeld toezicht, de klok, de speeltijdtimer die niet telt of de bestanden van PlayGuard zelf). Een genegeerde melding telt niet meer mee en staat als laatste onder *Genegeerd*, waar Ⓐ hem weer laat meetellen. Hij komt vanzelf terug na 30 dagen (tenzij *Genegeerde waarschuwingen na 30 dagen weer meetellen* uit staat), zodra wat hij meldt is opgelost en daarna opnieuw gebeurt, of, voor de pincode, bij een nieuwe pincode met een andere lengte.
@@ -143,6 +143,7 @@ Daaronder wat het spelen het eerst stopt:
   - een andere, geopend boven een game, dat de tijd in PlayGuard meetelt, met Ⓐ hoe;
   - een game die open blijft in het HOME-menu, verschijnt als oranje pil (*telt door*, met Ⓐ waarom), als de pil over PlayGuard geopend boven een game het niet al zegt.
 - De pillen zetten eerst wat de ouder nodig heeft (oranje, met een driehoek), dan wat aan staat (blauwgroen, met een vinkje), dan de rest (grijs, met een stip): de vorm zegt het net zo goed als de kleur.
+- Wat in orde is en wat alleen wordt gemeld, valt samen in één pil na de pillen die de ouder nodig hebben (*✓ 3 controles in orde*); Ⓐ erop toont ze, zolang het tabblad open is.
 - Onder de pillen de extra tijd die nog moet worden teruggezet (Ⓐ zet hem terug) en het alarm "Tijd is om" zolang het uit staat (Ⓐ zet het weer aan).
 
 ### Eerste stappen
@@ -208,7 +209,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 - Met aanraken wordt een aangetikte dag bewerkt, waarna een tik op de boven- of onderkant hem met 15 min wijzigt.
 - De wijzigingen worden samen opgeslagen, met **+** of *Opslaan*, zoals in de editor per dag (de bevestiging toont de gewijzigde dagen, voor → na); *Verwerpen* draait ze terug.
-- In de balk van elke dag de tijd die de laatste keer op die dag van de week is gespeeld (vandaag inbegrepen, alle accounts), in koraalrood zodra de limiet werd bereikt, de limiet zelf ook, en een legenda onder de week zegt dat (*limiet overschreden*).
+- In de balk van elke dag de tijd die de laatste keer op die dag van de week is gespeeld (vandaag inbegrepen, alle accounts). Boven de limiet is de balk vol en de bovenkant koraalrood, voor hetzelfde deel als de tijd boven de limiet van de gespeelde tijd is; een legenda onder de week zegt dat (*limiet overschreden*), en ook de limiet staat in koraalrood. De dagen na vandaag tonen het spelen van vorige week, vager (geselecteerd: *Vorige vrijdag: 2 u 10 gespeeld van 2 u*).
 - Een gewijzigde dag die nog niet is opgeslagen heeft zijn limiet in oranje en een oranje rand om zijn balk; onder de week de cijfers van de geselecteerde dag (*donderdag: 1 u 20 gespeeld van 2 u*).
 - Boven de week, in oranje, een bereikte limiet en wat de console dan doet, of een console die geen speeltijd telt.
 - `0` minuten betekent *die dag niet spelen*; *Speeltijdlimiet verwijderen* zet de timer uit.
@@ -254,13 +255,13 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=activity)*
 
-Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het activiteitenlog van de console zelf — voor alle accounts of voor **één gebruikersaccount** (de accounts als chips bovenaan, als de console er meerdere heeft). PlayGuard start op het laatst getoonde account, of op het account dat bij *Standaardaccount* is gekozen (alle accounts, of één).
+Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het activiteitenlog van de console zelf — voor alle accounts of voor **één gebruikersaccount** (de accounts als chips bovenaan, als de console er meerdere heeft). PlayGuard start op het laatst getoonde account, of op het account dat bij *Standaardaccount* is gekozen (alle accounts, of één; onderaan het tabblad, bij *Alle games*).
 
 ### Bovenaan
 
 - De accounts als chips, de periode en *Exporteren of delen*.
 - Vandaag, de afgelopen 7 dagen en altijd als cijfers. Onder de afgelopen 7 dagen de vergelijking met de 7 ervoor, per dag: ▲ *+20 min/dag t.o.v. vorige week* in oranje, ▼ minder in blauwgroen, *zoals vorige week* bij hoogstens 5 minuten verschil.
-- De vier meest gespeelde games als kaarten (Ⓐ opent er een); over de afgelopen 7 dagen zegt de game die het meest meer is gespeeld dan de week ervoor met hoeveel, vanaf een half uur (▲ *+2 u*).
+- De vier meest gespeelde games als kaarten (Ⓐ opent er een); over de afgelopen 7 dagen zegt de game die het meest meer is gespeeld dan de week ervoor met hoeveel, vanaf een half uur (▲ *+2 u t.o.v. vorige week*).
 - Niets gespeeld in de periode: een kaart zegt dat, met *Totaal bekijken* als er iets te zien is.
 
 ### Grafieken en samenvatting
@@ -292,8 +293,8 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (een hangslot voor beperkt, een vinkje voor toegestaan, en de geïnstalleerde games die het blokkeert; Ⓐ stelt het in; geldt *Aangepast* al, dan gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld.
-- **Bij Aangepast:** leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen.
+- **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (een hangslot voor beperkt, anders *Toegestaan* in woorden, en de geïnstalleerde games die het blokkeert; Ⓐ stelt het in; geldt *Aangepast* al, dan gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Het geldende niveau zegt *✓ Huidig*; de blauwgroene rand staat alleen waar de focus is. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld; *Geen* vraagt het in koraalrood, omdat het elke beperking opheft.
+- **De instellingen van het niveau:** leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen. Bij een vooraf ingesteld niveau zijn het diens eigen instellingen: er één wijzigen maakt het niveau *Aangepast*, vanuit de instellingen van dat niveau met die wijziging, na een vraag (met de instellingen op een rij).
 - **Onder *Leeftijdsclassificatie*** de **classificatie-instantie** (PEGI, ESRB, USK, CERO …): de lijst zegt voor welke landen elke instantie classificeert (PEGI: het grootste deel van Europa, ESRB: de Verenigde Staten, Canada en Latijns-Amerika, USK: Duitsland, PEGI BBFC: het Verenigd Koninkrijk…).
 - **Geblokkeerde geïnstalleerde games** (ook onder *Leeftijdsclassificatie*): hoeveel van de geïnstalleerde games het geldende niveau blokkeert op hun leeftijdsclassificatie (*3 van 15*), waarbij Ⓐ ze toont met hun classificatie (*PEGI 16*); de tegel van elk niveau zegt het ook (*Geblokkeerde games · 3*).
   - De classificaties zijn die van elke game zelf (de controlegegevens van de game, gelezen door de controle van de geïnstalleerde games bij het opstarten of via *Console › Geïnstalleerde games controleren*), volgens de instantie die de console gebruikt.

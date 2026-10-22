@@ -1994,7 +1994,7 @@
             "played_day": "{}: {} giocato su {}",
             "played_day_free": "{}: {} giocato, senza limite",
             "bonus": "{}: {} previsto per quel giorno",
-            "last_week_day": "{} scorso"
+            "last_week_day": "{} precedente"
         },
         "activity": {
             "share": "Esporta o condividi",

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 c9719f1eb7be -->
+<!-- translated from docs/features.md, sha256 ca638de42393 -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -106,7 +106,7 @@ Die zur Information: ein Build, von dem zurückgekehrt wurde, eine mit dieser Ve
 
 - Jeder Abschnitt listet seine Einträge in einer festen Reihenfolge, egal welche Prüfung zuerst fertig war.
 - **In der Seitenleiste** zählt ein bernsteinfarbenes Abzeichen neben dem Namen eines Tabs dessen zu erledigende Einträge, dort, wo sie behoben werden: der Tab Sicherheit (keine Geheimzahl, eine schwache Geheimzahl, PlayGuard ohne seine Geheimzahl, vorübergehend aufgehoben), die Spielzeit (der Alarm aus, die Konsole zählt nicht), *Heute* (Änderungen außerhalb von PlayGuard, Zusatzzeit zum Zurücknehmen), die Konsole (ihre Einträge oben und die Netzwerkuhr). Ignorierte Einträge und die zur Information werden nicht gezählt.
-- Im Tab steht dasselbe Abzeichen in der Zeile, in der jeder behoben wird (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Speicher*, *Spiel-Patches*; *Geheimzahl festlegen oder ändern*, *PlayGuard mit der Geheimzahl schützen*; *Erweitert* der Spielzeit für den Alarm), und der Tab öffnet beim ersten davon.
+- Im Tab steht dasselbe Abzeichen in der Zeile, in der jeder behoben wird (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Speicher*, *Spiel-Patches*; *Geheimzahl festlegen oder ändern*, *PlayGuard mit der Geheimzahl schützen*; *Erweitert* der Spielzeit für den Alarm), und der Tab öffnet beim ersten davon. Eine Zeile ohne eigenen Wert sagt davor in Bernstein, wofür das Abzeichen steht (*Leicht zu erraten*, *Ungenau*).
 - **Ⓐ** auf einem Eintrag führt die Lösung aus (*Einschalten*, *Stellen*, *Aktualisieren*…) oder öffnet den Tab, in dem sie gemacht wird. Ein Eintrag verschwindet von selbst, sobald behoben ist, was er meldet.
 - **Ⓧ** markiert einen Eintrag zur Information als gelesen; **Ⓨ** markiert alle. Ein als gelesen markierter Eintrag bleibt beim nächsten Start gelesen, bis sich sein Text ändert.
 - **Ignorieren:** Einige zu erledigende Einträge können mit Ⓧ ignoriert werden, nach einer Bestätigung und der Geheimzahl: eine Geheimzahl, die jeder zuerst ausprobieren würde, PlayGuard, das ohne die Geheimzahl öffnet, der Alarm „Zeit ist um“ ausgeschaltet, die SD-Karte fast voll (nie die fehlende Geheimzahl, der aufgehobene Jugendschutz, die Uhr, die Spielzeit, die nicht gezählt wird, oder PlayGuards eigene Dateien). Ein ignorierter Eintrag wird nicht mehr gezählt und steht zuletzt unter *Ignoriert*, wo Ⓐ ihn wieder zählen lässt. Er kommt von selbst 30 Tage später zurück (außer *Ignorierte Warnungen nach 30 Tagen wieder zählen* ist aus), sobald das Gemeldete behoben ist und dann erneut auftritt, oder, bei der Geheimzahl, bei einer neuen Geheimzahl mit anderer Länge.
@@ -143,6 +143,7 @@ Darunter, was das Spielen zuerst beendet:
   - eine andere, über einem Spiel geöffnet, dass die Zeit in PlayGuard mitgezählt wird, Ⓐ sagt, wie;
   - ein im HOME-Menü offen gelassenes Spiel erscheint als bernsteinfarbene Kapsel (*zählt weiter*, Ⓐ sagt, warum), wenn die Kapsel zu PlayGuard über einem Spiel es nicht schon sagt.
 - Die Kapseln stellen an den Anfang, was den Elternteil braucht (Bernstein, mit einem Dreieck), dann, was aktiv ist (Petrol, mit einem Häkchen), dann den Rest (grau, mit einem Punkt): Die Form sagt es ebenso wie die Farbe.
+- Was in Ordnung ist und was nur mitgeteilt wird, fasst sich nach den Kapseln, die den Elternteil brauchen, in einer Kapsel zusammen (*✓ 3 Prüfungen in Ordnung*); Ⓐ darauf zeigt sie, solange der Tab offen ist.
 - Unter den Kapseln die noch zurückzunehmende Zusatzzeit (Ⓐ nimmt sie zurück) und der Alarm „Zeit ist um“, solange er aus ist (Ⓐ schaltet ihn wieder ein).
 
 ### Erste Schritte
@@ -208,7 +209,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 - Per Touch wird ein angetippter Tag bearbeitet, dann ändert ein Tippen auf sein oberes oder unteres Ende ihn um 15 min.
 - Die Änderungen werden gemeinsam gespeichert, mit **+** oder *Speichern*, wie im Editor pro Tag (die Bestätigung listet die geänderten Tage auf, vorher → nachher); *Verwerfen* setzt sie zurück.
-- In jedem Tagesbalken die Zeit, die an diesem Wochentag zuletzt gespielt wurde (heute eingeschlossen, alle Benutzer), in Korallenrot, sobald das Limit erreicht wurde, sein Limit auch, und eine Legende unter der Woche sagt das (*Limit überschritten*).
+- In jedem Tagesbalken die Zeit, die an diesem Wochentag zuletzt gespielt wurde (heute eingeschlossen, alle Benutzer). Über dem Limit ist der Balken voll und sein oberer Teil in Korallenrot, so groß wie der Anteil der Zeit über dem Limit an der gespielten Zeit; eine Legende unter der Woche sagt das (*Limit überschritten*), und auch das Limit ist in Korallenrot. Die Tage nach heute zeigen das Spielen der letzten Woche, blasser (ausgewählt: *Freitag letzte Woche: 2 h 10 von 2 h gespielt*).
 - Ein geänderter, noch nicht gespeicherter Tag hat sein Limit in Bernstein und seinen Balken bernsteinfarben umrandet; unter der Woche die Zahlen des ausgewählten Tages (*Donnerstag: 1 h 20 von 2 h gespielt*).
 - Über der Woche, in Bernstein, ein erreichtes Limit und was die Konsole dann tut, oder dass die Konsole keine Spielzeit zählt.
 - `0` Minuten bedeutet *an diesem Tag kein Spielen*; *Spielzeitlimit entfernen* schaltet den Timer aus.
@@ -254,13 +255,13 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=activity)*
 
-Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem eigenen Aktivitätsprotokoll der Konsole — für alle Benutzer oder **ein Benutzerkonto** (die Benutzer als Chips oben, wenn die Konsole mehrere hat). PlayGuard startet mit dem zuletzt angezeigten Benutzer, oder mit dem unter *Standardkonto* festgelegten (alle Benutzer, oder einer).
+Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem eigenen Aktivitätsprotokoll der Konsole — für alle Benutzer oder **ein Benutzerkonto** (die Benutzer als Chips oben, wenn die Konsole mehrere hat). PlayGuard startet mit dem zuletzt angezeigten Benutzer, oder mit dem unter *Standardkonto* festgelegten (alle Benutzer, oder einer; unten im Tab, mit *Alle Spiele*).
 
 ### Oben
 
 - Die Benutzer als Chips, der Zeitraum und *Exportieren oder teilen*.
 - Heute, die letzten 7 Tage und insgesamt als Zahlen. Unter den letzten 7 Tagen der Vergleich mit den 7 davor, pro Tag: ▲ *+20 min/Tag ggü. Vorwoche* in Bernstein, ▼ weniger in Petrol, *wie in der Vorwoche* bei höchstens 5 Minuten Unterschied.
-- Die vier meistgespielten Spiele als Karten (Ⓐ öffnet eines); über die letzten 7 Tage sagt das Spiel, das am meisten mehr gespielt wurde als in der Woche davor, um wie viel, ab einer halben Stunde (▲ *+2 h*).
+- Die vier meistgespielten Spiele als Karten (Ⓐ öffnet eines); über die letzten 7 Tage sagt das Spiel, das am meisten mehr gespielt wurde als in der Woche davor, um wie viel, ab einer halben Stunde (▲ *+2 h ggü. Vorwoche*).
 - Im Zeitraum nichts gespielt: Eine Karte sagt das, mit *Gesamt ansehen*, wenn es etwas zu sehen gibt.
 
 ### Diagramme und Zusammenfassung
@@ -292,8 +293,8 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (ein Vorhängeschloss für eingeschränkt, ein Häkchen für erlaubt, und die installierten Spiele, die sie sperrt; Ⓐ legt sie fest; ist *Nutzerdefiniert* aktiv, führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Was eine Kategorie einschränkt (Altersgrenze, Posten, Kommunikation), wird noch einmal gesagt, bevor sie festgelegt wird.
-- **Bei Nutzerdefiniert:** Altersfreigabe, Posten in sozialen Netzwerken, Kommunikation mit anderen.
+- **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (ein Vorhängeschloss für eingeschränkt, sonst *Erlaubt* in Worten, und die installierten Spiele, die sie sperrt; Ⓐ legt sie fest; ist *Nutzerdefiniert* aktiv, führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Die geltende Kategorie zeigt *✓ Aktiv*; der Ring in Petrol steht nur dort, wo der Fokus ist. Was eine Kategorie einschränkt (Altersgrenze, Posten, Kommunikation), wird noch einmal gesagt, bevor sie festgelegt wird; *Keine* fragt in Korallenrot nach, da sie jede Einschränkung aufhebt.
+- **Die Einstellungen der Kategorie:** Altersfreigabe, Posten in sozialen Netzwerken, Kommunikation mit anderen. Bei einer vorgegebenen Kategorie sind es ihre eigenen: Eine davon zu ändern macht die Kategorie zu *Nutzerdefiniert*, ausgehend von den Einstellungen der vorgegebenen mit dieser Änderung, nach einer Nachfrage (die Einstellungen aufgelistet).
 - **Unter *Alterseinstufung*:** das **Alterseinstufungssystem** (PEGI, ESRB, USK, CERO …): Die Liste sagt, für welche Länder jedes einstuft (PEGI: der größte Teil Europas, ESRB: die USA, Kanada und Lateinamerika, USK: Deutschland, PEGI BBFC: das Vereinigte Königreich…).
 - **Blockierte installierte Spiele** (ebenfalls unter *Alterseinstufung*): wie viele der installierten Spiele die geltende Kategorie wegen ihrer Altersfreigabe blockiert (*3 von 15*), Ⓐ listet sie mit ihrer Freigabe auf (*PEGI 16*); die Kachel jeder Kategorie sagt es auch (*Blockierte Spiele · 3*).
   - Die Freigaben sind die jedes Spiels selbst (seine Steuerdaten, gelesen von der Prüfung der installierten Spiele beim Start oder über *Konsole › Installierte Spiele prüfen*), nach dem System, das die Konsole verwendet.
