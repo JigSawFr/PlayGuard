@@ -1,15 +1,18 @@
-<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
+<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
 # 安裝
 
 如何安裝、更新和移除 PlayGuard，以及它會在 SD 卡上寫入哪些檔案。安裝之後：[開始使用](getting-started.md)。返回 [README](../../README.md)。
 
 ## 取得方式
 
+> [!WARNING]
+> PlayGuard **還沒有上架 Homebrew App Store（也還沒有上架 sphaira 的商店）**：它的商店頁面仍在等待審核。目前請手動安裝。
+
 任選一種：
 
-- **Homebrew App Store** / **sphaira 的 App Store**（同一個目錄）——商店頁面通過審核後，搜尋 *PlayGuard* 即可。新版本會在審核後自動提供：通常比 GitHub 晚幾天。PlayGuard 知道自己是從那裡安裝的，會建議透過商店更新。
+- **手動**（目前建議使用）——從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的**根目錄**。應用程式會放在 `sd:/switch/playguard/`，它的檔案則在 `sd:/config/playguard/`。
 - **sphaira › GitHub**——版本的 zip 檔已包含對應的項目（`/config/sphaira/github/playguard.json`）：第一次安裝之後，在 sphaira 中從 *GitHub* 更新即可。
-- **手動**——從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的**根目錄**。應用程式會放在 `sd:/switch/playguard/`，它的檔案則在 `sd:/config/playguard/`。
+- **Homebrew App Store** / **sphaira 的 App Store**（同一個目錄）——**尚未上架。** 商店頁面通過審核後，搜尋 *PlayGuard* 即可。之後新版本會在審核後自動提供：通常比 GitHub 晚幾天。PlayGuard 知道自己是從那裡安裝的，會建議透過商店更新。
 
 選用的**復原 sysmodule**（`playguard-rescue.zip`）需要另外下載：同樣解壓縮到 SD 卡的根目錄，然後重新啟動主機。它會放在 `atmosphere/contents/4200000000505247/`，只有在 `RESCUE` 檔案要求時才會動作——請見[被鎖在外面？](troubleshooting.md#被鎖在外面)。
 
@@ -33,7 +36,7 @@
 - **`profiles/`**——已儲存的遊玩時間上限設定檔
 - **`exports/`**——匯出的活動紀錄
 - **`nand/<system>/`**——屬於某一個系統的資料，每個系統都有自己的家長監護：`sysmmc/` 是 sysMMC 的，`emummc/` 是 emuMMC 的。裡面有：`history.json`，變更紀錄（最新的 500 筆，包括遭主機拒絕的變更；無法讀取時會保留為 `history.json.bad`、前一份保留為 `.bad.1`，而不是直接覆蓋，PlayGuard 會提示一次）；`state.json`，*封鎖所有遊戲*、延長時間、待重新啟用的鎖定以及韌體選擇需要記住的內容（[config.md](../config.md#state-kept-between-launches)，英文）；`watch.json`，PlayGuard 上次看到的主機狀態，用來判斷在它之外有哪些變更（[config.md](../config.md#watchjson)，英文；刪除它沒有影響）；`backups/`，設定的備份（絕不包含PIN碼）；`cache/`，最近一次讀取的遊玩活動（所有帳號，以及每個看過的帳號），下次啟動時會立即顯示，同時重新讀取記錄。這些資料夾出現之前的版本所留下的檔案，會歸到 PlayGuard 第一次啟動的那個系統
-- **`cache/`**——遊戲圖示（`icons/`，最多 16 MB，主機語言變更時會清空），所有系統共用，這樣每次啟動時就不必重新讀取每款遊戲的名稱和圖示；Atmosphère、hekate 和韌體的版本說明（`sys_notes.json`，供*主機*使用）以及 PlayGuard 自己的版本說明（供*關於*使用）；在開發者模式下，還有*安裝其他建置*的清單（`dev_builds.json`）
+- **`cache/`**——遊戲圖示（`icons/`，最多 16 MB，主機語言變更時會清空），所有系統共用，這樣每次啟動時就不必重新讀取每款遊戲的名稱和圖示；Atmosphère、hekate、sys-patch 和韌體的版本說明（`sys_notes.json`，供*主機*使用）以及 PlayGuard 自己的版本說明（供*關於*使用）；在開發者模式下，還有*安裝其他建置*的清單（`dev_builds.json`）
 - **`github_token`**——*線上傳送報告*，以及開發者模式下*安裝其他建置*所使用的 GitHub 登入資訊；登出時會刪除（*關於 › 說明與診斷 › GitHub 帳戶*，登入後才會顯示）
 - **`previous_build.json`**、**`boot_check.json`**——直接在原處安裝建置之後：被取代的建置名稱（以 `playguard.nro.previous` 保留在 `.nro` 旁邊），以及下次啟動時的檢查（第一個畫面出現後即刪除）
 - **`rescue_report.txt`**——復原 sysmodule 執行動作後留下的報告，直到 PlayGuard 在啟動時顯示它為止（無法讀取的報告會被刪除，PlayGuard 也會提示）
