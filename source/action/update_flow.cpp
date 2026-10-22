@@ -2,7 +2,9 @@
 #include "action/update_flow.hpp"
 
 #include "action/dev_build_flow.hpp"
+#include "action/hbmenu_lock.hpp"
 #include "action/notices.hpp"
+#include "action/pin_lock.hpp"
 #include "action/sys_update_flow.hpp"
 #include "activity/update_activity.hpp"
 #include "app.hpp"
@@ -166,6 +168,7 @@ void hand_over(const launcher::Target& target, const std::string& manual)
     const std::string name = store_name(target.store);
     ui::confirm(brls::getStr("playguard/update/open_body", name), brls::getStr("playguard/update/open_confirm", name),
                 [target, manual]() {
+                    if (!pin_lock::before_handing_over(hbmenu_lock::locked())) return;
                     if (launcher::launch(target)) brls::Application::quit();
                     else ui::info(manual);
                 });

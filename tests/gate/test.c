@@ -303,6 +303,18 @@ static void test_until(void)
     CHECK(gate_error_code(1, t, 5) == 0);
 }
 
+// The console clock against the network clock: within 5 minutes, the same;
+// beyond, either way, moved; an unreadable network clock never counts.
+static void test_clocks(void)
+{
+    const uint64_t t = 1761000000;
+    CHECK(!gate_clocks_differ(t, true, t));
+    CHECK(!gate_clocks_differ(t + GATE_CLOCK_SLACK, true, t) && !gate_clocks_differ(t, true, t + GATE_CLOCK_SLACK));
+    CHECK(gate_clocks_differ(t + GATE_CLOCK_SLACK + 1, true, t) && gate_clocks_differ(t, true, t + GATE_CLOCK_SLACK + 1));
+    CHECK(gate_clocks_differ(t + 365ull * 86400, true, t) && gate_clocks_differ(0, true, t));
+    CHECK(!gate_clocks_differ(t + 86400, false, t) && !gate_clocks_differ(t, false, 0));
+}
+
 int main(void)
 {
     test_until();
@@ -313,5 +325,6 @@ int main(void)
     test_hours();
     test_rules();
     test_log();
+    test_clocks();
     return CHECK_DONE("gate argv, free hours, rules and log assertions passed");
 }

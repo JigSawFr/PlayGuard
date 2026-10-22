@@ -125,6 +125,13 @@ bool gate_spans_hold(const GateHours *spans, unsigned n, int wday, int minute)
     return false;
 }
 
+bool gate_clocks_differ(uint64_t console, bool network_ok, uint64_t network)
+{
+    if (!network_ok) return false;
+    const uint64_t apart = console > network ? console - network : network - console;
+    return apart > GATE_CLOCK_SLACK;
+}
+
 static bool valid(const GateHours *h)
 {
     return h && (h->days & 0x7F) && !(h->days & 0x80) && h->from <= 1440 && h->to <= 1440 && h->from != h->to;

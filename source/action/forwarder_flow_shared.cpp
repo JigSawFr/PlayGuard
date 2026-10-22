@@ -8,6 +8,7 @@
 #include "action/forwarder_flow.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
+#include "action/pin_lock.hpp"
 #include "app.hpp"
 #include "core/forwarder.h"
 #include "core/forwarder_pack.h"
@@ -144,6 +145,15 @@ void tidy_gates()
 // the PIN, it goes through the gate as it is now (gate_nro).
 bool install(const forwarders::Made& m, bool self, const char* kind, const std::string& done_text, bool quiet)
 {
+    // Made again without the PIN in place of one protected with it (the
+    // same .nro and argv: the same ID): the PIN first, whatever "Protect
+    // PlayGuard with the PIN" says, as set_pin's turning it off asks.
+    forwarders::Made before;
+    if (!m.pin && forwarders::find(forwarder_id(m.nro.c_str(), m.argv.c_str()), &before) && before.pin &&
+        !pin_lock::confirm()) {
+        ui::refuse(pin_lock::refusal_text());
+        return false;
+    }
     nro::Info info;
     std::string error;
     if (!assets_of(m.nro, self, info, error)) {

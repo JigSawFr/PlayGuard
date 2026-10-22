@@ -87,6 +87,13 @@ size_t gate_rules_format(const GateRules *r, char *buf, size_t size);
 // Whether one of `spans` (n of them) holds `wday` and `minute` (gate_hours_free).
 bool gate_spans_hold(const GateHours *spans, unsigned n, int wday, int minute);
 
+// The console clock (System Settings sets it) moved away from the network
+// clock (they cannot): more than GATE_CLOCK_SLACK seconds apart. The gate's
+// rules then hold at their strictest (gate_nx.c). False when the network
+// clock could not be read (`network_ok`).
+#define GATE_CLOCK_SLACK (5 * 60)
+bool gate_clocks_differ(uint64_t console, bool network_ok, uint64_t network);
+
 typedef enum {
     GateResult_Pin = 0,     // the PIN entered: started
     GateResult_Free = 1,    // in its free hours, or no PIN on the console: started
