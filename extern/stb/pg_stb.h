@@ -23,6 +23,8 @@ int  pg_font_init(PgFont *f, const unsigned char *data, float px);
 // A codepoint's advance and left bearing, in pixels; the kerning to the next.
 float pg_font_advance(const PgFont *f, int cp);
 float pg_font_kern(const PgFont *f, int cp, int next);
+// Whether the font draws `cp` (not its missing glyph).
+int  pg_font_has(const PgFont *f, int cp);
 // Its coverage bitmap (free it with pg_free), its size and offset from the pen.
 unsigned char *pg_font_glyph(const PgFont *f, int cp, float shift_x, int *w, int *h, int *x0, int *y0);
 

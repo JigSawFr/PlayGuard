@@ -51,11 +51,13 @@ typedef struct {
     const char          *note;
     int                  note_warn;
     unsigned             rules;        // GATE_RULE_*, 0: none shown
+    const char          *badge;        // "Protected by PlayGuard" in its language, or NULL (English)
 } GateScreen;
 
 // Draws `s` into `px` (`w` x `h` pixels, `stride` pixels a row, RGBA: R in
-// the lowest byte). The layout is made for 1280 x 720; a missing font draws
-// no text, a missing icon PlayGuard's mark in its place.
+// the lowest byte). The layout is made for 1280 x 720: the text keeps left
+// of the dial, the status and the hint on up to two lines each; a missing
+// font draws no text, a missing icon PlayGuard's mark in its place.
 void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *s);
 
 #ifdef __cplusplus

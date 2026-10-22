@@ -267,7 +267,7 @@ static void screen_show(Screen *sc, GateScreenState state, const char *note, int
     const GateScreen s = {
         sc->brand, sc->text, sc->icon, sc->icon_size, sc->name, gate_text(sc->language, STATUS[state]),
         hint == GateText_Count ? NULL : gate_text(sc->language, hint), footer, sc->clock, state, note, note_warn,
-        sc->rules,
+        sc->rules, gate_text(sc->language, GateText_Badge),
     };
     u32 stride = 0;
     uint32_t *px = (uint32_t *)framebufferBegin(&sc->fb, &stride);
