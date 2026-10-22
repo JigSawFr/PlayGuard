@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
+<!-- translated from docs/getting-started.md, sha256 db71c88bd2a7 -->
 # Como começar
 
 Do cartão SD a uma consola configurada para o seu filho, em cerca de dez minutos, e depois as tarefas do dia a dia. Voltar ao [README](../../README.md).
@@ -13,7 +13,7 @@ Quer dar uma vista de olhos primeiro? [Experimente o PlayGuard no navegador](htt
 
 ## 1. Instale-o
 
-Procure *PlayGuard* na Homebrew App Store ou no sphaira, ou extraia o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) para a raiz do cartão SD ([instalação](install.md)).
+Extraia o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) para a raiz do cartão SD ([instalação](install.md)). O PlayGuard ainda não está na Homebrew App Store nem no sphaira: a sua ficha ainda aguarda aprovação.
 
 > [!TIP]
 > Extraia também o `playguard-rescue.zip`, o sysmodule de recuperação opcional. Não faz nada até precisar dele, e é a única forma de voltar a entrar se um limite de 0 minutos bloquear tudo e o PIN tiver sido esquecido ([Consola bloqueada?](troubleshooting.md#consola-bloqueada)).
