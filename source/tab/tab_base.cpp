@@ -67,6 +67,9 @@ void TabBase::update_marks()
                 cell->detail->setVisibility(count > 0 ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
                 if (count > 0) reason = notices::reason_of(m.ids);
             }
+        // On a tile (a column, as narrow as a third of the screen), on two
+        // lines when it has to; on a row, one.
+        m.reason->setSingleLine(m.row->getAxis() != brls::Axis::COLUMN);
         ui::set_text(m.reason, reason);
         ui::set_visible(m.reason, !reason.empty());
     }
@@ -100,6 +103,9 @@ void TabBase::willAppear(bool resetState)
         if (v->getId() == "main_tabs") s_main_screen = this->screen;
     frame_stats_flow::set_screen(this->screen);
     this->update_ro_note();
+    // A row made a tile after mark() (cadran::List::tiles): its words laid
+    // out for it.
+    this->update_marks();
     this->refresh();
     // The smoke test's "alarm" (PLAYGUARD_SIM_TAB_RACE): a read of the play
     // data ending as a tab replaces another, the one replaced not freed yet.
