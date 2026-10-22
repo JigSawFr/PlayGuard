@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # 安裝
 
 如何安裝、更新和移除 PlayGuard，以及它會在 SD 卡上寫入哪些檔案。安裝之後：[開始使用](getting-started.md)。返回 [README](../../README.md)。
@@ -20,13 +20,13 @@
 
 ## 更新
 
-- **在 PlayGuard 中：** *關於 › 更新方式*可以選擇更新的方式——在 PlayGuard 內（它會下載版本、檢查、取代自己並重新啟動）、sphaira、Homebrew App Store 或手動。開啟*每天檢查更新*時，有新版本時 PlayGuard 會開在新版本的畫面上。
+- **在 PlayGuard 中：** *偏好設定 › 更新方式*可以選擇更新的方式——在 PlayGuard 內（它會下載版本、檢查、取代自己並重新啟動）、sphaira、Homebrew App Store 或手動。開啟*每天檢查更新*時，有新版本時 PlayGuard 會開在新版本的畫面上。
 - **復原 sysmodule** 要跟上 PlayGuard 的版本：每次更新後，都要重新解壓縮該版本的 `playguard-rescue.zip`（或在通知鈴鐺的*復原 sysmodule 不是最新版本*上選*更新*），然後重新啟動主機。
 - 設定、紀錄、設定檔和備份都會保留：它們在 `sd:/config/playguard/`，不在應用程式旁邊。
 
 ## 移除
 
-刪除 `sd:/switch/playguard/`（應用程式），如果也要移除它的檔案，再刪除 `sd:/config/playguard/`；裝了復原 sysmodule 的話，也要刪除 `sd:/atmosphere/contents/4200000000505247/`。上限、PIN碼和限制都是主機本身的：它們**會留在主機上**。如果也要移除這些，請先使用*PIN碼 › 刪除所有家長監護設定*。
+刪除 `sd:/switch/playguard/`（應用程式），如果也要移除它的檔案，再刪除 `sd:/config/playguard/`；裝了復原 sysmodule 的話，也要刪除 `sd:/atmosphere/contents/4200000000505247/`。上限、PIN碼和限制都是主機本身的：它們**會留在主機上**。如果也要移除這些，請先使用*安全 › 刪除所有家長監護設定*。
 
 ## SD 卡上的檔案
 

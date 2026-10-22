@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # Installatie
 
 Hoe je PlayGuard installeert, bijwerkt en verwijdert, en wat het op de SD-kaart schrijft. Eenmaal geïnstalleerd: [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -20,13 +20,13 @@ Open PlayGuard daarna **boven een game**, met de gebruiker van een ouder ([waaro
 
 ## Bijwerken
 
-- **In PlayGuard:** *Info › Bijwerken met* kiest hoe — in PlayGuard zelf (het downloadt de release, controleert hem, vervangt zichzelf en herstart), sphaira, de Homebrew App Store of met de hand. Met *Elke dag op updates controleren* aan opent PlayGuard op de nieuwe release als die er is.
+- **In PlayGuard:** *Voorkeuren › Bijwerken met* kiest hoe — in PlayGuard zelf (het downloadt de release, controleert hem, vervangt zichzelf en herstart), sphaira, de Homebrew App Store of met de hand. Met *Elke dag op updates controleren* aan opent PlayGuard op de nieuwe release als die er is.
 - **De herstel-sysmodule** volgt de versie van PlayGuard: pak na elke update de `playguard-rescue.zip` van die release opnieuw uit (of *Bijwerken* bij *De herstel-sysmodule is verouderd* onder de bel), en start de console daarna opnieuw op.
 - Instellingen, geschiedenis, profielen en back-ups blijven bewaard: ze staan in `sd:/config/playguard/`, niet naast de app.
 
 ## Verwijderen
 
-Verwijder `sd:/switch/playguard/` (de app) en, om ook zijn bestanden te verwijderen, `sd:/config/playguard/`; met de herstel-sysmodule ook `sd:/atmosphere/contents/4200000000505247/`. De limieten, de pincode en de beperkingen zijn die van de console zelf: ze **blijven op de console**. Wil je ook die verwijderen, gebruik dan eerst *Pincode › Ouderlijk toezicht wissen*.
+Verwijder `sd:/switch/playguard/` (de app) en, om ook zijn bestanden te verwijderen, `sd:/config/playguard/`; met de herstel-sysmodule ook `sd:/atmosphere/contents/4200000000505247/`. De limieten, de pincode en de beperkingen zijn die van de console zelf: ze **blijven op de console**. Wil je ook die verwijderen, gebruik dan eerst *Beveiliging › Ouderlijk toezicht wissen*.
 
 ## Bestanden op de SD-kaart
 

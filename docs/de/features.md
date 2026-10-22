@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 bf49da9b97f3 -->
+<!-- translated from docs/features.md, sha256 c9719f1eb7be -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -16,7 +16,7 @@ Die Screenshots zeigen das dunkle Design, die Voreinstellung von PlayGuard (auf 
 | ![Aktivität](../../images/screenshots/activity.png) | ![Ein Spiel](../../images/screenshots/activity_game.png) |
 | **Einschränkungen** | **Konsole › Netzwerkuhr** |
 | ![Einschränkungen](../../images/screenshots/restrictions.png) | ![Netzwerkuhr](../../images/screenshots/clock.png) |
-| **Geheimzahl** | **Optionen** |
+| **Sicherheit** | **Optionen** |
 | ![Geheimzahl](../../images/screenshots/security.png) | ![Optionen](../../images/screenshots/preferences.png) |
 
 ## Steuerung
@@ -105,7 +105,7 @@ Die zur Information: ein Build, von dem zurückgekehrt wurde, eine mit dieser Ve
 ### Wie sich Einträge verhalten
 
 - Jeder Abschnitt listet seine Einträge in einer festen Reihenfolge, egal welche Prüfung zuerst fertig war.
-- **In der Seitenleiste** zählt ein bernsteinfarbenes Abzeichen neben dem Namen eines Tabs dessen zu erledigende Einträge, dort, wo sie behoben werden: der Tab Geheimzahl (keine Geheimzahl, eine schwache Geheimzahl, PlayGuard ohne seine Geheimzahl, vorübergehend aufgehoben), die Spielzeit (der Alarm aus, die Konsole zählt nicht), *Heute* (Änderungen außerhalb von PlayGuard, Zusatzzeit zum Zurücknehmen), die Konsole (ihre Einträge oben und die Netzwerkuhr). Ignorierte Einträge und die zur Information werden nicht gezählt.
+- **In der Seitenleiste** zählt ein bernsteinfarbenes Abzeichen neben dem Namen eines Tabs dessen zu erledigende Einträge, dort, wo sie behoben werden: der Tab Sicherheit (keine Geheimzahl, eine schwache Geheimzahl, PlayGuard ohne seine Geheimzahl, vorübergehend aufgehoben), die Spielzeit (der Alarm aus, die Konsole zählt nicht), *Heute* (Änderungen außerhalb von PlayGuard, Zusatzzeit zum Zurücknehmen), die Konsole (ihre Einträge oben und die Netzwerkuhr). Ignorierte Einträge und die zur Information werden nicht gezählt.
 - Im Tab steht dasselbe Abzeichen in der Zeile, in der jeder behoben wird (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Speicher*, *Spiel-Patches*; *Geheimzahl festlegen oder ändern*, *PlayGuard mit der Geheimzahl schützen*; *Erweitert* der Spielzeit für den Alarm), und der Tab öffnet beim ersten davon.
 - **Ⓐ** auf einem Eintrag führt die Lösung aus (*Einschalten*, *Stellen*, *Aktualisieren*…) oder öffnet den Tab, in dem sie gemacht wird. Ein Eintrag verschwindet von selbst, sobald behoben ist, was er meldet.
 - **Ⓧ** markiert einen Eintrag zur Information als gelesen; **Ⓨ** markiert alle. Ein als gelesen markierter Eintrag bleibt beim nächsten Start gelesen, bis sich sein Text ändert.
@@ -219,7 +219,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 - **Jeden Tag gleiches Limit:** eine Schnellliste oder eine genaue Dauer (*Dauer eingeben…*: ↑/↓ in 15-min-Schritten, gehalten in Stundenschritten, Ⓛ/Ⓡ in 5-min-Schritten).
 - **Wochentage und Wochenende ›:** der Editor, der nach Montag–Freitag und dann nach dem Wochenende fragt.
-- **Zusatzzeit für heute** und **heute nicht mehr spielen**, wie in *Heute*. Ein Hinweis darunter sagt, was die Konsole beim Limit tut. Während der Jugendschutz vorübergehend aufgehoben ist, wird die Spielzeit *möglicherweise* nicht gezählt: Das ist noch offen ([Doku, auf Englisch](../parental-controls.md#still-open)).
+- **Zusatzzeit oder heute nicht mehr spielen ›** öffnet *Heute*, wo beides ist. Ein Hinweis darunter sagt, was die Konsole beim Limit tut. Während der Jugendschutz vorübergehend aufgehoben ist, wird die Spielzeit *möglicherweise* nicht gezählt: Das ist noch offen ([Doku, auf Englisch](../parental-controls.md#still-open)).
 - Jede Bestätigung listet die Tage auf, die sich ändern, vorher → nachher.
 
 ### Profile
@@ -230,6 +230,14 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
   - Wenn der Zeitraum beginnt, fragt PlayGuard, ob es angewendet werden soll (die Tage, die es ändert, unter der Frage dargestellt); wenn er vorbei ist, ob die Limits, die es ersetzt hat, wiederhergestellt oder behalten werden sollen.
   - Einmal am Tag gefragt, auf dem Hauptbildschirm, wenn nichts anderes im Vordergrund ist: PlayGuard handelt nur, wenn es geöffnet wird, also behält eine Konsole, auf der es nicht geöffnet wird, ihre Limits. Ein Zeitraum, der verstrichen ist, ohne dass das Profil je angewendet wurde, wird vergessen.
   - Immer nur eines; die Zeile ändert, entfernt oder beendet es.
+
+### Alle Spiele sperren
+
+*Alle Spiele sperren*, unter den Einstellungen der Woche: ein Schalter, der das Limit jedes Tages auf 0 setzt, sodass zum Starten eines Spiels eine Geheimzahl nötig ist — eine leichte Sperre ohne Altersfreigaben oder Kommunikationsgrenzen.
+
+- Sie sperrt das Starten von Spielen, nicht das HOME-Menü, und braucht eine Geheimzahl.
+- Die vorherigen Limits kommen zurück, wenn sie ausgeschaltet wird.
+- Solange sie an ist, werden *Zusatzzeit* und *heute nicht mehr spielen* abgelehnt, und auf anderem Weg gesetzte Limits (ein Profil, eine Sicherung, der Verlauf…) ersetzen sie.
 
 ### Gute-Nacht-Alarm
 
@@ -250,7 +258,7 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 ### Oben
 
-- Die Benutzer als Chips, der Zeitraum und der Export.
+- Die Benutzer als Chips, der Zeitraum und *Exportieren oder teilen*.
 - Heute, die letzten 7 Tage und insgesamt als Zahlen. Unter den letzten 7 Tagen der Vergleich mit den 7 davor, pro Tag: ▲ *+20 min/Tag ggü. Vorwoche* in Bernstein, ▼ weniger in Petrol, *wie in der Vorwoche* bei höchstens 5 Minuten Unterschied.
 - Die vier meistgespielten Spiele als Karten (Ⓐ öffnet eines); über die letzten 7 Tage sagt das Spiel, das am meisten mehr gespielt wurde als in der Woche davor, um wie viel, ab einer halben Stunde (▲ *+2 h*).
 - Im Zeitraum nichts gespielt: Eine Karte sagt das, mit *Gesamt ansehen*, wenn es etwas zu sehen gibt.
@@ -275,8 +283,8 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 ### Export und Teilen
 
-- **Auf die SD-Karte exportieren** (der Chip *Exportieren*) als CSV, JSON, XLSX (Excel) oder PDF, eine Spalte pro Tag, dann die letzten 7 Tage, die letzten 30 Tage und insgesamt.
-- **Wochenübersicht als QR-Code:** Die Kamera eines Handys liest ihn als einige Zeilen Text, in der angezeigten Sprache — die letzten 7 Tage und ihr Durchschnitt, der Trend, jeder Tag, die drei meistgespielten Spiele, die Sitzungen, die längste davon und die zwischen 21:00 und 06:00 gespielte Zeit. Nichts geht online.
+- **Auf die SD-Karte exportieren** (*Exportieren oder teilen › Auf der SD-Karte speichern*) als CSV, JSON, XLSX (Excel) oder PDF, eine Spalte pro Tag, dann die letzten 7 Tage, die letzten 30 Tage und insgesamt.
+- **Wochenübersicht als QR-Code** (*Exportieren oder teilen*, oder *QR-Code zeigen* in der Glocke): Die Kamera eines Handys liest ihn als einige Zeilen Text, in der angezeigten Sprache — die letzten 7 Tage und ihr Durchschnitt, der Trend, jeder Tag, die drei meistgespielten Spiele, die Sitzungen, die längste davon und die zwischen 21:00 und 06:00 gespielte Zeit. Nichts geht online.
 - Öffnet sofort mit den zuletzt gelesenen Zahlen (zwischen den Starts auf der SD-Karte aufbewahrt), im Hintergrund aktualisiert, wenn sie älter als eine Minute sind; Ⓧ liest sie sofort neu, mit einer Ladeanzeige.
 - Zeiten sind ungefähr, wenn die Konsolenuhr geändert wurde.
 
@@ -286,18 +294,18 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 - **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (ein Vorhängeschloss für eingeschränkt, ein Häkchen für erlaubt, und die installierten Spiele, die sie sperrt; Ⓐ legt sie fest; ist *Nutzerdefiniert* aktiv, führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Was eine Kategorie einschränkt (Altersgrenze, Posten, Kommunikation), wird noch einmal gesagt, bevor sie festgelegt wird.
 - **Bei Nutzerdefiniert:** Altersfreigabe, Posten in sozialen Netzwerken, Kommunikation mit anderen.
-- **VR-Modus** und das **Alterseinstufungssystem** (PEGI, ESRB, USK, CERO …): Die Liste sagt, für welche Länder jedes einstuft (PEGI: der größte Teil Europas, ESRB: die USA, Kanada und Lateinamerika, USK: Deutschland, PEGI BBFC: das Vereinigte Königreich…).
-- **Die Anzahl der Spiele, die kommunizieren dürfen** (die Liste selbst steht im Diagnosebericht, roh, bis ihr Aufbau bekannt ist).
-- **Blockierte installierte Spiele:** wie viele der installierten Spiele die geltende Kategorie wegen ihrer Altersfreigabe blockiert (*3 von 15*), Ⓐ listet sie mit ihrer Freigabe auf (*PEGI 16*); die Kachel jeder Kategorie sagt es auch (*Blockierte Spiele · 3*).
+- **Unter *Alterseinstufung*:** das **Alterseinstufungssystem** (PEGI, ESRB, USK, CERO …): Die Liste sagt, für welche Länder jedes einstuft (PEGI: der größte Teil Europas, ESRB: die USA, Kanada und Lateinamerika, USK: Deutschland, PEGI BBFC: das Vereinigte Königreich…).
+- **Blockierte installierte Spiele** (ebenfalls unter *Alterseinstufung*): wie viele der installierten Spiele die geltende Kategorie wegen ihrer Altersfreigabe blockiert (*3 von 15*), Ⓐ listet sie mit ihrer Freigabe auf (*PEGI 16*); die Kachel jeder Kategorie sagt es auch (*Blockierte Spiele · 3*).
   - Die Freigaben sind die jedes Spiels selbst (seine Steuerdaten, gelesen von der Prüfung der installierten Spiele beim Start oder über *Konsole › Installierte Spiele prüfen*), nach dem System, das die Konsole verwendet.
   - Ein Spiel, das dieses System nicht einstuft, wird nicht gezählt, ebenso wenig die in der Smart-Geräte-App festgelegten Ausnahmen.
   - Der Bildschirm eines Spiels in Aktivität zeigt seine Freigabe, und *auf der aktuellen Stufe blockiert*, wenn es das ist.
+- **Unter *Sonstiges*:** VR-Modus. Die Spiele, die kommunizieren dürfen, stehen im Diagnosebericht, roh, bis ihre Liste verstanden ist.
 
-## Geheimzahl — die Geheimzahl, Aufheben, Spiele sperren, Smart-Geräte-App
+## Sicherheit — die Geheimzahl, Aufheben, das Homebrew-Menü, Smart-Geräte-App
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=security)*
 
-- **Oben** drei Kacheln: die Geheimzahl, die Einschränkungen und das vorübergehende Aufheben, jede mit einem Häkchen in Petrol, wenn alles ist, wie es sein soll (eine Geheimzahl festgelegt, Einschränkungen aktiv, gesperrt), oder einem bernsteinfarbenen Warnzeichen, wenn etwas zu tun ist.
+- **Oben** vier Kacheln: die Geheimzahl, die Einschränkungen, das vorübergehende Aufheben und das Homebrew-Menü, jede mit einem Häkchen in Petrol, wenn alles ist, wie es sein soll (eine Geheimzahl festgelegt, Einschränkungen aktiv, gesperrt), oder einem bernsteinfarbenen Warnzeichen, wenn etwas zu tun ist; das Homebrew-Menü sagt *Offen* oder *Gesperrt* (ein Häkchen, sobald es gesperrt ist: offen ist ohne Forwarder in Ordnung).
 - **Geheimzahl festlegen oder ändern** (Geheimzahl-Bildschirm des Systems).
 - **Geheimzahl anzeigen**: nach einer Warnung und der Geheimzahl selbst, jedes Mal abgefragt; im Verlauf festgehalten, dann wird eine neue Geheimzahl angeboten.
 - **Vorübergehend aufheben**, und ob PlayGuard sie direkt nach einer Änderung, die das Aufheben brauchte, von selbst wieder aktiviert (standardmäßig an).
@@ -314,15 +322,8 @@ Die Geheimzahl in PlayGuard selbst:
 
 - Einmal eingegeben, gilt die Geheimzahl, bis PlayGuard geschlossen wird; *Geheimzahl nach 5 Minuten erneut abfragen* (standardmäßig aus) fragt danach erneut und bringt den Sperrbildschirm von *Beim Öffnen von PlayGuard* zurück, wenn PlayGuard nach 5 min oder mehr außerhalb des Fokus zurückkehrt.
 - Wird in der Dienstschicht geprüft, sodass keine Änderung sie umgeht; das Wiederaktivieren fragt nie danach. *Geheimzahl anzeigen* fragt jedes Mal danach, in jedem Modus und sogar direkt nach der Eingabe, und eine fehlende oder beschädigte `config.json` zählt als *Vor einer Änderung*.
+- **Homebrew-Menü sperren ›** öffnet *Konsole › Forwarder*, wo es nach seinen Prüfungen gesperrt wird (siehe [Forwarder](#forwarder)).
 - **Beenden**, während der Jugendschutz noch aufgehoben ist, fragt, ob er wieder aktiviert werden soll (*Wieder aktivieren und beenden* schließt auch das Spiel, über dem PlayGuard geöffnet wurde, zurück zum HOME-Menü statt zu hbmenu); wird PlayGuard stattdessen über das HOME-Menü geschlossen, aktiviert es ihn beim nächsten Start wieder, und ein Neustart der Konsole aktiviert ihn von selbst.
-
-### Alle Spiele sperren
-
-Ein Schalter, der das Limit jedes Tages auf 0 setzt, sodass zum Starten eines Spiels eine Geheimzahl nötig ist — eine leichte Sperre ohne Altersfreigaben oder Kommunikationsgrenzen.
-
-- Sie sperrt das Starten von Spielen, nicht das HOME-Menü, und braucht eine Geheimzahl.
-- Die vorherigen Limits kommen zurück, wenn sie ausgeschaltet wird.
-- Solange sie an ist, werden *Zusatzzeit* und *heute nicht mehr spielen* abgelehnt, und auf anderem Weg gesetzte Limits (ein Profil, eine Sicherung, der Verlauf…) ersetzen sie.
 
 ### Smart-Geräte-App
 
@@ -334,11 +335,31 @@ Ein Schalter, der das Limit jedes Tages auf 0 setzt, sodass zum Starten eines Sp
 
 Zwei Bestätigungen, unumkehrbar; vorher wird eine Sicherung der Einstellungen gespeichert.
 
+## Verlauf — was PlayGuard geändert hat, und die Sicherungen
+
+*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=history)*
+
+**Oben** als Kacheln, wie viele Änderungen aufgezeichnet sind und der Tag der letzten Sicherung: ein Häkchen in Petrol, oder ein bernsteinfarbenes Warnzeichen, wenn es keine gibt oder seit 30 Tagen keine.
+
+### Änderungsverlauf
+
+- Die neuesten 500 Änderungen von PlayGuard (Limits, Einschränkungskategorie, Geheimzahl, Aufheben, Trennen, die Uhr, Wiederherstellungen, Pausieren oder Fortsetzen des Countdowns …) und was es außerhalb von sich geändert gesehen hat, nach Tag gruppiert (*Heute*, *Gestern*, dann Wochentag und Datum), mit der Uhrzeit und woher; ein Limit, das für einen Tag geändert wurde, nennt diesen Tag.
+- Eine Änderung, die die Konsole **abgelehnt** hat, steht auch da, in Bernstein, mit dem Fehler der Konsole und dem, was versucht wurde (nie wiederherstellbar: Es hat sich nichts geändert).
+- *Anzeigen* behält eine Art (Spielzeit, Einschränkungen, Sicherheit und App, außerhalb von PlayGuard bemerkt, von der Konsole abgelehnt); *Angezeigtes exportieren* schreibt sie nach `exports/` als CSV, JSON, XLSX oder PDF.
+- Ⓐ auf einer Änderung zeigt sie und **stellt** bei einem Wert **den vorherigen wieder her** — mit demselben Aufheben und derselben Geheimzahl wie jede Änderung, und sagt, ob er sich inzwischen geändert hat.
+- Jede Änderung behält die PlayGuard-Version, die sie gemacht hat (ein Entwicklungs-Build: als solcher genannt, mit seinem Commit und, beim Build eines Pull Requests, dessen Nummer); eine Änderung, die von einer neueren Version von PlayGuard aufgezeichnet wurde, erscheint als *Andere Änderung*.
+
+### Sicherungen
+
+- **Einstellungen sichern / wiederherstellen** auf der SD-Karte: Einschränkungskategorie, nutzerdefinierte Einstellungen, VR-Modus, Alterseinstufungssystem, Tageslimits, der Alarm „Zeit ist um“ (mit eingeschalteten erweiterten Aktionen) und der rohe Block des Timers zur Dokumentation — nie die Geheimzahl.
+- Eine Wiederherstellung listet nur auf, was sich ändern würde (nichts zu ändern: Sie sagt es einfach, ohne Aufheben und ohne etwas zu schreiben), und sagt, wenn in der Sicherung ein Gute-Nacht-Alarm an war (er wird nicht zurückgeschrieben).
+- Wähle, wie viele Sicherungen aufbewahrt werden.
+
 ## Konsole — die Netzwerkuhr, die installierten Spiele, was auf der Konsole läuft
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=console)*
 
-**Oben**, was auf der Konsole läuft, als Kacheln (die Firmware, Atmosphère, hekate, wenn es auf der SD-Karte liegt, und sys-patch, wenn es installiert ist; Ⓐ öffnet seine Versionshinweise), dann die Diagnose, dann die Zeilen der Konsole, die Kompatibilität zuerst (nur ein Häkchen in Petrol, wenn PlayGuard auf dieser Firmware geprüft wurde, sonst eine Warnung und was nicht stimmt).
+**Oben**, was auf der Konsole läuft, als Kacheln (die Firmware, Atmosphère, hekate, wenn es auf der SD-Karte liegt, und sys-patch, wenn es installiert ist; Ⓐ öffnet seine Versionshinweise), dann die Werkzeuge als Kacheln (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Forwarder*), dann die Zeilen der Konsole, die Kompatibilität zuerst (nur ein Häkchen in Petrol, wenn PlayGuard auf dieser Firmware geprüft wurde, sonst eine Warnung und was nicht stimmt).
 
 ### Netzwerkuhr
 
@@ -384,7 +405,7 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 
 ### Forwarder
 
-*Forwarder ›*, ein eigener Bildschirm unter *Homebrew* — ein Homebrew im HOME-Menü, mit seinem Symbol und seinem Namen, von dort wie ein Spiel gestartet (ein NRO-Forwarder, wie sphaira sie erstellt).
+*Forwarder ›*, ein eigener Bildschirm, eine Kachel unter *Werkzeuge* (auch *Sicherheit › Homebrew-Menü sperren*) — ein Homebrew im HOME-Menü, mit seinem Symbol und seinem Namen, von dort wie ein Spiel gestartet (ein NRO-Forwarder, wie sphaira sie erstellt).
 
 - **Eine Karte oben** sagt, wie es um das Homebrew-Menü steht: gesperrt oder offen, seine Rückwege (der Forwarder von PlayGuard, die geschützten Menüs, die noch nie über das HOME-Menü gestarteten), was es noch ohne Geheimzahl öffnet und ob das Rettungsmodul installiert ist. Ⓐ darauf listet auf, was zu tun ist, jedes einen Druck entfernt (der nächste Schritt zur Sperre, einen Forwarder schützen oder löschen, der es ohne Geheimzahl öffnet, die Prüfung, das Notfallblatt).
 - **Die Liste nach Gruppen:** der von PlayGuard, die mit der Geheimzahl geschützten, die ohne, die einer anderen App, die nicht mehr im HOME-Menü. Ein geschützter hat ein Vorhängeschloss auf seinem Symbol (ein Häkchen für ein Menü, das nachweislich über sein Tor funktioniert), ein hier ohne Geheimzahl erstellter ein offenes Vorhängeschloss in Bernstein.
@@ -439,31 +460,14 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Was PlayGuard selbst einrichtet:
-  - Sprache (jede Sprache der Konsole, oder die der Konsole), Design (standardmäßig dunkel, hell oder das der Konsole), Textgröße (automatisch / normal / größer): alle drei sofort.
-  - Der Tab, mit dem gestartet wird.
+  - Zuerst als Kacheln: Sprache (jede Sprache der Konsole, oder die der Konsole), Design (standardmäßig dunkel, hell oder das der Konsole), Textgröße (automatisch / normal / größer) und der Tab, mit dem gestartet wird.
   - **Das Intro** beim Start: der Ladebildschirm für 2 Sekunden (standardmäßig an; Ⓐ oder Ⓑ überspringt es; aus öffnet PlayGuard, sobald es bereit ist).
 - Die Meldungen, die es zeigt:
   - Die Arten von Benachrichtigungen (siehe [oben](#wie-sich-einträge-verhalten)).
   - Eine **monatliche Erinnerung, PlayGuard zu unterstützen** (standardmäßig an, nie im ersten Monat und nicht direkt nach einem Update; *Nicht mehr anzeigen* auf der Erinnerung oder dieser Schalter schaltet sie endgültig aus, auch nach Updates).
-- Eine Einstellung, die eine Funktion prägt, steht bei ihr: Zusatzzeit in *Spielzeit*, das Wiederaktivieren des Jugendschutzes in *Geheimzahl*, die Prüfung der Uhr in *Konsole › Netzwerkuhr*. Die Updates und *Hilfe & Diagnose* sind in *Info*.
-
-### Änderungen und Sicherungen
-
-Am Ende von *Optionen* (der Tab Verlauf früherer Versionen).
-
-#### Änderungsverlauf
-
-- Die neuesten 500 Änderungen von PlayGuard (Limits, Einschränkungskategorie, Geheimzahl, Aufheben, Trennen, die Uhr, Wiederherstellungen, Pausieren oder Fortsetzen des Countdowns …) und was es außerhalb von sich geändert gesehen hat, nach Tag gruppiert (*Heute*, *Gestern*, dann Wochentag und Datum), mit der Uhrzeit und woher; ein Limit, das für einen Tag geändert wurde, nennt diesen Tag.
-- Eine Änderung, die die Konsole **abgelehnt** hat, steht auch da, in Bernstein, mit dem Fehler der Konsole und dem, was versucht wurde (nie wiederherstellbar: Es hat sich nichts geändert).
-- *Anzeigen* behält eine Art (Spielzeit, Einschränkungen, Sicherheit und App, außerhalb von PlayGuard bemerkt, von der Konsole abgelehnt); *Angezeigtes exportieren* schreibt sie nach `exports/` als CSV, JSON, XLSX oder PDF.
-- Ⓐ auf einer Änderung zeigt sie und **stellt** bei einem Wert **den vorherigen wieder her** — mit demselben Aufheben und derselben Geheimzahl wie jede Änderung, und sagt, ob er sich inzwischen geändert hat.
-- Jede Änderung behält die PlayGuard-Version, die sie gemacht hat (ein Entwicklungs-Build: als solcher genannt, mit seinem Commit und, beim Build eines Pull Requests, dessen Nummer); eine Änderung, die von einer neueren Version von PlayGuard aufgezeichnet wurde, erscheint als *Andere Änderung*.
-
-#### Sicherungen
-
-- **Einstellungen sichern / wiederherstellen** auf der SD-Karte: Einschränkungskategorie, nutzerdefinierte Einstellungen, VR-Modus, Alterseinstufungssystem, Tageslimits, der Alarm „Zeit ist um“ (mit eingeschalteten erweiterten Aktionen) und der rohe Block des Timers zur Dokumentation — nie die Geheimzahl.
-- Eine Wiederherstellung listet nur auf, was sich ändern würde (nichts zu ändern: Sie sagt es einfach, ohne Aufheben und ohne etwas zu schreiben), und sagt, wenn in der Sicherung ein Gute-Nacht-Alarm an war (er wird nicht zurückgeschrieben).
-- Wähle, wie viele Sicherungen aufbewahrt werden.
+- Wie es sich aktualisiert: *Täglich nach Updates suchen* beim Start, und *Aktualisieren mit* (siehe [Info](#version-und-updates)).
+- **Erste Schritte** noch einmal (auch in *Info › Hilfe & Diagnose*).
+- Eine Einstellung, die eine Funktion prägt, steht bei ihr: Zusatzzeit in *Spielzeit*, das Wiederaktivieren des Jugendschutzes in *Sicherheit*, die Prüfung der Uhr in *Konsole › Netzwerkuhr*. Der Änderungsverlauf und die Sicherungen haben ihren Tab, [Verlauf](#verlauf--was-playguard-geändert-hat-und-die-sicherungen); die Suche nach Updates jetzt und *Hilfe & Diagnose* sind in *Info*.
 
 ## Info
 
@@ -471,23 +475,25 @@ Am Ende von *Optionen* (der Tab Verlauf früherer Versionen).
 
 ### Version und Updates
 
-- Das installierte PlayGuard: Version (in Bernstein, wenn eine neuere erschienen ist; Ⓐ öffnet ihre **Versionshinweise**), Startmodus und Datenordner.
-- **Nach Updates suchen** sofort; *Täglich nach Updates suchen* beim Start.
-- *Aktualisieren mit*: in PlayGuard, das die Version herunterlädt, prüft, sich selbst ersetzt und neu startet, oder sphaira, Homebrew App Store oder von Hand (beim ersten Update gefragt, wenn nichts gewählt ist). Aus dem Homebrew App Store oder dem App Store von sphaira installiert, ist der Store dort der empfohlene Weg, damit er die Version im Blick behält; wenn sein Katalog die neue Version noch nicht hat (er veröffentlicht eine nach einer Prüfung, oft ein paar Tage später), sagt PlayGuard das und bietet stattdessen an, direkt zu aktualisieren.
+- Oben seine Karte: das Logo, der Name, die Version.
+- Das installierte PlayGuard: Version (in Bernstein, wenn eine neuere erschienen ist; Ⓐ öffnet ihre **Versionshinweise**).
+- **Nach Updates suchen** sofort; *Täglich nach Updates suchen* beim Start ist in *Optionen*.
+- *Aktualisieren mit* (in *Optionen*): in PlayGuard, das die Version herunterlädt, prüft, sich selbst ersetzt und neu startet, oder sphaira, Homebrew App Store oder von Hand (beim ersten Update gefragt, wenn nichts gewählt ist). Aus dem Homebrew App Store oder dem App Store von sphaira installiert, ist der Store dort der empfohlene Weg, damit er die Version im Blick behält; wenn sein Katalog die neue Version noch nicht hat (er veröffentlicht eine nach einer Prüfung, oft ein paar Tage später), sagt PlayGuard das und bietet stattdessen an, direkt zu aktualisieren.
 - Solange eine neuere Version bekannt ist, öffnet PlayGuard mit **PlayGuard X.Y.Z ist verfügbar** (ihr Datum und ihre Hinweise): *Aktualisieren*, oder *Später* für 1 Tag, 1 Woche oder höchstens 30 Tage.
 - Die Versionshinweise sind die von PlayGuard selbst, auf demselben Bildschirm wie die von Atmosphère und hekate in *Konsole*: aus seinen GitHub-Releases, ein Tab pro Version (die installierte, die neueren, die älteren), jede mit ihren Highlights als Karten und jeder Änderung, auf der SD-Karte zum Offline-Lesen aufbewahrt (die der installierten Version sind auch in der App, für den Fall, dass noch nichts abgerufen wurde).
 - Nach einem Update öffnet PlayGuard einmal mit **Neu in X.Y.Z** (dieselben Highlights, dann die QR-Codes).
 
 ### Hilfe & Diagnose
 
-*Hilfe & Diagnose ›*, ein eigener Bildschirm, unter *Aktualisieren mit*:
+*Hilfe & Diagnose ›*, ein eigener Bildschirm, unter *Nach Updates suchen*:
 
 - **Erste Schritte** öffnet die Anleitung erneut (mit einem Schritt *Smart-Geräte-App trennen*, solange sie verknüpft ist, einem Schritt *Alarm „Zeit ist um“ wieder einschalten*, solange er aus ist, einem Schritt *PlayGuard schützen*, sobald eine Geheimzahl festgelegt ist — die Wahl *PlayGuard mit der Geheimzahl schützen* —, und einem Schalter, damit sie beim Start nicht mehr erscheint). Unter *Schließen* zeigt *PlayGuard unterstützen* die QR-Codes zur Unterstützung.
+- Wie PlayGuard gestartet wurde (Anwendung oder Applet) und sein Datenordner.
 - **Diagnosebericht exportieren** oder **online senden** (siehe [Einen Fehler melden](troubleshooting.md#einen-fehler-melden)); wie viele gespeicherte Berichte, Absturzdateien, Sitzungsprotokolle und Links online gesendeter Berichte aufbewahrt werden, nach Anzahl, Alter oder Größe.
 
 ### Danksagungen
 
-Die Danksagungen, wie man **PlayGuard unterstützt** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), als QR-Codes zum Scannen mit einem Handy) und ein kleines *Made in France* 🇫🇷.
+*Mitwirkende und Lizenz ›*: wer es gemacht hat, worauf es aufbaut, seine Lizenz und sein Quellcode als QR-Code, in einem Dialog. Dann, wie man **PlayGuard unterstützt** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), als QR-Codes zum Scannen mit einem Handy) und ein kleines *Made in France* 🇫🇷.
 
 ## Sicher durch Design
 

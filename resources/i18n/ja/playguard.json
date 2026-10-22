@@ -817,7 +817,7 @@
         "upload_note": "レポートを GitHub アカウントのシークレット gist に送信し（必要ならまずサインイン）、リンクを QR コードで表示します。サポートしてくれる人に渡すか、バグ報告に使ってください。",
         "storage_note_emummc": "現在はemuMMCです。sysMMCには別のみまもり設定があり、PlayGuardはここからは確認できません。そちらでも設定するか、hekateの起動メニューを非表示にしてください。",
         "storage_note_sysmmc": "現在はsysMMCで、このSDカードにはemuMMCも設定されています。emuMMCには別のみまもり設定があり、PlayGuardはここからは確認できません。そちらでも設定するか、hekateの起動メニューを非表示にしてください。",
-        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
+        "patches_note_mixed": "sys-patchは有効ですが、SDカードにはsigpatchファイル（{}）もあります。2つのツールが同じチェックにパッチを当てており、フォワーダーが起動できなくなる既知の原因です。それらを退避してから（A）、本体を再起動してください。"
     },
     "games": {
         "open": "インストール済みのゲームをチェック",
@@ -1157,14 +1157,14 @@
         "week_note": "今週の拒否：{}、その前の週：{}。",
         "climb_title": "いつもより多くの暗証番号が拒否されました",
         "climb_detail": "過去7日間にゲートで{}回暗証番号が拒否されました（その前の週は{}回）。",
-        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
-        "patches_title": "This forwarder would not start yet",
-        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
-        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
-        "refresh": "Make the forwarders again with this loader",
-        "refresh_confirm": "Make these forwarders again with the new loader? {}: made again, they start their homebrew with this build's loader and keep their name, icon and PIN rules.",
-        "refresh_title": "Forwarders made with an older loader",
-        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
+        "patches_incomplete": "本体がフォワーダーを起動するには署名パッチが必要ですが、sys-patch {}はこのファームウェアに対してすべてのパッチを当てられませんでした（未適用：{}）。sys-patchを更新してから、本体を再起動してください。",
+        "patches_title": "このフォワーダーはまだ起動できません",
+        "patches_anyway": "このまま追加する（パッチがそろえば起動します）",
+        "patches_mixed": "sys-patchは有効ですが、SDカードにはsigpatchファイル（{}）もあります。これはフォワーダーが起動できなくなる既知の原因です。それらを退避してから（「本体」›「ゲーム用パッチ」）、本体を再起動してください。",
+        "refresh": "このローダーでフォワーダーを作り直す",
+        "refresh_confirm": "新しいローダーでこれらのフォワーダーを作り直しますか？{}：作り直すと、このビルドのローダーでHomebrewを起動し、名前、アイコン、暗証番号のルールはそのまま残ります。",
+        "refresh_title": "古いローダーで作成されたフォワーダー",
+        "refresh_detail": "{}：以前のPlayGuardで作成されました。作り直すと、このビルドのローダーでHomebrewを起動します。"
     },
     "hbmenu": {
         "section": "Homebrewメニュー",
@@ -2056,10 +2056,10 @@
         "removed": "予約したプリセットを取り消しました。"
     },
     "sigpatch": {
-        "set_aside": "Set the sigpatch files aside",
-        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
-        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
-        "failed": "The sigpatch files were not all moved: {}",
-        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
+        "set_aside": "sigpatchファイルを退避する",
+        "confirm": "sigpatchファイル（es、fs、loader用の.ips）を{}に移動しますか？何も削除されません。元に戻せば取り消せます。次の起動からはsys-patchだけがパッチを当てます。本体を再起動してください。",
+        "hekate": "hekateのbootloader/patches.iniはそのまま残ります。hekate_ipl.iniにまだkip1patch=nosigchkがある場合は、hekateのfss0で起動する前にその行を削除してください。",
+        "failed": "一部のsigpatchファイルを移動できませんでした：{}",
+        "done": "sigpatchファイルを退避しました。本体を再起動してから、もう一度フォワーダーを試してください。"
     }
 }

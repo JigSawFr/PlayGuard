@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # Instalação
 
 Como instalar, atualizar e remover o PlayGuard, e o que ele grava no cartão SD. Depois de instalado: [primeiros passos](getting-started.md). Volte ao [README](../../README.md).
@@ -20,13 +20,13 @@ Depois, abra o PlayGuard **por cima de um jogo**, com o usuário de um responsá
 
 ## Atualizar
 
-- **No PlayGuard:** *Sobre › Atualizar com* escolhe como — no próprio PlayGuard (ele baixa a versão, verifica, se substitui e reinicia), pelo sphaira, pela Homebrew App Store ou manualmente. Com *Procurar atualizações todos os dias* ativado, o PlayGuard abre mostrando a nova versão quando houver uma.
+- **No PlayGuard:** *Preferências › Atualizar com* escolhe como — no próprio PlayGuard (ele baixa a versão, verifica, se substitui e reinicia), pelo sphaira, pela Homebrew App Store ou manualmente. Com *Procurar atualizações todos os dias* ativado, o PlayGuard abre mostrando a nova versão quando houver uma.
 - **O sysmodule de recuperação** acompanha a versão do PlayGuard: depois de cada atualização, extraia de novo o `playguard-rescue.zip` dessa versão (ou *Atualizar* na entrada *O sysmodule de recuperação está desatualizado* do sino) e depois reinicie o console.
 - As configurações, o histórico, os perfis e os backups ficam: eles estão em `sd:/config/playguard/`, não ao lado do app.
 
 ## Remover
 
-Apague `sd:/switch/playguard/` (o app) e, para remover também os arquivos dele, `sd:/config/playguard/`; com o sysmodule de recuperação, apague também `sd:/atmosphere/contents/4200000000505247/`. Os limites, o PIN e as restrições são do próprio console: eles **continuam no console**. Para removê-los também, use antes *PIN › Excluir todo o controle dos pais*.
+Apague `sd:/switch/playguard/` (o app) e, para remover também os arquivos dele, `sd:/config/playguard/`; com o sysmodule de recuperação, apague também `sd:/atmosphere/contents/4200000000505247/`. Os limites, o PIN e as restrições são do próprio console: eles **continuam no console**. Para removê-los também, use antes *Segurança › Excluir todo o controle dos pais*.
 
 ## Arquivos no cartão SD
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 bf49da9b97f3 -->
+<!-- translated from docs/features.md, sha256 c9719f1eb7be -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Novo no PlayGuard? Comece por [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -16,7 +16,7 @@ As capturas de ecrã mostram o tema escuro, o predefinido do PlayGuard (em ingl�
 | ![Atividade](../../images/screenshots/activity.png) | ![Um jogo](../../images/screenshots/activity_game.png) |
 | **Restrições** | **Consola › Relógio de rede** |
 | ![Restrições](../../images/screenshots/restrictions.png) | ![Relógio de rede](../../images/screenshots/clock.png) |
-| **PIN** | **Preferências** |
+| **Segurança** | **Preferências** |
 | ![PIN](../../images/screenshots/security.png) | ![Preferências](../../images/screenshots/preferences.png) |
 
 ## Comandos
@@ -105,7 +105,7 @@ As de informação: uma compilação da qual se voltou atrás, um firmware não 
 ### Como se comportam as entradas
 
 - Cada secção lista as suas entradas por uma ordem fixa, seja qual for a verificação que terminou primeiro.
-- **Na barra lateral**, um distintivo âmbar junto do nome de um separador conta as suas entradas a fazer, onde se resolvem: o separador PIN (sem PIN, um PIN fraco, o PlayGuard sem o seu PIN, desbloqueado temporariamente), o Tempo de jogo (o alarme desativado, a consola a não contar), *Hoje* (alterações feitas fora do PlayGuard, tempo extra por retirar), a Consola (as suas entradas acima, e o relógio de rede). As entradas ignoradas e as de informação não são contadas.
+- **Na barra lateral**, um distintivo âmbar junto do nome de um separador conta as suas entradas a fazer, onde se resolvem: o separador Segurança (sem PIN, um PIN fraco, o PlayGuard sem o seu PIN, desbloqueado temporariamente), o Tempo de jogo (o alarme desativado, a consola a não contar), *Hoje* (alterações feitas fora do PlayGuard, tempo extra por retirar), a Consola (as suas entradas acima, e o relógio de rede). As entradas ignoradas e as de informação não são contadas.
 - No separador, o mesmo distintivo está na linha onde cada uma se resolve (*Relógio de rede*, *Verificar os jogos instalados*, *Armazenamento*, *Patches de jogos*; *Definir ou alterar o PIN*, *Proteger o PlayGuard com o PIN*; *Avançado* do Tempo de jogo para o alarme), e o separador abre na primeira delas.
 - **Ⓐ** numa entrada faz a correção (*Ligá-lo*, *Acertá-lo*, *Atualizar*…) ou abre o separador onde ela se faz. Uma entrada desaparece sozinha assim que o que ela indica fica resolvido.
 - **Ⓧ** marca uma entrada de informação como lida; **Ⓨ** marca-as todas. Uma entrada marcada como lida continua lida no arranque seguinte, até o seu texto mudar.
@@ -219,7 +219,7 @@ Com o texto maior, *Hoje* continua a caber num só ecrã: a linha por cima do t�
 
 - **Mesmo limite todos os dias:** uma lista rápida ou uma duração exata (*Introduzir uma duração…*: ↑/↓ de 15 em 15 min, de hora em hora quando mantidos premidos, Ⓛ/Ⓡ de 5 em 5 min).
 - **Dias úteis e fim de semana ›:** o editor, que pede o limite de segunda a sexta e depois o do fim de semana.
-- **Tempo extra hoje** e **terminar o jogo por hoje**, como em *Hoje*. Uma nota por baixo deles diz o que a consola faz no limite. Enquanto o controlo parental está desbloqueado temporariamente, o tempo de jogo *pode* não ser contado: a questão continua em aberto ([documentação, em inglês](../parental-controls.md#still-open)).
+- **Tempo extra ou terminar o jogo hoje ›** abre *Hoje*, onde estão ambos. Uma nota por baixo diz o que a consola faz no limite. Enquanto o controlo parental está desbloqueado temporariamente, o tempo de jogo *pode* não ser contado: a questão continua em aberto ([documentação, em inglês](../parental-controls.md#still-open)).
 - Cada confirmação lista os dias que mudam, antes → depois.
 
 ### Perfis
@@ -230,6 +230,14 @@ Com o texto maior, *Hoje* continua a caber num só ecrã: a linha por cima do t�
   - Quando o período começa, o PlayGuard pergunta se deve aplicá-lo (com os dias que muda desenhados por baixo da pergunta); quando termina, se deve repor os limites que ele substituiu, ou mantê-los.
   - A pergunta é feita uma vez por dia, no ecrã principal, quando não há mais nada à frente: o PlayGuard só age quando é aberto, por isso uma consola onde não é aberto mantém os limites que tem. Um período que passou sem que o perfil tenha sido aplicado é esquecido.
   - Um de cada vez; a linha altera-o, remove-o ou termina-o.
+
+### Bloquear todos os jogos
+
+*Bloquear todos os jogos*, por baixo das definições da semana: um interruptor que põe o limite de cada dia a 0, para que seja preciso o PIN para iniciar um jogo — um bloqueio leve, sem classificações etárias nem limites de comunicação.
+
+- Bloqueia o arranque dos jogos, não o menu HOME, e precisa de um PIN.
+- Os limites anteriores voltam quando é desativado.
+- Enquanto está ativo, *tempo extra* e *terminar o jogo por hoje* são recusados, e os limites definidos de outra forma (um perfil, uma cópia de segurança, o histórico…) substituem-no.
 
 ### Alarme de hora de dormir
 
@@ -250,7 +258,7 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **no total**, a partir do pr�
 
 ### No topo
 
-- As contas em botões, o período e a exportação.
+- As contas em botões, o período e *Exportar ou partilhar*.
 - Hoje, os últimos 7 dias e desde sempre em números. Por baixo dos últimos 7 dias, a comparação, por dia, com os 7 anteriores: ▲ *+20 min/dia vs semana anterior* a âmbar, ▼ menos a verde-azulado, *como na semana anterior* com uma diferença de até 5 minutos.
 - Os quatro jogos mais jogados em cartões (Ⓐ abre um); nos últimos 7 dias, aquele cujo tempo mais aumentou em relação à semana anterior diz em quanto, a partir de meia hora (▲ *+2 h*).
 - Nada jogado no período: um cartão di-lo, com *Ver desde sempre* quando há alguma coisa para ver.
@@ -275,8 +283,8 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **no total**, a partir do pr�
 
 ### Exportação e partilha
 
-- **Exportação para o cartão SD** (o botão *Exportar*) em CSV, JSON, XLSX (Excel) ou PDF, uma coluna por dia, e depois os últimos 7 dias, os últimos 30 dias e desde sempre.
-- **O resumo da semana num código QR:** a câmara de um telemóvel lê-o como algumas linhas de texto, no idioma mostrado — os últimos 7 dias e a sua média, a tendência, cada dia, os três jogos mais jogados, as sessões, a mais longa e o tempo jogado entre as 21:00 e as 06:00. Nada vai para a Internet.
+- **Exportação para o cartão SD** (*Exportar ou partilhar › Guardar no cartão SD*) em CSV, JSON, XLSX (Excel) ou PDF, uma coluna por dia, e depois os últimos 7 dias, os últimos 30 dias e desde sempre.
+- **O resumo da semana num código QR** (*Exportar ou partilhar*, ou *Mostrar o código QR* no sino): a câmara de um telemóvel lê-o como algumas linhas de texto, no idioma mostrado — os últimos 7 dias e a sua média, a tendência, cada dia, os três jogos mais jogados, as sessões, a mais longa e o tempo jogado entre as 21:00 e as 06:00. Nada vai para a Internet.
 - Abre logo com os últimos números lidos (guardados no cartão SD entre utilizações), atualizados em segundo plano quando têm mais de um minuto; Ⓧ volta a lê-los já, com um indicador de carregamento.
 - Os tempos são aproximados se o relógio da consola foi alterado.
 
@@ -286,18 +294,18 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **no total**, a partir do pr�
 
 - **O nível de restrição:** Criança pequena, Criança, Adolescente e Personalizado lado a lado em mosaicos, cada um com o que restringe (um cadeado para o que é restrito, uma marca de verificação para o que é permitido, e os jogos instalados que bloqueia; Ⓐ escolhe-o; com *Personalizado* em vigor, Ⓐ leva às suas definições, mais abaixo); *Nenhum* por baixo deles. O que um nível restringe (limite de idade, publicações, comunicação) é dito de novo antes de ser aplicado.
 - **Em Personalizado:** classificação etária, publicação nas redes sociais, comunicação com outras pessoas.
-- **Modo VR** e o **organismo de classificação** (PEGI, ESRB, USK, CERO …): a lista diz para que países cada um classifica (PEGI: a maior parte da Europa, ESRB: Estados Unidos, Canadá e América Latina, USK: Alemanha, PEGI BBFC: Reino Unido…).
-- **O número de jogos autorizados a comunicar** (a lista em si está no relatório de diagnóstico, em bruto, até a sua estrutura ser conhecida).
-- **Jogos instalados bloqueados:** quantos dos jogos instalados o nível em vigor bloqueia pela sua classificação etária (*3 de 15*), com Ⓐ a listá-los com a sua classificação (*PEGI 16*); o mosaico de cada nível também o indica (*Jogos bloqueados · 3*).
+- **Em *Classificação etária*,** o **organismo de classificação** (PEGI, ESRB, USK, CERO …): a lista diz para que países cada um classifica (PEGI: a maior parte da Europa, ESRB: Estados Unidos, Canadá e América Latina, USK: Alemanha, PEGI BBFC: Reino Unido…).
+- **Jogos instalados bloqueados** (também em *Classificação etária*): quantos dos jogos instalados o nível em vigor bloqueia pela sua classificação etária (*3 de 15*), com Ⓐ a listá-los com a sua classificação (*PEGI 16*); o mosaico de cada nível também o indica (*Jogos bloqueados · 3*).
   - As classificações são as de cada jogo (os seus dados de controlo, lidos pela verificação dos jogos instalados ao arrancar ou a partir de *Consola › Verificar os jogos instalados*), segundo o organismo que a consola usa.
   - Um jogo que esse organismo não classifica não é contado, nem as exceções definidas na aplicação móvel.
   - O ecrã de um jogo em Atividade mostra a sua classificação, e *bloqueado no nível atual* quando é o caso.
+- **Em *Outros*,** o modo VR. Os jogos autorizados a comunicar estão no relatório de diagnóstico, em bruto, até a sua lista ser compreendida.
 
-## PIN — o PIN, o desbloqueio, o bloqueio dos jogos, a aplicação móvel
+## Segurança — o PIN, o desbloqueio, o menu homebrew, a aplicação móvel
 
 *[Experimentar no simulador ›](https://playguard.link/simulator/?tab=security)*
 
-- **No topo**, três mosaicos: o PIN, as restrições e o desbloqueio temporário, cada um com uma marca de verificação verde-azulada quando está como deve estar (um PIN definido, restrições ativas, bloqueado) ou um sinal de aviso âmbar quando é preciso intervir.
+- **No topo**, quatro mosaicos: o PIN, as restrições, o desbloqueio temporário e o menu homebrew, cada um com uma marca de verificação verde-azulada quando está como deve estar (um PIN definido, restrições ativas, bloqueado) ou um sinal de aviso âmbar quando é preciso intervir; o menu homebrew indica *Aberto* ou *Bloqueado* (uma marca de verificação depois de bloqueado: aberto não é problema sem forwarders).
 - **Definir ou alterar o PIN** (ecrã de PIN do sistema).
 - **Mostrar o PIN**: depois de um aviso e do próprio PIN, pedido sempre; registado no histórico, e depois é proposto um novo PIN.
 - **Desbloquear temporariamente**, e se o PlayGuard o reativa sozinho logo depois de uma alteração que precisou do desbloqueio (ativo por predefinição).
@@ -314,15 +322,8 @@ O PIN no próprio PlayGuard:
 
 - Depois de introduzido, o PIN vale até o PlayGuard fechar; *Pedir o PIN novamente após 5 minutos* (desativado por predefinição) volta a pedi-lo depois desse tempo, e traz de volta o ecrã de bloqueio de *Para abrir o PlayGuard* quando o PlayGuard regressa após 5 min ou mais fora de foco.
 - É verificado na camada de serviço, por isso nenhuma alteração lhe escapa; voltar a bloquear nunca o pede. *Mostrar o PIN* pede-o sempre, em todos os modos e mesmo logo depois de ter sido introduzido, e um `config.json` em falta ou danificado conta como *Antes de uma alteração*.
+- **Bloquear o menu homebrew ›** abre *Consola › Forwarders*, onde é bloqueado depois das suas verificações (veja [Forwarders](#forwarders)).
 - **Sair** com o controlo parental ainda desbloqueado pergunta se deve voltar a bloqueá-lo (*Reativar e sair* fecha também o jogo sobre o qual o PlayGuard foi aberto, voltando ao menu HOME em vez do hbmenu); se for fechado a partir do menu HOME, o PlayGuard volta a bloqueá-lo da próxima vez que arrancar, e um reinício da consola bloqueia-o sozinho.
-
-### Bloquear todos os jogos
-
-Um interruptor que põe o limite de cada dia a 0, para que seja preciso o PIN para iniciar um jogo — um bloqueio leve, sem classificações etárias nem limites de comunicação.
-
-- Bloqueia o arranque dos jogos, não o menu HOME, e precisa de um PIN.
-- Os limites anteriores voltam quando é desativado.
-- Enquanto está ativo, *tempo extra* e *terminar o jogo por hoje* são recusados, e os limites definidos de outra forma (um perfil, uma cópia de segurança, o histórico…) substituem-no.
 
 ### Aplicação móvel
 
@@ -334,11 +335,31 @@ Um interruptor que põe o limite de cada dia a 0, para que seja preciso o PIN pa
 
 Duas confirmações, irreversível; antes é guardada uma cópia de segurança das definições.
 
+## Histórico — o que o PlayGuard alterou, e as cópias de segurança
+
+*[Experimentar no simulador ›](https://playguard.link/simulator/?tab=history)*
+
+**No topo**, em mosaicos, quantas alterações estão registadas e o dia da última cópia de segurança: uma marca de verificação verde-azulada, ou um aviso âmbar quando não há nenhuma ou nenhuma há 30 dias.
+
+### Histórico de alterações
+
+- As 500 alterações mais recentes feitas pelo PlayGuard (limites, nível de restrição, PIN, desbloqueios, desvinculação, o relógio, restauros, pausar ou retomar a contagem decrescente …) e o que ele viu mudar fora dele, agrupadas por dia (*Hoje*, *Ontem*, depois o dia e a data), com a hora e a origem; um limite alterado para um dia nomeia esse dia.
+- Uma alteração **recusada** pela consola também é listada, a âmbar, com o erro da consola e o que foi tentado (nunca reposta: nada mudou).
+- *Mostrar* mantém um tipo (tempo de jogo, restrições, segurança e aplicação, visto fora do PlayGuard, recusado pela consola); *Exportar o que é mostrado* escreve-o em `exports/` em CSV, JSON, XLSX ou PDF.
+- Ⓐ numa alteração mostra-a e, para um valor, **repõe o anterior** — com o mesmo desbloqueio e o mesmo PIN que qualquer alteração, indicando se mudou entretanto.
+- Cada alteração guarda a versão do PlayGuard que a fez (uma versão de desenvolvimento: indicada como tal, com o seu commit e, para a compilação de um pull request, o seu número); uma alteração registada por uma versão mais recente do PlayGuard aparece como *Outra alteração*.
+
+### Cópias de segurança
+
+- **Fazer uma cópia de segurança / restaurar as definições** no cartão SD: nível de restrição, definições personalizadas, modo VR, organismo de classificação, limites diários, o alarme "Tempo esgotado" (com as ações avançadas ativas), e o bloco em bruto do temporizador, para registo — nunca o PIN.
+- Um restauro lista só o que mudaria (nada a mudar: diz isso, sem desbloqueio e sem escrever nada), e avisa quando a cópia de segurança tinha um alarme de hora de dormir ativo (não é reposto).
+- Escolha quantas cópias de segurança manter.
+
 ## Consola — o relógio de rede, os jogos instalados, o que a consola executa
 
 *[Experimentar no simulador ›](https://playguard.link/simulator/?tab=console)*
 
-**No topo**, o que a consola executa em mosaicos (o firmware, o Atmosphère, o hekate quando está no cartão SD e o sys-patch quando está instalado; Ⓐ abre as suas notas da versão), depois o diagnóstico, depois as linhas da consola, a começar pela compatibilidade (só uma marca de verificação verde-azulada quando o PlayGuard foi verificado neste firmware, senão um aviso e o que está errado).
+**No topo**, o que a consola executa em mosaicos (o firmware, o Atmosphère, o hekate quando está no cartão SD e o sys-patch quando está instalado; Ⓐ abre as suas notas da versão), depois as ferramentas em mosaicos (*Relógio de rede*, *Verificar os jogos instalados*, *Forwarders*), depois as linhas da consola, a começar pela compatibilidade (só uma marca de verificação verde-azulada quando o PlayGuard foi verificado neste firmware, senão um aviso e o que está errado).
 
 ### Relógio de rede
 
@@ -384,7 +405,7 @@ Numa consola sem Internet, *Usar o relógio da consola* é proposto na caixa de 
 
 ### Forwarders
 
-*Forwarders ›*, um ecrã próprio em *Homebrew* — um homebrew no menu HOME, com o seu ícone e o seu nome, iniciado a partir dali como um jogo (um forwarder de NRO, como os que o sphaira cria).
+*Forwarders ›*, um ecrã próprio, um mosaico em *Ferramentas* (também *Segurança › Bloquear o menu homebrew*) — um homebrew no menu HOME, com o seu ícone e o seu nome, iniciado a partir dali como um jogo (um forwarder de NRO, como os que o sphaira cria).
 
 - **Um cartão no topo** diz em que ponto está o menu homebrew: bloqueado ou aberto, os seus caminhos de volta (o forwarder do PlayGuard, os menus protegidos, os que ainda nunca foram iniciados a partir do menu HOME), o que ainda o abre sem o PIN, e se o módulo de recuperação está instalado. Ⓐ nele lista o que fazer, cada coisa a um toque (o passo seguinte para um bloqueio, proteger ou eliminar um forwarder que o abre sem o PIN, a verificação, a folha de recuperação).
 - **A lista por grupos:** o do próprio PlayGuard, os protegidos com o PIN, os que estão sem ele, os criados por outra aplicação, os que já não estão no menu HOME. Um protegido tem um cadeado no ícone (uma marca de verificação para um menu que já se viu funcionar através da sua porta), um criado aqui sem o PIN um cadeado aberto a âmbar.
@@ -439,31 +460,14 @@ Numa consola sem Internet, *Usar o relógio da consola* é proposto na caixa de 
 *[Experimentar no simulador ›](https://playguard.link/simulator/?tab=preferences)*
 
 - O que configura o próprio PlayGuard:
-  - Idioma (todos os idiomas da consola, ou o da própria consola), tema (escuro por predefinição, claro, ou o da consola), tamanho do texto (automático / normal / maior): os três de imediato.
-  - O separador em que abre.
+  - Primeiro em mosaicos: idioma (todos os idiomas da consola, ou o da própria consola), tema (escuro por predefinição, claro, ou o da consola), tamanho do texto (automático / normal / maior) e o separador em que abre.
   - **A introdução** ao arrancar: o ecrã de carregamento durante 2 segundos (ativa por predefinição; Ⓐ ou Ⓑ salta-a; desativada, o PlayGuard abre assim que estiver pronto).
 - As mensagens que mostra:
   - Os tipos de notificações (veja [acima](#como-se-comportam-as-entradas)).
   - Um **lembrete mensal para apoiar o PlayGuard** (ativo por predefinição, nunca no primeiro mês nem logo depois de uma atualização; *Não mostrar novamente* no lembrete, ou este interruptor, desativa-o de vez, incluindo nas atualizações).
-- Uma definição que só diz respeito a uma funcionalidade fica junto dela: o tempo extra em *Tempo de jogo*, reativar o controlo parental em *PIN*, a verificação do relógio em *Consola › Relógio de rede*. As atualizações e *Ajuda e diagnóstico* estão em *Sobre*.
-
-### Alterações e cópias de segurança
-
-No fim de *Preferências* (o separador Histórico das versões anteriores).
-
-#### Histórico de alterações
-
-- As 500 alterações mais recentes feitas pelo PlayGuard (limites, nível de restrição, PIN, desbloqueios, desvinculação, o relógio, restauros, pausar ou retomar a contagem decrescente …) e o que ele viu mudar fora dele, agrupadas por dia (*Hoje*, *Ontem*, depois o dia e a data), com a hora e a origem; um limite alterado para um dia nomeia esse dia.
-- Uma alteração **recusada** pela consola também é listada, a âmbar, com o erro da consola e o que foi tentado (nunca reposta: nada mudou).
-- *Mostrar* mantém um tipo (tempo de jogo, restrições, segurança e aplicação, visto fora do PlayGuard, recusado pela consola); *Exportar o que é mostrado* escreve-o em `exports/` em CSV, JSON, XLSX ou PDF.
-- Ⓐ numa alteração mostra-a e, para um valor, **repõe o anterior** — com o mesmo desbloqueio e o mesmo PIN que qualquer alteração, indicando se mudou entretanto.
-- Cada alteração guarda a versão do PlayGuard que a fez (uma versão de desenvolvimento: indicada como tal, com o seu commit e, para a compilação de um pull request, o seu número); uma alteração registada por uma versão mais recente do PlayGuard aparece como *Outra alteração*.
-
-#### Cópias de segurança
-
-- **Fazer uma cópia de segurança / restaurar as definições** no cartão SD: nível de restrição, definições personalizadas, modo VR, organismo de classificação, limites diários, o alarme "Tempo esgotado" (com as ações avançadas ativas), e o bloco em bruto do temporizador, para registo — nunca o PIN.
-- Um restauro lista só o que mudaria (nada a mudar: diz isso, sem desbloqueio e sem escrever nada), e avisa quando a cópia de segurança tinha um alarme de hora de dormir ativo (não é reposto).
-- Escolha quantas cópias de segurança manter.
+- Como se atualiza: *Procurar atualizações todos os dias* ao arrancar, e *Atualizar com* (veja [Sobre](#versão-e-atualizações)).
+- **Primeiros passos** de novo (também em *Sobre › Ajuda e diagnóstico*).
+- Uma definição que só diz respeito a uma funcionalidade fica junto dela: o tempo extra em *Tempo de jogo*, reativar o controlo parental em *Segurança*, a verificação do relógio em *Consola › Relógio de rede*. O histórico de alterações e as cópias de segurança têm o seu separador, [Histórico](#histórico--o-que-o-playguard-alterou-e-as-cópias-de-segurança); procurar atualizações agora e *Ajuda e diagnóstico* estão em *Sobre*.
 
 ## Sobre
 
@@ -471,23 +475,25 @@ No fim de *Preferências* (o separador Histórico das versões anteriores).
 
 ### Versão e atualizações
 
-- O PlayGuard instalado: versão (a âmbar quando há uma mais recente; Ⓐ abre as suas **notas da versão**), modo de arranque e pasta de dados.
-- **Procurar atualizações** agora; *Procurar atualizações todos os dias* ao arrancar.
-- *Atualizar com*: no PlayGuard, que transfere a versão, verifica-a, substitui-se a si próprio e reinicia, ou sphaira, Homebrew App Store ou manualmente (perguntado na primeira atualização quando nada foi escolhido). Instalado a partir da Homebrew App Store ou da App Store do sphaira, a loja é a forma recomendada aí, para que acompanhe a versão; quando o seu catálogo ainda não tem a nova versão (publica-a depois de uma revisão, muitas vezes alguns dias mais tarde), o PlayGuard indica-o e propõe atualizar-se diretamente.
+- No topo, o seu cartão: o símbolo, o nome, a versão.
+- O PlayGuard instalado: versão (a âmbar quando há uma mais recente; Ⓐ abre as suas **notas da versão**).
+- **Procurar atualizações** agora; *Procurar atualizações todos os dias* ao arrancar está em *Preferências*.
+- *Atualizar com* (em *Preferências*): no PlayGuard, que transfere a versão, verifica-a, substitui-se a si próprio e reinicia, ou sphaira, Homebrew App Store ou manualmente (perguntado na primeira atualização quando nada foi escolhido). Instalado a partir da Homebrew App Store ou da App Store do sphaira, a loja é a forma recomendada aí, para que acompanhe a versão; quando o seu catálogo ainda não tem a nova versão (publica-a depois de uma revisão, muitas vezes alguns dias mais tarde), o PlayGuard indica-o e propõe atualizar-se diretamente.
 - Enquanto se conhece uma versão mais recente, o PlayGuard abre em **O PlayGuard X.Y.Z está disponível** (a sua data e notas): *Atualizar*, ou *Mais tarde* durante 1 dia, 1 semana ou 30 dias no máximo.
 - As notas da versão são as do próprio PlayGuard, no mesmo ecrã que as do Atmosphère e do hekate em *Consola*: a partir das suas versões no GitHub, um separador por versão (a instalada, as mais recentes, as mais antigas), cada uma com os seus destaques em cartões e todas as alterações, guardadas no cartão SD para leitura offline (as da versão instalada também estão na aplicação, para quando ainda nada foi obtido).
 - Depois de uma atualização, o PlayGuard abre uma vez em **Novidades da X.Y.Z** (os mesmos destaques e depois os códigos QR).
 
 ### Ajuda e diagnóstico
 
-*Ajuda e diagnóstico ›*, um ecrã próprio, por baixo de *Atualizar com*:
+*Ajuda e diagnóstico ›*, um ecrã próprio, por baixo de *Procurar atualizações*:
 
 - **Primeiros passos** abre de novo o guia (com um passo *Desvincular a aplicação móvel* enquanto está associada, um passo *Reativar o alarme "Tempo esgotado"* enquanto está desativado, um passo *Proteger o PlayGuard* depois de definido um PIN — a escolha *Proteger o PlayGuard com o PIN* —, e um interruptor para deixar de aparecer ao arrancar). Por baixo de *Fechar*, *Apoiar o PlayGuard* mostra os códigos QR de apoio.
+- Como o PlayGuard foi iniciado (aplicação ou applet) e a sua pasta de dados.
 - **Exportar relatório de diagnóstico**, ou **enviá-lo online** (veja [Comunicar um erro](troubleshooting.md#comunicar-um-erro)); quantos relatórios guardados, ficheiros de falha, registos de sessão e ligações de relatórios enviados online são mantidos, por número, idade ou tamanho.
 
 ### Créditos
 
-Os créditos, como **apoiar o PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), mostrados como códigos QR a ler com um telemóvel), e um pequeno *Made in France* 🇫🇷.
+*Créditos e licença ›*: quem o fez, aquilo em que se baseia, a sua licença e o seu código-fonte num código QR, numa só caixa de diálogo. Depois, como **apoiar o PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), mostrados como códigos QR a ler com um telemóvel), e um pequeno *Made in France* 🇫🇷.
 
 ## Segurança desde a conceção
 

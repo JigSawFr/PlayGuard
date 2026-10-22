@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 bf49da9b97f3 -->
+<!-- translated from docs/features.md, sha256 c9719f1eb7be -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -16,7 +16,7 @@ De schermafbeeldingen tonen het donkere thema, de standaard van PlayGuard (in he
 | ![Activiteit](../../images/screenshots/activity.png) | ![Eén game](../../images/screenshots/activity_game.png) |
 | **Beperkingen** | **Console › Netwerkklok** |
 | ![Beperkingen](../../images/screenshots/restrictions.png) | ![Netwerkklok](../../images/screenshots/clock.png) |
-| **Pincode** | **Voorkeuren** |
+| **Beveiliging** | **Voorkeuren** |
 | ![Pincode](../../images/screenshots/security.png) | ![Voorkeuren](../../images/screenshots/preferences.png) |
 
 ## Bediening
@@ -105,7 +105,7 @@ Ter informatie: een build waarvan is teruggegaan, een firmware die niet met deze
 ### Hoe meldingen zich gedragen
 
 - Elke sectie toont haar meldingen in een vaste volgorde, welke controle ook als eerste klaar was.
-- **In de zijbalk** telt een oranje badge naast de naam van een tabblad de meldingen die te doen zijn, op de plek waar ze worden opgelost: het tabblad Pincode (geen pincode, een zwakke pincode, PlayGuard zonder pincode, tijdelijk ontgrendeld), de Speeltijdtimer (het alarm uit, de console die niet telt), *Vandaag* (wijzigingen buiten PlayGuard, extra tijd om terug te zetten), de Console (de meldingen hierboven, en de netwerkklok). Genegeerde meldingen en meldingen ter informatie worden niet geteld.
+- **In de zijbalk** telt een oranje badge naast de naam van een tabblad de meldingen die te doen zijn, op de plek waar ze worden opgelost: het tabblad Beveiliging (geen pincode, een zwakke pincode, PlayGuard zonder pincode, tijdelijk ontgrendeld), de Speeltijdtimer (het alarm uit, de console die niet telt), *Vandaag* (wijzigingen buiten PlayGuard, extra tijd om terug te zetten), de Console (de meldingen hierboven, en de netwerkklok). Genegeerde meldingen en meldingen ter informatie worden niet geteld.
 - In het tabblad staat dezelfde badge op de regel waar elke melding wordt opgelost (*Netwerkklok*, *Geïnstalleerde games controleren*, *Opslag*, *Gamepatches*; *Pincode instellen of wijzigen*, *PlayGuard beveiligen met de pincode*; *Geavanceerd* van de Speeltijdtimer voor het alarm), en het tabblad opent op de eerste daarvan.
 - **Ⓐ** op een melding voert de oplossing uit (*Inschakelen*, *Instellen*, *Bijwerken*…) of opent het tabblad waar je het oplost. Een melding verdwijnt vanzelf zodra wat ze meldt is opgelost.
 - **Ⓧ** markeert een melding ter informatie als gelezen; **Ⓨ** markeert ze allemaal. Een melding die als gelezen is gemarkeerd, blijft gelezen bij de volgende start, tot de tekst ervan verandert.
@@ -219,7 +219,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 - **Elke dag dezelfde limiet:** een snelle lijst of een exacte duur (*Een duur invoeren…*: ↑/↓ per 15 min, per uur zodra je ze ingedrukt houdt, Ⓛ/Ⓡ per 5 min).
 - **Doordeweeks en weekend ›:** de editor, die eerst om maandag–vrijdag en daarna om het weekend vraagt.
-- **Extra tijd vandaag** en **vandaag niet meer spelen**, zoals op *Vandaag*. Een opmerking eronder zegt wat de console bij de limiet doet. Zolang ouderlijk toezicht tijdelijk ontgrendeld is, wordt speeltijd *mogelijk* niet geteld: dat is nog een open vraag ([docs, in het Engels](../parental-controls.md#still-open)).
+- **Extra tijd of vandaag niet meer spelen ›** opent *Vandaag*, waar ze allebei staan. Een opmerking eronder zegt wat de console bij de limiet doet. Zolang ouderlijk toezicht tijdelijk ontgrendeld is, wordt speeltijd *mogelijk* niet geteld: dat is nog een open vraag ([docs, in het Engels](../parental-controls.md#still-open)).
 - Elke bevestiging toont de dagen die veranderen, voor → na.
 
 ### Profielen
@@ -230,6 +230,14 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
   - Als de periode begint, vraagt PlayGuard of het profiel moet worden toegepast (de dagen die het verandert, getekend onder de vraag); als ze voorbij is, of de limieten die het verving moeten worden teruggezet of behouden.
   - Eén keer per dag gevraagd, op het hoofdscherm, als er niets anders voor staat: PlayGuard handelt alleen als het wordt geopend, dus een console waarop het niet wordt geopend, houdt de limieten die hij heeft. Een periode die voorbijging zonder dat het profiel ooit is toegepast, wordt vergeten.
   - Eén tegelijk; de regel wijzigt, verwijdert of beëindigt het.
+
+### Alle games blokkeren
+
+*Alle games blokkeren*, onder de instellingen van de week: één schakelaar die de limiet van elke dag op 0 zet, zodat er een pincode nodig is om een game te starten — een lichte blokkade zonder leeftijdsclassificatie of communicatiebeperkingen.
+
+- Het blokkeert het starten van games, niet het HOME-menu, en vereist een pincode.
+- De vorige limieten komen terug als je het uitzet.
+- Zolang het aan staat, worden *extra tijd* en *vandaag niet meer spelen* geweigerd, en vervangen limieten die op een andere manier worden ingesteld (een profiel, een back-up, de geschiedenis…) het.
 
 ### Bedtijdalarm
 
@@ -250,7 +258,7 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 ### Bovenaan
 
-- De accounts als chips, de periode en de export.
+- De accounts als chips, de periode en *Exporteren of delen*.
 - Vandaag, de afgelopen 7 dagen en altijd als cijfers. Onder de afgelopen 7 dagen de vergelijking met de 7 ervoor, per dag: ▲ *+20 min/dag t.o.v. vorige week* in oranje, ▼ minder in blauwgroen, *zoals vorige week* bij hoogstens 5 minuten verschil.
 - De vier meest gespeelde games als kaarten (Ⓐ opent er een); over de afgelopen 7 dagen zegt de game die het meest meer is gespeeld dan de week ervoor met hoeveel, vanaf een half uur (▲ *+2 u*).
 - Niets gespeeld in de periode: een kaart zegt dat, met *Totaal bekijken* als er iets te zien is.
@@ -275,8 +283,8 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 ### Exporteren en delen
 
-- **Exporteren naar de SD-kaart** (de chip *Exporteren*) als CSV, JSON, XLSX (Excel) of PDF, één kolom per dag, en daarna de afgelopen 7 dagen, de afgelopen 30 dagen en altijd.
-- **Weekoverzicht als QR-code:** de camera van een telefoon leest hem als een paar regels tekst, in de getoonde taal — de afgelopen 7 dagen en hun gemiddelde, de trend, elke dag, de drie meest gespeelde games, de sessies, de langste en de tijd gespeeld tussen 21:00 en 06:00. Er gaat niets online.
+- **Exporteren naar de SD-kaart** (*Exporteren of delen › Opslaan op de SD-kaart*) als CSV, JSON, XLSX (Excel) of PDF, één kolom per dag, en daarna de afgelopen 7 dagen, de afgelopen 30 dagen en altijd.
+- **Weekoverzicht als QR-code** (*Exporteren of delen*, of *QR-code tonen* bij de bel): de camera van een telefoon leest hem als een paar regels tekst, in de getoonde taal — de afgelopen 7 dagen en hun gemiddelde, de trend, elke dag, de drie meest gespeelde games, de sessies, de langste en de tijd gespeeld tussen 21:00 en 06:00. Er gaat niets online.
 - Opent meteen met de laatst gelezen cijfers (bewaard op de SD-kaart tussen twee starts), op de achtergrond vernieuwd als ze ouder zijn dan een minuut; Ⓧ leest ze nu opnieuw, met een laadindicator.
 - De tijden zijn bij benadering als de klok van de console is gewijzigd.
 
@@ -286,18 +294,18 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 - **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (een hangslot voor beperkt, een vinkje voor toegestaan, en de geïnstalleerde games die het blokkeert; Ⓐ stelt het in; geldt *Aangepast* al, dan gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld.
 - **Bij Aangepast:** leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen.
-- **VR-modus** en de **classificatie-instantie** (PEGI, ESRB, USK, CERO …): de lijst zegt voor welke landen elke instantie classificeert (PEGI: het grootste deel van Europa, ESRB: de Verenigde Staten, Canada en Latijns-Amerika, USK: Duitsland, PEGI BBFC: het Verenigd Koninkrijk…).
-- **Het aantal games dat mag communiceren** (de lijst zelf staat ruw in het diagnoserapport, tot de opbouw ervan bekend is).
-- **Geblokkeerde geïnstalleerde games:** hoeveel van de geïnstalleerde games het geldende niveau blokkeert op hun leeftijdsclassificatie (*3 van 15*), waarbij Ⓐ ze toont met hun classificatie (*PEGI 16*); de tegel van elk niveau zegt het ook (*Geblokkeerde games · 3*).
+- **Onder *Leeftijdsclassificatie*** de **classificatie-instantie** (PEGI, ESRB, USK, CERO …): de lijst zegt voor welke landen elke instantie classificeert (PEGI: het grootste deel van Europa, ESRB: de Verenigde Staten, Canada en Latijns-Amerika, USK: Duitsland, PEGI BBFC: het Verenigd Koninkrijk…).
+- **Geblokkeerde geïnstalleerde games** (ook onder *Leeftijdsclassificatie*): hoeveel van de geïnstalleerde games het geldende niveau blokkeert op hun leeftijdsclassificatie (*3 van 15*), waarbij Ⓐ ze toont met hun classificatie (*PEGI 16*); de tegel van elk niveau zegt het ook (*Geblokkeerde games · 3*).
   - De classificaties zijn die van elke game zelf (de controlegegevens van de game, gelezen door de controle van de geïnstalleerde games bij het opstarten of via *Console › Geïnstalleerde games controleren*), volgens de instantie die de console gebruikt.
   - Een game die deze instantie niet classificeert, telt niet mee, en ook de uitzonderingen die in de smartphone-app zijn ingesteld niet.
   - Het scherm van een game in Activiteit toont de classificatie, en *geblokkeerd op het huidige niveau* als dat zo is.
+- **Onder *Overig*** de VR-modus. De games die mogen communiceren staan ruw in het diagnoserapport, tot hun lijst wordt begrepen.
 
-## Pincode — de pincode, ontgrendelen, games blokkeren, smartphone-app
+## Beveiliging — de pincode, ontgrendelen, het homebrewmenu, smartphone-app
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=security)*
 
-- **Bovenaan** drie tegels: de pincode, de beperkingen en het tijdelijk ontgrendelen, elk met een blauwgroen vinkje als het is zoals het hoort (een pincode ingesteld, beperkingen aan, vergrendeld) of een oranje waarschuwingsteken als er iets moet gebeuren.
+- **Bovenaan** vier tegels: de pincode, de beperkingen, het tijdelijk ontgrendelen en het homebrewmenu, elk met een blauwgroen vinkje als het is zoals het hoort (een pincode ingesteld, beperkingen aan, vergrendeld) of een oranje waarschuwingsteken als er iets moet gebeuren; het homebrewmenu zegt *Open* of *Vergrendeld* (een vinkje zodra het vergrendeld is: open is prima zonder forwarders).
 - **Pincode instellen of wijzigen** (pincodescherm van het systeem).
 - **Pincode tonen**: na een waarschuwing en de pincode zelf, die elke keer wordt gevraagd; vastgelegd in de geschiedenis, daarna wordt een nieuwe pincode voorgesteld.
 - **Tijdelijk ontgrendelen**, en of PlayGuard het vanzelf weer inschakelt meteen na een wijziging waarvoor het ontgrendeld moest worden (standaard aan).
@@ -314,15 +322,8 @@ De pincode in PlayGuard zelf:
 
 - Eenmaal ingevoerd, geldt de pincode tot PlayGuard wordt gesloten; *Na 5 minuten opnieuw om de pincode vragen* (standaard uit) vraagt er daarna opnieuw om, en brengt het vergrendelscherm van *Om PlayGuard te openen* terug als PlayGuard na 5 min of langer op de achtergrond weer op de voorgrond komt.
 - Gecontroleerd in de servicelaag, dus geen enkele wijziging slaat het over; opnieuw vergrendelen vraagt er nooit om. *Pincode tonen* vraagt er elke keer om, in elke modus en zelfs vlak nadat hij is ingevoerd, en een ontbrekend of beschadigd `config.json` geldt als *Vóór een wijziging*.
+- **Homebrewmenu vergrendelen ›** opent *Console › Forwarders*, waar het na zijn controles wordt vergrendeld (zie [Forwarders](#forwarders)).
 - **Afsluiten** terwijl ouderlijk toezicht nog ontgrendeld is, vraagt of het weer moet worden vergrendeld (*Weer inschakelen en afsluiten* sluit ook de game waarboven PlayGuard werd geopend, terug naar het HOME-menu in plaats van hbmenu); wordt PlayGuard in plaats daarvan via het HOME-menu gesloten, dan vergrendelt het bij de volgende start opnieuw, en een herstart van de console vergrendelt vanzelf.
-
-### Alle games blokkeren
-
-Eén schakelaar die de limiet van elke dag op 0 zet, zodat er een pincode nodig is om een game te starten — een lichte blokkade zonder leeftijdsclassificatie of communicatiebeperkingen.
-
-- Het blokkeert het starten van games, niet het HOME-menu, en vereist een pincode.
-- De vorige limieten komen terug als je het uitzet.
-- Zolang het aan staat, worden *extra tijd* en *vandaag niet meer spelen* geweigerd, en vervangen limieten die op een andere manier worden ingesteld (een profiel, een back-up, de geschiedenis…) het.
 
 ### Smartphone-app
 
@@ -334,11 +335,31 @@ Eén schakelaar die de limiet van elke dag op 0 zet, zodat er een pincode nodig 
 
 Twee bevestigingen, onomkeerbaar; eerst wordt een back-up van de instellingen opgeslagen.
 
+## Geschiedenis — wat PlayGuard veranderde, en de back-ups
+
+*[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=history)*
+
+**Bovenaan** als tegels hoeveel wijzigingen er zijn vastgelegd en de dag van de laatste back-up: een blauwgroen vinkje, of een oranje waarschuwing als er geen is of al 30 dagen geen.
+
+### Wijzigingsgeschiedenis
+
+- De nieuwste 500 wijzigingen die PlayGuard heeft gedaan (limieten, beperkingsniveau, pincode, ontgrendelingen, ontkoppelen, de klok, terugzettingen, het aftellen pauzeren of hervatten …) en wat het buiten zichzelf zag veranderen, per dag gegroepeerd (*Vandaag*, *Gisteren*, daarna de dag en de datum), met het tijdstip en de bron; een limiet die voor één dag is gewijzigd, noemt die dag.
+- Een wijziging die de console **weigerde**, staat er ook, in oranje, met de foutmelding van de console en wat er werd geprobeerd (nooit terugzetten: er is niets veranderd).
+- *Tonen* houdt één soort over (speeltijd, beperkingen, beveiliging en app, gezien buiten PlayGuard, geweigerd door de console); *Getoonde exporteren* schrijft dat naar `exports/` als CSV, JSON, XLSX of PDF.
+- Ⓐ op een wijziging toont haar en, voor een waarde, **zet de vorige terug** — met hetzelfde ontgrendelen en dezelfde pincode als elke wijziging, en met de melding als de waarde sindsdien is veranderd.
+- Elke wijziging bewaart de PlayGuard-versie die haar deed (een ontwikkelbuild: als zodanig vermeld, met zijn commit en, voor de build van een pull request, het nummer daarvan); een wijziging die door een nieuwere versie van PlayGuard is vastgelegd, verschijnt als *Andere wijziging*.
+
+### Back-ups
+
+- **Back-up maken / terugzetten van de instellingen** op de SD-kaart: beperkingsniveau, aangepaste instellingen, VR-modus, classificatie-instantie, daglimieten, het alarm "Tijd is om" (met de geavanceerde acties aan), en ter registratie het ruwe blok van de speeltijdtimer — nooit de pincode.
+- Een terugzetting toont alleen wat er zou veranderen (niets te veranderen: dan zegt het dat gewoon, zonder ontgrendelen en zonder iets te schrijven), en meldt wanneer de back-up een bedtijdalarm aan had (dat wordt niet teruggeschreven).
+- Kies hoeveel back-ups er bewaard blijven.
+
 ## Console — de netwerkklok, de geïnstalleerde games, wat de console draait
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**Bovenaan** wat de console draait, als tegels (de firmware, Atmosphère, hekate als het op de SD-kaart staat en sys-patch als het is geïnstalleerd; Ⓐ opent de release-opmerkingen), dan de diagnose, dan de regels van de console, compatibiliteit eerst (alleen een blauwgroen vinkje als PlayGuard op deze firmware is gecontroleerd, anders een waarschuwing en wat er mis is).
+**Bovenaan** wat de console draait, als tegels (de firmware, Atmosphère, hekate als het op de SD-kaart staat en sys-patch als het is geïnstalleerd; Ⓐ opent de release-opmerkingen), dan de hulpmiddelen als tegels (*Netwerkklok*, *Geïnstalleerde games controleren*, *Forwarders*), dan de regels van de console, compatibiliteit eerst (alleen een blauwgroen vinkje als PlayGuard op deze firmware is gecontroleerd, anders een waarschuwing en wat er mis is).
 
 ### Netwerkklok
 
@@ -384,7 +405,7 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 
 ### Forwarders
 
-*Forwarders ›*, een eigen scherm onder *Homebrew* — een homebrew in het HOME-menu, met zijn icoon en zijn naam, van daaruit gestart als een game (een NRO-forwarder, zoals sphaira ze maakt).
+*Forwarders ›*, een eigen scherm, een tegel onder *Hulpmiddelen* (ook *Beveiliging › Homebrewmenu vergrendelen*) — een homebrew in het HOME-menu, met zijn icoon en zijn naam, van daaruit gestart als een game (een NRO-forwarder, zoals sphaira ze maakt).
 
 - **Een kaart bovenaan** zegt hoe het homebrew-menu ervoor staat: vergrendeld of open, zijn wegen terug (de forwarder van PlayGuard, de beveiligde menu's, die nog nooit vanuit het HOME-menu zijn gestart), wat het nog zonder de pincode opent, en of de herstel-sysmodule is geïnstalleerd. Ⓐ erop toont wat eraan te doen is, elk met één druk (de volgende stap naar een vergrendeling, een forwarder die het zonder de pincode opent beveiligen of verwijderen, de controle, het herstelblad).
 - **De lijst per groep:** die van PlayGuard zelf, die met de pincode beveiligd zijn, die zonder, die een andere app heeft gemaakt, die niet meer in het HOME-menu staan. Een beveiligde heeft een hangslot op zijn icoon (een vinkje voor een menu dat werkend door zijn poort is gezien), een die hier zonder de pincode is gemaakt een open hangslot in oranje.
@@ -439,31 +460,14 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=preferences)*
 
 - Wat PlayGuard zelf instelt:
-  - Taal (elke taal van de console, of die van de console zelf), thema (standaard donker, licht of dat van de console), tekstgrootte (automatisch / normaal / groter): alle drie meteen.
-  - Het tabblad om mee te starten.
+  - Eerst als tegels: taal (elke taal van de console, of die van de console zelf), thema (standaard donker, licht of dat van de console), tekstgrootte (automatisch / normaal / groter) en het tabblad om mee te starten.
   - **De intro** bij het opstarten: het laadscherm gedurende 2 seconden (standaard aan; Ⓐ of Ⓑ slaat het over; uit, dan opent PlayGuard zodra het klaar is).
 - De berichten die het toont:
   - De soorten meldingen (zie [hierboven](#hoe-meldingen-zich-gedragen)).
   - Een **maandelijkse herinnering om PlayGuard te steunen** (standaard aan, nooit in de eerste maand en niet meteen na een update; *Niet meer tonen* op de herinnering of deze schakelaar zet haar voorgoed uit, ook na updates).
-- Een instelling die bij één functie hoort, staat bij die functie: extra tijd in *Speeltijdtimer*, ouderlijk toezicht weer inschakelen in *Pincode*, de klokcontrole in *Console › Netwerkklok*. De updates en *Hulp en diagnose* staan in *Info*.
-
-### Wijzigingen en back-ups
-
-Aan het einde van *Voorkeuren* (het tabblad Geschiedenis van eerdere versies).
-
-#### Wijzigingsgeschiedenis
-
-- De nieuwste 500 wijzigingen die PlayGuard heeft gedaan (limieten, beperkingsniveau, pincode, ontgrendelingen, ontkoppelen, de klok, terugzettingen, het aftellen pauzeren of hervatten …) en wat het buiten zichzelf zag veranderen, per dag gegroepeerd (*Vandaag*, *Gisteren*, daarna de dag en de datum), met het tijdstip en de bron; een limiet die voor één dag is gewijzigd, noemt die dag.
-- Een wijziging die de console **weigerde**, staat er ook, in oranje, met de foutmelding van de console en wat er werd geprobeerd (nooit terugzetten: er is niets veranderd).
-- *Tonen* houdt één soort over (speeltijd, beperkingen, beveiliging en app, gezien buiten PlayGuard, geweigerd door de console); *Getoonde exporteren* schrijft dat naar `exports/` als CSV, JSON, XLSX of PDF.
-- Ⓐ op een wijziging toont haar en, voor een waarde, **zet de vorige terug** — met hetzelfde ontgrendelen en dezelfde pincode als elke wijziging, en met de melding als de waarde sindsdien is veranderd.
-- Elke wijziging bewaart de PlayGuard-versie die haar deed (een ontwikkelbuild: als zodanig vermeld, met zijn commit en, voor de build van een pull request, het nummer daarvan); een wijziging die door een nieuwere versie van PlayGuard is vastgelegd, verschijnt als *Andere wijziging*.
-
-#### Back-ups
-
-- **Back-up maken / terugzetten van de instellingen** op de SD-kaart: beperkingsniveau, aangepaste instellingen, VR-modus, classificatie-instantie, daglimieten, het alarm "Tijd is om" (met de geavanceerde acties aan), en ter registratie het ruwe blok van de speeltijdtimer — nooit de pincode.
-- Een terugzetting toont alleen wat er zou veranderen (niets te veranderen: dan zegt het dat gewoon, zonder ontgrendelen en zonder iets te schrijven), en meldt wanneer de back-up een bedtijdalarm aan had (dat wordt niet teruggeschreven).
-- Kies hoeveel back-ups er bewaard blijven.
+- Hoe het bijwerkt: *Elke dag op updates controleren* bij het opstarten, en *Bijwerken met* (zie [Info](#versie-en-updates)).
+- **Eerste stappen** opnieuw (ook in *Info › Hulp en diagnose*).
+- Een instelling die bij één functie hoort, staat bij die functie: extra tijd in *Speeltijdtimer*, ouderlijk toezicht weer inschakelen in *Beveiliging*, de klokcontrole in *Console › Netwerkklok*. De wijzigingsgeschiedenis en de back-ups hebben hun eigen tabblad, [Geschiedenis](#geschiedenis--wat-playguard-veranderde-en-de-back-ups); nu op updates controleren en *Hulp en diagnose* staan in *Info*.
 
 ## Info
 
@@ -471,23 +475,25 @@ Aan het einde van *Voorkeuren* (het tabblad Geschiedenis van eerdere versies).
 
 ### Versie en updates
 
-- De geïnstalleerde PlayGuard: versie (in oranje als er een nieuwere is; Ⓐ opent de **release-opmerkingen**), startmodus en gegevensmap.
-- Nu **op updates controleren**; *Elke dag op updates controleren* bij het opstarten.
-- *Bijwerken met*: in PlayGuard, dat de release downloadt, controleert, zichzelf vervangt en herstart, of sphaira, Homebrew App Store of met de hand (gevraagd bij de eerste update als er nog niets is gekozen). Geïnstalleerd vanuit de Homebrew App Store of de App Store van sphaira is de store daar de aanbevolen weg, zodat hij de versie bijhoudt; als zijn catalogus de nieuwe release nog niet heeft (hij publiceert er een na een controle, vaak een paar dagen later), zegt PlayGuard dat en biedt het aan om in plaats daarvan ter plekke bij te werken.
+- Bovenaan zijn kaart: het logo, de naam, de versie.
+- De geïnstalleerde PlayGuard: versie (in oranje als er een nieuwere is; Ⓐ opent de **release-opmerkingen**).
+- Nu **op updates controleren**; *Elke dag op updates controleren* bij het opstarten staat in *Voorkeuren*.
+- *Bijwerken met* (in *Voorkeuren*): in PlayGuard, dat de release downloadt, controleert, zichzelf vervangt en herstart, of sphaira, Homebrew App Store of met de hand (gevraagd bij de eerste update als er nog niets is gekozen). Geïnstalleerd vanuit de Homebrew App Store of de App Store van sphaira is de store daar de aanbevolen weg, zodat hij de versie bijhoudt; als zijn catalogus de nieuwe release nog niet heeft (hij publiceert er een na een controle, vaak een paar dagen later), zegt PlayGuard dat en biedt het aan om in plaats daarvan ter plekke bij te werken.
 - Zolang er een nieuwere release bekend is, opent PlayGuard op **PlayGuard X.Y.Z is beschikbaar** (de datum en de opmerkingen): *Bijwerken*, of *Later* voor 1 dag, 1 week of hoogstens 30 dagen.
 - De release-opmerkingen zijn die van PlayGuard zelf, op hetzelfde scherm als die van Atmosphère en hekate in *Console*: uit de GitHub-releases, een tabblad per versie (de geïnstalleerde, de nieuwere, de oudere), elk met de hoogtepunten als kaarten en alle wijzigingen, bewaard op de SD-kaart om offline te lezen (die van de geïnstalleerde versie zitten ook in de app, voor als er nog niets is opgehaald).
 - Na een update opent PlayGuard één keer op **Nieuw in X.Y.Z** (dezelfde hoogtepunten, daarna de QR-codes).
 
 ### Hulp en diagnose
 
-*Hulp en diagnose ›*, een eigen scherm, onder *Bijwerken met*:
+*Hulp en diagnose ›*, een eigen scherm, onder *Op updates controleren*:
 
 - **Eerste stappen** opent de gids opnieuw (met een stap *De smartphone-app ontkoppelen* zolang die gekoppeld is, een stap *Alarm "Tijd is om" weer inschakelen* zolang het uit staat, een stap *PlayGuard beveiligen* zodra er een pincode is — de keuze *PlayGuard beveiligen met de pincode* —, en een schakelaar zodat de gids niet meer bij het opstarten verschijnt). Onder *Sluiten* toont *PlayGuard steunen* de QR-codes voor een bijdrage.
+- Hoe PlayGuard is gestart (applicatie of applet) en zijn gegevensmap.
 - **Een diagnoserapport exporteren**, of **online versturen** (zie [Een bug melden](troubleshooting.md#een-bug-melden)); hoeveel opgeslagen rapporten, crashbestanden, sessielogs en links van online verstuurde rapporten er bewaard blijven, op aantal, leeftijd of grootte.
 
 ### Met dank aan
 
-De dankbetuigingen, hoe je **PlayGuard steunt** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), getoond als QR-codes om met een telefoon te scannen), en een klein *Made in France* 🇫🇷.
+*Dankwoord en licentie ›*: wie het heeft gemaakt, waarop het voortbouwt, de licentie en de broncode als QR-code, in één dialoogvenster. Daarna hoe je **PlayGuard steunt** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), getoond als QR-codes om met een telefoon te scannen), en een klein *Made in France* 🇫🇷.
 
 ## Veilig ontworpen
 
