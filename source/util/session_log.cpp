@@ -52,17 +52,6 @@ long long steady_ms()
         .count();
 }
 
-bool write_all(int fd, const char* data, size_t size)
-{
-    while (size > 0) {
-        const ssize_t n = ::write(fd, data, size);
-        if (n <= 0) return false;
-        data += n;
-        size -= (size_t)n;
-    }
-    return true;
-}
-
 // Appends to the file at `path`, created 0644 (as util/pt_log.cpp) when it
 // went (Delete the log files skips it, but a computer may not). No allocation.
 bool append(const char* path, const char* data, size_t size) noexcept
@@ -130,6 +119,17 @@ void to_ring(const std::string& line)
     g_count.fetch_add(1, std::memory_order_release);
 }
 }   // namespace
+
+bool write_all(int fd, const char* data, size_t size)
+{
+    while (size > 0) {
+        const ssize_t n = ::write(fd, data, size);
+        if (n <= 0) return false;
+        data += n;
+        size -= (size_t)n;
+    }
+    return true;
+}
 
 std::string format(std::time_t t, int ms, char level, const std::string& text)
 {

@@ -84,12 +84,6 @@ uint64_t value_of(const GameStat& g, int period)
     return activity_summary::value(g, period);
 }
 
-std::string game_name(const GameStat& g)
-{
-    if (g.name[0]) return g.name;
-    return brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", (unsigned long long)g.app_id));
-}
-
 // Seven bars, oldest first, today last (teal); `values[k]`: k days ago.
 template <typename T>
 void show_bars(const std::vector<brls::View*>& bars, const T* values, float most)
@@ -338,7 +332,7 @@ void ActivityTab::show_summary(const std::shared_ptr<const PlayStats>& data)
         per_day->setDetailText(p == AllTime ? ui::fmt_per_day_over(sum.per_day_s, sum.days) : ui::fmt_play_time(sum.per_day_s));
     }
     if (sum.known && sum.top >= 0)
-        top->setDetailText(game_name(data->games[sum.top]) + " · " + ui::fmt_play_time(sum.top_s));
+        top->setDetailText(play_data::game_name(data->games[sum.top]) + " · " + ui::fmt_play_time(sum.top_s));
     if (sum.known && sum.days_played >= 0)
         days_played->setDetailText(brls::getStr("playguard/activity/summary/days_played_value", sum.days_played));
     if (sum.known && sum.busiest >= 0)
@@ -660,7 +654,7 @@ void ActivityTab::show_top()
     // All time, and the game most played.
     const auto all = activity_summary::summarize(s, activity_summary::AllTime);
     total_value->setText(all.known ? ui::fmt_play_time(all.total_s) : "—");
-    total_sub->setText(all.known && all.top >= 0 ? brls::getStr("playguard/cadran/activity/top", game_name(s.games[all.top])) : "");
+    total_sub->setText(all.known && all.top >= 0 ? brls::getStr("playguard/cadran/activity/top", play_data::game_name(s.games[all.top])) : "");
 
     // The games of the period, most played first.
     std::vector<const GameStat*> games;
@@ -702,7 +696,7 @@ void ActivityTab::show_top()
         const GameStat& g = *games[i];
         c.app_id = g.app_id;
         ids.push_back(g.app_id);
-        c.name->setText(game_name(g));
+        c.name->setText(play_data::game_name(g));
         c.today->setText(s.windows_ok && g.today_s ? ui::fmt_play_time(g.today_s) : "—");
         c.today->setTextColor(g.today_s ? theme["cadran/text"] : theme["cadran/text3"]);
         // The period is the section's title: "in all" over it.
@@ -773,7 +767,7 @@ void ActivityTab::export_stats(std::shared_ptr<const PlayStats> data, int p, con
         text.day = [](int wday) {
             return brls::getStr("playguard/activity/columns/day", brls::getStr(fmt::format("playguard/days_short/{}", wday)));
         };
-        text.name = [](const GameStat& g) { return game_name(g); };
+        text.name = [](const GameStat& g) { return play_data::game_name(g); };
         text.time = [](uint64_t posix) { return ui::time_text(posix); };
         return activity_summary::export_table(s, p, text);
     });

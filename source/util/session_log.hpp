@@ -59,6 +59,10 @@ constexpr const char* END = "=== end: ";
 // next ones indented by four spaces.
 std::string format(std::time_t t, int ms, char level, const std::string& text);
 
+// Writes all of `data` to `fd`, retrying short writes; false on an error.
+// No allocation (also the crash file's, util/crash_report).
+bool write_all(int fd, const char* data, size_t size);
+
 // Starts this run's file in `dir` (created when missing), dated `now`:
 // `header` (lines ending in "\n"), then the lines logged before it from
 // memory. Returns its name, or "" when the SD card refused (the lines are
