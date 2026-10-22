@@ -30,6 +30,7 @@
 #include <vector>
 
 #include "action/game_verify_flow.hpp"
+#include "ui/cadran_kit.hpp"
 #include "util/game_cache.hpp"
 
 #include "util/pctl_ops_c.hpp"
@@ -83,6 +84,10 @@ class GameCheckActivity : public brls::Activity
     bool removing = false;              // remove_games() under way
     std::set<u64> selected;             // the games picked with Ⓨ
     brls::DetailCell* selection = nullptr;   // above the sections, once a game is picked: A for what to do
+    // In the sections' place when no game has a problem: how many look fine,
+    // when they were checked, and Check again (the focus).
+    cadran::kit::Empty all_clear;
+    brls::Box* check_again = nullptr;
     bool grid = false;
 
     // A list or covers: every section's games built again, next frame, the
@@ -110,6 +115,8 @@ class GameCheckActivity : public brls::Activity
     void check(std::vector<GameRecord> records, bool full);
     void status_text(const std::string& text);
     void status_text(const std::string& text, NVGcolor color);
+    // The check under way: in the card when it shows, else on the status line.
+    void checking_text(const std::string& text);
     void show();
     brls::View* first_game() const;
     // Whether `game`, checked again, changes the list (not its status line).
@@ -126,7 +133,11 @@ class GameCheckActivity : public brls::Activity
     void save_list(const std::vector<GameFacts>& games,
                    std::function<void(const std::string& path, const std::string& error)> done) const;
     void remove_games(std::vector<GameFacts> games, bool asked = false);
-    void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);
+    // remove_games()' dialog: the game under way, the bar, and Cancel.
+    struct Removal;
+    void remove_next(std::shared_ptr<Removal> removal, size_t at);
+    // Short of some games, or stopped: how many went, the ones left, the list.
+    static void removal_summary(const Removal& removal);
     // Ⓨ on a game; the actions on the games picked.
     void toggle(u64 id);
     void selection_menu();
