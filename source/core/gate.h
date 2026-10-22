@@ -146,6 +146,17 @@ size_t gate_hours_text(const GateHours *h, const char *days, char *buf, size_t s
 // Each of `spans` so, joined by ", ". Length, 0 when none fits.
 size_t gate_spans_text(const GateHours *spans, unsigned n, const char *days, char *buf, size_t size);
 
+// When the span of `spans` that holds `wday` and `minute` ends, as a minute
+// of the day (0..1439: past midnight, the next morning's); -1 when none does.
+int gate_spans_until(const GateHours *spans, unsigned n, int wday, int minute);
+// "45 min", "1 h 05 min": `minutes` by `min_fmt` (printf: an int) under an
+// hour, else by `hm_fmt` (two ints, the hours and the minutes). Length, 0
+// when it does not fit.
+size_t gate_minutes_text(uint64_t minutes, const char *min_fmt, const char *hm_fmt, char *buf, size_t size);
+// "2054-0012": a Result as the console's error screens write it (2000 + its
+// module, then its description). Length, 0 when it does not fit.
+size_t gate_error_code(uint32_t rc, char *buf, size_t size);
+
 #ifdef __cplusplus
 }
 #endif

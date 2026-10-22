@@ -351,6 +351,36 @@ size_t gate_spans_text(const GateHours *spans, unsigned n, const char *days, cha
     return used;
 }
 
+int gate_spans_until(const GateHours *spans, unsigned n, int wday, int minute)
+{
+    for (unsigned i = 0; spans && i < n; i++)
+        if (gate_hours_free(&spans[i], wday, minute)) return spans[i].to % 1440;
+    return -1;
+}
+
+size_t gate_minutes_text(uint64_t minutes, const char *min_fmt, const char *hm_fmt, char *buf, size_t size)
+{
+    if (!buf || size == 0 || !min_fmt || !hm_fmt) return 0;
+    const int k = minutes < 60 ? snprintf(buf, size, min_fmt, (int)minutes)
+                               : snprintf(buf, size, hm_fmt, (int)(minutes / 60 > 99999 ? 99999 : minutes / 60), (int)(minutes % 60));
+    if (k < 0 || (size_t)k >= size) {
+        buf[0] = '\0';
+        return 0;
+    }
+    return (size_t)k;
+}
+
+size_t gate_error_code(uint32_t rc, char *buf, size_t size)
+{
+    if (!buf || size == 0) return 0;
+    const int k = snprintf(buf, size, "%04u-%04u", 2000u + (rc & 0x1FFu), (rc >> 9) & 0x1FFFu);
+    if (k < 0 || (size_t)k >= size) {
+        buf[0] = '\0';
+        return 0;
+    }
+    return (size_t)k;
+}
+
 // The pause file, line by line: `fn` with each line (without "\n", "\r").
 typedef bool (*LineFn)(const char *line, size_t n, void *ctx);
 static void each_line(const char *text, size_t len, LineFn fn, void *ctx)

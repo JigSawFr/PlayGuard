@@ -45,7 +45,7 @@ static void draw_rules(GateScreenState state, const unsigned char *icon, size_t 
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
     const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", "PlayGuard · tagline", "21:03", state,
-                           note, warn, rules, NULL };
+                           note, warn, rules, NULL, NULL, NULL };
     gate_screen_draw(px, W, H, STRIDE, &s);
 }
 
@@ -120,7 +120,7 @@ static void test_wrap(void)
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0;
     const char *longer = "Code PIN non saisi : retour au menu HOME, puis encore un peu de texte pour la seconde ligne.";
     GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", longer, "A hint",
-                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, "Protégé par PlayGuard" };
+                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, "Protégé par PlayGuard", NULL, NULL };
     gate_screen_draw(px, W, H, STRIDE, &s);
     CHECK(count_near(400, 420, 900, 460, 0xFF, 0x7A, 0x7A, 40) > 150);   // its first line
     CHECK(count_near(400, 470, 900, 505, 0xFF, 0x7A, 0x7A, 40) > 150);   // its second one
@@ -131,6 +131,27 @@ static void test_wrap(void)
     s.status = "\xE8\xAF\xB7\xE8\xBE\x93\xE5\x85\xA5\xE5\xAE\xB6\xE9\x95\xBF\xE6\x8E\xA7\xE5\x88\xB6PIN\xE4\xBB\xA5\xE5\x90\xAF\xE5\x8A\xA8\xE3\x80\x82";
     gate_screen_draw(px, W, H, STRIDE, &s);
     CHECK(count_near(400, 322, 500, 376, 0x2E, 0xC4, 0xA6, 40) > 100);   // the badge, its padlock
+}
+
+// Once refused: Ⓐ and Ⓑ bottom right, in place of the site; the icon's
+// frame in the state's colour, none while it asks.
+static void test_buttons(void)
+{
+    for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0;
+    GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", "Refused", "A hint",
+                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, NULL, NULL, NULL };
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    const int site = count_near(800, 655, W - 60, 690, 0xEE, 0xF2, 0xF8, 20);
+    const int frame = count_near(100, 202, 112, 458, 0xFF, 0x7A, 0x7A, 60);
+    s.button_a = "Try again";
+    s.button_b = "HOME menu";
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(site < 20);
+    CHECK(count_near(800, 655, W - 60, 690, 0xEE, 0xF2, 0xF8, 20) > 800);   // two light discs
+    CHECK(frame > 300);
+    s.state = GateScreen_Asking;
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(count_near(100, 202, 112, 458, 0xFF, 0x7A, 0x7A, 60) == 0);
 }
 
 static void test_text(void)
@@ -162,6 +183,7 @@ int main(void)
     test_screen();
     test_rules();
     test_wrap();
+    test_buttons();
     test_text();
     free(px);
     free(font);

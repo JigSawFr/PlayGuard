@@ -29,6 +29,14 @@ static const Lines DE = { {
     "Die Spielzeit von heute ist aufgebraucht: zurück zum HOME-Menü.",
     "Es öffnet sich morgen wieder, oder wenn ein Elternteil Zeit hinzufügt.",
     "Geschützt durch PlayGuard",
+    "Erneut versuchen",
+    "HOME-Menü",
+    "Heute verbleibende Spielzeit: %s",
+    "%d Min.",
+    "%d Std. %02d Min.",
+    "Ohne Geheimzahl bis %s Uhr.",
+    "in %d Min.",
+    "Fehlercode: %s",
 } };
 
 static const Lines EN_US = { {
@@ -52,6 +60,14 @@ static const Lines EN_US = { {
     "Today's play time is used up: back to the HOME menu.",
     "It opens again tomorrow, or when a parent adds time.",
     "Protected by PlayGuard",
+    "Try again",
+    "HOME menu",
+    "Play time left today: %s",
+    "%d min",
+    "%d h %02d min",
+    "Without the PIN until %s.",
+    "in %d min",
+    "Error code: %s",
 } };
 
 static const Lines ES = { {
@@ -75,6 +91,14 @@ static const Lines ES = { {
     "El tiempo de juego de hoy se ha agotado: vuelta al menú HOME.",
     "Se abrirá de nuevo mañana, o cuando un adulto añada tiempo.",
     "Protegido por PlayGuard",
+    "Reintentar",
+    "Menú HOME",
+    "Tiempo de juego restante hoy: %s",
+    "%d min",
+    "%d h %02d min",
+    "Sin el PIN hasta las %s.",
+    "en %d min",
+    "Código de error: %s",
 } };
 
 static const Lines ES_419 = { {
@@ -98,6 +122,14 @@ static const Lines ES_419 = { {
     "El tiempo de juego de hoy se agotó: vuelta al menú HOME.",
     "Se abrirá de nuevo mañana, o cuando un adulto agregue tiempo.",
     "Protegido por PlayGuard",
+    "Reintentar",
+    "Menú HOME",
+    "Tiempo de juego restante hoy: %s",
+    "%d min",
+    "%d h %02d min",
+    "Sin el PIN hasta las %s.",
+    "en %d min",
+    "Código de error: %s",
 } };
 
 static const Lines FR = { {
@@ -121,6 +153,14 @@ static const Lines FR = { {
     "Le temps de jeu du jour est écoulé : retour au menu HOME.",
     "Il se rouvrira demain, ou quand un parent ajoutera du temps.",
     "Protégé par PlayGuard",
+    "Réessayer",
+    "Menu HOME",
+    "Temps de jeu restant aujourd'hui : %s",
+    "%d min",
+    "%d h %02d",
+    "Sans code PIN jusqu'à %s.",
+    "dans %d min",
+    "Code d'erreur : %s",
 } };
 
 static const Lines FR_CA = { {
@@ -144,6 +184,14 @@ static const Lines FR_CA = { {
     "Le temps de jeu du jour est écoulé : retour au menu HOME.",
     "Il se rouvrira demain, ou quand un parent ajoutera du temps.",
     "Protégé par PlayGuard",
+    "Réessayer",
+    "Menu HOME",
+    "Temps de jeu restant aujourd'hui : %s",
+    "%d min",
+    "%d h %02d",
+    "Sans NIP jusqu'à %s.",
+    "dans %d min",
+    "Code d'erreur : %s",
 } };
 
 static const Lines IT = { {
@@ -167,6 +215,14 @@ static const Lines IT = { {
     "Il tempo di gioco di oggi è esaurito: ritorno al menu HOME.",
     "Si riaprirà domani, o quando un genitore aggiungerà del tempo.",
     "Protetto da PlayGuard",
+    "Riprova",
+    "Menu HOME",
+    "Tempo di gioco rimasto oggi: %s",
+    "%d min",
+    "%d h %02d min",
+    "Senza PIN fino alle %s.",
+    "tra %d min",
+    "Codice errore: %s",
 } };
 
 static const Lines JA = { {
@@ -190,6 +246,14 @@ static const Lines JA = { {
     "今日のプレイ時間は終わりました：HOMEメニューに戻ります。",
     "明日、または保護者が時間を追加すると、また開けます。",
     "PlayGuardで保護中",
+    "もう一度",
+    "HOMEメニュー",
+    "今日の残りプレイ時間：%s",
+    "%d分",
+    "%d時間%02d分",
+    "%sまで暗証番号は不要です。",
+    "%d分後",
+    "エラーコード：%s",
 } };
 
 static const Lines KO = { {
@@ -213,6 +277,14 @@ static const Lines KO = { {
     "오늘의 플레이 시간이 끝났습니다: HOME 메뉴로 돌아갑니다.",
     "내일, 또는 보호자가 시간을 추가하면 다시 열립니다.",
     "PlayGuard로 보호됨",
+    "다시 시도",
+    "HOME 메뉴",
+    "오늘 남은 플레이 시간: %s",
+    "%d분",
+    "%d시간 %02d분",
+    "%s까지 PIN이 필요 없습니다.",
+    "%d분 후",
+    "오류 코드: %s",
 } };
 
 static const Lines NL = { {
@@ -236,6 +308,14 @@ static const Lines NL = { {
     "De speeltijd van vandaag is op: terug naar het HOME-menu.",
     "Morgen gaat het weer open, of zodra een ouder tijd toevoegt.",
     "Beschermd door PlayGuard",
+    "Opnieuw",
+    "HOME-menu",
+    "Speeltijd over vandaag: %s",
+    "%d min",
+    "%d u %02d min",
+    "Zonder pincode tot %s.",
+    "over %d min",
+    "Foutcode: %s",
 } };
 
 static const Lines PT = { {
@@ -259,6 +339,14 @@ static const Lines PT = { {
     "O tempo de jogo de hoje acabou: regresso ao menu HOME.",
     "Volta a abrir amanhã, ou quando um adulto acrescentar tempo.",
     "Protegido pelo PlayGuard",
+    "Tentar novamente",
+    "Menu HOME",
+    "Tempo de jogo restante hoje: %s",
+    "%d min",
+    "%d h %02d min",
+    "Sem o PIN até às %s.",
+    "daqui a %d min",
+    "Código de erro: %s",
 } };
 
 static const Lines PT_BR = { {
@@ -282,6 +370,14 @@ static const Lines PT_BR = { {
     "O tempo de jogo de hoje acabou: de volta ao menu HOME.",
     "Ele abre de novo amanhã, ou quando um adulto adicionar tempo.",
     "Protegido pelo PlayGuard",
+    "Tentar de novo",
+    "Menu HOME",
+    "Tempo de jogo restante hoje: %s",
+    "%d min",
+    "%d h %02d min",
+    "Sem o PIN até %s.",
+    "em %d min",
+    "Código de erro: %s",
 } };
 
 static const Lines RU = { {
@@ -305,6 +401,14 @@ static const Lines RU = { {
     "Время игры на сегодня закончилось: возврат в меню HOME.",
     "Откроется снова завтра или когда родитель добавит время.",
     "Под защитой PlayGuard",
+    "Повторить",
+    "Меню HOME",
+    "Осталось игрового времени сегодня: %s",
+    "%d мин",
+    "%d ч %02d мин",
+    "Без PIN-кода до %s.",
+    "через %d мин",
+    "Код ошибки: %s",
 } };
 
 static const Lines ZH_HANS = { {
@@ -328,6 +432,14 @@ static const Lines ZH_HANS = { {
     "今天的游戏时间已用完：返回HOME菜单。",
     "明天或家长增加时间后即可再次打开。",
     "受 PlayGuard 保护",
+    "重试",
+    "HOME菜单",
+    "今日剩余游戏时间：%s",
+    "%d分钟",
+    "%d小时%02d分钟",
+    "%s前无需PIN。",
+    "%d分钟后",
+    "错误代码：%s",
 } };
 
 static const Lines ZH_HANT = { {
@@ -351,6 +463,14 @@ static const Lines ZH_HANT = { {
     "今天的遊戲時間已用完：返回HOME選單。",
     "明天或家長增加時間後即可再次開啟。",
     "受 PlayGuard 保護",
+    "重試",
+    "HOME選單",
+    "今日剩餘遊戲時間：%s",
+    "%d分鐘",
+    "%d小時%02d分鐘",
+    "%s前無需PIN碼。",
+    "%d分鐘後",
+    "錯誤代碼：%s",
 } };
 
 // libnx's SetLanguage order (ja, en-US, fr, de, it, es, zh-CN, ko, nl, pt, ru,
