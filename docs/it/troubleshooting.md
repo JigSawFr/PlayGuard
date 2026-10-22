@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
+<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
 # Risoluzione dei problemi
 
 Riprendere il controllo di una console bloccata, i problemi comuni, segnalare un bug, e la modalità sviluppatore. Torna al [README](../../README.md).
@@ -11,7 +11,7 @@ PlayGuard vede solo il filtro famiglia del sistema su cui gira: **emuMMC e sysMM
 
 Conosci il PIN, ma l'app Filtro famiglia del proprietario precedente è ancora collegata (lo scollegamento non riesce, o un ripristino alle impostazioni di fabbrica chiede il suo account).
 
-*PIN › Scollega l'app Filtro famiglia*, poi, se non vuoi nessun filtro famiglia, *Elimina il filtro famiglia*. Entrambi funzionano offline, su emuMMC come su sysMMC.
+*Sicurezza › Scollega l'app Filtro famiglia*, poi, se non vuoi nessun filtro famiglia, *Elimina il filtro famiglia*. Entrambi funzionano offline, su emuMMC come su sysMMC.
 
 ### PIN dimenticato
 
@@ -43,18 +43,18 @@ PlayGuard non può aiutare: richiede Atmosphère. La procedura della master key 
 - **L'orologio di rete non è mai stato impostato.** *Console › Orologio di rete › Misura la differenza oraria*, poi impostalo ([orologio di rete](features.md#orologio-di-rete)).
 - **L'orologio è stato portato indietro.** Dopo un salto indietro, il conteggio si ferma finché l'orologio non supera l'ora precedente; non c'è niente da fare.
 - **Un limite è appena stato scritto.** Avvia un gioco per un minuto, poi controlla di nuovo.
-- **Il filtro famiglia è sbloccato temporaneamente.** Il tempo di gioco potrebbe allora non essere contato: *PIN › Riattiva il filtro famiglia*.
+- **Il filtro famiglia è sbloccato temporaneamente.** Il tempo di gioco potrebbe allora non essere contato: *Sicurezza › Riattiva il filtro famiglia*.
 
 ### I miei limiti sono cambiati da soli
 
-- **L'app Filtro famiglia è ancora collegata.** La sua prossima sincronizzazione sovrascrive ciò che PlayGuard ha impostato: *PIN › Scollega l'app Filtro famiglia*.
-- **Un altro strumento, o un profilo.** *Oggi* mostra un riquadro ambra per i limiti diversi da quelli che PlayGuard ha visto per ultimi, e *Preferenze › Cronologia delle modifiche* elenca ogni modifica vista fuori da PlayGuard. Ⓐ su una di esse rimette il valore precedente.
+- **L'app Filtro famiglia è ancora collegata.** La sua prossima sincronizzazione sovrascrive ciò che PlayGuard ha impostato: *Sicurezza › Scollega l'app Filtro famiglia*.
+- **Un altro strumento, o un profilo.** *Oggi* mostra un riquadro ambra per i limiti diversi da quelli che PlayGuard ha visto per ultimi, e *Cronologia › Modifiche fatte da PlayGuard* elenca ogni modifica vista fuori da PlayGuard. Ⓐ su una di esse rimette il valore precedente.
 - **Un profilo programmato** messo in vigore, o rimesso com'era una volta finito il suo periodo (*Tempo di gioco › Profili › Profilo programmato*).
 
 ### Il bambino ha giocato oltre il limite
 
 - **La console si limita ad avvisare.** *Tempo di gioco › Quando il tempo è scaduto*: scegli *Sospendi il software*.
-- **Il filtro famiglia è rimasto sbloccato.** Finché lo è, il limite di oggi è in pausa: la pillola dell'intestazione lo dice su ogni scheda; *PIN › Riattiva il filtro famiglia*. Anche un riavvio della console lo blocca.
+- **Il filtro famiglia è rimasto sbloccato.** Finché lo è, il limite di oggi è in pausa: la pillola dell'intestazione lo dice su ogni scheda; *Sicurezza › Riattiva il filtro famiglia*. Anche un riavvio della console lo blocca.
 - **L'orologio è stato portato indietro.** Il conteggio si ferma finché l'orologio non supera l'ora precedente ([cosa conta](features.md#cosa-conta-come-tempo-di-gioco)).
 - **L'altro sistema.** emuMMC e sysMMC hanno ognuno il proprio filtro famiglia: impostalo su entrambi, o nascondi il menu di avvio di hekate ([compatibilità](compatibility.md#emummc-e-sysmmc)).
 
@@ -68,7 +68,7 @@ La console usa un firmware più recente del più recente testato: PlayGuard cont
 
 ### PlayGuard chiede il PIN di continuo, o mai
 
-*PIN › Proteggi PlayGuard con il PIN*: *Prima di una modifica* (l'impostazione predefinita) lo chiede una volta, prima della prima modifica, e il PIN vale fino alla chiusura di PlayGuard. *Richiedi di nuovo il PIN dopo 5 minuti* lo richiede trascorso quel tempo. *Mostra il PIN* lo chiede sempre.
+*Sicurezza › Proteggi PlayGuard con il PIN*: *Prima di una modifica* (l'impostazione predefinita) lo chiede una volta, prima della prima modifica, e il PIN vale fino alla chiusura di PlayGuard. *Richiedi di nuovo il PIN dopo 5 minuti* lo richiede trascorso quel tempo. *Mostra il PIN* lo chiede sempre.
 
 ### Un gioco non si avvia, o mostra un "!" nel menu HOME
 
@@ -143,7 +143,7 @@ Premi Ⓨ sette volte su *Informazioni › Versione*; gli strumenti per sviluppa
 - il rapporto di diagnostica sullo schermo (Ⓨ lo salva, Ⓧ lo invia online), e una scorciatoia per esportarlo dalla scheda Tempo di gioco;
 - **Autotest della console**: ciò che PlayGuard controlla da solo su questa console prima di percorrere a mano [la checklist sulla console](../hardware-test.md) (in inglese) — il PIN, le patch di firma, la cartella dei dati, ogni forwarder creato da PlayGuard (nel menu HOME, protetto, visto funzionare attraverso il suo cancello), il cancello sulla scheda SD, ciò che Atmosphère legge del blocco del menu homebrew, le vie di ritorno, il sysmodule di ripristino. Non cambia nulla, e scrive il suo risultato in Markdown in `config/playguard/self-test.md`, da incollare nella pull request;
 - **Installa un'altra build** al posto di quella attuale, per provare una correzione prima che venga pubblicata ([sotto](#installare-unaltra-build));
-- **Confronta blocco tempo di gioco** (solo mentre l'app Filtro famiglia è collegata e può sincronizzarsi — non con un file hosts che blocca Nintendo; anche in *PIN*), per decifrare le impostazioni che PlayGuard non mostra ancora: salva il blocco grezzo come riferimento, cambia un'impostazione nell'app Filtro famiglia, torna qui — PlayGuard elenca i valori che sono cambiati (salvati in `logs/reports/` su richiesta). Orari diversi di Sogni d'oro per ogni giorno, impostati dall'app Filtro famiglia, potrebbero essere confermati così. Allega quel file a una issue, o invialo con il rapporto (*Invia un rapporto online*).
+- **Confronta blocco tempo di gioco** (solo mentre l'app Filtro famiglia è collegata e può sincronizzarsi — non con un file hosts che blocca Nintendo; anche in *Sicurezza*), per decifrare le impostazioni che PlayGuard non mostra ancora: salva il blocco grezzo come riferimento, cambia un'impostazione nell'app Filtro famiglia, torna qui — PlayGuard elenca i valori che sono cambiati (salvati in `logs/reports/` su richiesta). Orari diversi di Sogni d'oro per ogni giorno, impostati dall'app Filtro famiglia, potrebbero essere confermati così. Allega quel file a una issue, o invialo con il rapporto (*Invia un rapporto online*).
 - **Registra il tempo di gioco**: ogni 30 s mentre PlayGuard è aperto, una riga di ciò che riporta il timer (tempo rimanente, tempo trascorso, il blocco grezzo delle impostazioni…) in `logs/play_timer/log.csv`, un file pronto per un foglio di calcolo, più una riga subito dopo ogni modifica fatta da PlayGuard, che dice quale (la sua ultima colonna, `event`), e una nota quando l'orologio si è spostato più del tempo trascorso. Lasciato aperto oltre la mezzanotte, o fino allo scadere del tempo, mostra ciò che un solo rapporto non può mostrare: quando il tempo trascorso si azzera, cosa dice la console verso la fine. L'interruttore viene ricordato; registra solo in modalità sviluppatore. Ciò che si sa finora è in [parental-controls.md](../parental-controls.md) (in inglese).
 - **Svuota la cache** ed **Elimina i file di log**, ognuno dopo una conferma che dice quanti file e quanto spazio: la cache (`cache/` e il `nand/<system>/cache/` di ogni sistema: nomi e icone dei giochi, gli ultimi dati di Attività, l'elenco delle build) viene riletta dalla console quando serve; i file di log sono i file di crash, i registri di sessione (tranne quello di questa sessione, ancora in scrittura), i rapporti salvati e la registrazione del tempo di gioco, mentre `uploads/` (i link per rimuovere i rapporti inviati online) e il riferimento del blocco restano. Impostazioni, cronologia, backup, profili ed esportazioni non vengono mai toccati.
 - **Riesegui le migrazioni**: gli spostamenti delle organizzazioni precedenti — la cartella dei dati accanto al `.nro`, i log di prima delle loro sottocartelle, ciò che tutti i sistemi condividevano — ognuno su una riga da spuntare o togliere (tutte spuntate all'inizio; A ne cambia una), poi *Riesegui le N scelte* e una conferma che le elenca con ciò che ognuna sposta. Vengono eseguite subito, qualunque cosa registri `migrations.json` (altrimenti ognuna viene eseguita una sola volta, al primo avvio di una build che ne ha bisogno; il livello registrato non viene mai abbassato); un file già al suo posto non viene mai sostituito. Una finestra dice quanti elementi sono stati spostati; ogni passaggio è nel registro di sessione.

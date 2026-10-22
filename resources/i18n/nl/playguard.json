@@ -819,7 +819,7 @@
         "upload_note": "Stuurt een rapport naar een geheime gist in je GitHub-account (eerst inloggen indien nodig) en toont de link met een QR-code: geef die aan wie je helpt, of open er een bugmelding mee.",
         "storage_note_emummc": "Dit is de emuMMC: de sysMMC heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate.",
         "storage_note_sysmmc": "Dit is de sysMMC, en op deze SD-kaart is een emuMMC ingesteld: die heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate.",
-        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
+        "patches_note_mixed": "sys-patch is actief, en er staan ook sigpatch-bestanden ({}) op de SD-kaart: twee tools die dezelfde controles patchen, een bekende oorzaak van forwarders die niet konden worden gestart. Zet ze opzij (A) en start de console opnieuw op."
     },
     "games": {
         "open": "Geïnstalleerde games controleren",
@@ -1165,14 +1165,14 @@
         "week_note": "Geweigerd deze week: {}; de week ervoor: {}.",
         "climb_title": "Meer geweigerde pincodes dan normaal",
         "climb_detail": "{} pincodes geweigerd bij de poort in de laatste zeven dagen, {} de week ervoor.",
-        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
-        "patches_title": "This forwarder would not start yet",
-        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
-        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
-        "refresh": "Make the forwarders again with this loader",
-        "refresh_confirm": "Make these forwarders again with the new loader? {}: made again, they start their homebrew with this build's loader and keep their name, icon and PIN rules.",
-        "refresh_title": "Forwarders made with an older loader",
-        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
+        "patches_incomplete": "De console start een forwarder alleen met handtekeningpatches, en sys-patch {} heeft ze voor deze firmware niet allemaal toegepast (niet gepatcht: {}). Werk sys-patch bij en start de console opnieuw op.",
+        "patches_title": "Deze forwarder zou nog niet starten",
+        "patches_anyway": "Toch toevoegen (hij start zodra de patches er zijn)",
+        "patches_mixed": "sys-patch is actief, maar er staan ook sigpatch-bestanden ({}) op de SD-kaart: een bekende oorzaak van forwarders die niet konden worden gestart. Zet ze opzij (Console › Gamepatches) en start de console opnieuw op.",
+        "refresh": "De forwarders opnieuw maken met deze loader",
+        "refresh_confirm": "Deze forwarders opnieuw maken met de nieuwe loader? {}: opnieuw gemaakt starten ze hun homebrew met de loader van deze build en behouden ze hun naam, pictogram en pincoderegels.",
+        "refresh_title": "Forwarders gemaakt met een oudere loader",
+        "refresh_detail": "{}: gemaakt door een oudere PlayGuard. Opnieuw gemaakt starten ze hun homebrew met de loader van deze build."
     },
     "hbmenu": {
         "section": "Homebrewmenu",
@@ -2081,10 +2081,10 @@
         "removed": "Gepland profiel verwijderd."
     },
     "sigpatch": {
-        "set_aside": "Set the sigpatch files aside",
-        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
-        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
-        "failed": "The sigpatch files were not all moved: {}",
-        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
+        "set_aside": "De sigpatch-bestanden opzijzetten",
+        "confirm": "De sigpatch-bestanden (.ips voor es, fs en de loader) naar {} verplaatsen? Er wordt niets verwijderd: terugzetten maakt het ongedaan. sys-patch patcht dan vanaf de volgende start alleen; start de console opnieuw op.",
+        "hekate": "bootloader/patches.ini van hekate blijft staan: als hekate_ipl.ini nog kip1patch=nosigchk bevat, verwijder die regel dan voordat je opstart met fss0 van hekate.",
+        "failed": "De sigpatch-bestanden zijn niet allemaal verplaatst: {}",
+        "done": "De sigpatch-bestanden zijn opzijgezet. Start de console opnieuw op en probeer de forwarder daarna nog eens."
     }
 }

@@ -819,7 +819,7 @@
         "upload_note": "Invia un rapporto in un gist segreto del tuo account GitHub (accedi prima, se serve) e ne mostra il link con un codice QR: dallo a chi ti aiuta, o apri una segnalazione di bug con esso.",
         "storage_note_emummc": "Sei sulla emuMMC: la sysMMC ha un proprio filtro famiglia, che PlayGuard non può vedere da qui. Impostalo anche lì, oppure nascondi il menu di avvio di hekate.",
         "storage_note_sysmmc": "Sei sulla sysMMC e su questa scheda SD è configurata una emuMMC: ha un proprio filtro famiglia, che PlayGuard non può vedere da qui. Impostalo anche lì, oppure nascondi il menu di avvio di hekate.",
-        "patches_note_mixed": "sys-patch is active, and sigpatch files ({}) are on the SD card too: two tools patching the same checks, a known cause of forwarders that could not be started. Set them aside (A), then restart the console."
+        "patches_note_mixed": "sys-patch è attivo, e sulla scheda SD ci sono anche file sigpatch ({}): due strumenti che applicano patch agli stessi controlli, una causa nota di forwarder che non è stato possibile avviare. Mettili da parte (A), poi riavvia la console."
     },
     "games": {
         "open": "Controlla i giochi installati",
@@ -1165,14 +1165,14 @@
         "week_note": "Rifiuti questa settimana: {}; la settimana prima: {}.",
         "climb_title": "Più PIN rifiutati del solito",
         "climb_detail": "{} PIN rifiutati al cancello negli ultimi sette giorni, {} la settimana prima.",
-        "patches_incomplete": "The console starts a forwarder only with signature patches, and sys-patch {} did not apply all of them for this firmware (not patched: {}). Update sys-patch, then restart the console.",
-        "patches_title": "This forwarder would not start yet",
-        "patches_anyway": "Add it anyway (it starts once the patches are in place)",
-        "patches_mixed": "sys-patch is active, but sigpatch files ({}) are on the SD card too: a known cause of forwarders that could not be started. Set them aside (Console › Game patches), then restart the console.",
-        "refresh": "Make the forwarders again with this loader",
-        "refresh_confirm": "Make these forwarders again with the new loader? {}: made again, they start their homebrew with this build's loader and keep their name, icon and PIN rules.",
-        "refresh_title": "Forwarders made with an older loader",
-        "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
+        "patches_incomplete": "La console avvia un forwarder solo con le patch delle firme, e sys-patch {} non le ha applicate tutte per questo firmware (non applicate: {}). Aggiorna sys-patch, poi riavvia la console.",
+        "patches_title": "Questo forwarder non si avvierebbe ancora",
+        "patches_anyway": "Aggiungilo comunque (si avvierà quando le patch saranno a posto)",
+        "patches_mixed": "sys-patch è attivo, ma sulla scheda SD ci sono anche file sigpatch ({}): una causa nota di forwarder che non è stato possibile avviare. Mettili da parte (Console › Patch dei giochi), poi riavvia la console.",
+        "refresh": "Rifai i forwarder con questo loader",
+        "refresh_confirm": "Rifare questi forwarder con il nuovo loader? {}: una volta rifatti, avviano il loro homebrew con il loader di questa build e mantengono nome, icona e regole del PIN.",
+        "refresh_title": "Forwarder creati con un loader precedente",
+        "refresh_detail": "{}: creati da un PlayGuard precedente. Una volta rifatti, avviano il loro homebrew con il loader di questa build."
     },
     "hbmenu": {
         "section": "Menu homebrew",
@@ -1994,7 +1994,7 @@
             "played_day": "{}: {} giocato su {}",
             "played_day_free": "{}: {} giocato, senza limite",
             "bonus": "{}: {} previsto per quel giorno",
-            "last_week_day": "{} scorso"
+            "last_week_day": "{} precedente"
         },
         "activity": {
             "share": "Esporta o condividi",
@@ -2081,10 +2081,10 @@
         "removed": "Profilo programmato tolto."
     },
     "sigpatch": {
-        "set_aside": "Set the sigpatch files aside",
-        "confirm": "Move the sigpatch files (.ips for es, fs and the loader) to {}? Nothing is deleted: moving them back undoes it. sys-patch then patches alone from the next start; restart the console.",
-        "hekate": "hekate's bootloader/patches.ini stays: if hekate_ipl.ini still has kip1patch=nosigchk, remove that line before you boot with hekate's fss0.",
-        "failed": "The sigpatch files were not all moved: {}",
-        "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
+        "set_aside": "Metti da parte i file sigpatch",
+        "confirm": "Spostare i file sigpatch (.ips per es, fs e il loader) in {}? Non viene eliminato nulla: rimetterli al loro posto annulla tutto. sys-patch applicherà poi le patch da solo dal prossimo avvio; riavvia la console.",
+        "hekate": "Il bootloader/patches.ini di hekate resta: se hekate_ipl.ini contiene ancora kip1patch=nosigchk, togli quella riga prima di avviare con il fss0 di hekate.",
+        "failed": "Non tutti i file sigpatch sono stati spostati: {}",
+        "done": "I file sigpatch sono stati messi da parte. Riavvia la console, poi riprova il forwarder."
     }
 }

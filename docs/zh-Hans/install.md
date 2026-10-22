@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
+<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
 # 安装
 
 如何安装、更新和删除 PlayGuard，以及它会在 SD 卡上写入哪些文件。安装之后：[快速上手](getting-started.md)。返回 [README](../../README.md)。
@@ -20,13 +20,13 @@
 
 ## 更新
 
-- **在 PlayGuard 中：** *关于 › 更新方式* 选择更新的方式——在 PlayGuard 内（它会下载发布版本、校验、替换自身并重新启动）、sphaira、Homebrew App Store 或手动。开启 *每天检查更新* 后，有新版本时 PlayGuard 打开时会显示它。
+- **在 PlayGuard 中：** *偏好设置 › 更新方式* 选择更新的方式——在 PlayGuard 内（它会下载发布版本、校验、替换自身并重新启动）、sphaira、Homebrew App Store 或手动。开启 *每天检查更新* 后，有新版本时 PlayGuard 打开时会显示它。
 - **恢复 sysmodule** 与 PlayGuard 的版本保持一致：每次更新后，重新解压该版本的 `playguard-rescue.zip`（或者在铃铛的 *恢复 sysmodule 不是最新版本* 上选择 *更新*），然后重启主机。
 - 设置、历史记录、配置和备份都会保留：它们位于 `sd:/config/playguard/`，而不是应用旁边。
 
 ## 删除
 
-删除 `sd:/switch/playguard/`（应用本身）；如果要连它的文件一起删除，再删除 `sd:/config/playguard/`；装了恢复 sysmodule 的话，还要删除 `sd:/atmosphere/contents/4200000000505247/`。时间限制、PIN 和各项限制都是主机自身的：它们**会留在主机上**。如果也要删除它们，请先使用 *PIN › 删除所有家长控制*。
+删除 `sd:/switch/playguard/`（应用本身）；如果要连它的文件一起删除，再删除 `sd:/config/playguard/`；装了恢复 sysmodule 的话，还要删除 `sd:/atmosphere/contents/4200000000505247/`。时间限制、PIN 和各项限制都是主机自身的：它们**会留在主机上**。如果也要删除它们，请先使用 *安全 › 删除所有家长控制*。
 
 ## SD 卡上的文件
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 db71c88bd2a7 -->
+<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
 # Aan de slag
 
 Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien minuten, en daarna de dagelijkse taken. Terug naar de [README](../../README.md).
@@ -27,7 +27,7 @@ Open PlayGuard **boven een game** (houd R ingedrukt terwijl je een game start, m
 
 ## 3. Volg *Eerste stappen*
 
-Bij de eerste start verschijnt de gids *Eerste stappen* (later: *Info › Hulp en diagnose › Eerste stappen*). *Vandaag* toont dezelfde stappen als kaart tot ze gedaan zijn (*1 van 3*):
+Bij de eerste start verschijnt de gids *Eerste stappen* (later: *Voorkeuren › Eerste stappen*). *Vandaag* toont dezelfde stappen als kaart tot ze gedaan zijn (*1 van 3*):
 
 1. **De pincode.** De eigen pincode van de console, die het HOME-menu vraagt om na de limiet een game te starten of om de instellingen te wijzigen. Vermijd 0000, 1234 of 2580: PlayGuard markeert een pincode die iedereen als eerste zou proberen.
 2. **Een daglimiet.** Elke dag dezelfde, of één voor doordeweeks en één voor het weekend. Wijzig later elke afzonderlijke dag in *Speeltijdtimer*.
@@ -35,7 +35,7 @@ Bij de eerste start verschijnt de gids *Eerste stappen* (later: *Info › Hulp e
 
 ## 4. Ontkoppel de app op de telefoon
 
-Nog gekoppeld aan de app *Ouderlijk toezicht* van Nintendo (of een tweedehands console die aan die van iemand anders is gekoppeld)? *Pincode › Smartphone-app ontkoppelen*. Anders overschrijft de volgende synchronisatie van de app wat je in PlayGuard hebt ingesteld. Het werkt offline.
+Nog gekoppeld aan de app *Ouderlijk toezicht* van Nintendo (of een tweedehands console die aan die van iemand anders is gekoppeld)? *Beveiliging › Smartphone-app ontkoppelen*. Anders overschrijft de volgende synchronisatie van de app wat je in PlayGuard hebt ingesteld. Het werkt offline.
 
 ## 5. Stel de netwerkklok in
 
@@ -49,7 +49,7 @@ Een console zonder internet: als geen enkele server antwoordt, biedt PlayGuard a
 
 ## 7. Beveilig PlayGuard zelf
 
-*Pincode › PlayGuard beveiligen met de pincode*:
+*Beveiliging › PlayGuard beveiligen met de pincode*:
 
 - **Vóór een wijziging** (de standaard) — iedereen kan kijken, alleen de ouder wijzigt iets;
 - **Om PlayGuard te openen** — een vergrendelscherm bij het opstarten;
@@ -72,9 +72,9 @@ Een console zonder internet: als geen enkele server antwoordt, biedt PlayGuard a
 | De limiet van één dag te wijzigen | *Speeltijdtimer*: Ⓐ op de dag, ↑/↓, dan **+** om op te slaan. |
 | Te wisselen tussen schooltijd en vakantie | *Speeltijdtimer › Profielen*; *Gepland profiel* voor een vooraf gekozen periode. |
 | Te zien wie wat speelde | *Activiteit*: per game, per account, vandaag, 7 dagen, altijd; exporteren of een QR-code. |
-| Voorlopig alle games te blokkeren | *Pincode › Alle games blokkeren*. Zet je het uit, dan komen de vorige limieten terug. |
-| Een wijziging ongedaan te maken | **ZR** *Ongedaan maken* er direct na, of *Voorkeuren › Wijzigingsgeschiedenis* op elk moment. |
-| Een kopie van de instellingen te bewaren | *Voorkeuren › Back-up van de instellingen maken* (nooit de pincode). |
+| Voorlopig alle games te blokkeren | *Speeltijdtimer › Alle games blokkeren*. Zet je het uit, dan komen de vorige limieten terug. |
+| Een wijziging ongedaan te maken | **ZR** *Ongedaan maken* er direct na, of *Geschiedenis › Wijzigingen via PlayGuard* op elk moment. |
+| Een kopie van de instellingen te bewaren | *Geschiedenis › Back-up van de instellingen maken* (nooit de pincode). |
 | Te weten wat je aandacht vraagt | De bel (Ⓨ): wat te doen is in oranje, wat je moet weten met een "i". |
 
 ## Verder
