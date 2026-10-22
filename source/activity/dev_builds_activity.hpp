@@ -8,12 +8,13 @@
 // there on the console); the tab opened first is the installed build's,
 // then the last one chosen in this run. A on the pull requests' tab, when
 // it is shown, sorts them the other way (the newest build first, or by
-// number; the tab says which, config.json remembers it). Ⓨ finds the build
+// number; A's hint says which it goes to, config.json remembers it). Ⓨ finds the build
 // of any pull request or commit (signed in). A on a build shows it
 // (activity/dev_build_activity.hpp); below the list, signing in to GitHub
 // (signed out, only the releases are listed), Go back to the previous build
 // (the one installed before, kept: action/rollback_flow.hpp), and how old
-// the list is; Ⓧ fetches it again.
+// the list is; Ⓧ fetches it again, and so does the screen itself every few
+// minutes while a build's checks are still running.
 // While the list is fetched, or a build looked for, a bar above the tabs
 // shows how far it is.
 // A list fetched again while this screen is open replaces its content in
@@ -60,8 +61,12 @@ class DevBuildsActivity : public brls::Activity
     // The pull requests' other order (A on their tab when it is shown).
     void sort();
 
-    dev_builds::Cache cache;
-    dev_builds::Kind  tab = dev_builds::Kind::Release;
+    // How often the list is fetched again while a build's checks run.
+    static constexpr brls::Time REFRESH_MS = 3 * 60 * 1000;
+
+    dev_builds::Cache    cache;
+    dev_builds::Kind     tab = dev_builds::Kind::Release;
+    brls::RepeatingTimer refresh_timer;
 
     BRLS_BIND(brls::Label,      note,           "db_note");
     BRLS_BIND(brls::Box,        loading_box,    "db_loading");

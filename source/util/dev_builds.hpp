@@ -169,12 +169,13 @@ bool newer(const Build& b, const std::string& running_version, const Build* runn
 std::string short_date(const std::string& iso);
 
 // How long before `now` (POSIX seconds) the time `iso` ("…T…Z") was, as the
-// builds' screens say it: under an hour (or later than now) Now, under two
-// days in whole hours, else in whole days; None when `iso` is malformed.
+// builds' screens say it: under a minute (or later than now) Now, under an
+// hour in whole minutes, under two days in whole hours, else in whole days;
+// None when `iso` is malformed.
 struct Age
 {
-    enum Unit { None, Now, Hours, Days } unit = None;
-    int count = 0;   // the hours or the days
+    enum Unit { None, Now, Minutes, Hours, Days } unit = None;
+    int count = 0;   // the minutes, the hours or the days
 };
 Age age_of(const std::string& iso, int64_t now);
 

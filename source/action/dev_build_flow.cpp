@@ -4,11 +4,14 @@
 #include <algorithm>
 #include <atomic>
 #include <borealis.hpp>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <memory>
 #include <vector>
+
+#include <fmt/format.h>
 
 #include "action/github_login_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -27,6 +30,7 @@
 #include "util/migrations.hpp"
 #include "util/paths.hpp"
 #include "util/rollback.hpp"
+#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -81,31 +85,43 @@ std::string file_path(const std::string& sd)
     return root == "/" ? sd : root + sd;
 }
 
-// The download's dialog (cadran::progress_body): the build, a bar, the share
-// and "3 of 7 MB", and Cancel (B too), updated
-// from the download thread (at most once per percent, through brls::sync).
-// Cancel sets the flag the download checks (it stops within a second) and
-// closes the dialog at once; nothing touches the dialog after it closed,
-// whichever way (Cancel, B, the download's end) it did.
+// "4,7" (MB, one decimal, the language's decimal mark).
+std::string mb_text(uint64_t bytes)
+{
+    std::string text = fmt::format("{:.1f}", (double)bytes / (1024.0 * 1024.0));
+    const size_t dot = text.find('.');
+    if (dot != std::string::npos) text.replace(dot, 1, "playguard/games/decimal_mark"_i18n);
+    return text;
+}
+
+// The download's dialog (cadran::progress_body): what is under way (the
+// download, then the checks, then the install), the build, a bar, the share
+// and "3,2 of 4,7 MB · 1,1 MB/s", what it replaces, and Cancel (B too),
+// updated from the download thread (at most once per percent, through
+// brls::sync). Cancel sets the flag the download checks (it stops within a
+// second) and closes the dialog at once; nothing touches the dialog after it
+// closed, whichever way (Cancel, B, the download's end) it did. Once the
+// build is being put in place (installing()), Cancel goes: nothing can stop
+// that.
 class DownloadProgress
 {
   public:
-    DownloadProgress(const std::string& name, uint64_t size) : size(size)
+    DownloadProgress(const std::string& name, uint64_t size, const std::string& replaces) : size(size)
     {
-        this->body = cadran::progress_body("playguard/dev_build/downloading"_i18n, name);
+        this->body = cadran::progress_body("playguard/dev_build/downloading"_i18n, name, replaces);
         // Its own button, not the dialog's: a dialog's button acts once the
         // dialog is gone, and the download must stop updating it before.
-        auto* cancel = new brls::Button();
-        cancel->setText("hints/cancel"_i18n);
-        cadran::style_button(cancel);
-        cancel->setWidth(260);
-        cancel->setMarginTop(28);
-        cancel->setAlignSelf(brls::AlignSelf::CENTER);
-        cancel->registerClickAction([this](brls::View*) {
+        this->button = new brls::Button();
+        this->button->setText("hints/cancel"_i18n);
+        cadran::style_button(this->button);
+        this->button->setWidth(260);
+        this->button->setMarginTop(28);
+        this->button->setAlignSelf(brls::AlignSelf::CENTER);
+        this->button->registerClickAction([this](brls::View*) {
             this->cancel();
             return true;
         });
-        this->body.box->addView(cancel);
+        this->body.box->addView(this->button);
         this->dialog = new brls::Dialog(this->body.box);
         this->dialog->setCancelable(false);   // B: below, through cancel()
         this->dialog->getAppletFrame()->registerAction(
@@ -133,6 +149,16 @@ class DownloadProgress
     const std::atomic<bool>* cancel_flag() const { return &this->cancelled; }
     bool was_cancelled() const { return this->cancelled.load(); }
 
+    // The build is put in place: said, and Cancel goes.
+    void installing()
+    {
+        if (!this->dialog) return;
+        this->placing = true;
+        this->body.heading->setText("playguard/dev_build/installing"_i18n);
+        this->body.show(1.0f, "");
+        ui::set_visible(this->button, false);
+    }
+
     void close()
     {
         if (this->dialog) this->dialog->close();
@@ -143,12 +169,19 @@ class DownloadProgress
     const uint64_t size;
     std::atomic<int> percent{ -1 };
     std::atomic<bool> cancelled{ false };
+    // The first bytes seen, and when: the speed is counted from them (a
+    // download resumed starts with what an earlier attempt kept).
+    uint64_t first_done = 0;
+    std::chrono::steady_clock::time_point first_at;
+    bool first_seen = false;
     brls::Dialog* dialog = nullptr;   // null once it is closing: never touched again
+    brls::Button* button = nullptr;
+    bool placing = false;   // installing(): nothing to cancel any more
     cadran::Progress body;
 
     void cancel()
     {
-        if (!this->dialog) return;
+        if (!this->dialog || this->placing) return;
         this->cancelled = true;
         this->close();
     }
@@ -157,9 +190,21 @@ class DownloadProgress
     {
         if (!this->dialog) return;
         const float part = total ? std::min(1.0f, (float)done / (float)total) : 0.0f;
-        // Whole MB, the total rounded up (never "0 of 0"), what came in down.
-        const uint64_t mb = 1024 * 1024;
-        this->body.show(part, brls::getStr("playguard/dev_build/downloaded_mb", (int)(done / mb), (int)((total + mb - 1) / mb)));
+        // Everything in: what follows is the checks (the digest, the zip, the NRO header).
+        if (total && done >= total) this->body.heading->setText("playguard/dev_build/verifying"_i18n);
+        std::string detail = brls::getStr("playguard/dev_build/downloaded_mb", mb_text(std::min(done, total)), mb_text(total));
+        // The speed, once a second has gone by and while it is coming in.
+        const auto now = std::chrono::steady_clock::now();
+        if (!this->first_seen && done > 0) {
+            this->first_seen = true;
+            this->first_done = done;
+            this->first_at = now;
+        }
+        const double elapsed = this->first_seen ? std::chrono::duration<double>(now - this->first_at).count() : 0;
+        if (elapsed >= 1 && done > this->first_done && done < total)
+            detail += " · " + brls::getStr("playguard/dev_build/speed",
+                                          mb_text((uint64_t)((double)(done - this->first_done) / elapsed)));
+        this->body.show(part, detail);
     }
 };
 
@@ -200,7 +245,10 @@ void install(const dev_builds::Build& b)
     if (s_busy) return;
     s_busy = true;
     const std::string target = file_path(sd_path());
-    auto progress = std::make_shared<DownloadProgress>(label(b), b.size);
+    // What it replaces: the running build's name, as Go back to the previous
+    // build will give it (rollback_flow).
+    auto progress = std::make_shared<DownloadProgress>(label(b), b.size,
+                                                       brls::getStr("playguard/dev_build/replacing", rollback_flow::running_label()));
     // Not behind the play log or the game icons (ui::in_background).
     ui::in_background("dev build download", [b, target, progress]() {
         std::string err;
@@ -217,22 +265,32 @@ void install(const dev_builds::Build& b)
                 ui::notify("playguard/dev_build/cancelled"_i18n);
                 return;
             }
-            if (ok) {
+            auto end = [b, progress](bool ok, std::string err) {
+                s_busy = false;
+                progress->close();
+                // The one reason a user can act on, said in their language.
+                if (err == dev_builds::NO_DIGEST) err = "playguard/dev_build/no_digest"_i18n;
+                if (!ok) ui::error(brls::getStr("playguard/dev_build/failed", err));
+                else installed_now(b);
+            };
+            if (!ok) {
+                end(false, err);
+                return;
+            }
+            // Said first, drawn once, then done: the swap holds the UI thread.
+            progress->installing();
+            brls::delay(100, [target, fresh, end]() {
                 // The running .nro is held open by romfs:/ (the app's
                 // resources), and the SD card will not rename an open file:
                 // released for the two renames, here on the UI thread so that
                 // nothing reads romfs:/ meanwhile, then mounted again.
+                std::string err;
                 platform_romfs_release();
-                ok = dev_builds::replace(target, fresh, &err, rollback::previous_file(target));
+                const bool ok = dev_builds::replace(target, fresh, &err, rollback::previous_file(target));
                 platform_romfs_mount();
                 if (!ok) std::remove(fresh.c_str());
-            }
-            s_busy = false;
-            progress->close();
-            // The one reason a user can act on, said in their language.
-            if (err == dev_builds::NO_DIGEST) err = "playguard/dev_build/no_digest"_i18n;
-            if (!ok) ui::error(brls::getStr("playguard/dev_build/failed", err));
-            else installed_now(b);
+                end(ok, err);
+            });
         });
     });
 }
@@ -265,6 +323,7 @@ std::string age_text(const std::string& iso)
     switch (age.unit) {
         case dev_builds::Age::None: break;
         case dev_builds::Age::Now: return "playguard/dev_build/age_now"_i18n;
+        case dev_builds::Age::Minutes: return brls::getStr("playguard/dev_build/age_minutes", age.count);
         case dev_builds::Age::Hours: return brls::getStr("playguard/dev_build/age_hours", age.count);
         case dev_builds::Age::Days: return brls::getStr("playguard/dev_build/age_days", age.count);
     }
@@ -282,7 +341,7 @@ std::string label(const dev_builds::Build& b)
             text = brls::getStr("playguard/dev_build/main", b.commit, dev_builds::short_date(b.date));
             break;
         case dev_builds::Kind::PullRequest:
-            text = brls::getStr("playguard/dev_build/pr", b.pr, b.title, b.commit);
+            text = brls::getStr("playguard/dev_build/pr", b.pr, subject(b), b.commit);
             break;
         case dev_builds::Kind::Commit:
             text = brls::getStr("playguard/dev_build/commit", b.commit, b.branch, dev_builds::short_date(b.date));
@@ -316,7 +375,17 @@ std::string release_text(const dev_builds::Build& b)
 std::string checked_text(const dev_builds::Cache& cache)
 {
     const int64_t age = now() - cache.fetched_at;
-    return brls::getStr("playguard/dev_build/checked", (int)(age > 0 ? age / 60 : 0));
+    if (age < 60) return "playguard/dev_build/checked_now"_i18n;
+    return brls::getStr("playguard/dev_build/checked", (int)(age / 60));
+}
+
+std::string subject(const dev_builds::Build& b)
+{
+    // A list kept by 1.1.0, which gave only pull requests a title.
+    // Every list fetched from 1.2.0 on has them: this can go in 1.3.0.
+    if (b.title.empty()) return b.commit;
+    const std::string text = text::capitalise_ascii(dev_builds::parse_subject(b.title).text);
+    return text.empty() ? b.title : text;
 }
 
 void choose(const dev_builds::Build& b, bool newer)
@@ -351,8 +420,7 @@ void go_back()
 {
     std::string previous;
     if (s_busy || !rollback_flow::previous(&previous)) return;
-    std::string running = app::version();
-    if (!app::commit().empty()) running += " (" + app::commit() + ")";
+    const std::string running = rollback_flow::running_label();
     ui::confirm(brls::getStr("playguard/dev_build/back_body", running, previous), "playguard/dev_build/back_confirm"_i18n,
                 []() {
                     // As for an install: whatever Protect PlayGuard with the PIN says.
@@ -393,6 +461,11 @@ void find()
             });
         });
     });
+}
+
+void refresh()
+{
+    if (!s_busy) open(true);
 }
 
 void open(bool force)

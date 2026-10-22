@@ -431,7 +431,8 @@ Age age_of(const std::string& iso, int64_t now)
     int64_t then = 0;
     if (!date::iso_seconds(iso, &then)) return a;
     const int64_t age = now - then;
-    if (age < 3600) a.unit = Age::Now;
+    if (age < 60) a.unit = Age::Now;
+    else if (age < 3600) a.unit = Age::Minutes, a.count = (int)(age / 60);
     else if (age < 2 * 86400) a.unit = Age::Hours, a.count = (int)(age / 3600);
     else a.unit = Age::Days, a.count = (int)(age / 86400);
     return a;

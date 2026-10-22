@@ -28,11 +28,6 @@ std::string check_file() { return paths::data_dir() + "/boot_check.json"; }
 // finish (0: asked for). Read and removed by the build gone back to.
 std::string back_file() { return paths::data_dir() + "/went_back.json"; }
 
-std::string running_label()
-{
-    return app::commit().empty() ? app::version() : app::version() + " (" + app::commit() + ")";
-}
-
 // util/migrations.hpp's lines, in the log.
 void log_migration(bool warning, const std::string& line)
 {
@@ -126,6 +121,15 @@ void note_went_back()
                      notices::clear("went_back");
                      upload_flow::choose();
                  });
+}
+
+std::string running_label()
+{
+    // Plain ASCII: the start-up's text screen shows it too (at_start()).
+    std::string label = app::version();
+    if (app::pr() && !app::commit().empty()) label += " (#" + std::to_string(app::pr()) + ", " + app::commit() + ")";
+    else if (!app::commit().empty()) label += " (" + app::commit() + ")";
+    return label;
 }
 
 void installed(const std::string& installed_label)

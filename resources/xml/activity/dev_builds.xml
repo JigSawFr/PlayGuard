@@ -52,7 +52,12 @@
             <brls:Box id="db_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
             <brls:DetailCell id="db_sign_in" title="@i18n/playguard/dev_build/sign_in" marginTop="24"/>
             <brls:DetailCell id="db_back" title=" " marginTop="24"/>
-            <brls:Label id="db_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/cadran/text3"/>
+            <!-- In a box of its own: a label right under a card would become
+                 that card's foot (cadran::List), and how old the list is says
+                 nothing of Sign in or Go back. -->
+            <brls:Box width="auto" height="auto" marginTop="16">
+                <brls:Label id="db_checked" text=" " fontSize="18" textColor="@theme/cadran/text3"/>
+            </brls:Box>
 
         </brls:Box>
 
