@@ -227,7 +227,7 @@ Result forwarder_install(const ForwarderSpec *spec, u64 *id)
             .name = spec->name, .author = spec->author,
             .nacp = spec->nacp, .icon = spec->icon, .icon_size = spec->icon_size,
             .exefs_main = main, .main_size = main_size, .exefs_npdm = npdm, .npdm_size = npdm_size,
-            .force_debug = ams_180(), .seal = seal_header, .seal_ctx = key,
+            .force_debug = ams_180(), .options = spec->options, .seal = seal_header, .seal_ctx = key,
         };
         const FwdError e = forwarder_pack(&in, &p);
         if (e == FWD_NO_MEMORY) rc = MAKERESULT(Module_Libnx, LibnxError_OutOfMemory);

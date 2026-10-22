@@ -42,6 +42,9 @@ nlohmann::json array_of(const std::vector<Made>& all)
         if (!m.icon.empty()) e["icon"] = m.icon;
         if (!m.loader.empty()) e["loader"] = m.loader;
         if (!m.icon.empty() && m.icon_x != ICON_X_MIDDLE) e["icon_x"] = m.icon_x;
+        if (m.ask_user) e["ask_user"] = true;
+        if (!m.screenshots) e["screenshots"] = false;
+        if (!m.video) e["video"] = false;
         list.push_back(e);
     }
     return list;
@@ -87,6 +90,13 @@ std::vector<Made> parse_list(const std::string& text)
 
 namespace
 {
+// `key` there and false: an option turned off (missing, it is on).
+bool is_false(const nlohmann::json& e, const char* key)
+{
+    const auto it = e.find(key);
+    return it != e.end() && it->is_boolean() && !it->get<bool>();
+}
+
 std::vector<Made> from_array(const nlohmann::json& list)
 {
     std::vector<Made> out;
@@ -127,6 +137,10 @@ std::vector<Made> from_array(const nlohmann::json& list)
         m.loader = json_util::string_at(e, "loader");
         const int64_t x = json_util::integer_or(e, "icon_x", ICON_X_MIDDLE);
         m.icon_x = !m.icon.empty() && x >= 0 && x <= 100 ? (int)x : ICON_X_MIDDLE;
+        // Missing (made before they were kept): the defaults.
+        m.ask_user = json_util::flag_at(e, "ask_user");
+        m.screenshots = !is_false(e, "screenshots");
+        m.video = !is_false(e, "video");
         bool seen = false;
         for (const Made& o : out) seen = seen || o.id == m.id;
         if (!seen) out.push_back(m);

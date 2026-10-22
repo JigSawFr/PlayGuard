@@ -387,7 +387,7 @@ static void test_nacp(void)
     strcpy((char *)nacp + 0x3060, "1.2.3");
     nacp[0x3025] = 1;   // asked for an account at start
     memset(nacp + 0x3080, 0xFF, 8);
-    fwd_patch_nacp(nacp, "New", "", 0x0512345678ABC000ull);
+    fwd_patch_nacp(nacp, "New", "", 0x0512345678ABC000ull, 0);
     for (int l = 0; l < 16; l++) CHECK(strcmp((const char *)nacp + l * 0x300, "New") == 0);
     CHECK(strcmp((const char *)nacp + 0x200, "Old author") == 0);   // an empty author keeps the NACP's
     CHECK(strcmp((const char *)nacp + 0x300 + 0x200, "") == 0);
@@ -398,18 +398,29 @@ static void test_nacp(void)
     CHECK(u64_at(nacp + 0x30B0) == 0x0512345678ABC000ull && u64_at(nacp + 0x30E8) == 0x0512345678ABC000ull);
     CHECK(memcmp(nacp + 0x30A8, "PlayGrd", 8) == 0);
     CHECK(u32_at(nacp + 0x302C) == 1);   // American English alone: the one icon there is
+    CHECK(nacp[0x3034] == 0 && nacp[0x3035] == 2);   // screenshots allowed, videos automatic
+
+    // The launch options: a user picked at start, no screenshot, no video;
+    // and back to the defaults.
+    fwd_patch_nacp(nacp, "", "", 1, FWD_ASK_USER | FWD_NO_SCREENSHOT | FWD_NO_VIDEO);
+    CHECK(nacp[0x3025] == 1 && nacp[0x3034] == 1 && nacp[0x3035] == 0);
+    CHECK(strcmp((const char *)nacp, "New") == 0);   // the names kept
+    fwd_patch_nacp(nacp, "", "", 1, FWD_NO_VIDEO);
+    CHECK(nacp[0x3025] == 0 && nacp[0x3034] == 0 && nacp[0x3035] == 0);
+    fwd_patch_nacp(nacp, "", "", 1, 0);
+    CHECK(nacp[0x3025] == 0 && nacp[0x3034] == 0 && nacp[0x3035] == 2);
 
     // A name too long for its field: cut, terminated.
     char longname[0x300];
     memset(longname, 'n', sizeof(longname) - 1);
     longname[sizeof(longname) - 1] = '\0';
-    fwd_patch_nacp(nacp, longname, "A", 1);
+    fwd_patch_nacp(nacp, longname, "A", 1, 0);
     CHECK(strlen((const char *)nacp) == 0x1FF && strcmp((const char *)nacp + 0x200, "A") == 0);
 
     // The compressed titles of 21.0.0+: back to plain entries.
     memset(nacp, 0xAB, 0x3000);
     nacp[0x3215] = 1;
-    fwd_patch_nacp(nacp, "Plain", "Me", 1);
+    fwd_patch_nacp(nacp, "Plain", "Me", 1, 0);
     CHECK(nacp[0x3215] == 0 && strcmp((const char *)nacp + 15 * 0x300, "Plain") == 0);
     CHECK(nacp[0x300 + 0x2FF] == 0);
     free(nacp);
@@ -540,6 +551,16 @@ static void test_pack(void)
         const uint8_t *romfs = romfs_of(&s, &size);
         f = romfs ? romfs_file(romfs, size, "control.nacp", &n) : NULL;
         CHECK(f && strcmp((const char *)f + 15 * 0x300, "PlayGuard") == 0 && f[0x3060] == 0);
+        CHECK(f && f[0x3025] == 0 && f[0x3034] == 0 && f[0x3035] == 2);   // the defaults
+    }
+    forwarder_package_free(&p);
+
+    // Its launch options, in the NACP the HOME menu reads.
+    in.options = FWD_ASK_USER | FWD_NO_VIDEO;
+    if (CHECK(forwarder_pack(&in, &p) == FWD_OK) && CHECK(section(&p.contents[1], 0, &s))) {
+        const uint8_t *romfs = romfs_of(&s, &size);
+        f = romfs ? romfs_file(romfs, size, "control.nacp", &n) : NULL;
+        CHECK(f && f[0x3025] == 1 && f[0x3034] == 0 && f[0x3035] == 0);
     }
     forwarder_package_free(&p);
     free(nacp);

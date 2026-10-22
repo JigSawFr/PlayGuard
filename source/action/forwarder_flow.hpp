@@ -74,6 +74,18 @@ void create_self(std::function<void(bool)> done);
 void rebuild(const forwarders_logic::Row& row, const std::string& name, const std::string& author,
              std::function<void(bool)> done);
 
+// How the HOME menu starts it (forwarders::Made::ask_user, screenshots,
+// video): set with the PIN (a user picked at launch decides whose play time
+// it is), made again with them, the same program ID, in the change history.
+struct Options
+{
+    bool ask_user = false, screenshots = true, video = true;
+};
+void set_options(const forwarders_logic::Row& row, const Options& options, std::function<void(bool)> done);
+// "A user picked at launch · No screenshots", in the UI's language; ""
+// for the defaults.
+std::string options_label(const Options& options);
+
 // Protects it with the PIN (`on`, confirmed first; refused without a PIN on
 // the console), or no longer: made again, the same program ID, starting
 // PlayGuard first, which asks for the PIN (util/forwarder_gate.hpp). Not for

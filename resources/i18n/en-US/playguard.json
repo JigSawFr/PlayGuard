@@ -1108,6 +1108,15 @@
         "sheet_install": "Install and delete",
         "action_pin": "Ask for the PIN",
         "action_limit": "Closed once today's play time is used up",
+        "sheet_launch": "At launch",
+        "action_ask_user": "Choose a user at launch",
+        "action_screenshots": "Screenshots",
+        "action_video": "Video capture",
+        "option_ask_user": "A user chosen at launch",
+        "option_no_screenshots": "No screenshots",
+        "option_no_video": "No video capture",
+        "options_default": "No user asked, captures allowed",
+        "options_set": "{} made again with its launch options",
         "detail_paused": "Paused",
         "closed_title": "Hours it never opens, the PIN or not",
         "state_paused": "paused until {}",
@@ -1618,7 +1627,8 @@
             "gate_pause": "Pause after refused PINs",
             "gate_pause_lifted": "Forwarder's pause lifted",
             "gate_limit": "Forwarder closed (today's play time used up)",
-            "gate_limit_set": "Forwarder closed after today's play time"
+            "gate_limit_set": "Forwarder closed after today's play time",
+            "forwarder_options": "Forwarder launch options changed"
         },
         "sources": {
             "uniform": "Same limit every day",

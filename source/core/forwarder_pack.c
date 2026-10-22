@@ -192,7 +192,7 @@ static void put_text(uint8_t *dst, size_t size, const char *text)
     memcpy(dst, text, n < size - 1 ? n : size - 1);
 }
 
-void fwd_patch_nacp(uint8_t *nacp, const char *name, const char *author, uint64_t id)
+void fwd_patch_nacp(uint8_t *nacp, const char *name, const char *author, uint64_t id, uint32_t options)
 {
     // A compressed title block (21.0.0+) is not one names can be written
     // into: back to the plain entries, which every firmware reads.
@@ -213,11 +213,11 @@ void fwd_patch_nacp(uint8_t *nacp, const char *name, const char *author, uint64_
     // NACP lists French would show no icon on a French console. As NTON
     // fixed it; with no language listed, the console takes this one anyway.
     put_u32(nacp + 0x302C, 1);
-    nacp[0x3025] = 0;      // startup_user_account: no account picked at start
+    nacp[0x3025] = (options & FWD_ASK_USER) ? 1 : 0;      // startup_user_account: picked at start, or none
     nacp[0x3026] = 0;      // user_account_switch_lock
     nacp[0x3027] = 1;      // add_on_content_registration_type: on demand
-    nacp[0x3034] = 0;      // screenshot: allowed
-    nacp[0x3035] = 2;      // video_capture: automatic
+    nacp[0x3034] = (options & FWD_NO_SCREENSHOT) ? 1 : 0; // screenshot: allowed, or denied
+    nacp[0x3035] = (options & FWD_NO_VIDEO) ? 0 : 2;      // video_capture: automatic, or disabled
     nacp[0x3036] = 0;      // data_loss_confirmation: none, it keeps no save data
     nacp[0x3037] = 0;      // play_log_policy: logged, as a game
     put_u64(nacp + 0x3038, id);                 // presence_group_id
@@ -578,7 +578,7 @@ FwdError forwarder_pack(const FwdInput *in, FwdPackage *out)
     uint8_t *nacp = (uint8_t *)calloc(1, FWD_NACP_SIZE);
     if (!nacp) return FWD_NO_MEMORY;
     if (in->nacp) memcpy(nacp, in->nacp, FWD_NACP_SIZE);
-    fwd_patch_nacp(nacp, in->name, in->author, id);
+    fwd_patch_nacp(nacp, in->name, in->author, id, in->options);
     const FwdFile control[] = { { "control.nacp", nacp, FWD_NACP_SIZE },
                                 { "icon_AmericanEnglish.dat", in->icon, in->icon_size } };
     ok = nca_begin(&n) && nca_romfs(&n, 0, control, 2) &&

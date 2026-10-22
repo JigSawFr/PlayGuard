@@ -350,6 +350,38 @@ void rebuild(const forwarders_logic::Row& row, const std::string& name, const st
     if (done) done(ok);
 }
 
+std::string options_label(const Options& o)
+{
+    std::string out;
+    const auto add = [&out](const std::string& s) { out += (out.empty() ? "" : " · ") + s; };
+    if (o.ask_user) add("playguard/forwarders/option_ask_user"_i18n);
+    if (!o.screenshots) add("playguard/forwarders/option_no_screenshots"_i18n);
+    if (!o.video) add("playguard/forwarders/option_no_video"_i18n);
+    return out;
+}
+
+void set_options(const forwarders_logic::Row& row, const Options& o, std::function<void(bool)> done)
+{
+    forwarders::Made m = made_of(row);
+    if (m.nro.empty() || ui::refuse_read_only() || !pin_lock::confirm()) {
+        if (done) done(false);
+        return;
+    }
+    if (m.name.empty()) m.name = row.name;
+    m.ask_user = o.ask_user;
+    m.screenshots = o.screenshots;
+    m.video = o.video;
+    const bool ok = install(m, row.self || m.nro == self_nro(), nullptr,
+                            brls::getStr("playguard/forwarders/options_set", m.name));
+    if (ok) {
+        const std::string what = options_label(o);
+        history_flow::record_event("forwarder_options", "",
+                                   history_label(m.name, m.id) + " · " +
+                                       (what.empty() ? "playguard/forwarders/options_default"_i18n : what));
+    }
+    if (done) done(ok);
+}
+
 void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)> done)
 {
     forwarders::Made m = made_of(row);

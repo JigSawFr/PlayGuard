@@ -453,7 +453,7 @@ static void test_forwarders()
     std::vector<unsigned char> nacp(FWD_NACP_SIZE, 0);
     std::memcpy(nacp.data() + 0x3060, "1.4.0", 5);
     const unsigned char jpeg[] = { 0xFF, 0xD8, 0xFF, 0xD9 };
-    ForwarderSpec spec = { path, path, nullptr, nullptr, nullptr, "PlayGuard", "JigSawFr", nacp.data(), jpeg, sizeof(jpeg) };
+    ForwarderSpec spec = { path, path, nullptr, nullptr, nullptr, "PlayGuard", "JigSawFr", nacp.data(), jpeg, sizeof(jpeg), 0 };
     u64 id = 0;
     CHECK(forwarder_install(&spec, &id) == 0 && id == forwarder_id(path, path));
     spec.name = "Parental";

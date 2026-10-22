@@ -1108,6 +1108,15 @@
         "sheet_install": "Installeren en verwijderen",
         "action_pin": "Vraag om de pincode",
         "action_limit": "Dicht zodra de speeltijd van vandaag op is",
+        "sheet_launch": "Bij het starten",
+        "action_ask_user": "Bij het starten een gebruiker kiezen",
+        "action_screenshots": "Schermafbeeldingen",
+        "action_video": "Video-opname",
+        "option_ask_user": "Gebruiker gekozen bij het starten",
+        "option_no_screenshots": "Geen schermafbeeldingen",
+        "option_no_video": "Geen video-opname",
+        "options_default": "Geen gebruiker gevraagd, opnames toegestaan",
+        "options_set": "{} opnieuw gemaakt met zijn startopties",
         "detail_paused": "Gepauzeerd",
         "closed_title": "Uren waarop het nooit opent, met of zonder pincode",
         "state_paused": "gepauzeerd tot {}",
@@ -1618,7 +1627,8 @@
             "gate_pause": "Pauze na geweigerde pincodes",
             "gate_pause_lifted": "Pauze van een forwarder opgeheven",
             "gate_limit": "Forwarder gesloten (speeltijd van vandaag op)",
-            "gate_limit_set": "Forwarder gesloten na de speeltijd van vandaag"
+            "gate_limit_set": "Forwarder gesloten na de speeltijd van vandaag",
+            "forwarder_options": "Startopties van een forwarder gewijzigd"
         },
         "sources": {
             "uniform": "Elke dag dezelfde limiet",

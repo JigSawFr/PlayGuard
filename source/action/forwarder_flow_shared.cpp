@@ -10,6 +10,7 @@
 #include "action/history_flow.hpp"
 #include "app.hpp"
 #include "core/forwarder.h"
+#include "core/forwarder_pack.h"
 #include "core/gate.h"
 #include "ui/ui.hpp"
 #include "util/forwarder_gate.hpp"
@@ -185,6 +186,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         made.pin ? gate_argv.c_str() : nullptr, made.pin && gate.pinned ? gate.sha256.data() : nullptr,
         made.name.c_str(), made.author.c_str(),
         info.nacp.size() >= nro::NACP_SIZE ? info.nacp.data() : nullptr, info.icon.data(), info.icon.size(),
+        (made.ask_user ? FWD_ASK_USER : 0u) | (made.screenshots ? 0u : FWD_NO_SCREENSHOT) | (made.video ? 0u : FWD_NO_VIDEO),
     };
     u64 id = 0;
     const Result rc = forwarder_install(&spec, &id);

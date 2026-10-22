@@ -1108,6 +1108,15 @@
         "sheet_install": "インストールと削除",
         "action_pin": "暗証番号をたずねる",
         "action_limit": "今日のプレイ時間を使い切ったら閉じる",
+        "sheet_launch": "起動時",
+        "action_ask_user": "起動時にユーザーを選ぶ",
+        "action_screenshots": "画面写真",
+        "action_video": "動画撮影",
+        "option_ask_user": "起動時にユーザーを選択",
+        "option_no_screenshots": "画面写真なし",
+        "option_no_video": "動画撮影なし",
+        "options_default": "ユーザー選択なし、撮影可",
+        "options_set": "{}を起動オプション付きで作り直しました",
         "detail_paused": "一時停止中",
         "closed_title": "利用不可の時間（暗証番号があっても）",
         "state_paused": "{}まで一時停止",
@@ -1618,7 +1627,8 @@
             "gate_pause": "暗証番号の拒否後の一時停止",
             "gate_pause_lifted": "フォワーダーの一時停止を解除",
             "gate_limit": "フォワーダー利用不可（今日のプレイ時間が終了）",
-            "gate_limit_set": "今日のプレイ時間後はフォワーダー利用不可"
+            "gate_limit_set": "今日のプレイ時間後はフォワーダー利用不可",
+            "forwarder_options": "フォワーダーの起動オプションを変更"
         },
         "sources": {
             "uniform": "毎日同じ上限",

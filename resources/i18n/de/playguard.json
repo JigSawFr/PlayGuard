@@ -1108,6 +1108,15 @@
         "sheet_install": "Installieren und löschen",
         "action_pin": "Nach der Geheimzahl fragen",
         "action_limit": "Geschlossen, sobald die heutige Spielzeit aufgebraucht ist",
+        "sheet_launch": "Beim Start",
+        "action_ask_user": "Beim Start einen Nutzer auswählen",
+        "action_screenshots": "Screenshots",
+        "action_video": "Videoaufnahme",
+        "option_ask_user": "Nutzer wird beim Start ausgewählt",
+        "option_no_screenshots": "Keine Screenshots",
+        "option_no_video": "Keine Videoaufnahme",
+        "options_default": "Kein Nutzer abgefragt, Aufnahmen erlaubt",
+        "options_set": "{} mit seinen Startoptionen neu erstellt",
         "detail_paused": "Pausiert",
         "closed_title": "Zeiten, in denen es nie öffnet, mit Geheimzahl oder nicht",
         "state_paused": "pausiert bis {}",
@@ -1618,7 +1627,8 @@
             "gate_pause": "Pause nach abgelehnten Geheimzahlen",
             "gate_pause_lifted": "Pause eines Forwarders aufgehoben",
             "gate_limit": "Forwarder gesperrt (heutige Spielzeit aufgebraucht)",
-            "gate_limit_set": "Forwarder nach der heutigen Spielzeit gesperrt"
+            "gate_limit_set": "Forwarder nach der heutigen Spielzeit gesperrt",
+            "forwarder_options": "Startoptionen eines Forwarders geändert"
         },
         "sources": {
             "uniform": "Jeden Tag gleiches Limit",
