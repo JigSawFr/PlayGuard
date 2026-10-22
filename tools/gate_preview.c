@@ -72,7 +72,17 @@ int main(int argc, char **argv)
     // Paused until 21:18; closed in the evening.
     const GateHours evening = { 0x7F, 1260, 420 };
     char paused[128], closed[256] = "";
-    snprintf(paused, sizeof(paused), gate_text(lang, GateText_PausedUntil), "21:18");
+    char in[64], at[96];
+    snprintf(in, sizeof(in), gate_text(lang, GateText_InMinutes), 12);
+    snprintf(at, sizeof(at), "21:18 (%s)", in);
+    snprintf(paused, sizeof(paused), gate_text(lang, GateText_PausedUntil), at);
+    // Opening: the day's play time left; free: until 20:00; an error: its code.
+    char minutes[64], left[128], until[128], code[16], error[128];
+    gate_minutes_text(45, gate_text(lang, GateText_Minutes), gate_text(lang, GateText_HoursMinutes), minutes, sizeof(minutes));
+    snprintf(left, sizeof(left), gate_text(lang, GateText_TimeLeft), minutes);
+    snprintf(until, sizeof(until), gate_text(lang, GateText_FreeUntil), "20:00");
+    gate_error_code(168u | (12u << 9), code, sizeof(code));
+    snprintf(error, sizeof(error), gate_text(lang, GateText_ErrorCode), code);
     if (gate_hours_text(&evening, gate_text(lang, GateText_Days), span, sizeof(span)))
         snprintf(closed, sizeof(closed), gate_text(lang, GateText_ClosedHours), span);
     uint32_t *px = (uint32_t *)malloc(sizeof(uint32_t) * GATE_SCREEN_W * GATE_SCREEN_H);
@@ -85,10 +95,17 @@ int main(int argc, char **argv)
                                : SHOTS[i].state == GateScreen_Refused ? tried
                                : SHOTS[i].state == GateScreen_Paused  ? paused
                                : SHOTS[i].state == GateScreen_Closed  ? closed
+                               : SHOTS[i].state == GateScreen_Opening ? left
+                               : SHOTS[i].state == GateScreen_Free    ? until
+                               : SHOTS[i].state == GateScreen_Error   ? error
                                                                       : NULL,
-                               SHOTS[i].state != GateScreen_Asking,
+                               SHOTS[i].state != GateScreen_Asking && SHOTS[i].state != GateScreen_Opening &&
+                                   SHOTS[i].state != GateScreen_Free,
                                // Its rules: hours without the PIN, its closed hours, the day's limit.
-                               GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT, gate_text(lang, GateText_Badge) };
+                               GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT, gate_text(lang, GateText_Badge),
+                               // Refused: Ⓐ to try again, Ⓑ for the HOME menu.
+                               SHOTS[i].state == GateScreen_Refused ? gate_text(lang, GateText_RetryA) : NULL,
+                               SHOTS[i].state == GateScreen_Refused ? gate_text(lang, GateText_RetryB) : NULL };
         gate_screen_draw(px, GATE_SCREEN_W, GATE_SCREEN_H, GATE_SCREEN_W, &s);
         char path[512];
         snprintf(path, sizeof(path), "%s/%s.png", out, SHOTS[i].file);

@@ -52,6 +52,10 @@ typedef struct {
     int                  note_warn;
     unsigned             rules;        // GATE_RULE_*, 0: none shown
     const char          *badge;        // "Protected by PlayGuard" in its language, or NULL (English)
+    // Ⓐ's and Ⓑ's labels, bottom right in place of the site, as the HOME
+    // menu puts its buttons ("Try again", "HOME menu"); NULL: none.
+    const char          *button_a;
+    const char          *button_b;
 } GateScreen;
 
 // Draws `s` into `px` (`w` x `h` pixels, `stride` pixels a row, RGBA: R in

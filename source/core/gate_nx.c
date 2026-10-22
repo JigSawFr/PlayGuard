@@ -101,19 +101,30 @@ static int refused_on(const char *nro, const char *day)
     return gate_log_count(text, n, nro, day, GateResult_Refused);
 }
 
-// The system's PIN screen, unless the console has no PIN.
-static GateResult ask_pin(void)
+// The system's PIN screen, unless the console has no PIN. `*code`: why it
+// did not open (GateResult_Error), for its error code on the screen.
+static GateResult ask_pin(Result *code)
 {
-    if (R_FAILED(pctlInitialize())) return GateResult_Error;
+    *code = 0;
+    Result rc = pctlInitialize();
+    if (R_FAILED(rc)) {
+        *code = rc;
+        return GateResult_Error;
+    }
     u32 len = 0;
-    const Result rc = rd_u32(pctlGetServiceSession_Service(), 1206, &len);
+    rc = rd_u32(pctlGetServiceSession_Service(), 1206, &len);
     // The PIN screen opens its own privileged session: ours must be closed.
     pctlExit();
-    if (R_FAILED(rc)) return GateResult_Error;
+    if (R_FAILED(rc)) {
+        *code = rc;
+        return GateResult_Error;
+    }
     if (len == 0) return GateResult_Free;
     const Result shown = pctlauthShowForConfiguration();
     if (R_SUCCEEDED(shown)) return GateResult_Pin;
-    return shown == PCTL_RC_AUTH_CANCELLED ? GateResult_Refused : GateResult_Error;
+    if (shown == PCTL_RC_AUTH_CANCELLED) return GateResult_Refused;
+    *code = shown;
+    return GateResult_Error;
 }
 
 static void log_try(const char *when, GateResult r, const char *nro)
@@ -251,7 +262,8 @@ static void screen_open(Screen *sc, const char *nro, const char *when)
     sc->on = true;
 }
 
-static void screen_show(Screen *sc, GateScreenState state, const char *note, int note_warn)
+// `buttons`: Ⓐ to try again, Ⓑ for the HOME menu (once refused).
+static void screen_show(Screen *sc, GateScreenState state, const char *note, int note_warn, bool buttons)
 {
     if (!sc->on) return;
     static const GateText STATUS[] = { GateText_Asking, GateText_Opening, GateText_Free,  GateText_Refused,
@@ -268,6 +280,7 @@ static void screen_show(Screen *sc, GateScreenState state, const char *note, int
         sc->brand, sc->text, sc->icon, sc->icon_size, sc->name, gate_text(sc->language, STATUS[state]),
         hint == GateText_Count ? NULL : gate_text(sc->language, hint), footer, sc->clock, state, note, note_warn,
         sc->rules, gate_text(sc->language, GateText_Badge),
+        buttons ? gate_text(sc->language, GateText_RetryA) : NULL, buttons ? gate_text(sc->language, GateText_RetryB) : NULL,
     };
     u32 stride = 0;
     uint32_t *px = (uint32_t *)framebufferBegin(&sc->fb, &stride);
@@ -285,18 +298,109 @@ static void screen_close(Screen *sc)
     plExit();
 }
 
-// The console's play timer: on, and today's time used up (or the console
-// restricting play now). False when it cannot be read: the PIN then.
-static bool play_time_used_up(void)
+// The console's play timer: whether it is on, today's time left
+// (nanoseconds, below 0 once past) and whether it restricts play now.
+// False when it cannot be read.
+static bool play_timer(bool *on, s64 *left, bool *restricted)
 {
+    *on = false;
+    *left = 1;
+    *restricted = false;
     if (R_FAILED(pctlInitialize())) return false;
     Service *srv = pctlGetServiceSession_Service();
-    bool on = false, restricted = false;
-    u64 remaining = 1;   // a TimeSpan in nanoseconds, signed: below 0 once past
-    const bool read = R_SUCCEEDED(rd_bool(srv, 1453, &on)) && R_SUCCEEDED(rd_u64(srv, 1454, &remaining));
-    if (read && on) rd_bool(srv, 1455, &restricted);
+    u64 remaining = 1;   // a TimeSpan in nanoseconds, signed
+    const bool read = R_SUCCEEDED(rd_bool(srv, 1453, on)) && R_SUCCEEDED(rd_u64(srv, 1454, &remaining));
+    if (read && *on) rd_bool(srv, 1455, restricted);
     pctlExit();
-    return read && on && ((s64)remaining <= 0 || restricted);
+    *left = (s64)remaining;
+    return read;
+}
+
+// The play timer on, and today's time used up (or the console restricting
+// play now). False when it cannot be read: the PIN then.
+static bool play_time_used_up(void)
+{
+    bool on, restricted;
+    s64 left;
+    return play_timer(&on, &left, &restricted) && on && (left <= 0 || restricted);
+}
+
+// "Play time left today: 45 min", or "" when the timer is off or past.
+static void time_left_note(int language, char *out, size_t size)
+{
+    out[0] = '\0';
+    bool on, restricted;
+    s64 left;
+    if (!play_timer(&on, &left, &restricted) || !on || restricted || left <= 0) return;
+    char d[64];
+    const uint64_t minutes = ((uint64_t)left + 59999999999ULL) / 60000000000ULL;
+    if (gate_minutes_text(minutes, gate_text(language, GateText_Minutes), gate_text(language, GateText_HoursMinutes), d,
+                          sizeof(d)))
+        snprintf(out, size, gate_text(language, GateText_TimeLeft), d);
+}
+
+// "It asks again at 21:18 (in 12 min).": when the pause ends, from `now`.
+static void paused_note(int language, uint64_t until, uint64_t now, char *out, size_t size)
+{
+    char at[16], in[64], both[96];
+    clock_of(until, at, sizeof(at));
+    snprintf(in, sizeof(in), gate_text(language, GateText_InMinutes), (int)((until - now + 59) / 60));
+    snprintf(both, sizeof(both), "%s (%s)", at, in);
+    snprintf(out, size, gate_text(language, GateText_PausedUntil), both);
+}
+
+// ---------------------------------------------------------------- the watchdog
+
+// Should the gate stop on its way to the homebrew (a screen that never
+// comes back, as the single buffer did), the console would stay on it with
+// no way out but HOME: past WATCHDOG_NS without news, the gate ends,
+// back to the HOME menu. Not while the system's PIN screen is open.
+#define WATCHDOG_NS 10000000000ULL
+static UEvent g_watch_done;
+static volatile u64 g_watch_deadline;   // system ticks; 0: not watching
+
+static void watch_kick(void)
+{
+    g_watch_deadline = armGetSystemTick() + armNsToTicks(WATCHDOG_NS);
+}
+
+static void watch_pause(void)
+{
+    g_watch_deadline = 0;
+}
+
+static void watchdog(void *arg)
+{
+    (void)arg;
+    while (R_FAILED(waitSingle(waiterForUEvent(&g_watch_done), 500000000ULL))) {
+        const u64 deadline = g_watch_deadline;
+        if (deadline && armGetSystemTick() > deadline) svcExitProcess();
+    }
+}
+
+// ---------------------------------------------------------------- once refused
+
+// How long the refused screen waits for Ⓐ or Ⓑ before the HOME menu.
+#define RETRY_WAIT_NS 15000000000ULL
+
+// Ⓐ: try again (true); Ⓑ, +, or nothing for a while: the HOME menu.
+static bool wants_retry(void)
+{
+    PadState pad;
+    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+    padInitializeDefault(&pad);
+    padUpdate(&pad);   // what is held from the PIN screen is not a press
+    const u64 start = armGetSystemTick();
+    while (appletMainLoop()) {
+        watch_kick();
+        padUpdate(&pad);
+        const u64 down = padGetButtonsDown(&pad);
+        if (down & HidNpadButton_A) return true;
+        if (down & (HidNpadButton_B | HidNpadButton_Plus)) return false;
+        if (armTicksToNs(armGetSystemTick() - start) > RETRY_WAIT_NS) return false;
+        svcSleepThread(16000000ULL);
+    }
+    return false;
 }
 
 bool gate_nx_run(void)
@@ -309,9 +413,13 @@ bool gate_nx_run(void)
 
     int wday = -1, minute = -1;
     char when[32] = "?";
-    const bool timed = local_time(&wday, &minute, when, sizeof(when));
+    bool timed = local_time(&wday, &minute, when, sizeof(when));
     Screen sc;
     screen_open(&sc, nro, when);
+    ueventCreate(&g_watch_done, false);
+    Thread watch;
+    const bool watching = R_SUCCEEDED(threadCreate(&watch, watchdog, NULL, NULL, 0x2000, 0x2C, -2)) &&
+                          R_SUCCEEDED(threadStart(&watch));
     // The rules: those the forwarder carries (its RomFS, on the console's
     // storage). One made before carries none: no free hours then (the SD
     // card's file is not trusted), its closed hours and its pause from the
@@ -334,68 +442,107 @@ bool gate_nx_run(void)
         closed_n = 1;
     }
     sc.rules = (free_n ? GATE_RULE_FREE : 0u) | (closed_n ? GATE_RULE_CLOSED : 0u) | (rules.limit ? GATE_RULE_LIMIT : 0u);
-    u64 now = 0;
-    const bool clocked = R_SUCCEEDED(timeGetCurrentTime(TimeType_LocalSystemClock, &now));
-    const size_t pause_len = pause_read();
-    uint64_t until = 0;
-    gate_pause_find(pause_text, pause_len, nro, NULL, &until);
-    // The day's refusals so far ("2026-10-20 21:03": its day), and when it
-    // starts without the PIN: said while it asks.
-    char day[11] = "";
-    if (timed) snprintf(day, sizeof(day), "%.10s", when);
-    const int refused = timed ? refused_on(nro, day) : 0;
-    char note[256] = "", span[256];
     const char *days = gate_text(sc.language, GateText_Days);
-    if (refused > 0) snprintf(note, sizeof(note), gate_text(sc.language, GateText_Tried), refused);
-    else if (free_n && gate_spans_text(free_spans, free_n, days, span, sizeof(span)))
-        snprintf(note, sizeof(note), gate_text(sc.language, GateText_FreeHours), span);
-    GateResult r;
-    // Its hours without any access first (the PIN changes nothing then),
-    // then the day's time used up, then a pause after refusals, then its
-    // free hours; else the PIN.
-    if (timed && gate_spans_hold(closed_spans, closed_n, wday, minute)) {
-        r = GateResult_Closed;
+    GateResult r = GateResult_Error;
+    char note[256] = "", span[256];
+    bool shown = false;   // how it went already on the screen (refused, Ⓐ not pressed)
+    // Each try; once refused, Ⓐ tries again (until a pause starts).
+    for (bool first = true;; first = false) {
+        if (!first) timed = local_time(&wday, &minute, when, sizeof(when));
+        u64 now = 0;
+        const bool clocked = R_SUCCEEDED(timeGetCurrentTime(TimeType_LocalSystemClock, &now));
+        const size_t pause_len = pause_read();
+        uint64_t until = 0;
+        gate_pause_find(pause_text, pause_len, nro, NULL, &until);
+        // The day's refusals so far ("2026-10-20 21:03": its day), else when
+        // it starts without the PIN, else the day's play time left: said
+        // while it asks.
+        char day[11] = "";
+        if (timed) snprintf(day, sizeof(day), "%.10s", when);
+        const int refused = timed ? refused_on(nro, day) : 0;
         note[0] = '\0';
-        if (gate_spans_text(closed_spans, closed_n, days, span, sizeof(span)))
-            snprintf(note, sizeof(note), gate_text(sc.language, GateText_ClosedHours), span);
-    } else if (rules.limit && play_time_used_up()) {
-        r = GateResult_Limit;
-    } else if (clocked && until > now) {
-        r = GateResult_Paused;
-        char at[16];
-        clock_of(until, at, sizeof(at));
-        snprintf(note, sizeof(note), gate_text(sc.language, GateText_PausedUntil), at);
-    } else if (timed && gate_spans_hold(free_spans, free_n, wday, minute)) {
-        r = GateResult_Free;
-    } else {
-        screen_show(&sc, GateScreen_Asking, note, refused > 0);
-        r = ask_pin();
-    }
-    log_try(when, r, nro);
-    if (clocked) pause_write(pause_len, nro, r, now, pause_rule);
-    // Refused: the day's count with this one, or the pause it starts now.
-    if (r == GateResult_Refused) {
-        uint64_t next_until = 0;
-        static char after[GATE_PAUSE_MAX];
-        const size_t n =
-            clocked ? gate_pause_update_with(pause_text, pause_len, nro, r, now, pause_rule, after, sizeof(after)) : 0;
-        if (n && gate_pause_find(after, n, nro, NULL, &next_until) && next_until > now) {
-            char at[16];
-            clock_of(next_until, at, sizeof(at));
-            snprintf(note, sizeof(note), gate_text(sc.language, GateText_PausedUntil), at);
-        } else if (timed) {
-            snprintf(note, sizeof(note), gate_text(sc.language, GateText_Tried), refused + 1);
+        if (refused > 0) snprintf(note, sizeof(note), gate_text(sc.language, GateText_Tried), refused);
+        else if (free_n && gate_spans_text(free_spans, free_n, days, span, sizeof(span)))
+            snprintf(note, sizeof(note), gate_text(sc.language, GateText_FreeHours), span);
+        else if (rules.limit)
+            time_left_note(sc.language, note, sizeof(note));
+        Result code = 0;
+        // Its hours without any access first (the PIN changes nothing then),
+        // then the day's time used up, then a pause after refusals, then its
+        // free hours; else the PIN.
+        if (timed && gate_spans_hold(closed_spans, closed_n, wday, minute)) {
+            r = GateResult_Closed;
+            note[0] = '\0';
+            if (gate_spans_text(closed_spans, closed_n, days, span, sizeof(span)))
+                snprintf(note, sizeof(note), gate_text(sc.language, GateText_ClosedHours), span);
+        } else if (rules.limit && play_time_used_up()) {
+            r = GateResult_Limit;
+        } else if (clocked && until > now) {
+            r = GateResult_Paused;
+            paused_note(sc.language, until, now, note, sizeof(note));
+        } else if (timed && gate_spans_hold(free_spans, free_n, wday, minute)) {
+            r = GateResult_Free;
+        } else {
+            watch_kick();
+            screen_show(&sc, GateScreen_Asking, note, refused > 0, false);
+            watch_pause();
+            r = ask_pin(&code);
         }
+        watch_kick();
+        log_try(when, r, nro);
+        if (clocked) pause_write(pause_len, nro, r, now, pause_rule);
+        // How it went, said under it: paused or closed, as above.
+        if (r != GateResult_Paused && r != GateResult_Closed) note[0] = '\0';
+        if (r == GateResult_Refused) {
+            // The day's count with this one, or the pause it starts now.
+            uint64_t next_until = 0;
+            static char after[GATE_PAUSE_MAX];
+            const size_t n =
+                clocked ? gate_pause_update_with(pause_text, pause_len, nro, r, now, pause_rule, after, sizeof(after)) : 0;
+            if (n && gate_pause_find(after, n, nro, NULL, &next_until) && next_until > now) {
+                paused_note(sc.language, next_until, now, note, sizeof(note));
+                break;   // paused: no trying again
+            }
+            if (timed) snprintf(note, sizeof(note), gate_text(sc.language, GateText_Tried), refused + 1);
+            if (sc.on) {
+                screen_show(&sc, GateScreen_Refused, note, 1, true);
+                if (wants_retry()) continue;
+                shown = true;
+            }
+            break;
+        }
+        if (r == GateResult_Free && timed) {
+            const int end = gate_spans_until(free_spans, free_n, wday, minute);
+            if (end >= 0) {
+                char at[16];
+                snprintf(at, sizeof(at), "%02u:%02u", (unsigned)end / 60u, (unsigned)end % 60u);
+                snprintf(note, sizeof(note), gate_text(sc.language, GateText_FreeUntil), at);
+            }
+        } else if (r == GateResult_Pin && rules.limit) {
+            time_left_note(sc.language, note, sizeof(note));
+        } else if (r == GateResult_Error && code) {
+            char c[16];
+            if (gate_error_code((uint32_t)code, c, sizeof(c)))
+                snprintf(note, sizeof(note), gate_text(sc.language, GateText_ErrorCode), c);
+        }
+        break;
     }
-    // How it went, a moment: longer when it does not start.
+    // How it went, a moment: shorter when it starts (the homebrew waits),
+    // longer when it does not. Once refused, the screen above was it.
     static const GateScreenState SHOWN[] = { GateScreen_Opening, GateScreen_Free,   GateScreen_Refused, GateScreen_Error,
                                              GateScreen_Paused,  GateScreen_Closed, GateScreen_Limit };
-    const bool noted = r == GateResult_Refused || r == GateResult_Paused || r == GateResult_Closed;
-    screen_show(&sc, SHOWN[r], noted ? note : NULL, 1);
-    if (sc.on) svcSleepThread(r == GateResult_Pin || r == GateResult_Free ? 700000000ULL : 2500000000ULL);
+    const bool opens = r == GateResult_Pin || r == GateResult_Free;
+    if (sc.on && !shown) {
+        screen_show(&sc, SHOWN[r], note[0] ? note : NULL, !opens, false);
+        svcSleepThread(opens ? 250000000ULL : 2500000000ULL);
+    }
     screen_close(&sc);
-    if ((r == GateResult_Pin || r == GateResult_Free) && envHasNextLoad() && R_SUCCEEDED(envSetNextLoad(nro, argv)))
-        return true;
+    if (watching) {
+        ueventSignal(&g_watch_done);
+        threadWaitForExit(&watch);
+        threadClose(&watch);
+    }
+    if (opens && envHasNextLoad() && R_SUCCEEDED(envSetNextLoad(nro, argv))) return true;
     __nx_applet_exit_mode = 1;
     return true;
 }

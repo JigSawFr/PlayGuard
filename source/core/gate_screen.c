@@ -459,7 +459,9 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
         fill_rrect(&cv, ix, iy, isz, isz, 32, NAVY, 1);
         mark(&cv, ix + isz / 2, iy + isz / 2, 86);
     }
-    stroke_rrect(&cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 2, WHITE, 0.08f);
+    // Its frame: the state's colour once it is known, how it went at a glance.
+    if (s->state == GateScreen_Asking) stroke_rrect(&cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 2, WHITE, 0.08f);
+    else stroke_rrect(&cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 4, accent, 0.85f);
 
     // The text, left of the dial's minutes.
     const float tx = 400, right = 940;
@@ -502,9 +504,24 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
         text(&cv, s->text_font, 24, tx + 22, y, s->note, tone, 1, right - tx - 22);
     }
 
-    // The footer: a hairline, PlayGuard's tagline and site.
+    // The footer: a hairline, PlayGuard's tagline; its site, or the buttons
+    // (each a light disc with its letter, then its label, from the right).
     for (int x = 64; x < w - 64; x++) blend(&cv, x, h - 82, WHITE, 0.08f);
-    text(&cv, s->text_font, 24, 64, (float)h - 40, s->footer, TEXT3, 1, (float)w - 480);
-    static const char SITE[] = "playguard.link";
-    text(&cv, s->brand_font, 24, (float)w - 64 - measure(s->brand_font, 24, SITE), (float)h - 40, SITE, TEXT3, 1, 0);
+    float left = (float)w - 64;
+    if (s->button_a && *s->button_a && s->button_b && *s->button_b) {
+        const char *const keys[2] = { "B", "A" }, *const labels[2] = { s->button_b, s->button_a };
+        for (int i = 0; i < 2; i++) {
+            left -= measure(s->text_font, 24, labels[i]);
+            text(&cv, s->text_font, 24, left, (float)h - 40, labels[i], TEXT2, 1, 0);
+            left -= 10 + 30;
+            fill_circle(&cv, left + 15, (float)h - 48, 15, TEXT, 1);
+            text(&cv, s->brand_font, 20, left + 15 - measure(s->brand_font, 20, keys[i]) / 2, (float)h - 41, keys[i], NAVY, 1, 0);
+            left -= 28;
+        }
+    } else {
+        static const char SITE[] = "playguard.link";
+        left -= measure(s->brand_font, 24, SITE);
+        text(&cv, s->brand_font, 24, left, (float)h - 40, SITE, TEXT3, 1, 0);
+    }
+    text(&cv, s->text_font, 24, 64, (float)h - 40, s->footer, TEXT3, 1, left - 64 - 32);
 }

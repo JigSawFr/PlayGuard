@@ -31,6 +31,14 @@ typedef enum {
     GateText_Limit,        // the day's play time used up (GateRules.limit)
     GateText_LimitHint,
     GateText_Badge,        // "Protected by PlayGuard"
+    GateText_RetryA,       // Ⓐ's label once refused: "Try again"
+    GateText_RetryB,       // Ⓑ's: "HOME menu"
+    GateText_TimeLeft,     // "Play time left today: %s" (printf: GateText_Minutes's)
+    GateText_Minutes,      // "%d min" (printf: an int)
+    GateText_HoursMinutes, // "%d h %02d min" (printf: two ints)
+    GateText_FreeUntil,    // "Without the PIN until %s." (printf: "20:00")
+    GateText_InMinutes,    // "in %d min" (printf: an int), after the time a pause ends
+    GateText_ErrorCode,    // "Error code: %s" (printf: "2054-0012")
     GateText_Count,
 } GateText;
 

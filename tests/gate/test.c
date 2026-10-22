@@ -282,8 +282,30 @@ static void test_carried(void)
           strcmp(text, "Mon\xE2\x80\x93" "Fri 16:00\xE2\x80\x93" "19:00, Sat\xE2\x80\x93" "Sun 09:00\xE2\x80\x93" "20:00") == 0);
 }
 
+// When the free span holding now ends; minutes as text; a Result as an error code.
+static void test_until(void)
+{
+    const GateHours spans[2] = { { 0x3E, 960, 1140 }, { 0x41, 1260, 420 } };   // weekdays 16-19, weekend 21-07
+    CHECK(gate_spans_until(spans, 2, 3, 1000) == 1140);
+    CHECK(gate_spans_until(spans, 2, 6, 1300) == 420);    // Saturday evening: the next morning
+    CHECK(gate_spans_until(spans, 2, 0, 100) == 420);     // Sunday, past midnight
+    CHECK(gate_spans_until(spans, 2, 3, 600) == -1);
+    CHECK(gate_spans_until(spans, 0, 3, 1000) == -1);
+    const GateHours late = { 0x7F, 1200, 1440 };
+    CHECK(gate_spans_until(&late, 1, 2, 1300) == 0);     // to midnight
+    char t[32];
+    CHECK(gate_minutes_text(45, "%d min", "%d h %02d min", t, sizeof(t)) && strcmp(t, "45 min") == 0);
+    CHECK(gate_minutes_text(65, "%d min", "%d h %02d min", t, sizeof(t)) && strcmp(t, "1 h 05 min") == 0);
+    CHECK(gate_minutes_text(0, "%d min", "%d h %02d min", t, sizeof(t)) && strcmp(t, "0 min") == 0);
+    CHECK(gate_minutes_text(65, "%d min", "%d h %02d min", t, 4) == 0 && t[0] == '\0');
+    CHECK(gate_error_code(168u | (12u << 9), t, sizeof(t)) && strcmp(t, "2168-0012") == 0);
+    CHECK(gate_error_code(0, t, sizeof(t)) && strcmp(t, "2000-0000") == 0);
+    CHECK(gate_error_code(1, t, 5) == 0);
+}
+
 int main(void)
 {
+    test_until();
     test_carried();
     test_pause();
     test_counts();
