@@ -81,6 +81,10 @@ Its gate (`config/playguard/gate-….nro`) is no longer the file the forwarder w
 
 Before any PlayGuard screen, with no error code (Atmosphère's report in `atmosphere/crash_reports/` names the `forwarder` module, result `2000-0000`): it was made by a PlayGuard whose gate was built without its assets, which the forwarder's loader refused. Update PlayGuard, then make it again: the bell and *Console › Forwarders* offer it for every forwarder made with an older loader.
 
+### A protected forwarder stays on its gate's screen after the PIN
+
+The PIN accepted, the screen with the homebrew's icon stays and nothing more happens: its gate drew that screen with a single buffer, and waited for ever to draw the next one. Update PlayGuard, then make it again: the bell and *Console › Forwarders* offer it for every forwarder made with an older gate.
+
 ### A forwarder shows "The software could not be started"
 
 The console refused to start it: a signature check is still in place. In the order to look:

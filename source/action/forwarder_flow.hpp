@@ -38,7 +38,8 @@ bool loader_present();
 std::string loader_id();
 
 // Forwarders made with another loader than this build's (or before it was
-// kept: forwarders_logic::stale_loader), still on the HOME menu; made again
+// kept: forwarders_logic::stale_loader), or protected with another gate
+// (forwarders_logic::stale_gate), still on the HOME menu; made again
 // (confirmed first, and their patches checked) by refresh.
 std::vector<forwarders_logic::Row> to_refresh();
 void refresh(std::function<void(bool)> done);
