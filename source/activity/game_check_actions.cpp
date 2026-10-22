@@ -163,6 +163,20 @@ void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
     });
 }
 
+static constexpr int OPEN_MS = 300;   // remove_games()' dialog opening, before the first game
+
+// What remove_games() shares with its dialog (main thread only).
+struct GameCheckActivity::Removal
+{
+    std::vector<GameFacts> games;
+    std::string path;   // their list, saved first
+    bool cancel = false;
+    bool open = true;   // the dialog is on screen
+    brls::Dialog* dialog = nullptr;
+    // Its heading "Removing the games… 3 of 32", its title the game's name.
+    cadran::Progress body;
+};
+
 void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
 {
     if (games.empty() || this->removing) return;
@@ -185,29 +199,69 @@ void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
                 return;
             }
             this->removing = true;
-            this->remove_next(games, 0, 0, path);
+            auto removal = std::make_shared<Removal>();
+            removal->games = games;
+            removal->path = path;
+            removal->body = cadran::progress_body("", "");
+            removal->dialog = new brls::Dialog(removal->body.box);
+            ui::add_cancel(removal->dialog, [removal]() {
+                removal->cancel = true;
+                removal->open = false;   // the dialog closes itself
+            });
+            removal->dialog->open();
+            this->remove_next(removal, 0, 0);
         });
     };
     if (asked) now();
     else ui::confirm_danger(body, "playguard/games/remove"_i18n, now);
 }
 
-// One game a frame, the count above the list in between.
-void GameCheckActivity::remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path)
+// One game a frame, in a dialog of its own: the game under way (icon, name),
+// its place in the batch, the bar, and Cancel (B too), which stops after the
+// game being removed.
+void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at, u32 removed)
 {
-    if (at == games.size()) {
+    const std::vector<GameFacts>& games = removal->games;
+    const size_t total = games.size();
+    if (at == total || removal->cancel) {
         this->removing = false;
-        const u32 total = (u32)games.size();
-        if (removed == total) ui::notify(brls::getStr("playguard/games/removed_all", (int)removed, path));
-        else ui::error(brls::getStr("playguard/games/removed_some", (int)removed, (int)total, path));
+        const std::string path = removal->path;
+        auto report = [removed, total, path]() {
+            if (removed == total) ui::notify(brls::getStr("playguard/games/removed_all", (int)removed, path));
+            else ui::error(brls::getStr("playguard/games/removed_some", (int)removed, (int)total, path));
+        };
+        if (removal->open) {
+            removal->open = false;
+            removal->dialog->close(report);
+        } else {
+            report();
+        }
         this->refresh(false, 0);
         return;
     }
-    this->status_text(brls::getStr("playguard/games/removing", (int)at + 1, (int)games.size()));
+    const GameFacts& g = games[at];
+    const std::vector<unsigned char> icon = icon_of(g.app_id);
+    if (!icon.empty()) removal->body.image->setImageFromMem(icon.data(), (int)icon.size());
+    ui::set_visible(removal->body.image, !icon.empty());
+    removal->body.heading->setText(brls::getStr("playguard/games/removing", (int)at + 1, (int)total));
+    removal->body.title->setText(game_name(g));
+    removal->body.show((float)at / (float)total, "");
+    // On the UI thread, as the PIN it may ask for: the first game once the
+    // dialog is fully on screen, each next one a frame later.
     std::weak_ptr<bool> weak = this->alive;
-    brls::sync([this, weak, games, at, removed, path]() {
-        if (weak.expired()) return;
-        const GameFacts& g = games[at];
+    auto step = [this, weak, removal, at, removed]() {
+        if (weak.expired()) {
+            if (removal->open) {
+                removal->open = false;
+                removal->dialog->close();
+            }
+            return;
+        }
+        if (removal->cancel) {
+            this->remove_next(removal, at, removed);
+            return;
+        }
+        const GameFacts& g = removal->games[at];
         const Result rc = gamecheck_remove(g.app_id);
         u32 done = removed;
         if (R_SUCCEEDED(rc)) {
@@ -216,8 +270,10 @@ void GameCheckActivity::remove_next(std::vector<GameFacts> games, size_t at, u32
         } else {
             brls::Logger::warning("games: {} not removed ({})", id_text(g.app_id), ui::rc_text(rc));
         }
-        this->remove_next(games, at + 1, done, path);
-    });
+        this->remove_next(removal, at + 1, done);
+    };
+    if (at) brls::sync(step);
+    else brls::delay(OPEN_MS, step);
 }
 
 void GameCheckActivity::toggle(u64 id)

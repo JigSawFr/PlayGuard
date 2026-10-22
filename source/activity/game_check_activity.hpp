@@ -126,7 +126,9 @@ class GameCheckActivity : public brls::Activity
     void save_list(const std::vector<GameFacts>& games,
                    std::function<void(const std::string& path, const std::string& error)> done) const;
     void remove_games(std::vector<GameFacts> games, bool asked = false);
-    void remove_next(std::vector<GameFacts> games, size_t at, u32 removed, std::string path);
+    // remove_games()' dialog: the game under way, the bar, and Cancel.
+    struct Removal;
+    void remove_next(std::shared_ptr<Removal> removal, size_t at, u32 removed);
     // Ⓨ on a game; the actions on the games picked.
     void toggle(u64 id);
     void selection_menu();
