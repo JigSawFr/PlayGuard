@@ -57,6 +57,7 @@
  "install_3": "Abra-o por cima de um jogo, com o usuário de um responsável.",
  "tab_store": "Loja de apps",
  "tab_manual": "Manualmente (.zip)",
+ "store_pending": "Ainda não disponível: a ficha do PlayGuard ainda aguarda aprovação. Por enquanto, instale-o manualmente.",
  "start_title": "Primeiros passos",
  "start_1": "Abra o PlayGuard: o guia \"{{app:onboarding/title}}\" define o PIN e o limite diário.",
  "start_2": "Ainda vinculado ao app do celular? \"{{app:tabs/security}} › {{app:pairing/unlink}}\", senão a próxima sincronização dele substitui o que você definiu.",
