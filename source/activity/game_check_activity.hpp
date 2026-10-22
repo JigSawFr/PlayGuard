@@ -93,7 +93,10 @@ class GameCheckActivity : public brls::Activity
     // A list or covers: every section's games built again, next frame, the
     // game with the focus keeping it.
     void switch_view();
-    void set_view_hint();   // Ⓡ says what it switches to (registered once, in onContentAvailable)
+    void set_view_hint();   // Ⓡ says what it switches to
+    // Ⓡ registered, or not while no game is listed (nothing to show as covers).
+    void show_view_action(bool shown);
+    brls::ActionIdentifier view_action = 0;
     // The views of the games are deleted when rebuilt, and borealis keeps a
     // pointer to the one with the focus: the focus waits on the status line
     // meanwhile (focusable only then), and leaves it in show().
