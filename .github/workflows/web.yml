@@ -150,8 +150,30 @@ jobs:
       # Japanese, Korean and Chinese in the simulator: a CJK font cut out of
       # Noto Sans CJK with fontTools (tools/web_cjk_font.py); the website's
       # documentation is Markdown (tools/build_site.py).
+      # The packages as downloaded by main's last build (68 MB, the CJK font
+      # 61 MB of it): an Ubuntu mirror served them at 78 kB/s once, 14 minutes
+      # of the run (2026-10-22). apt takes them from there and fetches only
+      # what moved since; main's builds save them (build.yml says why only
+      # main's).
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .apt-archives
+          key: apt-web-${{ github.sha }}
+          restore-keys: apt-web-
       - name: Noto Sans CJK, fontTools and Python-Markdown
-        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
+        run: |
+          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives -o Dpkg::Options::=--force-unsafe-io"
+          mkdir -p .apt-archives/partial
+          sudo apt-get update -q
+          sudo apt-get install $archives -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
+          sudo apt-get autoclean $archives > /dev/null
+          sudo chown -R "$USER" .apt-archives
+          rm -f .apt-archives/lock
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: .apt-archives
+          key: apt-web-${{ github.sha }}
       - name: The simulator
         if: env.BUILD_SIMULATOR == '1'
         env:
