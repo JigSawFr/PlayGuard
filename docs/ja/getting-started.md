@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
+<!-- translated from docs/getting-started.md, sha256 db71c88bd2a7 -->
 # はじめに
 
 SD カードから、子どものために設定した本体まで、約 10 分で進めます。そのあとは、ふだんの操作です。トップページは [README](../../README.md)。
@@ -13,7 +13,7 @@ SD カードから、子どものために設定した本体まで、約 10 分�
 
 ## 1. インストールする
 
-Homebrew App Store か sphaira で *PlayGuard* を検索するか、[最新リリース](https://github.com/JigSawFr/PlayGuard/releases/latest)の `playguard.zip` を SD カードのルートに展開します（[インストール](install.md)）。
+[最新リリース](https://github.com/JigSawFr/PlayGuard/releases/latest)の `playguard.zip` を SD カードのルートに展開します（[インストール](install.md)）。PlayGuard はまだ Homebrew App Store にも sphaira にもありません。掲載はまだ承認待ちです。
 
 > [!TIP]
 > オプションのリカバリー sysmodule、`playguard-rescue.zip` も展開しておいてください。必要になるまで何もしません。上限 0 分ですべてがブロックされ、暗証番号も忘れたときに、本体に戻れる唯一の方法です（[ロックされて入れない？](troubleshooting.md#ロックされて入れない)）。

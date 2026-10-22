@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 5b0b1b94198f -->
+<!-- translated from docs/troubleshooting.md, sha256 dfba216fecfa -->
 # Solución de problemas
 
 Recuperar el acceso a una consola bloqueada, los problemas frecuentes, reportar un error y el modo desarrollador. Volver al [README](../../README.md).
@@ -78,6 +78,23 @@ La consola ejecuta un firmware más reciente que el más reciente probado: PlayG
 
 Su puerta (`config/playguard/gate-….nro`) ya no es el archivo con el que se creó el forwarder: se modificó o se reemplazó en la tarjeta SD, así que el forwarder no la inicia. Abra PlayGuard desde su propio forwarder: vuelve a escribir la puerta al iniciarse; *Consola › Forwarders › Reinstalar todos* vuelve a crear todos los forwarders con ella.
 
+### Un forwarder protegido se cierra de inmediato (“Se produjo un error”)
+
+Antes de cualquier pantalla de PlayGuard, sin código de error (el informe de Atmosphère en `atmosphere/crash_reports/` nombra el módulo `forwarder`, resultado `2000-0000`): lo creó un PlayGuard cuya puerta se compiló sin sus recursos, que el cargador del forwarder rechazó. Actualice PlayGuard y luego vuelva a crearlo: la campana y *Consola › Forwarders* lo ofrecen para cada forwarder creado con un cargador anterior.
+
+### Un forwarder protegido se queda en la pantalla de su puerta después del PIN
+
+El PIN se acepta, la pantalla con el ícono del homebrew se queda y no pasa nada más: su puerta dibujó esa pantalla con un solo búfer y esperó indefinidamente para dibujar la siguiente. Actualice PlayGuard y luego vuelva a crearlo: la campana y *Consola › Forwarders* lo ofrecen para cada forwarder creado con una puerta anterior.
+
+### Un forwarder muestra “No se pudo iniciar el software”
+
+La consola se negó a iniciarlo: todavía hay una verificación de firma. En este orden, revise:
+
+- **Archivos de sigpatches junto a sys-patch.** Archivos `.ips` en `atmosphere/kip_patches/fs_patches`, `loader_patches` o `atmosphere/exefs_patches/es_patches` mientras sys-patch está activo: dos herramientas que parchean las mismas verificaciones, la causa que más mencionan los hilos de sys-patch y de sigpatches en GBAtemp. *Consola › Parches de juegos* lo advierte, y Ⓐ ahí los aparta (los mueve a `config/playguard/sigpatches-aside/`, nunca los elimina; el `bootloader/patches.ini` de hekate se queda). Reinicie la consola.
+- **Un patrón que sys-patch no aplicó.** Los forwarders necesitan sus parches de fs y de loader, todos los patrones que tiene para este firmware (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), no solo uno por módulo. *Información › Ayuda y diagnóstico › Exportar un informe de diagnóstico* indica, en su línea `game patches`, la versión de sys-patch y cada patrón omitido; `sd:/config/sys-patch/log.ini` contiene lo mismo. Verifique que `config/sys-patch/config.ini` parchee este sistema (`patch_emummc=1` en la emuMMC) y no desactive ninguno; el propio responsable de sys-patch dice que 23.0.x no necesita un sys-patch más reciente que el 1.6.2.3.
+- **No se reinició desde que cambiaron los parches.** sys-patch parchea al arrancar.
+- **Un forwarder creado por un PlayGuard anterior.** La campana y *Consola › Forwarders* ofrecen volver a crear los que se crearon con un cargador anterior.
+
 ### La campana o una pestaña muestra una insignia ámbar
 
 Algo requiere su atención: Ⓨ abre la lista, y Ⓐ en una entrada aplica la solución o abre donde se hace ([notificaciones](features.md#notificaciones--lo-que-requiere-su-atención-desde-cualquier-pestaña)).
@@ -86,7 +103,7 @@ Algo requiere su atención: Ⓨ abre la lista, y Ⓐ en una entrada aplica la so
 
 Un error muestra el código del sistema (por ejemplo, `0x0001088E`) con lo que se sabe de él: qué hacer, para los códigos cuyo significado está documentado; si no, un informe ayuda.
 
-1. *Información › Ayuda y diagnóstico › Exportar un informe de diagnóstico* guarda un archivo de texto en `sd:/config/playguard/logs/reports/`: firmware, versión de Atmosphère, cuánto tardó el inicio y cuánto tardaron las pantallas lentas (el historial de cambios, *Todos los juegos*, la comprobación de los juegos instalados, las pestañas que se actualizan solas), relojes, almacenamiento, estado del ocultamiento del número de serie y de los parches de juegos, el resultado sin procesar de cada consulta al control parental, y los registros: cómo terminó la última sesión, la memoria y el espacio libre en la tarjeta SD, los archivos de fallo más recientes y las últimas 80 líneas registradas. **Nunca contiene el PIN ni el número de serie.**
+1. *Información › Ayuda y diagnóstico › Exportar un informe de diagnóstico* guarda un archivo de texto en `sd:/config/playguard/logs/reports/`: firmware, versión de Atmosphère, cuánto tardó el inicio y cuánto tardaron las pantallas lentas (el historial de cambios, *Todos los juegos*, la comprobación de los juegos instalados, las pestañas que se actualizan solas), relojes, almacenamiento, estado del ocultamiento del número de serie y de los parches de juegos, lo que hace la redirección DNS de Atmosphère con los servidores de control parental y de hora de Nintendo (leído de su archivo hosts en la tarjeta SD, no una prueba de red, con el final del propio `atmosphere/logs/dns_mitm_startup.log` de Atmosphère), el resultado sin procesar de cada consulta al control parental, y los registros: cómo terminó la última sesión, la memoria y el espacio libre en la tarjeta SD, los archivos de fallo más recientes y las últimas 80 líneas registradas. **Nunca contiene el PIN ni el número de serie.**
 2. [Abra un issue](https://github.com/JigSawFr/PlayGuard/issues/new) y adjúntelo.
 
 ### Enviar un informe en línea
@@ -98,7 +115,7 @@ Con la consola conectada a Internet, *Información › Ayuda y diagnóstico › 
   - los registros de esta sesión y de la anterior (`logs/sessions/`; de uno largo, su comienzo y sus últimos 64 KiB);
   - los archivos de depuración: la referencia del bloque del temporizador de juego, el final del registro del temporizador mientras *Registrar el temporizador de juego* está activado, los últimos 20 cambios del historial de cambios (sin nombres de juegos, cuentas ni perfiles, y solo con su fecha), y la configuración de PlayGuard.
 - **Inicio de sesión:** sin sesión iniciada, PlayGuard ofrece iniciarla primero; *Cuenta de GitHub*, justo debajo una vez iniciada la sesión, la cierra; si GitHub rechaza el gist, PlayGuard ofrece volver a iniciar sesión.
-- **Después:** muestra el enlace y dos códigos QR: el informe, y el formulario de reporte de error con el enlace, sus versiones, cómo se inició PlayGuard (sobre un juego o desde el Álbum; agregue el menú) y el sistema (sysMMC o emuMMC) ya completados. Cada enlace se guarda en `logs/uploads/` como un acceso directo de Internet (`.url`) que una computadora abre en su navegador.
+- **Después:** muestra dos códigos QR, con el enlace debajo del primero y su identificador en grupos de cuatro para leerlo en voz alta o escribirlo: el informe, para quien ya lo esté ayudando, y el formulario de reporte de error con el enlace, sus versiones, cómo se inició PlayGuard (sobre un juego o desde el Álbum; agregue el menú) y el sistema (sysMMC o emuMMC) ya completados, para escanearlo y reportar un error. El enlace también queda en las notificaciones, y cada uno se guarda en `logs/uploads/` como un acceso directo de Internet (`.url`) que una computadora abre en su navegador.
 
 > [!WARNING]
 > Cualquier persona con el enlace puede leer el informe hasta que usted elimine el gist en GitHub, y un reporte de error abierto con él es público: la confirmación lo indica.
@@ -140,20 +157,20 @@ Presione Ⓨ siete veces en *Información › Versión*; las herramientas de des
 
 - una de las 20 últimas versiones (incluidas las preliminares, etiquetadas);
 - uno de los 20 últimos commits de `main`;
-- la compilación más reciente de una pull request abierta desde una rama de este repositorio (nunca desde un fork: su código todavía no se revisó). A en la pestaña de las pull requests, cuando se muestra, las ordena al revés (compilación más reciente primero, o por número).
+- la compilación más reciente de una pull request abierta desde una rama de este repositorio (nunca desde un fork: su código todavía no se revisó). A en la pestaña de las pull requests, cuando se muestra, las ordena al revés (compilación más reciente primero, o por número): la indicación de A dice cuál.
 
-**Cada compilación** muestra su título (el asunto de un commit o de una pull request; el mensaje completo de un commit es su descripción) sobre etiquetas: el tipo de cambio (*Novedad*, *Corrección*, *Docs*…) y su alcance, *Incompatible*, la pull request de la que vino un commit, cómo terminaron sus comprobaciones (*CI OK*, *CI fallida*, *CI en curso*), preliminar, *instalada* o *nueva*; su antigüedad y su commit a la derecha. Una compilación abre primero su página: etiquetas (su tipo, sus comprobaciones, instalada o nueva), una tarjeta de datos (compilación, tamaño, commit, suma de verificación, cuándo la borra GitHub), **Instalar**, **Ver en GitHub** (su página como código QR para un celular), y luego las notas de una versión o la descripción de una pull request, presentadas a partir del Markdown de GitHub (títulos, listas, casillas de tareas, código, citas y alertas, tablas).
+**Cada compilación** muestra su título (el asunto de un commit o de una pull request; el mensaje completo de un commit es su descripción) sobre etiquetas: el tipo de cambio (*Novedad*, *Corrección*, *Docs*…) y su alcance, *Incompatible*, la pull request de la que vino un commit, cómo terminaron sus comprobaciones (*CI OK*, *CI fallida*, *CI en curso*), preliminar, *instalada* o *nueva*; su antigüedad (en minutos, horas y luego días) y su commit a la derecha. Una compilación abre primero su página: etiquetas (su tipo, sus comprobaciones, instalada o nueva), una tarjeta de datos (compilación, tamaño, commit, suma de verificación, cuándo la borra GitHub), **Instalar**, **Ver en GitHub** (su página como código QR para un celular), una advertencia cuando sus comprobaciones todavía están en curso, y luego las notas de una versión o la descripción de una pull request, presentadas a partir del Markdown de GitHub (títulos, listas, casillas de tareas, código, citas y alertas, tablas).
 
 **Lectura segura:** todo lo que viene de GitHub se muestra como texto simple: no se abre ningún enlace, no se ejecuta HTML ni scripts, y se eliminan los caracteres invisibles que podrían disfrazar un título (inversiones de derecha a izquierda, caracteres de ancho cero, caracteres de control, UTF-8 no válido).
 
 **Inicio de sesión.** Las versiones publicadas no necesitan nada; las demás son los artefactos del workflow de compilación, que GitHub solo entrega a usuarios con sesión iniciada. **Cuenta de GitHub** inicia sesión con un código y un código QR para escanear con un celular. Los únicos permisos que se piden son leer los archivos del workflow de compilación (Actions) y crear gists, para *Enviar un informe en línea*; por lo demás, el token solo puede leer lo que es público. Se guarda en `github_token`, nunca se envía con un informe, y *Cuenta de GitHub* cierra la sesión. Con la sesión iniciada, Ⓨ (*Buscar*) acepta el número de una pull request (abierta o cerrada) o un commit (de 7 a 40 dígitos hexadecimales) y encuentra su compilación, solo desde una rama de este repositorio.
 
-**Instalación:** PlayGuard descarga la compilación, la verifica (tamaño, el SHA-256 que registra GitHub, el encabezado NRO), la pone en lugar de su propio `.nro` y se reinicia con ella (antes pide el PIN si hay uno definido).
+**Instalación:** PlayGuard descarga la compilación, la verifica (tamaño, el SHA-256 que registra GitHub, el encabezado NRO), la pone en lugar de su propio `.nro` y se reinicia con ella (antes pide el PIN si hay uno definido). Su ventana indica en qué paso está, el tamaño y la velocidad de la descarga, y qué compilación reemplaza; Cancelar desaparece una vez que la compilación se está poniendo en su lugar.
 
-- La lista se conserva 10 minutos y se muestra de inmediato, con su antigüedad (Ⓧ la vuelve a obtener); mientras se obtiene, una barra muestra el avance.
+- La lista se conserva 10 minutos y se muestra de inmediato, con su antigüedad (Ⓧ la vuelve a obtener, y también la pantalla cada 3 minutos mientras las comprobaciones de una compilación están en curso); mientras se obtiene, una barra muestra el avance.
 - Una descarga interrumpida (se perdió la red) continúa desde donde se detuvo la próxima vez que se instala la misma compilación.
 - Los artefactos vencen a los 90 días.
 
-**Volver atrás.** La compilación reemplazada se conserva (`playguard.nro.previous`): **Volver a la compilación anterior**, en la misma lista, las intercambia de nuevo, después del PIN. Si una compilación instalada desde aquí (o con *Actualizar* desde PlayGuard) falla antes de su primera pantalla, el siguiente inicio de PlayGuard ofrece volver a la compilación anterior en una pantalla de texto simple, antes de cargar cualquier otra cosa (A vuelve atrás, B la inicia de todos modos), sin el PIN, ya que la propia pantalla del PIN podría ser lo que falla. La misma lista permite volver a cualquier versión publicada en cualquier momento.
+**Volver atrás.** La compilación reemplazada se conserva (`playguard.nro.previous`): **Volver a la compilación anterior**, en la misma lista, las intercambia de nuevo, después del PIN; nombra esa compilación por su versión, su pull request y su commit. Si una compilación instalada desde aquí (o con *Actualizar* desde PlayGuard) falla antes de su primera pantalla, el siguiente inicio de PlayGuard ofrece volver a la compilación anterior en una pantalla de texto simple, antes de cargar cualquier otra cosa (A vuelve atrás, B la inicia de todos modos), sin el PIN, ya que la propia pantalla del PIN podría ser lo que falla. La misma lista permite volver a cualquier versión publicada en cualquier momento.
 
 **Qué compilación se ejecuta:** *Información › Versión* muestra el commit en modo desarrollador. El encabezado de cada pantalla muestra la versión en ejecución junto al título: la de una versión publicada en una etiqueta gris (`1.2.0`), la de cualquier otra compilación en una etiqueta ámbar seguida de su commit, para que una compilación de prueba nunca se confunda con la versión publicada.
