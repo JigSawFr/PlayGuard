@@ -176,6 +176,12 @@ void unlisten(int id)
     s_listeners.erase(id);
 }
 
+std::string game_name(const GameStat& g)
+{
+    if (g.name[0]) return g.name;
+    return brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", (unsigned long long)g.app_id));
+}
+
 const std::vector<PlayAccount>& accounts()
 {
     static bool read = false;

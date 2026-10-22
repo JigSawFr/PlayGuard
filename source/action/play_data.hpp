@@ -41,6 +41,9 @@ void unlisten(int id);
 // Calls every listener now, as at the end of a read.
 void notify();
 
+// A game's name, or "Deleted game (<title ID>)" when it has none.
+std::string game_name(const GameStat& g);
+
 // The console's user accounts, read once per run (acc:u0 is quick).
 const std::vector<PlayAccount>& accounts();
 

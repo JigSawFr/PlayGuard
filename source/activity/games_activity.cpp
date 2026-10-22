@@ -36,12 +36,6 @@ constexpr int COLUMNS = (int)((1280 - 2 * 60) / GameTile::WIDTH);
 constexpr size_t ICONS_BEHIND = 12;
 constexpr size_t ICONS_AHEAD = 30;
 
-std::string game_name(const GameStat& g)
-{
-    if (g.name[0]) return g.name;
-    return brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", (unsigned long long)g.app_id));
-}
-
 std::string period_label(int period)
 {
     return brls::getStr(fmt::format("playguard/activity/periods/{}", period));
@@ -357,10 +351,10 @@ void GamesActivity::fill(Entry& e, const GameStat& g) const
 {
     const std::string time = ui::fmt_play_time(activity_summary::value(g, this->period));
     if (e.tile) {
-        e.tile->set_name(game_name(g));
+        e.tile->set_name(play_data::game_name(g));
         e.tile->set_detail(time);
     } else {
-        e.cell->setText(game_name(g));
+        e.cell->setText(play_data::game_name(g));
         e.cell->setDetailText(time);
     }
     const GameStat copy = g;
@@ -395,7 +389,7 @@ void GamesActivity::show_selected(const GameStat* g)
         last->setText("—");
         return;
     }
-    name->setText(game_name(*g));
+    name->setText(play_data::game_name(*g));
     const bool known = this->period == activity_summary::AllTime ? g->totals_ok
                                                                   : this->data && activity_summary::period_read(*this->data, this->period);
     period_value->setText(known ? ui::fmt_play_time(activity_summary::value(*g, this->period)) : na);
