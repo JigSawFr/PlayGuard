@@ -309,6 +309,11 @@ DYNAMIC_KEYS = {
     "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
+    # notices::reason_of: what a row's badge is for, the ids its tab marks
+    # (TabBase::mark(row, { "id", ... })).
+    "notices/short/": [i for f in glob.glob(f"{ROOT}/source/tab/*.cpp")
+                       for ids in re.findall(r'\bmark\([^,;]+,\s*\{([^}]*)\}\)', read(f))
+                       for i in re.findall(r'"(\w+)"', ids)],
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
     values = [v for v in values if v]

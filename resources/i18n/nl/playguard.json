@@ -472,7 +472,7 @@
         "age_value": "Tot {} jaar",
         "sns": "Berichten op sociale media beperken",
         "comm": "Communicatie met anderen beperken",
-        "custom_only": "Kies het niveau \"Aangepast\" om deze instellingen te wijzigen.",
+        "custom_only": "Een ervan wijzigen zet het niveau op \"Aangepast\", uitgaande van deze instellingen.",
         "section_other": "Overig",
         "section_rating": "Leeftijdsclassificatie",
         "vr": "VR-modus beperken",
@@ -505,7 +505,9 @@
         "blocked_title": "{} classificeert ze boven {}",
         "blocked_none": "{}: geen geïnstalleerde game is boven {} geclassificeerd.",
         "blocked_no_age": "Dit niveau beperkt games niet op leeftijd.",
-        "blocked_note": "Uit de laatste controle van de geïnstalleerde games. Een game die de classificatie-instantie niet classificeert, telt niet mee, en ook de uitzonderingen in de app niet."
+        "blocked_note": "Uit de laatste controle van de geïnstalleerde games. Een game die de classificatie-instantie niet classificeert, telt niet mee, en ook de uitzonderingen in de app niet.",
+        "section_level_settings": "Instellingen van dit niveau",
+        "to_custom": "Het beperkingsniveau wordt \"Aangepast\", uitgaande van de instellingen van \"{}\" met deze wijziging:"
     },
     "clock": {
         "section_now": "Klokken",
@@ -1850,7 +1852,19 @@
         "clock_detail_dns": "De DNS van Atmosphère blokkeert de tijdserver van Nintendo, dus de console kan hem niet zelf instellen: stel hem in via een tijdserver.",
         "week_more": "{} per dag meer dan de week ervoor.",
         "week_less": "{} per dag minder dan de week ervoor.",
-        "week_same": "Ongeveer als de week ervoor."
+        "week_same": "Ongeveer als de week ervoor.",
+        "short": {
+            "pin_missing": "Niet ingesteld",
+            "pin_weak": "Makkelijk te raden",
+            "pin_lock_off": "Opent zonder",
+            "alarm_off": "Alarm uit",
+            "clock": "Niet nauwkeurig",
+            "games": "Sommige starten niet",
+            "patches": "Nakijken",
+            "sd_space": "Bijna vol",
+            "backup": "Back-up nodig",
+            "console_lock_long": "Lang geblokkeerd"
+        }
     },
     "cadran": {
         "date": "{1} {2} {3}",
@@ -1894,7 +1908,7 @@
             "ok": "ok",
             "clock_fix": "Nu meten en instellen",
             "clock_fine": "de timer telt goed",
-            "serial_hidden": "Serienummer verborgen",
+            "serial_hidden": "Serienummer afgeschermd",
             "next_time_up": "Als er verder gespeeld wordt, is de tijd om rond {}",
             "next_bedtime": "Bedtijdalarm om {}, over {}",
             "next_bedtime_now": "Bedtijd: weer spelen vanaf {}",
@@ -1936,7 +1950,8 @@
             "steps_count": "{} van {}",
             "tl_bed_first": "bedtijd komt eerst",
             "bed_off_value": "Uit",
-            "bed_set": "Instellen"
+            "bed_set": "Instellen",
+            "fine_pill": "{} controles in orde"
         },
         "pill": {
             "pc_on": "Ouderlijk toezicht actief",
@@ -1972,7 +1987,8 @@
             "over_key": "limiet overschreden",
             "played_day": "{}: {} gespeeld van {}",
             "played_day_free": "{}: {} gespeeld, geen limiet",
-            "bonus": "{}: {} gepland voor die dag"
+            "bonus": "{}: {} gepland voor die dag",
+            "last_week_day": "Vorige {}"
         },
         "activity": {
             "share": "Exporteren of delen",
@@ -1987,7 +2003,8 @@
             "see_all": "Totaal bekijken",
             "trend_up": "+{}/dag t.o.v. vorige week",
             "trend_down": "-{}/dag t.o.v. vorige week",
-            "trend_same": "zoals vorige week"
+            "trend_same": "zoals vorige week",
+            "grew": "+{} t.o.v. vorige week"
         },
         "restrictions": {
             "choose": "Dit niveau kiezen",
@@ -1999,7 +2016,9 @@
             "none": "software voor elke leeftijd, sociale media en communicatie toegestaan",
             "to_settings": "De instellingen",
             "games": "Geblokkeerde games",
-            "games_none": "geen"
+            "games_none": "geen",
+            "current": "Huidig",
+            "allowed": "Toegestaan"
         },
         "clock": {
             "console": "Console",

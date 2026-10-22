@@ -472,7 +472,7 @@
         "age_value": "{}歲以下",
         "sns": "限制在社群網站上發文",
         "comm": "限制與他人交流",
-        "custom_only": "若要變更這些設定，請選擇「自訂」等級。",
+        "custom_only": "變更其中任一項會切換到「自訂」等級，並以這些設定為基礎。",
         "section_other": "其他",
         "section_rating": "年齡分級",
         "vr": "限制VR模式",
@@ -505,7 +505,9 @@
         "blocked_title": "{} 分級高於 {} 歲",
         "blocked_none": "{}：沒有分級高於 {} 歲的已安裝遊戲。",
         "blocked_no_age": "此限制等級不依年齡限制遊戲。",
-        "blocked_note": "根據最近一次已安裝遊戲檢查。分級機構未分級的遊戲不計入，手機應用程式中設定的例外也不計入。"
+        "blocked_note": "根據最近一次已安裝遊戲檢查。分級機構未分級的遊戲不計入，手機應用程式中設定的例外也不計入。",
+        "section_level_settings": "此等級的設定",
+        "to_custom": "限制等級將變為「自訂」，以「{}」的設定為基礎並加上此變更："
     },
     "clock": {
         "section_now": "時鐘",
@@ -1850,7 +1852,19 @@
         "clock_detail_dns": "Atmosphère 的 DNS 封鎖了任天堂的時間伺服器，主機無法自行校準：請透過時間伺服器校準。",
         "week_more": "比上週每天多 {}。",
         "week_less": "比上週每天少 {}。",
-        "week_same": "與上週大致相當。"
+        "week_same": "與上週大致相當。",
+        "short": {
+            "pin_missing": "未設定",
+            "pin_weak": "容易被猜到",
+            "pin_lock_off": "無需 PIN 即可開啟",
+            "alarm_off": "鬧鐘已關閉",
+            "clock": "不準確",
+            "games": "部分無法啟動",
+            "patches": "需要檢查",
+            "sd_space": "快滿了",
+            "backup": "需要備份",
+            "console_lock_long": "已長時間鎖定"
+        }
     },
     "cadran": {
         "date": "{3}{2}日 {0}",
@@ -1894,7 +1908,7 @@
             "ok": "正常",
             "clock_fix": "立即測量並設定",
             "clock_fine": "計時準確",
-            "serial_hidden": "序號已隱藏",
+            "serial_hidden": "序號已遮蔽",
             "next_time_up": "繼續遊玩的話，約{}時間到",
             "next_bedtime": "就寢鬧鐘{}（還有{}）",
             "next_bedtime_now": "就寢時間：{}起可再次遊玩",
@@ -1936,7 +1950,8 @@
             "steps_count": "{} / {}",
             "tl_bed_first": "就寢在先",
             "bed_off_value": "已關閉",
-            "bed_set": "設定"
+            "bed_set": "設定",
+            "fine_pill": "{} 項檢查正常"
         },
         "pill": {
             "pc_on": "家長監護已開啟",
@@ -1972,7 +1987,8 @@
             "over_key": "超出限制",
             "played_day": "{}：已玩 {} / {}",
             "played_day_free": "{}：已玩 {}（不限）",
-            "bonus": "{}：當天排定延長 {}"
+            "bonus": "{}：當天排定延長 {}",
+            "last_week_day": "上週{}"
         },
         "activity": {
             "share": "匯出或分享",
@@ -1987,7 +2003,8 @@
             "see_all": "查看全部期間",
             "trend_up": "比上週每天 +{}",
             "trend_down": "比上週每天 -{}",
-            "trend_same": "與上週相當"
+            "trend_same": "與上週相當",
+            "grew": "比上週 +{}"
         },
         "restrictions": {
             "choose": "選擇此級別",
@@ -1999,7 +2016,9 @@
             "none": "所有年齡的軟體，允許社群媒體與交流",
             "to_settings": "查看設定",
             "games": "被限制的遊戲",
-            "games_none": "無"
+            "games_none": "無",
+            "current": "目前",
+            "allowed": "允許"
         },
         "clock": {
             "console": "主機",

@@ -446,8 +446,8 @@ void ActivityTab::build_cards()
         c.rest->setWidth(0);
         line->addView(c.rest);
         text->addView(line);
-        // Against the week before, as the week's tile says it ("vs last
-        // week" there): a caret and the amount.
+        // Against the week before, as the week's tile says it: a caret, the
+        // amount and "vs last week".
         c.grew_row = new brls::Box(brls::Axis::ROW);
         c.grew_row->setAlignItems(brls::AlignItems::CENTER);
         c.grew_row->setMarginTop(2);
@@ -697,7 +697,8 @@ void ActivityTab::show_top()
         ui::set_visible(c.box, shown);
         if (!shown) continue;
         ui::set_visible(c.grew_row, games[i] == grew);
-        if (games[i] == grew) ui::set_text(c.grew, "+" + ui::fmt_play_time((u64)grew_s));
+        if (games[i] == grew)
+            ui::set_text(c.grew, brls::getStr("playguard/cadran/activity/grew", ui::fmt_play_time((u64)grew_s)));
         const GameStat& g = *games[i];
         c.app_id = g.app_id;
         ids.push_back(g.app_id);

@@ -65,7 +65,8 @@ itself, and keep them in the cache.
 
 The "cadran" scenario tours the boards on top of the tabs: every tab, then
 the child screen and back with the PIN, a day of the week edited with the
-stick and saved, a restriction level's confirmation, the text size, the
+stick and saved, a restriction level's confirmation and the one a preset's
+setting changed asks (the level becoming Custom), the text size, the
 network clock's screen, a game's screen from its card and the notification
 bell's list. The "cadranstates" one shows Cadran's Today and
 Play timer in the states "alarm" and "outside" set up, together: the time
@@ -1562,8 +1563,7 @@ if LIBRARY:
                 for l in open(os.path.join(OUT, "app.log"), errors="replace") if "games list: " in l]
     key("Down", steps("dashboard", "activity"))
     key("Right")               # Every account, the first chip
-    key_to_end("Down", hold=0.15)   # the end of the tab, the focus on its last line (the QR code)
-    key("Up", 3)               # scrolled back to that line, then All games
+    go_to("All games")
     key("Return")
     shot("01_games")           # the covers, the first one's figures on top
     if not listed() or not listed()[-1].startswith("50 of ") or not listed()[-1].endswith("(grid)"):
@@ -1707,6 +1707,12 @@ if CADRAN:
     key("Right", 2)            # Teen
     key("Return")
     shot("16_level_confirm")
+    key("Escape")
+    # A setting of the preset in force changed: the level would become
+    # Custom from it, asked first; cancelled, the switch back as it was.
+    go_to("Restrict posting to social media")
+    key("Return")
+    shot("16_to_custom")
     key("Escape")
 
     # Preferences › Text size: its three choices.
@@ -2364,7 +2370,7 @@ pdfs_before = pdfs()   # the run folder is kept between local runs
 key("Left", 2)             # past Network clock, the tile left of the games': back to the sidebar
 key("Up", steps("activity", "console"))
 key("Right")               # Every account, the first chip
-go_to("All games")         # its last line (Down past it would only scroll the tab)
+go_to("All games")
 key("Return")              # the covers, on the first game
 shot("28_activity_games")
 key("Return")

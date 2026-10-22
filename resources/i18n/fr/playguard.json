@@ -472,7 +472,7 @@
         "age_value": "Jusqu'à {} ans",
         "sns": "Restreindre les publications sur les réseaux sociaux",
         "comm": "Restreindre la communication avec d'autres joueurs",
-        "custom_only": "Pour modifier ces réglages, choisissez le niveau « Personnalisé ».",
+        "custom_only": "En modifier un fait passer au niveau « Personnalisé », à partir de ces réglages.",
         "section_other": "Autres",
         "section_rating": "Classification",
         "vr": "Restreindre le mode VR",
@@ -505,7 +505,9 @@
         "blocked_title": "{} les classe au-dessus de {} ans",
         "blocked_none": "{} : aucun jeu installé n'est classé au-dessus de {} ans.",
         "blocked_no_age": "Ce niveau ne limite pas les jeux selon l'âge.",
-        "blocked_note": "D'après la dernière vérification des jeux installés. Un jeu que l'organisme de classification ne classe pas n'est pas compté, ni les exceptions réglées dans l'application mobile."
+        "blocked_note": "D'après la dernière vérification des jeux installés. Un jeu que l'organisme de classification ne classe pas n'est pas compté, ni les exceptions réglées dans l'application mobile.",
+        "section_level_settings": "Réglages de ce niveau",
+        "to_custom": "Le niveau de restriction deviendra « Personnalisé », à partir des réglages de « {} » avec ce changement :"
     },
     "clock": {
         "section_now": "Horloges",
@@ -1850,7 +1852,19 @@
         "clock_detail_dns": "Le DNS d'Atmosphère bloque le serveur de temps de Nintendo, la console ne peut donc pas la régler seule : réglez-la depuis un serveur de temps.",
         "week_more": "{} de plus par jour que la semaine d'avant.",
         "week_less": "{} de moins par jour que la semaine d'avant.",
-        "week_same": "À peu près comme la semaine d'avant."
+        "week_same": "À peu près comme la semaine d'avant.",
+        "short": {
+            "pin_missing": "Non configuré",
+            "pin_weak": "Facile à deviner",
+            "pin_lock_off": "S'ouvre sans",
+            "alarm_off": "Alarme désactivée",
+            "clock": "Imprécise",
+            "games": "Certains ne démarrent pas",
+            "patches": "À vérifier",
+            "sd_space": "Presque pleine",
+            "backup": "Sauvegarde à faire",
+            "console_lock_long": "Bloqués depuis longtemps"
+        }
     },
     "cadran": {
         "date": "{1} {2} {3}",
@@ -1936,7 +1950,8 @@
             "steps_count": "{} sur {}",
             "tl_bed_first": "le coucher d'abord",
             "bed_off_value": "Désactivée",
-            "bed_set": "La régler"
+            "bed_set": "La régler",
+            "fine_pill": "{} vérifications OK"
         },
         "pill": {
             "pc_on": "Contrôle parental actif",
@@ -1972,7 +1987,8 @@
             "over_key": "limite dépassée",
             "played_day": "{} : {} joué sur {}",
             "played_day_free": "{} : {} joué, sans limite",
-            "bonus": "{} : {} prévu pour ce jour-là"
+            "bonus": "{} : {} prévu pour ce jour-là",
+            "last_week_day": "{} dernier"
         },
         "activity": {
             "share": "Exporter ou partager",
@@ -1987,7 +2003,8 @@
             "see_all": "Voir depuis toujours",
             "trend_up": "+{}/jour vs semaine d'avant",
             "trend_down": "-{}/jour vs semaine d'avant",
-            "trend_same": "comme la semaine d'avant"
+            "trend_same": "comme la semaine d'avant",
+            "grew": "+{} vs semaine d'avant"
         },
         "restrictions": {
             "choose": "Choisir ce niveau",
@@ -1999,7 +2016,9 @@
             "none": "logiciels de tout âge, réseaux sociaux et communication permis",
             "to_settings": "Ses réglages",
             "games": "Jeux bloqués",
-            "games_none": "aucun"
+            "games_none": "aucun",
+            "current": "Actuel",
+            "allowed": "Autorisé"
         },
         "clock": {
             "console": "Console",
