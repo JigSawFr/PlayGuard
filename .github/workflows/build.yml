@@ -407,7 +407,7 @@ jobs:
   # XML / view errors without a console. The scenarios run in parallel
   # shards of about the same length, about 4 minutes each under software GL
   # (the default tour is split in two, `smoke` and `games`; the text check in
-  # four, four languages each at most). The
+  # five, three languages each). The
   # desktop-smoke job below gathers them under one name for the release job
   # and branch rules.
   desktop-smoke-shard:
@@ -419,36 +419,48 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Every shard under 250 s, by the scenarios'
-          # times on a runner (s, main on 2026-10-22): smoke 144, games 148,
-          # cadran 142, gate 103, hbmenu 102, homebrew 101, devbuild 79,
-          # forwarders 64, outside 59, cadranlarge 35, library 27, update 25,
-          # errors 24, sysnotes 24, rescue 15, the others 10 or less. Each
+          # About 160 s of scenarios a shard (its job about 4 minutes, setup
+          # and visual check included), by their times on a runner (s, this
+          # workflow's run of 2026-10-22): cadran 156, smoke 151, games 146,
+          # gate 111, hbmenu 104, homebrew 102, devbuild 80, forwarders 64,
+          # outside 59, cadranlarge 34, update 25, errors 25, sysnotes 24,
+          # library 18, rescue 15, bedtime 9, the others 8 or less. Each
           # scenario starts the program anew: any of them can go to any shard.
+          # 13 shards with the languages: about 20 jobs for the run, half the
+          # 40 a Pro account runs at once.
           - shard: default
-            scenarios: smoke homebrew
+            scenarios: smoke forged
           - shard: games
-            scenarios: games hbmenu
+            scenarios: games bedtime
           - shard: cadran
-            scenarios: cadran rescue cadranlarge cadranunlocked forged lock loading
+            scenarios: cadran lock loading
           - shard: states
-            scenarios: gate outside alarm cadranstates rollback bedtime
+            scenarios: gate cadranlarge alarm cadranstates
+          - shard: hbmenu
+            scenarios: hbmenu outside
+          - shard: homebrew
+            scenarios: homebrew library rescue cadranunlocked
           - shard: developer
-            scenarios: devbuild library update errors sysnotes forwarders
+            scenarios: devbuild forwarders
+          - shard: system
+            scenarios: update errors sysnotes rollback
           # Every Cadran tab, a few common dialogs and the child screen in
           # the 15 languages, normal and larger text: no text cut short
-          # (tools/cut_text_check.py, tests/cut_text/): about 58 s a language
-          # (both sizes), four a shard.
+          # (tools/cut_text_check.py, tests/cut_text/): about 59 s a language
+          # (both sizes), three a shard.
           - shard: languages-1
             scenarios: cuttext
-            languages: en-US fr fr-CA de
+            languages: en-US fr fr-CA
           - shard: languages-2
             scenarios: cuttext
-            languages: es es-419 it nl
+            languages: de es es-419
           - shard: languages-3
             scenarios: cuttext
-            languages: pt pt-BR ru ja
+            languages: it nl pt
           - shard: languages-4
+            scenarios: cuttext
+            languages: pt-BR ru ja
+          - shard: languages-5
             scenarios: cuttext
             languages: ko zh-Hans zh-Hant
     env:
