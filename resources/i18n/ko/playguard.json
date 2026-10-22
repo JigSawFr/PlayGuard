@@ -472,7 +472,7 @@
         "age_value": "{}세까지",
         "sns": "SNS 게시 제한",
         "comm": "다른 사람과의 커뮤니케이션 제한",
-        "custom_only": "이 설정을 변경하려면 \"사용자 설정\" 레벨을 선택하세요.",
+        "custom_only": "하나를 변경하면 이 설정을 바탕으로 \"사용자 설정\" 레벨이 됩니다.",
         "section_other": "기타",
         "section_rating": "등급 분류",
         "vr": "VR 모드 제한",
@@ -505,7 +505,9 @@
         "blocked_title": "{} 기준 {}세 초과",
         "blocked_none": "{}: {}세를 초과하는 설치된 게임이 없습니다.",
         "blocked_no_age": "이 제한 수준은 연령으로 게임을 제한하지 않습니다.",
-        "blocked_note": "설치된 게임을 마지막으로 확인한 결과입니다. 등급 분류 기관이 분류하지 않은 게임과 스마트폰 앱에서 설정한 예외는 포함되지 않습니다."
+        "blocked_note": "설치된 게임을 마지막으로 확인한 결과입니다. 등급 분류 기관이 분류하지 않은 게임과 스마트폰 앱에서 설정한 예외는 포함되지 않습니다.",
+        "section_level_settings": "이 레벨의 설정",
+        "to_custom": "제한 레벨이 \"{}\"의 설정에 이 변경을 더한 \"사용자 설정\"이 됩니다:"
     },
     "clock": {
         "section_now": "시계",
@@ -823,7 +825,9 @@
         "open": "설치된 게임 확인",
         "title": "설치된 게임",
         "note": "HOME 메뉴가 실행하거나 표시하지 못하는 게임(계속 로딩되는 아이콘, \"!\", 점선 테두리)과 그 원인, 해결 방법. 게임에서 A를 누르면 자세한 내용이 표시됩니다.",
+        "note_clear": "HOME 메뉴가 실행하거나 표시하지 못하는 게임(계속 로딩되는 아이콘, \"!\", 점선 테두리)과 그 원인, 해결 방법.",
         "none": "설치된 게임 {}개가 모두 정상으로 보입니다.",
+        "none_one": "설치된 게임이 정상으로 보입니다.",
         "err_list": "설치된 게임 목록을 불러올 수 없습니다",
         "truncated": "처음 {}개의 게임만 확인했습니다.",
         "many": "여러 게임에 동시에 문제가 있습니다. 컴퓨터에서 SD 카드의 오류를 확인하고, 이 게임들을 설치했을 때와 같은 저장소(현재 {})로 본체가 부팅되었는지 확인하세요. sysMMC에서 설치한 게임은 emuMMC에서 작동하지 않으며, 그 반대도 마찬가지입니다.",
@@ -969,13 +973,17 @@
         "remove_all": "이 게임 {}개 삭제",
         "remove_all_body": "이 게임 {}개를 업데이트와 추가 콘텐츠까지 본체에서 삭제해 다시 설치할 수 있게 합니다. 먼저 목록을 PlayGuard 내보내기 폴더에 저장합니다. 세이브 데이터는 남습니다.",
         "removed_all": "게임 {}개를 삭제했습니다. 목록: {}",
+        "removed_all_one": "게임 1개를 삭제했습니다. 목록: {}",
         "remove_finished": "삭제 완료",
         "remove_stopped": "삭제 중단됨",
         "remove_summary": "게임 {}개 삭제됨(전체 {}개)",
+        "remove_summary_one": "게임 1개 삭제됨(전체 {}개)",
         "remove_title": "게임 삭제 중",
         "remove_title_n": "게임 삭제 중 · {}/{}번째 게임",
-        "remove_done_n": "{}개 삭제됨",
-        "remove_failed_n": "{}개 삭제 안 됨",
+        "remove_done": "{}개 삭제됨",
+        "remove_done_one": "1개 삭제됨",
+        "remove_failed": "{}개 삭제 안 됨",
+        "remove_failed_one": "1개 삭제 안 됨",
         "remove_note": "세이브 데이터는 남습니다. 목록: {}",
         "remove_count_err": "삭제 안 됨: {}",
         "verify_all": "이 게임 {}개 확인",
@@ -1850,7 +1858,19 @@
         "clock_detail_dns": "Atmosphère의 DNS가 닌텐도 시간 서버를 차단해 본체가 스스로 맞출 수 없습니다. 시간 서버로 맞추세요.",
         "week_more": "지난주보다 하루 {} 많습니다.",
         "week_less": "지난주보다 하루 {} 적습니다.",
-        "week_same": "지난주와 비슷합니다."
+        "week_same": "지난주와 비슷합니다.",
+        "short": {
+            "pin_missing": "설정 안 됨",
+            "pin_weak": "추측하기 쉬움",
+            "pin_lock_off": "PIN 없이 열림",
+            "alarm_off": "알람 꺼짐",
+            "clock": "정확하지 않음",
+            "games": "일부 실행 불가",
+            "patches": "확인 필요",
+            "sd_space": "거의 가득 참",
+            "backup": "백업 필요",
+            "console_lock_long": "오랫동안 차단됨"
+        }
     },
     "cadran": {
         "date": "{3} {2}일 {0}",
@@ -1894,7 +1914,7 @@
             "ok": "정상",
             "clock_fix": "지금 측정하고 설정",
             "clock_fine": "타이머가 정확히 계산 중",
-            "serial_hidden": "일련번호 숨김",
+            "serial_hidden": "시리얼 번호 숨김",
             "next_time_up": "계속 플레이하면 {}쯤 시간 종료",
             "next_bedtime": "취침 알람 {} ({} 후)",
             "next_bedtime_now": "취침 시간: {}부터 다시 플레이 가능",
@@ -1936,7 +1956,8 @@
             "steps_count": "{} / {}",
             "tl_bed_first": "취침이 먼저",
             "bed_off_value": "꺼짐",
-            "bed_set": "설정하기"
+            "bed_set": "설정하기",
+            "fine_pill": "확인 {}개 정상"
         },
         "pill": {
             "pc_on": "자녀 보호 켜짐",
@@ -1972,7 +1993,8 @@
             "over_key": "제한 초과",
             "played_day": "{}: {} / {} 플레이",
             "played_day_free": "{}: {} 플레이 (제한 없음)",
-            "bonus": "{}: 이날 {} 추가 예정"
+            "bonus": "{}: 이날 {} 추가 예정",
+            "last_week_day": "지난주 {}"
         },
         "activity": {
             "share": "내보내기 또는 공유",
@@ -1987,7 +2009,8 @@
             "see_all": "전체 기간 보기",
             "trend_up": "지난주 대비 하루 +{}",
             "trend_down": "지난주 대비 하루 -{}",
-            "trend_same": "지난주와 비슷"
+            "trend_same": "지난주와 비슷",
+            "grew": "지난주 대비 +{}"
         },
         "restrictions": {
             "choose": "이 단계 선택",
@@ -1999,7 +2022,9 @@
             "none": "모든 연령의 소프트웨어, SNS와 커뮤니케이션 허용",
             "to_settings": "설정 보기",
             "games": "제한되는 게임",
-            "games_none": "없음"
+            "games_none": "없음",
+            "current": "현재",
+            "allowed": "허용"
         },
         "clock": {
             "console": "본체",

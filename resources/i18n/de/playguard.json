@@ -472,7 +472,7 @@
         "age_value": "Bis {} Jahre",
         "sns": "Posten in sozialen Netzwerken sperren",
         "comm": "Kommunikation mit anderen Nutzern sperren",
-        "custom_only": "Um diese Einstellungen zu ändern, wählen Sie die Kategorie „Nutzerdefiniert“.",
+        "custom_only": "Wird eine davon geändert, gilt die Kategorie „Nutzerdefiniert“, ausgehend von diesen Einstellungen.",
         "section_other": "Sonstiges",
         "section_rating": "Alterseinstufung",
         "vr": "VR-Modus (3D-Sicht) sperren",
@@ -505,7 +505,9 @@
         "blocked_title": "{} stuft sie über {} ein",
         "blocked_none": "{}: Kein installiertes Spiel ist über {} eingestuft.",
         "blocked_no_age": "Diese Stufe beschränkt Spiele nicht nach Alter.",
-        "blocked_note": "Aus der letzten Prüfung der installierten Spiele. Ein Spiel, das die Alterseinstufungsorganisation nicht einstuft, wird nicht gezählt, ebenso wenig die in der App festgelegten Ausnahmen."
+        "blocked_note": "Aus der letzten Prüfung der installierten Spiele. Ein Spiel, das die Alterseinstufungsorganisation nicht einstuft, wird nicht gezählt, ebenso wenig die in der App festgelegten Ausnahmen.",
+        "section_level_settings": "Einstellungen dieser Kategorie",
+        "to_custom": "Die Kategorie wird „Nutzerdefiniert“, ausgehend von den Einstellungen von „{}“ mit dieser Änderung:"
     },
     "clock": {
         "section_now": "Uhren",
@@ -823,7 +825,9 @@
         "open": "Installierte Spiele prüfen",
         "title": "Installierte Spiele",
         "note": "Die Spiele, die das HOME-Menü nicht starten oder anzeigen kann (ein Symbol, das endlos lädt, „!“, ein gestrichelter Rahmen), warum, und was zu tun ist. A auf einem Spiel für die Details.",
+        "note_clear": "Die Spiele, die das HOME-Menü nicht starten oder anzeigen kann (ein Symbol, das endlos lädt, „!“, ein gestrichelter Rahmen), warum, und was zu tun ist.",
         "none": "Alle {} installierten Spiele scheinen in Ordnung.",
+        "none_one": "Das installierte Spiel scheint in Ordnung.",
         "err_list": "Die installierten Spiele konnten nicht aufgelistet werden",
         "truncated": "Nur die ersten {} Spiele wurden geprüft.",
         "many": "Mehrere Spiele auf einmal: Prüfen Sie die SD-Karte an einem Computer auf Fehler und ob die Konsole vom selben Speicher ({} gerade) gestartet ist wie bei der Installation dieser Spiele. Ein von sysMMC installiertes Spiel funktioniert nicht unter emuMMC und umgekehrt.",
@@ -969,13 +973,17 @@
         "remove_all": "Diese {} Spiele entfernen",
         "remove_all_body": "Diese {} Spiele werden samt Updates und Zusatzinhalten von der Konsole entfernt, damit sie neu installiert werden können. Ihre Liste wird vorher im Export-Ordner von PlayGuard gespeichert. Spielstände bleiben erhalten.",
         "removed_all": "{} Spiele entfernt. Ihre Liste: {}",
+        "removed_all_one": "1 Spiel entfernt. Seine Liste: {}",
         "remove_finished": "Entfernen abgeschlossen",
         "remove_stopped": "Entfernen abgebrochen",
         "remove_summary": "{} von {} Spielen entfernt",
+        "remove_summary_one": "1 von {} Spielen entfernt",
         "remove_title": "Spiel wird entfernt",
         "remove_title_n": "Spiele werden entfernt · Spiel {} von {}",
-        "remove_done_n": "{} entfernt",
-        "remove_failed_n": "{} nicht entfernt",
+        "remove_done": "{} entfernt",
+        "remove_done_one": "1 entfernt",
+        "remove_failed": "{} nicht entfernt",
+        "remove_failed_one": "1 nicht entfernt",
         "remove_note": "Spielstände bleiben erhalten. Ihre Liste: {}",
         "remove_count_err": "Nicht entfernt: {}",
         "verify_all": "Diese {} Spiele prüfen",
@@ -1850,7 +1858,19 @@
         "clock_detail_dns": "Das DNS von Atmosphère blockiert Nintendos Zeitserver, die Konsole kann sie also nicht selbst stellen: Stellen Sie sie über einen Zeitserver.",
         "week_more": "{} mehr pro Tag als in der Vorwoche.",
         "week_less": "{} weniger pro Tag als in der Vorwoche.",
-        "week_same": "Etwa wie in der Vorwoche."
+        "week_same": "Etwa wie in der Vorwoche.",
+        "short": {
+            "pin_missing": "Nicht eingerichtet",
+            "pin_weak": "Leicht zu erraten",
+            "pin_lock_off": "Öffnet ohne PIN",
+            "alarm_off": "Alarm aus",
+            "clock": "Ungenau",
+            "games": "Manche starten nicht",
+            "patches": "Prüfen",
+            "sd_space": "Fast voll",
+            "backup": "Sicherung fällig",
+            "console_lock_long": "Lange gesperrt"
+        }
     },
     "cadran": {
         "date": "{0}, {2}. {3}",
@@ -1894,7 +1914,7 @@
             "ok": "ok",
             "clock_fix": "Jetzt messen und einstellen",
             "clock_fine": "der Timer zählt richtig",
-            "serial_hidden": "Seriennummer verborgen",
+            "serial_hidden": "Seriennummer anonymisiert",
             "next_time_up": "Wenn weitergespielt wird, ist die Zeit gegen {} um",
             "next_bedtime": "Gute-Nacht-Alarm um {}, in {}",
             "next_bedtime_now": "Schlafenszeit: Spielen wieder erlaubt ab {}",
@@ -1936,7 +1956,8 @@
             "steps_count": "{} von {}",
             "tl_bed_first": "Schlafenszeit kommt zuerst",
             "bed_off_value": "Aus",
-            "bed_set": "Einstellen"
+            "bed_set": "Einstellen",
+            "fine_pill": "{} Prüfungen in Ordnung"
         },
         "pill": {
             "pc_on": "Jugendschutz aktiv",
@@ -1972,7 +1993,8 @@
             "over_key": "Limit überschritten",
             "played_day": "{}: {} von {} gespielt",
             "played_day_free": "{}: {} gespielt, ohne Limit",
-            "bonus": "{}: {} für diesen Tag geplant"
+            "bonus": "{}: {} für diesen Tag geplant",
+            "last_week_day": "{} letzte Woche"
         },
         "activity": {
             "share": "Exportieren oder teilen",
@@ -1987,7 +2009,8 @@
             "see_all": "Gesamt ansehen",
             "trend_up": "+{}/Tag ggü. Vorwoche",
             "trend_down": "-{}/Tag ggü. Vorwoche",
-            "trend_same": "wie in der Vorwoche"
+            "trend_same": "wie in der Vorwoche",
+            "grew": "+{} ggü. Vorwoche"
         },
         "restrictions": {
             "choose": "Diese Stufe wählen",
@@ -1999,7 +2022,9 @@
             "none": "Software jeder Altersstufe, soziale Medien und Kommunikation erlaubt",
             "to_settings": "Ihre Einstellungen",
             "games": "Blockierte Spiele",
-            "games_none": "keine"
+            "games_none": "keine",
+            "current": "Aktiv",
+            "allowed": "Erlaubt"
         },
         "clock": {
             "console": "Konsole",
