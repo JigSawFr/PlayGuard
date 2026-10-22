@@ -30,7 +30,10 @@ Every console language, light and dark themes. Everything else: [features](https
 
 ## Install
 
-Search for *PlayGuard* in the Homebrew App Store or sphaira, or extract `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) to the root of the SD card. Launch it over a game, with a parent's user, and follow *First steps*. Still linked to Nintendo's phone app? *PIN › Unlink the companion app*, or its next sync overwrites what you set.
+> [!WARNING]
+> PlayGuard is **not in the Homebrew App Store (nor sphaira's) yet**: its listing is still awaiting approval. Install it by hand for now.
+
+Extract `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) to the root of the SD card. Launch it over a game, with a parent's user, and follow *First steps*. Still linked to Nintendo's phone app? *PIN › Unlink the companion app*, or its next sync overwrites what you set.
 
 Firmware 22.0.0 → 23.0.1 tested (Atmosphère 1.11–1.12); older ones and the details: [compatibility](https://playguard.link/docs/compatibility/). No Switch 2.
 
