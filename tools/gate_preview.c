@@ -88,7 +88,7 @@ int main(int argc, char **argv)
                                                                       : NULL,
                                SHOTS[i].state != GateScreen_Asking,
                                // Its rules: hours without the PIN, its closed hours, the day's limit.
-                               GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT };
+                               GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT, gate_text(lang, GateText_Badge) };
         gate_screen_draw(px, GATE_SCREEN_W, GATE_SCREEN_H, GATE_SCREEN_W, &s);
         char path[512];
         snprintf(path, sizeof(path), "%s/%s.png", out, SHOTS[i].file);

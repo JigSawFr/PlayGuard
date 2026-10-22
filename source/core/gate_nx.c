@@ -240,7 +240,9 @@ static void screen_open(Screen *sc, const char *nro, const char *when)
     // "2026-10-20 21:03": its time.
     const char *space = strchr(when, ' ');
     if (space) snprintf(sc->clock, sizeof(sc->clock), "%.5s", space + 1);
-    if (R_FAILED(framebufferCreate(&sc->fb, nwindowGetDefault(), GATE_SCREEN_W, GATE_SCREEN_H, PIXEL_FORMAT_RGBA_8888, 1)))
+    // Two buffers: with one, the compositor keeps it while it is shown, and
+    // the next frame (how it went, after the PIN) waited for it for ever.
+    if (R_FAILED(framebufferCreate(&sc->fb, nwindowGetDefault(), GATE_SCREEN_W, GATE_SCREEN_H, PIXEL_FORMAT_RGBA_8888, 2)))
         return;
     if (R_FAILED(framebufferMakeLinear(&sc->fb))) {
         framebufferClose(&sc->fb);
@@ -265,7 +267,7 @@ static void screen_show(Screen *sc, GateScreenState state, const char *note, int
     const GateScreen s = {
         sc->brand, sc->text, sc->icon, sc->icon_size, sc->name, gate_text(sc->language, STATUS[state]),
         hint == GateText_Count ? NULL : gate_text(sc->language, hint), footer, sc->clock, state, note, note_warn,
-        sc->rules,
+        sc->rules, gate_text(sc->language, GateText_Badge),
     };
     u32 stride = 0;
     uint32_t *px = (uint32_t *)framebufferBegin(&sc->fb, &stride);

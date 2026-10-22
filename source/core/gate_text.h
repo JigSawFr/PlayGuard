@@ -30,6 +30,7 @@ typedef enum {
     GateText_ClosedHint,
     GateText_Limit,        // the day's play time used up (GateRules.limit)
     GateText_LimitHint,
+    GateText_Badge,        // "Protected by PlayGuard"
     GateText_Count,
 } GateText;
 

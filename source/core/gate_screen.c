@@ -283,6 +283,98 @@ static float measure(const unsigned char *font, float px_size, const char *s)
     return text_width(&f, s);
 }
 
+// Whether `font` draws every character of `s`.
+static bool covers(const unsigned char *font, const char *s)
+{
+    PgFont f;
+    if (!font || !s || !pg_font_init(&f, font, 16)) return false;
+    while (*s)
+        if (!pg_font_has(&f, utf8_next(&s))) return false;
+    return true;
+}
+
+// Punctuation a line does not start with (French puts a space before it).
+static bool clings(const char *s)
+{
+    return *s == ':' || *s == ';' || *s == '!' || *s == '?' || !strncmp(s, "\xC2\xBB", 2);
+}
+
+// The width of `s`'s first `len` bytes.
+static float width_of(const PgFont *f, const char *s, size_t len)
+{
+    char buf[512];
+    if (len >= sizeof(buf)) len = sizeof(buf) - 1;
+    memcpy(buf, s, len);
+    buf[len] = '\0';
+    return text_width(f, buf);
+}
+
+// `s` from (x, baseline) on up to `max_lines` lines `step` apart, each at
+// most `max` wide; the last one cut with "…". Broken at a space (after a
+// colon when the rest then fits, else where the two last lines come out
+// even), else (a language without them) between two characters. How many
+// lines it drew; with `cv` NULL, how many it would draw, drawing nothing.
+static int paragraph(Canvas *cv, const unsigned char *font, float px_size, float x, float baseline, float step,
+                     const char *s, Rgb c, float max, int max_lines)
+{
+    PgFont f;
+    if (!font || !s || !*s || !pg_font_init(&f, font, px_size)) return 0;
+    char buf[512];
+    int n = 0;
+    while (*s && n < max_lines) {
+        if (n == max_lines - 1 || text_width(&f, s) <= max) {
+            if (cv) text(cv, font, px_size, x, baseline + n * step, s, c, 1, max);
+            return n + 1;
+        }
+        // Where it may break: the spaces within `max`, and the last character that fits.
+        const char *spaces[64];
+        int k = 0;
+        const char *p = s, *fit = NULL;
+        while (*p) {
+            const char *q = p;
+            utf8_next(&q);
+            if ((size_t)(q - s) >= sizeof(buf) || width_of(&f, s, (size_t)(q - s)) > max) break;
+            fit = q;
+            if (*q == ' ' && !clings(q + 1) && k < 64) spaces[k++] = q;
+            p = q;
+        }
+        const char *end = k ? spaces[k - 1] : fit;
+        const float rest_of_last = k ? text_width(&f, spaces[k - 1] + 1) : max + 1;
+        if (k && rest_of_last <= max) {
+            // Two lines will do: after a colon, else the most even.
+            float best = 1e9f;
+            for (int i = 0; i < k; i++) {
+                const float w1 = width_of(&f, s, (size_t)(spaces[i] - s)), w2 = text_width(&f, spaces[i] + 1);
+                if (w2 > max) continue;
+                if (spaces[i][-1] == ':') {
+                    end = spaces[i];
+                    break;
+                }
+                const float worst = w1 > w2 ? w1 : w2;
+                if (worst < best) best = worst, end = spaces[i];
+            }
+        }
+        if (!end) {   // not even one character: it alone
+            end = s;
+            utf8_next(&end);
+        }
+        const size_t len = (size_t)(end - s) < sizeof(buf) ? (size_t)(end - s) : sizeof(buf) - 1;
+        memcpy(buf, s, len);
+        buf[len] = '\0';
+        if (cv) text(cv, font, px_size, x, baseline + n * step, buf, c, 1, max);
+        n++;
+        s = end;
+        while (*s == ' ') s++;
+    }
+    return n;
+}
+
+// `size`, or `smaller` when `s` needs more than `lines` lines `max` wide at `size`.
+static float fitting(const unsigned char *font, float size, float smaller, const char *s, float max, int lines)
+{
+    return paragraph(NULL, font, size, 0, 0, 0, s, TEXT, max, 64) > lines ? smaller : size;
+}
+
 // ---------------------------------------------------------------- icon
 
 // The homebrew's icon, `size` square at (x, y), its corners rounded by `r`
@@ -331,24 +423,25 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
         for (int x = 0; x < w; x++) px[(size_t)y * (size_t)stride + (size_t)x] = 0xFF000000u | b << 16 | g << 8 | r;
     }
 
-    // Cadran's dial on the right: its glow, two rings, the minutes, the day's arc.
+    // Cadran's dial on the right, past the text: its glow, two rings, the
+    // minutes, the day's arc.
     const Rgb accent = s->state == GateScreen_Refused || s->state == GateScreen_Closed || s->state == GateScreen_Limit ? CORAL
                        : s->state == GateScreen_Error || s->state == GateScreen_Paused ? AMBER
                                                                                          : TEAL;
-    const float dx = 1130, dy = 340;
-    glow(&cv, dx, dy, 330, accent, 0.09f);
-    arc(&cv, dx, dy, 262, 1.5f, 0, 6.2831853f, WHITE, 0.05f);
-    arc(&cv, dx, dy, 160, 1.5f, 0, 6.2831853f, WHITE, 0.04f);
+    const float dx = 1196, dy = 340;
+    glow(&cv, dx, dy, 290, accent, 0.09f);
+    arc(&cv, dx, dy, 226, 1.5f, 0, 6.2831853f, WHITE, 0.05f);
+    arc(&cv, dx, dy, 138, 1.5f, 0, 6.2831853f, WHITE, 0.04f);
     for (int i = 0; i < 60; i++) {
-        const float ang = i * 6.2831853f / 60.0f, len = i % 5 == 0 ? 18.0f : 8.0f;
+        const float ang = i * 6.2831853f / 60.0f, len = i % 5 == 0 ? 16.0f : 7.0f;
         const float sx = sinf(ang), sy = -cosf(ang);
         for (float t = 0; t < len; t += 0.5f) {
-            const float rr = 272 + t;
+            const float rr = 235 + t;
             blend(&cv, (int)(dx + sx * rr), (int)(dy + sy * rr), WHITE, i % 5 == 0 ? 0.12f : 0.06f);
         }
     }
-    arc(&cv, dx, dy, 211, 20, 0, 6.2831853f, TRACK, 0.28f);
-    arc(&cv, dx, dy, 211, 20, 0, 6.2831853f * 0.75f, accent, 0.16f);
+    arc(&cv, dx, dy, 182, 18, 0, 6.2831853f, TRACK, 0.28f);
+    arc(&cv, dx, dy, 182, 18, 0, 6.2831853f * 0.75f, accent, 0.16f);
 
     // The header: PlayGuard's mark and name; the clock.
     mark(&cv, 92, 76, 30);
@@ -368,16 +461,19 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
     }
     stroke_rrect(&cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 2, WHITE, 0.08f);
 
-    const float tx = 400;
-    text(&cv, s->text_font, 58, tx, 290, s->name, TEXT, 1, (float)w - tx - 80);
+    // The text, left of the dial's minutes.
+    const float tx = 400, right = 940;
+    text(&cv, s->text_font, 58, tx, 290, s->name, TEXT, 1, right - tx);
 
-    // "Protected by PlayGuard", a teal badge with its padlock.
-    static const char BADGE[] = "Protected by PlayGuard";
-    const float bw = measure(s->brand_font, 26, BADGE) + 92;
+    // "Protected by PlayGuard", a teal badge with its padlock: in PlayGuard's
+    // font when it has the language's letters, else the console's.
+    const char *badge = s->badge && *s->badge ? s->badge : "Protected by PlayGuard";
+    const unsigned char *badge_font = covers(s->brand_font, badge) ? s->brand_font : s->text_font;
+    const float bw = measure(badge_font, 26, badge) + 92;
     fill_rrect(&cv, tx, 322, bw, 54, 27, TEAL, 0.14f);
     stroke_rrect(&cv, tx, 322, bw, 54, 27, 2, TEAL, 0.55f);
     padlock(&cv, tx + 26, 334, 30, TEAL);
-    text(&cv, s->brand_font, 26, tx + 70, 358, BADGE, TEAL, 1, 0);
+    text(&cv, badge_font, 26, tx + 70, 358, badge, TEAL, 1, 0);
     // After it, the rules it carries, a round chip each.
     float rx = tx + bw + 14;
     void (*const DRAW[])(Canvas *, float, float, float, Rgb) = { open_padlock, stop_square, timer };
@@ -389,16 +485,21 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
         rx += 54 + 10;
     }
 
-    // How it goes.
+    // How it goes, then what to do, each on up to two lines; the note under them.
     const Rgb line = s->state == GateScreen_Asking ? TEXT2 : accent;
+    const float sx = s->state == GateScreen_Asking ? tx : tx + 28;
     if (s->state != GateScreen_Asking) fill_circle(&cv, tx + 9, 442, 7, accent, 1);
-    text(&cv, s->text_font, 32, s->state == GateScreen_Asking ? tx : tx + 28, 454, s->status, line, 1,
-         (float)w - tx - 80);
-    text(&cv, s->text_font, 26, tx, 500, s->hint, TEXT3, 1, (float)w - tx - 80);
+    // A size smaller when two lines are not enough (German's longer words),
+    // and a third line for the status then.
+    const float ss = fitting(s->text_font, 32, 28, s->status, right - sx, 2), hs = fitting(s->text_font, 26, 23, s->hint, right - tx, 2);
+    int lines = paragraph(&cv, s->text_font, ss, sx, 454, ss * 1.25f, s->status, line, right - sx, ss < 32 ? 3 : 2);
+    float y = 454 + (lines > 0 ? lines - 1 : 0) * ss * 1.25f + 46;
+    lines = paragraph(&cv, s->text_font, hs, tx, y, hs * 1.23f, s->hint, TEXT3, right - tx, 2);
+    if (lines > 0) y += (lines - 1) * hs * 1.23f + 48;
     if (s->note && *s->note) {
         const Rgb tone = s->note_warn ? AMBER : TEAL;
-        fill_circle(&cv, tx + 7, 539, 5, tone, 1);
-        text(&cv, s->text_font, 24, tx + 22, 548, s->note, tone, 1, (float)w - tx - 102);
+        fill_circle(&cv, tx + 7, y - 9, 5, tone, 1);
+        text(&cv, s->text_font, 24, tx + 22, y, s->note, tone, 1, right - tx - 22);
     }
 
     // The footer: a hairline, PlayGuard's tagline and site.

@@ -643,6 +643,14 @@ static void test_stale_loader()
     CHECK(stale_loader("0123456789abcdef", "fedcba9876543210"));
     CHECK(stale_loader("", "fedcba9876543210"));   // made before it was kept
     CHECK(!stale_loader("", "") && !stale_loader("0123456789abcdef", ""));   // unknown here: none
+    using forwarders_logic::stale_gate;
+    const std::string a = "sdmc:/config/playguard/gate-0123456789abcdef.nro";
+    const std::string b = "sdmc:/config/playguard/gate-fedcba9876543210.nro";
+    CHECK(stale_gate(true, a, b, true));
+    CHECK(!stale_gate(true, b, b, true));
+    CHECK(!stale_gate(false, a, b, true));   // not protected: no gate
+    CHECK(!stale_gate(true, a, "sdmc:/switch/playguard.nro", false));   // PlayGuard the gate: changes with each update
+    CHECK(!stale_gate(true, a, "", true));
 }
 
 static void test_patches()

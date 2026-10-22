@@ -191,6 +191,11 @@ bool stale_loader(const std::string& made, const std::string& current)
     return !current.empty() && made != current;
 }
 
+bool stale_gate(bool pin, const std::string& made, const std::string& current, bool pinned)
+{
+    return pin && pinned && !current.empty() && made != current;
+}
+
 std::string patch_gaps(const patches::Report& r)
 {
     std::string out;

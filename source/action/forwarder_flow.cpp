@@ -497,10 +497,13 @@ std::vector<forwarders_logic::Row> to_refresh()
     std::vector<forwarders_logic::Row> out;
     const std::string current = loader_id();
     if (current.empty()) return out;
+    const Gate gate = gate_nro();
     for (const auto& r : made_rows(true)) {
         forwarders::Made m;
         if (r.state != forwarders_logic::State::NotInstalled && r.state != forwarders_logic::State::Elsewhere &&
-            forwarders::find(r.id, &m) && forwarders_logic::stale_loader(m.loader, current))
+            forwarders::find(r.id, &m) &&
+            (forwarders_logic::stale_loader(m.loader, current) ||
+             forwarders_logic::stale_gate(m.pin, m.gate, gate.path, gate.pinned)))
             out.push_back(r);
     }
     return out;

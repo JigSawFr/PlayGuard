@@ -28,6 +28,7 @@ static const Lines DE = { {
     "Ein Elternteil kann diese Zeiten in PlayGuard ändern.",
     "Die Spielzeit von heute ist aufgebraucht: zurück zum HOME-Menü.",
     "Es öffnet sich morgen wieder, oder wenn ein Elternteil Zeit hinzufügt.",
+    "Geschützt durch PlayGuard",
 } };
 
 static const Lines EN_US = { {
@@ -50,6 +51,7 @@ static const Lines EN_US = { {
     "A parent can change these hours in PlayGuard.",
     "Today's play time is used up: back to the HOME menu.",
     "It opens again tomorrow, or when a parent adds time.",
+    "Protected by PlayGuard",
 } };
 
 static const Lines ES = { {
@@ -72,6 +74,7 @@ static const Lines ES = { {
     "Un adulto puede cambiar estos horarios en PlayGuard.",
     "El tiempo de juego de hoy se ha agotado: vuelta al menú HOME.",
     "Se abrirá de nuevo mañana, o cuando un adulto añada tiempo.",
+    "Protegido por PlayGuard",
 } };
 
 static const Lines ES_419 = { {
@@ -94,6 +97,7 @@ static const Lines ES_419 = { {
     "Un adulto puede cambiar estos horarios en PlayGuard.",
     "El tiempo de juego de hoy se agotó: vuelta al menú HOME.",
     "Se abrirá de nuevo mañana, o cuando un adulto agregue tiempo.",
+    "Protegido por PlayGuard",
 } };
 
 static const Lines FR = { {
@@ -116,6 +120,7 @@ static const Lines FR = { {
     "Un parent peut changer ces horaires dans PlayGuard.",
     "Le temps de jeu du jour est écoulé : retour au menu HOME.",
     "Il se rouvrira demain, ou quand un parent ajoutera du temps.",
+    "Protégé par PlayGuard",
 } };
 
 static const Lines FR_CA = { {
@@ -138,6 +143,7 @@ static const Lines FR_CA = { {
     "Un parent peut changer ces horaires dans PlayGuard.",
     "Le temps de jeu du jour est écoulé : retour au menu HOME.",
     "Il se rouvrira demain, ou quand un parent ajoutera du temps.",
+    "Protégé par PlayGuard",
 } };
 
 static const Lines IT = { {
@@ -160,6 +166,7 @@ static const Lines IT = { {
     "Un genitore può cambiare questi orari in PlayGuard.",
     "Il tempo di gioco di oggi è esaurito: ritorno al menu HOME.",
     "Si riaprirà domani, o quando un genitore aggiungerà del tempo.",
+    "Protetto da PlayGuard",
 } };
 
 static const Lines JA = { {
@@ -182,6 +189,7 @@ static const Lines JA = { {
     "保護者はPlayGuardでこの時間を変更できます。",
     "今日のプレイ時間は終わりました：HOMEメニューに戻ります。",
     "明日、または保護者が時間を追加すると、また開けます。",
+    "PlayGuardで保護中",
 } };
 
 static const Lines KO = { {
@@ -204,6 +212,7 @@ static const Lines KO = { {
     "보호자가 PlayGuard에서 이 시간을 바꿀 수 있습니다.",
     "오늘의 플레이 시간이 끝났습니다: HOME 메뉴로 돌아갑니다.",
     "내일, 또는 보호자가 시간을 추가하면 다시 열립니다.",
+    "PlayGuard로 보호됨",
 } };
 
 static const Lines NL = { {
@@ -226,6 +235,7 @@ static const Lines NL = { {
     "Een ouder kan deze tijden wijzigen in PlayGuard.",
     "De speeltijd van vandaag is op: terug naar het HOME-menu.",
     "Morgen gaat het weer open, of zodra een ouder tijd toevoegt.",
+    "Beschermd door PlayGuard",
 } };
 
 static const Lines PT = { {
@@ -248,6 +258,7 @@ static const Lines PT = { {
     "Um adulto pode mudar estes horários no PlayGuard.",
     "O tempo de jogo de hoje acabou: regresso ao menu HOME.",
     "Volta a abrir amanhã, ou quando um adulto acrescentar tempo.",
+    "Protegido pelo PlayGuard",
 } };
 
 static const Lines PT_BR = { {
@@ -270,6 +281,7 @@ static const Lines PT_BR = { {
     "Um adulto pode mudar estes horários no PlayGuard.",
     "O tempo de jogo de hoje acabou: de volta ao menu HOME.",
     "Ele abre de novo amanhã, ou quando um adulto adicionar tempo.",
+    "Protegido pelo PlayGuard",
 } };
 
 static const Lines RU = { {
@@ -292,6 +304,7 @@ static const Lines RU = { {
     "Родитель может изменить эти часы в PlayGuard.",
     "Время игры на сегодня закончилось: возврат в меню HOME.",
     "Откроется снова завтра или когда родитель добавит время.",
+    "Под защитой PlayGuard",
 } };
 
 static const Lines ZH_HANS = { {
@@ -314,6 +327,7 @@ static const Lines ZH_HANS = { {
     "家长可在PlayGuard中更改这些时间。",
     "今天的游戏时间已用完：返回HOME菜单。",
     "明天或家长增加时间后即可再次打开。",
+    "受 PlayGuard 保护",
 } };
 
 static const Lines ZH_HANT = { {
@@ -336,6 +350,7 @@ static const Lines ZH_HANT = { {
     "家長可在PlayGuard中變更這些時間。",
     "今天的遊戲時間已用完：返回HOME選單。",
     "明天或家長增加時間後即可再次開啟。",
+    "受 PlayGuard 保護",
 } };
 
 // libnx's SetLanguage order (ja, en-US, fr, de, it, es, zh-CN, ko, nl, pt, ru,

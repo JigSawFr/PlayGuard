@@ -96,6 +96,11 @@ std::string patch_gaps(const patches::Report& report);
 // when unknown, as on the desktop: then none is). sphaira's own forwarders
 // had to be made again after a loader update to start their .nro well.
 bool stale_loader(const std::string& made, const std::string& current);
+// Whether a forwarder protected with the PIN (`pin`), made with the gate
+// `made` ("sdmc:/…"), is out of date against the gate this build writes,
+// `current`: only when that one is pinned (its own file, gate_nro), as a
+// new PlayGuard's gate is another file the forwarder does not start.
+bool stale_gate(bool pin, const std::string& made, const std::string& current, bool pinned);
 
 // Whether `nro` ("sdmc:/…") is a homebrew menu, which starts any other
 // .nro: hbmenu (sdmc:/hbmenu.nro, the one the album starts, or a copy of

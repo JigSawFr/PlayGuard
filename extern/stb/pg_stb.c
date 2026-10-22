@@ -52,6 +52,11 @@ float pg_font_kern(const PgFont *f, int cp, int next)
     return stbtt_GetCodepointKernAdvance((const stbtt_fontinfo *)f->opaque, cp, next) * f->scale;
 }
 
+int pg_font_has(const PgFont *f, int cp)
+{
+    return stbtt_FindGlyphIndex((const stbtt_fontinfo *)f->opaque, cp) != 0;
+}
+
 unsigned char *pg_font_glyph(const PgFont *f, int cp, float shift_x, int *w, int *h, int *x0, int *y0)
 {
     return stbtt_GetCodepointBitmapSubpixel((const stbtt_fontinfo *)f->opaque, f->scale, f->scale, shift_x, 0, cp, w,

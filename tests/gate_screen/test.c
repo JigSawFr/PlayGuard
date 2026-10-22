@@ -2,7 +2,7 @@
 // screen drawn into a buffer as the console's framebuffer (a stride wider
 // than the screen left alone), the night blue at its corners, the badge's
 // teal and the name's light text where they go, the state's colour on its
-// line; drawn with no font, no icon or a broken one without a fault; the
+// line, a long one wrapped left of the dial; drawn with no font, no icon or a broken one without a fault; the
 // lines there in every language libnx names, the console's font for each.
 // The look itself: make gate-preview.
 #include "check.h"
@@ -45,7 +45,7 @@ static void draw_rules(GateScreenState state, const unsigned char *icon, size_t 
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
     const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", "PlayGuard · tagline", "21:03", state,
-                           note, warn, rules };
+                           note, warn, rules, NULL };
     gate_screen_draw(px, W, H, STRIDE, &s);
 }
 
@@ -113,11 +113,33 @@ static void test_screen(void)
     gate_screen_draw(px, 64, 32, 64, &empty);     // a tiny buffer: clipped
 }
 
+// A long status wraps under itself, left of the dial; the badge in the
+// console's language, in the console's font when PlayGuard's lacks its letters.
+static void test_wrap(void)
+{
+    for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0;
+    const char *longer = "Code PIN non saisi : retour au menu HOME, puis encore un peu de texte pour la seconde ligne.";
+    GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", longer, "A hint",
+                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, "Protégé par PlayGuard" };
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(count_near(400, 420, 900, 460, 0xFF, 0x7A, 0x7A, 40) > 150);   // its first line
+    CHECK(count_near(400, 470, 900, 505, 0xFF, 0x7A, 0x7A, 40) > 150);   // its second one
+    CHECK(count_near(945, 400, W, 560, 0xFF, 0x7A, 0x7A, 40) == 0);      // none over the dial
+    CHECK(count_near(470, 335, 720, 366, 0x2E, 0xC4, 0xA6, 40) > 300);   // the badge
+    // Letters Sora has not: drawn all the same (the console's font, here Sora too).
+    s.badge = "\xE5\x8F\x97 PlayGuard \xE4\xBF\x9D\xE6\x8A\xA4";
+    s.status = "\xE8\xAF\xB7\xE8\xBE\x93\xE5\x85\xA5\xE5\xAE\xB6\xE9\x95\xBF\xE6\x8E\xA7\xE5\x88\xB6PIN\xE4\xBB\xA5\xE5\x90\xAF\xE5\x8A\xA8\xE3\x80\x82";
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(count_near(400, 322, 500, 376, 0x2E, 0xC4, 0xA6, 40) > 100);   // the badge, its padlock
+}
+
 static void test_text(void)
 {
     for (int lang = -1; lang <= 18; lang++)
         for (int t = 0; t < GateText_Count; t++) CHECK(gate_text(lang, (GateText)t)[0] != '\0');
     CHECK(strcmp(gate_text(2, GateText_Refused), "Code PIN non saisi : retour au menu HOME.") == 0);
+    CHECK(strcmp(gate_text(2, GateText_Badge), "Protégé par PlayGuard") == 0);
+    CHECK(strcmp(gate_text(1, GateText_Badge), "Protected by PlayGuard") == 0);
     CHECK(strstr(gate_text(13, GateText_Asking), "NIP") != NULL);           // Canadian French
     CHECK(strcmp(gate_text(99, GateText_Asking), gate_text(1, GateText_Asking)) == 0);
     CHECK(gate_text(1, GateText_Count)[0] == '\0');
@@ -139,6 +161,7 @@ int main(void)
     px = (uint32_t *)malloc(sizeof(uint32_t) * STRIDE * H);
     test_screen();
     test_rules();
+    test_wrap();
     test_text();
     free(px);
     free(font);
