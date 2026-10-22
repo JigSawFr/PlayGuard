@@ -1,15 +1,18 @@
-<!-- translated from docs/install.md, sha256 3b35bfa7ef3d -->
+<!-- translated from docs/install.md, sha256 7ff4e3d51ec9 -->
 # Installatie
 
 Hoe je PlayGuard installeert, bijwerkt en verwijdert, en wat het op de SD-kaart schrijft. Eenmaal geïnstalleerd: [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
 
 ## Waar je het vindt
 
+> [!WARNING]
+> PlayGuard staat **nog niet in de Homebrew App Store (en ook niet in die van sphaira)**: de vermelding wacht nog op goedkeuring. Installeer het voorlopig met de hand.
+
 Kies er één:
 
-- **Homebrew App Store** / **App Store van sphaira** (dezelfde catalogus) — Zoek naar *PlayGuard* zodra de vermelding is goedgekeurd. Nieuwe versies worden automatisch opgepikt, na een controle: vaak een paar dagen na GitHub. PlayGuard weet dat het daarvandaan is geïnstalleerd en raadt aan om via de store bij te werken.
+- **Handmatig** (voorlopig aanbevolen) — Download `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) en pak het uit in de **hoofdmap** van de SD-kaart. De app komt in `sd:/switch/playguard/`, zijn bestanden in `sd:/config/playguard/`.
 - **sphaira › GitHub** — De zip van de release bevat de vermelding al (`/config/sphaira/github/playguard.json`): werk na een eerste installatie bij via *GitHub* in sphaira.
-- **Handmatig** — Download `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) en pak het uit in de **hoofdmap** van de SD-kaart. De app komt in `sd:/switch/playguard/`, zijn bestanden in `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store van sphaira** (dezelfde catalogus) — **Nog niet vermeld.** Zoek naar *PlayGuard* zodra de vermelding is goedgekeurd. Nieuwe versies worden dan automatisch opgepikt, na een controle: vaak een paar dagen na GitHub. PlayGuard weet dat het daarvandaan is geïnstalleerd en raadt aan om via de store bij te werken.
 
 De optionele **herstel-sysmodule** (`playguard-rescue.zip`) is een aparte download: pak die ook uit in de hoofdmap van de SD-kaart en start de console daarna opnieuw op. Hij komt in `atmosphere/contents/4200000000505247/` en doet alleen iets als een `RESCUE`-bestand daarom vraagt — zie [Buitengesloten?](troubleshooting.md#buitengesloten).
 
@@ -33,7 +36,7 @@ Alles staat in `sd:/config/playguard/` (de app zelf blijft in `sd:/switch/playgu
 - **`profiles/`** — Opgeslagen profielen met speeltijdlimieten
 - **`exports/`** — Exports van de activiteit
 - **`nand/<system>/`** — Wat bij één systeem hoort, elk met zijn eigen ouderlijk toezicht: `sysmmc/` voor de sysMMC, `emummc/` voor de emuMMC. Daarin: `history.json` de wijzigingsgeschiedenis (de nieuwste 500, ook een wijziging die de console weigerde; een bestand dat niet te lezen is, wordt bewaard als `history.json.bad`, het vorige als `.bad.1`, in plaats van overschreven, en PlayGuard meldt dat één keer); `state.json` wat *Alle games blokkeren*, de extra tijd, een wachtende hervergrendeling en de firmwarekeuze moeten onthouden ([config.md](../config.md#state-kept-between-launches), in het Engels); `watch.json` wat PlayGuard het laatst van de console zag, om te zien wat erbuiten is gewijzigd ([config.md](../config.md#watchjson); verwijderen kan geen kwaad); `backups/` de back-ups van de instellingen (nooit met de pincode); `cache/` de laatst gelezen speelactiviteit (alle accounts, en elk bekeken account), die bij de volgende start meteen wordt getoond terwijl het log opnieuw wordt gelezen. De bestanden van een versie van vóór deze mappen gaan naar het eerste systeem waarop PlayGuard start
-- **`cache/`** — De icoontjes van de games (`icons/`, hoogstens 16 MB, geleegd als de taal van de console verandert), gedeeld door alle systemen, zodat namen en icoontjes niet bij elke start opnieuw uit elke game worden gelezen; de release-opmerkingen van Atmosphère, hekate en de firmware (`sys_notes.json`, voor *Console*) en die van PlayGuard zelf (voor *Info*); in ontwikkelaarsmodus de lijst van *Andere build installeren* (`dev_builds.json`)
+- **`cache/`** — De icoontjes van de games (`icons/`, hoogstens 16 MB, geleegd als de taal van de console verandert), gedeeld door alle systemen, zodat namen en icoontjes niet bij elke start opnieuw uit elke game worden gelezen; de release-opmerkingen van Atmosphère, hekate, sys-patch en de firmware (`sys_notes.json`, voor *Console*) en die van PlayGuard zelf (voor *Info*); in ontwikkelaarsmodus de lijst van *Andere build installeren* (`dev_builds.json`)
 - **`github_token`** — De GitHub-aanmelding van *Rapport online versturen* en, in ontwikkelaarsmodus, van *Andere build installeren*; verwijderd door af te melden (*Info › Hulp en diagnose › GitHub-account*, zichtbaar zodra je bent aangemeld)
 - **`previous_build.json`**, **`boot_check.json`** — Nadat een build ter plekke is geïnstalleerd: de naam van de vervangen build (bewaard naast de `.nro` als `playguard.nro.previous`), en de controle van de volgende start (verwijderd zodra het eerste scherm verschijnt)
 - **`rescue_report.txt`** — Achtergelaten door de herstel-sysmodule nadat die iets heeft gedaan, tot PlayGuard het bij het opstarten toont (een rapport dat het niet kan lezen, wordt verwijderd, en PlayGuard meldt dat)

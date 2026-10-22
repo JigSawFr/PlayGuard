@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 7eb08acd197b -->
+<!-- translated from docs/getting-started.md, sha256 db71c88bd2a7 -->
 # Primeros pasos
 
 De la tarjeta SD a una consola configurada para su hijo, en unos diez minutos, y luego las tareas de todos los días. Volver al [README](../../README.md).
@@ -13,7 +13,7 @@ De la tarjeta SD a una consola configurada para su hijo, en unos diez minutos, y
 
 ## 1. Instalarlo
 
-Busque *PlayGuard* en el Homebrew App Store o en sphaira, o extraiga `playguard.zip` de la [última versión](https://github.com/JigSawFr/PlayGuard/releases/latest) en la raíz de la tarjeta SD ([instalación](install.md)).
+Extraiga `playguard.zip` de la [última versión](https://github.com/JigSawFr/PlayGuard/releases/latest) en la raíz de la tarjeta SD ([instalación](install.md)). PlayGuard todavía no está en el Homebrew App Store ni en sphaira: su ficha sigue pendiente de aprobación.
 
 > [!TIP]
 > Extraiga también `playguard-rescue.zip`, el sysmodule de recuperación opcional. No hace nada hasta que lo necesite, y es la única forma de volver a entrar si un límite de 0 minutos lo bloquea todo y se olvidó el PIN ([¿Consola bloqueada?](troubleshooting.md#consola-bloqueada)).
