@@ -1749,8 +1749,9 @@ if CADRAN:
     time.sleep(3.5)            # the toast gone: the next screen is a reference
     shot("15_week_saved")
 
-    # A restriction level from its tile: the confirmation, cancelled.
-    key("Left", 2)
+    # A restriction level from its tile: the confirmation, cancelled. B to
+    # the sidebar: saved with no dialog, the focus stays where Save was.
+    key("Escape")
     key("Down", steps("play_timer", "restrictions"))
     key("Right")               # Young child, the first tile
     key("Right", 2)            # Teen
