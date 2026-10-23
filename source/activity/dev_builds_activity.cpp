@@ -94,6 +94,15 @@ void DevBuildsActivity::onContentAvailable()
 {
     note->setSingleLine(false);
     loading_text->setSingleLine(false);
+    // The bar in the header, at its right (the room the title leaves there),
+    // not over the tabs.
+    auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
+    if (brls::Box* header = frame ? frame->getHeader() : nullptr) {
+        if (brls::Box* parent = loading_box->getParent()) parent->removeView(loading_box.getView(), false);
+        loading_box->setAlignSelf(brls::AlignSelf::CENTER);
+        loading_box->setMarginRight(16);
+        header->addView(loading_box.getView(), 1);
+    }
     // Not the running build: the header's badge names it already, the list
     // marks it, and the build's page and the download name it again.
     note->setText("playguard/dev_build/note"_i18n);
