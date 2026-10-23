@@ -15,23 +15,36 @@ by a few dozen at most, a value going from "2 h" to "2 h 1" by about 200). For
 each failing screen, <shots-dir>/visual_diff/NAME.png shows the reference, the
 new screenshot and the changes (in red) side by side.
 
-Only screens that come out the same from one run to the next are kept as
-references: no toast, no held-key scrolling that can stop anywhere (held to
-the end of a list is fine), no app version (a release would change it), no
-SD-card content that piles up between local runs.
+The references are main's own screens (tools/visual_refs.py: the last run
+of main keeps them, a pull request compares with them), never files kept
+by hand. --screens FILE names the screens compared, one a line
+(tests/visual/<scenario>/SCREENS): only screens that come out the same
+from one run to the next, no toast, no held-key scrolling that can stop
+anywhere (held to the end of a list is fine), no app version (a release
+would change it), no SD-card content that piles up between local runs.
+A screen of the list without a reference yet is new: reported, not failed.
+Without --screens, every PNG of <reference-dir> is a reference (the web
+simulator's check against main's site).
 
-A change to the UI that is meant: run the smoke test, then
-  tools/visual_check.py <shots-dir> <reference-dir> --update
-which copies over the references the screenshots of the screens that
-changed (more than --max-pixels), leaving the others' files untouched, and
-adds those of --add NAME ... that have no reference yet; then look at the
-images before committing them.
+A change to the UI that is meant is announced, not stored: --expected
+names the screens allowed to change, `scenario/name` patterns (fnmatch,
+`cadran/*`) against --scenario's name, or `any`; a changed screen it names
+counts as announced, not as a failure, and one it names that did not
+change is said. CI reads them from the pull request's `Screens:` line.
 
-Usage: tools/visual_check.py <shots-dir> <reference-dir> [--update] [--add NAME ...]
+--update makes <reference-dir> this run's references (main's run, through
+visual_refs.py keep): the screenshots of the screens that changed (more
+than --max-pixels) replace theirs, the others' files are left untouched,
+--add NAME ... and the --screens list add those without a reference yet.
+--masked: the images are stored masked already (two sets of references).
+
+Usage: tools/visual_check.py <shots-dir> <reference-dir> [--screens FILE] [--scenario NAME]
+                             [--expected LIST] [--update] [--add NAME ...] [--masked]
                              [--fuzz PERCENT] [--max-pixels N]     (needs ImageMagick)
 """
 import argparse
 import collections
+import fnmatch
 import glob
 import os
 import re
@@ -76,11 +89,17 @@ def area_pixels(src):
     return px
 
 
+MASKED = False   # --masked: the images are stored masked already
+
+
 def masked(src, dst):
     """`src` with the footer clock showing CLOCK_TEXT: the area filled with
     its background, then the text in the clock's colour (both read from
     `src`, so a footer dimmed under a dialog stays dimmed). No clock there:
     only the background."""
+    if MASKED:
+        shutil.copyfile(src, dst)
+        return
     px = area_pixels(src)
     bg = collections.Counter(px.values()).most_common(1)[0][0]
     distance = lambda c: sum(abs(a - b) for a, b in zip(c, bg))
@@ -127,21 +146,48 @@ def compare(ref, new, tmp, args):
     return changed_pixels(ref_m, new_m, args.fuzz, os.path.join(tmp, "diff.png")), None
 
 
+def read_screens(path):
+    """The screen names of a SCREENS file, one a line, in its order."""
+    with open(path, encoding="utf-8") as f:
+        return [l.strip() for l in f if l.strip() and not l.startswith("#")]
+
+
+def expected_patterns(text):
+    """--expected as patterns: comma- or space-separated; `any` matches every
+    screen, `none` or nothing none."""
+    items = [p.strip() for p in (text or "").replace(",", " ").split()]
+    return [] if items == ["none"] else ["*/*" if p == "any" else p for p in items]
+
+
+def is_expected(patterns, scenario, name):
+    screen = f"{scenario}/{name}" if scenario else name
+    return any(fnmatch.fnmatchcase(screen, p) or fnmatch.fnmatchcase(name, p) for p in patterns)
+
+
 def main():
+    global MASKED
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("shots")
     ap.add_argument("reference")
-    ap.add_argument("--update", action="store_true", help="replace the references of the screens that changed")
+    ap.add_argument("--screens", metavar="FILE", help="the screens compared, one a line (default: every PNG of the references)")
+    ap.add_argument("--scenario", default="", help="the scenario's name, what --expected's patterns match before the /")
+    ap.add_argument("--expected", default="", metavar="LIST", help="screens allowed to change: scenario/name patterns, or any")
+    ap.add_argument("--update", action="store_true", help="make the references this run's screens (the changed ones replaced)")
     ap.add_argument("--add", nargs="*", default=[], metavar="NAME", help="with --update: screens to add")
+    ap.add_argument("--masked", action="store_true", help="the images are stored masked already")
     ap.add_argument("--fuzz", type=float, default=15.0)
     ap.add_argument("--max-pixels", type=int, default=100)
     args = ap.parse_args()
+    MASKED = args.masked
 
-    names = sorted(os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(args.reference, "*.png")))
+    listed = read_screens(args.screens) if args.screens else None
+    in_refs = sorted(os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(args.reference, "*.png")))
+    names = listed if listed is not None else in_refs
     if args.update:
         os.makedirs(args.reference, exist_ok=True)
+        wanted = sorted(set(names) | set(args.add) | (set(in_refs) if listed is None else set()))
         with tempfile.TemporaryDirectory() as tmp:
-            for name in sorted(set(names) | set(args.add)):
+            for name in wanted:
                 src = os.path.join(args.shots, name + ".png")
                 if not os.path.exists(src):
                     sys.exit(f"no {src}")
@@ -151,24 +197,35 @@ def main():
                 if os.path.exists(ref) and compare(ref, src, tmp, args)[0] <= args.max_pixels:
                     continue
                 # Stored with the footer clock at CLOCK_TEXT, never the host's time.
+                print("added" if not os.path.exists(ref) else "updated", name)
                 masked(src, ref)
                 subprocess.run(IM + ["mogrify", "-strip", ref], check=True)
-                print("updated", name)
+        # A reference the list no longer names is a screen that left the set.
+        for name in in_refs:
+            if listed is not None and name not in wanted:
+                os.remove(os.path.join(args.reference, name + ".png"))
+                print("removed", name)
+        print(f"references: {len(wanted)} screen(s) in {args.reference}")
         return 0
     if not names:
-        sys.exit(f"no reference image in {args.reference}")
+        sys.exit(f"no screen to compare: no --screens list and no reference image in {args.reference}")
 
-    failed = []
+    patterns = expected_patterns(args.expected)
+    failed, announced, new = [], [], []
     diff_dir = os.path.join(args.shots, "visual_diff")
     with tempfile.TemporaryDirectory() as tmp:
         for name in names:
             ref = os.path.join(args.reference, name + ".png")
-            new = os.path.join(args.shots, name + ".png")
-            if not os.path.exists(new):
-                print(f"FAIL {name}: no screenshot {new}")
+            new_shot = os.path.join(args.shots, name + ".png")
+            if not os.path.exists(new_shot):
+                print(f"FAIL {name}: no screenshot {new_shot}")
                 failed.append(name)
                 continue
-            n, why = compare(ref, new, tmp, args)
+            if not os.path.exists(ref):
+                print(f"new  {name} (no reference yet)")
+                new.append(name)
+                continue
+            n, why = compare(ref, new_shot, tmp, args)
             if why:
                 print(f"FAIL {name}: {why}")
                 failed.append(name)
@@ -176,19 +233,34 @@ def main():
             if n <= args.max_pixels:
                 print(f"ok   {name} ({n} px)")
                 continue
-            print(f"FAIL {name}: {n} pixels changed (at most {args.max_pixels})")
-            failed.append(name)
             os.makedirs(diff_dir, exist_ok=True)
             subprocess.run(IM + ["convert", os.path.join(tmp, "ref.png"), os.path.join(tmp, "new.png"),
                                  os.path.join(tmp, "diff.png"), "+append", os.path.join(diff_dir, name + ".png")],
                            check=True)
+            if is_expected(patterns, args.scenario, name):
+                print(f"ok   {name} ({n} px changed, announced)")
+                announced.append(name)
+                continue
+            print(f"FAIL {name}: {n} pixels changed (at most {args.max_pixels})")
+            failed.append(name)
 
+    if announced:
+        print(f"announced: {', '.join(announced)}")
+    if new:
+        print(f"new: {', '.join(new)}")
+    if args.scenario:
+        # The patterns of this scenario (`scenario/…`) that matched no changed screen.
+        mine = [p for p in patterns if p != "*/*" and "/" in p and fnmatch.fnmatchcase(args.scenario, p.split("/", 1)[0])]
+        unused = [p for p in mine if not any(is_expected([p], args.scenario, n) for n in announced)]
+        if unused:
+            print("announced but unchanged: " + ", ".join(unused))
     if failed:
         print(f"\nvisual check: {len(failed)} screen(s) changed: {', '.join(failed)}")
         print(f"Side-by-side images (reference | now | changes): {diff_dir}")
-        print("If the change is meant: tools/visual_check.py <shots-dir> <reference-dir> --update")
+        print("If the change is meant, announce it: the pull request's `Screens:` line (tests/visual/README.md)")
         return 1
-    print(f"visual check: {len(names)} screen(s) unchanged")
+    print(f"visual check: {len(names) - len(announced) - len(new)} screen(s) unchanged"
+          + (f", {len(announced)} changed as announced" if announced else "") + (f", {len(new)} new" if new else ""))
     return 0
 
 

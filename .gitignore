@@ -78,6 +78,8 @@ HB_APPSTORE_SUBMISSION.md
 /smoke-gate
 /smoke-errors
 /compat.json
+# The visual check's reference screens, main's (tools/visual_refs.py)
+/.visual-refs
 toolchain.txt
 /node_modules
 /out-rescue

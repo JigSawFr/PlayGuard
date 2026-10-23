@@ -138,6 +138,7 @@ jobs:
       host: ${{ steps.files.outputs.host }}
       desktop: ${{ steps.files.outputs.desktop }}
       switch: ${{ steps.files.outputs.switch }}
+      screens: ${{ steps.files.outputs.screens }}
     steps:
       - name: Files changed
         id: files
@@ -151,7 +152,7 @@ jobs:
           docs="$docs"'|^\.github/(ISSUE_TEMPLATE|DISCUSSION_TEMPLATE)/|^\.github/(CODEOWNERS|FUNDING\.yml|SUPPORT\.md|labels\.json|dependabot\.yml|pull_request_template\.md)$'
           docs="$docs"'|^\.github/workflows/(web|pages|codeql|clang-tidy|labels|pr-title|release-page|release-please|toolchain-watch)\.yml$|^\.clang-tidy$'
           docs="$docs"'|^tools/(build_site|check_site_links|web_[a-z_]+)\.py$|^tools/(site_screenshots|site_social|render_tour|render_branding)\.mjs$'
-          smoke='^tests/(visual|cut_text)/|^tools/(desktop_smoke|cut_text_check|visual_check)\.py$'
+          smoke='^tests/(visual|cut_text)/|^tools/(desktop_smoke|cut_text_check|visual_check|visual_refs)\.py$'
           # needed <skip> [<but>]: true when a file is neither documentation
           # nor <skip>, or matches <but>.
           needed() {
@@ -170,7 +171,17 @@ jobs:
             echo "$(wc -l <<< "$files") files changed:"
             sed 's/^/  /' <<< "$files"
           fi
-          { echo "host=$host"; echo "desktop=$desktop"; echo "switch=$switch"; } | tee -a "$GITHUB_OUTPUT"
+          # The screens the pull request announces it changes (its body's
+          # `Screens:` line, tests/visual/README.md): the visual check counts
+          # them as announced rather than failing on them. `none` or no line:
+          # none; `any`: every screen; else `scenario/name` patterns.
+          screens=""
+          if [ -n "$PR" ]; then
+            screens=$(gh api "repos/$REPO/pulls/$PR" --jq '.body // ""' | tr -d '\r' | sed -n 's/^[Ss]creens:[[:space:]]*//p' | head -n 1 | tr -s ' ,' ' ' | sed 's/^ //; s/ $//')
+            [ "$screens" != none ] || screens=""
+            [ -z "$screens" ] || echo "screens announced: $screens"
+          fi
+          { echo "host=$host"; echo "desktop=$desktop"; echo "switch=$switch"; echo "screens=$screens"; } | tee -a "$GITHUB_OUTPUT"
           skipped=""
           [ "$host" = true ] || skipped="$skipped, the clang and coverage host tests"
           [ "$desktop" = true ] || skipped="$skipped, the desktop build and smoke test"
@@ -432,7 +443,7 @@ jobs:
   # and branch rules.
   desktop-smoke-shard:
     name: desktop-smoke (${{ matrix.shard }})
-    needs: [ meta, desktop-build ]
+    needs: [ meta, changes, desktop-build ]
     runs-on: ubuntu-26.04
     timeout-minutes: 20
     strategy:
@@ -485,6 +496,11 @@ jobs:
             languages: ko zh-Hans zh-Hant
     env:
       ARTIFACT: playguard-${{ needs.meta.outputs.label }}-screenshots-${{ matrix.shard }}
+      REFS_ARTIFACT: playguard-${{ needs.meta.outputs.label }}-refs-${{ matrix.shard }}
+      # The screens the pull request announces (the changes job); a push to
+      # main, a release or the weekly run keep their screens instead.
+      EXPECTED: ${{ needs.changes.outputs.screens }}
+      KEEP: ${{ github.event_name != 'pull_request' && github.event_name != 'merge_group' && '1' || '0' }}
     steps:
       # The program comes built; borealis for the font the visual check
       # draws the footer's clock with (tools/visual_check.py), not its GLFW.
@@ -547,15 +563,34 @@ jobs:
             echo "::endgroup::"
           done
           if [ -n "$failed" ]; then echo "::error title=Smoke test::failed:$failed"; exit 1; fi
-      # The screens against tests/visual/<scenario> (reference | now | changes
-      # in smoke*/visual_diff/ when one changed; tests/visual/README.md says
-      # how to update the references after a change that is meant). The
-      # simulator draws the focus without its moving glow
+      # The references are main's own screens (tools/visual_refs.py,
+      # tests/visual/README.md): the last run of main left this shard's in
+      # the Actions cache, .visual-refs/<scenario>/; a scenario without any
+      # (a cache gone, a new scenario) gets the latest release's
+      # playguard-screens.zip, or compares nothing yet. Not for the text
+      # check's shards, which compare nothing.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.scenarios != 'cuttext'
+        with:
+          path: .visual-refs
+          key: visual-refs-${{ matrix.shard }}-${{ github.sha }}
+          restore-keys: visual-refs-${{ matrix.shard }}-
+      - name: Reference screens
+        if: matrix.scenarios != 'cuttext'
+        env:
+          SCENARIOS: ${{ matrix.scenarios }}
+        run: python3 tools/visual_refs.py fetch $SCENARIOS
+      # The screens of tests/visual/<scenario>/SCREENS against the references
+      # (reference | now | changes in smoke*/visual_diff/ when one changed).
+      # The simulator draws the focus without its moving glow
       # (PLAYGUARD_SIM_STILL_FOCUS), so a screen comes out the same in every
-      # run: one that changed fails the job, with the side-by-side images in
-      # the shard's screenshots artifact and the details in the job summary
-      # (visual-results.tsv: scenario, result, screens compared, the changed
-      # ones, the check's output).
+      # run: on a pull request one that changed fails the job unless the
+      # pull request announced it (EXPECTED), with the side-by-side images in
+      # the shard's screenshots artifact and the details in the job summary;
+      # on main, a release or the weekly run (KEEP) this run's screens become
+      # the references, the changed ones said. visual-results.tsv: scenario,
+      # result (ok, announced, changed, kept, none), screens compared, the
+      # changed or announced or new ones, the check's output.
       - name: Visual check
         env:
           SCENARIOS: ${{ matrix.scenarios }}
@@ -563,23 +598,52 @@ jobs:
           failed=""
           for sc in $SCENARIOS; do
             if [ "$sc" = smoke ]; then out=smoke; else out="smoke-$sc"; fi
-            if [ ! -d "tests/visual/$sc" ]; then   # no references for this scenario
+            if [ ! -f "tests/visual/$sc/SCREENS" ]; then   # no stable screen in this scenario
               printf '%s\tnone\t0\t\t\n' "$sc" >> visual-results.tsv
               continue
             fi
-            if python3 tools/visual_check.py "$out" "tests/visual/$sc" > "$out-visual.txt" 2>&1; then
+            if [ "$KEEP" = 1 ]; then
+              python3 tools/visual_refs.py keep "$out" "$sc" > "$out-visual.txt" 2>&1 || { cat "$out-visual.txt"; failed="$failed $sc"; }
               tail -n 1 "$out-visual.txt"
-              printf '%s\tok\t%s\t\t\n' "$sc" "$(grep -c '^ok   \|^FAIL ' "$out-visual.txt" || true)" >> visual-results.tsv
+              kept=$(grep -E '^(updated|added|removed) ' "$out-visual.txt" | sed 's/^updated /~/; s/^added /+/; s/^removed /-/' | paste -sd, -)
+              printf '%s\tkept\t%s\t%s\t%s\n' "$sc" "$(wc -l < "tests/visual/$sc/SCREENS")" "$kept" "$out-visual.txt" >> visual-results.tsv
+              continue
+            fi
+            if [ ! -d ".visual-refs/$sc" ]; then   # nothing of main's to compare with yet
+              echo "::warning title=Visual check ($sc)::no references of main yet (no cache, no release with playguard-screens.zip): nothing compared"
+              printf '%s\tnone\t0\t\t\n' "$sc" >> visual-results.tsv
+              continue
+            fi
+            if python3 tools/visual_check.py "$out" ".visual-refs/$sc" --screens "tests/visual/$sc/SCREENS" --scenario "$sc" --expected "$EXPECTED" > "$out-visual.txt" 2>&1; then
+              tail -n 1 "$out-visual.txt"
+              named=$(sed -n 's/^announced: //p; s/^new: //p' "$out-visual.txt" | tr -d ' ' | paste -sd, -)
+              state=ok; [ -z "$named" ] || state=announced
+              printf '%s\t%s\t%s\t%s\t%s\n' "$sc" "$state" "$(grep -c '^ok   \|^FAIL \|^new  ' "$out-visual.txt" || true)" "$named" "$out-visual.txt" >> visual-results.tsv
             else
               cat "$out-visual.txt"
               summary=$(grep '^visual check:' "$out-visual.txt" || echo "visual check failed")
-              echo "::error title=Visual check ($sc)::$summary — see the $ARTIFACT artifact (visual_diff/)"
+              echo "::error title=Visual check ($sc)::$summary — see the $ARTIFACT artifact (visual_diff/); a change that is meant is announced on the pull request's Screens: line"
               changed=$(sed -n 's/^visual check: [0-9]* screen(s) changed: //p' "$out-visual.txt" | tr -d ' ')
-              printf '%s\tchanged\t%s\t%s\t%s\n' "$sc" "$(grep -c '^ok   \|^FAIL ' "$out-visual.txt" || true)" "$changed" "$out-visual.txt" >> visual-results.tsv
+              printf '%s\tchanged\t%s\t%s\t%s\n' "$sc" "$(grep -c '^ok   \|^FAIL \|^new  ' "$out-visual.txt" || true)" "$changed" "$out-visual.txt" >> visual-results.tsv
               failed="$failed $sc"
             fi
           done
           [ -z "$failed" ]
+      # main's references for the next runs (a pull request keeps none), and
+      # this run's as an artifact: what a release attaches (the release job)
+      # and what `visual_refs.py fetch --run` takes.
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !cancelled() && matrix.scenarios != 'cuttext' && github.ref == 'refs/heads/main' && inputs.tag == '' }}
+        with:
+          path: .visual-refs
+          key: visual-refs-${{ matrix.shard }}-${{ github.sha }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() && matrix.scenarios != 'cuttext' && env.KEEP == '1' }}
+        with:
+          name: ${{ env.REFS_ARTIFACT }}
+          path: .visual-refs/
+          retention-days: 14
+          if-no-files-found: ignore
       - name: Upload screenshots
         id: screenshots
         if: always()
@@ -924,6 +988,16 @@ jobs:
         with:
           name: playguard-${{ env.LABEL }}-sdcard
           path: dist
+      # The reference screens of this build (every shard's, tools/visual_refs.py),
+      # attached as playguard-screens.zip: what the release page compares
+      # with the previous release's, and what a checkout fetches.
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: playguard-${{ env.LABEL }}-refs-*
+          path: refs
+          merge-multiple: true
+      - name: The reference screens
+        run: python3 tools/visual_refs.py zip refs dist/playguard-screens.zip
       # Anyone can then check that a download came from this repository's CI, unchanged:
       #   gh attestation verify playguard.nro -R JigSawFr/PlayGuard
       # SHA256SUMS.txt says the files match each other; this says who built them.
@@ -946,7 +1020,7 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           gh release upload "$TAG" --clobber dist/playguard.nro dist/playguard.zip dist/playguard-rescue.zip \
-            dist/compat.json dist/build-info.txt dist/SHA256SUMS.txt
+            dist/compat.json dist/build-info.txt dist/SHA256SUMS.txt dist/playguard-screens.zip
       # The release page laid out (tools/release_page.sh): "PlayGuard X.Y.Z",
       # a summary, the figures, the commit list release-please wrote folded
       # (what users notice, what contributors do), the screens that changed,
@@ -968,6 +1042,8 @@ jobs:
             tools/release_notes.py
             tools/release_page.sh
             tools/summarize_release.py
+            tools/visual_check.py
+            tools/visual_refs.py
           sparse-checkout-cone-mode: false
       # A token of the "PlayGuard Release" app, for the release's discussion:
       # the app published the release, so it is the discussion's author, and
