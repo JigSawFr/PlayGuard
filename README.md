@@ -32,7 +32,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - ⏱️ **Play-time limit** — every day or one per day, extra time or *no more play today* in one press, *Block all games* in one switch.
 - 📊 **Activity** — time per game and per account, charts, exports.
 - 🔒 **Restrictions and PIN** — age rating, temporary unlock, PlayGuard itself behind the PIN.
-- 🕒 **Console** — a network clock that counts right offline, homebrew on the HOME menu behind the PIN.
+- 🕒 **Console** — a network clock that counts right offline, the installed games checked and repaired, homebrew on the HOME menu behind the PIN.
 - ↩️ **History, backups, notifications** — every change logged and undoable.
 - 🌍 **Everywhere** — every console language, light and dark themes.
 

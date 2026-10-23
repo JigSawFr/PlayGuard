@@ -33,7 +33,7 @@ PlayGuard checks that Atmosphère runs, not which version: what counts is the fi
 
 ### Launchers
 
-Launching over a game (title override) is recommended. The app says whether it runs as an application or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard (unless the timer is off).
+Launching over a game (title override) is recommended. The app says whether it runs as an application (over a game, or from its own forwarder on the HOME menu) or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard, unless the timer is off or the PIN has paused parental controls ([details](features.md#the-pin-pauses-parental-controls-while-you-are-in-playguard)).
 
 ### Nintendo Switch 2
 

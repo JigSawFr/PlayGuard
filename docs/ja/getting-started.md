@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 150621760428 -->
 # はじめに
 
 SD カードから、子どものために設定した本体まで、約 10 分で進めます。そのあとは、ふだんの操作です。トップページは [README](../../README.md)。
@@ -24,6 +24,7 @@ PlayGuard は **ゲームの上から**（hbmenu、sphaira、Homebrew App Store 
 
 - ゲームの上からなら、PlayGuard はアプリケーションとして動き、メモリーをすべて使えます。アルバムからだとアプレットとして動き、使えるメモリーが少なくなります。
 - 本体は PlayGuard で過ごした時間をそのゲームの時間として数え、起動時に選んだユーザーの時間にします。子どもではなく、保護者のユーザーにしてください。
+- 暗証番号を入力すると、PlayGuard を使っている間はみまもり設定が一時停止するので、その時間は子どものプレイ時間から引かれません。PlayGuard から離れると、また有効になります。
 
 ## 3. *はじめに* に従う
 

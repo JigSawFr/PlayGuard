@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 150621760428 -->
 # 시작하기
 
 SD 카드에서 시작해 아이에게 맞게 설정된 본체까지 약 10분, 그다음 매일 하는 일을 설명합니다. 처음으로 돌아가기: [README](../../README.md).
@@ -24,6 +24,7 @@ PlayGuard는 **게임 위에서**(hbmenu, sphaira, Homebrew App Store로 게임�
 
 - 게임 위에서 열면 PlayGuard는 애플리케이션으로 실행되어 메모리를 모두 쓸 수 있습니다. 앨범에서 열면 애플릿으로 실행되어 메모리가 적습니다.
 - 본체는 PlayGuard에서 보낸 시간을 그 게임의 시간으로 계산하고, 실행할 때 고른 사용자에게 줍니다. 아이가 아니라 보호자의 사용자여야 합니다.
+- PIN을 입력하면 PlayGuard를 사용하는 동안 자녀 보호 기능이 일시 중지되므로, 그 시간은 아이의 시간에서 빠지지 않습니다. PlayGuard에서 나가면 다시 켜집니다.
 
 ## 3. *시작하기* 따라 하기
 

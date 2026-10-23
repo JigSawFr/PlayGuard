@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 150621760428 -->
 # 快速上手
 
 从 SD 卡到一台为孩子设置好的主机，大约十分钟，然后是日常操作。返回 [README](../../README.md)。
@@ -23,7 +23,8 @@
 **在游戏之上**（启动游戏时按住 R，使用 hbmenu、sphaira 或 Homebrew App Store）、用**家长的用户**打开 PlayGuard：
 
 - 在游戏之上，PlayGuard 作为应用运行，可以使用全部内存；从相册打开时，它作为小程序运行，内存较少；
-- 主机会把在 PlayGuard 中度过的时间算作那个游戏的时间，并记在启动时选择的用户名下：应该是家长的，而不是孩子的。
+- 主机会把在 PlayGuard 中度过的时间算作那个游戏的时间，并记在启动时选择的用户名下：应该是家长的，而不是孩子的；
+- 输入 PIN 后，在你使用 PlayGuard 期间，它会暂停家长控制，这段时间就不会占用孩子的时间；你离开时，家长控制会重新开启。
 
 ## 3. 按照 *入门* 操作
 

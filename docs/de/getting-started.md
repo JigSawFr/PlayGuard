@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 150621760428 -->
 # Einstieg
 
 Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa zehn Minuten, dann die alltäglichen Aufgaben. Zurück zum [README](../../README.md).
@@ -23,7 +23,8 @@ Entpacke `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/
 Öffne PlayGuard **über ein Spiel** (halte R gedrückt, während du ein Spiel startest, mit hbmenu, sphaira oder dem Homebrew App Store), mit **dem Benutzer eines Elternteils**:
 
 - über einem Spiel läuft PlayGuard als Anwendung, mit seinem ganzen Arbeitsspeicher; aus dem Album läuft es als Applet, mit weniger;
-- die Konsole zählt die Zeit in PlayGuard als die dieses Spiels und schreibt sie dem Benutzer zu, der beim Start gewählt wurde: dem eines Elternteils, nicht dem eines Kindes.
+- die Konsole zählt die Zeit in PlayGuard als die dieses Spiels und schreibt sie dem Benutzer zu, der beim Start gewählt wurde: dem eines Elternteils, nicht dem eines Kindes;
+- sobald die Geheimzahl eingegeben ist, pausiert PlayGuard den Jugendschutz, solange du darin bist, sodass diese Zeit nicht von der des Kindes abgeht; er wird wieder aktiv, sobald du es verlässt.
 
 ## 3. *Erste Schritte* folgen
 

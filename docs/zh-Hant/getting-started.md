@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 150621760428 -->
 # 開始使用
 
 從 SD 卡到一台為孩子設定好的主機，大約十分鐘，接著是日常的操作。返回 [README](../../README.md)。
@@ -23,7 +23,8 @@
 請**在遊戲之上**開啟 PlayGuard（啟動遊戲時按住 R，透過 hbmenu、sphaira 或 Homebrew App Store），並使用**家長的使用者**：
 
 - 在遊戲之上，PlayGuard 以應用程式的方式執行，可以使用全部的記憶體；從相簿開啟時，它以 applet 的方式執行，記憶體較少；
-- 主機會把在 PlayGuard 裡的時間算成那款遊戲的時間，並算在啟動時選擇的使用者身上：要是家長的，不是孩子的。
+- 主機會把在 PlayGuard 裡的時間算成那款遊戲的時間，並算在啟動時選擇的使用者身上：要是家長的，不是孩子的；
+- 輸入PIN碼後，你在 PlayGuard 中時，它會暫停家長監護，這段時間就不會佔用孩子的時間；你離開時，家長監護會重新開啟。
 
 ## 3. 依照*初始設定*操作
 
