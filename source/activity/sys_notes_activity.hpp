@@ -13,8 +13,8 @@
 // lists, the installed version's from the app when GitHub's are not there),
 // See online (its page
 // as a QR code), and when they were fetched. The notes kept on the SD card
-// show at once; a bar shows while they are fetched again (action/
-// sys_notes_flow.hpp), Ⓧ fetches them now.
+// show at once; a bar at the header's right shows while they are fetched
+// again (action/sys_notes_flow.hpp), Ⓧ fetches them now.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

@@ -66,8 +66,16 @@ SysNotesActivity::~SysNotesActivity()
 
 void SysNotesActivity::onContentAvailable()
 {
-    if (auto* applet = dynamic_cast<brls::AppletFrame*>(this->getContentView()))
-        applet->setTitle(brls::getStr("playguard/sys_notes/title", title_of(this->which)));
+    auto* applet = dynamic_cast<brls::AppletFrame*>(this->getContentView());
+    if (applet) applet->setTitle(brls::getStr("playguard/sys_notes/title", title_of(this->which)));
+    // The bar in the header, at its right (as on Install another build), not
+    // over the tabs.
+    if (brls::Box* top = applet ? applet->getHeader() : nullptr) {
+        if (brls::Box* parent = loading_box->getParent()) parent->removeView(loading_box.getView(), false);
+        loading_box->setAlignSelf(brls::AlignSelf::CENTER);
+        loading_box->setMarginRight(16);
+        top->addView(loading_box.getView(), 1);
+    }
     loading_text->setSingleLine(false);
     advice->setSingleLine(false);
     language->setSingleLine(false);
