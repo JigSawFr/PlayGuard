@@ -188,6 +188,16 @@ void gamecheck_last_timing(GameCheckTiming *out);
 // before any session is opened.
 Result gamecheck_remove(u64 app_id);
 
+// What the game takes on the console's storages, its update and add-ons
+// included (ns CalculateApplicationOccupiedSize), in bytes: what removing it
+// frees. 0 when unknown.
+Result gamecheck_occupied(u64 app_id, u64 *bytes);
+// The sum of ns' ApplicationOccupiedSize (0x80 bytes: 4 entries of 0x20, a
+// storage ID, then the game's, the update's and the add-ons' sizes, each
+// an s64 at +8, +0x10, +0x18 as switchbrew documents it); an entry with no
+// storage, or a size below 0, counts for nothing.
+u64 gamecheck_occupied_sum(const u8 raw[0x80]);
+
 // Deletes one content (an update or an add-on; not the game itself, not on a
 // game card): its files and its entry in the storage (ncm), then the HOME
 // menu entry is rebuilt without it (ns ListApplicationRecordContentMeta,

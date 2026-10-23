@@ -39,6 +39,9 @@ struct State
 // What the check of one game of a batch gave.
 using Verified = game_check_text::Verified;
 
+// "850 MB", "3.8 GB", with the language's decimal mark.
+std::string size_text(u64 bytes);
+
 // The dialog, built but not open yet (main thread); for a batch (`ids`, in
 // the order checked, more than one), the covers leafed through above.
 std::shared_ptr<State> make_dialog(const std::vector<u64>& ids = {});

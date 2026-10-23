@@ -278,6 +278,17 @@ Result nsCheckApplicationLaunchVersion(u64 id)
     return g ? g->launch_rc : 0x3456;
 }
 
+Result nsCalculateApplicationOccupiedSize(u64 id, NsApplicationOccupiedSize *out)
+{
+    REQUIRE(C.ns_open == 1);
+    (void)id;
+    // On the SD card (5): a game of 3 GB, an update of 512 MB, no add-on.
+    const s64 sizes[3] = { 3LL << 30, 512LL << 20, 0 };
+    out->unk_x0[0x20] = 5;
+    memcpy(out->unk_x0 + 0x28, sizes, sizeof sizes);
+    return 0;
+}
+
 Result nsDeleteApplicationCompletely(u64 id)
 {
     REQUIRE(C.ns_open == 1);
@@ -1171,6 +1182,25 @@ static void test_records_and_progress(void)
 static bool s_confirm;
 static bool confirm(void) { return s_confirm; }
 
+static void test_occupied(void)
+{
+    // An entry with no storage counts for nothing, nor a size below 0.
+    u8 raw[0x80] = { 0 };
+    const s64 nand[3] = { 100, 20, 3 }, none[3] = { 999, 999, 999 }, sd[3] = { -5, 1000, 0 };
+    raw[0x00] = 4;
+    memcpy(raw + 0x08, nand, sizeof nand);
+    memcpy(raw + 0x28, none, sizeof none);   // entry 1: storage 0
+    raw[0x40] = 5;
+    memcpy(raw + 0x48, sd, sizeof sd);
+    CHECK(gamecheck_occupied_sum(raw) == 1123);
+    // Through ns: the game and its update on the SD card.
+    reset();
+    u64 bytes = 1;
+    CHECK(gamecheck_occupied(0x0100000000010000ULL, &bytes) == 0);
+    CHECK(bytes == (3ULL << 30) + (512ULL << 20));
+    CHECK(C.ns_open == 0);
+}
+
 static void test_remove(void)
 {
     reset();
@@ -1414,6 +1444,7 @@ int main(void)
     test_categories();
     test_records_and_progress();
     test_paging();
+    test_occupied();
     test_remove();
     test_remove_content();
     test_reset_launch_version();

@@ -179,6 +179,19 @@ static void sim_bump(SimFixes *f, u64 id)
     sim_remember(f->bumps, &f->bump_count, COUNT_OF(f->bumps), id);
 }
 
+Result gamecheck_occupied(u64 app_id, u64 *bytes)
+{
+    // Between 0.5 and 8 GB, the same for a game from one run to the next.
+    *bytes = (512ULL + (app_id >> 12) % 7680ULL) << 20;
+    return 0;
+}
+
+u64 gamecheck_occupied_sum(const u8 raw[0x80])
+{
+    (void)raw;
+    return 0;
+}
+
 Result gamecheck_remove(u64 app_id)
 {
     const Result rc = sim_change_allowed("remove");
