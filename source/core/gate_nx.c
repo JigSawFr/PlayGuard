@@ -293,7 +293,8 @@ static void screen_open(Screen *sc, const char *nro, const char *when)
 static GateScreen screen_of(Screen *sc, GateScreenState state, const char *note, int note_warn, bool buttons)
 {
     static const GateText STATUS[] = { GateText_Asking, GateText_Opening, GateText_Free,  GateText_Refused,
-                                       GateText_Error,  GateText_Paused,  GateText_Closed, GateText_Limit };
+                                       GateText_Error,  GateText_Paused,  GateText_Closed, GateText_Limit,
+                                       GateText_Asking };
     const GateText hint = state == GateScreen_Asking    ? GateText_AskingHint
                           : state == GateScreen_Refused ? GateText_RefusedHint
                           : state == GateScreen_Paused  ? GateText_PausedHint
@@ -427,17 +428,18 @@ static u64 wait_ns(void)
     return (u64)gate_wait_parse(text, n) * 1000000ULL;
 }
 
-// It starts: the opening, its bar filling over `wait` (its arc turning),
-// as PlayGuard's intro; Ⓐ or Ⓑ skip the rest. No wait: a glimpse of it, full.
-static void screen_opening(Screen *sc, GateScreenState state, const char *note, u64 wait)
+// The opening, before the PIN screen (or in its free hours, before the
+// homebrew): its bar filling over `wait` (its arc turning), as PlayGuard's
+// intro; Ⓐ or Ⓑ skip the rest. No wait: drawn full at once. Its last frame
+// stays under the PIN screen, then until the homebrew draws its own.
+static void screen_opening(Screen *sc, GateScreenState state, const char *note, int note_warn, u64 wait)
 {
     if (!sc->on) return;
-    GateScreen s = screen_of(sc, state, note, 0, false);
+    GateScreen s = screen_of(sc, state, note, note_warn, false);
     // What stays, drawn once; each frame a copy of it and what moves.
     uint32_t *still = wait ? (uint32_t *)malloc(sizeof(uint32_t) * GATE_SCREEN_W * GATE_SCREEN_H) : NULL;
     if (!still) {
-        screen_show(sc, state, note, 0, false);
-        svcSleepThread(250000000ULL);
+        screen_show(sc, state, note, note_warn, false);
         return;
     }
     s.progress = 0;
@@ -533,6 +535,7 @@ bool gate_nx_run(void)
     GateResult r = GateResult_Error;
     char note[256] = "", span[256];
     bool shown = false;   // how it went already on the screen (refused, Ⓐ not pressed)
+    bool loaded = false;  // the opening shown before the PIN screen
     // Each try; once refused, Ⓐ tries again (until a pause starts).
     for (bool first = true;; first = false) {
         if (!first) timed = local_time(&wday, &minute, when, sizeof(when));
@@ -592,8 +595,11 @@ bool gate_nx_run(void)
                 snprintf(note, sizeof(note), "%s", gate_text(sc.language, GateText_ClockDiffers));
             else if (!netted && timed && gate_spans_hold(free_spans, free_n, wday, minute))
                 snprintf(note, sizeof(note), "%s", gate_text(sc.language, GateText_ClockUnknown));
+            // The opening first (once: not again when Ⓐ tries again), then
+            // the PIN screen over it; the PIN entered, the homebrew at once.
             watch_kick();
-            screen_show(&sc, GateScreen_Asking, note, refused > 0, false);
+            screen_opening(&sc, GateScreen_Loading, note[0] ? note : NULL, refused > 0, loaded ? 0 : wait_ns());
+            loaded = true;
             watch_pause();
             r = ask_pin(&code);
         }
@@ -637,14 +643,16 @@ bool gate_nx_run(void)
         }
         break;
     }
-    // How it went: the opening when it starts (GATE_WAIT_NAME's time), else
-    // a moment. Once refused, the screen above was it.
+    // How it went: in its free hours, the opening (GATE_WAIT_NAME's time);
+    // the PIN entered, nothing (it had its opening before); else a moment.
+    // Once refused, the screen above was it.
     static const GateScreenState SHOWN[] = { GateScreen_Opening, GateScreen_Free,   GateScreen_Refused, GateScreen_Error,
                                              GateScreen_Paused,  GateScreen_Closed, GateScreen_Limit };
     const bool opens = r == GateResult_Pin || r == GateResult_Free;
     if (sc.on && !shown) {
-        if (opens) screen_opening(&sc, SHOWN[r], note[0] ? note : NULL, wait_ns());
-        else {
+        if (opens) {
+            if (!loaded) screen_opening(&sc, SHOWN[r], note[0] ? note : NULL, 0, wait_ns());
+        } else {
             screen_show(&sc, SHOWN[r], note[0] ? note : NULL, 1, false);
             svcSleepThread(2500000000ULL);
         }

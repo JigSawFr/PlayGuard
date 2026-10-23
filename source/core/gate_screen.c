@@ -442,12 +442,33 @@ static void centred(Canvas *cv, const unsigned char *font, float px_size, float 
     text(cv, font, px_size, cx - (tw < max ? tw : max) / 2, baseline, s, c, 1, max);
 }
 
+// Cadran's dial on the right: its glow, two rings, the minutes, the day's
+// arc in `accent`.
+static void dial(Canvas *cv, Rgb accent)
+{
+    const float dx = 1196, dy = 340;
+    glow(cv, dx, dy, 290, accent, 0.09f);
+    arc(cv, dx, dy, 226, 1.5f, 0, 6.2831853f, WHITE, 0.05f);
+    arc(cv, dx, dy, 138, 1.5f, 0, 6.2831853f, WHITE, 0.04f);
+    for (int i = 0; i < 60; i++) {
+        const float ang = i * 6.2831853f / 60.0f, len = i % 5 == 0 ? 16.0f : 7.0f;
+        const float sx = sinf(ang), sy = -cosf(ang);
+        for (float t = 0; t < len; t += 0.5f) {
+            const float rr = 235 + t;
+            blend(cv, (int)(dx + sx * rr), (int)(dy + sy * rr), WHITE, i % 5 == 0 ? 0.12f : 0.06f);
+        }
+    }
+    arc(cv, dx, dy, 182, 18, 0, 6.2831853f, TRACK, 0.28f);
+    arc(cv, dx, dy, 182, 18, 0, 6.2831853f * 0.75f, accent, 0.16f);
+}
+
 // ---------------------------------------------------------------- the opening
 
 // Once it starts: centred, as PlayGuard's loading screen (activity/
 // loading.xml): the homebrew's icon over a soft teal glow, its name,
-// "Protected by PlayGuard", a bar filling, how it goes; at the bottom,
-// PlayGuard's mark, its arc turning, and its name.
+// "Protected by PlayGuard", a bar filling, how it goes; Cadran's dial on
+// the right, behind; at the bottom, PlayGuard's mark, its arc turning, and
+// its name.
 #define OPEN_ICON  184.0f
 #define OPEN_ICON_Y 130.0f
 #define OPEN_BAR_W 420.0f
@@ -458,7 +479,7 @@ static void centred(Canvas *cv, const unsigned char *font, float px_size, float 
 
 static bool opening(const GateScreen *s)
 {
-    return s->state == GateScreen_Opening || s->state == GateScreen_Free;
+    return s->state == GateScreen_Loading || s->state == GateScreen_Opening || s->state == GateScreen_Free;
 }
 
 // Where the bottom's mark goes: left of "PlayGuard", the two centred.
@@ -471,7 +492,9 @@ static float opening_mark_x(const GateScreen *s, float w)
 static void opening_still(Canvas *cv, const GateScreen *s)
 {
     night(cv);
-    const float cx = (float)cv->w / 2, max = (float)cv->w - 160;
+    dial(cv, TEAL);
+    // Centred, kept left of the dial's minutes.
+    const float cx = (float)cv->w / 2, max = 620;
     // The icon over its glow, in a hairline frame (else PlayGuard's mark).
     const float ix = cx - OPEN_ICON / 2, iy = OPEN_ICON_Y;
     glow(cv, cx, iy + OPEN_ICON / 2, 330, TEAL, 0.13f);
@@ -521,25 +544,11 @@ static void gate_still(Canvas *cv, const GateScreen *s)
     const int w = cv->w, h = cv->h;
     night(cv);
 
-    // Cadran's dial on the right, past the text: its glow, two rings, the
-    // minutes, the day's arc.
+    // Cadran's dial on the right, past the text, in the state's colour.
     const Rgb accent = s->state == GateScreen_Refused || s->state == GateScreen_Closed || s->state == GateScreen_Limit ? CORAL
                        : s->state == GateScreen_Error || s->state == GateScreen_Paused ? AMBER
                                                                                          : TEAL;
-    const float dx = 1196, dy = 340;
-    glow(cv, dx, dy, 290, accent, 0.09f);
-    arc(cv, dx, dy, 226, 1.5f, 0, 6.2831853f, WHITE, 0.05f);
-    arc(cv, dx, dy, 138, 1.5f, 0, 6.2831853f, WHITE, 0.04f);
-    for (int i = 0; i < 60; i++) {
-        const float ang = i * 6.2831853f / 60.0f, len = i % 5 == 0 ? 16.0f : 7.0f;
-        const float sx = sinf(ang), sy = -cosf(ang);
-        for (float t = 0; t < len; t += 0.5f) {
-            const float rr = 235 + t;
-            blend(cv, (int)(dx + sx * rr), (int)(dy + sy * rr), WHITE, i % 5 == 0 ? 0.12f : 0.06f);
-        }
-    }
-    arc(cv, dx, dy, 182, 18, 0, 6.2831853f, TRACK, 0.28f);
-    arc(cv, dx, dy, 182, 18, 0, 6.2831853f * 0.75f, accent, 0.16f);
+    dial(cv, accent);
 
     // The header: PlayGuard's mark and name; the clock.
     mark(cv, 92, 76, 30);

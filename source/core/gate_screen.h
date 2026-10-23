@@ -29,6 +29,7 @@ typedef enum {
     GateScreen_Paused,       // paused after refusals: back to the HOME menu, the PIN not asked
     GateScreen_Closed,       // in its hours without any access: back to the HOME menu
     GateScreen_Limit,        // the day's play time used up: back to the HOME menu
+    GateScreen_Loading,      // the opening, before the system's PIN screen
 } GateScreenState;
 
 // The rules a forwarder carries (GateScreen.rules), each an icon by the
@@ -58,7 +59,7 @@ typedef struct {
     // menu puts its buttons ("Try again", "HOME menu"); NULL: none.
     const char          *button_a;
     const char          *button_b;
-    // The opening (GateScreen_Opening, GateScreen_Free), as PlayGuard's
+    // The opening (GateScreen_Loading, _Opening, _Free), as PlayGuard's
     // loading screen: its bar filled to `progress` (0..1), the arc of
     // PlayGuard's mark turned by `spin` (in turns).
     float                progress;

@@ -31,7 +31,7 @@ Each step: what to do, then what must happen. ☐ is to tick.
 - ☐ Paused, then the console clock set a day forward in System Settings (*Synchronize Clock via Internet* off): still paused, saying when it asks again as before.
 - ☐ *Hours without the PIN* now included, on a console whose network clock was never set (one never online): the PIN asked all the same, the gate saying *No free hours: the network clock cannot be read*; the network clock set (*Set the network clock to the console clock*), it starts without the PIN.
 - ☐ *Pause after refused PINs › Never*: refused ten times, no pause.
-- ☐ A protected forwarder opened with the PIN: the opening screen centred, its bar filling over 2 s and the mark's ring turning, then the homebrew; Ⓐ skips it. *Opening screen › 5 s* then *Off*: five seconds, then a glimpse.
+- ☐ A protected forwarder from the HOME menu: the opening screen first (centred, the dial on the right, its bar filling over 2 s, the mark's ring turning), then the PIN screen, then the homebrew at once; Ⓐ skips the opening. *Opening screen › 5 s* then *Off*: five seconds, then the PIN screen at once.
 - ☐ *Hours without the PIN › Monday to Friday, and the weekend apart*: on a weekday in its span, no PIN; at the weekend, the weekend's span.
 - ☐ *Closed once today's play time is used up* switched on, a play timer with no time left today: the gate says *Today's play time is used up*, even with a PIN entered; time added (PlayGuard or the parent's app), it asks for the PIN again.
 - ☐ From a computer, `config/playguard/gate_rules.txt` written with a line giving sphaira every hour: the gate still asks for the PIN (its rules are in the forwarder).

@@ -167,7 +167,8 @@ static void test_opening(void)
     CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);   // the name, centred
     CHECK(count_near(0, 0, 400, H, 0xEE, 0xF2, 0xF8, 30) == 0);          // no text on the left
     CHECK(count_near(560, 425, 720, 455, 0x2E, 0xC4, 0xA6, 40) > 200);   // the badge
-    CHECK(count_near(1000, 100, W, 600, 0x2E, 0xC4, 0xA6, 40) == 0);     // no dial, no chips
+    CHECK(count_near(960, 100, W, 600, 0x2E, 0xC4, 0xA6, 40) == 0);      // no chips, no text over the dial
+    CHECK(count_near(1000, 100, W, 600, 0x1F, 0x33, 0x55, 30) > 2000);   // the dial's track, behind
     const int half = count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30);
     CHECK(half > 1200);                                                   // the bar's first half filled
     CHECK(count_near(652, 508, 848, 516, 0x2E, 0xC4, 0xA6, 30) == 0);    // its second not yet
@@ -181,7 +182,12 @@ static void test_opening(void)
     gate_screen_draw_motion(px, W, H, STRIDE, &s);
     CHECK(memcmp(px, whole, bytes) == 0);
 
-    // Full at the end; free hours the same screen; no motion in the other states.
+    // Before the PIN screen the same screen; full at the end; free hours the
+    // same screen; no motion in the other states.
+    s.state = GateScreen_Loading;
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30) == half);
+    CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);
     s.progress = 1.0f;
     s.state = GateScreen_Free;
     gate_screen_draw(px, W, H, STRIDE, &s);
