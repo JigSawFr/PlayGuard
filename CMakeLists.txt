@@ -179,7 +179,8 @@ else ()
     else ()
         list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/sim/web_.*")
     endif ()
-    # The console-free parts are shared with the simulator: one implementation.
+    # The console-free parts are shared with the simulator: one implementation
+    # (tools/check_sources.py fails on one left out).
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c

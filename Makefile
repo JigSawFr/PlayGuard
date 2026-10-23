@@ -364,6 +364,7 @@ fuzz:
 
 check: test
 	python3 tools/check_resources.py .
+	python3 tools/check_sources.py .
 	python3 tools/gen_compat.py . $(BUILD)/compat.json
 
 clean:
