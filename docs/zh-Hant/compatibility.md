@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # 相容性
 
 支援的韌體、Atmosphère 和啟動器，emuMMC 和 sysMMC，以及 PlayGuard 與替代型 sysmodule 的比較。返回 [README](../../README.md)。
@@ -16,7 +16,7 @@
 - **韌體 23.0.0**——Atmosphère 1.12.0。在 [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) 的表格中，指令與 23.0.1 相同。
 - **韌體 21.0.0 → 21.2.0**——Atmosphère 1.10.x。所有功能皆可使用。
 
-**21.0.0 之前：除了遊玩時間限制以外都可用**——限制、PIN碼、暫時解除、活動紀錄、網路時鐘、手機應用程式和紀錄都能使用。遊玩時間限制的設定區塊（0x44 位元組）從 21.0.0 起才是這個格式，所以 PlayGuard 會關閉依賴它的功能：每日上限、就寢鬧鐘、延長時間和主機鎖定。
+**21.0.0 之前：除了遊玩時間限制以外都可用**——限制、PIN碼、暫時解除、活動紀錄、網路時鐘、手機應用程式和紀錄都能使用。遊玩時間限制的設定區塊（0x44 位元組）從 21.0.0 起才是這個格式，所以 PlayGuard 會關閉依賴它的功能：每日上限、就寢鬧鐘、延長時間和*封鎖所有遊戲*。
 
 - **韌體 20.0.0 → 20.5.0**——Atmosphère 1.9.x
 - **韌體 19.0.x**——Atmosphère 1.8.0

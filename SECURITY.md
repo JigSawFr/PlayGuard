@@ -31,20 +31,42 @@ The latest release. Fixes are not backported.
 - **The update check and releases** — anything that makes PlayGuard trust a `compat.json`
   or a download that did not come from this repository's releases, or, in developer mode
   (*Install another build*), from this repository's own CI builds of `main` and of pull
-  requests from its branches (pull requests from forks are never offered).
+  requests from its branches (pull requests from forks are never offered); or another build
+  installed, or the previous one put back (at start-up too), without the PIN when one is set.
 - **The recovery screen** — reaching its actions (set a new PIN, delete everything) from a
   `rescue_report.txt` the console's state does not confirm, or, after an unlock, from one
   without the recovery sysmodule's proof for the current challenge (`rescue_nonce`, an
-  HMAC keyed with the stored PIN: see [`sysmodule/README.md`](sysmodule/README.md)), or
-  without the recovery sysmodule installed.
+  HMAC keyed with the stored PIN and a secret of the console: see
+  [`sysmodule/README.md`](sysmodule/README.md)), or without the recovery sysmodule
+  installed; or the PIN found back from a copy of PlayGuard's files on the card (a report's
+  proof included) without the console.
+- **The forwarder gate** — a forwarder protected with the PIN starting its homebrew from the
+  HOME menu without the PIN: outside its hours without the PIN, during its hours it never
+  opens, past a day's play time used up (*Closed once today's play time is used up*), or
+  while it pauses after refused PINs; including by changing the console clock in System
+  Settings (free hours are honoured only while the network clock vouches for the console
+  clock, and a pause also runs on the steady clock).
+- **The forwarder rules** — the rules of a forwarder made by this PlayGuard changed from the
+  SD card: they are in its RomFS on the console's storage, and the gate it starts is pinned
+  by its SHA-256 (`config/playguard/gate-<hash>.nro`), so free hours added in a file, or
+  another `.nro` put in place of the gate, must not take effect.
+- **The homebrew menu's lock** — while it is locked, the homebrew menu opened from the
+  console itself (the album, a game started with R held) without going through a forwarder
+  protected with the PIN, or the lock lifted at boot by anything but a `RESCUE` request or
+  an Atmosphère update.
 
 ## What is not
 
-- **Physical access to the SD card.** Whoever can edit the card can already turn off
-  PlayGuard's own PIN prompt in `config.json`, install the recovery sysmodule, or remove
-  parental controls with any pctl tool. On a console running custom firmware, any homebrew
-  can also read the stored PIN from the system (`pctl:a` command 1208): PlayGuard keeps a
-  child out of PlayGuard, not out of every homebrew. See [`sysmodule/README.md`](sysmodule/README.md).
+- **Physical access to the SD card**, but for the forwarder rules above. Whoever can edit
+  the card can already turn off PlayGuard's own PIN prompt in `config.json`, install the
+  recovery sysmodule, or remove parental controls with any pctl tool; and, for the
+  forwarders, delete the homebrew menu's lock (`atmosphere/config/override_config.ini`, by
+  design a way back, or its `config/playguard/hbmenu_lock.txt`), edit the pause after
+  refusals and the log of tries (`config/playguard/gate_pause.txt`, `gate_log.txt`) or the
+  files a forwarder made by an earlier PlayGuard reads its hours from, or replace the
+  homebrew a forwarder starts. On a console running custom firmware, any homebrew can also
+  read the stored PIN from the system (`pctl:a` command 1208): PlayGuard keeps a child out
+  of PlayGuard, not out of every homebrew. See [`sysmodule/README.md`](sysmodule/README.md).
 - **Custom firmware itself.** PlayGuard needs Atmosphère; a modded console can run any
   homebrew, including ones that change parental controls.
 - **Nintendo's parental controls.** Behaviour of the system `pctl` service or the phone app

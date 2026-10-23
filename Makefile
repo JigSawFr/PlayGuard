@@ -2,11 +2,15 @@
 #
 #   make              -> ./playguard.nro            (needs devkitPro, DEVKITPRO set)
 #   make dist         -> ./playguard.zip            (unzip onto the SD card root)
+#   make rescue       -> sysmodule/out/playguard-rescue.nsp (the recovery sysmodule; needs devkitPro)
+#   make dist-rescue  -> ./playguard-rescue.zip     (the recovery sysmodule, SD card layout)
 #   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
 #   make web          -> ./build-web/simulator/          (the same in a browser; needs Emscripten's emcmake)
 #   make web-serve    -> serves it at http://localhost:8000 (with the headers its threads need)
 #   make test         -> host unit tests (plain gcc/g++, ASan + UBSan; parallel, all suites)
+#   make check        -> make test, then the resource checks and compat.json
 #   make fuzz         -> libFuzzer runs of the parsers (clang; FUZZ_SECONDS=30 each, parallel)
+#   make gate-preview -> build/gate-preview/*.png    (the PIN gate's screen, one per state; GATE_LANG=n)
 #   make nxlink       -> push to a Switch running hbmenu (press Y there first)
 #
 # GL=1 builds the Switch .nro with OpenGL (mesa) instead of deko3d.
@@ -260,7 +264,7 @@ crash_dump_FLAGS := -std=c11 -Isource/util
 # parts of the service layer they share with the console.
 sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
 sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
-                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c) source/util/playlog.c \
+                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c rescue.c) source/util/playlog.c \
                       tests/forwarders/stb.c extern/stb/stb_image_write.c
 # Atomic coverage counters: the suite runs the same code from several threads
 # at once, and gcov's plain counters then come out wrong (negative ones, that

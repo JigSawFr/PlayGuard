@@ -1,10 +1,10 @@
 // rollback_flow — going back to the previous build (util/rollback.hpp).
 // At start-up, before borealis (so a build that crashes in its UI still
 // gets there): when the last start of a build just installed never reached
-// its first screen, a text screen offers the previous build; A swaps the
-// two .nro files and starts it again through hbloader, B goes on. At any
-// other time, Install another build has a line that does the same, after
-// the PIN.
+// its first screen, a text screen offers the previous build; A asks for
+// the PIN (the system's screen, when one is set), swaps the two .nro files
+// and starts it again through hbloader, B goes on. At any other time,
+// Install another build has a line that does the same, after the PIN.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # Compatibiliteit
 
 Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGuard zich verhoudt tot een vervangende sysmodule. Terug naar de [README](../../README.md).
@@ -16,7 +16,7 @@ Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGu
 - **Firmware 23.0.0** — Atmosphère 1.12.0. Dezelfde opdrachten als 23.0.1 in de tabel van [switchbrew](https://switchbrew.org/wiki/Parental_Control_services).
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Alle functies.
 
-**Vóór 21.0.0 alles behalve de speeltijdtimer** — beperkingen, pincode, tijdelijk ontgrendelen, activiteit, netwerkklok, smartphone-app en geschiedenis werken. Het instellingenblok van de speeltijdtimer (0x44 bytes) heeft deze opbouw pas sinds 21.0.0, dus zet PlayGuard uit wat erin staat: de daglimieten, het bedtijdalarm, extra tijd en het blokkeren van de console.
+**Vóór 21.0.0 alles behalve de speeltijdtimer** — beperkingen, pincode, tijdelijk ontgrendelen, activiteit, netwerkklok, smartphone-app en geschiedenis werken. Het instellingenblok van de speeltijdtimer (0x44 bytes) heeft deze opbouw pas sinds 21.0.0, dus zet PlayGuard uit wat erin staat: de daglimieten, het bedtijdalarm, extra tijd en *Alle games blokkeren*.
 
 - **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
 - **Firmware 19.0.x** — Atmosphère 1.8.0
