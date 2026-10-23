@@ -15,6 +15,7 @@
 #include <borealis.hpp>
 
 #include "view/loading_bar.hpp"
+#include "view/loading_dial.hpp"
 
 class LoadingActivity : public brls::Activity
 {
@@ -50,6 +51,7 @@ class LoadingActivity : public brls::Activity
 
   private:
     BRLS_BIND(LoadingBar, bar, "loading_bar");
+    BRLS_BIND(LoadingDial, dial, "loading_dial");
     BRLS_BIND(brls::Label, step_text, "loading_step");
     BRLS_BIND(brls::Rectangle, anchor, "loading_anchor");
     BRLS_BIND(brls::Box, root, "loading_root");

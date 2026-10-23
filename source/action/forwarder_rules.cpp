@@ -6,6 +6,7 @@
 
 #include <borealis.hpp>
 #include <cstdio>
+#include <string>
 
 #include "action/forwarder_flow_shared.hpp"
 #include "action/forwarder_rules_logic.hpp"
@@ -222,6 +223,45 @@ void lift_pause(const forwarders_logic::Row& row, std::function<void(bool)> done
     history_flow::record_event("gate_pause_lifted", "", history_label(row.name, row.id));
     ui::notify(brls::getStr("playguard/forwarders/pause_lifted", row.name), ui::Toast::Done);
     if (done) done(true);
+}
+
+namespace
+{
+std::string wait_path()
+{
+    return paths::data_dir() + "/" + GATE_WAIT_NAME;
+}
+}   // namespace
+
+unsigned launch_wait()
+{
+    std::string text;
+    if (!paths::read_file(wait_path(), text)) return GATE_WAIT_MS;
+    return gate_wait_parse(text.data(), text.size());
+}
+
+void set_launch_wait(unsigned ms, std::function<void(bool)> done)
+{
+    // How it looks, not who may start what: no PIN asked, nothing made again.
+    if (ui::refuse_read_only()) {
+        if (done) done(false);
+        return;
+    }
+    std::string err;
+    if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(wait_path(), std::to_string(ms) + "\n", &err)) {
+        const std::string hint = hbmenu_lock::write_hint(paths::data_dir());
+        ui::error("playguard/forwarders/wait_err"_i18n, hint.empty() ? err : err + "\n\n" + hint);
+        if (done) done(false);
+        return;
+    }
+    ui::notify(brls::getStr("playguard/forwarders/wait_set", wait_label(ms)), ui::Toast::Done);
+    if (done) done(true);
+}
+
+std::string wait_label(unsigned ms)
+{
+    if (!ms) return "playguard/forwarders/wait_off"_i18n;
+    return brls::getStr("playguard/forwarders/wait_seconds", (int)(ms / 1000));
 }
 
 std::string hours_label(const Hours& h)

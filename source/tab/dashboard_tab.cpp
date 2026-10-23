@@ -144,6 +144,11 @@ DashboardTab::DashboardTab()
     // Stop, the child screen, today's limit, the profile: on a second line
     // when a language needs the room.
     kit::wrap(actions2.getView());
+    // Broken only where it would be at the normal size: with the larger text,
+    // the buttons' words smaller again instead, and the cards' states whole.
+    for (brls::Button* b : { stop.getView(), child.getView(), limit.getView(), profile.getView() }) kit::fit_button(b);
+    for (brls::Box* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() })
+        kit::fit_head(dynamic_cast<brls::Box*>(card->getChildren().front()));
     YGNodeStyleSetGap(actions2->getYGNode(), YGGutterColumn, 12);
     YGNodeStyleSetGap(actions2->getYGNode(), YGGutterRow, 10);
     // Wrapped, the row's buttons are one line to borealis: ↓ would leave it

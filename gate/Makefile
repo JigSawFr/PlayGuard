@@ -27,7 +27,7 @@ APP_AUTHOR  := JigSawFr
 # The gate's own version, not PlayGuard's: a forwarder protected with the
 # PIN pins the gate by its SHA-256 (gate-<hash>.nro), so moving it at each
 # release would make a new gate file each release though nothing changed.
-APP_VERSION := 1.0.0
+APP_VERSION := 1.1.0
 
 # Only these: ../source/core also holds the app's service layer.
 CFILES      := main.c gate.c gate_nx.c gate_screen.c gate_text.c pg_stb.c

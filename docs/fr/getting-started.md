@@ -57,7 +57,7 @@ Une console sans Internet : quand aucun serveur ne répond, PlayGuard propose de
 
 ## 8. Confier la console
 
-*Aujourd'hui › Montrer à l'enfant* n'affiche que le temps restant et l'heure de fin du jeu, assez grand pour se lire de l'autre bout de la pièce. Ⓐ et le code PIN ramènent les écrans du parent.
+*Aujourd'hui › Écran enfant* n'affiche que le temps restant et l'heure de fin du jeu, assez grand pour se lire de l'autre bout de la pièce. Ⓐ et le code PIN ramènent les écrans du parent.
 
 > [!IMPORTANT]
 > **Un jeu laissé ouvert sur le menu HOME continue d'être décompté.** Fermez-le, ou mettez la console en veille ([ce qui compte](features.md#ce-qui-compte-comme-temps-de-jeu)).
@@ -68,7 +68,7 @@ Une console sans Internet : quand aucun serveur ne répond, PlayGuard propose de
 |---|---|
 | Donner plus de temps aujourd'hui | *Aujourd'hui › Temps en plus* (+15 min, +30 min, +1 h). Il est retiré de lui-même le lendemain. |
 | Donner plus de temps un autre jour | *Aujourd'hui › Temps en plus › Un autre jour…* |
-| Arrêter pour aujourd'hui | *Aujourd'hui › Arrêter pour aujourd'hui* : maintenant, ou dans 5 minutes pour sauvegarder. |
+| Fini pour aujourd'hui | *Aujourd'hui › Fini pour aujourd'hui* : maintenant, ou dans 5 minutes pour sauvegarder. |
 | Changer la limite d'un jour | *Temps de jeu* : Ⓐ sur le jour, ↑/↓, puis **+** pour enregistrer. |
 | Passer de la période scolaire aux vacances | *Temps de jeu › Profils* ; *Profil programmé* pour une période choisie à l'avance. |
 | Voir qui a joué à quoi | *Activité* : par jeu, par compte, aujourd'hui, 7 jours, depuis toujours ; export ou QR code. |

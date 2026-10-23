@@ -66,10 +66,16 @@ void DashboardTab::build_pills()
         ui::go_to_tab(view, ui::tab::console);
         return true;
     });
-    // Opened over a game, PlayGuard's own time counts: said at length on Ⓐ.
-    this->counted_pill = this->make_pill("playguard/cadran/today/counted_pill"_i18n, "cadran/amber_fill");
-    this->counted_pill.box->registerClickAction([this](brls::View*) {
-        std::string body = "playguard/cadran/today/counted_title"_i18n + "\n\n" + "playguard/dashboard/counted"_i18n;
+    // An application, PlayGuard's own time counts: opened over a game (as
+    // that game) or from a forwarder's HOME menu icon. Said at length on Ⓐ.
+    SysInfo si;
+    sysinfo_get(&si);
+    this->counted_pill = this->make_pill(si.forwarder ? "playguard/cadran/today/counted_icon_pill"_i18n
+                                                      : "playguard/cadran/today/counted_pill"_i18n,
+                                         "cadran/amber_fill");
+    this->counted_pill.box->registerClickAction([this, icon = si.forwarder](brls::View*) {
+        std::string body = "playguard/cadran/today/counted_title"_i18n + "\n\n"
+                           + (icon ? "playguard/dashboard/counted_icon"_i18n : "playguard/dashboard/counted"_i18n);
         if (this->home_counts()) body += "\n\n" + "playguard/dashboard/home_counts"_i18n;
         ui::info(body);
         return true;

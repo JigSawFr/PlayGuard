@@ -244,6 +244,18 @@ const char *gate_result_name(GateResult r)
     }
 }
 
+unsigned gate_wait_parse(const char *text, size_t len)
+{
+    unsigned ms = 0;
+    size_t i = 0;
+    for (; text && i < len && text[i] >= '0' && text[i] <= '9'; i++)
+        if (ms <= GATE_WAIT_MAX_MS) ms = ms * 10 + (unsigned)(text[i] - '0');   // past it, it stays past it
+    // Digits, then the end, a line's end or spaces: else not its file.
+    if (!text || i == 0 || (i < len && text[i] != '\n' && text[i] != '\r' && text[i] != ' ' && text[i] != '\0'))
+        return GATE_WAIT_MS;
+    return ms > GATE_WAIT_MAX_MS ? GATE_WAIT_MAX_MS : ms;
+}
+
 size_t gate_log_format(const char *when, GateResult r, const char *nro, char *buf, size_t size)
 {
     if (!buf || size == 0) return 0;

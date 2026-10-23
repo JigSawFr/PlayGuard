@@ -49,6 +49,7 @@ Clone with submodules (`git clone --recursive`, or `git submodule update --init`
 | `PLAYGUARD_SIM_EMUMMC=1` | Running on emuMMC |
 | `PLAYGUARD_SIM_BLANK=1` | Atmosphère blanking the serial number |
 | `PLAYGUARD_SIM_APPLET=1` | Applet (album) mode |
+| `PLAYGUARD_SIM_FROM_FORWARDER=1` | Started from a forwarder's HOME menu icon, not over a game (Today's pill and Help say so) |
 | `PLAYGUARD_SIM_NO_GAME=1` | No game open (applet mode with nothing behind it): no "game left open keeps counting" line, no "the game in progress is suspended" warning |
 | `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text |
 | `PLAYGUARD_SIM_BATTERY=1` | The console on its battery (no charger): *Visual effects › Lighter on battery* (not the default) leaves out the glow and every movement of the look (`ui/effects`, `ui/motion`) |

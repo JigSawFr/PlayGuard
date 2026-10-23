@@ -69,6 +69,7 @@
 #include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
 #include "view/loading_bar.hpp"
+#include "view/loading_dial.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
 #include "view/notice_bell.hpp"
@@ -188,7 +189,9 @@ std::string system_line(const SysInfo& si)
     return fmt::format("firmware {}, Atmosphère {}, {}, {}", fw,
                        si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "unknown",
                        storage ? storage : "storage unknown",
-                       si.applet_mode ? "from the Album (applet)" : "over a game");
+                       si.applet_mode ? "from the Album (applet)"
+                       : si.forwarder ? "from its HOME menu icon (forwarder)"
+                                      : "over a game");
 }
 
 // The start-up after the loading screen, one step per frame so the loading
@@ -324,6 +327,7 @@ void register_views()
     brls::Application::registerXMLView("AboutTab",        AboutTab::create);
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
+    brls::Application::registerXMLView("LoadingDial",     LoadingDial::create);
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
     brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
     brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);

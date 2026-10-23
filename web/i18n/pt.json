@@ -110,6 +110,7 @@
   "region": {"label": "Região", "options": {"": "Predefinida", "0": "Japão", "1": "Américas", "2": "Europa", "3": "Austrália", "4": "Hong Kong, Taiwan, Coreia", "5": "China"}},
   "sd_free_mb": {"label": "Espaço livre no cartão SD (MB)", "help": "Abaixo de 500 MB, o separador Consola avisa."},
   "applet": {"label": "Modo applet (a partir do álbum)"},
+  "from_forwarder": {"label": "Iniciado pelo seu ícone HOME (forwarder)"},
   "background": {"label": "PlayGuard em segundo plano"},
   "hbloader": {"label": "Um carregador que pode passar uma atualização a uma loja"},
   "forwarders": {"label": "Forwarders já criados (Consola › Forwarders)"},
