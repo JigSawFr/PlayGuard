@@ -42,7 +42,7 @@ struct RingState
         UNKNOWN,    // the play timer not read (or a firmware too old)
         NO_PLAY,    // today's limit is 0 (on hold when `unlocked`)
         ON_HOLD,    // unlocked: the limit stands, nothing stops play
-        FREE,       // no limit today, or the timer off
+        FREE,       // no limit today, or the timer off (not unlocked), a 0 included
         TIME_UP,    // the limit reached: suspended, or played past it (a warning only)
         COUNTING,   // counting down: `left` minutes left
         IDLE,       // a limit, no game counted yet today

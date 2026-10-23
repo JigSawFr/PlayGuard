@@ -321,8 +321,11 @@ static void test_ring_state()
     CHECK(r.kind == R::NO_PLAY && !r.unlocked && r.fraction == 1.0f);
     r = pt_logic::ring_state(pt, 3, true);
     CHECK(r.kind == R::NO_PLAY && r.unlocked && r.fraction < 0.0f);
-    pt.enabled = false;                             // the timer off: still the limit's 0
-    CHECK(pt_logic::ring_state(pt, 3, false).kind == R::NO_PLAY);
+    pt.enabled = false;                             // the timer off: the 0 restricts nothing
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::FREE && r.fraction < 0.0f);
+    r = pt_logic::ring_state(pt, 3, true);          // off while unlocked: the 0 on hold
+    CHECK(r.kind == R::NO_PLAY && r.unlocked);
 
     // No limit today, or the timer off: free; unlocked changes nothing then.
     pt = counting();

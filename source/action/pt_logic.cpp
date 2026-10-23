@@ -51,7 +51,8 @@ RingState ring_state(const PtState& pt, int weekday, bool unlocked)
     r.limit = pt.day_min[weekday];
     r.unlocked = unlocked && r.limit != PT_DAY_NOLIMIT;
     // Unlocked first: the timer may read off while the limit still stands.
-    if (r.limit == 0) {
+    // Off otherwise, even a 0 restricts nothing.
+    if (r.limit == 0 && (r.unlocked || pt.enabled)) {
         r.kind = RingState::NO_PLAY;
         r.fraction = r.unlocked ? -1.0f : 1.0f;
     } else if (r.unlocked) {

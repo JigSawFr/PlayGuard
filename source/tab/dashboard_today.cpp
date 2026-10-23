@@ -44,13 +44,10 @@ void DashboardTab::show_headline(int today, bool unlocked, const TodayLog& log)
         const uint16_t limit = st.limit;
         switch (st.kind) {
             case pt_logic::RingState::NO_PLAY:
-                if (st.unlocked || pt.enabled) {
-                    // A day without play in words ("0 min (no play)" said it twice).
-                    ui::set_text(headline, st.unlocked ? "playguard/cadran/today/head_unlocked_no_play"_i18n
-                                                       : "playguard/cadran/today/head_no_play"_i18n);
-                    break;
-                }
-                [[fallthrough]];   // the timer off: said as no limit
+                // A day without play in words ("0 min (no play)" said it twice).
+                ui::set_text(headline, st.unlocked ? "playguard/cadran/today/head_unlocked_no_play"_i18n
+                                                   : "playguard/cadran/today/head_no_play"_i18n);
+                break;
             case pt_logic::RingState::FREE:
                 ui::set_text(headline, log.ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_play_time(log.played_s))
                                               : "playguard/dashboard/gauge_none"_i18n);
@@ -96,7 +93,7 @@ void DashboardTab::show_ring(bool unlocked)
     if (brls::Label::getFontScale() > 1.0f) {
         const uint16_t limit = pt.valid ? pt.day_min[today] : PT_DAY_NOLIMIT;
         const std::string value = !pt.valid ? "—"
-                                  : limit == 0 ? "playguard/cadran/today/no_play"_i18n
+                                  : limit == 0 && (unlocked || pt.enabled) ? "playguard/cadran/today/no_play"_i18n
                                   : limit == PT_DAY_NOLIMIT || !pt.enabled ? "playguard/cadran/today/free"_i18n
                                                                            : ui::fmt_minutes(limit);
         // The day in capitals, as the kicker; the limit as everywhere else.
