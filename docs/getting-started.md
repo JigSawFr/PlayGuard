@@ -70,7 +70,7 @@ A console without Internet: when no server answers, PlayGuard offers to set the 
 | Give more time on another day | *Today › Extra time › Another day…* |
 | Stop for today | *Today › Stop for today*: now, or in 5 minutes to save. |
 | Change one day's limit | *Play timer*: Ⓐ on the day, ↑/↓, then **+** to save. |
-| Switch between term time and holidays | *Play timer › Profiles*; *Scheduled profile* for a period picked ahead. |
+| Switch between term time and holidays | *Play timer › Profiles*. |
 | See who played what | *Activity*: per game, per account, today, 7 days, all time; export. |
 | Block every game for now | *Play timer › Block all games*. Turned off, the previous limits come back. |
 | Undo a change | **ZR** *Undo* right after it, or *History › Changes made with PlayGuard* any time. |

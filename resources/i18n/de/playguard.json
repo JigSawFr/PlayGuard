@@ -2083,7 +2083,6 @@
         "date": "{0}. {1}",
         "cell": "Geplantes Profil",
         "note": "Ein Profil für einen Zeitraum (Ferien, eine Reise): PlayGuard bietet beim Öffnen an, es zu Beginn anzuwenden und danach die vorherigen Limits wiederherzustellen.",
-        "none": "Keins",
         "value": "{} · {} bis {}",
         "pick_profile": "Profil für den Zeitraum",
         "pick_from": "Erster Tag",
@@ -2102,7 +2101,9 @@
         "keep_remove": "Diese Limits behalten und entfernen",
         "change": "Ändern…",
         "remove": "Entfernen",
-        "removed": "Geplantes Profil entfernt."
+        "removed": "Geplantes Profil entfernt.",
+        "soon": "Bald",
+        "soon_note": "Kommt mit der MQTT-Brücke (Home Assistant): PlayGuard läuft nur, während es geöffnet ist, und kann daher nicht von selbst am richtigen Tag das Profil wechseln. Eine Hausautomation übernimmt das, nach einem Kalender oder den Schulferien."
     },
     "sigpatch": {
         "set_aside": "Die Sigpatch-Dateien beiseitelegen",

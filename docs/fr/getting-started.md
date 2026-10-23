@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 150621760428 -->
+<!-- translated from docs/getting-started.md, sha256 69c84ebb19c6 -->
 # Prise en main
 
 De la carte SD à une console réglée pour votre enfant, en une dizaine de minutes, puis les tâches du quotidien. Retour au [README](../../README.md).
@@ -71,7 +71,7 @@ Une console sans Internet : quand aucun serveur ne répond, PlayGuard propose de
 | Donner plus de temps un autre jour | *Aujourd'hui › Temps en plus › Un autre jour…* |
 | Fini pour aujourd'hui | *Aujourd'hui › Fini pour aujourd'hui* : maintenant, ou dans 5 minutes pour sauvegarder. |
 | Changer la limite d'un jour | *Temps de jeu* : Ⓐ sur le jour, ↑/↓, puis **+** pour enregistrer. |
-| Passer de la période scolaire aux vacances | *Temps de jeu › Profils* ; *Profil programmé* pour une période choisie à l'avance. |
+| Passer de la période scolaire aux vacances | *Temps de jeu › Profils*. |
 | Voir qui a joué à quoi | *Activité* : par jeu, par compte, aujourd'hui, 7 jours, depuis toujours ; export. |
 | Bloquer tous les jeux pour l'instant | *Temps de jeu › Bloquer tous les jeux*. Une fois désactivé, les limites précédentes reviennent. |
 | Annuler une modification | **ZR** *Annuler* juste après, ou *Historique › Historique des modifications* à tout moment. |

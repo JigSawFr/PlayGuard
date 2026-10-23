@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 584095baaee8 -->
+<!-- translated from docs/features.md, sha256 46fc9bf73ab1 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -228,10 +228,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 - **Profils** enregistrés sur la carte SD : appliquer (un profil déjà en vigueur le dit simplement), modifier, renommer ou supprimer un profil ; enregistrer les limites actuelles ou en créer un nouveau.
 - N'importe quel nom, dans n'importe quelle écriture (*École*, *周末*, *Выходные* …) — un nom sans lettres latines reçoit son propre nom de fichier, et deux noms qui donneraient le même fichier sont repérés.
-- **Profil programmé** (*Profils › Profil programmé*) : un profil pour une période — vacances, voyage — dont le premier et le dernier jour se choisissent parmi les 60 jours à venir.
-  - Quand la période commence, PlayGuard propose de l'appliquer (les jours qu'il change affichés sous la question) ; une fois finie, de remettre les limites qu'il a remplacées, ou de les garder.
-  - Demandé une fois par jour, sur l'écran principal, quand rien d'autre n'est devant : PlayGuard n'agit qu'à son ouverture, donc une console où il n'est pas ouvert garde ses limites. Une période passée sans que le profil ait été appliqué est oubliée.
-  - Un seul à la fois ; la ligne le modifie, le retire ou y met fin.
+- **Profil programmé** (*Profils › Profil programmé*) : *Bientôt*. PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul : changer de profil depuis un agenda ou les vacances scolaires arrive avec le [pont MQTT](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). Un profil programmé avec une version précédente est toujours proposé quand sa période commence, et la ligne le modifie, le retire ou y met fin.
 
 ### Bloquer tous les jeux
 
