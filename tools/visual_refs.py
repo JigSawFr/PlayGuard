@@ -51,12 +51,17 @@ IM = ["magick"] if shutil.which("magick") else []
 
 
 def scenarios(names):
-    """The scenarios asked for (every one with a SCREENS list by default)."""
+    """The scenarios asked for that have a SCREENS list (every one with one
+    by default); one without any (a scenario with no stable screen: nothing
+    to compare) is said and left out."""
     if names:
+        kept = []
         for n in names:
-            if not os.path.exists(os.path.join(SCREENS_DIR, n, "SCREENS")):
-                sys.exit(f"no tests/visual/{n}/SCREENS")
-        return list(names)
+            if os.path.exists(os.path.join(SCREENS_DIR, n, "SCREENS")):
+                kept.append(n)
+            else:
+                print(f"{n}: no tests/visual/{n}/SCREENS, no stable screen to compare")
+        return kept
     return sorted(d for d in os.listdir(SCREENS_DIR) if os.path.exists(os.path.join(SCREENS_DIR, d, "SCREENS")))
 
 
@@ -76,14 +81,18 @@ def cmd_keep(a):
 
 
 def download(url, dst):
-    """`url` into `dst`; False on a 404 (no such release or asset)."""
+    """`url` into `dst`; False when it cannot be had (no such release or
+    asset, or no network: the references are a comparison, not a need)."""
     try:
         with urllib.request.urlopen(url, timeout=60) as r, open(dst, "wb") as f:
             shutil.copyfileobj(r, f)
     except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return False
-        raise
+        if e.code != 404:
+            print(f"{url}: HTTP {e.code}")
+        return False
+    except (urllib.error.URLError, OSError, TimeoutError) as e:
+        print(f"{url}: {e}")
+        return False
     return True
 
 
@@ -130,7 +139,7 @@ def cmd_fetch(a):
                    else f"https://github.com/{REPO}/releases/download/{tag}/{ASSET}")
             zip_path = os.path.join(a.refs, ASSET)
             if not download(url, zip_path):
-                print(f"no {ASSET} on the {tag} release of {REPO}: no references yet for {', '.join(wanted)}")
+                print(f"no {ASSET} from the {tag} release of {REPO}: no references yet for {', '.join(wanted)}")
                 return 0
             source = url
         got = unzip_refs(zip_path, a.refs, set(wanted))
