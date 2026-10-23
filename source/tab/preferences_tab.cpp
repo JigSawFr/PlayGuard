@@ -131,7 +131,7 @@ void PreferencesTab::refresh()
 {
     const auto& cfg = config::get();
     language->setDetailText(ui::language_name(true));
-    theme->setDetailText(ui::theme_name());
+    theme->setDetailText(ui::theme_name(true));
     text_size->setDetailText(ui::text_size_name(true));
     effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.effects)])));
     start_tab->setDetailText(tab_name(config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));

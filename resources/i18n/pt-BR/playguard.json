@@ -708,7 +708,12 @@
         "copy_today": "Copiar {} para todos",
         "text_size_auto": "Auto: maior na TV",
         "text_size": "Texto",
-        "start_tab": "Abrir em"
+        "start_tab": "Abrir em",
+        "themes": {
+            "system": "Sistema",
+            "light": "Claro",
+            "dark": "Escuro"
+        }
     },
     "tools": {
         "section_diag": "Diagnóstico",

@@ -708,7 +708,12 @@
         "copy_today": "Копировать {} на все дни",
         "text_size_auto": "Авто: крупнее на ТВ",
         "text_size": "Шрифт",
-        "start_tab": "При запуске"
+        "start_tab": "При запуске",
+        "themes": {
+            "system": "Системная",
+            "light": "Светлая",
+            "dark": "Тёмная"
+        }
     },
     "tools": {
         "section_diag": "Диагностика",

@@ -534,9 +534,9 @@ std::string language_name(bool tile)
     return brls::getStr("playguard/tools/languages/" + std::string(config::LANGUAGES[index_of(config::LANGUAGES, config::get().language)]));
 }
 
-std::string theme_name()
+std::string theme_name(bool tile)
 {
-    return brls::getStr("playguard/tools/themes/" + std::string(config::THEMES[index_of(config::THEMES, config::get().theme)]));
+    return brls::getStr(std::string(tile ? "playguard/tiles/themes/" : "playguard/tools/themes/") + std::string(config::THEMES[index_of(config::THEMES, config::get().theme)]));
 }
 
 void quick_settings(std::function<void()> after)

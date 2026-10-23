@@ -708,7 +708,12 @@
         "copy_today": "{}を全曜日にコピー",
         "text_size_auto": "自動：テレビでは大きめ",
         "text_size": "文字の大きさ",
-        "start_tab": "起動時のタブ"
+        "start_tab": "起動時のタブ",
+        "themes": {
+            "system": "本体の設定",
+            "light": "ホワイト",
+            "dark": "ブラック"
+        }
     },
     "tools": {
         "section_diag": "診断",

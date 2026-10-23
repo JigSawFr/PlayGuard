@@ -708,7 +708,12 @@
         "copy_today": "將{}的上限套用至每天",
         "text_size_auto": "自動：電視上較大",
         "text_size": "文字大小",
-        "start_tab": "啟動時顯示"
+        "start_tab": "啟動時顯示",
+        "themes": {
+            "system": "依系統",
+            "light": "淺色",
+            "dark": "深色"
+        }
     },
     "tools": {
         "section_diag": "診斷",
