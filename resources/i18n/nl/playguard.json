@@ -1088,8 +1088,6 @@
         "help_body": "Wat dit scherm doet, in de handleiding:",
         "fix_delete": "{} verwijderen",
         "fix_protect": "{} beveiligen met de pincode",
-        "group_protected": "Beveiligd met de pincode",
-        "group_open": "Zonder pincode",
         "group_elsewhere": "Gemaakt door een andere app",
         "group_gone": "Niet meer in het HOME-menu",
         "state_verified": "gecontroleerd",

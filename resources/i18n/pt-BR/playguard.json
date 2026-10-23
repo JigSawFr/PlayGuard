@@ -1088,8 +1088,6 @@
         "help_body": "O que esta tela faz, no guia:",
         "fix_delete": "Excluir {}",
         "fix_protect": "Proteger {} com o PIN",
-        "group_protected": "Protegidos com o PIN",
-        "group_open": "Sem o PIN",
         "group_elsewhere": "Criados por outro app",
         "group_gone": "Não estão mais no menu HOME",
         "state_verified": "verificado",

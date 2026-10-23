@@ -9,6 +9,7 @@
 #include <time.h>
 
 #include "../core/pctl_ops.h"
+#include "../core/rescue.h"
 #include "../core/sim_env.h"
 #include "../core/sysinfo.h"
 #include "../core/time_ops.h"
@@ -139,8 +140,11 @@ Result pctl_pin_weak(bool *weak)
 }
 // HMAC-SHA256 with util/sha256 (sim_platform.cpp): C++, as the rest of it.
 void sim_hmac_sha256(void *dst, const void *key, size_t key_size, const void *msg, size_t size);
+// The simulated console's secret (its Mii author ID, core/rescue.h): 16
+// bytes, as tools/desktop_smoke.py signs its recovery report with them.
+#define SIM_SECRET "PlayGuard sim id"
 // The recovery report's proof, keyed with the simulated PIN as pctl_pin_weak
-// reads it (PLAYGUARD_SIM_FAIL=pin fails the read).
+// reads it (PLAYGUARD_SIM_FAIL=pin fails the read) and the secret above.
 Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
 {
     if (!mac) return NXM_RC_INVALID_ARGUMENT;
@@ -148,8 +152,10 @@ Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
     if (!msg) return NXM_RC_INVALID_ARGUMENT;
     if (sim_fails("pin")) return SIM_FAIL_RC;
     if (!sim_state().console.pin_length) return NXM_RC_NO_PIN;
-    sim_hmac_sha256(mac, SIM_PIN, strlen(SIM_PIN), msg, size);
-    return 0;
+    _Static_assert(sizeof(SIM_SECRET) - 1 == RESCUE_SECRET_SIZE, "the secret's size");
+    return rescue_proof_mac(sim_hmac_sha256, (const uint8_t *)SIM_SECRET, SIM_PIN, strlen(SIM_PIN), msg, size, mac)
+               ? 0
+               : NXM_RC_STATE_UNKNOWN;
 }
 // Locking again never asks for the PIN (write_guard.h): read-only only.
 Result pctl_lock_state(u32 *pin_length, bool *unlocked)

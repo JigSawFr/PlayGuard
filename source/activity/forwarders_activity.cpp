@@ -4,8 +4,10 @@
 #include <algorithm>
 
 #include "action/forwarder_flow.hpp"
+#include "action/forwarders_text.hpp"
 #include "action/game_icons.hpp"
 #include "action/hbmenu_lock.hpp"
+#include "activity/forwarders_pickers.hpp"
 #include "activity/icon_sheet.hpp"
 #include "app.hpp"
 #include "tab/cadran_list.hpp"
@@ -28,19 +30,30 @@ using forwarders_logic::State;
 namespace
 {
 
-std::string state_only(const Row& r)
+using forwarders_text::state_only;
+
+// When its pause ends, for the texts below ("" when not paused).
+std::string until(const Row& r)
 {
-    switch (r.state) {
-        case State::Ready:        return "playguard/forwarders/state_ready"_i18n;
-        case State::NroMissing:   return "playguard/forwarders/state_nro_missing"_i18n;
-        case State::GateMissing:  return "playguard/forwarders/state_gate_missing"_i18n;
-        case State::NotInstalled: return "playguard/forwarders/state_not_installed"_i18n;
-        case State::Elsewhere:    return "playguard/forwarders/state_elsewhere"_i18n;
-    }
-    return "";
+    return r.paused_until ? forwarder_flow::until_label(r.paused_until) : "";
 }
 
-std::string state_text_pin(const Row& r, bool full);
+std::string state_text(const Row& r, bool full = false)
+{
+    return forwarders_text::state_text(r, until(r), full);
+}
+
+std::string list_text(const Row& r)
+{
+    return forwarders_text::list_text(r, until(r));
+}
+
+std::vector<GameCell::Mark> list_marks(const Row& r)
+{
+    std::vector<GameCell::Mark> out;
+    for (const forwarders_text::Mark& m : forwarders_text::list_marks(r)) out.push_back({ m.icon, m.color_key });
+    return out;
+}
 
 // A box of the grouped list: the focus coming from below goes to its last
 // line, from above to its first (borealis' own: the line focused last),
@@ -66,67 +79,6 @@ class Nearest : public Base
         return nullptr;
     }
 };
-
-// Its state, and whether it asks for the PIN (and when it does not); a
-// protected menu seen working through its gate. In the list (`full` false)
-// a forwarder with more than one rule says so in a word: Details has them.
-std::string state_text(const Row& r, bool full = false)
-{
-    if (!r.pin) return state_only(r);
-    if (r.verified && forwarders_logic::is_menu(r.nro))
-        return state_text_pin(r, full) + " · " + "playguard/forwarders/state_verified"_i18n;
-    return state_text_pin(r, full);
-}
-
-// Protected: the PIN, and when it is not asked.
-std::string state_text_pin(const Row& r, bool full)
-{
-    std::string out = state_only(r) + " · ";
-    // Paused after refused PINs: that first, it is what the child sees now.
-    if (r.paused_until) return out + brls::getStr("playguard/forwarders/state_paused", forwarder_flow::until_label(r.paused_until));
-    // Made before it carried its rules: its free hours wait for it to be made again.
-    const std::string remake = r.carried ? "" : " · " + "playguard/forwarders/state_remake"_i18n;
-    const int rules = (r.free_days ? 1 : 0) + (r.closed_days ? 1 : 0) + (r.limit ? 1 : 0);
-    if (!full && rules > 1) return out + "playguard/forwarders/state_pin_rules"_i18n + remake;
-    const forwarder_flow::Hours free = { r.free_days, r.free_from, r.free_to, r.free2_days, r.free2_from, r.free2_to };
-    out += !r.free_days ? "playguard/forwarders/state_pin"_i18n
-                        : brls::getStr("playguard/forwarders/state_pin_hours", forwarder_flow::hours_label(free));
-    if (r.closed_days)
-        out += " · " + brls::getStr("playguard/forwarders/state_closed",
-                                    forwarder_flow::hours_label(r.closed_days, r.closed_from, r.closed_to));
-    if (r.limit) out += " · " + "playguard/forwarders/state_limit"_i18n;
-    return out + remake;
-}
-
-// In the list, a protected forwarder's rules are icons (list_marks), so its
-// text is only what they cannot say: a state other than ready, the pause's
-// end, made before it carried its rules.
-std::string list_text(const Row& r)
-{
-    if (!r.pin) return state_only(r);
-    std::string out = r.state == State::Ready ? "" : state_only(r);
-    const auto add = [&out](const std::string& part) { out += (out.empty() ? "" : " · ") + part; };
-    if (r.paused_until) add(brls::getStr("playguard/forwarders/state_paused", forwarder_flow::until_label(r.paused_until)));
-    else if (!r.carried) add("playguard/forwarders/state_remake"_i18n);
-    return out;
-}
-
-// One icon per thing turned on: the PIN (a key), hours without it (open
-// lock), hours it never opens (stop), closed once today's time is used up
-// (timer); paused after refused PINs, only that, as state_text_pin says.
-std::vector<GameCell::Mark> list_marks(const Row& r)
-{
-    if (!r.pin) return {};
-    std::vector<GameCell::Mark> out = { { "key", "cadran/teal" } };
-    if (r.paused_until) {
-        out.push_back({ "pause", "cadran/amber" });
-        return out;
-    }
-    if (r.free_days) out.push_back({ "unlock", "cadran/teal" });
-    if (r.closed_days) out.push_back({ "stop", "cadran/teal" });
-    if (r.limit) out.push_back({ "timer", "cadran/teal" });
-    return out;
-}
 
 // Under the protected ones: what each icon at their lines' end says, those
 // shown only (`used`: their icons' names).
@@ -458,18 +410,18 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
     brls::Application::giveFocus(keep ? keep : (brls::View*)self_cell.getView());
     this->cells.clear();
     this->list_rows = forwarder_flow::rows();
-    // By group: PlayGuard's own, protected, not protected, another app's,
-    // no longer on the HOME menu; by name in each (forwarders_logic::merge).
+    // By group: PlayGuard's own, the others made here (protected or not:
+    // their icon's badge says it), another app's, no longer on the HOME
+    // menu; by name in each (forwarders_logic::merge).
     const auto group_of = [](const Row& r) {
-        if (r.state == State::NotInstalled) return 4;
-        if (r.state == State::Elsewhere) return 3;
-        if (r.self) return 0;
-        return r.pin ? 1 : 2;
+        if (r.state == State::NotInstalled) return 3;
+        if (r.state == State::Elsewhere) return 2;
+        return r.self ? 0 : 1;
     };
-    static const char* const LABELS[] = { nullptr, "playguard/forwarders/group_protected", "playguard/forwarders/group_open",
-                                          "playguard/forwarders/group_elsewhere", "playguard/forwarders/group_gone" };
+    static const char* const LABELS[] = { nullptr, nullptr, "playguard/forwarders/group_elsewhere",
+                                          "playguard/forwarders/group_gone" };
     int groups = 0;
-    for (int g = 0; g < 5; g++)
+    for (int g = 0; g < 4; g++)
         for (const Row& r : this->list_rows)
             if (group_of(r) == g) {
                 groups++;
@@ -482,7 +434,7 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
         auto* groups_box = new Nearest<brls::Box>(brls::Axis::COLUMN);
         groups_box->setAlignItems(brls::AlignItems::STRETCH);
         list->addView(groups_box);
-        for (int g = 0; g < 5; g++) {
+        for (int g = 0; g < 4; g++) {
             cadran::Card* card = nullptr;
             for (const Row& r : this->list_rows) {
                 if (group_of(r) != g) continue;
@@ -778,24 +730,7 @@ void ForwardersActivity::pin(const Row& r, bool on)
 
 void ForwardersActivity::pick_pause()
 {
-    // Never, then tries in a row and how long: the default (5, 15 min) among them.
-    static const unsigned TRIES[] = { 0, 3, 5, 5, 10 }, MINUTES[] = { 0, 15, 15, 60, 60 };
-    const GatePauseRule now = forwarder_flow::pause_rule();
-    std::vector<std::string> names;
-    int current = -1;
-    for (size_t i = 0; i < 5; i++) {
-        names.push_back(forwarder_flow::pause_label(TRIES[i], MINUTES[i]));
-        if (now.tries == TRIES[i] && (!now.tries || now.minutes == MINUTES[i])) current = (int)i;
-    }
-    std::weak_ptr<bool> weak = this->alive;
-    ui::pick("playguard/forwarders/pause_cell"_i18n, names, current, [this, weak](int index) {
-        if (weak.expired() || index < 0 || index > 4) return;
-        forwarder_flow::set_pause_rule(TRIES[index], MINUTES[index], [this, weak](bool) {
-            brls::sync([this, weak]() {
-                if (!weak.expired()) this->show_lock();
-            });
-        });
-    }, true, { "", "", "playguard/forwarders/pause_default"_i18n, "", "" });
+    forwarders_pickers::pause(this->alive, [this]() { this->show_lock(); });
 }
 
 void ForwardersActivity::pick_icon(const Row& row)
@@ -814,83 +749,10 @@ void ForwardersActivity::pick_icon(const Row& row)
     });
 }
 
-void ForwardersActivity::pick_span(const std::string& title, int from_hour, int to_hour, std::function<void(int, int)> done)
-{
-    std::weak_ptr<bool> weak = this->alive;
-    std::vector<std::string> starts, ends;
-    for (int h = 0; h < 24; h++) starts.push_back(fmt::format("{:02}:00", h));
-    for (int h = 1; h <= 24; h++) ends.push_back(fmt::format("{:02}:00", h));
-    const std::string from_title = title.empty() ? "playguard/forwarders/hours_from"_i18n
-                                                 : brls::getStr("playguard/forwarders/hours_from_of", title);
-    const std::string to_title = title.empty() ? "playguard/forwarders/hours_to"_i18n
-                                               : brls::getStr("playguard/forwarders/hours_to_of", title);
-    ui::pick(from_title, starts, from_hour, [weak, ends, to_title, to_hour, done](int from) {
-        if (weak.expired() || from < 0 || from > 23) return;
-        brls::sync([weak, ends, to_title, to_hour, from, done]() {
-            ui::pick(to_title, ends, to_hour, [weak, from, done](int to) {
-                if (weak.expired() || to < 0 || to > 23) return;
-                const int end = (to + 1) * 60, start = from * 60;
-                if (end == start) return;
-                done(start, end);
-            });
-        });
-    });
-}
-
 void ForwardersActivity::pick_hours(const Row& row, bool closed)
 {
     const Row r = row;
-    const int cur_days = closed ? r.closed_days : r.free_days, cur_from = closed ? r.closed_from : r.free_from,
-              cur_to = closed ? r.closed_to : r.free_to;
-    // Never, every day, the school days, the weekend; free hours, the school
-    // days and the weekend apart too.
-    static const int DAYS[] = { 0, 0x7F, 0x3E, 0x41 };
-    std::vector<std::string> names = { "playguard/forwarders/hours_never"_i18n, "playguard/forwarders/hours_every_day"_i18n,
-                                       "playguard/forwarders/hours_weekdays"_i18n, "playguard/forwarders/hours_weekend"_i18n };
-    if (!closed) names.push_back("playguard/forwarders/hours_apart"_i18n);
-    int current = 0;
-    for (int i = 1; i < 4; i++)
-        if (cur_days == DAYS[i]) current = i;
-    if (!closed && r.free2_days) current = 4;
-    std::weak_ptr<bool> weak = this->alive;
-    ui::pick(closed ? "playguard/forwarders/closed_title"_i18n : "playguard/forwarders/hours_title"_i18n, names, current,
-             [this, weak, r, closed, cur_days, cur_from, cur_to](int index) {
-        if (weak.expired() || index < 0 || index > (closed ? 3 : 4)) return;
-        if (index == 0) {
-            this->hours(r, closed, {});
-            return;
-        }
-        // Free: 09:00 to 20:00 at first; closed: 21:00 to 07:00.
-        const int from_now = cur_days ? cur_from / 60 : closed ? 21 : 9;
-        const int to_now = cur_days ? std::max(0, cur_to / 60 - 1) : closed ? 6 : 19;
-        if (index == 4) {
-            // The school days (16:00 to 19:00 at first), then the weekend (9:00 to 20:00).
-            const bool had = r.free2_days != 0;
-            const int wd_from = had ? r.free_from / 60 : 16, wd_to = had ? std::max(0, r.free_to / 60 - 1) : 18;
-            const int we_from = had ? r.free2_from / 60 : 9, we_to = had ? std::max(0, r.free2_to / 60 - 1) : 19;
-            brls::sync([this, weak, r, wd_from, wd_to, we_from, we_to]() {
-                this->pick_span("playguard/forwarders/hours_weekdays"_i18n, wd_from, wd_to,
-                                [this, weak, r, we_from, we_to](int from, int to) {
-                    brls::sync([this, weak, r, from, to, we_from, we_to]() {
-                        if (weak.expired()) return;
-                        this->pick_span("playguard/forwarders/hours_weekend"_i18n, we_from, we_to,
-                                        [this, weak, r, from, to](int from2, int to2) {
-                            if (weak.expired()) return;
-                            this->hours(r, false, { 0x3E, from, to, 0x41, from2, to2 });
-                        });
-                    });
-                });
-            });
-            return;
-        }
-        const int days = DAYS[index];
-        brls::sync([this, weak, r, days, from_now, to_now, closed]() {
-            this->pick_span("", from_now, to_now, [this, weak, r, days, closed](int from, int to) {
-                if (weak.expired()) return;
-                this->hours(r, closed, { days, from, to });
-            });
-        });
-    });
+    forwarders_pickers::hours(r, closed, this->alive, [this, r, closed](const forwarder_flow::Hours& h) { this->hours(r, closed, h); });
 }
 
 void ForwardersActivity::pick_homebrew()

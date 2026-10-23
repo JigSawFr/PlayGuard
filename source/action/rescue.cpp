@@ -54,7 +54,7 @@ void new_nonce()
 }
 
 // Whether `proof` is the sysmodule's for `report`: its MAC made again with
-// the stored PIN.
+// the stored PIN and the console's secret (rescue_proof_mac).
 bool proven(const RescueReport& report, const RescueProof& proof)
 {
     if (!proof.present) return false;
@@ -271,10 +271,11 @@ bool confirmed(const RescueReport& report, const RescueProof& proof, bool* old_m
     const bool needs_proof = rescue_report_needs_proof(&report);
     const bool made_by_module = needs_proof ? state && proven(report, proof) : installed();
     const bool ok = state && made_by_module;
-    // The console agrees but no proof came with the unlock, and the module
-    // installed is not this PlayGuard's: one from before the proof writes
-    // none, and doing RESCUE again gives the same.
-    if (old_module) *old_module = !ok && state && needs_proof && !proof.present && outdated();
+    // The console agrees but no proof that checks came with the unlock, and
+    // the module installed is not this PlayGuard's: one from before the
+    // proof writes none, one from before the console's secret (core/rescue.h)
+    // one that never checks, and doing RESCUE again gives the same.
+    if (old_module) *old_module = !ok && state && needs_proof && !made_by_module && outdated();
     brls::Logger::info("rescue report {} by the console ({} {}, rc=0x{:08X}, PIN {}, unlocked={})",
                        ok ? "confirmed" : "not confirmed", needs_proof ? "proof" : "sysmodule",
                        needs_proof ? (made_by_module ? "valid" : proof.present ? "invalid" : "missing")

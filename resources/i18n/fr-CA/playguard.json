@@ -1088,8 +1088,6 @@
         "help_body": "Ce que fait cet écran, dans le guide :",
         "fix_delete": "Supprimer {}",
         "fix_protect": "Protéger {} par le NIP",
-        "group_protected": "Protégés par le NIP",
-        "group_open": "Sans NIP",
         "group_elsewhere": "Créés par une autre application",
         "group_gone": "Plus sur le menu HOME",
         "state_verified": "vérifié",

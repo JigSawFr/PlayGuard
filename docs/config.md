@@ -2,7 +2,7 @@
 
 PlayGuard's settings, in `sd:/config/playguard/config.json`, shared by every
 system on the SD card; and what one system's parental controls need
-remembered (the console lock, the extra time, a pending relock, the firmware
+remembered (*Block all games*, the extra time, a pending relock, the firmware
 choice), in its own `sd:/config/playguard/nand/<system>/state.json`
 ([below](#state-kept-between-launches)). Everything here is
 set from the app; the file is only worth editing by hand to get back in (see
@@ -21,8 +21,8 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
   becomes `config.json.bad.1` (an older `.bad.1` is deleted): the two most
   recent damaged files are kept. PlayGuard says so once, at start-up (*the
   settings could not be read and were reset*), and the change history
-  records *Settings reset*. What the old file held (the console lock's saved
-  limits, a pending relock or extra time, the firmware choice …) is not
+  records *Settings reset*. What the old file held (the limits *Block all games*
+  saved, a pending relock or extra time, the firmware choice …) is not
   carried over: check those settings, or copy values back from the `.bad`
   file by hand. Should the file not be movable either, nothing is saved
   until the next start, so it is never overwritten.
@@ -47,10 +47,10 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `theme` | string | `"dark"`, `"system"` (the console's), `"light"` | `"dark"` | Preferences |
 | `effects` | string | `"auto"` (lighter on the battery: no background glow, no pulse of the child screen's ring, no animation of the rings' arc while no charger is connected) or `"full"` | `"auto"` | Preferences › Visual effects |
 | `text_size` | string | `"auto"` (larger while the console is docked, on a TV), `"normal"` or `"large"`; larger text draws every label 25 % bigger but the header's, the sidebar's and the footer's, at once (no restart) | `"auto"` | Preferences › Text size, the header's AA |
-| `start_tab` | string | the tab shown at start-up: `"dashboard"` (Today), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (PIN), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
+| `start_tab` | string | the tab shown at start-up: `"dashboard"` (Today), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (Security), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
-| `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | PIN |
-| `pin_ask_again` | boolean | the PIN, once entered, holds 5 minutes instead of until PlayGuard closes: *Before a change* asks again after them, *To open PlayGuard* locks again after 5 minutes or more out of focus | `false` | PIN (*Ask for the PIN again after 5 minutes*) |
+| `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | Security |
+| `pin_ask_again` | boolean | the PIN, once entered, holds 5 minutes instead of until PlayGuard closes: *Before a change* asks again after them, *To open PlayGuard* locks again after 5 minutes or more out of focus | `false` | Security (*Ask for the PIN again after 5 minutes*) |
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
 | `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Console › Network clock |
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
@@ -68,7 +68,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 
 ## `pin_lock`
 
-*PIN › Protect PlayGuard with the PIN*. A string:
+*Security › Protect PlayGuard with the PIN*. A string:
 
 | Value | In the app | What it does |
 |---|---|---|
@@ -102,7 +102,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 
 ## Updates
 
-`update_via` and `update_daily` are set in *About › Updates*, under *Check for updates*, which checks at once.
+`update_via` and `update_daily` are set in *Preferences › Updates*; *About › Check for updates* checks at once.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
@@ -124,7 +124,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `seen_version` | string | the version whose *What's new* was shown; at most 32 characters | `""` |
 | `notices_system` | boolean | the notification bell shows newer Atmosphère, hekate and firmware releases (*Preferences › Notifications*) | `true` |
 | `notices_summary` | boolean | the bell shows the week's play time and a limit passed on several days | `true` |
-| `notices_reminders` | boolean | the bell reminds of a settings backup to make, the other system's parental controls and a console lock on for a week | `true` |
+| `notices_reminders` | boolean | the bell reminds of a settings backup to make, the other system's parental controls and *Block all games* on for a week | `true` |
 | `notices_read` | array of strings | the bell's entries for information marked as read, `"id:hash"` of their text, the newest last, at most 48 (one longer than 96 characters is dropped); a read entry comes back when its text changes | `[]` |
 | `notices_acked` | array of strings | the bell's entries to do the parent chose to ignore (a weak PIN, PlayGuard open without the PIN, the "time's up" alarm off, the SD card nearly full), `"id:print:YYYY-MM-DD"`: what it was about (the PIN's length for a weak PIN, never the PIN; empty otherwise) and the day; at most 16 (one longer than 96 characters is dropped); an entry comes back once what it says is fixed and then seen again, or when what it was about changes | `[]` |
 | `notices_ack_remind` | boolean | an ignored entry is counted again 30 days after it was ignored (*Preferences › Notifications*); off, it stays ignored | `true` |
@@ -152,22 +152,22 @@ These keys are in `state.json`, one per system: `nand/sysmmc/` for the
 sysMMC, `nand/emummc/` for the emuMMC (every emuMMC of the SD card shares
 it), `nand/unknown/` when the system could not be told
 (`source/util/nand.hpp`). Each system has its own parental
-controls: the console lock turned on on the sysMMC must not put its limits
+controls: *Block all games* turned on on the sysMMC must not put its limits
 back on an emuMMC. `state.json` is read like `config.json` (a damaged one is
 kept as `state.json.bad`, with the same notice); when a system has none yet,
 these keys are read from `config.json`, where the versions before it kept
 them, and leave it at the next save. `extra_auto_restore`, a preference,
 stays in `config.json`.
 
-### Console lock
+### Block all games
 
-*PIN › Block all games*: every day's limit set to 0, so the PIN is needed to
+*Play timer › Block all games*: every day's limit set to 0, so the PIN is needed to
 play.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `console_lock` | boolean | the console lock is on | `false` |
-| `console_lock_since` | string | `"YYYY-MM-DD"` the console lock was turned on (the bell says when it has been on for a week); anything else is cleared | `""` |
+| `console_lock` | boolean | *Block all games* is on | `false` |
+| `console_lock_since` | string | `"YYYY-MM-DD"` *Block all games* was turned on (the bell says when it has been on for a week); anything else is cleared | `""` |
 | `console_lock_prev` | array of 7 integers | the limits it replaced, Sunday to Saturday, in minutes: `0` to `1440`, or `65535` for no limit. Anything but seven valid values empties it; turning the lock off then clears the limits instead of putting them back | `[]` |
 
 ### Extra time today
@@ -228,7 +228,7 @@ version. The three keys go together.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
-| `relock_pending` | boolean | set right before PlayGuard unlocks parental controls (for a change, or *PIN › Unlock temporarily*), cleared once they are locked again (or *Quit, still unlocked* is chosen on quitting). Still `true` at start-up: the app stopped in between (or was closed from the HOME menu), so it locks again then | `false` |
+| `relock_pending` | boolean | set right before PlayGuard unlocks parental controls (for a change, or *Security › Unlock temporarily*), cleared once they are locked again (or *Quit, still unlocked* is chosen on quitting). Still `true` at start-up: the app stopped in between (or was closed from the HOME menu), so it locks again then | `false` |
 
 ## Example
 

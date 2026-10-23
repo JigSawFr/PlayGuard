@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # Compatibilité
 
 Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la comparaison avec un sysmodule de remplacement. Retour au [README](../../README.md).
@@ -16,7 +16,7 @@ Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la compa
 - **Firmware 23.0.0** — Atmosphère 1.12.0. Mêmes commandes que 23.0.1 dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services).
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Toutes les fonctions.
 
-**Avant 21.0.0, tout sauf le temps de jeu** — restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile et historique fonctionnent. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
+**Avant 21.0.0, tout sauf le temps de jeu** — restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile et historique fonctionnent. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et *Bloquer tous les jeux*.
 
 - **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
 - **Firmware 19.0.x** — Atmosphère 1.8.0
@@ -76,7 +76,7 @@ PlayGuard pilote le contrôle parental intégré à la console (le service `pctl
 |---|---|---|
 | **Limite de temps de jeu** | Une pour la console (le minuteur de la console) | Une par compte utilisateur |
 | **Code PIN, avertissements, suspension** | Ceux de la console | Les siens |
-| **En arrière-plan** | Rien (le module de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande) | Un sysmodule, dès le démarrage |
+| **En arrière-plan** | Rien (le sysmodule de récupération optionnel n'agit qu'au démarrage, quand un fichier `RESCUE` le demande) | Un sysmodule, dès le démarrage |
 | **Après une mise à jour du firmware** | Le contrôle de la console continue de fonctionner ; PlayGuard s'ouvre en lecture seule jusqu'à une version qui prend le firmware en charge | Le contrôle dépend du bon fonctionnement du sysmodule |
 | **Supprimé de la carte SD** | Les limites restent sur la console | Le contrôle disparaît avec lui |
 

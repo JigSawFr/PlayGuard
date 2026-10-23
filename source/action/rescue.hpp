@@ -26,14 +26,15 @@ std::optional<RescueReport> take(RescueProof* proof);
 
 // Whether the console confirms `report` (rescue_report_confirmed, from a
 // fresh read of 1206 and 1006). An unlock also needs `proof`, its MAC checked
-// with the stored PIN (pctl_pin_hmac): a console a parent left temporarily
-// unlocked confirms a report written by hand just as well, and only the
-// sysmodule makes the proof, so a report that has one shows it is installed
-// too. Anything else (no PIN left) needs the sysmodule on the SD card
+// with the stored PIN and the console's secret (pctl_pin_hmac): a console a
+// parent left temporarily unlocked confirms a report written by hand just as
+// well, and only the sysmodule makes the proof, so a report that has one
+// shows it is installed too. Anything else (no PIN left) needs the sysmodule on the SD card
 // (installed()). False when a read fails.
 // *old_module, when given, says why an unlock is not confirmed: the console
-// agrees, but the report has no proof and the module installed is
-// outdated(), one from before the proof (it writes none, at every RESCUE).
+// agrees, but the report has no proof that checks and the module installed
+// is outdated(): one from before the proof (it writes none, at every RESCUE)
+// or from before the console's secret (its proof never checks).
 bool confirmed(const RescueReport& report, const RescueProof& proof, bool* old_module = nullptr);
 
 // Whether the sysmodule is on the SD card

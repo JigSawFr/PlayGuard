@@ -54,15 +54,11 @@ class ForwardersActivity : public brls::Activity
     void rename(const forwarders_logic::Row& row);
     void change_author(const forwarders_logic::Row& row);
     void pick_homebrew();
-    // Hours when a protected one starts without the PIN: the days, then the
-    // span (the weekdays' then the weekend's, when apart). `closed`: the
-    // hours it never opens instead.
+    // Hours when a protected one starts without the PIN, or those it never
+    // opens (`closed`): forwarders_pickers::hours, then hours().
     void pick_hours(const forwarders_logic::Row& row, bool closed);
     // The icon its line in the list shows (0: none yet).
     int icon_of(uint64_t id) const;
-    // A span: its start, then its end, under `title`; `done(from, to)` in
-    // minutes (an end before the start runs past midnight).
-    void pick_span(const std::string& title, int from_hour, int to_hour, std::function<void(int, int)> done);
     // Sets them, then ZR a few seconds to put the ones before back.
     void hours(const forwarders_logic::Row& row, bool closed, const forwarder_flow::Hours& h);
     // Closed once the day's play time is used up, or no longer; ZR to undo.
@@ -71,7 +67,7 @@ class ForwardersActivity : public brls::Activity
     void pin(const forwarders_logic::Row& row, bool on);
     // Its icon: its .nro's, or a screenshot of the album.
     void pick_icon(const forwarders_logic::Row& row);
-    // The pause after refused PINs: its rule.
+    // The pause after refused PINs: its rule (forwarders_pickers::pause).
     void pick_pause();
     // After a change: the list again, the focus on `id` when it is there.
     std::function<void(bool)> then_rebuild(uint64_t id = 0);

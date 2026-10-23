@@ -146,6 +146,14 @@ jobs:
           previews=""
           # A pull request's newest successful build: the one before its last
           # push while that one builds, so its preview stays up meanwhile.
+          # Only pull requests from this repository's branches (never a
+          # fork's). Their previews share the site's origin: a pull request's
+          # scripts could read and write what main's pages keep in the
+          # browser (its simulator's cache, the kept simulated console in
+          # IndexedDB, the theme and language). The simulator's service
+          # worker keeps a cache per folder (web/sw.js), so the copies do not
+          # mix by accident; a separate origin for previews would need
+          # another host than this repository's Pages site.
           for pr in $(gh api "repos/$REPO/pulls?state=open&per_page=100" --paginate \
                         --jq ".[] | select(.head.repo.full_name == \"$REPO\") | \"\(.number):\(.head.ref)\""); do
             number=${pr%%:*}

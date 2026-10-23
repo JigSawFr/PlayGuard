@@ -10,12 +10,19 @@
 'use strict';
 
 if (typeof window === 'undefined') {
-  const CACHE = 'playguard-simulator';
+  // The site's origin holds several simulators (simulator/, its releases',
+  // each pull request's pr-<n>/simulator/): each worker keeps its own cache,
+  // named after its scope, and keeps only what is under it, so one
+  // deployment's files are never served for another's.
+  const SCOPE = new URL(self.registration.scope).pathname;
+  const CACHE = `playguard-simulator:${SCOPE}`;
   // A commit's files never change: one copy per file, the newest commit's.
   const BUILD_FILE = /\/(playguard\.(js|wasm|data)|cjk\.otf)$/;
 
   self.addEventListener('install', () => self.skipWaiting());
-  self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
+  // The one cache every deployment shared before: gone.
+  self.addEventListener('activate', (event) =>
+    event.waitUntil(caches.delete('playguard-simulator').then(() => self.clients.claim())));
 
   // The headers a cross-origin isolated page and its threads need.
   const isolated = (response) => {
@@ -36,6 +43,8 @@ if (typeof window === 'undefined') {
   };
 
   const respond = async (request, url) => {
+    // Another deployment's file: from the network, never kept.
+    if (!url.pathname.startsWith(SCOPE)) return fetch(request);
     const cache = await caches.open(CACHE);
     if (BUILD_FILE.test(url.pathname) && url.searchParams.has('v')) {
       const hit = await cache.match(request);

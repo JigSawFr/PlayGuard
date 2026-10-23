@@ -1088,8 +1088,6 @@
         "help_body": "What this screen does, in the guide:",
         "fix_delete": "Delete {}",
         "fix_protect": "Protect {} with the PIN",
-        "group_protected": "Protected with the PIN",
-        "group_open": "Without the PIN",
         "group_elsewhere": "Made by another app",
         "group_gone": "No longer on the HOME menu",
         "state_verified": "seen working",

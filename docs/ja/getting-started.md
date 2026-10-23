@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
+<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
 # はじめに
 
 SD カードから、子どものために設定した本体まで、約 10 分で進めます。そのあとは、ふだんの操作です。トップページは [README](../../README.md)。

@@ -313,6 +313,101 @@ static void test_clocks(void)
     CHECK(gate_clocks_differ(t + GATE_CLOCK_SLACK + 1, true, t) && gate_clocks_differ(t, true, t + GATE_CLOCK_SLACK + 1));
     CHECK(gate_clocks_differ(t + 365ull * 86400, true, t) && gate_clocks_differ(0, true, t));
     CHECK(!gate_clocks_differ(t + 86400, false, t) && !gate_clocks_differ(t, false, 0));
+    // Free hours only by a console clock the network clock vouches for:
+    // without it (a console never online), the time set into them opens
+    // nothing.
+    CHECK(gate_free_trusted(true, false));
+    CHECK(!gate_free_trusted(true, true) && !gate_free_trusted(false, false) && !gate_free_trusted(false, true));
+}
+
+// The pause timed by the steady clock too: moving the time forward does not
+// end it; a source that changed, or none, leaves the time alone to decide.
+static void test_steady_pause(void)
+{
+    char out[1024], next[1024];
+    size_t n = 0;
+    const GateSteady at = { { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee,
+                              0xff },
+                            5000 };
+    out[0] = '\0';
+    for (int i = 0; i < 5; i++) {
+        n = gate_pause_update_steady(out, n, "sdmc:/s.nro", GateResult_Refused, 1000, NULL, &at, next, sizeof(next));
+        CHECK(n > 0);
+        memcpy(out, next, n + 1);
+    }
+    // The fifth refusal paused it: its line, then its steady line.
+    CHECK(strcmp(out, "0\t1900\tsdmc:/s.nro\nsteady\t00112233445566778899aabbccddeeff\t5900\tsdmc:/s.nro\n") == 0);
+    GateSteady until;
+    unsigned streak;
+    uint64_t posix, left = 0;
+    CHECK(gate_pause_find(out, n, "sdmc:/s.nro", &streak, &posix) && posix == 1900);
+    CHECK(gate_pause_steady_find(out, n, "sdmc:/s.nro", &until) && until.seconds == 5900 &&
+          memcmp(until.source, at.source, 16) == 0);
+    CHECK(!gate_pause_steady_find(out, n, "sdmc:/o.nro", &until));
+
+    // The time set a day forward: still paused by the steady clock, for
+    // what is left of it.
+    GateSteady later = at;
+    later.seconds = 5100;
+    CHECK(gate_pause_holds(posix, 1000 + 86400, &until, &later, &left) && left == 800);
+    // Both say so: the later end.
+    CHECK(gate_pause_holds(posix, 1200, &until, &later, &left) && left == 800);
+    later.seconds = 5800;
+    CHECK(gate_pause_holds(posix, 1100, &until, &later, &left) && left == 800);
+    // Over by both.
+    later.seconds = 5900;
+    CHECK(!gate_pause_holds(posix, 1900, &until, &later, &left) && left == 0);
+    // Another source (the steady clock reset) or none: the time alone.
+    GateSteady other = later;
+    other.source[0] = 0xFF;
+    other.seconds = 10;
+    CHECK(!gate_pause_holds(posix, 2000, &until, &other, NULL));
+    CHECK(gate_pause_holds(posix, 1500, &until, &other, &left) && left == 400);
+    CHECK(gate_pause_holds(posix, 1500, NULL, &later, &left) && left == 400);
+    CHECK(!gate_pause_holds(posix, 2000, &until, NULL, NULL));
+    CHECK(!gate_pause_holds(0, 2000, NULL, NULL, NULL));
+
+    // A try while paused keeps both lines; another forwarder's try too.
+    n = gate_pause_update_steady(out, n, "sdmc:/s.nro", GateResult_Paused, 1100, NULL, &later, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    n = gate_pause_update_steady(out, n, "sdmc:/o.nro", GateResult_Refused, 1100, NULL, &later, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_steady_find(out, n, "sdmc:/s.nro", &until) && until.seconds == 5900);
+    CHECK(!gate_pause_steady_find(out, n, "sdmc:/o.nro", NULL));   // refused once: no pause, no steady line
+    // PlayGuard's rule change keeps it; lifting the pause takes both lines.
+    const GatePauseRule three = { 3, 60 };
+    n = gate_pause_edit(out, n, &three, NULL, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_steady_find(out, n, "sdmc:/s.nro", NULL) && gate_pause_find(out, n, "sdmc:/o.nro", NULL, NULL));
+    n = gate_pause_edit(out, n, NULL, "sdmc:/s.nro", next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(!gate_pause_steady_find(out, n, "sdmc:/s.nro", NULL) && !gate_pause_find(out, n, "sdmc:/s.nro", NULL, NULL));
+    // Opened: its lines go.
+    n = gate_pause_update_steady(out, n, "sdmc:/o.nro", GateResult_Refused, 1200, NULL, &later, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    n = gate_pause_update_steady(out, n, "sdmc:/o.nro", GateResult_Refused, 1300, NULL, &later, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    CHECK(gate_pause_steady_find(out, n, "sdmc:/o.nro", &until) && until.seconds == 5900 + 3600);
+    n = gate_pause_update_steady(out, n, "sdmc:/o.nro", GateResult_Pin, 9000, NULL, &later, next, sizeof(next));
+    CHECK(strcmp(next, "rule\t3\t60\n") == 0);
+
+    // Without the steady clock: no steady line, as before.
+    n = gate_pause_update_steady("", 0, "sdmc:/s.nro", GateResult_Refused, 1, &three, NULL, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    n = gate_pause_update_steady(out, n, "sdmc:/s.nro", GateResult_Refused, 2, &three, NULL, next, sizeof(next));
+    memcpy(out, next, n + 1);
+    n = gate_pause_update_steady(out, n, "sdmc:/s.nro", GateResult_Refused, 3, &three, NULL, next, sizeof(next));
+    CHECK(strcmp(next, "0\t3603\tsdmc:/s.nro\n") == 0);
+
+    // Damaged steady lines read as nothing (and are dropped).
+    static const char BAD[] = "steady\t00112233\t5\tsdmc:/a.nro\n"
+                              "steady\t00112233445566778899aabbccddeefg\t5\tsdmc:/a.nro\n"
+                              "steady\t00112233445566778899AABBCCDDEEFF\t5\tsdmc:/a.nro\n"
+                              "steady\t00112233445566778899aabbccddeeff\tx\tsdmc:/a.nro\n"
+                              "steady\t00112233445566778899aabbccddeeff\t5\t\n";
+    CHECK(!gate_pause_steady_find(BAD, sizeof(BAD) - 1, "sdmc:/a.nro", NULL));
+    n = gate_pause_edit(BAD, sizeof(BAD) - 1, NULL, NULL, next, sizeof(next));
+    CHECK(n == 0 && next[0] == '\0');
 }
 
 int main(void)
@@ -326,5 +421,6 @@ int main(void)
     test_rules();
     test_log();
     test_clocks();
+    test_steady_pause();
     return CHECK_DONE("gate argv, free hours, rules and log assertions passed");
 }

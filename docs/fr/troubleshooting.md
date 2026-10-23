@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 c1d140368007 -->
+<!-- translated from docs/troubleshooting.md, sha256 45158eaaf5a4 -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.md).
@@ -171,6 +171,6 @@ Appuyez sept fois sur Ⓨ sur *À propos › Version* ; les outils développeur 
 - Un téléchargement interrompu (réseau perdu) reprend là où il s'est arrêté la prochaine fois que le même build est installé.
 - Les artefacts expirent au bout de 90 jours.
 
-**Revenir en arrière.** Le build remplacé est gardé (`playguard.nro.previous`) : **Revenir au build précédent**, dans la même liste, les échange à nouveau, après le code PIN ; il désigne ce build par sa version, sa pull request et son commit. Si un build installé d'ici (ou par *Mettre à jour sur place*) plante avant son premier écran, le lancement suivant de PlayGuard propose de revenir au build précédent sur un simple écran texte, avant de charger quoi que ce soit (A revient en arrière, B le lance quand même), sans le code PIN, car l'écran du code PIN peut lui-même être ce qui plante. La même liste permet de revenir à n'importe quelle version publiée à tout moment.
+**Revenir en arrière.** Le build remplacé est gardé (`playguard.nro.previous`) : **Revenir au build précédent**, dans la même liste, les échange à nouveau, après le code PIN ; il désigne ce build par sa version, sa pull request et son commit. Si un build installé d'ici (ou par *Mettre à jour sur place*) plante avant son premier écran, le lancement suivant de PlayGuard propose de revenir au build précédent sur un simple écran texte, avant de charger quoi que ce soit (A revient en arrière, B le lance quand même). Revenir en arrière demande le code PIN sur l'écran du code PIN de la console quand il y en a un (pas l'écran de verrouillage de PlayGuard, qui peut être ce qui plante) ; sans lui, le build installé se lance. La même liste permet de revenir à n'importe quelle version publiée à tout moment.
 
 **Quel build tourne :** *À propos › Version* affiche le commit en mode développeur. L'en-tête de chaque écran affiche la version en cours à côté du titre : celle d'une version publiée dans une étiquette grise (`1.2.0`), celle de tout autre build dans une étiquette orange suivie de son commit, pour ne jamais confondre un build de test avec la version publiée.

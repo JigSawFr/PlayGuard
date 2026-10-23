@@ -1,8 +1,8 @@
 # Testing on a console: forwarders and the homebrew menu
 
-What the desktop and web simulators cannot show: the console's own HOME menu, its PIN screen, Atmosphère reading `override_config.ini`, the rescue module at boot. Go through it on a console after a change to *Console › Forwarders* (the files under `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), and note in the pull request what was checked, on which firmware and Atmosphère.
+What the desktop and web simulators cannot show: the console's own HOME menu, its PIN screen, Atmosphère reading `override_config.ini`, the recovery sysmodule at boot. Go through it on a console after a change to *Console › Forwarders* (the files under `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), and note in the pull request what was checked, on which firmware and Atmosphère.
 
-Before starting: a PIN on the console, sys-patch (or sigpatch files), sphaira in `/switch/sphaira/`, a computer with an SD card reader at hand, and preferably the rescue module installed (`playguard-rescue.zip`). Use a console you can put back as it was.
+Before starting: a PIN on the console, sys-patch (or sigpatch files), sphaira in `/switch/sphaira/`, a computer with an SD card reader at hand, and preferably the recovery sysmodule installed (`playguard-rescue.zip`). Use a console you can put back as it was.
 
 First, *Help & diagnostics › Console self-test* (developer mode, [troubleshooting](troubleshooting.md#developer-mode-investigating-a-new-firmware)): it checks what PlayGuard can by itself and writes `config/playguard/self-test.md`; paste it in the pull request. The steps below are what it cannot check: they need a hand on the console.
 
@@ -28,6 +28,8 @@ Each step: what to do, then what must happen. ☐ is to tick.
 - ☐ Refused five times in a row (the default pause): the fifth says *It asks again at …*; started again before then, it says it is paused and never shows the PIN screen. In PlayGuard: the bell has the pause; *Lift the pause* (the PIN asked) and it asks again at once.
 - ☐ *Hours without the PIN* now included: it starts without the PIN, the gate saying so; the gate's screen names the hours and shows an open padlock after *Protected by PlayGuard*, sphaira's row in PlayGuard the same icon, *Details* the hours.
 - ☐ *Hours it never opens* now included: the gate says *Not at this time* and the hours, even with a PIN on the console; outside them, the PIN again.
+- ☐ Paused, then the console clock set a day forward in System Settings (*Synchronize Clock via Internet* off): still paused, saying when it asks again as before.
+- ☐ *Hours without the PIN* now included, on a console whose network clock was never set (one never online): the PIN asked all the same, the gate saying *No free hours: the network clock cannot be read*; the network clock set (*Set the network clock to the console clock*), it starts without the PIN.
 - ☐ *Pause after refused PINs › Never*: refused ten times, no pause.
 - ☐ *Hours without the PIN › Monday to Friday, and the weekend apart*: on a weekday in its span, no PIN; at the weekend, the weekend's span.
 - ☐ *Closed once today's play time is used up* switched on, a play timer with no time left today: the gate says *Today's play time is used up*, even with a PIN entered; time added (PlayGuard or the parent's app), it asks for the PIN again.
@@ -49,8 +51,9 @@ Each step: what to do, then what must happen. ☐ is to tick.
 
 - ☐ Locked, sphaira's forwarder deleted in System Settings › Data Management: at the next start, the bell says a way back is missing; the lock stays.
 - ☐ From a computer: `atmosphere/config/override_config.ini` deleted, the console restarted: the album opens the homebrew menu; PlayGuard's next start tells the lock was taken away (bell, history).
-- ☐ With the rescue module: locked again, an empty `config/playguard/RESCUE` file, a restart: unlocked at boot, PlayGuard telling so at its next start.
-- ☐ Atmosphère updated while locked (rescue module installed): unlocked at boot, PlayGuard telling so.
+- ☐ With the recovery sysmodule: locked again, an empty `config/playguard/RESCUE` file, a restart: unlocked at boot, PlayGuard telling so at its next start.
+- ☐ Atmosphère updated while locked (recovery sysmodule installed): unlocked at boot, PlayGuard telling so.
+- ☐ The recovery sysmodule of this PlayGuard, an empty `config/playguard/RESCUE` file, a restart: the recovery screen offers its actions (the proof checked). The same with the module of an earlier PlayGuard (one that keyed the proof with the PIN alone): no actions, the recovery screen saying to update the module.
 - ☐ With an emuMMC: locking from one system warns that the lock is on the SD card; booted into the other, the album no longer opens the homebrew menu there either, and that system has none of the forwarders.
 
 ## 5. Backups

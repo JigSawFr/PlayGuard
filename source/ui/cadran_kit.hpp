@@ -38,10 +38,8 @@ constexpr float TEXT_TITLE  = 23;
 NVGcolor color(const char* key);
 
 // A label of `size` px in the theme colour `color_key` ("cadran/text2"…);
-// several lines when it has to. centered(): the same, centred, wrapping at
-// its box's width.
+// several lines when it has to.
 brls::Label* label(const std::string& text, float size, const char* color_key = "cadran/text");
-brls::Label* centered(const std::string& text, float size, const char* color_key = "cadran/text");
 
 // The same in the boards' display face (Sora; the other scripts from the
 // app's fonts): a dialog's title, a code to read out, a figure.

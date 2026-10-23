@@ -1088,8 +1088,6 @@
         "help_body": "此界面的用途（指南）：",
         "fix_delete": "删除{}",
         "fix_protect": "用PIN保护{}",
-        "group_protected": "已用PIN保护",
-        "group_open": "无需PIN",
         "group_elsewhere": "由其他应用创建",
         "group_gone": "已不在HOME菜单",
         "state_verified": "已验证",

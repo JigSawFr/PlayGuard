@@ -17,11 +17,13 @@
 //
 // Anyone who can edit the SD card can do this, as they can turn off
 // PlayGuard's own PIN prompt (pin_lock.hpp): it keeps a child out, not
-// someone with a computer. No PIN is ever written to either file. The report
-// is a plain file anyone can write, so PlayGuard trusts it only when the
-// console confirms it (rescue_report_confirmed) and, for an unlock, when it
-// carries the sysmodule's proof (RescueProof): an answer to a challenge the
-// app left on the card (RESCUE_NONCE_NAME), keyed with the stored PIN.
+// someone with a computer. No PIN is ever written to either file, nor
+// anything it could be guessed back from on a computer: the report is a
+// plain file anyone can write, so PlayGuard trusts it only when the console
+// confirms it (rescue_report_confirmed) and, for an unlock, when it carries
+// the sysmodule's proof (RescueProof): an answer to a challenge the app left
+// on the card (RESCUE_NONCE_NAME), keyed with the stored PIN and a secret of
+// the console that is not on the card (rescue_proof_mac).
 //
 // Plain C, no libnx: host-tested (tests/rescue).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -47,6 +49,9 @@ extern "C" {
 #define RESCUE_NONCE_NAME       "rescue_nonce"
 #define RESCUE_NONCE_SIZE       16
 #define RESCUE_MAC_SIZE         32   // HMAC-SHA256
+// The console's secret in the MAC's key (rescue_proof_mac): set:sys
+// GetMiiAuthorId, 16 random bytes the console made when it was set up.
+#define RESCUE_SECRET_SIZE      16
 // Where the sysmodule is installed, from the SD card root.
 #define RESCUE_SYSMODULE_PATH   "atmosphere/contents/4200000000505247/exefs.nsp"
 // Next to it: left by PlayGuard when it updates the module, removed by the
@@ -84,10 +89,13 @@ typedef struct {
 
 // What shows the sysmodule wrote a report: its "nonce=" and "mac=" lines,
 // after the others. `nonce` is the challenge it read (RESCUE_NONCE_NAME);
-// `mac` is HMAC-SHA256 of rescue_mac_message, keyed with the stored PIN
-// (1208, rescue_pin_length digits), which the app reads too to check it.
-// Nothing that cannot read the PIN can make one. Absent (present false) from
-// an older sysmodule's reports, and when there was no challenge to answer.
+// `mac` is rescue_proof_mac of rescue_mac_message, keyed with the stored PIN
+// (1208, rescue_pin_length digits) and the console's secret, which the app
+// reads too to check it. Nothing that cannot read the PIN can make one.
+// Absent (present false) from the reports of a sysmodule from before the
+// proof, and when there was no challenge to answer; one from before the
+// console's secret (keyed with the PIN alone, "playguard-rescue/1") never
+// checks.
 typedef struct {
     bool    present;
     uint8_t nonce[RESCUE_NONCE_SIZE];
@@ -132,10 +140,25 @@ size_t rescue_nonce_format(const uint8_t nonce[RESCUE_NONCE_SIZE], char *buf, si
 // ignored. False, and *out unchanged, for anything else.
 bool rescue_nonce_parse(const char *text, size_t len, uint8_t out[RESCUE_NONCE_SIZE]);
 
-// What the MAC covers: "playguard-rescue/1\n", "nonce=<hex>\n" and the report
+// What the MAC covers: "playguard-rescue/2\n", "nonce=<hex>\n" and the report
 // as rescue_report_format writes it. Both sides build it from the values, so
 // a report parsed back gives the same bytes. Length, or 0 when it does not fit.
 size_t rescue_mac_message(const RescueReport *r, const uint8_t nonce[RESCUE_NONCE_SIZE], char *buf, size_t size);
+
+// HMAC-SHA256 as libnx's hmacSha256CalculateMac: `dst` gets 32 bytes. Both
+// sides pass libnx's; the simulator and the tests their own.
+typedef void (*RescueHmac)(void *dst, const void *key, size_t key_size, const void *msg, size_t size);
+
+// The proof's MAC of `msg` (rescue_mac_message): HMAC-SHA256 keyed with
+// HMAC-SHA256(secret, "playguard-rescue-key/2\n" + the PIN's digits). Keyed
+// with the PIN alone, a copy of the report would give the PIN back on a
+// computer in seconds (10^8 PINs at most); the console's secret is on the
+// console only (in its settings, not in the PRODINFO backups Atmosphère
+// leaves on the SD card), so that takes 2^128 tries. False, and `mac`
+// zeroed, without a PIN (`pin_len` 0 or over 8) or with a secret of zeros
+// (none read). The intermediate key is wiped.
+bool rescue_proof_mac(RescueHmac hmac, const uint8_t secret[RESCUE_SECRET_SIZE], const char *pin, size_t pin_len,
+                      const void *msg, size_t msg_len, uint8_t mac[RESCUE_MAC_SIZE]);
 
 // "nonce=<32 hex>\nmac=<64 hex>\n" into buf, for a present proof; 0 (buf "")
 // when it is absent or does not fit.

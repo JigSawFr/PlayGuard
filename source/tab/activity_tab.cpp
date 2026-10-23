@@ -30,7 +30,6 @@ constexpr auto MAX_AGE = std::chrono::seconds(60);
 constexpr size_t CARDS = 4;
 constexpr float  WEEK_BAR_MAX = 56.0f;
 constexpr float  SPARK_MAX = 40.0f;
-constexpr long   GREW_MIN = 30;    // a game card says "+1 h vs last week" from half an hour more
 // The accounts' avatars, in turn (no picture of theirs is read).
 const char* const AVATARS[] = { "cadran/avatar0", "cadran/avatar1", "cadran/avatar2", "cadran/avatar3" };
 
@@ -604,21 +603,16 @@ void ActivityTab::show_top()
     const PlayStats& s = *data;
 
     // Today: on today's limit (every account: the limit is the console's).
-    uint64_t today_s = 0;
-    int games_today = 0;
-    for (uint32_t g = 0; g < s.count; g++) {
-        today_s += s.games[g].today_s;
-        games_today += s.games[g].today_s > 0;
-    }
-    std::string sub = games_today == 1 ? "playguard/cadran/activity/games_one"_i18n
-                                       : brls::getStr("playguard/cadran/activity/games", games_today);
+    const auto today = activity_summary::today_play(s);
+    std::string sub = today.games == 1 ? "playguard/cadran/activity/games_one"_i18n
+                                       : brls::getStr("playguard/cadran/activity/games", today.games);
     if (who < 0) {
         const PtState& pt = this->play_timer();
         const uint16_t limit = pt.fw_supported && pt.valid ? pt.day_min[ui::today_weekday()] : PT_DAY_NOLIMIT;
         sub = (limit == PT_DAY_NOLIMIT ? "playguard/cadran/week/no_limit"_i18n
                                        : brls::getStr("playguard/cadran/activity/on_limit", ui::fmt_minutes(limit))) + " · " + sub;
     }
-    today_value->setText(s.windows_ok ? ui::fmt_play_time(today_s) : "—");
+    today_value->setText(s.windows_ok ? ui::fmt_play_time(today.total_s) : "—");
     today_sub->setText(s.windows_ok ? sub : "");
 
     // The last seven days, and their bars.
@@ -630,25 +624,23 @@ void ActivityTab::show_top()
                           : "");
     // Against the 7 days before, per day: more (amber), less (teal) or about
     // the same (under 5 minutes either way).
-    int64_t diff = 0;
-    const bool trend = activity_summary::week_trend_min(s, diff);
-    if (trend) {
-        const int64_t same = activity_summary::TREND_SAME_MIN;
+    using activity_summary::Trend;
+    const auto trend = activity_summary::week_trend(s);
+    if (trend.known) {
         brls::Theme theme = brls::Application::getTheme();
-        const uint16_t amount = (uint16_t)std::min<int64_t>(24 * 60, diff < 0 ? -diff : diff);
-        ui::set_text(week_trend, diff >= same    ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(amount))
-                                 : diff <= -same ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(amount))
-                                                 : "playguard/cadran/activity/trend_same"_i18n);
-        week_trend->setTextColor(theme[diff >= same ? "cadran/amber" : diff <= -same ? "cadran/teal" : "cadran/text3"]);
+        const bool more = trend.trend == Trend::More, less = trend.trend == Trend::Less;
+        ui::set_text(week_trend, more   ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(trend.amount_min))
+                                 : less ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(trend.amount_min))
+                                        : "playguard/cadran/activity/trend_same"_i18n);
+        week_trend->setTextColor(theme[more ? "cadran/amber" : less ? "cadran/teal" : "cadran/text3"]);
         // Up or down said by the shape too, not by the colour alone.
-        week_trend_icon->setIcon(diff >= 0 ? "caret-up" : "caret-down");
-        week_trend_icon->setColor(theme[diff >= same ? "cadran/amber" : "cadran/teal"]);
-        ui::set_visible(week_trend_icon.getView(), diff >= same || diff <= -same);
+        week_trend_icon->setIcon(trend.per_day_min >= 0 ? "caret-up" : "caret-down");
+        week_trend_icon->setColor(theme[more ? "cadran/amber" : "cadran/teal"]);
+        ui::set_visible(week_trend_icon.getView(), more || less);
     }
-    ui::set_visible(week_trend_row.getView(), trend);
-    uint64_t day_total[7] = {};
-    for (uint32_t g = 0; g < s.count; g++)
-        for (int k = 0; k < 7; k++) day_total[k] += s.games[g].day_s[k];
+    ui::set_visible(week_trend_row.getView(), trend.known);
+    uint64_t day_total[7];
+    activity_summary::day_totals(s, day_total);
     show_bars(week_bars->getChildren(), day_total, WEEK_BAR_MAX);
 
     // All time, and the game most played.
@@ -657,12 +649,7 @@ void ActivityTab::show_top()
     total_sub->setText(all.known && all.top >= 0 ? brls::getStr("playguard/cadran/activity/top", play_data::game_name(s.games[all.top])) : "");
 
     // The games of the period, most played first.
-    std::vector<const GameStat*> games;
-    for (uint32_t g = 0; g < s.count; g++)
-        if (activity_summary::value(s.games[g], p) > 0) games.push_back(&s.games[g]);
-    std::sort(games.begin(), games.end(), [p](const GameStat* a, const GameStat* b) {
-        return activity_summary::value(*a, p) > activity_summary::value(*b, p);
-    });
+    const std::vector<const GameStat*> games = activity_summary::ranked_games(s, p);
     // Unread (the line under All games says why), or nothing played: the
     // empty card says so instead of that line.
     const bool unread = R_FAILED(s.rc) || !activity_summary::period_read(s, p);
@@ -674,25 +661,16 @@ void ActivityTab::show_top()
     if (brls::View* status = this->getView("ac_status"); status && none) ui::set_visible(status, false);
     // Over the last 7 days, the card of the game played most more than the
     // week before says by how much (half an hour at least).
-    const GameStat* grew = nullptr;
-    long grew_s = GREW_MIN * 60 - 1;
-    if (p == Week && s.windows_ok && s.prev_week_ok)
-        for (size_t i = 0; i < games.size() && i < this->cards.size(); i++) {
-            const long d = (long)games[i]->week_s - (long)games[i]->prev_week_s;
-            if (d > grew_s) {
-                grew   = games[i];
-                grew_s = d;
-            }
-        }
+    const auto grew = activity_summary::grew_most(s, games, this->cards.size(), p);
     std::vector<u64> ids;
     for (size_t i = 0; i < this->cards.size(); i++) {
         Card& c = this->cards[i];
         const bool shown = i < games.size();
         ui::set_visible(c.box, shown);
         if (!shown) continue;
-        ui::set_visible(c.grew_row, games[i] == grew);
-        if (games[i] == grew)
-            ui::set_text(c.grew, brls::getStr("playguard/cadran/activity/grew", ui::fmt_play_time((u64)grew_s)));
+        ui::set_visible(c.grew_row, games[i] == grew.game);
+        if (games[i] == grew.game)
+            ui::set_text(c.grew, brls::getStr("playguard/cadran/activity/grew", ui::fmt_play_time(grew.more_s)));
         const GameStat& g = *games[i];
         c.app_id = g.app_id;
         ids.push_back(g.app_id);
