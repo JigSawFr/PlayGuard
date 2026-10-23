@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 7e41c41641bb -->
+<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
 # 機能
 
 各タブでできること、PlayGuard が安全に書き込むしくみ、本体がプレイ時間として数えるものについて説明します。PlayGuard を初めて使うなら、[はじめに](getting-started.md)から読んでください。トップページは [README](../../README.md)。

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 7e41c41641bb -->
+<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
 # Recursos
 
 O que cada aba faz, como o PlayGuard grava as configurações com segurança e o que o console conta como tempo de jogo. Novo no PlayGuard? Comece pelos [primeiros passos](getting-started.md). Volte ao [README](../../README.md).

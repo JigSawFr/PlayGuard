@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 7e41c41641bb -->
+<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
 # Возможности
 
 Что делает каждая вкладка, как PlayGuard безопасно записывает настройки и что консоль считает игровым временем. Впервые с PlayGuard? Начните с [начала работы](getting-started.md). Назад к [README](../../README.md).

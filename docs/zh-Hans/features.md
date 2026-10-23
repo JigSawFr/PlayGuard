@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 7e41c41641bb -->
+<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
 # 功能
 
 每个标签页的作用、PlayGuard 如何安全地写入设置，以及主机把什么算作游戏时间。第一次使用 PlayGuard？请从[快速上手](getting-started.md)开始。返回 [README](../../README.md)。

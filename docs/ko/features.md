@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 7e41c41641bb -->
+<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
 # 기능
 
 각 탭에서 하는 일, PlayGuard가 안전하게 설정을 쓰는 방법, 본체가 플레이 시간으로 계산하는 것을 설명합니다. PlayGuard가 처음이라면 [시작하기](getting-started.md)부터 보세요. 처음으로 돌아가기: [README](../../README.md).
