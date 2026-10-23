@@ -78,6 +78,15 @@ void GameCheckActivity::onContentAvailable()
         return true;
     });
     this->all_clear.box->addView(this->check_again);
+    this->covers = new CoverStrip();
+    this->covers->setHeight(112);
+    this->covers->setAlignSelf(brls::AlignSelf::STRETCH);
+    this->all_clear.box->addView(this->covers, 0);
+    this->covers_bar = new LoadingBar();
+    this->covers_bar->setHeight(6);
+    this->covers_bar->setWidth(320);
+    this->covers_bar->setMarginTop(18);
+    this->all_clear.box->addView(this->covers_bar, 2);   // under the strip, above the title
     list->addView(this->all_clear.box);
     ui::set_visible(this->all_clear.box, false);
     // A section per way out, under its title and what to do; each hidden
@@ -269,6 +278,10 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
 {
     this->check_total = (u32)records.size();
     this->check_done = 0;
+    std::vector<u64> ids;
+    for (const GameRecord& r : records) ids.push_back(r.app_id);
+    this->covers->set_games(ids);
+    this->covers_bar->reset();
     this->show();
     auto run = std::make_shared<CheckRun>();
     run->alive = this->alive;
@@ -282,6 +295,12 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         const bool redraw = this->changes_list(game);
         game_cache::put(&this->cache, game);
         this->check_done = done;
+        this->covers->set_done(done);
+        if (this->check_total) this->covers_bar->setProgress((float)done / (float)this->check_total);
+        if (game_icons::wanted()) {
+            const std::vector<u64> wanted = this->covers->wanted();
+            if (!wanted.empty()) game_icons::load(wanted, ui::guarded(this->alive, [this]() { this->load_icons(); }));
+        }
         if (redraw) this->show();
         else this->checking_text(brls::getStr("playguard/games/checking", (int)this->check_done, (int)this->check_total));
     };
@@ -326,12 +345,30 @@ void GameCheckActivity::status_text(const std::string& text, NVGcolor color)
     ui::set_visible(status.getView(), !text.empty());
 }
 
+void GameCheckActivity::card_layout()
+{
+    brls::View* circle = this->all_clear.box->getChildren()[1];   // the check mark, after the strip
+    ui::set_visible(circle, !this->checking);
+    ui::set_visible(this->covers, this->checking);
+    ui::set_visible(this->covers_bar, this->checking);
+    if (this->checking && brls::Application::getCurrentFocus() == this->check_again)
+        brls::Application::giveFocus(this->covers);
+    ui::set_visible(this->check_again, !this->checking);
+    // Ⓧ greyed meanwhile: a check is already under way (the footer redrawn
+    // only when that changes, not at each game).
+    if (this->x_greyed != this->checking) {
+        this->x_greyed = this->checking;
+        this->getContentView()->setActionAvailable(brls::BUTTON_X, !this->checking);
+    }
+}
+
 void GameCheckActivity::checking_text(const std::string& text)
 {
     if (this->all_clear.box->getVisibility() != brls::Visibility::VISIBLE) {
         this->status_text(text);
         return;
     }
+    this->card_layout();
     this->all_clear.title->setText(text);
     this->all_clear.text->setText("");
     this->status_text("");
@@ -451,8 +488,12 @@ void GameCheckActivity::show()
     // The card while no game has a problem, a check under way included (its
     // count then in the card's title).
     const bool clear = broken.empty() && R_SUCCEEDED(this->list_rc);
-    if (!clear && brls::Application::getCurrentFocus() == this->check_again) this->park_focus();
+    brls::View* card_focus = this->checking ? (brls::View*)this->covers : this->check_again;
+    if (!clear && (brls::Application::getCurrentFocus() == this->check_again ||
+                   brls::Application::getCurrentFocus() == this->covers))
+        this->park_focus();
     ui::set_visible(this->all_clear.box, clear);
+    this->card_layout();
 
     // Nothing had the focus before the first game with a problem; and never
     // the focus left in a section that went (its last game repaired). While
@@ -470,8 +511,8 @@ void GameCheckActivity::show()
         brls::Application::giveFocus(first);
     }
     // Nothing else to focus then (not under a dialog, which keeps its own).
-    if (clear && brls::Application::getCurrentFocus() != this->check_again && ui::has_focus(this))
-        brls::Application::giveFocus(this->check_again);
+    if (clear && brls::Application::getCurrentFocus() != card_focus && ui::has_focus(this))
+        brls::Application::giveFocus(card_focus);
     // The check over (this was its last show): the focus is the user's.
     if (!this->checking) this->auto_focus = nullptr;
     // Never a stop of its own: only while the games are rebuilt.
@@ -685,7 +726,8 @@ brls::View* GameCheckActivity::first_game() const
 void GameCheckActivity::onResume()
 {
     brls::View* fallback = this->first_game();
-    if (!fallback && this->all_clear.box->getVisibility() == brls::Visibility::VISIBLE) fallback = this->check_again;
+    if (!fallback && this->all_clear.box->getVisibility() == brls::Visibility::VISIBLE)
+        fallback = this->checking ? (brls::View*)this->covers : this->check_again;
     ui::keep_focus(this, fallback);
 }
 
