@@ -9,7 +9,7 @@
 void sysinfo_reset_cache(void);
 
 static struct {
-    u32 hos; bool ams; AppletType applet;
+    u32 hos; bool ams; AppletType applet; u64 program_id;
     int spl_refs; unsigned spl_inits; bool spl_fail;
     int set_refs; bool set_fail; bool serial_fail;
     bool emummc_fail; u64 emummc;
@@ -32,6 +32,12 @@ Result splGetConfig(SplConfigItem item, u64 *out)
     return 1;
 }
 AppletType appletGetAppletType(void) { return m.applet; }
+Result svcGetInfo(u64 *out, u32 id0, u32 handle, u64 id1)
+{
+    CHECK(id0 == InfoType_ProgramId && handle == CUR_PROCESS_HANDLE && id1 == 0);
+    *out = m.program_id;
+    return 0;
+}
 Result setsysInitialize(void) { if (m.set_fail) return 1; m.set_refs++; return 0; }
 void setsysExit(void) { CHECK(m.set_refs == 1); m.set_refs--; }
 Result setsysGetSerialNumber(SetSysSerialNumber *out)
@@ -49,6 +55,7 @@ static void reset(void)
     m.hos = MAKEHOSVERSION(23, 0, 1);
     m.ams = true;
     m.applet = AppletType_Application;
+    m.program_id = 0x0100152000022000ULL;   // a game's
     m.serial = "XAW10000000001";
     sysinfo_reset_cache();
 }
@@ -71,7 +78,7 @@ int main(void)
     si = get();
     CHECK(si.hos_version == MAKEHOSVERSION(23, 0, 1) && si.is_atmosphere);
     CHECK(si.ams_valid && si.ams_major == 1 && si.ams_minor == 12 && si.ams_micro == 0);
-    CHECK(si.applet_mode);
+    CHECK(si.applet_mode && !si.forwarder);
     CHECK(si.emummc_valid && !si.emummc && sysinfo_storage(&si) == SysStorage_SysMMC);
     CHECK(si.blank_valid && !si.blank);
     CHECK(si.serial_valid && strcmp(si.serial, "XAW10000000001") == 0);
@@ -81,6 +88,14 @@ int main(void)
     CHECK(si.hos_version >= MAKEHOSVERSION(21, 0, 0));
     CHECK(sysinfo_hos_version() == MAKEHOSVERSION(23, 0, 1));
     CHECK(m.spl_inits == 1); /* the version alone: from the cache too */
+
+    // An application: over a game, or from a forwarder's icon (0x05…).
+    reset();
+    CHECK(!get().forwarder);
+    reset();
+    m.program_id = 0x0500ABCDEF012000ULL;
+    si = get();
+    CHECK(!si.applet_mode && si.forwarder);
 
     // emuMMC, PRODINFO blanked.
     reset();

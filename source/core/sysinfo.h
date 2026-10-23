@@ -36,6 +36,8 @@ typedef struct {
     bool ams_valid;
     u8   ams_major, ams_minor, ams_micro;
     bool applet_mode;    // running as a library applet (album launch): reduced memory
+    bool forwarder;      // an application started from a forwarder's HOME menu icon (its
+                         // program ID: FWD_ID_PREFIX, core/forwarder_pack.h), not over a game
     bool emummc_valid;   // spl item 65007 (ExosphereEmummcType) was read
     bool emummc;         // emuMMC active (false when unknown)
     bool blank_valid;    // spl item 65005 (ExosphereBlankProdInfo) read, or deduced from the serial

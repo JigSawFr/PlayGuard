@@ -110,6 +110,7 @@
   "region": {"label": "Regio", "options": {"": "Standaard", "0": "Japan", "1": "Amerika", "2": "Europa", "3": "Australië", "4": "Hongkong, Taiwan, Korea", "5": "China"}},
   "sd_free_mb": {"label": "Vrije ruimte op de SD-kaart (MB)", "help": "Onder 500 MB waarschuwt het tabblad Console."},
   "applet": {"label": "Appletmodus (vanuit het album)"},
+  "from_forwarder": {"label": "Gestart via zijn HOME-pictogram (forwarder)"},
   "background": {"label": "PlayGuard op de achtergrond"},
   "hbloader": {"label": "Een loader die een update aan een store kan doorgeven"},
   "forwarders": {"label": "Al gemaakte forwarders (Console › Forwarders)"},

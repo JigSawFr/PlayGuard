@@ -2,6 +2,7 @@
 #include "sysinfo.h"
 #include <stdio.h>
 #include <string.h>
+#include "forwarder_pack.h"
 
 static SysInfo s_info;
 static bool    s_cached = false;
@@ -62,6 +63,11 @@ void sysinfo_get(SysInfo *out)
             s_info.blank_valid = true;
         }
         s_info.applet_mode = appletGetAppletType() == AppletType_LibraryApplet;
+        // As an application, whose: a forwarder's (PlayGuard's own, or one
+        // another tool made for its .nro), or the game it was opened over.
+        u64 program_id = 0;
+        if (!s_info.applet_mode && R_SUCCEEDED(svcGetInfo(&program_id, InfoType_ProgramId, CUR_PROCESS_HANDLE, 0)))
+            s_info.forwarder = (program_id >> 56) == FWD_ID_PREFIX;
         s_cached = true;
     }
     *out = s_info;

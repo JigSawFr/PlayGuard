@@ -110,7 +110,7 @@ std::string current_report()
         fw,
         si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : std::string("unknown"),
         si.is_atmosphere ? "detected" : "not detected",
-        si.applet_mode ? "applet (album)" : "application",
+        si.applet_mode ? "applet (album)" : si.forwarder ? "application (forwarder)" : "application (over a game)",
         fmt::format("{} (data: nand/{})",
                     storage ? storage : "unknown",
                     paths::nand_key()),
