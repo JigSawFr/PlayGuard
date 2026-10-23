@@ -6,10 +6,12 @@
 #include <borealis.hpp>
 #include <fmt/format.h>
 #include <memory>
+#include <optional>
 #include <system_error>
 #include <thread>
 #include <vector>
 
+#include "action/clock_logic.hpp"
 #include "action/history_flow.hpp"
 #include "action/offline_clock_logic.hpp"
 #include "ui/cadran_modal.hpp"
@@ -163,30 +165,25 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
         brls::sync([hosts, replies, done]() {
             // Bring every sample to the same instant, then take the median.
             const auto ref = std::chrono::steady_clock::now();
-            std::vector<int64_t> estimates;
-            for (const auto& r : replies)
-                if (r.ok)
-                    estimates.push_back((int64_t)r.unix_seconds +
-                        std::chrono::duration_cast<std::chrono::seconds>(ref - r.received_at).count());
-
             TimeSnapshot s;
             time_clock_snapshot(&s);
+            const auto sum = clock_logic::summarize(replies, ref, R_SUCCEEDED(s.network_rc)
+                                                    ? std::optional<uint64_t>(s.network_time) : std::nullopt);
             Measurement m;
             m.server = hosts.front();
             m.at     = ref;
-            m.offset_known    = R_SUCCEEDED(s.network_rc);
+            m.offset_known    = sum.offset_known;
             m.network_seconds = m.offset_known ? s.network_time : 0;
             for (size_t i = 0; i < hosts.size(); i++) {
                 const auto& r = replies[i];
+                const auto& h = sum.hosts[i];
                 ServerLine line;
                 line.host = hosts[i];
                 line.ok   = r.ok;
                 if (r.ok) {
-                    const int64_t now_est = (int64_t)r.unix_seconds +
-                        std::chrono::duration_cast<std::chrono::seconds>(ref - r.received_at).count();
-                    line.unix_seconds = (uint64_t)now_est;
-                    line.offset = m.offset_known ? signed_seconds(now_est - (int64_t)s.network_time) : "?";
-                    m.report += brls::getStr("playguard/clock/result_line_ok", hosts[i], ui::time_text((uint64_t)now_est), line.offset);
+                    line.unix_seconds = (uint64_t)h.estimate;
+                    line.offset = m.offset_known ? signed_seconds(h.offset) : "?";
+                    m.report += brls::getStr("playguard/clock/result_line_ok", hosts[i], ui::time_text((uint64_t)h.estimate), line.offset);
                 } else {
                     line.error = ntp_error_text(r);
                     m.report += brls::getStr("playguard/clock/result_line_err", hosts[i], line.error);
@@ -195,24 +192,15 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
                 m.lines.push_back(line);
                 m.report += "\n";
             }
-            if (estimates.empty()) {
+            if (!sum.ok) {
                 m.report += "playguard/clock/result_none"_i18n;
                 done(m);
                 return;
             }
-            std::sort(estimates.begin(), estimates.end());
             m.ok           = true;
-            // Median; an even count takes the mean of the two middle samples
-            // (the difference as unsigned: hi >= lo, so it cannot overflow).
-            const size_t mid = estimates.size() / 2;
-            int64_t median   = estimates[mid];
-            if (estimates.size() % 2 == 0) {
-                const int64_t lo = estimates[mid - 1];
-                median = lo + (int64_t)(((uint64_t)estimates[mid] - (uint64_t)lo) / 2);
-            }
-            m.unix_seconds = (uint64_t)median;
-            m.spread       = estimates.back() - estimates.front();
-            if (m.offset_known) m.offset = (int64_t)m.unix_seconds - (int64_t)s.network_time;
+            m.unix_seconds = sum.median;
+            m.spread       = sum.spread;
+            if (m.offset_known) m.offset = sum.offset;
             const std::string diff = m.offset_known ? signed_seconds(m.offset) : "?";
             m.report += brls::getStr("playguard/clock/result_summary", ui::time_text(m.unix_seconds), diff);
             if (m.spread > 5) m.warning = brls::getStr("playguard/clock/result_spread", (int)m.spread);
