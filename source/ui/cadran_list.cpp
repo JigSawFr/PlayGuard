@@ -2,6 +2,7 @@
 #include "ui/cadran_list.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -104,10 +105,10 @@ CadranIcon* make_icon(const char* name, float size, NVGcolor color)
 
 // An action tile's lines, each on its one: its title and every label under
 // it (its value, a notice's reason: TabBase::mark()). A text too long for
-// its line gets smaller, a step a frame, down to 3/4 of its size, then ends
-// in "…" and scrolls while the tile has the focus. A new text, or a tile of
-// another width, starts again from the full size. Drawn as nothing (no
-// size), once the tile is laid out.
+// its line gets smaller, to the size the line holds, down to 3/4 of its own,
+// then ends in "…" and scrolls while the tile has the focus. A new text, or
+// a tile of another width, starts again from the full size. Drawn as
+// nothing (no size), once the tile is laid out.
 class TileFit : public brls::View
 {
   public:
@@ -119,7 +120,7 @@ class TileFit : public brls::View
         this->setWidth(0);
         this->setHeight(0);
     }
-    void draw(NVGcontext*, float, float, float, float, brls::Style, brls::FrameContext*) override
+    void draw(NVGcontext* vg, float, float, float, float, brls::Style, brls::FrameContext*) override
     {
         // The labels as they are now: one added later (a reason) joins in.
         std::vector<brls::Label*> labels = { this->title };
@@ -142,8 +143,20 @@ class TileFit : public brls::View
                 if (fit.label->getFontSize() != fit.size) fit.label->setFontSize(fit.size);
                 continue;   // laid out again first
             }
-            if (fit.label->getWidth() > 0 && fit.label->isTruncated() && fit.label->getFontSize() > fit.size * 0.75f + 0.5f)
-                fit.label->setFontSize(fit.label->getFontSize() - 1.0f);
+            const float least = fit.size * 0.75f;
+            if (fit.label->getWidth() <= 0 || !fit.label->isTruncated() || fit.label->getFontSize() <= least + 0.5f) continue;
+            // At once to the size its line holds (its text measured as the
+            // label measures it), then a step at a time if it still does not.
+            float size = fit.label->getFontSize() - 1.0f;
+            if (fit.label->getFontSize() == fit.size) {
+                nvgFontSize(vg, fit.label->getDrawnFontSize());
+                nvgFontFaceId(vg, fit.label->getFont());
+                float bounds[4];
+                nvgTextBounds(vg, 0, 0, text.c_str(), nullptr, bounds);
+                const float needed = bounds[2] - bounds[0];
+                if (needed > 0) size = std::floor(fit.size * fit.label->getWidth() / needed);
+            }
+            fit.label->setFontSize(std::max(least, std::min(size, fit.label->getFontSize() - 1.0f)));
         }
     }
 
