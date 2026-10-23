@@ -2052,8 +2052,7 @@
             "to_settings": "Ihre Einstellungen",
             "games": "Blockierte Spiele",
             "games_none": "keine",
-            "current": "Aktiv",
-            "allowed": "Erlaubt"
+            "current": "Aktiv"
         },
         "clock": {
             "console": "Konsole",

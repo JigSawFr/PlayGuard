@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 584095baaee8 -->
+<!-- translated from docs/features.md, sha256 194c5e251f6e -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -294,7 +294,7 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (ein Vorhängeschloss für eingeschränkt, sonst *Erlaubt* in Worten, und die installierten Spiele, die sie sperrt; Ⓐ legt sie fest; ist *Nutzerdefiniert* aktiv, führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Die geltende Kategorie zeigt *✓ Aktiv*; der Ring in Petrol steht nur dort, wo der Fokus ist. Was eine Kategorie einschränkt (Altersgrenze, Posten, Kommunikation), wird noch einmal gesagt, bevor sie festgelegt wird; *Keine* fragt in Korallenrot nach, da sie jede Einschränkung aufhebt.
+- **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (ein korallenrotes Vorhängeschloss für eingeschränkt, sonst ein grünes Häkchen, und die installierten Spiele, die sie sperrt; Ⓐ legt sie fest; ist *Nutzerdefiniert* aktiv, führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Die geltende Kategorie zeigt *✓ Aktiv*; der Ring in Petrol steht nur dort, wo der Fokus ist. Was eine Kategorie einschränkt (Altersgrenze, Posten, Kommunikation), wird noch einmal gesagt, bevor sie festgelegt wird; *Keine* fragt in Korallenrot nach, da sie jede Einschränkung aufhebt.
 - **Die Einstellungen der Kategorie:** Altersfreigabe, Posten in sozialen Netzwerken, Kommunikation mit anderen. Bei einer vorgegebenen Kategorie sind es ihre eigenen: Eine davon zu ändern macht die Kategorie zu *Nutzerdefiniert*, ausgehend von den Einstellungen der vorgegebenen mit dieser Änderung, nach einer Nachfrage (die Einstellungen aufgelistet).
 - **Unter *Alterseinstufung*:** das **Alterseinstufungssystem** (PEGI, ESRB, USK, CERO …): Die Liste sagt, für welche Länder jedes einstuft (PEGI: der größte Teil Europas, ESRB: die USA, Kanada und Lateinamerika, USK: Deutschland, PEGI BBFC: das Vereinigte Königreich…).
 - **Blockierte installierte Spiele** (ebenfalls unter *Alterseinstufung*): wie viele der installierten Spiele die geltende Kategorie wegen ihrer Altersfreigabe blockiert (*3 von 15*), Ⓐ listet sie mit ihrer Freigabe auf (*PEGI 16*); die Kachel jeder Kategorie sagt es auch (*Blockierte Spiele · 3*).

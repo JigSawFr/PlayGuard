@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 584095baaee8 -->
+<!-- translated from docs/features.md, sha256 194c5e251f6e -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -294,7 +294,7 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (een hangslot voor beperkt, anders *Toegestaan* in woorden, en de geïnstalleerde games die het blokkeert; Ⓐ stelt het in; geldt *Aangepast* al, dan gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Het geldende niveau zegt *✓ Huidig*; de blauwgroene rand staat alleen waar de focus is. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld; *Geen* vraagt het in koraalrood, omdat het elke beperking opheft.
+- **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (een koraalrood hangslot voor beperkt, anders een groen vinkje, en de geïnstalleerde games die het blokkeert; Ⓐ stelt het in; geldt *Aangepast* al, dan gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Het geldende niveau zegt *✓ Huidig*; de blauwgroene rand staat alleen waar de focus is. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld; *Geen* vraagt het in koraalrood, omdat het elke beperking opheft.
 - **De instellingen van het niveau:** leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen. Bij een vooraf ingesteld niveau zijn het diens eigen instellingen: er één wijzigen maakt het niveau *Aangepast*, vanuit de instellingen van dat niveau met die wijziging, na een vraag (met de instellingen op een rij).
 - **Onder *Leeftijdsclassificatie*** de **classificatie-instantie** (PEGI, ESRB, USK, CERO …): de lijst zegt voor welke landen elke instantie classificeert (PEGI: het grootste deel van Europa, ESRB: de Verenigde Staten, Canada en Latijns-Amerika, USK: Duitsland, PEGI BBFC: het Verenigd Koninkrijk…).
 - **Geblokkeerde geïnstalleerde games** (ook onder *Leeftijdsclassificatie*): hoeveel van de geïnstalleerde games het geldende niveau blokkeert op hun leeftijdsclassificatie (*3 van 15*), waarbij Ⓐ ze toont met hun classificatie (*PEGI 16*); de tegel van elk niveau zegt het ook (*Geblokkeerde games · 3*).
