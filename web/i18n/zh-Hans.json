@@ -110,6 +110,7 @@
   "region": {"label": "地区", "options": {"": "默认", "0": "日本", "1": "美洲", "2": "欧洲", "3": "澳大利亚", "4": "香港、台湾、韩国", "5": "中国"}},
   "sd_free_mb": {"label": "SD 卡剩余空间（MB）", "help": "低于 500 MB 时，“主机”标签会提醒。"},
   "applet": {"label": "小程序模式（从相册启动）"},
+  "from_forwarder": {"label": "从HOME图标启动（转发器）"},
   "background": {"label": "PlayGuard 在后台"},
   "hbloader": {"label": "能把更新交给商店的加载器"},
   "forwarders": {"label": "已创建的转发器（主机 › 转发器）"},

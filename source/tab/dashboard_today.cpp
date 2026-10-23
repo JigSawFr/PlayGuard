@@ -12,6 +12,7 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "app.hpp"
+#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/profiles.hpp"
 
@@ -240,7 +241,10 @@ void DashboardTab::show_profile()
     if (any) {
         const std::string current = profiles::match(this->pt.day_min);
         const std::string text = current.empty() ? "playguard/cadran/today/profiles"_i18n : current;
-        if (profile->getText() != text) profile->setText(text);
+        if (profile->getText() != text) {
+            profile->setText(text);
+            cadran::kit::fit_button(profile);
+        }
     }
     ui::set_visible(profile.getView(), any);
 }

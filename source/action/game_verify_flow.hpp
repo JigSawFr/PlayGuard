@@ -18,6 +18,7 @@
 #include "action/game_check_text.hpp"
 #include "core/gamecheck.h"
 #include "ui/cadran_modal.hpp"
+#include "view/cover_strip.hpp"
 
 namespace game_verify_flow
 {
@@ -31,14 +32,16 @@ struct State
     // Its heading "Checking the data", with the game's place in a batch;
     // its title the game's name.
     cadran::Progress body;
+    CoverStrip* strip = nullptr;   // a batch's covers leafed through, above (its own icon then hidden)
     std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
 };
 
 // What the check of one game of a batch gave.
 using Verified = game_check_text::Verified;
 
-// The dialog, built but not open yet (main thread).
-std::shared_ptr<State> make_dialog();
+// The dialog, built but not open yet (main thread); for a batch (`ids`, in
+// the order checked, more than one), the covers leafed through above.
+std::shared_ptr<State> make_dialog(const std::vector<u64>& ids = {});
 
 // The game under way, at `at` of `total`, in the dialog (main thread).
 void show_game(State* s, const std::vector<unsigned char>& icon, const std::string& name, size_t at, size_t total);

@@ -110,6 +110,7 @@
   "region": {"label": "지역", "options": {"": "기본값", "0": "일본", "1": "미주", "2": "유럽", "3": "호주", "4": "홍콩, 대만, 한국", "5": "중국"}},
   "sd_free_mb": {"label": "SD 카드 여유 공간(MB)", "help": "500MB 미만이면 본체 탭이 경고합니다."},
   "applet": {"label": "애플릿 모드(앨범에서 실행)"},
+  "from_forwarder": {"label": "HOME 아이콘으로 실행(포워더)"},
   "background": {"label": "PlayGuard가 백그라운드에 있음"},
   "hbloader": {"label": "업데이트를 스토어에 넘길 수 있는 로더"},
   "forwarders": {"label": "이미 만든 포워더 (본체 › 포워더)"},

@@ -150,7 +150,7 @@ jobs:
           host=true desktop=true switch=true
           docs='^(docs|site|branding|images|web)/|^(README(\.fr)?|ROADMAP|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY)\.md$|^LICENSE$'
           docs="$docs"'|^\.github/(ISSUE_TEMPLATE|DISCUSSION_TEMPLATE)/|^\.github/(CODEOWNERS|FUNDING\.yml|SUPPORT\.md|labels\.json|dependabot\.yml|pull_request_template\.md)$'
-          docs="$docs"'|^\.github/workflows/(web|pages|codeql|labels|pr-title|release-page|release-please|toolchain-watch)\.yml$'
+          docs="$docs"'|^\.github/workflows/(web|pages|codeql|clang-tidy|labels|pr-title|release-page|release-please|toolchain-watch)\.yml$|^\.clang-tidy$'
           docs="$docs"'|^tools/(build_site|check_site_links|web_[a-z_]+)\.py$|^tools/(site_screenshots|site_social|render_tour|render_branding)\.mjs$'
           smoke='^tests/(visual|cut_text)/|^tools/(desktop_smoke|cut_text_check|visual_check|visual_refs)\.py$'
           # needed <skip> [<but>]: true when a file is neither documentation
@@ -210,7 +210,7 @@ jobs:
         run: make test
       - name: Test summary
         if: always()
-        run: python3 tools/ci_summary.py host-tests build/host-tests --compiler "gcc $(gcc -dumpfullversion)" --flags "ASan + UBSan" >> "$GITHUB_STEP_SUMMARY"
+        run: python3 tools/ci_summary.py host-tests build/host-tests --compiler "gcc $(gcc -dumpfullversion)" --flags "ASan + UBSan + _GLIBCXX_ASSERTIONS" >> "$GITHUB_STEP_SUMMARY"
       - name: Resources (i18n keys, translations, XML layouts), the web simulator's settings and page logic, compat.json generator, Python tools
         run: |
           status=0
@@ -274,7 +274,7 @@ jobs:
         run: make test CC=clang CXX=clang++
       - name: Test summary (clang)
         if: always()
-        run: python3 tools/ci_summary.py host-tests build/host-tests --compiler "clang $(clang -dumpversion)" --flags "ASan + UBSan" >> "$GITHUB_STEP_SUMMARY"
+        run: python3 tools/ci_summary.py host-tests build/host-tests --compiler "clang $(clang -dumpversion)" --flags "ASan + UBSan + _GLIBCXX_ASSERTIONS" >> "$GITHUB_STEP_SUMMARY"
       - name: Unit tests (gcc, coverage)
         # Without the sanitizers: their instrumentation skews the counts.
         run: make test SAN= COV=--coverage CC=gcc CXX=g++

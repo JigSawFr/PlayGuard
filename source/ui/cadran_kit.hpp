@@ -133,6 +133,18 @@ brls::Box* empty_around(brls::Label* label, const char* icon_name);
 // has no attribute for it).
 void wrap(brls::View* row);
 
+// A button of such a row laid out by its text at the normal size: the row
+// breaks only where it would at that size, and with the larger text
+// (ui/text_size) the button's text is drawn smaller again, down to its size,
+// rather than pushing the button to a line of its own (patches/borealis/0007).
+// Again after its text changes.
+void fit_button(brls::Button* button);
+
+// A card's head: its title, then its state on the right; the state under
+// the title when a language (or the larger text) leaves no room for both,
+// each whole ("Jugendschutz", not "Jugendschut" over "z").
+void fit_head(brls::Box* row);
+
 // Over the foot of a scrolling frame drawn at (x, y, width, height): the
 // background (`color_key`) fading in over 32 px while there is more below,
 // so a line cut by the frame's edge reads as "more", not as the end.

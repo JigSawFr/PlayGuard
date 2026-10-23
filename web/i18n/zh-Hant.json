@@ -110,6 +110,7 @@
   "region": {"label": "地區", "options": {"": "預設", "0": "日本", "1": "美洲", "2": "歐洲", "3": "澳洲", "4": "香港、台灣、韓國", "5": "中國"}},
   "sd_free_mb": {"label": "SD 卡可用空間（MB）", "help": "低於 500 MB 時，「主機」分頁會提醒。"},
   "applet": {"label": "小程式模式（從相簿啟動）"},
+  "from_forwarder": {"label": "從HOME圖示啟動（轉發器）"},
   "background": {"label": "PlayGuard 在背景"},
   "hbloader": {"label": "能把更新交給商店的載入器"},
   "forwarders": {"label": "已建立的轉發器（主機 › 轉發器）"},
