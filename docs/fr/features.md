@@ -129,8 +129,8 @@ Dessous, ce qui arrêtera le jeu en premier :
 ### Les actions
 
 - **Temps en plus**, ses montants sur une rangée (+15 min, +30 min, +1 h), chacun à portée d'un appui, puis **…** pour tout autre (une durée, un autre jour) : un montant sélectionné déplace la fin du temps sur la ligne (*avec 15 min de plus*), ou dit sur la marque de l'alarme du coucher qu'elle arrive d'abord ; le premier ressort en sarcelle dès qu'il reste 15 min ou moins, ou plus rien.
-- **Arrêter pour aujourd'hui**, **Montrer à l'enfant**.
-- **Limite d'aujourd'hui…** : la limite du jour choisie sur place, écrite après une confirmation.
+- **Fini pour aujourd'hui**, **Écran enfant**.
+- **Limite du jour…** : la limite du jour choisie sur place, écrite après une confirmation.
 - **Le profil en vigueur**, par son nom, dès qu'un profil est enregistré (*Profils…* quand aucun ne correspond) : Ⓐ les liste, celui en vigueur coché, pour en appliquer un autre après une confirmation (les jours qui changent), ou *Gérer les profils…*.
 - Contrôle parental déverrouillé, **Réactiver** passe en premier, sur toute la largeur, et *Temps en plus* s'efface.
 - Sans limite sur aucun jour, **Définir les limites de la semaine** ouvre la semaine de *Temps de jeu*.
@@ -179,7 +179,7 @@ La console affiche « temps écoulé », puis suspend le jeu (sans « continuer 
 
 ### L'écran enfant
 
-*Montrer à l'enfant* sur *Aujourd'hui*, pour confier la console :
+*Écran enfant* sur *Aujourd'hui*, pour confier la console :
 
 - seulement le temps restant (contrôle parental déverrouillé, la limite du jour, en pause), l'heure de fin (*Fin vers 16:40* ; quand l'alarme du coucher arrive avant, l'anneau fait le compte à rebours jusqu'à elle, *45 min avant le coucher*, comme dans la dernière heure d'un jour sans limite), le coucher et ce qui se passe quand le temps est écoulé ;
 - fait pour se lire de l'autre bout de la pièce, sur la TV ; son texte garde sa taille quelle que soit la taille du texte (seuls le titre et le pied de page la suivent, comme sur tous les écrans) ;
