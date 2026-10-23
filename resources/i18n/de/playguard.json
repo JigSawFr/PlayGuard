@@ -1160,7 +1160,7 @@
         "hours_from_of": "{}: ab",
         "hours_to_of": "{}: bis",
         "remake": "Neu erstellen",
-        "remake_confirm": "Diese geschützten Forwarder neu erstellen? {}. Ihre Regeln (die Zeiten, die Pause) kommen in den Forwarder selbst, wo die SD-Karte sie nicht ändern kann, und die Datei des Tors wird vor dem Start geprüft.",
+        "remake_confirm": "Diese geschützten Forwarder neu erstellen? {}: Ihre Regeln (die Zeiten, die Pause) kommen in den Forwarder selbst, wo die SD-Karte sie nicht ändern kann, und die Datei des Tors wird vor dem Start geprüft.",
         "remade_n": "Neu erstellt: {}",
         "batch_title": "Forwarder {} von {}",
         "batch_made": "Erstellt: {}",

@@ -1160,7 +1160,7 @@
         "hours_from_of": "{}: vanaf",
         "hours_to_of": "{}: tot",
         "remake": "Opnieuw maken",
-        "remake_confirm": "Deze beveiligde forwarders opnieuw maken? {}. Hun regels (de uren, de pauze) gaan in de forwarder zelf, waar de SD-kaart ze niet kan wijzigen, en het bestand van de poort wordt vóór de start gecontroleerd.",
+        "remake_confirm": "Deze beveiligde forwarders opnieuw maken? {}: hun regels (de uren, de pauze) gaan in de forwarder zelf, waar de SD-kaart ze niet kan wijzigen, en het bestand van de poort wordt vóór de start gecontroleerd.",
         "remade_n": "Opnieuw gemaakt: {}",
         "batch_title": "Forwarder {} van {}",
         "batch_made": "Gemaakt: {}",

@@ -1160,7 +1160,7 @@
         "hours_from_of": "{}: from",
         "hours_to_of": "{}: until",
         "remake": "Make again",
-        "remake_confirm": "Make these protected forwarders again? {}. Their rules (the hours, the pause) go into the forwarder itself, where the SD card cannot change them, and the gate's file is checked before it starts.",
+        "remake_confirm": "Make these protected forwarders again? {}: their rules (the hours, the pause) go into the forwarder itself, where the SD card cannot change them, and the gate's file is checked before it starts.",
         "remade_n": "Made again: {}",
         "batch_title": "Forwarder {} of {}",
         "batch_made": "Made: {}",
