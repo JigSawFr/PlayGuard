@@ -441,11 +441,7 @@
             "late": "Played from 21:00 to 06:00"
         },
         "rating": "Age rating",
-        "rating_blocked": "{} · blocked at the current level",
-        "qr": "The week's summary as a QR code",
-        "share_sd": "Save to the SD card…",
-        "qr_body": "Scan it with a phone's camera: the last 7 days appear as text. Nothing goes online.",
-        "qr_days": "Each day"
+        "rating_blocked": "{} · blocked at the current level"
     },
     "library": {
         "title": "Games",
@@ -650,6 +646,7 @@
         "no_pin": "Set a PIN first (Set or change the PIN).",
         "set": "Protect PlayGuard with the PIN: {}",
         "ask_again": "Ask for the PIN again after 5 minutes",
+        "pauses": "Pause parental controls while I'm in PlayGuard",
         "again_on": {
             "changes": "Asked again after 5 minutes.",
             "open": "It comes back after 5 minutes away from PlayGuard."
@@ -1345,7 +1342,7 @@
         "effects": "Visual effects",
         "effects_values": {
             "full": "Always full",
-            "auto": "Lighter on battery",
+            "auto": "Automatic: full on the TV",
             "reduced": "Reduced motion"
         }
     },
@@ -1873,7 +1870,6 @@
         "sd_space_detail": "{} MB left: PlayGuard may fail to save its settings, its history and its logs.",
         "week": "Last 7 days: {} played",
         "week_detail": "{} a day on average.",
-        "week_qr": "Show its QR code",
         "week_top": "Most played: {} ({}).",
         "over_limit": "The limit was passed on {} of the last 7 days",
         "over_limit_detail": "When the time is up, the console only warns: play goes on past the limit (Play timer › When the time is up).",
@@ -2026,7 +2022,7 @@
             "done_day": "Done with {}"
         },
         "activity": {
-            "share": "Export or share",
+            "export": "Export",
             "games": "{} games",
             "games_one": "1 game",
             "on_limit": "of a {} limit",

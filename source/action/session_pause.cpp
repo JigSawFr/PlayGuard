@@ -10,6 +10,7 @@
 #include "app.hpp"
 #include "core/sysinfo.h"
 #include "ui/ui.hpp"
+#include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 
 namespace session_pause
@@ -29,6 +30,7 @@ bool wanted()
     SysInfo si;
     sysinfo_get(&si);
     session_pause_logic::Inputs in;
+    in.enabled = config::get().pin_pauses;
     in.pin_holds = pin_lock::holds();
     in.in_focus = s_focused && app::in_focus();
     in.holds = s_holds;
@@ -107,6 +109,14 @@ void pin_entered()
     s_failed = false;
     s_stopped = false;
     brls::sync([]() { apply(); });
+}
+
+void setting_changed()
+{
+    // Chosen now: a pause stopped by hand, or failed, may start again.
+    s_failed = false;
+    s_stopped = false;
+    apply();
 }
 
 bool active() { return s_active; }

@@ -391,6 +391,15 @@ if CADRANUNLOCKED:
     env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "pin_lock": "open", "theme": "light"}, open(config_file, "w"))
+if CADRAN or OUTSIDE:
+    # The PIN entered (cadran: on the way back from the child screen;
+    # outside: the weak PIN ignored) pauses parental controls (Security ›
+    # Pause parental controls while I'm in PlayGuard, off by default): the
+    # rest of the file as an earlier run left it.
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    cadran_config = json.load(open(config_file)) if os.path.exists(config_file) else {"schema": 1}
+    cadran_config["pin_pauses"] = True
+    json.dump(cadran_config, open(config_file, "w"))
 if CADRANLARGE:
     # The text 25 % bigger, as the console docked draws it by default.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
@@ -2449,10 +2458,8 @@ shot("28c_activity_games_list")
 key("y")                   # covers again (the config keeps the choice)
 key("Escape")
 key_to_end("Up", hold=0.15)   # the top: the accounts' chips
-key_to_end("Right")        # the row's last chip: Export or share
-key("Return")
-go_to("Save to the SD card…")   # the formats (the other line: the week as a QR code)
-key("Return")
+key_to_end("Right")        # the row's last chip: Export
+key("Return")              # the formats
 go_to("PDF")
 key("Return")
 shot("29_activity_export")

@@ -72,7 +72,7 @@ Uma consola sem Internet: quando nenhum servidor responde, o PlayGuard propõe a
 | Terminar por hoje | *Hoje › Terminar por hoje*: agora, ou daqui a 5 minutos para guardar. |
 | Alterar o limite de um dia | *Tempo de jogo*: Ⓐ no dia, ↑/↓, depois **+** para guardar. |
 | Alternar entre o tempo de aulas e as férias | *Tempo de jogo › Perfis*; *Perfil agendado* para um período escolhido com antecedência. |
-| Ver quem jogou a quê | *Atividade*: por jogo, por conta, hoje, 7 dias, desde sempre; uma exportação ou um código QR. |
+| Ver quem jogou a quê | *Atividade*: por jogo, por conta, hoje, 7 dias, desde sempre; uma exportação. |
 | Bloquear todos os jogos por agora | *Tempo de jogo › Bloquear todos os jogos*. Quando é desativado, os limites anteriores voltam. |
 | Anular uma alteração | **ZR** *Anular* logo a seguir, ou *Histórico › Alterações do PlayGuard* a qualquer momento. |
 | Guardar uma cópia das definições | *Histórico › Criar uma cópia de segurança* (nunca o PIN). |

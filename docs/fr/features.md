@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 28bfec66850f -->
+<!-- translated from docs/features.md, sha256 be5657db19a5 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -54,7 +54,7 @@ L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets
   - Les noms d'onglets de la barre latérale grandissent aussi, de 25 % eux aussi ; le titre, la pastille et la date de l'en-tête, les touches et l'heure du pied de page grandissent un peu moins (de 15 à 20 %), leurs lignes étant déjà pleines. Un nom trop long pour sa place dans une langue est dessiné un peu plus petit, jamais plus petit qu'en taille normale, plutôt que coupé. Les noms des niveaux de *Restrictions* gardent leur taille, déjà grands.
   - Le changement est immédiat, sur tous les écrans, sans relancer.
   - Les 25 % viennent d'une TV 55" en 4K : le plus petit texte (15 px) y fait alors 14,6 mm de haut en capitales, 20′ d'arc à 2,5 m, où la lecture est confortable (16′ en taille normale, le strict minimum).
-- **Effets visuels** (*Préférences*) : *Toujours complets*, par défaut, garde le halo de fond et chaque mouvement de l'interface sur batterie comme sur le dock : les écrans et leurs lignes qui prennent place, l'anneau qui se trace et glisse vers une nouvelle valeur, le battement de l'anneau de l'écran enfant dans ses dernières minutes, les petites réponses à une pression. *Allégés sur batterie* les retire tous tant qu'aucun chargeur n'est branché (en portable, débranchée ; relu toutes les 5 secondes : brancher la console les fait revenir). *Mouvements réduits* retire chaque mouvement décoratif, sur le dock aussi, et garde le halo : pour qui le mouvement fatigue.
+- **Effets visuels** (*Préférences*) : *Automatique : complets sur la TV*, par défaut, garde le halo de fond et chaque mouvement de l'interface tant que la console est sur son dock : les écrans et leurs lignes qui prennent place, l'anneau qui se trace et glisse vers une nouvelle valeur, le battement de l'anneau de l'écran enfant dans ses dernières minutes, les petites réponses à une pression. En main (en portable ou sur son pied, chargée ou non), il les retire tous, et remettre la console sur le dock les fait revenir. *Toujours complets* les garde aussi en main. *Mouvements réduits* retire chaque mouvement décoratif, sur le dock aussi, et garde le halo : pour qui le mouvement fatigue.
 - **Annuler :** après l'enregistrement d'une modification, **ZR** *Annuler* reste quelques secondes dans le pied de page : il ouvre cette modification dans l'historique, pour remettre la valeur précédente. Un historique vide le dit dans une carte.
 
 ## Notifications — ce qui demande votre attention, depuis n'importe quel onglet
@@ -83,7 +83,7 @@ Chacune avec un « i », un point sur la cloche ; elle peut être marquée comme
 - une limite encore abaissée par *Arrêter le jeu pour aujourd'hui* un jour précédent (*Remettre*) ;
 - une nouvelle version installée (*Nouveautés* ; après une mise à jour sur place, la version précédente gardée), ou une nouvelle version de PlayGuard ;
 - un rapport envoyé en ligne (*Afficher le lien*), ou PlayGuard fermé de façon inattendue la dernière fois (*Envoyer un rapport*) ;
-- le temps de jeu de la semaine (tous les 7 jours jusqu'à lecture ; avec la comparaison par jour avec la semaine d'avant ; *Afficher son QR code* ouvre le résumé de la semaine sur *Activité*), et une limite dépassée deux jours ou plus sur les 7 derniers quand la console se contente de prévenir ;
+- le temps de jeu de la semaine (tous les 7 jours jusqu'à lecture ; avec la comparaison par jour avec la semaine d'avant), et une limite dépassée deux jours ou plus sur les 7 derniers quand la console se contente de prévenir ;
 - une sauvegarde des réglages à faire (aucune, ou aucune depuis 30 jours) ;
 - tous les jeux bloqués depuis une semaine ;
 - un nouveau compte utilisateur ;
@@ -257,7 +257,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 
 ### En haut
 
-- Les comptes en puces, la période et *Exporter ou partager*.
+- Les comptes en puces, la période et *Exporter*.
 - Aujourd'hui, les 7 derniers jours et depuis toujours en chiffres. Sous les 7 derniers jours, la comparaison avec les 7 d'avant, par jour : ▲ *+20 min/jour vs semaine d'avant* en orange, ▼ de moins en sarcelle, *comme la semaine d'avant* à 5 minutes près.
 - Les quatre jeux les plus joués en cartes (Ⓐ en ouvre un) ; sur les 7 derniers jours, celui qui a le plus augmenté par rapport à la semaine d'avant le dit, dès une demi-heure (▲ *+2 h vs semaine d'avant*).
 - Rien de joué sur la période : une carte le dit, avec *Voir depuis toujours* quand il y a quelque chose à voir.
@@ -280,10 +280,9 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 - Le temps d'un jeu qu'aucun compte utilisateur ne porte (certains jeux n'en demandent pas, ou le compte a été supprimé depuis) apparaît en *Sans compte*, à partir d'une minute.
 - Un compte utilisateur que PlayGuard n'avait jamais vu est signalé en orange dans l'onglet pendant 30 jours (*Nouveau compte depuis le …* : créer un compte est une astuce connue pour repartir de zéro) et noté dans l'historique des modifications ; les comptes présents quand PlayGuard les liste pour la première fois ne sont pas signalés.
 
-### Export et partage
+### Export
 
-- **Export sur la carte SD** (*Exporter ou partager › Enregistrer sur la carte SD*) en CSV, JSON, XLSX (Excel) ou PDF, une colonne par jour, puis les 7 derniers jours, les 30 derniers jours et depuis toujours.
-- **Le résumé de la semaine en QR code** (*Exporter ou partager*, ou *Afficher son QR code* dans la cloche) : l'appareil photo d'un téléphone le lit comme quelques lignes de texte, dans la langue affichée — les 7 derniers jours et leur moyenne, la tendance, chaque jour, les trois jeux les plus joués, les sessions, la plus longue et le temps joué entre 21:00 et 06:00. Rien ne passe par Internet.
+- **Export sur la carte SD** (*Exporter*) en CSV, JSON, XLSX (Excel) ou PDF, une colonne par jour, puis les 7 derniers jours, les 30 derniers jours et depuis toujours.
 - S'ouvre aussitôt sur les derniers chiffres lus (gardés sur la carte SD d'un lancement à l'autre), actualisés en arrière-plan au-delà d'une minute ; Ⓧ les relit tout de suite, avec un indicateur de chargement.
 - Durées approximatives si l'horloge de la console a été modifiée.
 
@@ -323,6 +322,7 @@ Le code PIN dans PlayGuard lui-même :
 - Vérifié dans la couche service, donc aucune modification n'y échappe ; reverrouiller ne le demande jamais. *Afficher le code PIN* le demande à chaque fois, dans tous les modes et même juste après sa saisie, et un `config.json` absent ou abîmé compte comme *Avant une modification*.
 #### Le code PIN met le contrôle parental en pause pendant votre visite
 
+- Seulement avec *Sécurité › Contrôle parental en pause dans PlayGuard* activé (désactivé par défaut : saisir le code PIN laisse alors le contrôle parental tel quel, et le temps passé dans PlayGuard compte comme du temps de jeu). L'activer demande le code PIN.
 - Une fois le code PIN saisi (l'écran verrouillé de *Pour ouvrir PlayGuard*, la première modification avec *Avant une modification*, le retour depuis l'écran enfant…), PlayGuard déverrouille temporairement le contrôle parental : le temps passé dedans ne compte pas dans le temps de jeu de l'enfant, et *Ouvert depuis un jeu* quitte Aujourd'hui.
 - La pastille de l'en-tête dit *Contrôle parental en pause*, en sarcelle ; la toucher explique ce que c'est, avec *Réactiver maintenant* (plus de pause ensuite jusqu'à la prochaine saisie du code PIN). Aujourd'hui montre la journée telle qu'elle est pour l'enfant, et la tuile de Sécurité dit *Contrôle parental en pause*, sans alerte.
 - Il se réactive de lui-même dès que PlayGuard est quitté (menu HOME, veille) ou fermé, depuis le menu HOME aussi (la fermeture l'attend), et tant que l'écran enfant ou l'écran verrouillé est affiché. De retour dans PlayGuard, le code PIN valant toujours, il se remet en pause.

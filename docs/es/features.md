@@ -54,7 +54,7 @@ El aspecto de PlayGuard se llama Cadran: una barra de iconos para las pestañas,
   - Los nombres de las pestañas de la barra lateral también crecen, un 25 % igualmente; el título, la etiqueta y la fecha de la cabecera y las indicaciones de botones y el reloj del pie de página crecen algo menos (del 15 al 20 %), pues sus filas ya están llenas. Un nombre demasiado largo para su sitio en un idioma se dibuja algo más pequeño, nunca más que en tamaño normal, en lugar de cortarse. Los nombres de los niveles de Restricciones conservan su tamaño, que ya es grande.
   - Cambia al instante, en todas las pantallas, sin reiniciar.
   - El 25 % sale de una tele de 55" en 4K: el texto más pequeño (15 px) mide entonces 14,6 mm de alto en mayúsculas, 20′ de arco a 2,5 m, donde la lectura es cómoda (16′ en tamaño normal, el mínimo indispensable).
-- **Efectos visuales** (*Preferencias*): *Siempre completos*, la opción predeterminada, mantiene el halo de fondo y cada movimiento de la interfaz con batería igual que en la base: las pantallas y sus líneas que suben a su sitio, el anillo que se dibuja y se desliza hasta un nuevo valor, el latido del anillo de la pantalla del niño en sus últimos minutos, las pequeñas respuestas a una pulsación. *Más ligeros con batería* prescinde de todos ellos mientras no hay ningún cargador conectado (en modo portátil, desenchufada; se vuelve a leer cada 5 segundos, así que al enchufar la consola vuelven). *Menos movimiento* prescinde de todo movimiento decorativo, también en la base, y mantiene el halo: para quien se cansa con el movimiento.
+- **Efectos visuales** (*Preferencias*): *Automático: completos en la tele*, la opción predeterminada, mantiene el halo de fondo y cada movimiento de la interfaz mientras la consola está en la base: las pantallas y sus líneas que suben a su sitio, el anillo que se dibuja y se desliza hasta un nuevo valor, el latido del anillo de la pantalla del niño en sus últimos minutos, las pequeñas respuestas a una pulsación. En la mano (en modo portátil o sobremesa, cargando o no) prescinde de todos ellos, y vuelven en cuanto se coloca la consola en la base. *Siempre completos* los mantiene también en la mano. *Menos movimiento* prescinde de todo movimiento decorativo, también en la base, y mantiene el halo: para quien se cansa con el movimiento.
 - **Deshacer:** después de guardar un cambio, **ZR** *Deshacer* permanece unos segundos en el pie de página: abre ese cambio en el historial de cambios, para restablecer el valor anterior. Un historial de cambios vacío lo indica en una tarjeta.
 
 ## Notificaciones — lo que requiere tu atención, desde cualquier pestaña
@@ -83,7 +83,7 @@ Cada uno con una «i», un punto en la campana; se puede marcar como leído:
 - un límite todavía rebajado por *No jugar más hoy* un día anterior (*Restablecer*);
 - una versión nueva instalada (*Novedades*; tras una actualización en su lugar, la compilación anterior conservada), o una versión más reciente de PlayGuard;
 - un informe enviado en línea (*Mostrar el enlace*), o PlayGuard cerrado de forma inesperada la última vez (*Enviar un informe*);
-- el tiempo de juego de la semana (cada 7 días hasta que se lee; con la comparación por día con la semana anterior; *Mostrar su código QR* abre el resumen de la semana en *Actividad*), y un límite superado dos o más de los últimos 7 días mientras la consola solo avisa;
+- el tiempo de juego de la semana (cada 7 días hasta que se lee; con la comparación por día con la semana anterior), y un límite superado dos o más de los últimos 7 días mientras la consola solo avisa;
 - una copia de seguridad de los ajustes por hacer (ninguna todavía, o ninguna en 30 días);
 - todos los juegos bloqueados desde hace una semana;
 - una cuenta de usuario nueva;
@@ -260,7 +260,7 @@ Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir d
 
 ### Arriba
 
-- Las cuentas como chips, el periodo y *Exportar o compartir*.
+- Las cuentas como chips, el periodo y *Exportar*.
 - Hoy, los últimos 7 días y desde siempre como cifras. Bajo los últimos 7 días, la comparación con los 7 anteriores, por día: ▲ *+20 min/día vs. semana anterior* en ámbar, ▼ menos en turquesa, *como la semana anterior* con un margen de 5 minutos.
 - Los cuatro juegos más jugados como tarjetas (Ⓐ abre uno); en los últimos 7 días, el que más ha aumentado respecto a la semana anterior indica cuánto, a partir de media hora (▲ *+2 h vs. semana anterior*).
 - Si no se ha jugado nada en el periodo, una tarjeta lo indica, con *Ver desde siempre* cuando hay algo que ver.
@@ -283,10 +283,9 @@ Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir d
 - El tiempo de un juego que no pertenece a ninguna cuenta de usuario (algunos juegos nunca piden una, o la cuenta se ha eliminado desde entonces) aparece como *Sin cuenta*, a partir de un minuto.
 - Una cuenta de usuario que PlayGuard no había visto nunca se señala en ámbar en la pestaña durante 30 días (*Cuenta nueva desde el …*: una cuenta nueva es una forma conocida de empezar de cero) y se anota en el historial de cambios; las cuentas que ya estaban cuando PlayGuard las enumera por primera vez no se señalan.
 
-### Exportar y compartir
+### Exportar
 
-- **Exportar a la tarjeta SD** (*Exportar o compartir › Guardar en la tarjeta SD*) en CSV, JSON, XLSX (Excel) o PDF, una columna por día, y luego los últimos 7 días, los últimos 30 días y desde siempre.
-- **El resumen de la semana en código QR** (*Exportar o compartir*, o *Mostrar su código QR* en la campana): la cámara de un móvil lo lee como unas pocas líneas de texto, en el idioma mostrado: los últimos 7 días y su media, la tendencia, cada día, los tres juegos más jugados, las sesiones, la más larga y el tiempo jugado entre las 21:00 y las 06:00. Nada sale a Internet.
+- **Exportar a la tarjeta SD** (*Exportar*) en CSV, JSON, XLSX (Excel) o PDF, una columna por día, y luego los últimos 7 días, los últimos 30 días y desde siempre.
 - Se abre al instante con las últimas cifras leídas (guardadas en la tarjeta SD entre ejecuciones), que se actualizan en segundo plano si tienen más de un minuto; Ⓧ las vuelve a leer ahora, con un indicador de carga.
 - Los tiempos son aproximados si se cambió el reloj de la consola.
 

@@ -441,11 +441,7 @@
             "late": "21:00~06:00 사이 플레이"
         },
         "rating": "연령 등급",
-        "rating_blocked": "{} · 현재 제한 수준에서 제한됨",
-        "qr": "한 주 요약을 QR 코드로",
-        "share_sd": "SD 카드에 저장…",
-        "qr_body": "휴대폰 카메라로 스캔하면 최근 7일이 텍스트로 표시됩니다. 인터넷으로는 아무것도 보내지 않습니다.",
-        "qr_days": "날짜별"
+        "rating_blocked": "{} · 현재 제한 수준에서 제한됨"
     },
     "library": {
         "title": "게임",
@@ -650,6 +646,7 @@
         "no_pin": "먼저 PIN을 설정하세요(PIN 설정 또는 변경).",
         "set": "PIN으로 PlayGuard 보호: {}",
         "ask_again": "5분 후 PIN 다시 요구",
+        "pauses": "PlayGuard 사용 중에는 자녀 보호 일시 중지",
         "again_on": {
             "changes": "5분이 지나면 다시 요구합니다.",
             "open": "PlayGuard를 5분 이상 벗어나면 다시 표시됩니다."
@@ -1345,7 +1342,7 @@
         "effects": "시각 효과",
         "effects_values": {
             "full": "항상 전체",
-            "auto": "배터리 사용 시 가볍게",
+            "auto": "자동: TV에서는 전체",
             "reduced": "움직임 줄이기"
         }
     },
@@ -1873,7 +1870,6 @@
         "sd_space_detail": "{}MB 남음: PlayGuard가 설정, 기록, 로그를 저장하지 못할 수 있습니다.",
         "week": "최근 7일: {} 플레이",
         "week_detail": "하루 평균 {}.",
-        "week_qr": "QR 코드 보기",
         "week_top": "가장 많이 플레이: {} ({}).",
         "over_limit": "최근 7일 중 {}일 동안 제한을 넘었습니다",
         "over_limit_detail": "시간이 다 되어도 본체는 알리기만 하고, 제한을 넘어 계속 플레이할 수 있습니다(플레이 시간 › 시간이 다 되면).",
@@ -2026,7 +2022,7 @@
             "done_day": "{} 완료"
         },
         "activity": {
-            "share": "내보내기 또는 공유",
+            "export": "내보내기",
             "games": "게임 {}개",
             "games_one": "게임 1개",
             "on_limit": "제한 {} 중",

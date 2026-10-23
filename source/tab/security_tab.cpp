@@ -46,6 +46,12 @@ SecurityTab::SecurityTab()
         pin_lock::set_ask_again(!config::get().pin_ask_again, this->refresher());
         return true;
     });
+    // Off by default: entering the PIN leaves parental controls as they are.
+    pin_pauses->init("playguard/pin_lock/pauses"_i18n, config::get().pin_pauses, [](bool) {});
+    pin_pauses->registerClickAction([this](brls::View*) {
+        pin_lock::set_pauses(!config::get().pin_pauses, this->refresher());
+        return true;
+    });
     // While linked, anyone can save the block before and after a change made
     // in the phone app: the data ROADMAP.md waits for (Developer tools has it too).
     ui::set_detail(pr_decode, ui::fmt_played(2));   // how long it takes
@@ -103,6 +109,7 @@ SecurityTab::SecurityTab()
     });
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" }, { "sc_hbmenu", "home" } }, true);
     this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
+                       { "sc_pin_pauses", "pause" },
                        { "sc_hbmenu_lock", "home" }, { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" },
                        { "sc_auto_relock", "refresh" }, { "pr_active", "phone" },
                        { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
@@ -172,6 +179,7 @@ void SecurityTab::refresh()
     ui::set_detail(pin_lock_cell, pin_lock::mode_text());
     ui::set_text(pin_lock_note, pin_lock::note_text());
     pin_ask_again->setOn(config::get().pin_ask_again, false);
+    pin_pauses->setOn(config::get().pin_pauses, false);
 
     const bool writable = !app::read_only();
     const bool has_pin  = s.pin_length_ok && s.pin_length > 0;

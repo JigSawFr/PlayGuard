@@ -10,7 +10,6 @@
 #include "action/game_icons.hpp"
 #include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
-#include "action/week_qr.hpp"
 #include "activity/game_activity.hpp"
 #include "activity/games_activity.hpp"
 #include "ui/cadran_frame.hpp"
@@ -107,15 +106,9 @@ ActivityTab::ActivityTab()
         this->choose_period();
         return true;
     });
-    // The figures to the SD card, or the week's summary as a QR code for a
-    // phone: one chip, both a press away.
+    // The figures to the SD card.
     export_chip->registerClickAction([this](brls::View*) {
-        ui::pick_actions("playguard/cadran/activity/share"_i18n,
-                         { ui::Choice("playguard/activity/share_sd"_i18n, [this]() { this->export_to_sd(); }, "download"),
-                           ui::Choice("playguard/activity/qr"_i18n, []() {
-                               if (const auto data = shown_stats()) week_qr::show(*data, account_label(chosen_account()));
-                               else ui::notify("playguard/activity/export_not_ready"_i18n);
-                           }, "phone") });
+        this->export_to_sd();
         return true;
     });
     this->build_chips();

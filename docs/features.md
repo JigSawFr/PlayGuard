@@ -53,7 +53,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
   - The sidebar's tab names grow too, by 25 % as well; the header's title, pill and date and the footer's button hints and clock grow a little less (15 to 20 %), their rows being full already. A name too long for its room in a language is drawn a little smaller, never smaller than in normal size, rather than cut. The Restrictions levels' names keep their size, large already.
   - It changes at once, on every screen, with no restart.
   - The 25 % come from a 55" TV in 4K: the smallest text (15 px) is then 14.6 mm high in capitals, 20′ of arc from 2.5 m, where reading is comfortable (16′ in normal size, the bare minimum).
-- **Visual effects** (*Preferences*): *Always full*, the default, keeps the background glow and every movement of the look on the battery as on the dock: the screens and their lines rising into place, the ring drawing itself and sweeping to a new value, the beat of the child screen's ring in its last minutes, the small answers to a press. *Lighter on battery* leaves all of them out while no charger is connected (handheld, unplugged; read again every 5 seconds, so plugging the console in brings them back). *Reduced motion* leaves out every movement for show, on the dock too, and keeps the glow: for whom motion tires.
+- **Visual effects** (*Preferences*): *Automatic: full on the TV*, the default, keeps the background glow and every movement of the look while the console is on its dock: the screens and their lines rising into place, the ring drawing itself and sweeping to a new value, the beat of the child screen's ring in its last minutes, the small answers to a press. In hand (handheld or on its stand, charging or not) it leaves all of them out, and docking the console brings them back. *Always full* keeps them in hand too. *Reduced motion* leaves out every movement for show, on the dock too, and keeps the glow: for whom motion tires.
 - **Undo:** after a change is saved, **ZR** *Undo* stays in the footer for a few seconds: it opens that change in the change history, to put the previous value back. An empty change history says so in a card.
 
 ## Notifications — what needs you, from any tab
@@ -82,7 +82,7 @@ Each with an "i", a dot on the bell; it can be marked as read:
 - a limit still lowered by *No more play today* on an earlier day (*Put back*);
 - a new version installed (*What's new*; after an update in place, the previous build kept), or a newer version of PlayGuard;
 - a report sent online (*Show the link*), or PlayGuard closed unexpectedly last time (*Send a report*);
-- the week's play time (every 7 days until read; with how it compares with the week before, per day; *Show its QR code* opens the week's summary on *Activity*), and a limit passed on two or more of the last 7 days while the console only warns;
+- the week's play time (every 7 days until read; with how it compares with the week before, per day), and a limit passed on two or more of the last 7 days while the console only warns;
 - a settings backup to make (none yet, or none for 30 days);
 - all games blocked for a week;
 - a new user account;
@@ -256,7 +256,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 ### At the top
 
-- The accounts as chips, the period and *Export or share*.
+- The accounts as chips, the period and *Export*.
 - Today, the last 7 days and all time as figures. Under the last 7 days, how they compare with the 7 before, per day: ▲ *+20 min/day vs last week* in amber, ▼ less in teal, *same as last week* within 5 minutes.
 - The four games most played as cards (Ⓐ opens one); over the last 7 days, the one played most more than the week before says by how much, from half an hour (▲ *+2 h vs last week*).
 - Nothing played over the period: a card says so, with *See all time* when there is something to see.
@@ -279,10 +279,9 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 - A game's time that no user account holds (some games never ask for one, or the account was deleted since) shows as *No account*, from a minute up.
 - A user account PlayGuard never saw before is flagged in amber on the tab for 30 days (*New account since …*, a fresh account is a known way to start over) and recorded in the change history; the accounts there when PlayGuard first lists them are not flagged.
 
-### Export and sharing
+### Export
 
-- **Export to the SD card** (*Export or share › Save to the SD card*) as CSV, JSON, XLSX (Excel) or PDF, one column per day, then the last 7 days, the last 30 days and all time.
-- **The week's summary as a QR code** (*Export or share*, or the bell's *Show its QR code*): a phone's camera reads it as a few lines of text, in the language shown — the last 7 days and their average, the trend, each day, the three games most played, the sessions, the longest one and the time played between 21:00 and 06:00. Nothing goes online.
+- **Export to the SD card** (*Export*) as CSV, JSON, XLSX (Excel) or PDF, one column per day, then the last 7 days, the last 30 days and all time.
 - Opens at once on the last figures read (kept on the SD card between runs), refreshed in the background when over a minute old; Ⓧ reads them again now, with a spinner.
 - Times are approximate if the console clock was changed.
 
@@ -322,6 +321,7 @@ The PIN in PlayGuard itself:
 - Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even right after it was entered, and a missing or damaged `config.json` counts as *Before a change*.
 #### The PIN pauses parental controls while you are in PlayGuard
 
+- Only with *Security › Pause parental controls while I'm in PlayGuard* on (off by default: then entering the PIN leaves parental controls as they are, and the time spent in PlayGuard counts as play time). Turning it on asks for the PIN.
 - Once the PIN is entered (the lock screen of *To open PlayGuard*, the first change with *Before a change*, the child screen's way back…), PlayGuard unlocks parental controls temporarily, so the time spent in it does not take from the child's play time; *Opened from a game* leaves Today.
 - The header's pill says *Parental controls paused*, in teal; a tap says what that is, with *Turn back on now* (then not paused again until the PIN is entered again). Today shows the day as it is for the child, and the Security tile says *Parental controls paused* with no warning.
 - They come back on by themselves as soon as PlayGuard is left (HOME menu, sleep) or closed, from the HOME menu too (the exit waits for it), and while the child screen or the lock screen is up. Back in PlayGuard with the PIN still holding, they pause again.

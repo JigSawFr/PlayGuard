@@ -54,7 +54,7 @@ Het uiterlijk van PlayGuard heet Cadran: een smalle balk met iconen voor de tabb
   - De namen van de tabbladen in de zijbalk groeien mee, ook met 25 %; de titel, het label en de datum van de kopregel en de knopaanwijzingen en de klok van de voettekst groeien iets minder (15 tot 20 %), omdat hun regels al vol zijn. Een naam die in een taal te lang is voor zijn ruimte wordt iets kleiner getekend, nooit kleiner dan op normale grootte, in plaats van afgekapt. De namen van de niveaus in *Beperkingen* houden hun grootte, die al groot zijn.
   - Het verandert meteen, op elk scherm, zonder herstart.
   - De 25 % komen van een 55"-tv in 4K: de kleinste tekst (15 px) is dan 14,6 mm hoog in hoofdletters, 20′ gezichtshoek op 2,5 m, waar lezen comfortabel is (16′ in normale grootte, het absolute minimum).
-- **Visuele effecten** (*Voorkeuren*): *Altijd volledig*, de standaard, houdt de achtergrondgloed en elke beweging van het uiterlijk, op de accu net als in het dock: de schermen en hun regels die op hun plek schuiven, de ring die zichzelf tekent en naar een nieuwe waarde glijdt, het kloppen van de ring op het kinderscherm in de laatste minuten, de kleine reacties op een druk op een knop. *Lichter op de accu* laat ze allemaal weg zolang er geen lader is aangesloten (handheld, zonder kabel; elke 5 seconden opnieuw gelezen, dus de console aansluiten brengt ze terug). *Minder beweging* laat elke beweging die alleen voor de show is weg, ook in het dock, en houdt de gloed: voor wie beweging vermoeiend vindt.
+- **Visuele effecten** (*Voorkeuren*): *Automatisch: volledig op de tv*, de standaard, houdt de achtergrondgloed en elke beweging van het uiterlijk zolang de console in het dock staat: de schermen en hun regels die op hun plek schuiven, de ring die zichzelf tekent en naar een nieuwe waarde glijdt, het kloppen van de ring op het kinderscherm in de laatste minuten, de kleine reacties op een druk op een knop. In de hand (handheld of in tafelmodus, opladend of niet) laat het ze allemaal weg, en de console terug in het dock zetten brengt ze terug. *Altijd volledig* houdt ze ook in de hand. *Minder beweging* laat elke beweging die alleen voor de show is weg, ook in het dock, en houdt de gloed: voor wie beweging vermoeiend vindt.
 - **Ongedaan maken:** nadat een wijziging is opgeslagen, blijft **ZR** *Ongedaan maken* een paar seconden in de voettekst staan: het opent die wijziging in de wijzigingsgeschiedenis, om de vorige waarde terug te zetten. Een lege wijzigingsgeschiedenis zegt dat in een kaart.
 
 ## Meldingen — wat je aandacht vraagt, vanuit elk tabblad
@@ -83,7 +83,7 @@ Elk met een "i", een stip op de bel; kan als gelezen worden gemarkeerd:
 - een limiet die op een eerdere dag met *Vandaag niet meer spelen* is verlaagd en nog laag staat (*Terugzetten*);
 - een nieuwe versie geïnstalleerd (*Wat is er nieuw*; na een update ter plekke blijft de vorige build bewaard), of een nieuwere versie van PlayGuard;
 - een online verstuurd rapport (*Link tonen*), of PlayGuard de vorige keer onverwacht gesloten (*Rapport versturen*);
-- de speeltijd van de week (elke 7 dagen tot je het leest; met de vergelijking met de week ervoor, per dag; *QR-code tonen* opent het weekoverzicht op *Activiteit*), en een limiet die op twee of meer van de afgelopen 7 dagen is overschreden terwijl de console alleen waarschuwt;
+- de speeltijd van de week (elke 7 dagen tot je het leest; met de vergelijking met de week ervoor, per dag), en een limiet die op twee of meer van de afgelopen 7 dagen is overschreden terwijl de console alleen waarschuwt;
 - een back-up van de instellingen die nog moet worden gemaakt (nog geen, of geen in 30 dagen);
 - alle games al een week geblokkeerd;
 - een nieuw gebruikersaccount;
@@ -260,7 +260,7 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 ### Bovenaan
 
-- De accounts als chips, de periode en *Exporteren of delen*.
+- De accounts als chips, de periode en *Exporteren*.
 - Vandaag, de afgelopen 7 dagen en altijd als cijfers. Onder de afgelopen 7 dagen de vergelijking met de 7 ervoor, per dag: ▲ *+20 min/dag t.o.v. vorige week* in oranje, ▼ minder in blauwgroen, *zoals vorige week* bij hoogstens 5 minuten verschil.
 - De vier meest gespeelde games als kaarten (Ⓐ opent er een); over de afgelopen 7 dagen zegt de game die het meest meer is gespeeld dan de week ervoor met hoeveel, vanaf een half uur (▲ *+2 u t.o.v. vorige week*).
 - Niets gespeeld in de periode: een kaart zegt dat, met *Totaal bekijken* als er iets te zien is.
@@ -283,10 +283,9 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 - Speeltijd van een game die bij geen enkel gebruikersaccount hoort (sommige games vragen er nooit om, of het account is sindsdien verwijderd), verschijnt als *Zonder account*, vanaf een minuut.
 - Een gebruikersaccount dat PlayGuard nog nooit zag, wordt 30 dagen in oranje gemarkeerd op het tabblad (*Nieuw account sinds …*: een nieuw account is een bekende manier om opnieuw te beginnen) en vastgelegd in de wijzigingsgeschiedenis; de accounts die er al waren toen PlayGuard ze voor het eerst opsomde, worden niet gemarkeerd.
 
-### Exporteren en delen
+### Exporteren
 
-- **Exporteren naar de SD-kaart** (*Exporteren of delen › Opslaan op de SD-kaart*) als CSV, JSON, XLSX (Excel) of PDF, één kolom per dag, en daarna de afgelopen 7 dagen, de afgelopen 30 dagen en altijd.
-- **Weekoverzicht als QR-code** (*Exporteren of delen*, of *QR-code tonen* bij de bel): de camera van een telefoon leest hem als een paar regels tekst, in de getoonde taal — de afgelopen 7 dagen en hun gemiddelde, de trend, elke dag, de drie meest gespeelde games, de sessies, de langste en de tijd gespeeld tussen 21:00 en 06:00. Er gaat niets online.
+- **Exporteren naar de SD-kaart** (*Exporteren*) als CSV, JSON, XLSX (Excel) of PDF, één kolom per dag, en daarna de afgelopen 7 dagen, de afgelopen 30 dagen en altijd.
 - Opent meteen met de laatst gelezen cijfers (bewaard op de SD-kaart tussen twee starts), op de achtergrond vernieuwd als ze ouder zijn dan een minuut; Ⓧ leest ze nu opnieuw, met een laadindicator.
 - De tijden zijn bij benadering als de klok van de console is gewijzigd.
 

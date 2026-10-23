@@ -54,7 +54,7 @@ L'aspetto di PlayGuard si chiama Cadran: una barra di icone per le schede, una t
   - Anche i nomi delle schede della barra laterale crescono, sempre del 25 %; il titolo, l'etichetta e la data dell'intestazione e i suggerimenti dei tasti e l'orologio del piè di pagina crescono un po' meno (dal 15 al 20 %), perché le loro righe sono già piene. Un nome troppo lungo per il suo spazio in una lingua viene disegnato un po' più piccolo, mai meno che nella dimensione normale, invece di essere tagliato. I nomi dei livelli di Limitazioni mantengono la loro dimensione, già grande.
   - Il cambio è immediato, su ogni schermata, senza riavviare.
   - Il 25 % viene da una TV da 55" in 4K: il testo più piccolo (15 px) è allora alto 14,6 mm in maiuscolo, 20′ d'arco da 2,5 m, dove la lettura è comoda (16′ in dimensione normale, il minimo indispensabile).
-- **Effetti visivi** (*Preferenze*): *Sempre completi*, l'impostazione predefinita, mantiene l'alone di sfondo e ogni movimento dell'interfaccia a batteria come nella base: le schermate e le loro righe che salgono al loro posto, l'anello che si disegna e scorre verso un nuovo valore, il battito dell'anello della schermata del bambino nei suoi ultimi minuti, le piccole risposte a una pressione. *Più leggeri a batteria* li toglie tutti finché non è collegato un caricatore (in modalità portatile, senza alimentazione; riletto ogni 5 secondi, quindi collegare la console all'alimentazione li fa tornare). *Meno movimento* toglie ogni movimento decorativo, anche nella base, e mantiene l'alone: per chi si stanca con il movimento.
+- **Effetti visivi** (*Preferenze*): *Automatico: completi sulla TV*, l'impostazione predefinita, mantiene l'alone di sfondo e ogni movimento dell'interfaccia finché la console è nella base: le schermate e le loro righe che salgono al loro posto, l'anello che si disegna e scorre verso un nuovo valore, il battito dell'anello della schermata del bambino nei suoi ultimi minuti, le piccole risposte a una pressione. In mano (in modalità portatile o da tavolo, in carica o no) li toglie tutti, e rimettere la console nella base li fa tornare. *Sempre completi* li mantiene anche in mano. *Meno movimento* toglie ogni movimento decorativo, anche nella base, e mantiene l'alone: per chi si stanca con il movimento.
 - **Annulla:** dopo che una modifica è stata salvata, **ZR** *Annulla* resta nel piè di pagina per qualche secondo: apre quella modifica nella cronologia delle modifiche, per rimettere il valore precedente. Una cronologia delle modifiche vuota lo dice in un riquadro.
 
 ## Notifiche — ciò che richiede la tua attenzione, da qualsiasi scheda
@@ -83,7 +83,7 @@ Ognuno con una "i", un punto sulla campanella; si può segnare come letta:
 - un limite ancora abbassato da *Basta giocare per oggi* in un giorno precedente (*Ripristina*);
 - una nuova versione installata (*Novità*; dopo un aggiornamento sul posto, la build precedente conservata), o una versione più recente di PlayGuard;
 - un rapporto inviato online (*Mostra il link*), o PlayGuard chiuso in modo imprevisto l'ultima volta (*Invia un rapporto*);
-- il tempo di gioco della settimana (ogni 7 giorni finché non viene letto; con il confronto, al giorno, con la settimana precedente; *Mostra il codice QR* apre il riepilogo della settimana in *Attività*), e un limite superato in due o più degli ultimi 7 giorni mentre la console si limita ad avvisare;
+- il tempo di gioco della settimana (ogni 7 giorni finché non viene letto; con il confronto, al giorno, con la settimana precedente), e un limite superato in due o più degli ultimi 7 giorni mentre la console si limita ad avvisare;
 - un backup delle impostazioni da fare (nessuno, o nessuno da 30 giorni);
 - tutti i giochi bloccati da una settimana;
 - un nuovo utente;
@@ -260,7 +260,7 @@ Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registr
 
 ### In alto
 
-- Gli utenti come chip, il periodo e *Esporta o condividi*.
+- Gli utenti come chip, il periodo e *Esporta*.
 - Oggi, gli ultimi 7 giorni e da sempre come cifre. Sotto gli ultimi 7 giorni, il confronto con i 7 precedenti, al giorno: ▲ *+20 min/giorno vs settimana prima* in ambra, ▼ in meno in verde acqua, *come la settimana prima* entro 5 minuti.
 - I quattro giochi più giocati come riquadri (Ⓐ ne apre uno); sugli ultimi 7 giorni, quello giocato più della settimana prima dice di quanto, a partire da mezz'ora (▲ *+2 h vs settimana prima*).
 - Niente giocato nel periodo: un riquadro lo dice, con *Vedi da sempre* quando c'è qualcosa da vedere.
@@ -285,8 +285,7 @@ Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registr
 
 ### Esportazione e condivisione
 
-- **Esportazione sulla scheda SD** (*Esporta o condividi › Salva sulla scheda SD*) in CSV, JSON, XLSX (Excel) o PDF, una colonna per giorno, poi gli ultimi 7 giorni, gli ultimi 30 giorni e da sempre.
-- **Riepilogo della settimana come codice QR** (*Esporta o condividi*, o *Mostra il codice QR* della campanella): la fotocamera di un telefono lo legge come qualche riga di testo, nella lingua mostrata — gli ultimi 7 giorni e la loro media, la tendenza, ogni giorno, i tre giochi più giocati, le sessioni, la più lunga e il tempo giocato tra le 21:00 e le 06:00. Nulla viene inviato online.
+- **Esportazione sulla scheda SD** (*Esporta*) in CSV, JSON, XLSX (Excel) o PDF, una colonna per giorno, poi gli ultimi 7 giorni, gli ultimi 30 giorni e da sempre.
 - Si apre subito sugli ultimi dati letti (conservati sulla scheda SD tra un avvio e l'altro), aggiornati in background quando hanno più di un minuto; Ⓧ li rilegge subito, con un indicatore di caricamento.
 - I tempi sono approssimativi se l'orologio della console è stato cambiato.
 

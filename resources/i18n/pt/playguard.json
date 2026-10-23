@@ -441,11 +441,7 @@
             "late": "Jogado entre as 21:00 e as 06:00"
         },
         "rating": "Classificação etária",
-        "rating_blocked": "{} · bloqueado no nível atual",
-        "qr": "Resumo da semana em código QR",
-        "share_sd": "Guardar no cartão SD…",
-        "qr_body": "Leia-o com a câmara de um telemóvel: os últimos 7 dias aparecem como texto. Nada passa pela internet.",
-        "qr_days": "Cada dia"
+        "rating_blocked": "{} · bloqueado no nível atual"
     },
     "library": {
         "title": "Jogos",
@@ -650,6 +646,7 @@
         "no_pin": "Defina primeiro um PIN (Definir ou alterar o PIN).",
         "set": "Proteger o PlayGuard com o PIN: {}",
         "ask_again": "Pedir o PIN novamente após 5 minutos",
+        "pauses": "Pausar o controlo parental enquanto estou no PlayGuard",
         "again_on": {
             "changes": "Pedido novamente após 5 minutos.",
             "open": "Volta após 5 minutos fora do PlayGuard."
@@ -1345,7 +1342,7 @@
         "effects": "Efeitos visuais",
         "effects_values": {
             "full": "Sempre completos",
-            "auto": "Mais leves com bateria",
+            "auto": "Automático: completos na TV",
             "reduced": "Menos movimento"
         }
     },
@@ -1873,7 +1870,6 @@
         "sd_space_detail": "Restam {} MB: o PlayGuard pode deixar de conseguir guardar as definições, o histórico e os registos.",
         "week": "Últimos 7 dias: {} de jogo",
         "week_detail": "{} por dia em média.",
-        "week_qr": "Mostrar o código QR",
         "week_top": "O mais jogado: {} ({}).",
         "over_limit": "O limite foi ultrapassado em {} dos últimos 7 dias",
         "over_limit_detail": "Quando o tempo acaba, a consola apenas avisa: continua-se a jogar além do limite (Tempo de jogo › Quando o tempo acaba).",
@@ -2026,7 +2022,7 @@
             "done_day": "Concluir {}"
         },
         "activity": {
-            "share": "Exportar ou partilhar",
+            "export": "Exportar",
             "games": "{} jogos",
             "games_one": "1 jogo",
             "on_limit": "de um limite de {}",

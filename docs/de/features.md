@@ -54,7 +54,7 @@ Das Aussehen von PlayGuard heißt Cadran: eine schmale Leiste mit Symbolen für 
   - Die Namen der Tabs in der Seitenleiste wachsen mit, ebenfalls um 25 %; Titel, Plakette und Datum der Kopfzeile sowie Tastenhinweise und Uhr der Fußzeile etwas weniger (15 bis 20 %), da ihre Zeilen schon voll sind. Ein Name, der in einer Sprache zu lang für seinen Platz ist, wird etwas kleiner gezeichnet, nie kleiner als in normaler Größe, statt abgeschnitten zu werden. Die Namen der Kategorien in *Einschränkungen* behalten ihre Größe, sie sind schon groß.
   - Die Änderung wirkt sofort, auf jedem Bildschirm, ohne Neustart.
   - Die 25 % stammen von einem 55"-Fernseher in 4K: Der kleinste Text (15 px) ist dann in Großbuchstaben 14,6 mm hoch, 20′ Sehwinkel aus 2,5 m, wo das Lesen angenehm ist (16′ in normaler Größe, das absolute Minimum).
-- **Visuelle Effekte** (*Optionen*): *Immer vollständig*, der Standard, behält den Hintergrundschein und jede Bewegung der Oberfläche im Akkubetrieb wie im TV-Modus: die Bildschirme und ihre Zeilen, die an ihren Platz gleiten, den Ring, der sich zeichnet und zu einem neuen Wert gleitet, das Pulsieren des Rings auf dem Kinderbildschirm in seinen letzten Minuten, die kleinen Antworten auf einen Druck. *Sparsamer im Akkubetrieb* lässt sie alle weg, solange kein Ladegerät angeschlossen ist (Handheld, ohne Kabel; alle 5 Sekunden neu geprüft: Wird die Konsole angeschlossen, kommen sie zurück). *Weniger Bewegung* lässt jede bloß schmückende Bewegung weg, auch im TV-Modus, und behält den Schein: für alle, die Bewegung ermüdet.
+- **Visuelle Effekte** (*Optionen*): *Automatisch: vollständig am Fernseher*, der Standard, behält den Hintergrundschein und jede Bewegung der Oberfläche, solange die Konsole im TV-Modus ist: die Bildschirme und ihre Zeilen, die an ihren Platz gleiten, den Ring, der sich zeichnet und zu einem neuen Wert gleitet, das Pulsieren des Rings auf dem Kinderbildschirm in seinen letzten Minuten, die kleinen Antworten auf einen Druck. In der Hand (Handheld- oder Tischmodus, ob sie lädt oder nicht) lässt es sie alle weg; kommt die Konsole zurück in den TV-Modus, sind sie wieder da. *Immer vollständig* behält sie auch in der Hand. *Weniger Bewegung* lässt jede bloß schmückende Bewegung weg, auch im TV-Modus, und behält den Schein: für alle, die Bewegung ermüdet.
 - **Rückgängig:** Nachdem eine Änderung gespeichert ist, bleibt **ZR** *Rückgängig* einige Sekunden in der Fußzeile: Es öffnet diese Änderung im Änderungsverlauf, um den vorherigen Wert wiederherzustellen. Ein leerer Änderungsverlauf sagt das in einer Karte.
 
 ## Benachrichtigungen — was dich braucht, aus jedem Tab
@@ -83,7 +83,7 @@ Jeweils mit einem „i“, ein Punkt auf der Glocke; kann als gelesen markiert w
 - ein Limit, das an einem früheren Tag durch *Heute nicht mehr spielen* noch gesenkt ist (*Wiederherstellen*);
 - eine neue installierte Version (*Neuigkeiten*; nach einem Update an Ort und Stelle der aufbewahrte vorherige Build), oder eine neuere Version von PlayGuard;
 - ein online gesendeter Bericht (*Link anzeigen*), oder PlayGuard wurde beim letzten Mal unerwartet beendet (*Bericht senden*);
-- die Spielzeit der Woche (alle 7 Tage, bis sie gelesen ist; mit dem Vergleich zur Vorwoche, pro Tag; *QR-Code zeigen* öffnet die Wochenübersicht in *Aktivität*) und ein Limit, das an zwei oder mehr der letzten 7 Tage überschritten wurde, während die Konsole nur warnt;
+- die Spielzeit der Woche (alle 7 Tage, bis sie gelesen ist; mit dem Vergleich zur Vorwoche, pro Tag) und ein Limit, das an zwei oder mehr der letzten 7 Tage überschritten wurde, während die Konsole nur warnt;
 - eine Sicherung der Einstellungen, die fällig ist (noch keine, oder keine seit 30 Tagen);
 - alle Spiele seit einer Woche gesperrt;
 - ein neues Benutzerkonto;
@@ -260,7 +260,7 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 ### Oben
 
-- Die Benutzer als Chips, der Zeitraum und *Exportieren oder teilen*.
+- Die Benutzer als Chips, der Zeitraum und *Exportieren*.
 - Heute, die letzten 7 Tage und insgesamt als Zahlen. Unter den letzten 7 Tagen der Vergleich mit den 7 davor, pro Tag: ▲ *+20 min/Tag ggü. Vorwoche* in Bernstein, ▼ weniger in Petrol, *wie in der Vorwoche* bei höchstens 5 Minuten Unterschied.
 - Die vier meistgespielten Spiele als Karten (Ⓐ öffnet eines); über die letzten 7 Tage sagt das Spiel, das am meisten mehr gespielt wurde als in der Woche davor, um wie viel, ab einer halben Stunde (▲ *+2 h ggü. Vorwoche*).
 - Im Zeitraum nichts gespielt: Eine Karte sagt das, mit *Gesamt ansehen*, wenn es etwas zu sehen gibt.
@@ -283,10 +283,9 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 - Die Zeit eines Spiels, die keinem Benutzerkonto gehört (manche Spiele fragen nie nach einem, oder das Konto wurde inzwischen gelöscht), erscheint als *Ohne Nutzer*, ab einer Minute.
 - Ein Benutzerkonto, das PlayGuard nie zuvor gesehen hat, wird 30 Tage lang im Tab in Bernstein markiert (*Neuer Nutzer seit …*, ein frisches Konto ist ein bekannter Weg, von vorn anzufangen) und im Änderungsverlauf festgehalten; die Konten, die da sind, wenn PlayGuard sie zum ersten Mal auflistet, werden nicht markiert.
 
-### Export und Teilen
+### Export
 
-- **Auf die SD-Karte exportieren** (*Exportieren oder teilen › Auf der SD-Karte speichern*) als CSV, JSON, XLSX (Excel) oder PDF, eine Spalte pro Tag, dann die letzten 7 Tage, die letzten 30 Tage und insgesamt.
-- **Wochenübersicht als QR-Code** (*Exportieren oder teilen*, oder *QR-Code zeigen* in der Glocke): Die Kamera eines Handys liest ihn als einige Zeilen Text, in der angezeigten Sprache — die letzten 7 Tage und ihr Durchschnitt, der Trend, jeder Tag, die drei meistgespielten Spiele, die Sitzungen, die längste davon und die zwischen 21:00 und 06:00 gespielte Zeit. Nichts geht online.
+- **Auf die SD-Karte exportieren** (*Exportieren*) als CSV, JSON, XLSX (Excel) oder PDF, eine Spalte pro Tag, dann die letzten 7 Tage, die letzten 30 Tage und insgesamt.
 - Öffnet sofort mit den zuletzt gelesenen Zahlen (zwischen den Starts auf der SD-Karte aufbewahrt), im Hintergrund aktualisiert, wenn sie älter als eine Minute sind; Ⓧ liest sie sofort neu, mit einer Ladeanzeige.
 - Zeiten sind ungefähr, wenn die Konsolenuhr geändert wurde.
 

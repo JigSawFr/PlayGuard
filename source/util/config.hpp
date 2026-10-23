@@ -17,9 +17,9 @@ struct Config
     // The text: "auto" (larger while docked), "normal" or "large"
     // (ui/text_size).
     std::string text_size = "auto";
-    // "full" (the default), "auto" (lighter effects on the battery) or
+    // "auto" (the default: lighter effects off the dock), "full" or
     // "reduced" (no decorative movement) (ui/effects).
-    std::string effects = "full";
+    std::string effects = "auto";
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
@@ -75,6 +75,10 @@ struct Config
     // PIN › Ask for the PIN again: the PIN holds 5 minutes, not until
     // PlayGuard closes ("open" locks again after 5 minutes away).
     bool pin_ask_again = false;
+    // PIN › Pause parental controls while I'm in PlayGuard: the PIN, once
+    // entered, unlocks them until PlayGuard is left (action/session_pause).
+    // Off by default: entering the PIN changes nothing on the console.
+    bool pin_pauses = false;
     // First steps opens by itself at start-up while no PIN is set, unless
     // its "Show at start-up" switch was turned off.
     bool onboarding_at_start = true;
@@ -168,7 +172,7 @@ constexpr const char* THEMES[] = { "system", "light", "dark" };
 // What text_size may be: the default first.
 constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
 // What effects may be: the default first.
-constexpr const char* EFFECTS[] = { "full", "auto", "reduced" };
+constexpr const char* EFFECTS[] = { "auto", "full", "reduced" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "history", "console", "preferences", "about" };

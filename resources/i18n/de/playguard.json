@@ -441,11 +441,7 @@
             "late": "Gespielt zwischen 21:00 und 06:00"
         },
         "rating": "Alterseinstufung",
-        "rating_blocked": "{} · auf der aktuellen Stufe blockiert",
-        "qr": "Wochenübersicht als QR-Code",
-        "share_sd": "Auf der SD-Karte speichern…",
-        "qr_body": "Mit der Kamera eines Smartphones scannen: Die letzten 7 Tage erscheinen als Text. Nichts geht ins Internet.",
-        "qr_days": "Jeder Tag"
+        "rating_blocked": "{} · auf der aktuellen Stufe blockiert"
     },
     "library": {
         "title": "Spiele",
@@ -650,6 +646,7 @@
         "no_pin": "Legen Sie zuerst eine Geheimzahl fest (Geheimzahl festlegen oder ändern).",
         "set": "PlayGuard mit der Geheimzahl schützen: {}",
         "ask_again": "Geheimzahl nach 5 Minuten erneut abfragen",
+        "pauses": "Jugendschutz pausieren, solange ich in PlayGuard bin",
         "again_on": {
             "changes": "Erneute Abfrage nach 5 Minuten.",
             "open": "Er erscheint erneut nach 5 Minuten außerhalb von PlayGuard."
@@ -1345,7 +1342,7 @@
         "effects": "Visuelle Effekte",
         "effects_values": {
             "full": "Immer vollständig",
-            "auto": "Sparsamer im Akkubetrieb",
+            "auto": "Automatisch: vollständig am Fernseher",
             "reduced": "Weniger Bewegung"
         }
     },
@@ -1873,7 +1870,6 @@
         "sd_space_detail": "Noch {} MB frei: PlayGuard kann Einstellungen, Verlauf und Protokolle eventuell nicht mehr speichern.",
         "week": "Letzte 7 Tage: {} gespielt",
         "week_detail": "Im Schnitt {} pro Tag.",
-        "week_qr": "QR-Code zeigen",
         "week_top": "Am meisten gespielt: {} ({}).",
         "over_limit": "Das Limit wurde an {} der letzten 7 Tage überschritten",
         "over_limit_detail": "Wenn die Zeit um ist, warnt die Konsole nur: Es wird über das Limit hinaus weitergespielt (Spielzeit › Wenn die Zeit um ist).",
@@ -2026,7 +2022,7 @@
             "done_day": "Fertig mit {}"
         },
         "activity": {
-            "share": "Exportieren oder teilen",
+            "export": "Exportieren",
             "games": "{} Spiele",
             "games_one": "1 Spiel",
             "on_limit": "von {} Limit",

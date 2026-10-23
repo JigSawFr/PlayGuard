@@ -128,7 +128,7 @@ void sanitize(Config& c)
     if (!language_ok) c.language = "system";
     one_of(c.theme, { "system", "light", "dark" }, "dark");
     one_of(c.text_size, { "auto", "normal", "large" }, "auto");
-    one_of(c.effects, { "full", "auto", "reduced" }, "full");
+    one_of(c.effects, { "auto", "full", "reduced" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
@@ -341,6 +341,7 @@ static void load_shared()
     read_string(j, "dev_builds_order", c.dev_builds_order);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "pin_ask_again", c.pin_ask_again);
+    read_bool(j, "pin_pauses", c.pin_pauses);
     read_bool(j, "onboarding_at_start", c.onboarding_at_start);
     read_bool(j, "support_reminder", c.support_reminder);
     read_string(j, "support_reminded", c.support_reminded);
@@ -454,6 +455,7 @@ bool snapshot(Snapshot& snap)
     j["dev_builds_order"] = s_config.dev_builds_order;
     j["pin_lock"]        = s_config.pin_lock;
     j["pin_ask_again"]   = s_config.pin_ask_again;
+    j["pin_pauses"]      = s_config.pin_pauses;
     j["onboarding_at_start"] = s_config.onboarding_at_start;
     j["support_reminder"] = s_config.support_reminder;
     j["support_reminded"] = s_config.support_reminded;
