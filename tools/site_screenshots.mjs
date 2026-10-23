@@ -25,11 +25,13 @@ const LANGUAGES = ['en-US', 'fr', 'fr-CA', 'de', 'es', 'es-419', 'it', 'nl', 'pt
 // per start of PlayGuard (a start takes the longest): the tab it opens on,
 // then each screen with the keys to it from the one before.
 const RUNS = [
-  // The tabs, down the sidebar, then Console's Network clock (the row with its
-  // badge, where the tab opens: the simulated clock is off).
+  // The tabs, down the sidebar, to Security.
   { tab: '', screens: [['dashboard'], ['play_timer', 'ArrowDown'], ['activity', 'ArrowDown'],
-    ['restrictions', 'ArrowDown'], ['security', 'ArrowDown'], ['console', 'ArrowDown'],
-    ['clock', 'ArrowRight', 'Enter']] },
+    ['restrictions', 'ArrowDown'], ['security', 'ArrowDown']] },
+  // Console on a start of its own (History is between it and Security, see
+  // below), then its Network clock (the tile with its badge, where the tab
+  // opens: the simulated clock is off).
+  { tab: 'console', screens: [['console'], ['clock', 'ArrowRight', 'Enter']] },
   // The week: the profiles' chip, Monday, Monday edited (the documentation's
   // "Play timer › editing a day").
   { tab: 'play_timer', screens: [['per_day', 'ArrowRight', 'ArrowDown', 'Enter']] },
@@ -132,16 +134,15 @@ async function run(lang, theme, { tab, screens }) {
     if (version) query.set('version', `${version}:`);
     await page.goto(`${base}?${query}`);
     await page.waitForFunction(() => document.getElementById('overlay')?.hidden, null, { timeout: 120000 });
-    // PlayGuard's loading screen is navy (red 11), either theme of its first
-    // screen is grey (red 45 dark, 235 light): wait for the first screen (a
-    // corner of the header), then for its icons.
-    await page.waitForFunction(() => {
-      const c = document.createElement('canvas');
-      c.width = c.height = 1;
-      const g = c.getContext('2d');
-      g.drawImage(document.getElementById('canvas'), 8, 8, 1, 1, 0, 0, 1, 1);
-      return g.getImageData(0, 0, 1, 1).data[0] > 25;
-    }, null, { timeout: 120000, polling: 250 });
+    // The first screen, as the page says it (web/simulator.js: "start-up:
+    // first screen ready" in PlayGuard's log), as tools/web_smoke.py waits
+    // for it: Cadran's dark theme is the loading screen's navy, so no pixel
+    // tells them apart. Then a moment for its icons.
+    await page.waitForFunction(() => ['ready', 'error'].includes(document.body?.dataset.playguard),
+      null, { timeout: 120000, polling: 250 });
+    if (await page.evaluate(() => document.body.dataset.playguard) === 'error') {
+      throw new Error(`${lang}/${theme}: PlayGuard did not start`);
+    }
     await sleep(1000);
     await page.focus('#canvas');
     for (const [name, ...keys] of screens) {
