@@ -9,6 +9,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "view/build_cell.hpp"
+#include "view/cadran_icon.hpp"
 
 using namespace brls::literals;
 
@@ -27,14 +28,46 @@ dev_builds::Order order()
     return dev_builds::order_named(config::get().dev_builds_order);
 }
 
-// "20", or "20 · 3 new" when some came after the running build.
-std::string count_text(size_t count, size_t newer)
+// After a tab's words: a sparkle and how many came after the running build
+// (the sparkle of their tag in the list).
+struct NewCount
 {
-    std::string text = std::to_string(count);
-    if (newer == 1) text += " · " + "playguard/dev_build/count_new_one"_i18n;
-    else if (newer) text += " · " + brls::getStr("playguard/dev_build/count_new", (int)newer);
-    return text;
+    brls::Box*   box;
+    CadranIcon*  glyph;
+    brls::Label* count;
+};
+
+NewCount add_new_count(brls::Button* tab)
+{
+    auto* box = new brls::Box(brls::Axis::ROW);
+    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setMarginLeft(10);
+    auto* glyph = new CadranIcon();
+    glyph->setIcon("sparkle");
+    glyph->setWidth(18);
+    glyph->setHeight(18);
+    glyph->setMarginRight(4);
+    box->addView(glyph);
+    auto* count = new brls::Label();
+    count->setSingleLine(true);
+    count->setFontSize(20);
+    box->addView(count);
+    tab->addView(box);
+    return { box, glyph, count };
 }
+
+// `n` new in that tab's ink (dark on the chosen tab's teal); none: gone.
+void set_new_count(const NewCount& c, size_t n, bool chosen)
+{
+    const NVGcolor ink = brls::Application::getTheme()[(chosen ? brls::BUTTONSTYLE_PRIMARY
+                                                               : brls::BUTTONSTYLE_DEFAULT).enabledLabelColor];
+    c.glyph->setColor(ink);
+    c.count->setTextColor(ink);
+    c.count->setText(std::to_string(n));
+    ui::set_visible(c.box, n > 0);
+}
+
+NewCount s_new_release, s_new_main;   // the open screen's (s_open)
 }   // namespace
 
 void DevBuildsActivity::show(const dev_builds::Cache& cache)
@@ -129,6 +162,8 @@ void DevBuildsActivity::onContentAvailable()
     });
     // The L and R icons around the tabs say what moves between them (the same
     // glyphs as the footer's hints); no hint of their own in the footer.
+    s_new_release = add_new_count(tab_release.getView());
+    s_new_main = add_new_count(tab_main.getView());
     tab_l->setText(brls::Hint::getKeyIcon(brls::BUTTON_LB, true));
     tab_r->setText(brls::Hint::getKeyIcon(brls::BUTTON_RB, true));
     this->getContentView()->registerAction("", brls::BUTTON_RB, [this](brls::View*) {
@@ -216,8 +251,10 @@ void DevBuildsActivity::fill()
         for (const dev_builds::Build& b : list) n += dev_builds::newer(b, app::version(), running) ? 1 : 0;
         return n;
     };
-    tab_release->setText(brls::getStr("playguard/dev_build/section_release", count_text(releases.size(), newer_count(releases))));
-    tab_main->setText(brls::getStr("playguard/dev_build/section_main", count_text(mains.size(), newer_count(mains))));
+    tab_release->setText(brls::getStr("playguard/dev_build/section_release", (int)releases.size()));
+    tab_main->setText(brls::getStr("playguard/dev_build/section_main", (int)mains.size()));
+    set_new_count(s_new_release, newer_count(releases), this->tab == dev_builds::Kind::Release);
+    set_new_count(s_new_main, newer_count(mains), this->tab == dev_builds::Kind::Main);
     tab_pulls->setText(brls::getStr("playguard/dev_build/section_pulls", (int)pulls));
     // The order in A's hint, on the pull requests' tab when it is shown (what
     // A does there): not in the tab, which it made too wide.
