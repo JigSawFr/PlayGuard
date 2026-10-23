@@ -107,14 +107,16 @@ void HistoryActivity::rebuild()
     // There are only ever as many as the most shown at once (up to
     // history::MAX_ENTRIES); those past what is shown are hidden. Filled out
     // of the screen's layout, laid out once (ui::batch_layout).
-    auto& slots = list->getChildren();
     // A hidden line must not keep the focus: it goes to the filter.
     brls::View* focus = brls::Application::getCurrentFocus();
     bool focus_hidden = false;
     ui::batch_layout(list, [&]() {
         std::string day;
         for (size_t i = 0; i < this->shown.size(); i++) {
-            if (i >= slots.size()) list->addView(new_slot());
+            if (i >= slots.size()) {
+                slots.push_back(new_slot());
+                list->addView(slots.back());
+            }
             brls::View* slot = slots[i];
             const history::Entry e = this->shown[i];
             // A day's title over its first change.
