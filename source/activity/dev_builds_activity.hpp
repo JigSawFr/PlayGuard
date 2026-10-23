@@ -15,8 +15,8 @@
 // (the one installed before, kept: action/rollback_flow.hpp), and how old
 // the list is; Ⓧ fetches it again, and so does the screen itself every few
 // minutes while a build's checks are still running.
-// While the list is fetched, or a build looked for, a bar above the tabs
-// shows how far it is.
+// While the list is fetched, or a build looked for, a bar at the tabs'
+// right shows how far it is.
 // A list fetched again while this screen is open replaces its content in
 // place: the cells are reused, never freed (one of them may have the focus).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
