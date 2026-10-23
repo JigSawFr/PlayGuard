@@ -160,13 +160,26 @@ jobs:
           path: .apt-archives
           key: apt-web-${{ github.sha }}
           restore-keys: apt-web-
-      - name: Noto Sans CJK, fontTools and Python-Markdown
+      # Then Chromium's system libraries and fonts for Playwright (its
+      # install-deps, 25 MB the mirror served at 38 kB/s once: 11 minutes,
+      # 2026-10-23), here so that main's cache holds them too: wherever the
+      # simulator's smoke test, the layout check or the screenshots run, and
+      # on main to keep them in the cache. The browser itself comes from
+      # Playwright's CDN, in seconds. Every apt-get of the job goes through
+      # that folder, dpkg without fsync on a runner thrown away.
+      - name: Noto Sans CJK, fontTools, Python-Markdown and Chromium's libraries
         run: |
-          archives="-o Dir::Cache::Archives=$GITHUB_WORKSPACE/.apt-archives -o Dpkg::Options::=--force-unsafe-io"
+          printf 'Dir::Cache::Archives "%s/.apt-archives";\nDpkg::Options { "--force-unsafe-io"; };\n' "$GITHUB_WORKSPACE" \
+            | sudo tee /etc/apt/apt.conf.d/90-ci-archives > /dev/null
           mkdir -p .apt-archives/partial
           sudo apt-get update -q
-          sudo apt-get install $archives -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
-          sudo apt-get autoclean $archives > /dev/null
+          sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
+          if [ "$GITHUB_REF" = refs/heads/main ] || [ "$BUILD_SIMULATOR$CHECK_LAYOUT$TAKE_SCREENS" != 000 ]; then
+            python3 -m venv "$RUNNER_TEMP/playwright"
+            "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
+            sudo "$RUNNER_TEMP/playwright/bin/python" -m playwright install-deps chromium
+          fi
+          sudo apt-get autoclean > /dev/null
           sudo chown -R "$USER" .apt-archives
           rm -f .apt-archives/lock
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -198,7 +211,8 @@ jobs:
       # its first screen in each kind of start, move the time on and take a
       # live setting without a restart, add the CJK font, keep its state with
       # keep=1. Its screens go with the site, for the pull request's comment
-      # (pages.yml). Playwright, pinned, in a venv of its own.
+      # (pages.yml). Playwright, pinned, in a venv of its own; its system
+      # libraries installed above.
       # About a minute, its scenarios a few at once: one that hangs (a browser
       # that stopped answering) is stopped and fails, rather than the job's
       # timeout, its log unbuffered so that it says where.
@@ -208,7 +222,7 @@ jobs:
         run: |
           python3 -m venv "$RUNNER_TEMP/playwright"
           "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
-          "$RUNNER_TEMP/playwright/bin/python" -m playwright install --with-deps chromium
+          "$RUNNER_TEMP/playwright/bin/python" -m playwright install chromium
           "$RUNNER_TEMP/playwright/bin/python" -u tools/web_smoke.py build-web/simulator build-web/shots
       # Main's simulator and its smoke test's screens, when this build does
       # not make its own.
@@ -370,7 +384,7 @@ jobs:
           if [ ! -x "$py" ]; then
             python3 -m venv "$RUNNER_TEMP/playwright"
             "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
-            "$py" -m playwright install --with-deps --only-shell chromium
+            "$py" -m playwright install --only-shell chromium
           fi
       - name: The website on a phone, a tablet and a desktop
         if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
