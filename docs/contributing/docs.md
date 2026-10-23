@@ -1,0 +1,11 @@
+# The user guide and the website
+
+Part of the [contributor's guide](../../CONTRIBUTING.md).
+
+When a change is visible to users, update the English and French pages **both**. The [README](../../README.md) is in English only and stays short: the pitch, the main features, install and links to the website, where parents read the documentation in their language (the app's links to it are `app::doc_url()`: an installed app keeps them, so a page or a heading it links to keeps its name, which `tools/check_resources.py` checks); the details go to the user guide in [`docs/`](../../docs/), the website's source — `getting-started.md` (the walk-through and the everyday tasks, a parent's first page), `features.md` (every tab and setting), `install.md`, `compatibility.md`, `troubleshooting.md` (locked out, the common problems, reporting a bug) — with its French version in [`docs/fr/`](../../docs/fr/) and the console's other languages in `docs/<language>/`.
+
+Those other translations may lag: after changing an English page, stamp the French one again (`python3 tools/doc_stamp.py docs/fr/<page>.md`); `python3 tools/doc_delta.py docs/<language>/<page>.md` shows what changed in the English page since its translation was stamped (the diff from the version the stamp names), and `--all` lists every translation that is behind (CI's `host-tests` job runs it with `--github` for every pull request: a warning on each English page with translations behind, naming their languages, never a failure); the others say on the website that the English page may be more recent until someone updates and stamps them.
+
+`python3 tools/check_site_links.py <site-dir>` checks every link of a built site (CI runs it). `tools/site_layout.py <site-dir>` (Playwright) checks its layout on a phone, a tablet and a desktop, and with `SITE_AXE=<axe-core's axe.min.js>` its accessibility (CI runs both for a pull request that changes the site).
+
+The reference pages (`config.md`, `parental-controls.md`, `companion-app.md`) are in English only. [`hardware-test.md`](../../docs/hardware-test.md), the checklist to go through on a console, is for contributors: in English and French only, it is not on the website (not in `tools/build_site.py`'s `DOCS`), so a guide's link to it opens it on GitHub.

@@ -6,8 +6,8 @@ Errors:
 - a PLAYGUARD_SIM_* variable read anywhere in source/ without its entry in
   params.json (its name in lower case without the prefix), or an entry no
   variable matches any more;
-- a variable read in source/ that CONTRIBUTING.md's table of the desktop
-  simulator does not describe, or one it describes that nothing reads;
+- a variable read in source/ that docs/contributing/simulator.md's table
+  does not describe, or one it describes that nothing reads;
 - `live` on a variable PlayGuard reads once only: in the simulated console's
   first state (sim_defaults(), source/sim/sim_state.c) or into a static;
 - an entry of an unknown group or type, a select or a list without options,
@@ -61,16 +61,16 @@ def main():
                 if m:
                     once |= set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", m.group(1)))
 
-    # CONTRIBUTING.md's table of the variables, under "The desktop simulator".
-    with open(os.path.join(root, "CONTRIBUTING.md"), encoding="utf-8") as f:
-        m = re.search(r"\n## The desktop simulator\n(.*?)\n## ", f.read(), re.S)
-    documented = set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", m.group(1))) if m else set()
-    if not m:
-        errors.append("CONTRIBUTING.md: no section \"The desktop simulator\"")
+    # The simulator's page: its table of the variables.
+    simulator = os.path.join("docs", "contributing", "simulator.md")
+    with open(os.path.join(root, simulator), encoding="utf-8") as f:
+        documented = set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", f.read()))
+    if not documented:
+        errors.append(f"{simulator}: no PLAYGUARD_SIM_* variable described")
     for v in sorted(read - documented):
-        errors.append(f"PLAYGUARD_SIM_{v} is read in source/ but CONTRIBUTING.md's table does not describe it")
+        errors.append(f"PLAYGUARD_SIM_{v} is read in source/ but {simulator}'s table does not describe it")
     for v in sorted(documented - read):
-        errors.append(f"CONTRIBUTING.md describes PLAYGUARD_SIM_{v}, which nothing in source/ reads any more")
+        errors.append(f"{simulator} describes PLAYGUARD_SIM_{v}, which nothing in source/ reads any more")
 
     with open(os.path.join(root, "web", "params.json"), encoding="utf-8") as f:
         manifest = json.load(f)
