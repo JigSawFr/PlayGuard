@@ -2,10 +2,10 @@
 
 <!-- Console › Atmosphère, hekate or Firmware: the release notes.
      A tab for the installed version and one for each newer one (L / R move
-     from one to the next), a bar while they are fetched, what updating the
-     firmware needs first, then the chosen version's tags, title, notes and
-     its page as a QR code (See online), and when they were fetched (X
-     fetches them again). Filled by sys_notes_activity.cpp. -->
+     from one to the next), a bar at the header's right while they are
+     fetched, what updating the firmware needs first, then the chosen
+     version's tags, title, notes and its page as a QR code (See online), and
+     when they were fetched (X fetches them again). Filled by sys_notes_activity.cpp. -->
 
 <brls:AppletFrame
     iconInterpolation="linear">
@@ -28,11 +28,12 @@
             paddingBottom="@style/brls/sidebar/padding_bottom"
             paddingLeft="@style/brls/sidebar/padding_left">
 
-            <!-- While the notes are fetched: a bar and what is fetched. -->
-            <brls:Box id="sn_loading" width="auto" height="auto" axis="column" alignItems="center"
-                marginTop="8" marginBottom="24" visibility="gone">
-                <LoadingBar id="sn_loading_bar" width="420" height="8" marginBottom="14"/>
-                <brls:Label id="sn_loading_text" text=" " fontSize="18" horizontalAlign="center"
+            <!-- While the notes are fetched: a bar and what is fetched, moved by
+                 the code into the header, at its right. -->
+            <brls:Box id="sn_loading" width="340" height="auto" axis="column" alignItems="flexEnd"
+                visibility="gone">
+                <LoadingBar id="sn_loading_bar" width="300" height="8" marginBottom="8"/>
+                <brls:Label id="sn_loading_text" text=" " fontSize="16" horizontalAlign="right"
                     textColor="@theme/cadran/text3"/>
             </brls:Box>
             <!-- Between the L and R icons (set in the code); the tabs themselves
