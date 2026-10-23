@@ -174,21 +174,9 @@ static void settings_screen_of(brls::View* focus)
     if (!frame || !frame->getView("main_tabs")) return;
     auto* tools = VersionBadge::header_tools(frame);
     if (!tools || tools->getView(LANGUAGE_ID)) return;
-    // The keys that open them from any tab, which the footer leaves out
-    // (MainActivity): ⊖ before the language, theme and text size, Ⓨ before
-    // the bell. As the keys under the week are drawn (kit::key).
-    const auto key = [](const char* letter, float right) {
-        brls::Box* k = cadran::kit::key(letter, 18);
-        k->setFocusable(false);
-        k->setAlignSelf(brls::AlignSelf::CENTER);
-        k->setMarginRight(right);
-        return k;
-    };
-    tools->addView(key("−", 5), 0);
-    tools->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 1);
-    tools->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 2);
-    tools->addView(new HeaderSetting(HeaderSetting::Kind::TEXT_SIZE), 3);
-    tools->addView(key("Y", 3), 4);   // the bell is there already (main.cpp installs it first)
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 0);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 1);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::TEXT_SIZE), 2);
 }
 
 void HeaderSetting::install()

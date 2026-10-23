@@ -35,7 +35,7 @@ As capturas de ecrã mostram o tema escuro, o predefinido do PlayGuard (em ingl�
 A aplicação está organizada em separadores, como as Definições da consola; cada um tem a sua secção abaixo.
 
 - **O que falhou é dito numa caixa de diálogo, o que correu bem numa mensagem breve.** Uma caixa de diálogo só diz o que se aplica a esta consola neste momento: que o jogo em curso seria suspenso, só enquanto há um jogo aberto; que a aplicação móvel poderia substituir uma alteração, só enquanto está associada e consegue sincronizar.
-- **O cabeçalho** indica, em todos os separadores, quando o controlo parental está desbloqueado temporariamente (a sua etiqueta), e quando a aplicação está só de leitura (a etiqueta diz então *Só de leitura*, e as ações que escreveriam ficam a cinzento e são recusadas, indicando onde se desativa); tocar-lhe leva ao sítio onde isso se desfaz (*Hoje › Reativar*, o ecrã do firmware ou *Ajuda e diagnóstico*). Um pequeno ⊖ antes do idioma e um Ⓨ antes do sino indicam os botões que os abrem a partir de qualquer separador.
+- **O cabeçalho** indica, em todos os separadores, quando o controlo parental está desbloqueado temporariamente (a sua etiqueta), e quando a aplicação está só de leitura (a etiqueta diz então *Só de leitura*, e as ações que escreveriam ficam a cinzento e são recusadas, indicando onde se desativa); tocar-lhe leva ao sítio onde isso se desfaz (*Hoje › Reativar*, o ecrã do firmware ou *Ajuda e diagnóstico*). O rodapé indica os botões que os abrem a partir de qualquer separador: ⊖ para o idioma e o tema, Ⓨ para as notificações (com o seu número).
 - **No modo só de leitura**, as ações ficam no lugar, a cinzento, e dizem porquê quando são premidas.
 
 ## O aspeto: Cadran

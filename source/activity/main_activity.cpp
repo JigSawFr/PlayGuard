@@ -112,13 +112,15 @@ void MainActivity::onContentAvailable()
         return true;
     });
 
-    // Y: the notification bell's list, from any tab. Not in the footer: the
-    // header's bell shows it (and its count), and the footer keeps its room
-    // for the screen's own keys.
+    // Y: the notification bell's list, from any tab, its count in the footer.
+    // A tab with its own Ⓨ shows that one instead (the focused view's wins).
+    // With − below, the footer's optional keys: left out of it, − first, when
+    // a screen's own keys need their room (patches/borealis/0020).
+    brls::setHintsOptionalOwner(this->getContentView());
     this->getContentView()->registerAction("playguard/notices/hint"_i18n, brls::BUTTON_Y, [](brls::View*) {
         NoticesActivity::open();
         return true;
-    }, true);
+    });
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test). Not in
     // a browser, where the page presses Ⓨ itself for the Y key (web/README.md).
@@ -127,12 +129,12 @@ void MainActivity::onContentAvailable()
         return true;
     });
 #endif
-    // −: the language and the theme (also a tap on them in the header, which
-    // shows them: not in the footer either).
+    // −: the language and the theme, in the footer (also a tap on them in
+    // the header, which shows them).
     this->getContentView()->registerAction("playguard/quick/hint"_i18n, brls::BUTTON_BACK, [](brls::View*) {
         ui::quick_settings(TabBase::refresh_shown);
         return true;
-    }, true);
+    });
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_MINUS), [](brls::View*) {
         ui::quick_settings(TabBase::refresh_shown);
@@ -221,6 +223,7 @@ void MainActivity::onContentAvailable()
 MainActivity::~MainActivity()
 {
     notices::unlisten(this->notice_listener);
+    if (brls::getHintsOptionalOwner() == this->getContentView()) brls::setHintsOptionalOwner(nullptr);
 }
 
 void MainActivity::update_notice_hint()

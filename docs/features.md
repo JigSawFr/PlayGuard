@@ -34,7 +34,7 @@ The screenshots show the dark theme, PlayGuard's default.
 The app is organised in tabs, like System Settings; each has its section below.
 
 - **What failed is said in a dialog, what worked in a toast.** A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync.
-- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and while the app is read-only (its pill then says *Read-only*, the actions that would write greyed and refused with where to turn it off); a tap on it goes where it is undone (*Today › Turn back on*, the firmware screen or *Help & diagnostics*). A small ⊖ before the language and Ⓨ before the bell say the keys that open them from any tab.
+- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and while the app is read-only (its pill then says *Read-only*, the actions that would write greyed and refused with where to turn it off); a tap on it goes where it is undone (*Today › Turn back on*, the firmware screen or *Help & diagnostics*). The footer shows the keys that open them from any tab: ⊖ for the language and theme, Ⓨ for the notifications (with their count).
 - **In read-only mode**, actions stay in place, greyed, and say why when pressed.
 
 ## The look: Cadran

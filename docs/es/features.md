@@ -35,7 +35,7 @@ Las capturas muestran el tema oscuro, el predeterminado de PlayGuard (en inglés
 La aplicación está organizada en pestañas, como la configuración de la consola; cada una tiene su sección a continuación.
 
 - **Lo que ha fallado se indica en un cuadro de diálogo; lo que ha funcionado, en un aviso breve.** Un cuadro de diálogo solo dice lo que se aplica a esta consola en ese momento: que el juego en curso se suspendería, solo mientras hay un juego abierto; que la aplicación móvil podría sobrescribir un cambio, solo mientras está vinculada y puede sincronizarse.
-- **La cabecera** indica, en todas las pestañas, cuándo el control parental está desbloqueado temporalmente (su píldora), y cuándo la aplicación está en solo lectura (su píldora dice entonces *Solo lectura*, y las acciones que escribirían aparecen en gris y se rechazan indicando dónde desactivarlo); al tocarla, lleva a donde se deshace (*Hoy › Reactivar*, la pantalla del firmware o *Ayuda y diagnóstico*). Un pequeño ⊖ delante del idioma y un Ⓨ delante de la campana indican los botones que los abren desde cualquier pestaña.
+- **La cabecera** indica, en todas las pestañas, cuándo el control parental está desbloqueado temporalmente (su píldora), y cuándo la aplicación está en solo lectura (su píldora dice entonces *Solo lectura*, y las acciones que escribirían aparecen en gris y se rechazan indicando dónde desactivarlo); al tocarla, lleva a donde se deshace (*Hoy › Reactivar*, la pantalla del firmware o *Ayuda y diagnóstico*). El pie de página indica los botones que los abren desde cualquier pestaña: ⊖ para el idioma y el tema, Ⓨ para las notificaciones (con su número).
 - **En solo lectura**, las acciones siguen en su sitio, en gris, y explican por qué al pulsarlas.
 
 ## El aspecto: Cadran

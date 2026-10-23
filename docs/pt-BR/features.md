@@ -35,7 +35,7 @@ As capturas de tela mostram o tema escuro, o padrão do PlayGuard (em inglês).
 O app é organizado em abas, como as Configurações do console; cada uma tem sua seção abaixo.
 
 - **O que falhou é dito em uma caixa de diálogo, o que deu certo em uma mensagem rápida.** Uma caixa de diálogo só diz o que vale para este console agora: que o jogo em andamento seria suspenso, só quando há um jogo aberto; que o app do celular poderia substituir uma mudança, só enquanto ele estiver vinculado e puder sincronizar.
-- **O cabeçalho** indica, em todas as abas, quando o controle parental está desbloqueado temporariamente (a etiqueta dele), e quando o app está somente leitura (a etiqueta diz então *Somente leitura*, e as ações que gravariam ficam em cinza e são recusadas, dizendo onde desativar); um toque nela leva aonde isso é desfeito (*Hoje › Reativar*, a tela de firmware ou *Ajuda e diagnóstico*). Um pequeno ⊖ antes do idioma e um Ⓨ antes do sino mostram os botões que os abrem em qualquer aba.
+- **O cabeçalho** indica, em todas as abas, quando o controle parental está desbloqueado temporariamente (a etiqueta dele), e quando o app está somente leitura (a etiqueta diz então *Somente leitura*, e as ações que gravariam ficam em cinza e são recusadas, dizendo onde desativar); um toque nela leva aonde isso é desfeito (*Hoje › Reativar*, a tela de firmware ou *Ajuda e diagnóstico*). O rodapé mostra os botões que os abrem em qualquer aba: ⊖ para o idioma e o tema, Ⓨ para as notificações (com a contagem).
 - **No modo somente leitura**, as ações continuam no lugar, em cinza, e dizem por quê quando pressionadas.
 
 ## O visual: Cadran

@@ -35,7 +35,7 @@ Les captures montrent le thème sombre, celui par défaut (en anglais).
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
 
 - **Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification.** Un dialogue ne dit que ce qui s'applique à cette console maintenant : que le jeu en cours serait suspendu, seulement quand un jeu est ouvert ; que l'application compagnon pourrait écraser une modification, seulement quand elle est associée et peut se synchroniser.
-- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et que l'application est en lecture seule (sa pastille dit alors *Lecture seule*, les actions qui écriraient sont grisées et refusées en disant où la désactiver) ; la toucher mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware ou *Aide et diagnostic*). Un petit ⊖ avant la langue et un Ⓨ avant la cloche indiquent les touches qui les ouvrent depuis n'importe quel onglet.
+- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et que l'application est en lecture seule (sa pastille dit alors *Lecture seule*, les actions qui écriraient sont grisées et refusées en disant où la désactiver) ; la toucher mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware ou *Aide et diagnostic*). Le pied de page indique les touches qui les ouvrent depuis n'importe quel onglet : ⊖ pour la langue et le thème, Ⓨ pour les notifications (avec leur nombre).
 - **En lecture seule**, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 ## L'apparence : Cadran

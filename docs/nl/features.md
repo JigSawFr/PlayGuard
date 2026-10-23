@@ -35,7 +35,7 @@ De schermafbeeldingen tonen het donkere thema, de standaard van PlayGuard (in he
 De app is in tabbladen ingedeeld, zoals de systeeminstellingen; elk tabblad heeft hieronder een eigen sectie.
 
 - **Wat mislukt, staat in een dialoogvenster; wat lukt, in een korte melding.** Een dialoogvenster zegt alleen wat nu voor deze console geldt: dat de lopende game zou worden onderbroken, alleen zolang er een game open is; dat de smartphone-app een wijziging zou kunnen overschrijven, alleen zolang die gekoppeld is en kan synchroniseren.
-- **De kopregel** geeft op elk tabblad aan wanneer ouderlijk toezicht tijdelijk ontgrendeld is (met de pil), en wanneer de app alleen-lezen is (de pil zegt dan *Alleen-lezen*; acties die zouden schrijven zijn grijs en worden geweigerd, met waar je het uitzet); erop tikken brengt je naar de plek waar je het ongedaan maakt (*Vandaag › Weer inschakelen*, het firmwarescherm of *Hulp en diagnose*). Een kleine ⊖ voor de taal en Ⓨ voor de bel tonen de knoppen die ze vanuit elk tabblad openen.
+- **De kopregel** geeft op elk tabblad aan wanneer ouderlijk toezicht tijdelijk ontgrendeld is (met de pil), en wanneer de app alleen-lezen is (de pil zegt dan *Alleen-lezen*; acties die zouden schrijven zijn grijs en worden geweigerd, met waar je het uitzet); erop tikken brengt je naar de plek waar je het ongedaan maakt (*Vandaag › Weer inschakelen*, het firmwarescherm of *Hulp en diagnose*). De voettekst toont de knoppen die ze vanuit elk tabblad openen: ⊖ voor de taal en het thema, Ⓨ voor de meldingen (met hun aantal).
 - **In alleen-lezenmodus** blijven de acties op hun plaats, grijs, en zeggen ze waarom als je erop drukt.
 
 ## Het uiterlijk: Cadran
