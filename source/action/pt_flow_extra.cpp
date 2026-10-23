@@ -203,7 +203,7 @@ static void plan_bonus(std::function<void()> refresh)
         const uint16_t base = pt.day_min[day.weekday];
         ui::pick(brls::getStr("playguard/dashboard/bonus_amount_title", ui::day_name(day.weekday)), labels, 0,
                  [day, base, amounts, refresh](int i) {
-            const uint16_t value = (uint16_t)std::min(1440, base + amounts[(size_t)i]);
+            const uint16_t value = pt_logic::plan_extra(base, (uint16_t)amounts[(size_t)i], false, base).value;
             const std::string body = brls::getStr("playguard/dashboard/bonus_body", ui::day_name(day.weekday),
                                                   ui::fmt_minutes(base), ui::fmt_minutes(value), ui::fmt_minutes(base));
             confirm_write(body, "playguard/dashboard/extra_confirm"_i18n, [day, base, value, refresh](bool did_unlock) {
