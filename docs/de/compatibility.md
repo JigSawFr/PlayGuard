@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # Kompatibilität
 
 Unterstützte Firmware, Atmosphère und Launcher, emuMMC und sysMMC, und wie PlayGuard sich mit einem Ersatz-Sysmodul vergleicht. Zurück zum [README](../../README.md).
@@ -16,7 +16,7 @@ Unterstützte Firmware, Atmosphère und Launcher, emuMMC und sysMMC, und wie Pla
 - **Firmware 23.0.0** — Atmosphère 1.12.0. Dieselben Befehle wie 23.0.1 in der Tabelle von [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) (auf Englisch).
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Alle Funktionen.
 
-**Vor 21.0.0 alles außer dem Timer** — Einschränkungen, Geheimzahl, vorübergehendes Aufheben, Aktivität, Netzwerkuhr, Smart-Geräte-App und Verlauf funktionieren. Der Einstellungsblock des Timers (0x44 Bytes) hat diesen Aufbau erst seit 21.0.0, daher schaltet PlayGuard aus, was darin liegt: die Tageslimits, den Gute-Nacht-Alarm, die Zusatzzeit und die Konsolensperre.
+**Vor 21.0.0 alles außer dem Timer** — Einschränkungen, Geheimzahl, vorübergehendes Aufheben, Aktivität, Netzwerkuhr, Smart-Geräte-App und Verlauf funktionieren. Der Einstellungsblock des Timers (0x44 Bytes) hat diesen Aufbau erst seit 21.0.0, daher schaltet PlayGuard aus, was darin liegt: die Tageslimits, den Gute-Nacht-Alarm, die Zusatzzeit und *Alle Spiele sperren*.
 
 - **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
 - **Firmware 19.0.x** — Atmosphère 1.8.0
