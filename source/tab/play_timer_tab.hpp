@@ -61,6 +61,7 @@ class PlayTimerTab : public TabBase
     BRLS_BIND(brls::DetailCell,  extra_amounts,   "pt_extra_amounts");
     BRLS_BIND(brls::BooleanCell, extra_auto,      "pt_extra_auto");
     BRLS_BIND(brls::DetailCell,  advanced,        "pt_advanced");
+    BRLS_BIND(brls::DetailCell,  remove_cell,     "pt_remove");
     BRLS_BIND(brls::Label,       kicker,          "pt_kicker");
     BRLS_BIND(CadranDigits,      summary,         "pt_week_summary");
     BRLS_BIND(brls::Box,         profile_chip,    "pt_profile");
@@ -82,5 +83,4 @@ class PlayTimerTab : public TabBase
     BRLS_BIND(CadranDigits,      bed_end,         "pt_bed_end");
     BRLS_BIND(brls::Box,         time_up_chip,    "pt_time_up");
     BRLS_BIND(brls::Label,       time_up_value,   "pt_time_up_value");
-    BRLS_BIND(brls::Box,         remove_chip,     "pt_remove");
 };

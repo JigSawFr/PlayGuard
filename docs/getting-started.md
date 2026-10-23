@@ -56,7 +56,7 @@ A console without Internet: when no server answers, PlayGuard offers to set the 
 
 ## 8. Hand the console over
 
-*Today › Show the child* shows only the time left and when play ends, large enough to read from across the room. Ⓐ and the PIN bring the parent's screens back.
+*Today › Child view* shows only the time left and when play ends, large enough to read from across the room. Ⓐ and the PIN bring the parent's screens back.
 
 > [!IMPORTANT]
 > **A game left open on the HOME menu keeps counting.** Close it, or put the console in sleep mode ([what counts](features.md#what-counts-as-play-time)).

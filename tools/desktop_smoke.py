@@ -2038,7 +2038,7 @@ if not GAMES:
     button_x()                 # Ⓧ: Monday's picker
     shot("19_day_picker")
     key("Down", 15)            # to the end of the list (No limit) …
-    key("Up")                  # … then Enter a duration...: the stepper
+    key("Up")                  # … then Enter a duration…: the stepper
     key("Return")
     shot("22_stepper")
     key("Up", 2)               # 2 h → 2 h 30
@@ -2131,7 +2131,7 @@ if not GAMES:
     shot("24_backup_saved")
     if (len(os.listdir(backups)) if os.path.isdir(backups) else 0) != before + 1:
         fail("Return on 'Back up the settings' saved no backup (wrong cell focused?)")
-    key("Down")                # Restore a backup...
+    key("Down")                # Restore a backup…
     key("Return")
     shot("25_backup_list")
     key("Return")
@@ -2385,7 +2385,7 @@ key("Escape")
 key_to_end("Up", hold=0.15)   # the top: the accounts' chips
 key_to_end("Right")        # the row's last chip: Export or share
 key("Return")
-go_to("Save to the SD card...")   # the formats (the other line: the week as a QR code)
+go_to("Save to the SD card…")   # the formats (the other line: the week as a QR code)
 key("Return")
 go_to("PDF")
 key("Return")

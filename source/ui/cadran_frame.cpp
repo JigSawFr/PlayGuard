@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "activity/main_activity.hpp"
+#include "app.hpp"
 #include "core/sim_env.h"
 #include "tab/cadran_list.hpp"
 #include "tab/tab_base.hpp"
@@ -284,12 +285,15 @@ void cadran::set_pill(const std::string& text, const char* glyph, Tone tone)
 void cadran::refresh_pill()
 {
     if (!s_main_pill || !s_main_pill_label || !s_main_pill_icon) return;
-    // Unlocked: that first, on every screen (what a tab says comes back
-    // once locked again).
+    // Unlocked, then read-only: that first, on every screen (what a tab
+    // says comes back once locked again, or writable).
     const bool unlocked = ui::known_unlocked();
-    const std::string text = unlocked ? "playguard/cadran/pill/unlocked"_i18n : s_pill_text;
-    const char* glyph = unlocked ? "unlock" : s_pill_glyph.c_str();
-    const Tone tone = unlocked ? Tone::WARN : s_pill_tone;
+    const bool read_only = !unlocked && app::read_only();
+    const std::string text = unlocked    ? "playguard/cadran/pill/unlocked"_i18n
+                             : read_only ? "playguard/cadran/pill/read_only"_i18n
+                                         : s_pill_text;
+    const char* glyph = unlocked ? "unlock" : read_only ? "pencil-off" : s_pill_glyph.c_str();
+    const Tone tone = unlocked || read_only ? Tone::WARN : s_pill_tone;
     brls::Theme theme = brls::Application::getTheme();
     const NVGcolor ink = tone == Tone::DANGER ? theme["cadran/coral"]
                          : tone == Tone::WARN ? theme["cadran/amber"]
@@ -364,9 +368,10 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     pill->addView(pill_label);
     right->addView(pill);
     if (with_date) {   // the main screen: its pill is the one set_pill() changes
-        // Touched while unlocked, it goes where the padlock it replaces went.
+        // Touched while unlocked or read-only, it goes where that is undone.
         pill->addGestureRecognizer(new brls::TapGestureRecognizer(pill, []() {
             if (ui::known_unlocked()) TitleState::open(TitleState::Kind::UNLOCKED);
+            else if (app::read_only()) TitleState::open(TitleState::Kind::READ_ONLY);
         }));
         s_main_pill = pill;
         s_main_pill_label = pill_label;

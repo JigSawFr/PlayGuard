@@ -6,7 +6,7 @@
 // (branding/mark.svg); for the other screens, in the same strokes: key,
 // unlock, phone, trash, server, pin, refresh, history, restore, save, upload,
 // language, contrast, home, bolt, sparkle, bell, chip, code, heart, folder,
-// file, flag, gamepad, calendar, alert, pencil, tag, user, sun, tv,
+// file, flag, gamepad, calendar, alert, pencil, pencil-off, tag, user, sun, tv,
 // text-normal, text-large.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once

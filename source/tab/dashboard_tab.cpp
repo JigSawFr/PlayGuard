@@ -308,6 +308,11 @@ void DashboardTab::refresh()
     const bool can_extra = pt_logic::can_add_extra_time(pt, today, false);
     ui::set_visible(chips.getView(), can_extra);
     ui::set_visible(stop.getView(), pt_logic::can_stop_today(pt, today, false));
+    // Read-only: the actions that write stay in sight, greyed (A says why
+    // and where it is turned off), as on the other tabs.
+    const float alpha = app::read_only() ? 0.45f : 1.0f;
+    for (brls::View* v : { (brls::View*)chips.getView(), (brls::View*)stop.getView(), (brls::View*)profile.getView() })
+        v->setAlpha(alpha);
     ui::set_visible(relock.getView(), unlocked && !app::read_only());
     ui::set_visible(setup.getView(), !unlocked && !app::read_only() && pt.fw_supported && pt.valid &&
                                          !pt_configured(pt.block));
