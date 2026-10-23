@@ -463,7 +463,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 - Ce qui règle PlayGuard lui-même :
   - En tuiles d'abord : langue (toutes celles de la console, ou celle de la console), thème (sombre par défaut, clair, ou celui de la console), taille du texte (automatique / normale / plus grande) et l'onglet d'ouverture.
-  - **L'intro** au lancement : l'écran de chargement pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
+  - **L'intro** au lancement : l'écran de chargement (son icône à l'anneau tournant, la barre, le cadran de Cadran à droite) pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).
   - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).

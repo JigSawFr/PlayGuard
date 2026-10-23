@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- The loading screen (activity/loading_activity.hpp), in the brand colours of
-     the store banner (the light theme: its cool white, the wordmark and the
+     the store banner, Cadran's dial on the right (the light theme: its cool white, the wordmark and the
      bar in its inks, LoadingActivity::onContentAvailable): the icon with its
      ring turning, the wordmark, the tagline, and a progress bar over the
      start-up steps. -->
@@ -14,6 +14,15 @@
     justifyContent="center"
     alignItems="center"
     backgroundColor="#0B1424">
+
+    <!-- Cadran's dial on the right, behind the rest (as the PIN gate's). -->
+    <LoadingDial
+        id="loading_dial"
+        width="1280"
+        height="720"
+        positionType="absolute"
+        positionTop="0"
+        positionLeft="0"/>
 
     <LoadingMark
         width="168"

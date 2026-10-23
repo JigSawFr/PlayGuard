@@ -462,7 +462,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 - What sets PlayGuard itself up:
   - As tiles first: language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger) and the tab to start on.
-  - **The intro** at start-up: the loading screen for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
+  - **The intro** at start-up: the loading screen (its icon with the ring turning, the bar, Cadran's dial on the right) for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
 - The messages it shows:
   - The kinds of notifications (see [above](#how-entries-behave)).
   - A **monthly reminder to support PlayGuard** (on by default, never in the first month nor right after an update; *Don't show again* on the reminder or this switch turns it off for good, updates included).
