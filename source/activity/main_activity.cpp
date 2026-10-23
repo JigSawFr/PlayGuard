@@ -14,6 +14,7 @@
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
 #include "action/schedule_flow.hpp"
+#include "action/session_pause.hpp"
 #include "action/support_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/forwarders_activity.hpp"
@@ -58,7 +59,8 @@ static void compact_sidebar(brls::View* tab_frame)
 void MainActivity::quit_or_relock()
 {
     bool unlocked = false;
-    if (app::read_only() || R_FAILED(pctl_lock_state(nullptr, &unlocked)) || !unlocked) {
+    // PlayGuard's own pause locks again by itself as it closes (session_pause::end).
+    if (app::read_only() || session_pause::active() || R_FAILED(pctl_lock_state(nullptr, &unlocked)) || !unlocked) {
         brls::Application::quit();
         return;
     }

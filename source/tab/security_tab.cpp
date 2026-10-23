@@ -8,6 +8,7 @@
 #include "action/pin_lock.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
+#include "action/session_pause.hpp"
 #include "activity/forwarders_activity.hpp"
 #include "app.hpp"
 #include "ui/cadran_frame.hpp"
@@ -134,17 +135,21 @@ void SecurityTab::refresh()
 
     ui::set_detail(restrictions, ui::bool_text(s.restriction_enabled_ok, s.restriction_enabled,
                                                "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
-    // Said as a state, not as "unlocked: no" under a check.
-    ui::set_detail(temp, ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
-                                       "playguard/cadran/pill/unlocked"_i18n, "playguard/dashboard/pc_active"_i18n));
-    temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    // Said as a state, not as "unlocked: no" under a check. PlayGuard's own
+    // pause while the parent is here is no warning: it ends as it is left.
+    const bool paused = session_pause::active() && s.temp_unlocked_ok && s.temp_unlocked;
+    if (paused) ui::set_detail(temp, "playguard/cadran/pill/paused"_i18n);
+    else ui::set_detail(temp, ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
+                                            "playguard/cadran/pill/unlocked"_i18n, "playguard/dashboard/pc_active"_i18n));
+    temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked && !paused ? cadran::kit::color("cadran/amber")
+                                                                               : cadran::kit::color("cadran/text2"));
     // Each tile's state at a glance: a check when it is as it should be, a
     // warning when it needs the parent; nothing when it could not be read.
     constexpr const char* OK = "cadran/teal_fill";
     constexpr const char* WARN = "cadran/amber_fill";
     this->list.state("sc_pin", !s.pin_length_ok ? nullptr : s.pin_length ? OK : WARN);
     this->list.state("sc_restrictions", !s.restriction_enabled_ok ? nullptr : s.restriction_enabled ? OK : WARN);
-    this->list.state("sc_temp", !s.temp_unlocked_ok ? nullptr : s.temp_unlocked ? WARN : OK);
+    this->list.state("sc_temp", !s.temp_unlocked_ok ? nullptr : s.temp_unlocked && !paused ? WARN : OK);
     // Open is how most consoles are, and fine without forwarders: no warning,
     // only a check once it is locked.
     const std::string hb_state = this->hbmenu_locked ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n;

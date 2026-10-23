@@ -385,13 +385,17 @@ void cadran::refresh_pill()
     if (!s_main_pill || !s_main_pill_label || !s_main_pill_icon) return;
     // Unlocked, then read-only: that first, on every screen (what a tab
     // says comes back once locked again, or writable).
-    const bool unlocked = ui::known_unlocked();
-    const bool read_only = !unlocked && app::read_only();
-    const std::string text = unlocked    ? "playguard/cadran/pill/unlocked"_i18n
+    // PlayGuard's own pause while the parent is in it: said calmly, as a
+    // state of the tab would be (it ends by itself).
+    const bool paused = ui::known_paused();
+    const bool unlocked = ui::known_unlocked() && !paused;
+    const bool read_only = !unlocked && !paused && app::read_only();
+    const std::string text = paused      ? "playguard/cadran/pill/paused"_i18n
+                             : unlocked  ? "playguard/cadran/pill/unlocked"_i18n
                              : read_only ? "playguard/cadran/pill/read_only"_i18n
                                          : s_pill_text;
-    const char* glyph = unlocked ? "unlock" : read_only ? "pencil-off" : s_pill_glyph.c_str();
-    const Tone tone = unlocked || read_only ? Tone::WARN : s_pill_tone;
+    const char* glyph = paused ? "pause" : unlocked ? "unlock" : read_only ? "pencil-off" : s_pill_glyph.c_str();
+    const Tone tone = unlocked || read_only ? Tone::WARN : paused ? Tone::OK : s_pill_tone;
     brls::Theme theme = brls::Application::getTheme();
     const NVGcolor ink = tone == Tone::DANGER ? theme["cadran/coral"]
                          : tone == Tone::WARN ? theme["cadran/amber"]
@@ -466,9 +470,11 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     pill->addView(pill_label);
     right->addView(pill);
     if (with_date) {   // the main screen: its pill is the one set_pill() changes
-        // Touched while unlocked or read-only, it goes where that is undone.
+        // Touched while paused, unlocked or read-only, it says why or goes
+        // where that is undone.
         pill->addGestureRecognizer(new brls::TapGestureRecognizer(pill, []() {
-            if (ui::known_unlocked()) TitleState::open(TitleState::Kind::UNLOCKED);
+            if (ui::known_paused()) TitleState::open(TitleState::Kind::PAUSED);
+            else if (ui::known_unlocked()) TitleState::open(TitleState::Kind::UNLOCKED);
             else if (app::read_only()) TitleState::open(TitleState::Kind::READ_ONLY);
         }));
         s_main_pill = pill;

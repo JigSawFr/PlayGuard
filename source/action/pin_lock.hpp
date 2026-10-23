@@ -53,7 +53,10 @@ void watch_focus(std::function<void()> lock);
 bool at_start();
 
 // Asks for the PIN now. True when it was entered, or when no PIN is set.
+// Entered, it pauses parental controls while PlayGuard is open (session_pause).
 bool ask();
+// The PIN was entered in this run and still holds (as confirm() lets through).
+bool holds();
 // Asks for the PIN unless it still holds (entered since PlayGuard opened, or
 // in the last 5 minutes with "Ask for the PIN again"), whatever the mode.
 bool confirm();

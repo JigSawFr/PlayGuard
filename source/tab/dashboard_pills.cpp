@@ -7,6 +7,7 @@
 
 #include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
+#include "action/session_pause.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/motion.hpp"
@@ -151,7 +152,9 @@ void DashboardTab::show_pills()
     this->dns_pill.on = true;
     this->counted_pill.rank = 0;
     this->home_pill.rank = 0;
-    this->counted_pill.on = !si.applet_mode;
+    // Not while paused for the parent here (session_pause): the time spent
+    // here then is not the child's.
+    this->counted_pill.on = !si.applet_mode && !session_pause::active();
     this->home_pill.on = this->home_counts() && si.applet_mode;
     this->order_pills();
 }

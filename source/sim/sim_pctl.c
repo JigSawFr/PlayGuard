@@ -335,9 +335,12 @@ void pctl_play_timer_query(PtState *o)
     pt_decode(c.block, days);
     const u16 limit = days[wd];
     const s64 played = (s64)sim_played_today_s();
-    const bool reached = o->enabled && (c.limit_reached || (limit != PT_DAY_NOLIMIT && (s64)limit * 60 <= played));
+    // 1454 and 1455 go on while temporarily unlocked, though 1453 reads
+    // false (docs/parental-controls.md): today's limit minus the time spent.
+    const bool counts = o->enabled || (c.temp_unlocked && c.block[0] != 0);
+    const bool reached = counts && (c.limit_reached || (limit != PT_DAY_NOLIMIT && (s64)limit * 60 <= played));
     o->remaining_valid = true;
-    o->remaining_ns = o->enabled && !reached && limit != PT_DAY_NOLIMIT && !sim_env_flag("PLAYGUARD_SIM_IDLE")
+    o->remaining_ns = counts && !reached && limit != PT_DAY_NOLIMIT && !sim_env_flag("PLAYGUARD_SIM_IDLE")
                           ? ((s64)limit * 60 - played) * 1000000000LL + 20000000000LL - (s64)counting_ns() : 0;
     // The last minutes of the day's time, whatever the limit (the child screen's end).
     const long long left_min = sim_env_int("PLAYGUARD_SIM_LEFT_MIN", -1, 0, 24 * 60);

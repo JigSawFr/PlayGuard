@@ -178,6 +178,7 @@ changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
 support_SRC   := source/util/date.cpp source/util/support.cpp tests/support/test.cpp
 pt_logic_SRC   := source/action/pt_logic.cpp source/util/date.cpp tests/pt_logic/test.cpp
 pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
+session_pause_logic_SRC   := source/action/session_pause_logic.cpp tests/session_pause_logic/test.cpp
 console_lock_logic_SRC   := source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp
 history_logic_SRC   := source/util/date.cpp source/action/history_logic.cpp tests/history_logic/test.cpp
 self_test_logic_SRC   := source/action/self_test_logic.cpp tests/self_test_logic/test.cpp

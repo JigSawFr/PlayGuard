@@ -1986,6 +1986,7 @@
             "pc_on": "Control parental activo",
             "pc_off": "Desactivado",
             "unlocked": "Desbloqueado",
+            "paused": "Control parental en pausa",
             "read_only": "Solo lectura",
             "timer_on": "Temporizador activo",
             "timer_off": "Cuenta en pausa",
@@ -1993,6 +1994,10 @@
             "level": "Nivel · {}",
             "pin_set": "PIN definido",
             "pin_none": "Sin PIN"
+        },
+        "paused": {
+            "body": "El control parental está en pausa mientras estás en PlayGuard: el tiempo que pasas aquí no se descuenta del tiempo de juego del niño. Se reactiva solo en cuanto se sale de PlayGuard (menú HOME, modo de espera) o se cierra, y mientras está abierta la pantalla del niño.\n\nReactivado ahora, sigue activo hasta que se vuelva a ingresar el PIN.",
+            "relock": "Reactivar ahora"
         },
         "week": {
             "no_limit": "sin límite",

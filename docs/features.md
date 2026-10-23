@@ -41,7 +41,7 @@ The app is organised in tabs, like System Settings; each has its section below.
 
 PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-white palette (with the theme), cards instead of lists. Each tab opens on what matters most (a ring, tiles, cards, chips), its other settings underneath.
 
-- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *Today › Turn back on*. Secondary text is never under 15 px, to read from the couch on a TV. The footer's clock shows the hours and minutes (*16:00*).
+- **The header's pill** says what the tab is about (*Parental controls on*, *Play timer on*…); while parental controls are unlocked it says so on every tab, and a tap on it opens *Today › Turn back on*; while they are paused for you (see [below](#the-pin-pauses-parental-controls-while-you-are-in-playguard)) it says *Parental controls paused*, calmly, and a tap says what that is. Secondary text is never under 15 px, to read from the couch on a TV. The footer's clock shows the hours and minutes (*16:00*).
 - **Dialogs** are cards with their buttons as pills, the confirmation in teal (in coral when it removes or stops something).
   - The choices open as a card above the hints, the current one on a soft teal with its check. The teal ring is the focus's alone, everywhere: a level, an account, a choice in force keeps the soft fill.
   - A long dialog fades at its foot while more follows, and its warning (a game about to be suspended) comes first, in an amber card.
@@ -140,7 +140,8 @@ Under it, what stops play first:
 - The console's state as **pills**:
   - one says whether Atmosphère's DNS redirection blocks Nintendo's servers, and Ⓐ on it which ones and what that changes: no sync for the companion app, no network clock setting itself;
   - another, opened as an application, that the time spent in PlayGuard counts: as that game when opened over a game (*Opened from a game*), under its icon's name when started from a forwarder on the HOME menu (*Opened from its HOME icon*), Ⓐ saying how;
-  - a game left open on the HOME menu shows as an amber pill (*still counts*, Ⓐ saying why), when the pill about PlayGuard's own time does not say it already.
+  - a game left open on the HOME menu shows as an amber pill (*still counts*, Ⓐ saying why), when the pill about PlayGuard's own time does not say it already;
+  - neither while parental controls are paused for you: the time spent here then is not the child's.
 - The pills put what needs the parent first (amber, with a triangle), then what is on (teal, with a check), then the rest (grey, with a dot): the shape says it as well as the colour.
 - What is fine and what is only said fold into one pill after those that need the parent (*✓ 3 checks fine*); Ⓐ on it shows them, for as long as the tab is open.
 - Under the pills, the extra time still to put back (Ⓐ puts it back) and the "time's up" alarm while it is off (Ⓐ turns it back on).
@@ -151,7 +152,7 @@ Until the PIN and the week's limits are set, a card above the cards lists the th
 
 ### Is the console counting?
 
-PlayGuard's own time counts while it runs as an application, so with a limit today the time left should go down while it is open. When it has not moved for about 90 s on screen (timer on, a limit today, not unlocked, not opened from the album), an amber line under the time played says *The console is not counting play time right now*, with the likely causes:
+PlayGuard's own time counts while it runs as an application, so with a limit today the time left should go down while it is open. When it has not moved for about 90 s on screen (timer on, a limit today, not unlocked nor paused for you, not opened from the album), an amber line under the time played says *The console is not counting play time right now*, with the likely causes:
 
 - the clock was set back (it counts again later);
 - the network clock was never set (*Console › Network clock*);
@@ -322,8 +323,15 @@ The PIN in PlayGuard itself:
 
 - Once entered, the PIN holds until PlayGuard closes; *Ask for the PIN again after 5 minutes* (off by default) asks again after them, and brings *To open PlayGuard*'s lock screen back when PlayGuard returns after 5 min or more out of focus.
 - Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even right after it was entered, and a missing or damaged `config.json` counts as *Before a change*.
+#### The PIN pauses parental controls while you are in PlayGuard
+
+- Once the PIN is entered (the lock screen of *To open PlayGuard*, the first change with *Before a change*, the child screen's way back…), PlayGuard unlocks parental controls temporarily, so the time spent in it does not take from the child's play time; *Opened from a game* leaves Today.
+- The header's pill says *Parental controls paused*, in teal; a tap says what that is, with *Turn back on now* (then not paused again until the PIN is entered again). Today shows the day as it is for the child, and the Security tile says *Parental controls paused* with no warning.
+- They come back on by themselves as soon as PlayGuard is left (HOME menu, sleep) or closed, from the HOME menu too (the exit waits for it), and while the child screen or the lock screen is up. Back in PlayGuard with the PIN still holding, they pause again.
+- Not from the album (the time does not count there, and a game may be left open behind), not in read-only mode, and never over an unlock made with *Unlock temporarily*, which stays as it is.
+- Recorded as any unlock: should PlayGuard stop without locking, its next start locks again, and a restart of the console does it by itself. It relies on the time not counting while unlocked, inferred but not measured yet ([below](#what-counts-as-play-time)).
 - **Lock the homebrew menu ›** opens *Console › Forwarders*, where it is locked after its checks (see [Forwarders](#forwarders)).
-- **Quitting** while parental controls are still unlocked asks whether to lock them again (*Turn back on and quit* also closes the game PlayGuard was opened over, back to the HOME menu rather than hbmenu); closed from the HOME menu instead, PlayGuard locks them again the next time it starts, and a restart of the console locks them by itself.
+- **Quitting** while parental controls are still unlocked asks whether to lock them again (*Turn back on and quit* also closes the game PlayGuard was opened over, back to the HOME menu rather than hbmenu); closed from the HOME menu instead, PlayGuard locks them again the next time it starts, and a restart of the console locks them by itself. PlayGuard's own pause asks nothing: it ends as PlayGuard closes.
 
 ### Companion app
 
@@ -519,5 +527,5 @@ The play timer is the console's: PlayGuard reads it, it does not count anything 
 | **PlayGuard opened over a game** (as an application) | **Yes**, as that game | Measured (22.0.0): open it with a parent's user, or from the album for a quick look |
 | **PlayGuard started from a forwarder** (its HOME menu icon, an application too) | **Yes**, under the icon's name | Inferred: an application like any other; not measured by PlayGuard |
 | PlayGuard opened from the album (applet mode) | No | Inferred: it is not an application, and time outside applications did not seem to count |
-| While parental controls are temporarily unlocked | Maybe not | Not measured: still open |
+| While parental controls are temporarily unlocked (PlayGuard's pause while you are in it, too) | Maybe not | Not measured: still open |
 | After the clock was changed | The day starts over; after a jump back the count stops until the clock passes the old time | Observed (22.0.0); *Today* says when the console is not counting |

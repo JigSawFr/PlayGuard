@@ -12,6 +12,7 @@
 #include "action/profile_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
+#include "action/session_pause.hpp"
 #include "action/timer_health.hpp"
 #include "activity/cadran_child_activity.hpp"
 #include "activity/main_activity.hpp"
@@ -268,9 +269,11 @@ void DashboardTab::refresh()
     SysInfo si;
     sysinfo_get(&si);
 
+    ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
+    // Paused for the parent here: the day as it is for the child.
+    session_pause::shown_as_locked(&s, &this->pt);
     const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
     const bool has_pin  = s.pin_length_ok && s.pin_length > 0;
-    ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
 
     const TodayLog log = read_today_log();
 

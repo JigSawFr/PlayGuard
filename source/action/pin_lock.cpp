@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "action/pin_lock_logic.hpp"
+#include "action/session_pause.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -100,9 +101,15 @@ bool ask()
     brls::Logger::info("pctl_ask_pin returned 0x{:08X}", (unsigned)rc);
     if (R_SUCCEEDED(rc)) {
         s_pin_at = std::chrono::steady_clock::now();
+        session_pause::pin_entered();
         return true;
     }
     return rc == NXM_RC_NO_PIN;   // nothing to ask for
+}
+
+bool holds()
+{
+    return pin_lock_logic::holds(s_pin_at, std::chrono::steady_clock::now(), config::get().pin_ask_again);
 }
 
 bool confirm()

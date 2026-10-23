@@ -1657,6 +1657,13 @@ if OUTSIDE:
         fail("Today never said the console is not counting")
     time.sleep(6)              # the next refresh shows it
     shot("02_not_counting")
+    # The Play timer says it too: before the PIN below, which pauses
+    # parental controls while PlayGuard is open (the time then stays still
+    # on purpose, nothing said).
+    key("Left")
+    key("Down")
+    key("Right")
+    shot("04_play_timer_not_counting")
     key("y")                   # the notification bell's list (the keyboard's Y): both, the
     # simulated network clock (not accurate) and PIN (1234) to do; the broken
     # games under Console, on one line.
@@ -1681,10 +1688,7 @@ if OUTSIDE:
     # entry, a press does nothing) scrolls it from the settled layout.
     key("Down", 10)
     shot("03_notices_ignored")  # under "Ignored", last
-    key("Escape")
-    key("Down")                # Play timer: its state line says it too
-    key("Right")
-    shot("04_play_timer_not_counting")
+    key("Escape")              # back on the Play timer
     key("Down")                # off the week chart (←/→ pick a day there)
     key("Left")
     key("Up")                  # back to Today, on the notice's Dismiss line
@@ -1715,7 +1719,8 @@ if CADRAN:
         key("Left")            # back to the sidebar
 
     # The child screen, then back to the parent's with the PIN (the simulated
-    # PIN screen accepts at once).
+    # PIN screen accepts at once), which pauses parental controls while
+    # PlayGuard is open (action/session_pause).
     key("Up", steps("dashboard", tabs[-1]))
     key("Right")               # Extra time, the hero's first action
     key("Down")                # Stop for today
@@ -1727,10 +1732,12 @@ if CADRAN:
     time.sleep(1)
     if not alive() or not logged("pctl_ask_pin returned"):
         fail("the child screen did not ask for the PIN to go back")
+    if not logged("session pause: parental controls paused"):
+        fail("the PIN entered did not pause parental controls")
     shot("12_today_again")
 
-    # The week edited with the stick: Monday +30 min, saved with the unlock the
-    # running timer needs.
+    # The week edited with the stick: Monday +30 min, saved at once: paused,
+    # the timer needs no unlock (the "smoke" scenario has that dialog).
     key("Left", 3)             # the sidebar (Escape there would ask to quit)
     key("Down", steps("dashboard", "play_timer"))
     key("Right")               # the profile chip
@@ -1742,9 +1749,6 @@ if CADRAN:
     key("Down")                # Discard, then Save
     key("Right")
     key("Return")
-    shot("14_week_confirm")
-    key("Right")               # Unlock and apply
-    key("Return")
     time.sleep(1)
     written = json.load(open(os.path.join(ROOT, "resources", "i18n", "en-US", "playguard.json")))["play_timer"]["written_days"]
     if not any(m.startswith(written) for m in messages()):
@@ -1752,8 +1756,9 @@ if CADRAN:
     time.sleep(3.5)            # the toast gone: the next screen is a reference
     shot("15_week_saved")
 
-    # A restriction level from its tile: the confirmation, cancelled.
-    key("Left", 2)
+    # A restriction level from its tile: the confirmation, cancelled. B to
+    # the sidebar: saved with no dialog, the focus stays where Save was.
+    key("Escape")
     key("Down", steps("play_timer", "restrictions"))
     key("Right")               # Young child, the first tile
     key("Right", 2)            # Teen

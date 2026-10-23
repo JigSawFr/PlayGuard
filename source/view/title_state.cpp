@@ -3,6 +3,7 @@
 
 #include <borealis.hpp>
 
+#include "action/console_actions.hpp"
 #include "action/fw_gate.hpp"
 #include "ui/hooks.hpp"
 #include "ui/ui.hpp"
@@ -16,6 +17,14 @@ static void open_unlocked()
 {
     // Today, on "Turn back on".
     ui::open_tab(ui::tab::dashboard, "dash_relock");
+}
+
+static void open_paused()
+{
+    // Nothing to undo: it ends by itself as PlayGuard is left. Said, with a
+    // way to turn them back on now (until the PIN is entered again).
+    ui::confirm("playguard/cadran/paused/body"_i18n, "playguard/cadran/paused/relock"_i18n,
+                []() { console_actions::relock("", []() { ui::refresh_shown_tab(); }); });
 }
 
 static void open_read_only()
@@ -39,6 +48,7 @@ static void open_read_only()
 void open(Kind kind)
 {
     if (kind == Kind::UNLOCKED) open_unlocked();
+    else if (kind == Kind::PAUSED) open_paused();
     else open_read_only();
 }
 

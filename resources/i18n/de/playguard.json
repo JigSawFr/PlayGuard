@@ -1986,6 +1986,7 @@
             "pc_on": "Jugendschutz aktiv",
             "pc_off": "Deaktiviert",
             "unlocked": "Aufgehoben",
+            "paused": "Jugendschutz pausiert",
             "read_only": "Schreibgeschützt",
             "timer_on": "Spielzeit aktiv",
             "timer_off": "Zählung pausiert",
@@ -1993,6 +1994,10 @@
             "level": "Stufe · {}",
             "pin_set": "PIN festgelegt",
             "pin_none": "Keine PIN"
+        },
+        "paused": {
+            "body": "Der Jugendschutz ist pausiert, solange Sie in PlayGuard sind: Die Zeit hier zählt nicht zur Spielzeit des Kindes. Er wird von selbst wieder aktiv, sobald PlayGuard verlassen (HOME-Menü, Standby) oder geschlossen wird, und solange die Kinderansicht offen ist.\n\nJetzt wieder aktiviert, bleibt er aktiv, bis die PIN erneut eingegeben wird.",
+            "relock": "Jetzt wieder aktivieren"
         },
         "week": {
             "no_limit": "kein Limit",

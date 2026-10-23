@@ -4,6 +4,7 @@
 #include <borealis.hpp>
 #include <chrono>
 
+#include "action/session_pause.hpp"
 #include "action/timer_health_logic.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
@@ -34,7 +35,8 @@ bool observe(const PtState& pt)
     SysInfo si;
     sysinfo_get(&si);   // cached after the first call
     const int wd = ui::today_weekday();
-    const bool should = timer_health_logic::should_count(pt, wd, si.applet_mode);
+    // Paused for the parent here, the time left stays still on purpose.
+    const bool should = !session_pause::active() && timer_health_logic::should_count(pt, wd, si.applet_mode);
     const uint64_t now_ms = (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(
                                 std::chrono::steady_clock::now().time_since_epoch()).count();
     const bool was = s_state.stalled;
