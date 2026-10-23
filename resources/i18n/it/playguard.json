@@ -1160,7 +1160,7 @@
         "hours_from_of": "{}: dalle",
         "hours_to_of": "{}: fino alle",
         "remake": "Rifai",
-        "remake_confirm": "Rifare questi forwarder protetti? {}. Le loro regole (gli orari, la pausa) passano nel forwarder stesso, dove la scheda SD non può cambiarle, e il file del cancello viene verificato prima dell'avvio.",
+        "remake_confirm": "Rifare questi forwarder protetti? {}: le loro regole (gli orari, la pausa) passano nel forwarder stesso, dove la scheda SD non può cambiarle, e il file del cancello viene verificato prima dell'avvio.",
         "remade_n": "Rifatti: {}",
         "batch_title": "Forwarder {} di {}",
         "batch_made": "Fatti: {}",
