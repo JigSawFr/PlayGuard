@@ -13,6 +13,7 @@
 //   PLAYGUARD_SIM_LEFT_MIN, and "when the time is up" on a warning only;
 // - the changes: the read-only switch and the change check first, the play
 //   timer's gate, PLAYGUARD_SIM_FAIL;
+// - the recovery report's proof, against a known answer;
 // - the made-up games: the Activity tab's and the installed ones, one table;
 //   a removal kept; accounts sharing the time;
 // - the state read and changed from several threads at once (the sanitizers
@@ -367,6 +368,21 @@ static void test_changes()
     CHECK(pctl_get_level_settings(PctlSafetyLevel_Custom, &read) == 0 && read.rating_age == 16);
 }
 
+// The recovery report's proof (core/rescue.h, rescue_proof_mac): the known
+// answer for the simulated PIN (1234) and secret, as tools/desktop_smoke.py
+// signs its report (Python's hmac), so both sides agree on how it is made.
+static void test_pin_hmac()
+{
+    static const uint8_t want[32] = { 0x9f, 0xec, 0xe2, 0xb8, 0x35, 0xdf, 0xec, 0xc9, 0xe5, 0xd8, 0xa4,
+                                      0x15, 0x26, 0xc4, 0x31, 0x8e, 0x04, 0x54, 0xbc, 0x37, 0xfb, 0xaa,
+                                      0xe1, 0x75, 0x22, 0x4a, 0x3f, 0x4a, 0xe4, 0x78, 0x66, 0xd4 };
+    u8 mac[32];
+    CHECK(pctl_pin_hmac("message", 7, mac) == 0 && std::memcmp(mac, want, sizeof(want)) == 0);
+    sim_env_set("PLAYGUARD_SIM_FAIL", "pin");
+    CHECK(pctl_pin_hmac("message", 7, mac) == SIM_FAIL_RC && mac[0] == 0);
+    sim_env_set("PLAYGUARD_SIM_FAIL", nullptr);
+}
+
 // ---------------------------------------------------------------- the games
 
 static void test_games()
@@ -522,6 +538,7 @@ int main()
     test_living();   // as well
     test_time_left();
     test_changes();
+    test_pin_hmac();
     test_games();
     test_forwarders();
     test_threads();

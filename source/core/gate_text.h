@@ -40,6 +40,7 @@ typedef enum {
     GateText_InMinutes,    // "in %d min" (printf: an int), after the time a pause ends
     GateText_ErrorCode,    // "Error code: %s" (printf: "2054-0012")
     GateText_ClockDiffers, // free hours not applied: the console clock is not the network clock's
+    GateText_ClockUnknown, // free hours not applied: no network clock to check the console clock against
     GateText_Count,
 } GateText;
 

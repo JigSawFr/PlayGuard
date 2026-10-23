@@ -1,5 +1,5 @@
 // Host tests for source/util/rollback.cpp and paths::replace_file: when the
-// previous build is offered at start-up, its label and the start check on
+// previous build is offered at start-up and when the PIN lets it go back, its label and the start check on
 // disk (damaged files included), the swap of <nro> and <nro>.previous (back
 // and forth, with no previous build, with no current one), and an install
 // or a swap stopped between its renames, finished or undone.
@@ -21,13 +21,22 @@ static void test_offer()
     // Nothing without a previous build, whatever happened.
     CHECK(!rollback::offer_at_start(true, 3, false));
     // The build installed started once without reaching its first screen:
-    // offered (without the PIN: the PIN screen may be what crashes).
+    // offered (before PlayGuard's own lock screen: it may be what crashes).
     CHECK(rollback::offer_at_start(true, 1, true));
     CHECK(rollback::offer_at_start(true, 3, true));
     // Its first start (nothing failed yet), or no check at all: nothing.
     CHECK(!rollback::offer_at_start(true, 0, true));
     CHECK(!rollback::offer_at_start(false, 0, true));
     CHECK(!rollback::offer_at_start(false, 2, true));   // a check that is not there counts nothing
+}
+
+static void test_pin()
+{
+    // Going back asks the system's PIN screen: only the PIN, or no PIN set,
+    // lets it through. Left with B, or the screen failing: this build starts.
+    CHECK(rollback::go_back_allowed(true, false));
+    CHECK(rollback::go_back_allowed(false, true));
+    CHECK(!rollback::go_back_allowed(false, false));
 }
 
 static void test_files()
@@ -131,6 +140,7 @@ int main()
     g_dir = tmp.path();
 
     test_offer();
+    test_pin();
     test_files();
     test_swap();
     test_recover();

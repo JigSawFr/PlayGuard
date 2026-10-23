@@ -526,7 +526,10 @@ def service_worker(new_page):
             fail("service worker: the page is not isolated by it")
         else:
             print("ok   service worker: isolated")
-        cached = sw_page.evaluate("caches.open('playguard-simulator').then((c) => c.keys()).then((k) => k.map((r) => r.url))")
+        # Its own cache, named after its scope (web/sw.js).
+        cached = sw_page.evaluate(
+            "navigator.serviceWorker.ready.then((r) => caches.open('playguard-simulator:' + new URL(r.scope).pathname))"
+            ".then((c) => c.keys()).then((k) => k.map((r) => r.url))")
         if not any("playguard.wasm?v=" in u for u in cached) or not any("playguard.data?v=" in u for u in cached):
             fail(f"service worker: PlayGuard's files are not kept ({cached})")
         else:
