@@ -56,10 +56,11 @@ bool on_verify_progress(void* ctx, u64 current, u64 total)
 }
 }   // namespace
 
-std::shared_ptr<State> make_dialog()
+std::shared_ptr<State> make_dialog(const std::vector<u64>& ids)
 {
     auto state = std::make_shared<State>();
     state->body = cadran::progress_body("playguard/games/verify_title"_i18n, "", "playguard/games/verify_note"_i18n);
+    if (ids.size() > 1) state->strip = cover_strip_above(state->body, ids);
     state->dialog = new brls::Dialog(state->body.box);
     auto cancel = [state]() {
         state->cancel = true;
@@ -71,8 +72,13 @@ std::shared_ptr<State> make_dialog()
 
 void show_game(State* s, const std::vector<unsigned char>& icon, const std::string& name, size_t at, size_t total)
 {
-    if (!icon.empty()) s->body.image->setImageFromMem(icon.data(), (int)icon.size());
-    ui::set_visible(s->body.image, !icon.empty());
+    if (s->strip) {
+        s->strip->set_done((u32)at);
+        cover_strip_read(s->strip);
+    } else if (!icon.empty()) {
+        s->body.image->setImageFromMem(icon.data(), (int)icon.size());
+    }
+    ui::set_visible(s->body.image, !s->strip && !icon.empty());
     s->body.heading->setText(total == 1 ? "playguard/games/verify_title"_i18n
                                  : brls::getStr("playguard/games/verify_title_n", (int)at + 1, (int)total));
     s->body.title->setText(name);

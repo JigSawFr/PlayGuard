@@ -95,6 +95,12 @@ class GameCheckActivity : public brls::Activity
     CoverStrip* covers = nullptr;
     LoadingBar* covers_bar = nullptr;
     void card_layout();   // the card as the check is under way or not
+    // A full check (Ⓧ) asked with games listed: the covers leafed through in
+    // a dialog of their own, with Cancel, which stops the check there.
+    struct CheckDialog;
+    std::shared_ptr<CheckDialog> check_dialog;
+    void open_check_dialog();
+    void close_check_dialog();
     bool x_greyed = false;   // Ⓧ unavailable while a check runs
     bool grid = false;
 
