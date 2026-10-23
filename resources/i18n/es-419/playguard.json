@@ -320,7 +320,6 @@
             "section_presets": "Relleno rápido",
             "weekdays": "Fijar de lunes a viernes...",
             "weekend": "Fijar sábado y domingo...",
-            "copy_today": "Copiar el {} a todos los días",
             "copy_today_body": "¿Usar el límite del {} ({}) para todos los días?",
             "copy_today_confirm": "Copiar",
             "revert": "Descartar cambios",
@@ -701,6 +700,16 @@
         "note_unconfirmed": "Aquí no se puede cambiar nada sin el PIN, y PlayGuard se abre como de costumbre. ¿Sin acceso? Vuelve a poner el archivo RESCUE en la tarjeta SD, con el sysmodule de recuperación instalado, y reinicia la consola.",
         "note_old_module": "Aquí no se puede cambiar nada sin el PIN, y PlayGuard se abre como de costumbre. Actualiza el módulo desde una computadora: extrae playguard-rescue.zip de PlayGuard {} en la raíz de la tarjeta SD, vuelve a poner el archivo RESCUE y reinicia la consola."
     },
+    "tiles": {
+        "games": "Juegos instalados",
+        "upload": "Enviar un informe...",
+        "weekdays": "De lunes a viernes...",
+        "weekend": "Fin de semana...",
+        "copy_today": "Copiar el {} a todos",
+        "text_size_auto": "Auto: más grande en la TV",
+        "text_size": "Texto",
+        "start_tab": "Abrir en"
+    },
     "tools": {
         "section_diag": "Diagnóstico",
         "section_tools": "Herramientas",
@@ -815,7 +824,6 @@
         "update_last": "Última búsqueda: {}",
         "flag_read_only": "solo lectura",
         "flag_dev": "desarrollador",
-        "upload": "Enviar un informe en línea...",
         "upload_note": "Envía un informe a un gist secreto de tu cuenta de GitHub (inicia sesión antes si hace falta) y muestra su enlace con un código QR: dáselo a quien te ayude o abre un reporte de error con él.",
         "storage_note_emummc": "Está en la emuMMC: la sysMMC tiene su propio control parental, que PlayGuard no puede ver desde aquí. Configúrelo también allí u oculte el menú de arranque de hekate.",
         "storage_note_sysmmc": "Está en la sysMMC y hay una emuMMC configurada en esta tarjeta SD: tiene su propio control parental, que PlayGuard no puede ver desde aquí. Configúrelo también allí u oculte el menú de arranque de hekate.",

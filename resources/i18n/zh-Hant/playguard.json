@@ -320,7 +320,6 @@
             "section_presets": "快速設定",
             "weekdays": "設定星期一至星期五…",
             "weekend": "設定星期六與星期日…",
-            "copy_today": "將{}的上限套用至每天",
             "copy_today_body": "要將{}的上限（{}）套用至每天嗎？",
             "copy_today_confirm": "套用",
             "revert": "捨棄變更",
@@ -701,6 +700,16 @@
         "note_unconfirmed": "沒有 PIN碼 就無法在此變更任何內容，PlayGuard 會照常開啟。被鎖在外面？請在已安裝復原 sysmodule 的情況下把 RESCUE 檔案放回 SD 卡，然後重新啟動主機。",
         "note_old_module": "沒有 PIN碼 無法在此變更任何內容，PlayGuard 會照常開啟。請在電腦上更新該模組：將 PlayGuard {} 的 playguard-rescue.zip 解壓縮到 SD 卡根目錄，放回 RESCUE 檔案，然後重新啟動主機。"
     },
+    "tiles": {
+        "games": "已安裝的遊戲",
+        "upload": "傳送報告…",
+        "weekdays": "星期一至星期五…",
+        "weekend": "週末…",
+        "copy_today": "將{}的上限套用至每天",
+        "text_size_auto": "自動：電視上較大",
+        "text_size": "文字大小",
+        "start_tab": "啟動時顯示"
+    },
     "tools": {
         "section_diag": "診斷",
         "section_tools": "工具",
@@ -815,7 +824,6 @@
         "update_last": "上次檢查：{}",
         "flag_read_only": "唯讀",
         "flag_dev": "開發者",
-        "upload": "線上傳送報告…",
         "upload_note": "將報告傳送到你 GitHub 帳號中的私密 gist（如有需要請先登入），並顯示其連結與 QR 碼：交給協助你的人，或用它提交錯誤回報。",
         "storage_note_emummc": "目前為emuMMC：sysMMC有自己的家長監護設定，PlayGuard在此無法看到。請在那邊也進行設定，或隱藏hekate的開機選單。",
         "storage_note_sysmmc": "目前為sysMMC，且此SD卡上已設定emuMMC：它有自己的家長監護設定，PlayGuard在此無法看到。請在那邊也進行設定，或隱藏hekate的開機選單。",

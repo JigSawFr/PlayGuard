@@ -77,7 +77,7 @@ class List
     // Turns these cells (direct lines of the column) into tiles on one row,
     // where the first one was: `status` tiles show a reading (title small,
     // value large, no chevron), the others an action (icon then title on one
-    // line, its words under them). Before
+    // line, its words on the next, each smaller rather than on two). Before
     // apply(). Returns the row.
     brls::Box* tiles(const std::vector<std::pair<const char*, const char*>>& cells, bool status);
 
