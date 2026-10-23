@@ -209,7 +209,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen exter
 # Warnings on PlayGuard's own sources (not borealis, not the vendored
 # qrcodegen and stb); CI turns them into errors with -DPLAYGUARD_WERROR=ON.
 option(PLAYGUARD_WERROR "Treat PlayGuard's compiler warnings as errors" OFF)
-set(PLAYGUARD_WARNINGS -Wall -Wextra)
+# Also a switch case falling into the next unmarked, and a class with virtual
+# functions whose destructor is not virtual (C++ only).
+# Not -Wshadow: a hundred names in some forty files shadow another one.
+set(PLAYGUARD_WARNINGS -Wall -Wextra -Wimplicit-fallthrough $<$<COMPILE_LANGUAGE:CXX>:-Wnon-virtual-dtor>)
 if (PLAYGUARD_WERROR)
     list(APPEND PLAYGUARD_WARNINGS -Werror)
 endif ()
