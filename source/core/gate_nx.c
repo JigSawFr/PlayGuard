@@ -52,6 +52,16 @@ static bool network_time(u64 *t, int *wday, int *minute)
     return true;
 }
 
+// The steady clock (core/gate.h, GateSteady): false when it cannot be read.
+static bool steady_time(GateSteady *out)
+{
+    TimeSteadyClockTimePoint tp;
+    if (R_FAILED(timeGetStandardSteadyClockTimePoint(&tp)) || tp.time_point < 0) return false;
+    memcpy(out->source, tp.source_id.uuid, sizeof(out->source));
+    out->seconds = (uint64_t)tp.time_point;
+    return true;
+}
+
 // `nro`'s hours in `file` (GATE_RULES_NAME: free, GATE_CLOSED_NAME: none);
 // false when it has none.
 static bool hours_of(const char *file, const char *nro, GateHours *h)
@@ -78,11 +88,13 @@ static size_t pause_read(void)
 }
 
 // The pause file after this try (owner-writable only, as the log), by
-// `rule` (the forwarder's), else the file's.
-static void pause_write(size_t len, const char *nro, GateResult r, uint64_t now, const GatePauseRule *rule)
+// `rule` (the forwarder's), else the file's; a pause that starts timed by
+// the steady clock too (`steady`, NULL when it was not read).
+static void pause_write(size_t len, const char *nro, GateResult r, uint64_t now, const GatePauseRule *rule,
+                        const GateSteady *steady)
 {
     static char next[GATE_PAUSE_MAX];
-    const size_t n = gate_pause_update_with(pause_text, len, nro, r, now, rule, next, sizeof(next));
+    const size_t n = gate_pause_update_steady(pause_text, len, nro, r, now, rule, steady, next, sizeof(next));
     if (n == 0 && len == 0) return;
     const int fd = open(GATE_DIR GATE_PAUSE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
@@ -469,13 +481,19 @@ bool gate_nx_run(void)
         // Settings sets the one, not the other): each rule at its strictest.
         // No free hours, closed by either clock, and the pause timed by the
         // network clock, so setting the time forward does not end it.
+        // Without the network clock, nothing vouches for the console clock:
+        // no free hours either, its closed hours by it, and the pause by the
+        // steady clock too, which no setting moves.
         int net_wday = -1, net_minute = -1;
         const bool netted = network_time(&net, &net_wday, &net_minute);
         const bool moved = clocked && gate_clocks_differ(now, netted, net);
         if (moved) now = net;
+        GateSteady steady = { { 0 }, 0 }, steady_until = { { 0 }, 0 };
+        const bool steadied = steady_time(&steady);
         const size_t pause_len = pause_read();
-        uint64_t until = 0;
+        uint64_t until = 0, left = 0;
         gate_pause_find(pause_text, pause_len, nro, NULL, &until);
+        const bool steady_found = gate_pause_steady_find(pause_text, pause_len, nro, &steady_until);
         // The day's refusals so far ("2026-10-20 21:03": its day), else when
         // it starts without the PIN, else the day's play time left: said
         // while it asks.
@@ -500,16 +518,19 @@ bool gate_nx_run(void)
                 snprintf(note, sizeof(note), gate_text(sc.language, GateText_ClosedHours), span);
         } else if (rules.limit && play_time_used_up()) {
             r = GateResult_Limit;
-        } else if (clocked && until > now) {
+        } else if (clocked && gate_pause_holds(until, now, steady_found ? &steady_until : NULL,
+                                               steadied ? &steady : NULL, &left)) {
             r = GateResult_Paused;
-            paused_note(sc.language, until, now, note, sizeof(note));
-        } else if (timed && !moved && gate_spans_hold(free_spans, free_n, wday, minute)) {
+            paused_note(sc.language, now + left, now, note, sizeof(note));
+        } else if (timed && gate_free_trusted(netted, moved) && gate_spans_hold(free_spans, free_n, wday, minute)) {
             r = GateResult_Free;
         } else {
             // Its free hours would hold by one clock: why the PIN all the same.
             if (moved && ((timed && gate_spans_hold(free_spans, free_n, wday, minute)) ||
                           gate_spans_hold(free_spans, free_n, net_wday, net_minute)))
                 snprintf(note, sizeof(note), "%s", gate_text(sc.language, GateText_ClockDiffers));
+            else if (!netted && timed && gate_spans_hold(free_spans, free_n, wday, minute))
+                snprintf(note, sizeof(note), "%s", gate_text(sc.language, GateText_ClockUnknown));
             watch_kick();
             screen_show(&sc, GateScreen_Asking, note, refused > 0, false);
             watch_pause();
@@ -517,15 +538,16 @@ bool gate_nx_run(void)
         }
         watch_kick();
         log_try(when, r, nro);
-        if (clocked) pause_write(pause_len, nro, r, now, pause_rule);
+        if (clocked) pause_write(pause_len, nro, r, now, pause_rule, steadied ? &steady : NULL);
         // How it went, said under it: paused or closed, as above.
         if (r != GateResult_Paused && r != GateResult_Closed) note[0] = '\0';
         if (r == GateResult_Refused) {
             // The day's count with this one, or the pause it starts now.
             uint64_t next_until = 0;
             static char after[GATE_PAUSE_MAX];
-            const size_t n =
-                clocked ? gate_pause_update_with(pause_text, pause_len, nro, r, now, pause_rule, after, sizeof(after)) : 0;
+            const size_t n = clocked ? gate_pause_update_steady(pause_text, pause_len, nro, r, now, pause_rule,
+                                                                steadied ? &steady : NULL, after, sizeof(after))
+                                     : 0;
             if (n && gate_pause_find(after, n, nro, NULL, &next_until) && next_until > now) {
                 paused_note(sc.language, next_until, now, note, sizeof(note));
                 break;   // paused: no trying again
