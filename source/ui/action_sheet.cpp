@@ -13,6 +13,7 @@
 #include <yoga/Yoga.h>
 
 #include "tab/cadran_list.hpp"
+#include "ui/action_sheet.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
@@ -22,6 +23,24 @@ using namespace brls::literals;
 
 namespace ui
 {
+
+void close_sheet(std::function<void()> then)
+{
+    brls::Application::popActivity(brls::TransitionAnimation::FADE, [then]() {
+        if (then) brls::sync(then);
+    });
+}
+
+brls::Box* sheet_outside(float width, bool grow)
+{
+    auto* box = new brls::Box();
+    if (grow) box->setGrow(1);
+    else box->setWidth(width);
+    box->setShrink(0);
+    box->addGestureRecognizer(new brls::TapGestureRecognizer(box, []() { close_sheet(nullptr); }));
+    return box;
+}
+
 namespace
 {
 namespace kit = cadran::kit;
@@ -41,24 +60,6 @@ struct Line
     bool checked = false;      // the value chosen (pick())
     std::function<void()> run;
 };
-
-void close_sheet(std::function<void()> then)
-{
-    brls::Application::popActivity(brls::TransitionAnimation::FADE, [then]() {
-        if (then) brls::sync(then);
-    });
-}
-
-// Room around the panel: a touch there closes the sheet.
-brls::Box* outside(float width, bool grow)
-{
-    auto* box = new brls::Box();
-    if (grow) box->setGrow(1);
-    else box->setWidth(width);
-    box->setShrink(0);
-    box->addGestureRecognizer(new brls::TapGestureRecognizer(box, []() { close_sheet(nullptr); }));
-    return box;
-}
 
 // The lines' column: once laid out, its height sizes the panel.
 class Column : public brls::Box
@@ -101,7 +102,7 @@ class Sheet : public brls::Box
         this->setId("cadran_sheet");
         this->setBackgroundColor(theme["brls/backdrop"]);
         this->setAlignItems(brls::AlignItems::STRETCH);
-        this->addView(outside(0, true));
+        this->addView(sheet_outside(0, true));
 
         auto* panel = new Panel();
         panel->setGrow(1);
@@ -161,11 +162,11 @@ class Sheet : public brls::Box
         auto* row = new brls::Box(brls::Axis::ROW);
         row->setAlignItems(brls::AlignItems::STRETCH);
         row->setShrink(0);
-        row->addView(outside(SIDE, false));
+        row->addView(sheet_outside(SIDE, false));
         row->addView(panel);
-        row->addView(outside(SIDE, false));
+        row->addView(sheet_outside(SIDE, false));
         this->addView(row);
-        this->addView(outside(20, false));   // the gap above the hints
+        this->addView(sheet_outside(20, false));   // the gap above the hints
         this->addView(new brls::BottomBar());
 
         this->registerAction("hints/back"_i18n, brls::BUTTON_B, [](brls::View*) {
