@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
+<!-- translated from docs/troubleshooting.md, sha256 45158eaaf5a4 -->
 # Fehlerbehebung
 
 Wieder Zugang zu einer gesperrten Konsole bekommen, die häufigen Probleme, einen Fehler melden, und der Entwicklermodus. Zurück zum [README](../../README.md).
@@ -28,7 +28,7 @@ Das Sysmodul muss der Version von PlayGuard folgen: Entpacke bei jedem Update vo
 *Konsole › Forwarder › Homebrew-Menü sperren* verhindert, dass das Album und ein mit R gestartetes Spiel das Homebrew-Menü öffnen. Wenn der Forwarder von PlayGuard und das geschützte Menü beide weg sind (in den Systemeinstellungen gelöscht, oder auf dem anderen System: Die Sperre liegt auf der SD-Karte und wird von sysMMC und emuMMC gelesen):
 
 - **Von einem Computer aus:** Lösche `atmosphere/config/override_config.ini` auf der SD-Karte (oder lege `config/playguard/override_config.ini.backup` zurück, die Datei, wie sie war) und starte die Konsole dann neu.
-- **Mit installiertem Rettungsmodul** (optional): Lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte neu; das Modul hebt die Sperre beim Start auf, und PlayGuard sagt es bei seinem nächsten Start. Ein Update von Atmosphère seit dem Sperren hebt sie auf dieselbe Weise auf.
+- **Mit installiertem Wiederherstellungs-Sysmodul** (optional): Lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte neu; das Sysmodul hebt die Sperre beim Start auf, und PlayGuard sagt es bei seinem nächsten Start. Ein Update von Atmosphère seit dem Sperren hebt sie auf dieselbe Weise auf.
 
 ### Konsole nicht modifiziert
 
@@ -43,7 +43,7 @@ PlayGuard kann nicht helfen: Es braucht Atmosphère. Der offizielle Weg ist das 
 - **Die Netzwerkuhr wurde nie gestellt.** *Konsole › Netzwerkuhr › Zeitabweichung messen*, dann stelle sie ([Netzwerkuhr](features.md#netzwerkuhr)).
 - **Die Uhr wurde zurückgestellt.** Nach einem Sprung zurück hält die Zählung an, bis die Uhr die alte Uhrzeit überschreitet; nichts zu tun.
 - **Ein Limit wurde gerade geschrieben.** Starte ein Spiel für eine Minute, dann prüfe erneut.
-- **Der Jugendschutz ist vorübergehend aufgehoben.** Die Spielzeit wird dann möglicherweise nicht gezählt: *Sicherheit › Altersbeschränkungen wieder aktivieren*.
+- **Der Jugendschutz ist vorübergehend aufgehoben.** Die Spielzeit wird dann möglicherweise nicht gezählt: *Heute › Wieder aktivieren* (oder ein Tippen auf die Kapsel in der Kopfzeile).
 
 ### Meine Limits haben sich von selbst geändert
 
@@ -54,7 +54,7 @@ PlayGuard kann nicht helfen: Es braucht Atmosphère. Der offizielle Weg ist das 
 ### Das Kind hat über das Limit hinaus gespielt
 
 - **Die Konsole warnt nur.** *Spielzeit › Wenn die Zeit um ist*: Wähle *Software unterbrechen*.
-- **Der Jugendschutz blieb aufgehoben.** Solange er es ist, ist das heutige Limit ausgesetzt: Die Kapsel in der Kopfzeile sagt das in jedem Tab; *Sicherheit › Altersbeschränkungen wieder aktivieren*. Ein Neustart der Konsole aktiviert ihn ebenfalls wieder.
+- **Der Jugendschutz blieb aufgehoben.** Solange er es ist, ist das heutige Limit ausgesetzt: Die Kapsel in der Kopfzeile sagt das in jedem Tab, und ein Tippen darauf führt zu *Heute › Wieder aktivieren*. Ein Neustart der Konsole aktiviert ihn ebenfalls wieder.
 - **Die Uhr wurde zurückgestellt.** Die Zählung hält an, bis die Uhr die alte Uhrzeit überschreitet ([was zählt](features.md#was-als-spielzeit-zählt)).
 - **Das andere System.** emuMMC und sysMMC haben jeweils ihren eigenen Jugendschutz: Stelle ihn auf beiden ein oder blende das Bootmenü von hekate aus ([Kompatibilität](compatibility.md#emummc-und-sysmmc)).
 
@@ -141,7 +141,7 @@ Drücke siebenmal Ⓨ auf *Info › Version*; die Entwicklerwerkzeuge erscheinen
 
 - einen Schalter **schreibgeschützt** — ist er an, kann die App nichts ändern: der sichere Weg, eine neue Firmware zu untersuchen (der Firmware-Bildschirm bietet ihn direkt an);
 - den Diagnosebericht auf dem Bildschirm (Ⓨ speichert ihn, Ⓧ sendet ihn online) und eine Abkürzung, um ihn aus dem Tab Spielzeit zu exportieren;
-- **Selbsttest der Konsole**: was PlayGuard auf dieser Konsole von selbst prüft, bevor [die Konsolen-Checkliste](../hardware-test.md) (auf Englisch) von Hand durchgegangen wird — die Geheimzahl, die Signatur-Patches, den Datenordner, jeden von PlayGuard erstellten Forwarder (im HOME-Menü, geschützt, durch sein Tor funktionierend gesehen), das Tor auf der SD-Karte, was Atmosphère von der Sperre des Homebrew-Menüs liest, die Rückwege, das Rettungsmodul. Er ändert nichts und schreibt sein Ergebnis als Markdown nach `config/playguard/self-test.md`, zum Einfügen in den Pull Request;
+- **Selbsttest der Konsole**: was PlayGuard auf dieser Konsole von selbst prüft, bevor [die Konsolen-Checkliste](../hardware-test.md) (auf Englisch) von Hand durchgegangen wird — die Geheimzahl, die Signatur-Patches, den Datenordner, jeden von PlayGuard erstellten Forwarder (im HOME-Menü, geschützt, durch sein Tor funktionierend gesehen), das Tor auf der SD-Karte, was Atmosphère von der Sperre des Homebrew-Menüs liest, die Rückwege, das Wiederherstellungs-Sysmodul. Er ändert nichts und schreibt sein Ergebnis als Markdown nach `config/playguard/self-test.md`, zum Einfügen in den Pull Request;
 - **Anderen Build installieren** an Ort und Stelle, um eine Korrektur zu testen, bevor sie veröffentlicht wird ([unten](#einen-anderen-build-installieren));
 - **Spielzeit-Block vergleichen** (nur solange die Smart-Geräte-App verknüpft ist und synchronisieren kann — nicht mit einer Hosts-Datei, die Nintendo blockiert; auch in *Sicherheit*), um Einstellungen zu entschlüsseln, die PlayGuard noch nicht anzeigt: Speichere den rohen Block als Referenz, ändere eine Einstellung in der Smart-Geräte-App, komm zurück — PlayGuard listet die Werte auf, die sich geändert haben (auf Wunsch in `logs/reports/` gespeichert). Unterschiedliche Schlafenszeiten pro Tag, in der Smart-Geräte-App eingestellt, könnten so bestätigt werden. Hänge diese Datei an ein Issue an oder sende sie mit dem Bericht (*Bericht online senden*).
 - **Spielzeit aufzeichnen**: alle 30 s, solange PlayGuard offen ist, eine Zeile mit dem, was der Timer meldet (verbleibende Zeit, gespielte Zeit, der rohe Einstellungsblock…), in `logs/play_timer/log.csv`, einer Datei, die sich in einer Tabellenkalkulation öffnen lässt, dazu eine Zeile direkt nach jeder Änderung von PlayGuard, die sagt, welche (ihre letzte Spalte, `event`), und ein Vermerk, wenn sich die Uhr um mehr bewegt hat als die vergangene Zeit. Über Mitternacht offen gelassen, oder bis die Zeit um ist, zeigt es, was ein einzelner Bericht nicht kann: wann die gespielte Zeit zurückgesetzt wird, was die Konsole kurz vor dem Ende sagt. Der Schalter wird gemerkt; er zeichnet nur im Entwicklermodus auf. Was bisher bekannt ist, steht in [parental-controls.md](../parental-controls.md) (auf Englisch).
@@ -171,6 +171,6 @@ Drücke siebenmal Ⓨ auf *Info › Version*; die Entwicklerwerkzeuge erscheinen
 - Ein abgebrochener Download (Netzwerk verloren) geht beim nächsten Installieren desselben Builds dort weiter, wo er aufgehört hat.
 - Artefakte verfallen nach 90 Tagen.
 
-**Zurückkehren.** Der ersetzte Build wird aufbewahrt (`playguard.nro.previous`): **Zurück zum vorherigen Build** in derselben Liste tauscht sie wieder, nach der Geheimzahl; sie nennt diesen Build mit seiner Version, seinem Pull Request und seinem Commit. Stürzt ein von hier (oder über *Aktualisieren mit › In PlayGuard*) installierter Build vor seinem ersten Bildschirm ab, bietet der nächste Start von PlayGuard auf einem einfachen Textbildschirm an, zum vorherigen Build zurückzukehren, bevor irgendetwas anderes geladen wird (A kehrt zurück, B startet ihn trotzdem), ohne die Geheimzahl, da der Bildschirm der Geheimzahl selbst das sein kann, was abstürzt. Dieselbe Liste kehrt jederzeit zu jeder Version zurück.
+**Zurückkehren.** Der ersetzte Build wird aufbewahrt (`playguard.nro.previous`): **Zurück zum vorherigen Build** in derselben Liste tauscht sie wieder, nach der Geheimzahl; sie nennt diesen Build mit seiner Version, seinem Pull Request und seinem Commit. Stürzt ein von hier (oder über *Aktualisieren mit › In PlayGuard*) installierter Build vor seinem ersten Bildschirm ab, bietet der nächste Start von PlayGuard auf einem einfachen Textbildschirm an, zum vorherigen Build zurückzukehren, bevor irgendetwas anderes geladen wird (A kehrt zurück, B startet ihn trotzdem). Das Zurückkehren fragt nach der Geheimzahl, auf der Geheimzahl-Eingabe der Konsole selbst, wenn eine festgelegt ist (nicht auf dem Sperrbildschirm von PlayGuard, der das sein kann, was abstürzt); ohne sie startet der installierte Build. Dieselbe Liste kehrt jederzeit zu jeder Version zurück.
 
 **Welcher Build läuft:** *Info › Version* zeigt im Entwicklermodus den Commit. Die Kopfzeile jedes Bildschirms zeigt die laufende Version neben dem Titel: die einer Version in einem grauen Etikett (`1.2.0`), die jedes anderen Builds in einem bernsteinfarbenen Etikett, gefolgt von seinem Commit, damit ein Test-Build nie für die Version gehalten wird.

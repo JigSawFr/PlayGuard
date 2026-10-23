@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
+<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
 # Einstieg
 
 Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa zehn Minuten, dann die alltäglichen Aufgaben. Zurück zum [README](../../README.md).

@@ -248,6 +248,28 @@ forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source
 forwarders_text_FLAGS := $(format_text_FLAGS)
 forwarders_text_CSRC   := source/core/calendar.c
 forwarders_text_CFLAGS := -std=gnu11 -Isource/core
+# borealis' own string tables (core/i18n.cpp) with PlayGuard's patches to
+# them, read from other threads while the language changes. A copy of the
+# two files at the submodule's commit, patched here (the submodule's are
+# patched only when CMake configures), first in the include path.
+I18N_COPY    := $(TESTOUT)/borealis_i18n
+I18N_PATCHES := $(sort $(shell grep -l 'core/i18n\.\|core/platform\.hpp' patches/borealis/*.patch))
+$(I18N_COPY)/i18n.cpp: $(I18N_PATCHES) | $(TESTOUT)
+	@rm -rf $(I18N_COPY) && mkdir -p $(I18N_COPY)/library/lib/core $(I18N_COPY)/library/include/borealis/core
+	@git -C extern/borealis show HEAD:library/lib/core/i18n.cpp > $(I18N_COPY)/library/lib/core/i18n.cpp
+	@git -C extern/borealis show HEAD:library/include/borealis/core/i18n.hpp > $(I18N_COPY)/library/include/borealis/core/i18n.hpp
+	@git -C extern/borealis show HEAD:library/include/borealis/core/platform.hpp > $(I18N_COPY)/library/include/borealis/core/platform.hpp
+	@for p in $(I18N_PATCHES); do patch -s -p1 -d $(I18N_COPY) -i $(CURDIR)/$$p || exit 1; done
+	@# The suffix without a space, as newer clang wants it (-Wdeprecated-literal-operator),
+	@# in this copy only: borealis itself is built as it is.
+	@sed 's/operator"" _i18n/operator""_i18n/' $(I18N_COPY)/library/lib/core/i18n.cpp > $@
+i18n_threads_SRC   := $(I18N_COPY)/i18n.cpp tests/i18n_threads/test.cpp
+i18n_threads_FLAGS := -std=c++17 -isystem $(I18N_COPY)/library/include -isystem extern/borealis/library/include \
+                      -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
+                      $(addprefix -isystem extern/borealis/library/,include/borealis/extern include/borealis/extern/nanovg \
+                        include/borealis/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga/src) \
+                      -DBRLS_RESOURCES='"./"'
+i18n_threads_LIBS  := -pthread
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_CSRC   := source/core/gamecheck_rules.c
 game_check_text_CFLAGS := -std=gnu11 -Isource/core
