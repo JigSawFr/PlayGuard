@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 7d2be6a20dff -->
+<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
 # インストール
 
 PlayGuard のインストール、アップデート、削除の方法と、PlayGuard が SD カードに書き込むファイルについて説明します。インストールしたら、[はじめに](getting-started.md)へ。トップページは [README](../../README.md)。
@@ -35,9 +35,10 @@ PlayGuard のインストール、アップデート、削除の方法と、Play
 - **`config.json`** — オプション（言語、テーマ、NTP サーバー、*PlayGuardを暗証番号で保護* …）。すべてのキーは [config.md](../config.md)（英語）にあります。読み込めないファイルは `config.json.bad` として残され（その前のものは `.bad.1`）、設定は初期値に戻ります。PlayGuard は起動時に一度そのことを知らせます
 - **`profiles/`** — 保存したプレイ時間のプリセット
 - **`exports/`** — プレイ記録のエクスポート
-- **`nand/<system>/`** — システムごとのデータです。システムはそれぞれ独自のみまもり設定を持っています。sysMMC は `sysmmc/`、emuMMC は `emummc/` です。中身は次のとおりです。`history.json`：変更履歴（新しいものから 500 件。本体が拒否した変更も含みます。読み込めないファイルは上書きせずに `history.json.bad`、その前のものは `.bad.1` として残し、PlayGuard が一度知らせます）。`state.json`：*すべてのソフトをブロック*、延長、保留中の再ロック、ファームウェアの選択のために覚えておく内容（[config.md](../config.md#state-kept-between-launches)、英語）。`watch.json`：PlayGuard が最後に見た本体の状態で、PlayGuard の外で変わったことを知らせるために使います（[config.md](../config.md#watchjson)、英語。削除しても問題ありません）。`backups/`：設定のバックアップ（暗証番号は含みません）。`cache/`：最後に読み込んだプレイ記録（すべてのユーザーと、表示した各ユーザー）。次の起動時、記録を読み直している間にすぐ表示されます。これらのフォルダーができる前のバージョンのファイルは、PlayGuard が最初に起動したシステムに移されます
+- **`nand/<system>/`** — システムごとのデータです。システムはそれぞれ独自のみまもり設定を持っています。sysMMC は `sysmmc/`、emuMMC は `emummc/` です。中身は次のとおりです。`history.json`：変更履歴（新しいものから 500 件。本体が拒否した変更も含みます。読み込めないファイルは上書きせずに `history.json.bad`、その前のものは `.bad.1` として残し、PlayGuard が一度知らせます）。`state.json`：*すべてのソフトをブロック*、延長、保留中の再ロック、ファームウェアの選択のために覚えておく内容（[config.md](../config.md#state-kept-between-launches)、英語）。`forwarders.json`：PlayGuard が作成したフォワーダー。`watch.json`：PlayGuard が最後に見た本体の状態で、PlayGuard の外で変わったことを知らせるために使います（[config.md](../config.md#watchjson)、英語。削除しても問題ありません）。`backups/`：設定のバックアップ（暗証番号は含みません）。`cache/`：最後に読み込んだプレイ記録（すべてのユーザーと、表示した各ユーザー）。次の起動時、記録を読み直している間にすぐ表示されます。これらのフォルダーができる前のバージョンのファイルは、PlayGuard が最初に起動したシステムに移されます
 - **`cache/`** — ゲームのアイコン（`icons/`、最大 16 MB、本体の言語が変わると空になります）。すべてのシステムで共有し、起動のたびに各ゲームから名前とアイコンを読み直さずに済むようにします。Atmosphère、hekate、sys-patch、ファームウェアのリリースノート（`sys_notes.json`、*本体* 用）と、PlayGuard 自身のリリースノート（*情報* 用）。開発者モードでは、*別のビルドをインストール* の一覧（`dev_builds.json`）
-- **`github_token`** — *レポートをオンラインで送信* と、開発者モードでは *別のビルドをインストール* で使う GitHub のログイン情報です。ログアウトすると削除されます（*情報 › ヘルプと診断 › GitHub アカウント*、ログイン中に表示されます）
+- **`github_token`** — *レポートを送信…* と、開発者モードでは *別のビルドをインストール* で使う GitHub のログイン情報です。ログアウトすると削除されます（*情報 › ヘルプと診断 › GitHub アカウント*、ログイン中に表示されます）
+- **`gate.nro`**、**`gate-<hash>.nro`**、**`gate_*.txt`** — 保護されたフォワーダーのゲート（*本体 › フォワーダー*）です。そのプログラム、暗証番号なしの時間帯、利用不可の時間、拒否後の一時停止、PlayGuard が読み込むまでの試行の記録、起動画面の表示時間（`gate_wait.txt`。起動のたびに読み込まれます）
 - **`previous_build.json`**、**`boot_check.json`** — ビルドをその場でインストールしたあとに使います。置き換えたビルドの名前（そのビルドは `.nro` の隣に `playguard.nro.previous` として残ります）と、次回の起動のチェック（最初の画面が表示されると削除されます）
 - **`rescue_report.txt`** — リカバリー sysmodule が動作したあとに残すファイルです。PlayGuard が起動時に表示するまで残ります（PlayGuard が読み込めない場合は削除され、そのことを知らせます）
 - **`rescue_nonce`** — リカバリー sysmodule がレポートの中で答えるランダムなチャレンジです。これで PlayGuard は、sysmodule が書いたレポートと手で書かれたレポートを見分けられます（[sysmodule/README.md](../../sysmodule/README.md)、英語）。起動のたびに新しくなります
