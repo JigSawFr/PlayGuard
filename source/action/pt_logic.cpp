@@ -44,6 +44,40 @@ int over_limit_min(const PtState& pt, int weekday)
     return (int)std::min<uint64_t>(1440, (over_ns + 30000000000ULL) / 60000000000ULL);
 }
 
+RingState ring_state(const PtState& pt, int weekday, bool unlocked)
+{
+    RingState r;
+    if (!pt.fw_supported || !pt.valid || !pt.enabled_valid || weekday < 0 || weekday > 6) return r;
+    r.limit = pt.day_min[weekday];
+    r.unlocked = unlocked && r.limit != PT_DAY_NOLIMIT;
+    // Unlocked first: the timer may read off while the limit still stands.
+    // Off otherwise, even a 0 restricts nothing.
+    if (r.limit == 0 && (r.unlocked || pt.enabled)) {
+        r.kind = RingState::NO_PLAY;
+        r.fraction = r.unlocked ? -1.0f : 1.0f;
+    } else if (r.unlocked) {
+        r.kind = RingState::ON_HOLD;
+    } else if (r.limit == PT_DAY_NOLIMIT || !pt.enabled) {
+        r.kind = RingState::FREE;
+    } else if ((r.over = over_limit_min(pt, weekday)) >= 0 || (pt.restricted_valid && pt.restricted)) {
+        // Suspended at the limit, or past it with the console only warning
+        // (alarm_only): the time left reads below 0 then, not 0.
+        r.kind = RingState::TIME_UP;
+        r.fraction = 1.0f;
+        r.played = played_today_min(pt, weekday);
+    } else if (pt.remaining_valid && pt.remaining_ns > 0) {
+        r.kind = RingState::COUNTING;
+        r.left = (int)((uint64_t)pt.remaining_ns / 60000000000ULL);
+        r.played = played_today_min(pt, weekday);
+        r.fraction = (float)r.played / (float)r.limit;
+    } else {
+        // The time left reads 0 until a game has been counted today.
+        r.kind = RingState::IDLE;
+        r.fraction = 0.0f;
+    }
+    return r;
+}
+
 int suspend_warning_min(const PtState& pt, int weekday, const uint16_t new_days[7])
 {
     if (!new_days || weekday < 0 || weekday > 6 || pt.alarm_only) return -1;
@@ -83,10 +117,16 @@ int stop_soon_limit(const PtState& pt, int weekday, int minutes)
     return value < pt.day_min[weekday] ? value : -1;
 }
 
+bool day_over(const std::string& date, const std::string& today)
+{
+    int days = 0;
+    return date::days_between(date, today, &days) && days > 0;
+}
+
 Restore restore_action(const ExtraRecord& rec, const std::string& today, const PtState& pt, bool read_only)
 {
     if (rec.weekday < 0 || rec.weekday > 6) return Restore::None;
-    if (rec.date == today) return Restore::None;           // still the day it was added
+    if (!day_over(rec.date, today)) return Restore::None;   // the day it was added not over yet
     if (read_only || !pt.fw_supported || !pt.valid) return Restore::Later;
     if (pt.day_min[rec.weekday] != rec.value) return Restore::Forget;
     return Restore::Offer;
@@ -95,8 +135,7 @@ Restore restore_action(const ExtraRecord& rec, const std::string& today, const P
 Restore bonus_action(const BonusRecord& rec, const std::string& today, const PtState& pt, bool read_only)
 {
     if (rec.weekday < 0 || rec.weekday > 6) return Restore::None;
-    int days = 0;
-    if (!date::days_between(rec.date, today, &days) || days <= 0) return Restore::None;   // the day not over yet
+    if (!day_over(rec.date, today)) return Restore::None;   // the day not over yet
     if (read_only || !pt.fw_supported || !pt.valid) return Restore::Later;
     if (pt.day_min[rec.weekday] != rec.value) return Restore::Forget;
     return Restore::Offer;

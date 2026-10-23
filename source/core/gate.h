@@ -93,6 +93,10 @@ bool gate_spans_hold(const GateHours *spans, unsigned n, int wday, int minute);
 // clock could not be read (`network_ok`).
 #define GATE_CLOCK_SLACK (5 * 60)
 bool gate_clocks_differ(uint64_t console, bool network_ok, uint64_t network);
+// Whether free hours may open without the PIN: only by a console clock the
+// network clock vouches for (read, and not apart from it). Without one, the
+// console clock alone says nothing (anyone can set it into them): the PIN.
+bool gate_free_trusted(bool network_ok, bool clocks_differ);
 
 typedef enum {
     GateResult_Pin = 0,     // the PIN entered: started
@@ -140,6 +144,31 @@ size_t gate_pause_update_with(const char *text, size_t len, const char *nro, Gat
 // The file with `rule` as its rule line, the forwarders' lines kept; or
 // without `nro`'s line (`rule` NULL, a pause lifted).
 size_t gate_pause_edit(const char *text, size_t len, const GatePauseRule *rule, const char *nro, char *out, size_t size);
+
+// A time of the console's steady clock (time's StandardSteadyClock): seconds
+// that go on whatever the console clock is set to, from a source that
+// changes only when the clock itself was reset (its battery ran out). A
+// pause also timed by it ends when it should, the time set forward or not.
+// Its line, after the forwarder's: "steady\t<source, 32 hex>\t<until>\t<nro>\n"
+// (an older gate drops it: its pause then ends by the time alone).
+typedef struct {
+    uint8_t  source[16];
+    uint64_t seconds;
+} GateSteady;
+// When `nro`'s pause ends by the steady clock; false when it has no such line.
+bool gate_pause_steady_find(const char *text, size_t len, const char *nro, GateSteady *until);
+// As gate_pause_update_with, and a pause that starts also timed from
+// `steady` (NULL: the steady clock not read, by the time alone). An opened
+// forwarder's steady line goes with its line.
+size_t gate_pause_update_steady(const char *text, size_t len, const char *nro, GateResult r, uint64_t now,
+                                const GatePauseRule *rule, const GateSteady *steady, char *out, size_t size);
+// Whether a pause holds at `now` (POSIX, the clock the gate goes by): until
+// `until` by that clock (0: none) or, with its steady end and the steady
+// clock now from the same source, until that end, whichever is later. A
+// steady time of another source (or none) cannot be compared: the time alone
+// decides then. *left (may be NULL): the seconds it still holds.
+bool gate_pause_holds(uint64_t until, uint64_t now, const GateSteady *steady_until, const GateSteady *steady_now,
+                      uint64_t *left);
 
 // How many lines of the log's `text` say `r` for `nro` on `day` ("2026-10-20",
 // the first ten characters of their time): the gate tells the tries of the day.

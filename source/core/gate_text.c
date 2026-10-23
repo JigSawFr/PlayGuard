@@ -38,6 +38,7 @@ static const Lines DE = { {
     "in %d Min.",
     "Fehlercode: %s",
     "Keine freien Zeiten: Die Uhr der Konsole weicht von der Netzwerkuhr ab.",
+    "Keine freien Zeiten: Netzwerkuhr nicht lesbar.",
 } };
 
 static const Lines EN_US = { {
@@ -70,6 +71,7 @@ static const Lines EN_US = { {
     "in %d min",
     "Error code: %s",
     "No free hours: the console clock differs from the network clock.",
+    "No free hours: the network clock cannot be read.",
 } };
 
 static const Lines ES = { {
@@ -102,6 +104,7 @@ static const Lines ES = { {
     "en %d min",
     "Código de error: %s",
     "Sin horario libre: el reloj de la consola no coincide con el de la red.",
+    "Sin horario libre: reloj de red no disponible.",
 } };
 
 static const Lines ES_419 = { {
@@ -134,6 +137,7 @@ static const Lines ES_419 = { {
     "en %d min",
     "Código de error: %s",
     "Sin horario libre: el reloj de la consola no coincide con el de la red.",
+    "Sin horario libre: reloj de red no disponible.",
 } };
 
 static const Lines FR = { {
@@ -166,6 +170,7 @@ static const Lines FR = { {
     "dans %d min",
     "Code d'erreur : %s",
     "Pas d'horaires libres : l'horloge de la console diffère de l'horloge réseau.",
+    "Pas d'horaires libres : horloge réseau illisible.",
 } };
 
 static const Lines FR_CA = { {
@@ -198,6 +203,7 @@ static const Lines FR_CA = { {
     "dans %d min",
     "Code d'erreur : %s",
     "Pas d'heures libres : l'horloge de la console diffère de l'horloge réseau.",
+    "Pas d'heures libres : horloge réseau illisible.",
 } };
 
 static const Lines IT = { {
@@ -230,6 +236,7 @@ static const Lines IT = { {
     "tra %d min",
     "Codice errore: %s",
     "Niente orari liberi: l'orologio della console non coincide con quello di rete.",
+    "Niente orari liberi: ora di rete non disponibile.",
 } };
 
 static const Lines JA = { {
@@ -262,6 +269,7 @@ static const Lines JA = { {
     "%d分後",
     "エラーコード：%s",
     "自由な時間帯は使えません：本体の時計がネットワーク時計とずれています。",
+    "自由な時間帯なし：ネットワーク時計を読めません。",
 } };
 
 static const Lines KO = { {
@@ -294,6 +302,7 @@ static const Lines KO = { {
     "%d분 후",
     "오류 코드: %s",
     "자유 시간 없음: 본체 시계가 네트워크 시계와 다릅니다.",
+    "자유 시간 없음: 네트워크 시계를 읽을 수 없음",
 } };
 
 static const Lines NL = { {
@@ -326,6 +335,7 @@ static const Lines NL = { {
     "over %d min",
     "Foutcode: %s",
     "Geen vrije uren: de klok van de console wijkt af van de netwerkklok.",
+    "Geen vrije uren: netwerkklok niet leesbaar.",
 } };
 
 static const Lines PT = { {
@@ -358,6 +368,7 @@ static const Lines PT = { {
     "daqui a %d min",
     "Código de erro: %s",
     "Sem horas livres: o relógio da consola difere do relógio da rede.",
+    "Sem horas livres: relógio da rede indisponível.",
 } };
 
 static const Lines PT_BR = { {
@@ -390,6 +401,7 @@ static const Lines PT_BR = { {
     "em %d min",
     "Código de erro: %s",
     "Sem horário livre: o relógio do console difere do relógio da rede.",
+    "Sem horário livre: relógio da rede indisponível.",
 } };
 
 static const Lines RU = { {
@@ -422,6 +434,7 @@ static const Lines RU = { {
     "через %d мин",
     "Код ошибки: %s",
     "Свободных часов нет: часы консоли расходятся с сетевыми.",
+    "Свободных часов нет: сетевые часы недоступны.",
 } };
 
 static const Lines ZH_HANS = { {
@@ -454,6 +467,7 @@ static const Lines ZH_HANS = { {
     "%d分钟后",
     "错误代码：%s",
     "自由时段不适用：主机时钟与网络时钟不一致。",
+    "自由时段不适用：无法读取网络时钟。",
 } };
 
 static const Lines ZH_HANT = { {
@@ -486,6 +500,7 @@ static const Lines ZH_HANT = { {
     "%d分鐘後",
     "錯誤代碼：%s",
     "自由時段不適用：主機時鐘與網路時鐘不一致。",
+    "自由時段不適用：無法讀取網路時鐘。",
 } };
 
 // libnx's SetLanguage order (ja, en-US, fr, de, it, es, zh-CN, ko, nl, pt, ru,

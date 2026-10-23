@@ -32,9 +32,9 @@ On the first start, the *First steps* guide comes up (later: *Preferences › Fi
 2. **A daily limit.** The same every day, or one for weekdays and one for the weekend. Change any single day later on *Play timer*.
 3. **The network clock.** The play timer counts with it. A console that never reaches Nintendo's servers keeps it inaccurate: see step 5.
 
-## 4. Unlink the phone app
+## 4. Unlink the companion app
 
-Still linked to Nintendo's *Parental Controls* app (or a second-hand console linked to someone else's)? *Security › Unlink the companion app*. Otherwise the app's next sync overwrites what you set in PlayGuard. It works offline.
+Still linked to Nintendo's *Parental Controls* phone app, the companion app (or a second-hand console linked to someone else's)? *Security › Unlink the companion app*. Otherwise the companion app's next sync overwrites what you set in PlayGuard. It works offline.
 
 ## 5. Set the network clock
 

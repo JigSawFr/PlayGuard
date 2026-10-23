@@ -21,14 +21,6 @@ NVGcolor color(const char* key)
     return brls::Application::getTheme()[key];
 }
 
-brls::Label* centered(const std::string& text, float size, const char* color_key)
-{
-    brls::Label* l = label(text, size, color_key);
-    l->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    l->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the box's width
-    return l;
-}
-
 brls::Label* label(const std::string& text, float size, const char* color_key)
 {
     auto* l = new brls::Label();

@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
+<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
 # Начало работы
 
 От SD-карты до консоли, настроенной для вашего ребёнка, примерно за десять минут, а затем — повседневные задачи. Назад к [README](../../README.md).

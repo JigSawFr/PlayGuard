@@ -11,6 +11,7 @@
 #include "action/icon_logic.hpp"
 #include "core/album.h"
 #include "core/calendar.h"
+#include "ui/action_sheet.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/format_text.hpp"
@@ -58,23 +59,6 @@ struct Choice
     brls::Image* image = nullptr;
     brls::Box*   cell = nullptr;
 };
-
-void close_sheet(std::function<void()> then)
-{
-    brls::Application::popActivity(brls::TransitionAnimation::FADE, [then]() {
-        if (then) brls::sync(then);
-    });
-}
-
-brls::Box* outside(float width, bool grow)
-{
-    auto* box = new brls::Box();
-    if (grow) box->setGrow(1);
-    else box->setWidth(width);
-    box->setShrink(0);
-    box->addGestureRecognizer(new brls::TapGestureRecognizer(box, []() { close_sheet(nullptr); }));
-    return box;
-}
 
 int texture_of(const std::vector<uint8_t>& rgba, int px)
 {
@@ -135,7 +119,7 @@ class Sheet : public brls::Box
         this->setId("cadran_sheet");
         this->setBackgroundColor(theme["brls/backdrop"]);
         this->setAlignItems(brls::AlignItems::STRETCH);
-        this->addView(outside(0, true));
+        this->addView(ui::sheet_outside(0, true));
 
         auto* panel = new brls::Box(brls::Axis::COLUMN);
         panel->setWidth(PANEL_W);
@@ -157,15 +141,15 @@ class Sheet : public brls::Box
         auto* line = new brls::Box(brls::Axis::ROW);
         line->setJustifyContent(brls::JustifyContent::CENTER);
         line->setShrink(0);
-        line->addView(outside(0, true));
+        line->addView(ui::sheet_outside(0, true));
         line->addView(panel);
-        line->addView(outside(0, true));
+        line->addView(ui::sheet_outside(0, true));
         this->addView(line);
-        this->addView(outside(20, false));   // the gap above the hints
+        this->addView(ui::sheet_outside(20, false));   // the gap above the hints
         this->addView(new brls::BottomBar());
 
         this->registerAction("hints/back"_i18n, brls::BUTTON_B, [](brls::View*) {
-            close_sheet(nullptr);
+            ui::close_sheet(nullptr);
             return true;
         }, false, false, brls::SOUND_BACK);
         this->registerAction("playguard/forwarders/icon_own"_i18n, brls::BUTTON_Y, [this](brls::View*) {
@@ -494,7 +478,7 @@ class Sheet : public brls::Box
                 if (done) done(shot, x);
             };
         }
-        close_sheet(then);
+        ui::close_sheet(then);
     }
 
     // Off the UI thread: the .nro's own icon, the games, then each

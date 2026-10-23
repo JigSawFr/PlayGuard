@@ -25,19 +25,6 @@ std::string (*s_firmware_choice)() = nullptr;
 std::string (*s_homebrew_lock)() = nullptr;
 std::string (*s_dns)() = nullptr;
 
-// "1.5 GiB", "312.4 MiB", "18 KiB".
-std::string bytes(uint64_t n)
-{
-    if (n >= (1ULL << 30)) return fmt::format("{:.1f} GiB", (double)n / (1ULL << 30));
-    if (n >= (1ULL << 20)) return fmt::format("{:.1f} MiB", (double)n / (1ULL << 20));
-    return fmt::format("{} KiB", (n + 1023) / 1024);
-}
-
-std::string first_line(const std::string& text)
-{
-    return text.substr(0, text.find('\n'));
-}
-
 // This run, the one before, the memory, the SD card and the crash files kept.
 std::string logs_section()
 {
@@ -89,15 +76,6 @@ void set_firmware_choice(std::string (*summary)()) { s_firmware_choice = summary
 void set_homebrew_lock(std::string (*section)()) { s_homebrew_lock = section; }
 void set_dns(std::string (*section)()) { s_dns = section; }
 
-const char* storage_name(SysStorage storage)
-{
-    switch (storage) {
-        case SysStorage_EmuMMC: return "emuMMC";
-        case SysStorage_SysMMC: return "sysMMC";
-        default:                return nullptr;
-    }
-}
-
 std::string current_report()
 {
     SysInfo si;
@@ -106,24 +84,7 @@ std::string current_report()
     sysinfo_version_string(si.hos_version, fw, sizeof(fw));
 
     // Game patches: sys-patch state and sigpatch files (no personal data).
-    const patches::Report pr = patches::detect(paths::sd_root(), fw, si.emummc);
-    std::string files, gaps;
-    for (const auto& f : pr.files) files += (files.empty() ? "" : ",") + f;
-    for (const auto& g : pr.gaps) gaps += (gaps.empty() ? " (not patched: " : ", ") + g;
-    if (!gaps.empty()) gaps += ")";
-    static const char* const STATUS[] = { "none", "sys-patch", "sys-patch incomplete", "sigpatch files only" };
-    static const char* const ISSUE[]  = { "none", "not at boot", "no log", "stale log", "skipped", "not patched" };
-    const std::string patch_line = fmt::format(
-        "{} (issue: {}; sys-patch installed={} boot2={} log={}{}; fs={} ldr={} es={}{}; files={})",
-        STATUS[(int)patches::status(pr)], ISSUE[(int)patches::issue(pr)],
-        pr.syspatch_installed ? 1 : 0, pr.syspatch_at_boot ? 1 : 0,
-        !pr.log_present ? "none" : (pr.log_current ? "current" : "stale"),
-        pr.log_present ? fmt::format(" fw={} emummc={} version={}", pr.log_fw, pr.log_emummc ? 1 : 0,
-                                     pr.log_version.empty() ? std::string("?") : pr.log_version)
-                       : std::string(),
-        patches::module_name(pr.fs), patches::module_name(pr.ldr), patches::module_name(pr.es),
-        gaps,
-        files.empty() ? std::string("none") : files);
+    const std::string patches_text = patch_line(patches::detect(paths::sd_root(), fw, si.emummc));
 
     // The serial number itself is never written: reports are attached to
     // public bug reports.
@@ -154,7 +115,7 @@ std::string current_report()
                     storage ? storage : "unknown",
                     paths::nand_key()),
         !si.blank_valid ? "unknown" : (si.blank ? "blanked" : "not blanked"),
-        patch_line,
+        patches_text,
         (int)sysinfo_compat(&si));
 
     // How long this run took to start, step by step (util/startup.h).

@@ -70,6 +70,11 @@ bool offer_at_start(bool checked, int starts_before, bool have_previous)
     return have_previous && checked && starts_before >= 1;
 }
 
+bool go_back_allowed(bool pin_entered, bool no_pin_set)
+{
+    return pin_entered || no_pin_set;
+}
+
 void recover(const std::string& nro)
 {
     paths::recover_replace(nro, previous_file(nro));

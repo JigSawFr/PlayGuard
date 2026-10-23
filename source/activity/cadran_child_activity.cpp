@@ -116,42 +116,46 @@ void CadranChildActivity::onContentAvailable()
 
 void CadranChildActivity::refresh()
 {
+    // The weekday and the time of day below, read at one moment.
+    ui::SameTime same;
     PtState pt;
     pctl_play_timer_query(&pt);
     const int today = ui::today_weekday();
-    float frac = -1.0f;
+    // As on Today (pt_logic::ring_state), in the child's words.
+    const pt_logic::RingState st = pt_logic::ring_state(pt, today, ui::known_unlocked());
     std::string left = "—", caption = "";
-    int left_min = -1;   // counting down: the minutes left
-    bool free = false;   // no limit today: the bedtime alone stops play
-    if (pt.fw_supported && pt.valid && pt.enabled_valid) {
-        const uint16_t limit = pt.day_min[today];
-        // Unlocked first, as on Today: the console reports the timer off
-        // while unlocked, though today's limit still stands.
-        const bool unlocked = ui::known_unlocked() && limit != PT_DAY_NOLIMIT;
-        if (limit == 0 || unlocked) {
-            frac = unlocked ? -1.0f : 1.0f;
-            left = limit == 0 ? "playguard/cadran/today/no_play"_i18n : ui::fmt_minutes(limit);
-            caption = unlocked ? "playguard/cadran/child/on_hold"_i18n : "playguard/cadran/today/today"_i18n;
-        } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
+    const int left_min = st.left;   // counting down: the minutes left
+    const bool free = st.kind == pt_logic::RingState::FREE;   // no limit today: the bedtime alone stops play
+    switch (st.kind) {
+        case pt_logic::RingState::NO_PLAY:
+            left = "playguard/cadran/today/no_play"_i18n;
+            caption = st.unlocked ? "playguard/cadran/child/on_hold"_i18n : "playguard/cadran/today/today"_i18n;
+            break;
+        case pt_logic::RingState::ON_HOLD:
+            left = ui::fmt_minutes(st.limit);
+            caption = "playguard/cadran/child/on_hold"_i18n;
+            break;
+        case pt_logic::RingState::FREE:
             left = "playguard/cadran/today/free"_i18n;
             caption = "playguard/cadran/today/no_limit"_i18n;
-            free = true;
-        } else if (pt.restricted_valid && pt.restricted) {
-            frac = 1.0f;
+            break;
+        case pt_logic::RingState::TIME_UP:
+            // Suspended, or past the limit with the console only warning.
             left = ui::fmt_played(0);
-            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_minutes(limit)) + " · " + "playguard/cadran/today/time_up"_i18n;
-        } else if (pt.remaining_valid && pt.remaining_ns > 0 && limit > 0) {
-            left_min = (int)(pt.remaining_ns / 60000000000ULL);
-            const uint16_t used = left_min >= limit ? 0 : (uint16_t)(limit - left_min);
-            frac = (float)used / (float)limit;
+            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_minutes(st.limit)) + " · " + "playguard/cadran/today/time_up"_i18n;
+            break;
+        case pt_logic::RingState::COUNTING:
             left = ui::fmt_duration_ns(pt.remaining_ns);
-            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_minutes(limit));
-        } else {
-            frac = 0.0f;
-            left = ui::fmt_minutes(limit);
+            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_minutes(st.limit));
+            break;
+        case pt_logic::RingState::IDLE:
+            left = ui::fmt_minutes(st.limit);
             caption = "playguard/cadran/today/today"_i18n;
-        }
+            break;
+        case pt_logic::RingState::UNKNOWN:
+            break;
     }
+    const float frac = st.fraction;
     // When it ends, by the clock, as Today says it (not after the bedtime
     // alarm: its chip says when); amber and the ring beating near the end.
     const LocalTime now = ui::local_now();

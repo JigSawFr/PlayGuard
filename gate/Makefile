@@ -24,6 +24,9 @@ ROMFS       := build/romfs
 # them the gate had no romfs, and nothing after its code.
 APP_TITLE   := PlayGuard gate
 APP_AUTHOR  := JigSawFr
+# The gate's own version, not PlayGuard's: a forwarder protected with the
+# PIN pins the gate by its SHA-256 (gate-<hash>.nro), so moving it at each
+# release would make a new gate file each release though nothing changed.
 APP_VERSION := 1.0.0
 
 # Only these: ../source/core also holds the app's service layer.

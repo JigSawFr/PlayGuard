@@ -119,31 +119,14 @@ size_t trailing_reference(const std::string& line)
 std::string trim_playguard(const std::string& md)
 {
     std::vector<std::string> out;
-    enum { Plain, Comment, Hide, Only } block = Plain;
+    text::ConsoleComments comments;
     bool heading_seen = false;
     for (const std::string& raw : text::lines(md)) {
         const std::string t = text::trim_space(raw);
-        if (block == Comment) {
-            if (t.find("-->") != std::string::npos) block = Plain;
-            continue;
-        }
-        if (block == Hide) {
-            if (t == "<!-- /console -->") block = Plain;
-            continue;
-        }
-        if (block == Only && t == "-->") {
-            block = Plain;
-            continue;
-        }
-        if (block == Plain && text::starts_with(t, "<!--")) {
-            const bool closed = t.size() >= 7 && t.compare(t.size() - 3, 3, "-->") == 0;
-            if (t == "<!-- console:hide -->") block = Hide;
-            else if (t == "<!-- console:only") block = Only;
-            else if (closed && text::starts_with(t, "<!-- console:"))
-                out.push_back(text::trim_space(t.substr(13, t.size() - 16)));
-            else if (!closed) block = Comment;
-            continue;
-        }
+        std::string inner;
+        const auto step = comments.next(t, inner);
+        if (step == text::ConsoleComments::Directive) out.push_back(inner);
+        if (step != text::ConsoleComments::Show) continue;
         // Its own heading; the next one ("## 🖼️ On screen") ends the notes.
         if (text::starts_with(t, "## ")) {
             if (heading_seen) break;

@@ -108,7 +108,8 @@ set(CMAKE_C_EXTENSIONS ON)
 # On desktop borealis looks for "<BRLS_RESOURCES_DIR>/resources/" at runtime:
 # point it at the merged copy assembled below.
 if (PLAYGUARD_WEB)
-    # Packaged into the page's file system at /app/resources (web/CMakeLists).
+    # Packaged into the page's file system at /app/resources (the web target's
+    # --preload-file, below).
     set(BRLS_RESOURCES_DIR /app)
 elseif (PLATFORM_DESKTOP)
     set(BRLS_RESOURCES_DIR ${CMAKE_BINARY_DIR})

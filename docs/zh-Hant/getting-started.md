@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
+<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
 # 開始使用
 
 從 SD 卡到一台為孩子設定好的主機，大約十分鐘，接著是日常的操作。返回 [README](../../README.md)。
