@@ -83,6 +83,7 @@ class TabBase : public brls::Box
     std::vector<Mark> marks;
     int               notice_listener = 0;
     bool              focused_once    = false;
+    bool              revealed        = false;   // risen into place once (ui/motion)
 
     void update_marks();
 

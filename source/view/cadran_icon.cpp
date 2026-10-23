@@ -3,6 +3,14 @@
 
 #include <cmath>
 
+#include "ui/effects.hpp"
+#include "ui/motion.hpp"
+
+namespace
+{
+constexpr float POP_US = 380000.0f;
+}   // namespace
+
 CadranIcon::CadranIcon()
 {
     this->color = brls::Application::getTheme()["brls/text"];
@@ -15,6 +23,7 @@ CadranIcon::CadranIcon()
 
 void CadranIcon::setIcon(const std::string& name) { this->icon = name; }
 void CadranIcon::setColor(NVGcolor value) { this->color = value; }
+void CadranIcon::pop() { this->pop_since = effects::motion() ? motion::now() : 0; }
 
 static void mark(NVGcontext* vg, float w, float h)
 {
@@ -54,6 +63,18 @@ void CadranIcon::draw(NVGcontext* vg, float x, float y, float width, float heigh
     (void)ctx;
     nvgSave(vg);
     nvgTranslate(vg, x, y);
+    // Popping: scaled about its middle, from nothing past its size and back.
+    if (this->pop_since) {
+        const float t = motion::progress(this->pop_since, POP_US);
+        if (t >= 1.0f) {
+            this->pop_since = 0;
+        } else {
+            const float scale = motion::back_out(t);
+            nvgTranslate(vg, width / 2.0f, height / 2.0f);
+            nvgScale(vg, scale, scale);
+            nvgTranslate(vg, -width / 2.0f, -height / 2.0f);
+        }
+    }
     if (this->icon == "mark") {
         mark(vg, width, height);
         nvgRestore(vg);

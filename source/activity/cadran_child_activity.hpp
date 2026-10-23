@@ -24,6 +24,7 @@ class CadranChildActivity : public brls::Activity
 
   private:
     brls::RepeatingTimer timer;
+    bool was_counting = false;   // the last refresh saw the timer counting (the time up after it: one breath)
 
     void refresh();
 

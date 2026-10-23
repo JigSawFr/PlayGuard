@@ -1340,8 +1340,9 @@
         },
         "effects": "视觉效果",
         "effects_values": {
+            "full": "始终完整",
             "auto": "电池供电时精简",
-            "full": "始终完整"
+            "reduced": "减少动态效果"
         }
     },
     "backup": {

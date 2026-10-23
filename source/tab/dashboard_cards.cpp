@@ -12,6 +12,7 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "app.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 #include "util/text.hpp"
 
@@ -140,8 +141,24 @@ void DashboardTab::show_steps_card(bool has_pin)
     const bool limits = this->pt.valid && pt_configured(this->pt.block);
     const bool shown = !app::read_only() && this->status.pin_length_ok && this->pt.fw_supported && this->pt.valid &&
                        (!has_pin || !limits);
+    if (!shown) {
+        // All done (or no longer the parent's to do): the card bows out,
+        // then goes; nothing more to show in it meanwhile.
+        if (this->steps_shown) {
+            this->steps_shown = false;
+            motion::dismiss(this->steps_card, ui::guarded(this->alive, [this]() { ui::set_visible(this->steps_card, false); }));
+        } else {
+            ui::set_visible(this->steps_card, false);
+        }
+        return;
+    }
+    // Up again after bowing out: whole and in its place.
+    if (!this->steps_shown) {
+        this->steps_card->setAlpha(1.0f);
+        this->steps_card->setTranslationY(0.0f);
+    }
     ui::set_visible(this->steps_card, shown);
-    if (!shown) return;
+    this->steps_shown = true;
     brls::Theme theme = brls::Application::getTheme();
     const bool clock_ok = R_SUCCEEDED(this->accuracy_rc) && this->accurate;
     const bool done[3] = { has_pin, limits, clock_ok };
@@ -154,11 +171,15 @@ void DashboardTab::show_steps_card(bool has_pin)
     for (int i = 0; i < 3; i++) {
         Step& s = this->steps[i];
         count += done[i];
+        // A step just done (seen to do before): its check pops in.
+        if (done[i] && this->steps_read && !this->steps_done[i]) s.done->pop();
+        this->steps_done[i] = done[i];
         ui::set_visible(s.done, done[i]);
         ui::set_visible(s.todo, !done[i]);
         ui::set_text(s.state, state[i]);
         s.state->setTextColor(theme[done[i] ? "cadran/teal" : "cadran/amber"]);
     }
+    this->steps_read = true;
     ui::set_text(this->steps_count, brls::getStr("playguard/cadran/today/steps_count", count, 3));
 }
 
@@ -212,6 +233,11 @@ void DashboardTab::show_low(bool unlocked)
         low = up || (timer.remaining_valid && timer.remaining_ns > 0 && timer.remaining_ns <= QUARTER_NS);
     }
     brls::Theme theme = brls::Application::getTheme();
+    // Lit anew: one breath of the chip, so the eye finds it.
+    if (low && !this->low_lit && !this->amount_chips.empty() && chips->getVisibility() == brls::Visibility::VISIBLE &&
+        this->amount_chips[0]->getVisibility() == brls::Visibility::VISIBLE)
+        motion::breathe(this->amount_chips[0], 0.5f, 800);
+    this->low_lit = low;
     for (size_t i = 0; i < this->amount_chips.size(); i++) {
         brls::Box* chip = this->amount_chips[i];
         const bool lit = low && i == 0;

@@ -9,6 +9,7 @@
 #include "app.hpp"
 #include "core/sim_env.h"
 #include "ui/cadran_kit.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 #include "view/tab_badge.hpp"
 
@@ -112,6 +113,12 @@ void TabBase::willAppear(bool resetState)
     // out for it.
     this->update_marks();
     this->refresh();
+    // Opened (not back from a dialog or a screen over it): the tab rises
+    // into place, its lines in cascade after it (cadran::List::apply).
+    if (!this->revealed) {
+        this->revealed = true;
+        motion::reveal(this, 6.0f, 160);
+    }
     // The smoke test's "alarm" (PLAYGUARD_SIM_TAB_RACE): a read of the play
     // data ending as a tab replaces another, the one replaced not freed yet.
     // Only the new tab may answer (the header's pill, #251).

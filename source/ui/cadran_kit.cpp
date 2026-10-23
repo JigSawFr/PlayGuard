@@ -9,6 +9,8 @@
 #include <yoga/Yoga.h>
 
 #include "ui/cadran_list.hpp"
+#include "ui/effects.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/qr_view.hpp"
@@ -213,10 +215,35 @@ brls::Box* key(const char* letter, float size)
     return bubble;
 }
 
+Chip::Chip()
+    : brls::Box(brls::Axis::ROW)
+{
+}
+
+void Chip::frame(brls::FrameContext* ctx)
+{
+    // The press's flash (borealis' click animation, 0 → 1 → 0) as a dip of
+    // the whole chip, background and words, about its middle.
+    const float press = effects::motion() ? this->getClickAlpha() : 0.0f;
+    if (press <= 0.0f) {
+        brls::Box::frame(ctx);
+        return;
+    }
+    const brls::Rect at = this->getFrame();
+    const float cx = at.getMidX(), cy = at.getMidY();
+    const float scale = 1.0f - 0.05f * press;
+    nvgSave(ctx->vg);
+    nvgTranslate(ctx->vg, cx, cy);
+    nvgScale(ctx->vg, scale, scale);
+    nvgTranslate(ctx->vg, -cx, -cy);
+    brls::Box::frame(ctx);
+    nvgRestore(ctx->vg);
+}
+
 brls::Box* chip(const std::string& text, float height)
 {
     brls::Theme theme = brls::Application::getTheme();
-    auto* box = new brls::Box(brls::Axis::ROW);
+    auto* box = new Chip();
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setHeight(height);
     box->setPaddingLeft(22);
@@ -262,7 +289,18 @@ Bar::Bar()
 
 void Bar::set(float value)
 {
-    this->fraction = value < 0 ? 0 : value > 1 ? 1 : value;
+    value = value < 0 ? 0 : value > 1 ? 1 : value;
+    if (value == this->fraction) return;
+    // From where the fill is drawn now, over a third of a second.
+    this->from     = this->drawn();
+    this->since    = effects::motion() ? motion::now() : 0;
+    this->fraction = value;
+}
+
+float Bar::drawn() const
+{
+    const float t = motion::ease_out(motion::progress(this->since, 350000.0f));
+    return this->from + (this->fraction - this->from) * t;
 }
 
 void Bar::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style, brls::FrameContext*)
@@ -273,8 +311,9 @@ void Bar::draw(NVGcontext* vg, float x, float y, float width, float height, brls
     nvgRoundedRect(vg, x, y, width, height, radius);
     nvgFillColor(vg, this->a(theme["cadran/well"]));
     nvgFill(vg);
-    if (this->fraction <= 0) return;
-    const float w = std::max(width * this->fraction, height);
+    const float fill = this->drawn();
+    if (fill <= 0) return;
+    const float w = std::max(width * fill, height);
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x, y, w, height, radius);
     nvgFillColor(vg, this->a(theme["cadran/teal_fill"]));

@@ -2,8 +2,9 @@
 // the time left in big digits in the middle, made smaller when they would
 // come near the ring (a margin inside it). Teal → amber (≥ 75 %) → coral
 // (limit reached); the numbers are always written too, never colour alone.
-// A change of the time played moves the arc there rather than jumping; the
-// extra time given today tints the ring's end, the part of the limit it is.
+// A change of the time played moves the arc there rather than jumping, and
+// the first value known draws the arc from nothing; the extra time given
+// today tints the ring's end, the part of the limit it is.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -19,7 +20,8 @@ class PtRing : public brls::Box
 
     // used: 0..1 fraction of today's limit already played. Negative == unknown
     // (the track alone is drawn). From one known value to another, the arc
-    // travels there, but with the lighter effects (ui/effects).
+    // travels there; from unknown to the first one, it draws itself from
+    // nothing (not with the motion off: ui/effects).
     void setFraction(float used);
     // extra: the fraction of today's limit that is extra time (0: none).
     void setExtra(float extra);
@@ -28,9 +30,14 @@ class PtRing : public brls::Box
     // The arc shows what is left rather than what was played (the child
     // screen); the colour still follows what was played.
     void setShowLeft(bool left);
-    // The last minutes (the child screen): the arc beats, slowly (steady
-    // with the lighter effects).
-    void setPulse(bool pulse);
+    // The last minutes (the child screen): the arc beats, slowly (every
+    // 1.4 s; `fast`, the last minute: every second); steady with the
+    // motion off.
+    void setPulse(bool pulse, bool fast = false);
+    // A brighter point at the arc's end, where the time is (the child screen).
+    void setTip(bool tip);
+    // The figure's digits roll when they change (ui/motion).
+    void setRolls(bool rolls);
     void setValueSize(float size);
     void setCaptionSize(float size);
 
@@ -48,6 +55,8 @@ class PtRing : public brls::Box
     void fit();
     bool show_left = false;
     bool pulse = false;
+    bool pulse_fast = false;
+    bool tip = false;
     CadranDigits* value  = nullptr;
     brls::Label* caption = nullptr;
     NVGcolor track, teal, amber, coral;

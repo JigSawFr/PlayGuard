@@ -1,10 +1,19 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/footer_hints.hpp"
 
+#include "ui/cadran_kit.hpp"
+#include "ui/effects.hpp"
 #include "ui/guarded.hpp"
+#include "ui/motion.hpp"
 
 #include <algorithm>
 #include <cmath>
+#include <string>
+
+// The timed hint (set_timed): one at a time, the footer's own.
+static std::string s_timed_text;
+static brls::Time  s_timed_until = 0;
+static brls::Time  s_timed_total = 0;
 
 // Each hint's room on either side and between its button and its text
 // (borealis' hint XML), and the least they get here: 2 × 6 px still part
@@ -87,6 +96,42 @@ void FooterHints::fit()
     // Still too wide: the texts are cut ("…"), the clock is not.
     if (this->getWidth() > room)
         this->setShrink(1);
+}
+
+void FooterHints::set_timed(const std::string& hint_text, brls::Time until, brls::Time total_us)
+{
+    s_timed_text  = hint_text;
+    s_timed_until = until;
+    s_timed_total = total_us;
+}
+
+void FooterHints::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+                       brls::FrameContext* ctx)
+{
+    brls::Hints::draw(vg, x, y, width, height, style, ctx);
+    if (s_timed_text.empty() || !s_timed_until || !effects::motion()) return;
+    const brls::Time now = motion::now();
+    if (now >= s_timed_until || s_timed_total <= 0) return;
+    const float left = (float)(s_timed_until - now) / (float)s_timed_total;   // 1 → 0
+    constexpr float LAST_SECOND_US = 1000000.0f;
+    for (brls::View* v : this->getChildren()) {
+        auto* hint = dynamic_cast<brls::Box*>(v);
+        auto* text = hint ? dynamic_cast<brls::Label*>(hint->getView("hint")) : nullptr;
+        if (!text || text->getFullText() != s_timed_text) continue;
+        // Fading over its last second: the eye is told it is about to go.
+        const float fade = std::min(1.0f, (float)(s_timed_until - now) / LAST_SECOND_US);
+        hint->setAlpha(std::max(0.02f, fade));
+        // The line, under the hint's words, as long as the time left.
+        const float lx = text->getX(), lw = text->getWidth() * left;
+        const float ly = hint->getY() + hint->getHeight() - 3.0f;
+        NVGcolor teal = cadran::kit::color("cadran/teal_fill");
+        teal.a *= fade;
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, lx, ly, std::max(2.0f, lw), 2.0f, 1.0f);
+        nvgFillColor(vg, teal);
+        nvgFill(vg);
+        return;
+    }
 }
 
 void FooterHints::install()

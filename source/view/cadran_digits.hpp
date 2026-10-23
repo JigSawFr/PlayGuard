@@ -26,6 +26,10 @@ class CadranDigits : public brls::View
     // Drawn Preferences › Text size's times larger, as the labels are
     // (ui/text_size); off by default, the figures sized for their place.
     void setFollowsTextSize(bool follows);
+    // A new text rolls in from below while the old one leaves upwards (a
+    // counter's wheel), once a text was shown; off by default. Nothing with
+    // the motion off (ui/effects).
+    void setRolls(bool rolls);
     // The size taken again after the text size changed (ui/text_size).
     void remeasure() { this->measure(); }
 
@@ -41,6 +45,12 @@ class CadranDigits : public brls::View
     float fitWidth = 0.0f;
     bool smallUnits = false;
     bool followsTextSize = false;
+    bool rolls = false;
+    // The text before, leaving (rolls): until when (µs), and its size.
+    std::string leaving;
+    brls::Time  roll_since = 0;
+    float       leaving_size = 32.0f;
+    bool        drawn = false;   // shown at least once: a change may roll
     NVGcolor color;
     int font;
 
@@ -50,6 +60,8 @@ class CadranDigits : public brls::View
         std::string text;
         bool figure;   // drawn at the full size
     };
-    std::vector<Run> runs() const;   // the text cut into figures and words
-    float advance(NVGcontext* vg, float size) const;   // its width at `size`
+    std::vector<Run> runs(const std::string& text) const;   // the text cut into figures and words
+    float advance(NVGcontext* vg, float size) const;         // its width at `size`
+    // `text` written at `size` within (x, y, width, height), at its middle.
+    void write(NVGcontext* vg, const std::string& text, float size, float x, float y, float height) const;
 };

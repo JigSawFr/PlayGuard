@@ -14,6 +14,7 @@
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_palette.hpp"
 #include "ui/effects.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "view/cadran_icon.hpp"
@@ -217,12 +218,22 @@ class Glow : public brls::View
     {
         static const bool off = sim_env_flag("PLAYGUARD_SIM_CADRAN_NOGLOW");
         if (off || !config::get().cadran_glow || effects::light()) return;
-        const NVGpaint paint = nvgRadialGradient(vg, x + this->cx, y + this->cy, 0.0f, this->radius, this->glow, this->clear);
+        // The light drifts, slowly (a turn in 24 s, a little wider and
+        // narrower on the way): the screen breathes, nothing else moves.
+        // One gradient either way: the drift costs nothing.
+        float gx = this->cx, gy = this->cy, gr = this->radius;
+        if (effects::motion()) {
+            const double t = (double)(brls::getCPUTimeUsec() % 24000000) / 24000000.0 * 2.0 * NVG_PI;
+            gx += (float)std::sin(t) * this->radius * 0.035f;
+            gy += (float)std::cos(t * 0.7) * this->radius * 0.025f;
+            gr *= 1.0f + 0.05f * (float)std::sin(t * 1.3);
+        }
+        const NVGpaint paint = nvgRadialGradient(vg, x + gx, y + gy, 0.0f, gr, this->glow, this->clear);
         // Only the square around the light: past its radius it is clear, so
         // the screen's other pixels are left alone (the same picture, about
         // half the fill).
-        const float left = std::max(x, x + this->cx - this->radius), top = std::max(y, y + this->cy - this->radius);
-        const float right = std::min(x + width, x + this->cx + this->radius), bottom = std::min(y + height, y + this->cy + this->radius);
+        const float left = std::max(x, x + gx - gr), top = std::max(y, y + gy - gr);
+        const float right = std::min(x + width, x + gx + gr), bottom = std::min(y + height, y + gy + gr);
         if (right <= left || bottom <= top) return;
         nvgBeginPath(vg);
         nvgRect(vg, left, top, right - left, bottom - top);
@@ -245,21 +256,87 @@ CadranIcon* icon(const char* name, float size, NVGcolor color)
     return view;
 }
 
-// The sidebar items in their active / inactive look (teal on a pill, or
+// A sidebar item's words and icon in one colour (teal when active, else
 // text2), after the library's own colouring of the frame.
-void tint_rail(const std::vector<brls::SidebarItem*>& items, brls::SidebarItem* active)
+void tint_item(brls::SidebarItem* it, NVGcolor color)
 {
-    brls::Theme theme = brls::Application::getTheme();
-    for (brls::SidebarItem* it : items) {
-        const bool on = it == active;
-        it->setBackgroundColor(on ? theme["cadran/rail_active"] : theme["cadran/none"]);
-        const NVGcolor color = on ? theme["cadran/teal"] : theme["cadran/text2"];
-        for (brls::View* c : it->getChildren()) {
-            if (auto* label = dynamic_cast<brls::Label*>(c)) label->setTextColor(color);
-            else if (auto* ic = dynamic_cast<CadranIcon*>(c)) ic->setColor(color);
-        }
+    for (brls::View* c : it->getChildren()) {
+        if (auto* label = dynamic_cast<brls::Label*>(c)) label->setTextColor(color);
+        else if (auto* ic = dynamic_cast<CadranIcon*>(c)) ic->setColor(color);
     }
 }
+
+// The active tab's pill, drawn behind the rail's items: it slides from the
+// tab left to the tab chosen, the two tabs' colours crossing meanwhile; at
+// rest, the same rounded rectangle the item's own background would be.
+// Still with the motion off (ui/effects). Held by the first item, as its
+// first child (drawn after that item's own, empty, background and before
+// everything else of the rail), never by the items' column: the library
+// finds a tab by its place among that column's children (Sidebar::getItem).
+class RailPill : public brls::View
+{
+  public:
+    explicit RailPill(std::vector<brls::SidebarItem*> rail)
+        : items(std::move(rail))
+    {
+        this->setFocusable(false);
+        this->setPositionType(brls::PositionType::ABSOLUTE);
+        this->setWidth(0);
+        this->setHeight(0);
+        this->setCulled(false);
+    }
+
+    // `item` is the active tab now: the pill goes there.
+    void activate(brls::SidebarItem* item)
+    {
+        if (item == this->to) return;
+        this->from  = this->to;
+        this->to    = item;
+        this->since = this->from && effects::motion() ? motion::now() : 0;
+        this->tint(1.0f);
+    }
+
+    void draw(NVGcontext* vg, float, float, float, float, brls::Style, brls::FrameContext*) override
+    {
+        if (!this->to) return;
+        const float t = motion::ease_out(motion::progress(this->since, SLIDE_US));
+        brls::Rect at = this->to->getFrame();
+        if (this->since && this->from && t < 1.0f) {
+            const brls::Rect was = this->from->getFrame();
+            at = brls::Rect(was.getMinX() + (at.getMinX() - was.getMinX()) * t, was.getMinY() + (at.getMinY() - was.getMinY()) * t,
+                            was.getWidth() + (at.getWidth() - was.getWidth()) * t, was.getHeight() + (at.getHeight() - was.getHeight()) * t);
+            this->tint(t);
+        } else if (this->since) {
+            this->since = 0;   // arrived: the colours settled once
+            this->tint(1.0f);
+        }
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, at.getMinX(), at.getMinY(), at.getWidth(), at.getHeight(), this->to->getCornerRadius());
+        NVGcolor fill = cadran::kit::color("cadran/rail_active");
+        fill.a *= this->to->getAlpha();
+        nvgFillColor(vg, fill);
+        nvgFill(vg);
+    }
+
+  private:
+    // The two tabs' colours `t` of the way across, the others' at rest.
+    void tint(float t)
+    {
+        brls::Theme theme = brls::Application::getTheme();
+        const NVGcolor on = theme["cadran/teal"], off = theme["cadran/text2"];
+        for (brls::SidebarItem* it : this->items) {
+            if (it == this->to) tint_item(it, nvgLerpRGBA(off, on, t));
+            else if (it == this->from) tint_item(it, nvgLerpRGBA(on, off, t));
+            else tint_item(it, off);
+        }
+    }
+
+    static constexpr float SLIDE_US = 140000.0f;
+    std::vector<brls::SidebarItem*> items;
+    brls::SidebarItem* from = nullptr;
+    brls::SidebarItem* to   = nullptr;
+    brls::Time since = 0;
+};
 }   // namespace
 
 namespace
@@ -488,6 +565,9 @@ void skin_screen_of(brls::View* focus)
     cadran::style_header(frame, nullptr, "", false, false);
     add_crumb(frame);
     if (!frame->getView("cadran_list")) cadran::List(frame, true).apply(SCREEN_ICONS);   // a Cadran screen dresses itself
+    // The screen's content rises into place under its header (the main
+    // screen's tabs do the same: TabBase).
+    motion::reveal(frame->getContentView(), 8.0f, 180);
 }
 }   // namespace
 
@@ -546,18 +626,23 @@ void cadran::style_rail(brls::View* tab_frame)
         item->addView(icon(name, RAIL_ICON, theme["cadran/text2"]), 0);
         items.push_back(item);
     }
+    // The active tab's pill, behind the items (their background stays none).
+    if (items.empty()) return;
+    auto* pill = new RailPill(items);
+    items[0]->addView(pill, 0);
     for (brls::SidebarItem* item : items) {
-        item->getActiveEvent()->subscribe([items, item](brls::View*) {
+        item->setBackgroundColor(theme["cadran/none"]);
+        item->getActiveEvent()->subscribe([items, item, pill](brls::View*) {
             // In this frame, not the next (the frame would be drawn in the
             // library's colours first, the text flashing at each move): the
             // tab left is made inactive here, before the library recolours it
             // after this event, which then leaves it as it is.
             for (brls::SidebarItem* it : items)
                 if (it != item) it->setActive(false);
-            tint_rail(items, item);
+            pill->activate(item);
         });
     }
-    if (!items.empty()) tint_rail(items, items[0]);   // the first tab is already active
+    pill->activate(items[0]);   // the first tab is already active
 }
 
 void cadran::style_frame(brls::AppletFrame* frame, brls::View* tab_frame)

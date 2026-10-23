@@ -1340,8 +1340,9 @@
         },
         "effects": "Efeitos visuais",
         "effects_values": {
+            "full": "Sempre completos",
             "auto": "Mais leves com bateria",
-            "full": "Sempre completos"
+            "reduced": "Menos movimento"
         }
     },
     "backup": {

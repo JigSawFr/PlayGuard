@@ -1340,8 +1340,9 @@
         },
         "effects": "Visuele effecten",
         "effects_values": {
+            "full": "Altijd volledig",
             "auto": "Lichter op de accu",
-            "full": "Altijd volledig"
+            "reduced": "Minder beweging"
         }
     },
     "backup": {

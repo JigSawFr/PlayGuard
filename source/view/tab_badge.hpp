@@ -26,4 +26,5 @@ class TabBadge : public brls::View
 
   private:
     int count = 0;
+    brls::Time pop_since = 0;   // the number changed: the disc pops (µs; 0 at rest)
 };

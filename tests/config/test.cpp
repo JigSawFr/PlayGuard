@@ -285,7 +285,7 @@ static void test_preferences()
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again);
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
-    CHECK(d.effects == "auto");
+    CHECK(d.effects == "full");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
@@ -315,7 +315,7 @@ static void test_preferences()
     CHECK(config::get().pin_lock == "changes");
 
     // Values from the lists are kept.
-    write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 3, "effects": "full",
+    write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 3, "effects": "auto",
                     "activity_account": "0123456789ABCDEF0123456789ABCDEF", "activity_account_last": "",
                     "games_grid": false, "check_grid": true, "export_format": 3, "backup_keep": 10, "update_daily": true,
                     "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
@@ -330,8 +330,11 @@ static void test_preferences()
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
     CHECK(c.activity_period == 3 && !c.games_grid && c.check_grid && c.export_format == 3 && c.backup_keep == 10);
-    CHECK(c.effects == "full");
+    CHECK(c.effects == "auto");
     CHECK(c.activity_account == "0123456789ABCDEF0123456789ABCDEF" && c.activity_account_last.empty());
+    write_config(R"({"effects": "reduced"})");
+    config::load();
+    CHECK(config::get().effects == "reduced");
     CHECK(c.update_daily && c.update_checked == "2026-10-07" && c.clock_check_at_start);
 
     // Anything else goes back to the default: no 7-minute keep, no 999-minute
@@ -348,7 +351,7 @@ static void test_preferences()
     CHECK(c.logs_keep == 20 && c.logs_keep_days == 0 && c.logs_keep_mb == 0);
     CHECK(c.start_tab == "dashboard" && c.extra_amounts == std::vector<int>({ 15, 30, 60 }));
     CHECK(c.activity_period == 1 && c.export_format == 0 && c.backup_keep == 0 && c.update_checked.empty());
-    CHECK(c.effects == "auto");
+    CHECK(c.effects == "full");
     CHECK(c.activity_account == "last" && c.activity_account_last.empty());
     // The tabs that became Console: the network clock and the console part of Tools.
     for (const char* old_tab : { "clock", "tools" }) {

@@ -11,6 +11,7 @@
 #include "core/sim_env.h"
 #include "ui/cadran_kit.hpp"
 #include "ui/effects.hpp"
+#include "ui/motion.hpp"
 #include "util/config.hpp"
 #include "view/cadran_icon.hpp"
 
@@ -595,6 +596,13 @@ void cadran::List::apply(const std::vector<std::pair<const char*, const char*>>&
     for (brls::View* line : this->box->getChildren())
         if (auto* c = dynamic_cast<Card*>(line)) c->follow_rows();
     this->sync();
+    // The screen's lines rise into place one after the other, the first
+    // ones only (the rest are below the fold, or come as they are): its top
+    // board, its tile rows and its cards. A kicker is a label: left as it is.
+    std::vector<brls::View*> rising;
+    for (brls::View* line : this->box->getChildren())
+        if (dynamic_cast<brls::Box*>(line) && line->getId() != "cadran_list") rising.push_back(line);
+    motion::reveal_all(rising);
 }
 
 void cadran::List::section(brls::Header* header)
