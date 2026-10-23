@@ -95,6 +95,7 @@ DashboardTab::DashboardTab()
         pt_flow::turn_alarm_on("overview", this->refresher());
         return true;
     });
+    ring->setRolls(true);   // the minutes roll as they go
     this->enable_auto_refresh(5000);
     // Only while shown: replaced by another tab and waiting to be freed, its
     // pill would cover the new tab's.

@@ -21,6 +21,10 @@ class CadranIcon : public brls::View
 
     void setIcon(const std::string& name);
     void setColor(NVGcolor color);
+    // The icon pops into place (grows from nothing, a little past its size,
+    // then settles): a check that was just earned. Nothing with the motion
+    // off (ui/effects).
+    void pop();
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
@@ -30,4 +34,5 @@ class CadranIcon : public brls::View
   private:
     std::string icon = "today";
     NVGcolor color;
+    brls::Time pop_since = 0;   // pop(): when it began (µs), 0 at rest
 };

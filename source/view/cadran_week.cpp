@@ -2,9 +2,12 @@
 #include "view/cadran_week.hpp"
 
 #include <algorithm>
+#include <cstdlib>
 #include <fmt/format.h>
 
 #include "action/pt_logic.hpp"
+#include "ui/effects.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -12,6 +15,10 @@ using namespace brls::literals;
 namespace
 {
 constexpr float COL_HEIGHT = 262.0f;
+// A bar's way to a new height (µs), and the gap between two bars moving
+// together (a day copied to the others).
+constexpr float BAR_MOVE_US   = 180000.0f;
+constexpr int   BAR_STAGGER_MS = 35;
 constexpr float BED_HEIGHT = 24.0f;   // the bedtimes' line, when shown
 // The tallest bar still leaves room in its column (262 less its padding, 18,
 // the arrows, 52, the value, 31, the day's name, 16, and 8 under the bar):
@@ -318,6 +325,7 @@ void CadranWeekView::render()
     uint16_t top = 180;
     for (int d = 0; d < 7; d++)
         if (this->days[d] != PT_DAY_NOLIMIT) top = std::max(top, this->days[d]);
+    float target[7];   // each bar's height asked
     for (int d = 0; d < 7; d++) {
         Col& c = this->cols[d];
         const uint16_t m = this->days[d];
@@ -332,7 +340,7 @@ void CadranWeekView::render()
         // Not the colour alone: a triangle before it too (the key shows one).
         c.over->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         const float bar = !this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top);
-        c.bar->setHeight(bar);
+        target[d] = bar;   // laid out below, on its way there
         c.bar->setBackgroundColor(is_focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
         c.bar->setBorderColor(theme["cadran/amber_fill"]);
         c.bar->setBorderThickness(changed ? 2 : 0);
@@ -342,8 +350,8 @@ void CadranWeekView::render()
         // played (a third at least, to be seen). Nothing on a day without
         // a limit. Last week's days fainter.
         const bool fills = this->valid && this->played_ok && m != PT_DAY_NOLIMIT && m > 0 && this->played[d] > 0;
+        this->bars[d].fill_share = fills ? std::min(1.0f, (float)this->played[d] / (float)m) : 0.0f;
         if (fills) {
-            c.fill->setHeight(std::max(6.0f, bar * std::min(1.0f, (float)this->played[d] / (float)m)));
             // On the focused bar (teal itself), the teal darkened.
             NVGcolor shade = theme["cadran/navy"];
             shade.a = 0.35f;
@@ -358,7 +366,7 @@ void CadranWeekView::render()
             }
             const float within = over ? std::min(2.0f / 3.0f, (float)m / (float)this->played[d]) : 1.0f;
             c.fill->setBackgroundColor(over ? past : played_color);
-            c.within->setHeight(bar * within);
+            this->bars[d].within_share = within;
             c.within->setBackgroundColor(played_color);
             c.within->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         }
@@ -370,6 +378,58 @@ void CadranWeekView::render()
         c.up->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
         c.down->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
     }
+    // The bars whose height changed start moving: one after the other,
+    // outward from the focused day, when several do (a copy); at once when
+    // one does, or the first time, or with the motion off.
+    const brls::Time now = motion::now();
+    const auto place = [](int d) { return (d + 6) % 7; };   // Monday first
+    int changed = 0;
+    for (int d = 0; d < 7; d++) changed += target[d] != this->bars[d].to ? 1 : 0;
+    for (int d = 0; d < 7; d++) {
+        BarMove& b = this->bars[d];
+        if (target[d] == b.to) continue;   // there, or on its way there
+        if (!this->bars_set || !effects::motion()) {
+            b.from  = b.to = target[d];
+            b.since = 0;
+            continue;
+        }
+        b.from = this->bar_now(d);   // from where it is drawn now
+        b.to   = target[d];
+        const int gap = changed > 1 && this->focused >= 0 ? std::abs(place(d) - place(this->focused)) : 0;
+        b.since = now + (brls::Time)gap * BAR_STAGGER_MS * 1000;
+    }
+    this->bars_set = true;
+    this->layout_bars();
+}
+
+float CadranWeekView::bar_now(int day) const
+{
+    const BarMove& b = this->bars[day];
+    if (!b.since) return b.to;
+    const float t = motion::ease_out(motion::progress(b.since, BAR_MOVE_US));
+    return b.from + (b.to - b.from) * t;
+}
+
+void CadranWeekView::layout_bars()
+{
+    for (int d = 0; d < 7; d++) {
+        Col& c = this->cols[d];
+        BarMove& b = this->bars[d];
+        const float h = this->bar_now(d);
+        if (b.since && motion::progress(b.since, BAR_MOVE_US) >= 1.0f) b.since = 0;   // arrived
+        c.bar->setHeight(h);
+        if (b.fill_share > 0.0f) c.fill->setHeight(std::max(6.0f, h * b.fill_share));
+        c.within->setHeight(h * b.within_share);
+    }
+}
+
+void CadranWeekView::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+                          brls::FrameContext* ctx)
+{
+    bool on_the_move = false;
+    for (const BarMove& b : this->bars) on_the_move = on_the_move || b.since != 0;
+    if (on_the_move) this->layout_bars();
+    brls::Box::draw(vg, x, y, width, height, style, ctx);
 }
 
 bool CadranWeekView::last_week(int day)

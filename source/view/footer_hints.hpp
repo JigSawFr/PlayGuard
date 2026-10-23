@@ -20,6 +20,15 @@ class FooterHints : public brls::Hints
     static void install();
     static brls::View* create();
 
+    // The hint whose text is `hint_text` is on offer until `until` (µs,
+    // brls::getCPUTimeUsec), out of `total_us`: a thin teal line under it
+    // drains meanwhile, and the hint fades over its last second (ZR Undo).
+    // An empty text, or `until` 0, ends it. Nothing with the motion off.
+    static void set_timed(const std::string& hint_text, brls::Time until, brls::Time total_us);
+
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+              brls::FrameContext* ctx) override;
+
   private:
     void fit();
 

@@ -98,7 +98,8 @@ brls::Box* key(const char* letter, float size = 24);
 brls::Box* qr(const std::string& payload, float side, const std::string& title, const std::string& caption,
               float width = 0);
 
-// A progress bar, 12 px high: the well, filled in teal up to `set`.
+// A progress bar, 12 px high: the well, filled in teal up to `set`; the
+// fill eases to each new value (at once with the motion off).
 class Bar : public brls::View
 {
   public:
@@ -108,10 +109,21 @@ class Bar : public brls::View
               brls::FrameContext* ctx) override;
 
   private:
+    float drawn() const;   // the fill now, on its way from `from` to `fraction`
     float fraction = 0;
+    float from = 0;
+    brls::Time since = 0;
 };
 
 // A rounded chip with a text in the display face (an amount, a period…).
+// Pressed (A, a tap), it dips a little and comes back, with the press's
+// own flash.
+class Chip : public brls::Box
+{
+  public:
+    Chip();
+    void frame(brls::FrameContext* ctx) override;
+};
 brls::Box* chip(const std::string& text, float height = 48);
 
 // What an empty list shows instead: a card with `icon_name` in a soft circle,

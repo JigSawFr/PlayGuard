@@ -9,6 +9,7 @@
 #include "action/pairing_state.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_text.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -166,7 +167,13 @@ void DashboardTab::order_pills()
     std::vector<std::pair<brls::View*, bool>> shown;
     for (const Pill* p : all) shown.push_back({ p->box, p->on && (p->rank == 0 || !fold) });
     shown.push_back({ this->fine_pill.box, fold });
-    for (const auto& [view, visible] : shown) ui::set_visible(view, visible);
+    // The pills unfolded (Ⓐ on the summary) come in one after the other.
+    std::vector<brls::View*> unfolded;
+    for (const auto& [view, visible] : shown) {
+        if (visible && view->getVisibility() != brls::Visibility::VISIBLE && this->fine_open) unfolded.push_back(view);
+        ui::set_visible(view, visible);
+    }
+    if (!unfolded.empty()) motion::reveal_all(unfolded, 6.0f, 200, 30, 8);
     all.push_back(&this->fine_pill);
     std::vector<brls::View*> wanted;
     for (const Pill* p : all)
@@ -175,6 +182,13 @@ void DashboardTab::order_pills()
     // Not under the focus: moved, a focused pill would lose it.
     for (brls::View* v : wanted)
         if (v->isFocused()) return;
+    // Each pill slides from where it was to where it goes (the places are
+    // laid out again on the spot).
+    std::vector<std::pair<brls::View*, brls::Point>> was;
+    for (brls::View* v : wanted)
+        if (v->getVisibility() == brls::Visibility::VISIBLE && v->getWidth() > 0) was.push_back({ v, brls::Point { v->getX(), v->getY() } });
     for (brls::View* v : wanted) pills->removeView(v, false);
     for (brls::View* v : wanted) pills->addView(v);
+    for (const auto& [v, at] : was)
+        if (v->getVisibility() == brls::Visibility::VISIBLE && v->getWidth() > 0) motion::slide_from(v, at.x - v->getX(), at.y - v->getY());
 }

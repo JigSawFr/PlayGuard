@@ -50,6 +50,10 @@ class CadranWeekView : public brls::Box
     void focus_day(int day);   // 0 = Sunday
     int  focused_day() const { return this->focused; }
 
+    // The bars on their way to their new heights (ui/motion), then the week.
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+              brls::FrameContext* ctx) override;
+
     static brls::View* create();
     // Whether `day` (0 = Sunday) comes after today in the week laid out from
     // Monday: what it shows played is last week's.
@@ -88,6 +92,22 @@ class CadranWeekView : public brls::Box
     std::function<void(int)>           on_focus;
 
     void render();
+    // A bar's height eases to the one render() asks (at once with the motion
+    // off); several asked at once (L / R copy a day) start one after the
+    // other, outward from the day copied. layout_bars() sets the heights as
+    // they are now, the time played inside each bar following.
+    struct BarMove
+    {
+        float      from  = 0;   // the height left
+        float      to    = 0;   // the height asked
+        brls::Time since = 0;   // when it started (µs); 0: there already
+        float      fill_share   = 0;   // the time played, as a share of the bar (0: none drawn)
+        float      within_share = 0;   // of it, the part within the limit (a limit gone past)
+    };
+    BarMove bars[7];
+    bool    bars_set = false;   // the first render laid the bars: later ones move them
+    float   bar_now(int day) const;
+    void    layout_bars();
     void nudge(int day, int delta);
     pt_logic::Held held;   // ↑/↓ held (nudge())
     void set_edit(bool on);

@@ -1333,8 +1333,9 @@
         },
         "effects": "Visual effects",
         "effects_values": {
+            "full": "Always full",
             "auto": "Lighter on battery",
-            "full": "Always full"
+            "reduced": "Reduced motion"
         }
     },
     "backup": {

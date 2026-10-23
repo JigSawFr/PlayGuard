@@ -27,9 +27,13 @@ class GameTile : public brls::Box
     // Back to the placeholder: the tile shows another game.
     void clear_icon();
 
+    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+              brls::FrameContext* ctx) override;
+
   private:
     brls::Image* icon = nullptr;
     brls::Label* name = nullptr;
     brls::Label* detail = nullptr;
     bool iconed = false;
+    brls::Time icon_since = 0;   // the icon arrived then (µs): it fades in; 0 at rest
 };

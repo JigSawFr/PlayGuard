@@ -11,6 +11,7 @@
 #include "action/pt_logic.hpp"
 #include "activity/main_activity.hpp"
 #include "ui/cadran_frame.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 #include "ui/cadran_kit.hpp"
 
@@ -60,6 +61,8 @@ void CadranChildActivity::onContentAvailable()
     }
 
     ring->setShowLeft(true);
+    ring->setTip(true);     // where the time is, a point of light at the arc's end
+    ring->setRolls(true);   // the minutes roll as they go
     ring->setValueSize(96);
     ring->setCaptionSize(22);
     // Already sized for the room: the larger text leaves it as it is.
@@ -70,6 +73,7 @@ void CadranChildActivity::onContentAvailable()
     if (brls::View* root = this->getView("child_root")) {
         root->setHideHighlight(true);
         brls::Application::giveFocus(root);
+        motion::reveal(root, 10.0f, 220);   // the ring and its chips rise into place
     }
     // Back to the parent's screens only with the PIN (none on the console: at once).
     this->getContentView()->registerAction("playguard/cadran/child/back"_i18n, brls::BUTTON_A, [](brls::View*) {
@@ -177,7 +181,13 @@ void CadranChildActivity::refresh()
     end_icon->setColor(theme[last ? "cadran/amber" : "cadran/teal"]);
     end_text->setTextColor(theme[last ? "cadran/amber" : "cadran/text"]);
     ui::set_visible(end_chip.getView(), ending);
-    ring->setPulse(last);
+    // The beat of the last minutes, faster in the last one.
+    ring->setPulse(last, last && n.in <= 1);
+    // The time just up (seen counting before): the arc has emptied, the end
+    // chip breathes once, then all is still.
+    const bool up = st.kind == pt_logic::RingState::TIME_UP;
+    if (up && this->was_counting && ending) motion::breathe(end_chip.getView(), 0.45f, 900);
+    this->was_counting = st.kind == pt_logic::RingState::COUNTING;
     const bool bed = pt.bedtime_valid && pt.bedtime_enabled;
     ui::set_visible(bed_chip.getView(), bed);
     if (bed) {
