@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
+<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
 # 快速上手
 
 从 SD 卡到一台为孩子设置好的主机，大约十分钟，然后是日常操作。返回 [README](../../README.md)。

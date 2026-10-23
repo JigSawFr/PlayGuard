@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
+<!-- translated from docs/troubleshooting.md, sha256 45158eaaf5a4 -->
 # Solución de problemas
 
 Recuperar el acceso a una consola bloqueada, los problemas habituales, informar de un error y el modo desarrollador. Volver al [README](../../README.md).
@@ -28,7 +28,7 @@ El módulo debe seguir la versión de PlayGuard: con cada actualización de Play
 *Consola › Forwarders › Bloquear el menú homebrew* impide que el álbum y un juego iniciado con R abran el menú homebrew. Si el forwarder de PlayGuard y el menú protegido han desaparecido los dos (eliminados en la configuración de la consola, o en el otro sistema: el bloqueo está en la tarjeta SD y lo leen tanto la sysMMC como la emuMMC):
 
 - **Desde un ordenador:** elimina `atmosphere/config/override_config.ini` de la tarjeta SD (o vuelve a poner `config/playguard/override_config.ini.backup`, el archivo tal como estaba) y reinicia la consola.
-- **Con el módulo de rescate instalado** (opcional): coloca un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y reinicia; el módulo quita el bloqueo al arrancar, y PlayGuard lo indica la siguiente vez que se inicia. Una actualización de Atmosphère desde que se bloqueó lo quita de la misma forma.
+- **Con el sysmodule de recuperación instalado** (opcional): coloca un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y reinicia; el sysmodule quita el bloqueo al arrancar, y PlayGuard lo indica la siguiente vez que se inicia. Una actualización de Atmosphère desde que se bloqueó lo quita de la misma forma.
 
 ### Consola sin modificar
 
@@ -43,7 +43,7 @@ PlayGuard no puede ayudar: necesita Atmosphère. La vía oficial es el procedimi
 - **El reloj de red nunca se ajustó.** *Consola › Reloj de red › Medir el desfase del reloj*, y luego ajústalo ([reloj de red](features.md#reloj-de-red)).
 - **El reloj se atrasó.** Tras un salto hacia atrás, la cuenta se detiene hasta que el reloj pasa la hora anterior; no hay nada que hacer.
 - **Se acaba de escribir un límite.** Inicia un juego un minuto y vuelve a comprobarlo.
-- **El control parental está desbloqueado temporalmente.** Es posible que entonces no se cuente el tiempo de juego: *Seguridad › Reactivar el control parental*.
+- **El control parental está desbloqueado temporalmente.** Es posible que entonces no se cuente el tiempo de juego: *Hoy › Reactivar* (o un toque en la píldora de la cabecera).
 
 ### Mis límites han cambiado solos
 
@@ -54,7 +54,7 @@ PlayGuard no puede ayudar: necesita Atmosphère. La vía oficial es el procedimi
 ### El niño ha jugado más allá del límite
 
 - **La consola solo avisa.** *Tiempo de juego › Cuando se acabe el tiempo*: elige *Suspender el programa*.
-- **El control parental se quedó desbloqueado.** Mientras lo está, el límite de hoy queda en pausa: la píldora de la cabecera lo indica en todas las pestañas; *Seguridad › Reactivar el control parental*. Reiniciar la consola también lo bloquea.
+- **El control parental se quedó desbloqueado.** Mientras lo está, el límite de hoy queda en pausa: la píldora de la cabecera lo indica en todas las pestañas, y al tocarla lleva a *Hoy › Reactivar*. Reiniciar la consola también lo bloquea.
 - **El reloj se atrasó.** La cuenta se detiene hasta que el reloj pasa la hora anterior ([qué cuenta](features.md#qué-cuenta-como-tiempo-de-juego)).
 - **El otro sistema.** La emuMMC y la sysMMC tienen cada una su propio control parental: configúralo en ambas, u oculta el menú de arranque de hekate ([compatibilidad](compatibility.md#emummc-y-sysmmc)).
 
@@ -141,7 +141,7 @@ Pulsa Ⓨ siete veces en *Acerca de › Versión*; las herramientas de desarroll
 
 - un interruptor de **solo lectura**: activado, la aplicación no puede cambiar nada; es la forma segura de investigar un firmware nuevo (la pantalla del firmware lo ofrece directamente);
 - el informe de diagnóstico en pantalla (Ⓨ lo guarda, Ⓧ lo envía en línea), y un acceso directo para exportarlo desde la pestaña Tiempo de juego;
-- **Autoprueba de la consola**: lo que PlayGuard comprueba por sí solo en esta consola antes de recorrer a mano [la lista de comprobación en consola](../hardware-test.md) (en inglés): el PIN, los parches de firma, la carpeta de datos, cada forwarder creado por PlayGuard (en el menú HOME, protegido, visto funcionar a través de su puerta), la puerta en la tarjeta SD, lo que Atmosphère lee del bloqueo del menú homebrew, los caminos de vuelta, el módulo de rescate. No cambia nada, y escribe su resultado en Markdown en `config/playguard/self-test.md`, para pegarlo en la pull request;
+- **Autoprueba de la consola**: lo que PlayGuard comprueba por sí solo en esta consola antes de recorrer a mano [la lista de comprobación en consola](../hardware-test.md) (en inglés): el PIN, los parches de firma, la carpeta de datos, cada forwarder creado por PlayGuard (en el menú HOME, protegido, visto funcionar a través de su puerta), la puerta en la tarjeta SD, lo que Atmosphère lee del bloqueo del menú homebrew, los caminos de vuelta, el sysmodule de recuperación. No cambia nada, y escribe su resultado en Markdown en `config/playguard/self-test.md`, para pegarlo en la pull request;
 - **Instalar otra compilación** en su lugar, para probar una corrección antes de que se publique ([más abajo](#instalar-otra-compilación));
 - **Comparar bloque del temporizador** (solo mientras la aplicación móvil está vinculada y puede sincronizarse, no con un archivo hosts que bloquee a Nintendo; también en *Seguridad*), para descifrar ajustes que PlayGuard aún no muestra: guarda el bloque en bruto como referencia, cambia un ajuste en la aplicación móvil y vuelve: PlayGuard enumera los valores que han cambiado (guardados en `logs/reports/` si lo pides). Así se podrían confirmar horas de dormir distintas para cada día, configuradas desde la aplicación móvil. Adjunta ese archivo a una incidencia, o envíalo con el informe (*Enviar un informe en línea*).
 - **Registrar el temporizador de juego**: cada 30 s mientras PlayGuard está abierto, una línea con lo que indica el temporizador (tiempo restante, tiempo jugado, el bloque de ajustes en bruto…) en `logs/play_timer/log.csv`, un archivo listo para una hoja de cálculo, más una línea justo después de cada cambio que hace PlayGuard, que dice cuál (su última columna, `event`), y una nota cuando el reloj se ha movido más que el tiempo transcurrido. Si se deja abierto pasada la medianoche, o hasta que se acabe el tiempo, muestra lo que un solo informe no puede: cuándo se pone a cero el tiempo jugado y qué dice la consola cerca del final. El interruptor se recuerda; solo registra en modo desarrollador. Lo que se sabe hasta ahora está en [parental-controls.md](../parental-controls.md) (en inglés).
@@ -171,6 +171,6 @@ Pulsa Ⓨ siete veces en *Acerca de › Versión*; las herramientas de desarroll
 - Una descarga interrumpida (pérdida de red) continúa donde se quedó la próxima vez que se instala la misma compilación.
 - Los artefactos caducan a los 90 días.
 
-**Volver atrás.** La compilación sustituida se conserva (`playguard.nro.previous`): **Volver a la compilación anterior**, en la misma lista, las vuelve a intercambiar, tras el PIN; nombra esa compilación por su versión, su pull request y su commit. Si una compilación instalada desde aquí (o con *Actualizar* en PlayGuard) se cierra antes de su primera pantalla, el siguiente inicio de PlayGuard ofrece volver a la compilación anterior en una pantalla de texto simple, antes de cargar nada más (A vuelve atrás, B la inicia de todos modos), sin el PIN, ya que la propia pantalla del PIN puede ser lo que falla. La misma lista permite volver a cualquier versión publicada en cualquier momento.
+**Volver atrás.** La compilación sustituida se conserva (`playguard.nro.previous`): **Volver a la compilación anterior**, en la misma lista, las vuelve a intercambiar, tras el PIN; nombra esa compilación por su versión, su pull request y su commit. Si una compilación instalada desde aquí (o con *Actualizar* en PlayGuard) se cierra antes de su primera pantalla, el siguiente inicio de PlayGuard ofrece volver a la compilación anterior en una pantalla de texto simple, antes de cargar nada más (A vuelve atrás, B la inicia de todos modos). Volver atrás pide el PIN en la propia pantalla del PIN de la consola cuando hay uno (no en la pantalla de bloqueo de PlayGuard, que puede ser lo que falla); sin él, se inicia la compilación instalada. La misma lista permite volver a cualquier versión publicada en cualquier momento.
 
 **Qué compilación se ejecuta:** *Acerca de › Versión* muestra el commit en modo desarrollador. La cabecera de cada pantalla muestra la versión en uso junto al título: la de una versión publicada en una etiqueta gris (`1.2.0`), la de cualquier otra compilación en una etiqueta ámbar seguida de su commit, para que nunca se confunda una compilación de prueba con la versión publicada.
