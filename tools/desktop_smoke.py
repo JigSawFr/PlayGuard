@@ -121,6 +121,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -581,9 +582,9 @@ if LOADING:
 if ROLLBACK:
     # A build installed in place whose last start never reached its first
     # screen, the build before it kept: the start-up screen offers it before
-    # anything else (the PIN set or not), A takes it back and hbloader starts
-    # it. Then a start that is not after a crash: nothing offered (see the
-    # end of the run).
+    # anything else, A asks for the PIN (refused first: nothing swapped),
+    # takes it back and hbloader starts it. Then a start that is not after a
+    # crash: nothing offered (see the end of the run).
     env.setdefault("PLAYGUARD_SIM_HBLOADER", "1")
     env["PLAYGUARD_SIM_BOOT_CHOICE"] = "a"
     sd_nro = os.path.join(run_dir, "playguard_data", "sd", "switch", "playguard", "playguard.nro")
@@ -602,6 +603,40 @@ def have(tool):
 cmd = (["stdbuf", "-oL", "-eL"] if have("stdbuf") else []) + [APP]
 if have("dbus-run-session"):
     cmd = ["dbus-run-session", "--"] + cmd
+if ROLLBACK:
+    # First the PIN screen left with B: A on the start-up screen does not
+    # go back, the build installed starts (its window), the two builds as
+    # they are; its start counts again, so the run below is offered too.
+    refused_log_file = os.path.join(OUT, "app-pin-refused.log")
+    refused_env = dict(env, PLAYGUARD_SIM_FAIL="pin_entry")
+    with open(refused_log_file, "w") as refused_log:
+        # Its own process group, all of it ended (dbus-run-session's child
+        # too), before the run below reads the same files.
+        p = subprocess.Popen(cmd, cwd=run_dir, env=refused_env, stdout=refused_log, stderr=subprocess.STDOUT,
+                             start_new_session=True)
+        for _ in range(40):
+            if p.poll() is not None or "start-up: loading screen drawn" in open(refused_log_file, errors="replace").read():
+                break
+            time.sleep(0.2)
+        try:
+            os.killpg(p.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        p.wait()
+    text = open(refused_log_file, errors="replace").read()
+    refused = None
+    if "rollback: offered" not in text or "rollback: not gone back, the PIN not entered" not in text:
+        refused = "the start-up screen did not ask for the PIN before going back"
+    elif "next load: sdmc:" in text or open(sd_nro).read() != "the build that crashes":
+        refused = "the two builds were swapped without the PIN"
+    elif "start-up: loading screen drawn" not in text:
+        refused = "the build installed did not start once the PIN was not entered"
+    elif json.load(open(os.path.join(data, "boot_check.json"))).get("starts") != 2:
+        refused = "the start after the PIN was not entered was not counted"
+    if refused:
+        print("SMOKE FAILED:", refused)
+        print(text[-3000:])
+        sys.exit(1)
 proc = subprocess.Popen(cmd, cwd=run_dir, env=env, stdout=log, stderr=subprocess.STDOUT)
 
 
