@@ -34,7 +34,7 @@ void sysinfo_get(SysInfo *out)
     out->blank_valid = true;
     out->blank = sim_env_flag("PLAYGUARD_SIM_BLANK");
     out->applet_mode = sim_env_flag("PLAYGUARD_SIM_APPLET");
-    out->forwarder = !out->applet_mode && sim_env_flag("PLAYGUARD_SIM_FORWARDER");
+    out->forwarder = !out->applet_mode && sim_env_flag("PLAYGUARD_SIM_FROM_FORWARDER");
     out->serial_valid = true;
     out->device_id_valid = true;
     out->device_id = 0x0010000000000001ULL;

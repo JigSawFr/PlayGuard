@@ -24,6 +24,7 @@
   {"name": "region", "group": "console", "type": "select", "options": ["", "0", "1", "2", "3", "4", "5"]},
   {"name": "sd_free_mb", "group": "console", "type": "number", "min": 0},
   {"name": "applet", "group": "console", "type": "bool"},
+  {"name": "from_forwarder", "group": "console", "type": "bool"},
   {"name": "background", "live": true, "group": "console", "type": "bool"},
   {"name": "hbloader", "live": true, "group": "console", "type": "bool"},
   {"name": "forwarders", "group": "console", "type": "bool"},
