@@ -97,6 +97,9 @@ void test_reads_while_the_language_changes()
 }
 } // namespace
 
+// A sanitizer's report says where it was reached (as CI shows it).
+extern "C" const char* __ubsan_default_options() { return "print_stacktrace=1"; }
+
 int main()
 {
     TempDir tmp("i18n_threads", TempDir::Enter);
