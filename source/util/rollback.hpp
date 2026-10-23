@@ -36,10 +36,16 @@ bool write_check(const std::string& json_file, const Check& check);
 // Whether the previous build is offered at start-up: the last start of the
 // build installed did not reach its first screen. `checked`: boot_check.json
 // was there, `starts_before` read from it (before this start counts);
-// `have_previous`: <nro>.previous is there. It goes back without the PIN:
-// the PIN screen itself may be what crashes, and the build was just
-// installed by whoever knows the PIN.
+// `have_previous`: <nro>.previous is there. It is offered before
+// PlayGuard's own lock screen (which may be what crashes); going back still
+// needs the PIN (go_back_allowed).
 bool offer_at_start(bool checked, int starts_before, bool have_previous);
+
+// Whether the start-up may go back once the system's PIN screen (pctlauth,
+// not PlayGuard's code) was shown: the PIN entered, or no PIN set. A start
+// that did not finish is easy to cause (the power button), and going back
+// replaces PlayGuard, as Install another build does with the PIN.
+bool go_back_allowed(bool pin_entered, bool no_pin_set);
 
 // Swaps <nro> and <nro>.previous (the build running becomes the previous
 // one), through paths::replace_file. When a step fails, what was moved is

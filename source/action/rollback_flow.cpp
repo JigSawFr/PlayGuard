@@ -13,6 +13,7 @@
 #include "util/launcher.hpp"
 #include "util/migrations.hpp"
 #include "util/paths.hpp"
+#include "util/pctl_ops_c.hpp"
 #include "util/rollback.hpp"
 
 using namespace brls::literals;
@@ -83,6 +84,21 @@ bool at_start()
                              previous + "\n  (B)  Start " + running_label() + "\n";
     brls::Logger::info("rollback: offered (crashed)");
     if (!platform_boot_choice(text.c_str())) return false;
+
+    // Going back replaces PlayGuard, as Install another build does: the
+    // PIN whenever one is set. The system's PIN screen, not PlayGuard's
+    // (which may be what crashed); config and borealis are not needed.
+    const Result pin = pctl_ask_pin();
+    if (!rollback::go_back_allowed(R_SUCCEEDED(pin), pin == NXM_RC_NO_PIN)) {
+        brls::Logger::info("rollback: not gone back, the PIN not entered (0x{:08X})", (unsigned)pin);
+        // Left with B: said plainly; another failure with its code.
+        const std::string why =
+            pin == NXM_RC_CANCELLED ? std::string() : " (" + fmt::format("0x{:08X}", (unsigned)pin) + ")";
+        platform_boot_choice(("\n  The PIN was not entered" + why + ": " + previous + " stays where it is.\n\n" +
+                              "  (A) / (B)  Start " + running_label() + "\n")
+                                 .c_str());
+        return false;
+    }
 
     std::string err;
     if (!swap(nro, &err, true)) {

@@ -63,20 +63,46 @@ bool hosversionAtLeast(u8 major, u8 minor, u8 micro)
     return model.hos >= MAKEHOSVERSION(major, minor, micro);
 }
 
-/* What pctl_pin_hmac handed libnx's HMAC: the key and the message. */
-static char hmac_key[33];
-static size_t hmac_key_size, hmac_msg_size;
+/* What pctl_pin_hmac handed libnx's HMAC, call by call: the key and the
+ * message (rescue_proof_mac makes two: the key, then the MAC). */
+static u8 hmac_key[2][33], hmac_msg[2][64];
+static size_t hmac_key_size[2], hmac_msg_size[2];
 static unsigned hmacs;
 
 void hmacSha256CalculateMac(void *dst, const void *key, size_t key_size, const void *src, size_t size)
 {
+    const unsigned i = hmacs < 2 ? hmacs : 1;
     hmacs++;
-    hmac_key_size = key_size < sizeof(hmac_key) ? key_size : sizeof(hmac_key) - 1;
-    memcpy(hmac_key, key, hmac_key_size);
-    hmac_key[hmac_key_size] = '\0';
-    hmac_msg_size = size;
-    memset(dst, 0xA5, 32);   /* any MAC: what matters is what it is made of */
-    (void)src;
+    hmac_key_size[i] = key_size < sizeof(hmac_key[i]) ? key_size : sizeof(hmac_key[i]) - 1;
+    memcpy(hmac_key[i], key, hmac_key_size[i]);
+    hmac_msg_size[i] = size;
+    memcpy(hmac_msg[i], src, size < sizeof(hmac_msg[i]) ? size : sizeof(hmac_msg[i]));
+    memset(dst, 0xA5 + i, 32);   /* any MAC: what matters is what it is made of */
+}
+
+/* The console's secret (GetMiiAuthorId): its session released, a failure. */
+static struct {
+    unsigned refs, reads;
+    bool fail, zero;
+} setsys;
+Result setsysInitialize(void)
+{
+    CHECK(setsys.refs == 0);
+    setsys.refs++;
+    return 0;
+}
+void setsysExit(void)
+{
+    CHECK(setsys.refs == 1);
+    setsys.refs--;
+}
+Result setsysGetMiiAuthorId(Uuid *out)
+{
+    CHECK(setsys.refs == 1);
+    setsys.reads++;
+    if (setsys.fail) return MOCK_ERROR;
+    for (int i = 0; i < 16; i++) out->uuid[i] = setsys.zero ? 0 : (u8)(0xC0 + i);
+    return 0;
 }
 
 Result pctlInitialize(void)
@@ -1438,31 +1464,58 @@ static void test_pin_weak(void)
     CHECK(pctl_pin_weak(NULL) == NXM_RC_INVALID_ARGUMENT);
 }
 
-/* pctl_pin_hmac: the digits of the PIN as the key (as the recovery sysmodule
- * takes them), no reveal check, every session released, nothing on error. */
+/* pctl_pin_hmac: the key made of the console's secret and the digits of the
+ * PIN (as the recovery sysmodule takes them, rescue_proof_mac), no reveal
+ * check, every session released, nothing on error. */
 static void test_pin_hmac(void)
 {
+    static const char label[] = "playguard-rescue-key/2\n";
     u8 mac[32];
     reset();
+    memset(&setsys, 0, sizeof(setsys));
     reveal_answer = false;
     reveals = 0;
     hmacs = 0;
     core_set_reveal_check(reveal_check);   /* refusing: not asked at all */
     model.pin = "1234";
-    CHECK(pctl_pin_hmac("message", 7, mac) == 0 && reveals == 0 && hmacs == 1);
-    CHECK(strcmp(hmac_key, "1234") == 0 && hmac_key_size == 4 && hmac_msg_size == 7 && mac[0] == 0xA5);
-    CHECK(model.writes == 0 && model.refs == 0 && model.init_calls == model.exit_calls);
+    CHECK(pctl_pin_hmac("message", 7, mac) == 0 && reveals == 0 && hmacs == 2 && setsys.reads == 1);
+    /* The key: HMAC(secret, label + PIN); the PIN alone is never a key. */
+    CHECK(hmac_key_size[0] == 16 && hmac_key[0][0] == 0xC0 && hmac_key[0][15] == 0xCF);
+    CHECK(hmac_msg_size[0] == strlen(label) + 4 && memcmp(hmac_msg[0], label, strlen(label)) == 0 &&
+          memcmp(hmac_msg[0] + strlen(label), "1234", 4) == 0);
+    /* The MAC: the message under that key. */
+    CHECK(hmac_key_size[1] == 32 && hmac_key[1][0] == 0xA5 && hmac_msg_size[1] == 7 &&
+          memcmp(hmac_msg[1], "message", 7) == 0 && mac[0] == 0xA6);
+    CHECK(model.writes == 0 && model.refs == 0 && model.init_calls == model.exit_calls && setsys.refs == 0);
     core_set_reveal_check(NULL);
 
     reset();
+    hmacs = 0;
     model.pin = "";
     memset(mac, 1, sizeof(mac));
-    CHECK(pctl_pin_hmac("m", 1, mac) == NXM_RC_NO_PIN && mac[0] == 0 && hmacs == 1 && model.refs == 0);
+    CHECK(pctl_pin_hmac("m", 1, mac) == NXM_RC_NO_PIN && mac[0] == 0 && hmacs == 0 && model.refs == 0);
 
     reset();
+    hmacs = 0;
     model.fail_command = 1208;
     memset(mac, 1, sizeof(mac));
-    CHECK(pctl_pin_hmac("m", 1, mac) == MOCK_ERROR && mac[31] == 0 && hmacs == 1 && model.refs == 0);
+    CHECK(pctl_pin_hmac("m", 1, mac) == MOCK_ERROR && mac[31] == 0 && hmacs == 0 && model.refs == 0);
+
+    /* The secret not read: no session opened, no MAC. */
+    reset();
+    hmacs = 0;
+    setsys.fail = true;
+    memset(mac, 1, sizeof(mac));
+    CHECK(pctl_pin_hmac("m", 1, mac) == MOCK_ERROR && mac[0] == 0 && hmacs == 0 && model.init_calls == 0 &&
+          setsys.refs == 0);
+    /* A secret of zeros is none. */
+    reset();
+    hmacs = 0;
+    setsys.fail = false;
+    setsys.zero = true;
+    memset(mac, 1, sizeof(mac));
+    CHECK(pctl_pin_hmac("m", 1, mac) == NXM_RC_STATE_UNKNOWN && mac[0] == 0 && hmacs == 0 && model.refs == 0);
+    setsys.zero = false;
 
     CHECK(pctl_pin_hmac(NULL, 0, mac) == NXM_RC_INVALID_ARGUMENT);
     CHECK(pctl_pin_hmac("m", 1, NULL) == NXM_RC_INVALID_ARGUMENT);

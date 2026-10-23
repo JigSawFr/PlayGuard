@@ -22,16 +22,16 @@
 
 ---
 
-PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.apple.com/app/id1190074407) phone app onto a modded console. It drives the console's **own** controls — the limit, the PIN, the warnings, the suspension — so **nothing runs in the background**.
+PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.apple.com/app/id1190074407) phone app (the companion app) onto a modded console. It drives the console's **own** controls — the limit, the PIN, the warnings, the suspension — so **nothing runs in the background**.
 
 > [!WARNING]
 > **Requires custom firmware (Atmosphère).** PlayGuard uses the restricted `pctl` service, some of it through `*ForDebug` commands. **Use at your own risk.**
 
 ## ✨ Features
 
-- ⏱️ **Play-time limit** — every day or one per day, extra time or *no more play today* in one press.
+- ⏱️ **Play-time limit** — every day or one per day, extra time or *no more play today* in one press, *Block all games* in one switch.
 - 📊 **Activity** — time per game and per account, charts, exports.
-- 🔒 **Restrictions and PIN** — age rating, temporary unlock, *Block all games* in one switch.
+- 🔒 **Restrictions and PIN** — age rating, temporary unlock, PlayGuard itself behind the PIN.
 - 🕒 **Console** — a network clock that counts right offline, homebrew on the HOME menu behind the PIN.
 - ↩️ **History, backups, notifications** — every change logged and undoable.
 - 🌍 **Everywhere** — every console language, light and dark themes.
@@ -55,9 +55,9 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 </p>
 
 <p align="center">
-  <img src="images/screenshots/security.png" alt="PIN" width="49%">
+  <img src="images/screenshots/security.png" alt="Security" width="49%">
   <img src="images/screenshots/console.png" alt="Console" width="49%">
-  <br><sub><b>PIN</b> · <b>Console</b></sub>
+  <br><sub><b>Security</b> · <b>Console</b></sub>
 </p>
 
 </details>
@@ -78,9 +78,9 @@ The real app, against a simulated console, in your browser:
 3. Launch PlayGuard **over a game**, with a **parent's user**, and follow *First steps*.
 
 > [!TIP]
-> Still linked to Nintendo's phone app? Use *Security › Unlink the companion app*, or its next sync overwrites what you set.
+> Still linked to the companion app? Use *Security › Unlink the companion app*, or its next sync overwrites what you set.
 
-**Compatibility:** firmware 22.0.0 → 23.0.1 tested (Atmosphère 1.11–1.12). Older firmware and details: [compatibility](https://playguard.link/docs/compatibility/). **No Switch 2.**
+**Compatibility:** tested on firmware 22.0.0, 22.1.0, 22.5.0 and 23.0.1 (Atmosphère 1.11–1.12); 23.0.0 and 21.x should work, untested; older firmware, everything but the play timer. Details: [compatibility](https://playguard.link/docs/compatibility/). **No Switch 2.**
 
 ## 📖 Documentation
 

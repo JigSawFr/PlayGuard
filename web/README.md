@@ -199,7 +199,10 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   their URL) once fetched, a commit's copy replacing the one before, and
   takes them from its cache from then on: the page starts without
   downloading them again. The page's own files come from the network, from
-  the cache without one, so the simulator opens offline once visited.
+  the cache without one, so the simulator opens offline once visited. Each
+  copy of the simulator on the site (main's, a release's, a pull request's
+  preview) has its own cache, named after its folder, and keeps only its own
+  files.
   `manifest.webmanifest` (the icon from `branding/icon.svg`) makes it
   installable as an app.
 - **A Content-Security-Policy** (`index.html`'s `<meta>`): only the page's
