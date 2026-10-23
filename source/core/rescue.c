@@ -253,11 +253,12 @@ bool rescue_proof_mac(RescueHmac hmac, const uint8_t secret[RESCUE_SECRET_SIZE],
     for (size_t i = 0; i < RESCUE_SECRET_SIZE; i++) any |= secret[i];
     if (!any) return false;
     static const char label[] = "playguard-rescue-key/2\n";
-    char text[sizeof(label) - 1 + 8];
-    memcpy(text, label, sizeof(label) - 1);
-    memcpy(text + sizeof(label) - 1, pin, pin_len);
+    const size_t label_len = strlen(label);
+    char text[sizeof(label) + 8];
+    memcpy(text, label, label_len);
+    memcpy(&text[label_len], pin, pin_len);
     uint8_t key[RESCUE_MAC_SIZE];
-    hmac(key, secret, RESCUE_SECRET_SIZE, text, sizeof(label) - 1 + pin_len);
+    hmac(key, secret, RESCUE_SECRET_SIZE, text, label_len + pin_len);
     hmac(mac, key, sizeof(key), msg, msg_len);
     wipe(text, sizeof(text));
     wipe(key, sizeof(key));
