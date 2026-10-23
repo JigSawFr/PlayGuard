@@ -37,14 +37,14 @@
  } // namespace brls
 --- a/library/lib/views/hint.cpp
 +++ b/library/lib/views/hint.cpp
-@@ -17,6 +17,7 @@
- #include <borealis/core/application.hpp>
- #include <borealis/core/i18n.hpp>
+@@ -19,6 +19,7 @@
  #include <borealis/core/logger.hpp>
-+#include <borealis/core/thread.hpp>
  #include <borealis/core/touch/tap_gesture.hpp>
  #include <borealis/core/util.hpp>
++#include <borealis/core/thread.hpp>
  #include <borealis/views/applet_frame.hpp>
+ #include <borealis/views/hint.hpp>
+ 
 @@ -54,6 +55,33 @@
  )xml";
  
