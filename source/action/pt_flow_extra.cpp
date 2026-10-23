@@ -490,8 +490,8 @@ static void offer_bonus_restore(std::function<void()> refresh, bool asked)
 void offer_extra_time_restore(std::function<void()> refresh, bool asked)
 {
     const pt_logic::ExtraRecord rec = extra_record();
-    // No extra time to put back: a bonus planned may be.
-    if (rec.weekday < 0 || rec.weekday > 6 || rec.date == ui::today_date()) {
+    // No extra time to put back (yet): a bonus planned may be.
+    if (rec.weekday < 0 || rec.weekday > 6 || !pt_logic::day_over(rec.date, ui::today_date())) {
         offer_bonus_restore(refresh, asked);
         return;
     }

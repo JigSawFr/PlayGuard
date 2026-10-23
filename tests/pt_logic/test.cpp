@@ -347,6 +347,41 @@ static void test_ring_state()
     CHECK(pt_logic::ring_state(counting(), -1, false).kind == R::UNKNOWN);
 }
 
+// A record's day is over once the date comes after it; one rule for extra
+// time and planned bonuses.
+static void test_day_over()
+{
+    CHECK(!pt_logic::day_over("2026-10-07", "2026-10-07"));
+    CHECK(pt_logic::day_over("2026-10-07", "2026-10-08"));
+    CHECK(pt_logic::day_over("2026-12-31", "2027-01-01"));
+    CHECK(!pt_logic::day_over("2026-10-07", "2026-10-06"));   // the clock put back
+    CHECK(!pt_logic::day_over("soon", "2026-10-08"));
+    CHECK(!pt_logic::day_over("", "2026-10-08"));
+
+    // The clock put back before the day extra time was added on: not over,
+    // nothing put back (as for a bonus before its day).
+    pt_logic::ExtraRecord rec;
+    rec.weekday = 3;
+    rec.date = "2026-10-07";
+    rec.base = 120;
+    rec.value = 150;
+    PtState pt = counting();
+    pt.day_min[3] = 150;
+    using pt_logic::Restore;
+    CHECK(pt_logic::restore_action(rec, "2026-10-06", pt, false) == Restore::None);
+    CHECK(pt_logic::restore_action(rec, "2026-09-30", pt, false) == Restore::None);
+    CHECK(pt_logic::restore_action(rec, "2026-10-14", pt, false) == Restore::Offer);   // a week on
+    rec.date = "soon";
+    CHECK(pt_logic::restore_action(rec, "2026-10-08", pt, false) == Restore::None);
+    pt_logic::BonusRecord bonus;
+    bonus.weekday = 6;
+    bonus.date = "2026-10-10";
+    bonus.base = 180;
+    bonus.value = 240;
+    pt.day_min[6] = 240;
+    CHECK(pt_logic::bonus_action(bonus, "2026-10-09", pt, false) == Restore::None);
+}
+
 static void test_restore_way()
 {
     using pt_logic::RestoreWay;
@@ -709,6 +744,7 @@ int main()
     test_restore();
     test_bonus();
     test_ring_state();
+    test_day_over();
     test_restore_way();
     test_bedtime();
     test_pickers();
@@ -717,5 +753,5 @@ int main()
     test_next_stop();
     test_counts_to_bed();
     test_held_step();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, today's ring, bedtime, picker, pending-relock, next-stop, child-ring and held-arrow assertions passed");
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, today's ring, day over, bedtime, picker, pending-relock, next-stop, child-ring and held-arrow assertions passed");
 }

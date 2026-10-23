@@ -100,9 +100,13 @@ struct ExtraRecord
     uint16_t    value = 0;      // limit written
 };
 
+// The day `date` is over on `today`: `today` comes after it. Not when the
+// clock was put back before it, nor when either is no date.
+bool day_over(const std::string& date, const std::string& today);
+
 enum class Restore
 {
-    None,    // nothing recorded, or still the day it was added
+    None,    // nothing recorded, or the day it was added not over (day_over)
     Later,   // cannot tell now (read failed, read-only): ask at the next start
     Forget,  // the limit changed since: nothing to put back, drop the record
     Offer,   // the extra time is still there: offer to put `base` back

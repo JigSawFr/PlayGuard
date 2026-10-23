@@ -116,10 +116,16 @@ int stop_soon_limit(const PtState& pt, int weekday, int minutes)
     return value < pt.day_min[weekday] ? value : -1;
 }
 
+bool day_over(const std::string& date, const std::string& today)
+{
+    int days = 0;
+    return date::days_between(date, today, &days) && days > 0;
+}
+
 Restore restore_action(const ExtraRecord& rec, const std::string& today, const PtState& pt, bool read_only)
 {
     if (rec.weekday < 0 || rec.weekday > 6) return Restore::None;
-    if (rec.date == today) return Restore::None;           // still the day it was added
+    if (!day_over(rec.date, today)) return Restore::None;   // the day it was added not over yet
     if (read_only || !pt.fw_supported || !pt.valid) return Restore::Later;
     if (pt.day_min[rec.weekday] != rec.value) return Restore::Forget;
     return Restore::Offer;
@@ -128,8 +134,7 @@ Restore restore_action(const ExtraRecord& rec, const std::string& today, const P
 Restore bonus_action(const BonusRecord& rec, const std::string& today, const PtState& pt, bool read_only)
 {
     if (rec.weekday < 0 || rec.weekday > 6) return Restore::None;
-    int days = 0;
-    if (!date::days_between(rec.date, today, &days) || days <= 0) return Restore::None;   // the day not over yet
+    if (!day_over(rec.date, today)) return Restore::None;   // the day not over yet
     if (read_only || !pt.fw_supported || !pt.valid) return Restore::Later;
     if (pt.day_min[rec.weekday] != rec.value) return Restore::Forget;
     return Restore::Offer;
