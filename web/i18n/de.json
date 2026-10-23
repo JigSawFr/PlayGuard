@@ -110,6 +110,7 @@
   "region": {"label": "Region", "options": {"": "Standard", "0": "Japan", "1": "Amerika", "2": "Europa", "3": "Australien", "4": "Hongkong, Taiwan, Korea", "5": "China"}},
   "sd_free_mb": {"label": "Freier Speicher auf der SD-Karte (MB)", "help": "Unter 500 MB warnt der Tab Konsole."},
   "applet": {"label": "Applet-Modus (aus dem Album)"},
+  "from_forwarder": {"label": "Über sein HOME-Symbol gestartet (Forwarder)"},
   "background": {"label": "PlayGuard im Hintergrund"},
   "hbloader": {"label": "Ein Loader, der ein Update an einen Store übergeben kann"},
   "forwarders": {"label": "Bereits erstellte Forwarder (Konsole › Forwarder)"},

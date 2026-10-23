@@ -7,7 +7,7 @@
 #   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
 #   make web          -> ./build-web/simulator/          (the same in a browser; needs Emscripten's emcmake)
 #   make web-serve    -> serves it at http://localhost:8000 (with the headers its threads need)
-#   make test         -> host unit tests (plain gcc/g++, ASan + UBSan; parallel, all suites)
+#   make test         -> host unit tests (plain gcc/g++, ASan + UBSan + libstdc++'s assertions; parallel, all suites)
 #   make check        -> make test, then the resource checks and compat.json
 #   make fuzz         -> libFuzzer runs of the parsers (clang; FUZZ_SECONDS=30 each, parallel)
 #   make gate-preview -> build/gate-preview/*.png    (the PIN gate's screen, one per state; GATE_LANG=n)
@@ -36,8 +36,11 @@ JOBS    ?= $(shell nproc 2>/dev/null || echo 4)
 SAN     ?= -fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined
 COV     ?=
 # -Wshadow as the app is built (CMakeLists.txt); -Itests: tests/check.h, the
-# CHECK() every suite uses.
-CWARN   := -Wall -Wextra -Wshadow -Werror $(SAN) $(COV) -Itests
+# CHECK() every suite uses. _GLIBCXX_ASSERTIONS: libstdc++ checks what the
+# sanitizers cannot see, an index within a vector's capacity but past its
+# size, front() of an empty container, a string_view cut past its end
+# (the fuzz targets below take it too).
+CWARN   := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(SAN) $(COV) -Itests
 SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 # A zip that depends only on the files: one date for all, entries in a fixed
 # order, no extra file attributes (-X), and TZ=UTC as a zip keeps local times.
@@ -359,7 +362,7 @@ FUZZ_SECONDS ?= 30
 FUZZ_CC      ?= clang
 FUZZ_CXX     ?= clang++
 FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -g -O1
-FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror $(FUZZ_SAN) -Itests/fuzz -Isource -isystem extern/borealis/library/include
+FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(FUZZ_SAN) -Itests/fuzz -Isource -isystem extern/borealis/library/include
 zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
 markdown_FUZZ      := $(filter-out tests/%,$(markdown_SRC)) tests/fuzz/markdown/fuzz.cpp

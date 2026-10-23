@@ -237,7 +237,9 @@ void HelpTab::refresh()
     // How PlayGuard was opened and where it keeps its files (About before).
     SysInfo si;
     sysinfo_get(&si);
-    mode->setDetailText(si.applet_mode ? "playguard/tools/mode_applet"_i18n : "playguard/tools/mode_app"_i18n);
+    mode->setDetailText(si.applet_mode ? "playguard/tools/mode_applet"_i18n
+                        : si.forwarder ? "playguard/tools/mode_forwarder"_i18n
+                                       : "playguard/tools/mode_app"_i18n);
     data->setDetailText(paths::data_dir());
     logs_keep->setDetailText(logs_keep_text(cfg.logs_keep));
     logs_keep_days->setDetailText(logs_days_text(cfg.logs_keep_days));

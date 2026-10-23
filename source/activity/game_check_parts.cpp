@@ -165,12 +165,12 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
         auto* card = new brls::Box(brls::Axis::COLUMN);
         card->setBackgroundColor(theme["cadran/surf2"]);
         card->setCornerRadius(14);
-        card->setPadding(12, 18, 14, 18);
+        card->setPadding(14, 18, 16, 18);
         card->setMarginTop(14);
         brls::Label* t = kit::label(cadran::upper(title), 15, "cadran/text3");
         card->addView(t);
         brls::Label* body = kit::label(text, 18, "cadran/text");
-        body->setMarginTop(4);
+        body->setMarginTop(14);   // the kicker apart from what it heads
         card->addView(body);
         box->addView(card);
     };

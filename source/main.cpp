@@ -189,7 +189,9 @@ std::string system_line(const SysInfo& si)
     return fmt::format("firmware {}, Atmosphère {}, {}, {}", fw,
                        si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "unknown",
                        storage ? storage : "storage unknown",
-                       si.applet_mode ? "from the Album (applet)" : "over a game");
+                       si.applet_mode ? "from the Album (applet)"
+                       : si.forwarder ? "from its HOME menu icon (forwarder)"
+                                      : "over a game");
 }
 
 // The start-up after the loading screen, one step per frame so the loading

@@ -68,6 +68,26 @@ if [ -n "$prev" ] && gh api "repos/$GH_REPO/compare/$prev...$tag" > "$work/compa
 elif [ -z "$prev" ] && gh api "repos/$GH_REPO/contributors" --jq '[.[] | select(.type == "User") | .login]' > "$work/contributors.json" 2>/dev/null; then
   args+=(--contributors "$work/contributors.json")   # a first release: everyone so far
 fi
+# The screens that look different: this release's playguard-screens.zip
+# (the reference screens of its build, tools/visual_refs.py) against the
+# previous release's, a before/after image attached to the release for the
+# page's "On screen" section (--apply; else only listed). A release without
+# the zip (before 1.3.0), or a previous one without it: no section.
+if [ -n "$prev" ] && gh release download "$tag" -p playguard-screens.zip -D "$work/now" 2>/dev/null \
+    && gh release download "$prev" -p playguard-screens.zip -D "$work/before" 2>/dev/null; then
+  mkdir -p "$work/now/refs" "$work/before/refs"
+  unzip -q "$work/now/playguard-screens.zip" -d "$work/now/refs"
+  unzip -q "$work/before/playguard-screens.zip" -d "$work/before/refs"
+  if python3 "$here/visual_refs.py" diff "$work/before/refs" "$work/now/refs" \
+       --json "$work/screens.json" --sheet "$work/playguard-screens-changed.png"; then
+    if [ -s "$work/playguard-screens-changed.png" ] && [ "$apply" = --apply ]; then
+      gh release upload "$tag" --clobber "$work/playguard-screens-changed.png"
+    fi
+    args+=(--screens "$work/screens.json")
+  else
+    echo "::warning title=Release page::the screens could not be compared with $prev's (see the log above)"
+  fi
+fi
 if [ "${GITHUB_WORKFLOW:-}" = release-please ] && [ -n "${GITHUB_RUN_ID:-}" ]; then
   run_url="$repo_url/actions/runs/$GITHUB_RUN_ID"
 else

@@ -20,8 +20,9 @@ update screen reads, up to the next "## "):
   "What changed": the sections a user notices, then those for contributors
   (build, tests, docs), each folded;
 then, for a computer:
-  "## 🖼️ On screen": the screens whose visual-check reference changed since
-  the previous release (tests/visual/), before and after;
+  "## 🖼️ On screen": the screens that look different from the previous
+  release (its playguard-screens.zip against this one's, --screens: the
+  lists and the before/after image attached to the release);
   "## 📦 Install": three steps (new install, update, locked out) with the
   assets and their size, the firmware checked (compat.json);
   "## 🔍 Build": the build's report (the run page), the checksums and the
@@ -61,7 +62,6 @@ FIGURES = {
 }
 # The website (tools/build_site.py): the latest release's documentation at docs/.
 SITE_URL = "https://playguard.link/"
-MAX_SCREENS = 12
 HIDE, SHOW = "<!-- console:hide -->", "<!-- /console -->"
 
 INSTALL = """## 📦 Install
@@ -114,17 +114,27 @@ def folded(label: str, what: str, body: str) -> str:
     return f"<details>\n<summary><b>{label}</b> ({what})</summary>\n\n{body}\n\n</details>"
 
 
-def screens(compare: dict, repo_slug: str, prev: str, tag: str):
-    """The visual-check references added or changed between the two tags."""
-    raw = f"https://raw.githubusercontent.com/{repo_slug}"
-    rows = []
-    for f in compare.get("files") or []:
-        name, status = f.get("filename", ""), f.get("status", "")
-        if not (name.startswith("tests/visual/") and name.endswith(".png")) or status not in ("added", "modified", "renamed"):
-            continue
-        before = f.get("previous_filename", name) if status != "added" else ""
-        rows.append((name[len("tests/visual/"):-4], f"{raw}/{prev}/{before}" if before else "", f"{raw}/{tag}/{name}"))
-    return sorted(rows)
+def screens_section(shown: dict, repo: str, tag: str) -> str:
+    """The "On screen" section from tools/visual_refs.py diff's JSON: the
+    screens changed, new and gone since the previous release, the
+    before/after image attached to the release (its `sheet`), the zip."""
+    changed, new, gone = shown.get("changed") or [], shown.get("new") or [], shown.get("gone") or []
+    if not (changed or new or gone):
+        return ""
+    body = []
+    if shown.get("sheet"):
+        body.append(f'<img src="{repo}/releases/download/{tag}/{shown["sheet"]}" width="100%" '
+                    f'alt="the screens that changed, before and after">')
+    if changed:
+        body.append("Changed: " + ", ".join(f"`{s}`" for s in changed))
+    if new:
+        body.append("New: " + ", ".join(f"`{s}`" for s in new))
+    if gone:
+        body.append("Gone: " + ", ".join(f"`{s}`" for s in gone))
+    body.append(f"Every reference screen of this release: [`playguard-screens.zip`]({repo}/releases/download/{tag}/playguard-screens.zip).")
+    n = len(changed) + len(new) + len(gone)
+    return "## 🖼️ On screen\n\n" + folded("Screens that look different", plural(n, "screen") + ", before and after",
+                                             "\n\n".join(body))
 
 
 # --- the summary, plain (as written) and for the page ----------------------
@@ -221,7 +231,7 @@ def unlayout(notes: str):
 
 
 def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str = "",
-           assets=None, compare=None, run_url: str = "", contributors=None) -> str:
+           assets=None, compare=None, run_url: str = "", contributors=None, screens_diff=None) -> str:
     notes, existing = unlayout(notes)
     summary = (summary or existing).strip()
     lines = notes.splitlines(keepends=True)
@@ -276,17 +286,9 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
         out.append(folded(f"🛠️ For contributors: {names}", plural(sum(items(b) for _, b in contrib), "change"),
                           "\n\n".join(b for _, b in contrib)))
 
-    shown = screens(compare or {}, slug, prev, tag) if prev else []
-    if shown:
-        rows = ["| Screen | Before | After |", "|---|---|---|"]
-        for name, before, after in shown[:MAX_SCREENS]:
-            b = f'<img src="{before}" width="320" alt="{name}, before">' if before else "*new*"
-            rows.append(f'| `{name}` | {b} | <img src="{after}" width="320" alt="{name}, after"> |')
-        more = len(shown) - MAX_SCREENS
-        if more > 0:
-            rows.append(f"\n…and {more} more: [every changed file]({repo}/compare/{prev}...{tag}#files_bucket).")
-        out.append("## 🖼️ On screen\n\n" + folded("Screens that look different",
-                                                   plural(len(shown), "screen") + ", before and after", "\n".join(rows)))
+    section = screens_section(screens_diff, repo, tag) if screens_diff else ""
+    if section:
+        out.append(section)
 
     out.append(INSTALL.format(dl=dl, site=SITE_URL, firmware=firmware, size_zip=size("playguard.zip"),
                               size_nro=size("playguard.nro"), size_rescue=size("playguard-rescue.zip")))
@@ -332,7 +334,8 @@ def main() -> int:
     ap.add_argument("--summary", help="the summary file, if any")
     ap.add_argument("--compat", help="the release's compat.json, for the firmware line")
     ap.add_argument("--assets", help="gh release view --json assets, for the sizes")
-    ap.add_argument("--compare", help="the API's compare of the previous tag, for the screens and contributors")
+    ap.add_argument("--compare", help="the API's compare of the previous tag, for the contributors")
+    ap.add_argument("--screens", help="tools/visual_refs.py diff's JSON: the screens that look different, their image")
     ap.add_argument("--contributors", help="a JSON list of logins, the contributors when there is no compare")
     ap.add_argument("--run-url", default="", help="the run that built the release, for the build report")
     ap.add_argument("--raw", action="store_true", help="only print release-please's notes, out of a laid-out page")
@@ -349,10 +352,12 @@ def main() -> int:
     assets = (read_json(a.assets) or {}).get("assets") if a.assets else None
     compare = read_json(a.compare) if a.compare else None
     contributors = read_json(a.contributors) if a.contributors else None
+    screens_diff = read_json(a.screens) if a.screens else None
     sys.stdout.write(layout(sys.stdin.read(), a.version.lstrip("v"), a.repo_url.rstrip("/"), summary,
                             firmware_line(a.compat) if a.compat else "", assets,
                             compare if isinstance(compare, dict) else None, a.run_url,
-                            contributors if isinstance(contributors, list) else None))
+                            contributors if isinstance(contributors, list) else None,
+                            screens_diff if isinstance(screens_diff, dict) else None))
     return 0
 
 
