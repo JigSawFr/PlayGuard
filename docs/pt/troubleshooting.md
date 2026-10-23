@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
+<!-- translated from docs/troubleshooting.md, sha256 45158eaaf5a4 -->
 # Resolução de problemas
 
 Voltar a entrar numa consola bloqueada, os problemas comuns, comunicar um erro e o modo de programador. Voltar ao [README](../../README.md).
@@ -28,7 +28,7 @@ O módulo tem de acompanhar a versão do PlayGuard: a cada atualização do Play
 *Consola › Forwarders › Bloquear o menu homebrew* impede que o álbum e um jogo iniciado com R abram o menu homebrew. Se o forwarder do PlayGuard e o menu protegido tiverem ambos desaparecido (eliminados nas Definições da consola, ou no outro sistema: o bloqueio está no cartão SD, lido tanto pelo sysMMC como pelo emuMMC):
 
 - **A partir de um computador:** elimine `atmosphere/config/override_config.ini` no cartão SD (ou reponha `config/playguard/override_config.ini.backup`, o ficheiro tal como estava) e depois reinicie a consola.
-- **Com o módulo de recuperação instalado** (opcional): coloque um ficheiro vazio `config/playguard/RESCUE` no cartão SD e reinicie; o módulo levanta o bloqueio no arranque, e o PlayGuard indica-o no arranque seguinte. Uma atualização do Atmosphère desde que foi bloqueado levanta-o da mesma forma.
+- **Com o sysmodule de recuperação instalado** (opcional): coloque um ficheiro vazio `config/playguard/RESCUE` no cartão SD e reinicie; o sysmodule levanta o bloqueio no arranque, e o PlayGuard indica-o no arranque seguinte. Uma atualização do Atmosphère desde que foi bloqueado levanta-o da mesma forma.
 
 ### Consola não modificada
 
@@ -43,7 +43,7 @@ O PlayGuard não pode ajudar: precisa do Atmosphère. O procedimento da chave me
 - **O relógio de rede nunca foi acertado.** *Consola › Relógio de rede › Medir a diferença horária*, e depois acerte-o ([relógio de rede](features.md#relógio-de-rede)).
 - **O relógio foi atrasado.** Depois de um salto para trás, a contagem para até o relógio passar a hora antiga; não há nada a fazer.
 - **Acabou de ser escrito um limite.** Inicie um jogo durante um minuto e verifique de novo.
-- **O controlo parental está desbloqueado temporariamente.** O tempo de jogo pode então não ser contado: *Segurança › Reativar o controlo parental*.
+- **O controlo parental está desbloqueado temporariamente.** O tempo de jogo pode então não ser contado: *Hoje › Reativar* (ou um toque na etiqueta do cabeçalho).
 
 ### Os meus limites mudaram sozinhos
 
@@ -54,7 +54,7 @@ O PlayGuard não pode ajudar: precisa do Atmosphère. O procedimento da chave me
 ### A criança jogou para além do limite
 
 - **A consola só avisa.** *Tempo de jogo › Quando o tempo acabar*: escolha *Suspender o software*.
-- **O controlo parental ficou desbloqueado.** Enquanto está, o limite de hoje fica em pausa: a etiqueta do cabeçalho indica-o em todos os separadores; *Segurança › Reativar o controlo parental*. Um reinício da consola também o bloqueia.
+- **O controlo parental ficou desbloqueado.** Enquanto está, o limite de hoje fica em pausa: a etiqueta do cabeçalho indica-o em todos os separadores, e um toque nela leva a *Hoje › Reativar*. Um reinício da consola também o bloqueia.
 - **O relógio foi atrasado.** A contagem para até o relógio passar a hora antiga ([o que conta](features.md#o-que-conta-como-tempo-de-jogo)).
 - **O outro sistema.** O emuMMC e o sysMMC têm cada um o seu próprio controlo parental: defina-o nos dois, ou esconda o menu de arranque do hekate ([compatibilidade](compatibility.md#emummc-e-sysmmc)).
 
@@ -171,6 +171,6 @@ Prima Ⓨ sete vezes em *Sobre › Versão*; as ferramentas de programador apare
 - Uma transferência interrompida (rede perdida) continua de onde parou da próxima vez que a mesma compilação for instalada.
 - Os artefactos expiram ao fim de 90 dias.
 
-**Voltar atrás.** A compilação substituída é mantida (`playguard.nro.previous`): **Voltar à compilação anterior**, na mesma lista, troca-as de novo, depois do PIN; identifica essa compilação pela sua versão, o seu pull request e o seu commit. Se uma compilação instalada a partir daqui (ou pela atualização no próprio PlayGuard, *Atualizar com › No PlayGuard*) falhar antes do primeiro ecrã, o arranque seguinte do PlayGuard propõe voltar à compilação anterior num ecrã de texto simples, antes de carregar qualquer outra coisa (A volta atrás, B arranca-a mesmo assim), sem o PIN, já que o próprio ecrã do PIN pode ser o que falha. A mesma lista volta a qualquer versão publicada a qualquer momento.
+**Voltar atrás.** A compilação substituída é mantida (`playguard.nro.previous`): **Voltar à compilação anterior**, na mesma lista, troca-as de novo, depois do PIN; identifica essa compilação pela sua versão, o seu pull request e o seu commit. Se uma compilação instalada a partir daqui (ou pela atualização no próprio PlayGuard, *Atualizar com › No PlayGuard*) falhar antes do primeiro ecrã, o arranque seguinte do PlayGuard propõe voltar à compilação anterior num ecrã de texto simples, antes de carregar qualquer outra coisa (A volta atrás, B arranca-a mesmo assim). Voltar atrás pede o PIN no próprio ecrã do PIN da consola, quando há um definido (não no ecrã de bloqueio do PlayGuard, que pode ser o que falha); sem ele, arranca a compilação instalada. A mesma lista volta a qualquer versão publicada a qualquer momento.
 
 **Que compilação está a correr:** *Sobre › Versão* mostra o commit no modo de programador. O cabeçalho de cada ecrã mostra a versão em execução junto do título: a de uma versão publicada numa etiqueta cinzenta (`1.2.0`), a de qualquer outra compilação numa etiqueta âmbar seguida do seu commit, para que uma compilação de teste nunca seja confundida com a versão publicada.

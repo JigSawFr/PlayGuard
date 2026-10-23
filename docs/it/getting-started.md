@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
+<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
 # Per iniziare
 
 Dalla scheda SD a una console configurata per tuo figlio, in una decina di minuti, poi le attività di tutti i giorni. Torna al [README](../../README.md).
