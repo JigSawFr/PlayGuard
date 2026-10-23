@@ -21,8 +21,8 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
 - **The settings are in the URL**, each `PLAYGUARD_SIM_*` variable by its name
   in lower case without the prefix: `?unlocked=1&fw=20.5.0` is
   `PLAYGUARD_SIM_UNLOCKED=1 PLAYGUARD_SIM_FW=20.5.0`
-  ([CONTRIBUTING.md](../CONTRIBUTING.md#the-desktop-simulator) says what each
-  one simulates). `tab` is not a variable but the first tab (`play_timer`,
+  ([docs/contributing/simulator.md](../docs/contributing/simulator.md) says what
+  each one simulates). `tab` is not a variable but the first tab (`play_timer`,
   `console`, …), written into the simulated `config.json` before PlayGuard
   starts. A variable the panel does not know (one a newer build reads) still
   reaches PlayGuard.
@@ -64,7 +64,7 @@ them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
   over. The console then lives on: its time played today counts in real time
   while the page is open (not while it is closed), stays from one visit to
   the next, starts over with a new day or a clock change
-  ([CONTRIBUTING.md](../CONTRIBUTING.md#the-desktop-simulator)), and
+  ([docs/contributing/simulator.md](../docs/contributing/simulator.md)), and
   **Restart the console** ends a temporary unlock, as a restart does on a
   console, then reloads the page.
 - **The console's line**, under the time: what the simulated console does

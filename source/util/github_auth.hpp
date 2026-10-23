@@ -17,7 +17,7 @@
 //
 // The token is kept in its own file, sd:/config/playguard/github_token,
 // never in config.json, which "Send a report online" sends. It does not
-// expire (the app has token expiry off: CONTRIBUTING.md), so GitHub hands
+// expire (the app has token expiry off: docs/contributing/releases.md), so GitHub hands
 // no refresh token; one GitHub answers 401 (revoked, or the app's
 // authorisation removed) is forgotten, and the next use asks to sign in.
 //

@@ -54,10 +54,11 @@ It also warns, without failing:
   out;
 - about a history source the code writes that history_logic does not name
   (the History screen leaves it unsaid);
-- about a PLAYGUARD_SIM_* variable the code reads that CONTRIBUTING.md does
-  not document, or one it documents that nothing reads, and about a
-  tools/desktop_smoke.py scenario its list leaves out, or one it lists that
-  the script does not have;
+- about a PLAYGUARD_SIM_* variable the code reads that
+  docs/contributing/simulator.md does not document, or one it documents that
+  nothing reads, and about a tools/desktop_smoke.py scenario the list of
+  docs/contributing/tests.md leaves out, or one it lists that the script does
+  not have;
 - about a translation of a page the app links to whose sections are not the
   English page's (the website then opens the page, not the section).
 """
@@ -519,31 +520,39 @@ for k in sorted(code_written - code_read - {"schema"}):
 for k in sorted(code_read - code_written):
     warnings.append(f"source/util/config.cpp reads `{k}` but never writes it (lost at the next save)")
 
-# CONTRIBUTING.md against the code: the simulator's PLAYGUARD_SIM_* variables
-# (read with sim_env, sim_env_flag, sim_env_int, getenv or sim_net::value) and the smoke scenarios of
-# tools/desktop_smoke.py (SCENARIO == "name"), against its list of them.
-contributing = read(f"{ROOT}/CONTRIBUTING.md")
+# The contributor pages against the code: the simulator's PLAYGUARD_SIM_*
+# variables (read with sim_env, sim_env_flag, sim_env_int, getenv or
+# sim_net::value) against docs/contributing/simulator.md's table, and the
+# smoke scenarios of tools/desktop_smoke.py (SCENARIO == "name") against the
+# list of docs/contributing/tests.md.
+SIMULATOR_PAGE, TESTS_PAGE = "docs/contributing/simulator.md", "docs/contributing/tests.md"
+simulator_page = read(f"{ROOT}/{SIMULATOR_PAGE}")
+tests_page = read(f"{ROOT}/{TESTS_PAGE}")
 sim_read = set()
 for path, text in code_text.items():
     sim_read |= set(re.findall(r'(?:sim_env(?:_flag|_int)?|getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
 for path in glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
     sim_read |= set(re.findall(r'(?:sim_env(?:_flag|_int)?|getenv)\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
-sim_documented = set(re.findall(r"`(PLAYGUARD_SIM_\w+)", contributing))
+sim_documented = set(re.findall(r"`(PLAYGUARD_SIM_\w+)", simulator_page))
 if not sim_read or not sim_documented:
-    errors.append("no PLAYGUARD_SIM_* variable found in the code or in CONTRIBUTING.md")
+    errors.append(f"no PLAYGUARD_SIM_* variable found in the code or in {SIMULATOR_PAGE}")
 for v in sorted(sim_read - sim_documented):
-    warnings.append(f"the code reads {v}, which CONTRIBUTING.md does not document (the simulator's table)")
+    warnings.append(f"the code reads {v}, which {SIMULATOR_PAGE} does not document (the simulator's table)")
 for v in sorted(sim_documented - sim_read):
-    warnings.append(f"CONTRIBUTING.md documents {v}, which the code does not read")
+    warnings.append(f"{SIMULATOR_PAGE} documents {v}, which the code does not read")
 scenarios = set(re.findall(r'SCENARIO\s*==\s*"(\w+)"', read(f"{ROOT}/tools/desktop_smoke.py")))
-m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|]+)\]", contributing)
+m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|]+)\]", tests_page)
 listed_scenarios = set(m.group(1).split("|")) if m else set()
+# Each scenario of that synopsis has its line in the list under it.
+described = set(re.findall(r"^  - `(\w+)` —", tests_page, re.M))
 if not scenarios or not listed_scenarios:
-    errors.append("no smoke scenario found in tools/desktop_smoke.py, or no list of them in CONTRIBUTING.md")
+    errors.append(f"no smoke scenario found in tools/desktop_smoke.py, or no list of them in {TESTS_PAGE}")
 for v in sorted(scenarios - listed_scenarios):
-    warnings.append(f"tools/desktop_smoke.py has the scenario {v}, which CONTRIBUTING.md does not list")
+    warnings.append(f"tools/desktop_smoke.py has the scenario {v}, which {TESTS_PAGE} does not list")
 for v in sorted(listed_scenarios - scenarios):
-    warnings.append(f"CONTRIBUTING.md lists the smoke scenario {v}, which tools/desktop_smoke.py does not have")
+    warnings.append(f"{TESTS_PAGE} lists the smoke scenario {v}, which tools/desktop_smoke.py does not have")
+for v in sorted(listed_scenarios - described):
+    warnings.append(f"{TESTS_PAGE} lists the smoke scenario {v} but has no line saying what it covers")
 
 # The documentation the app links to (app::doc_url): the page, and the
 # heading's anchor as the website makes it (tools/build_site.py's
