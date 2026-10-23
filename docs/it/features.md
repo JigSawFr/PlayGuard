@@ -35,7 +35,7 @@ Le schermate mostrano il tema scuro, quello predefinito di PlayGuard (in inglese
 L'app è organizzata in schede, come le Impostazioni di sistema; ognuna ha la sua sezione qui sotto.
 
 - **Ciò che non è riuscito viene detto in una finestra di dialogo, ciò che è riuscito in un avviso a comparsa.** Una finestra di dialogo dice solo ciò che vale per questa console adesso: che il gioco in corso verrebbe sospeso, solo mentre un gioco è aperto; che l'app Filtro famiglia potrebbe sovrascrivere una modifica, solo mentre è collegata e può sincronizzarsi.
-- **L'intestazione** indica, su ogni scheda, quando il filtro famiglia è sbloccato temporaneamente (la sua pillola), e quando l'app è in sola lettura (la pillola dice allora *Sola lettura*, e le azioni che scriverebbero sono in grigio e rifiutate indicando dove disattivarla); toccarla porta dove si annulla (*Oggi › Riattiva*, la schermata del firmware o *Aiuto e diagnostica*). Un piccolo ⊖ prima della lingua e un Ⓨ prima della campanella indicano i tasti che li aprono da qualsiasi scheda.
+- **L'intestazione** indica, su ogni scheda, quando il filtro famiglia è sbloccato temporaneamente (la sua pillola), e quando l'app è in sola lettura (la pillola dice allora *Sola lettura*, e le azioni che scriverebbero sono in grigio e rifiutate indicando dove disattivarla); toccarla porta dove si annulla (*Oggi › Riattiva*, la schermata del firmware o *Aiuto e diagnostica*). Il piè di pagina indica i tasti che li aprono da qualsiasi scheda: ⊖ per la lingua e il tema, Ⓨ per le notifiche (con il loro numero).
 - **In sola lettura**, le azioni restano al loro posto, in grigio, e dicono perché quando le premi.
 
 ## L'aspetto: Cadran

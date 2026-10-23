@@ -8,7 +8,7 @@
 // es-419 or zh-Hant have none that fits. A tap opens the same list as
 // Preferences (ui::pick_language / pick_theme / pick_text_size); not
 // focusable, like the bell: − opens them from any tab (activity/main_activity),
-// which a small ⊖ key before them says (and a Ⓨ before the bell, for its list).
+// as the footer says (and Ⓨ the bell's list).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
