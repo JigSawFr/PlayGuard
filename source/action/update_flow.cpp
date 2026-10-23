@@ -27,8 +27,17 @@ namespace
 constexpr long WAIT_STEP_MS = 2000;
 constexpr int  WAIT_STEPS   = 30;
 
-bool  s_checking = false;   // one check at a time, whoever started it
+bool  s_checking = false;   // the release's details or the store's version asked
+bool  s_check_running = false;   // the update check: one at a time, whoever started it
+bool  s_checked = false;    // s_offer is this session's, from the server
 Offer s_offer;              // the last check's, for update_now()
+// Those waiting for the check under way: each told its result.
+std::vector<std::function<void(const Offer&)>> s_waiting;
+
+bool busy()
+{
+    return s_checking || s_check_running;
+}
 
 std::string store_name(launcher::Store store)
 {
@@ -93,13 +102,14 @@ void record_check(const update::Result& r)
     ui::save_config();
 }
 
+// Asks the server (or joins the request under way), then tells `done`.
 void run_check(std::function<void(const Offer&)> done)
 {
-    s_checking = true;
-    SysInfo si;
-    sysinfo_get(&si);
-    const uint32_t fw = si.hos_version;
-    ui::in_background("update check", [fw, done]() {
+    s_waiting.push_back(std::move(done));
+    if (s_check_running) return;
+    s_check_running = true;
+    const uint32_t fw = sysinfo_hos_version();
+    ui::in_background("update check", [fw]() {
         Offer o;
         o.result = update::check(fw);
         // The newer release's file and notes, for the update screen and an
@@ -110,11 +120,14 @@ void run_check(std::function<void(const Offer&)> done)
                             update::compare_versions(o.release.version, o.result.latest.version) == 0;
             if (!o.has_release && !err.empty()) brls::Logger::warning("update: no release details ({})", err);
         }
-        brls::sync([o, done]() {
-            s_checking = false;
+        brls::sync([o]() {
+            s_check_running = false;
             s_offer = o;
+            s_checked = o.result.verdict != update::Verdict::Unknown;
             record_check(o.result);
-            done(o);
+            std::vector<std::function<void(const Offer&)>> waiting;
+            waiting.swap(s_waiting);
+            for (const auto& done : waiting) done(o);
         });
     });
 }
@@ -144,9 +157,8 @@ void update_in_place()
         install_in_place(s_offer.release);
         return;
     }
-    // From the firmware screen (its own check), or the details could not be
-    // read during the check: fetched now.
-    if (s_checking) return;
+    // The details could not be read during the check: fetched now.
+    if (busy()) return;
     s_checking = true;
     ui::notify("playguard/update/checking"_i18n);
     ui::in_background("update release", []() {
@@ -188,7 +200,7 @@ void open_store()
         return;
     }
     const std::string latest = config::get().update_latest;
-    if (latest.empty() || !launcher::installed_by_store() || s_checking) {
+    if (latest.empty() || !launcher::installed_by_store() || busy()) {
         hand_over(target, manual);
         return;
     }
@@ -216,9 +228,19 @@ void check_now()
     // Pressing again while it runs says so, instead of starting another
     // request and stacking a second result dialog.
     ui::notify("playguard/update/checking"_i18n);
-    if (s_checking) return;
+    if (busy()) return;
     sys_update_flow::check_now();   // Atmosphère, hekate, firmware: in the notification bell
     run_check([](const Offer& o) { show_result(o); });
+}
+
+void check_once(std::function<void(const Offer&)> done)
+{
+    if (s_checked && !s_check_running) {
+        // Next frame, as after a request.
+        brls::sync([done]() { done(s_offer); });
+        return;
+    }
+    run_check(std::move(done));
 }
 
 void at_start(brls::Activity* main)
@@ -231,7 +253,7 @@ void at_start(brls::Activity* main)
     sys_update_flow::at_start();
     if (s_checking || !(pending || due)) return;
     // Quietly: only a newer version, not postponed, is worth a word.
-    run_check([main, today](const Offer& o) {
+    check_once([main, today](const Offer& o) {
         if (newer(o.result) && update::offer_at_start(o.result.latest.version, app::version(), snooze(), today))
             show_when_free(main, o, WAIT_STEPS);
     });

@@ -135,8 +135,7 @@ void GameCheckActivity::remove(const GameFacts& g, bool asked)
 void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
                                   std::function<void(const std::string& path, const std::string& error)> done) const
 {
-    SysInfo si;
-    sysinfo_get(&si);
+    const u32 hos = sysinfo_hos_version();
     table_export::Table t;
     t.title = "playguard/games/list_title"_i18n;
     t.sheet = t.title;
@@ -145,7 +144,7 @@ void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
                   { "version", "playguard/games/col_version"_i18n, false },
                   { "problem", "playguard/games/col_problem"_i18n, false } };
     for (const GameFacts& g : games) {
-        const GameIssue issue = gamecheck_classify(&g, si.hos_version);
+        const GameIssue issue = gamecheck_classify(&g, hos);
         t.rows.push_back({ game_name(g), id_text(g.app_id), g.display_version, short_text(g, issue) });
     }
     const std::string text = list_text(games);
@@ -356,12 +355,11 @@ std::vector<GameFacts> GameCheckActivity::selected_games() const
 // whole section, or none. With none picked yet: the sections only.
 void GameCheckActivity::selection_menu()
 {
-    SysInfo si;
-    sysinfo_get(&si);
+    const u32 hos = sysinfo_hos_version();
     const std::vector<GameFacts> games = this->selected_games();
     std::vector<GameFacts> to_verify, to_remove;
     for (const GameFacts& g : games) {
-        const u32 actions = gamecheck_actions(&g, gamecheck_classify(&g, si.hos_version));
+        const u32 actions = gamecheck_actions(&g, gamecheck_classify(&g, hos));
         if (actions & GA_VERIFY) to_verify.push_back(g);
         if (actions & GA_REMOVE) to_remove.push_back(g);
     }

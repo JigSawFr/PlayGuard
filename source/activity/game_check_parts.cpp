@@ -94,9 +94,7 @@ game_check_text::Words words()
 // The games to install again as text, with their problem on this console.
 std::string list_text(const std::vector<GameFacts>& games)
 {
-    SysInfo si;
-    sysinfo_get(&si);
-    return game_check_text::list_text(games, si.hos_version, words());
+    return game_check_text::list_text(games, sysinfo_hos_version(), words());
 }
 
 // The list of the games to install again could not be saved: why.

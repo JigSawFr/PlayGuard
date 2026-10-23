@@ -45,9 +45,7 @@ void UpdateActivity::onContentAvailable()
     std::string text = brls::getStr("playguard/update/running", app::version());
     if (!date.empty()) text = brls::getStr("playguard/update/released", date) + "\n" + text;
     if (this->offer.result.verdict == update::Verdict::UpdateNoSupport) {
-        SysInfo si;
-        sysinfo_get(&si);
-        const std::string fw = ui::hos_text(si.hos_version);
+        const std::string fw = ui::hos_text(sysinfo_hos_version());
         text += "\n" + brls::getStr("playguard/update/available_no_fw", fw);
     }
     body->setText(text);

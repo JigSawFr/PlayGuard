@@ -204,12 +204,11 @@ void GameCheckActivity::refresh(bool all, u64 also)
             }
             this->list_rc = 0;
             this->cache.truncated = truncated;
-            SysInfo si;
-            sysinfo_get(&si);
+            const u32 hos = sysinfo_hos_version();
             u64 now = 0;
             time_local_now(&now, nullptr);
-            const bool full = all || game_cache::expired(this->cache, (int64_t)now, si.hos_version);
-            std::vector<GameRecord> check = game_cache::to_check(&this->cache, *records, (int64_t)now, si.hos_version);
+            const bool full = all || game_cache::expired(this->cache, (int64_t)now, hos);
+            std::vector<GameRecord> check = game_cache::to_check(&this->cache, *records, (int64_t)now, hos);
             if (all) check = *records;
             // Asked for besides (a game just repaired: its entry may not say so).
             std::vector<u64> extra = this->waiting;
@@ -303,12 +302,10 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
             this->timing = timing;
             this->check_total = 0;
             if (complete && full) {
-                SysInfo si;
-                sysinfo_get(&si);
                 u64 now = 0;
                 time_local_now(&now, nullptr);
                 this->cache.checked_at = (int64_t)now;
-                this->cache.hos = si.hos_version;
+                this->cache.hos = sysinfo_hos_version();
             }
             this->save();
             // A game asked for meanwhile (a repair during the check): checked
@@ -694,12 +691,11 @@ void GameCheckActivity::onResume()
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const
 {
-    SysInfo si;
-    sysinfo_get(&si);
-    const GameIssue now = gamecheck_classify(&game, si.hos_version);
+    const u32 hos = sysinfo_hos_version();
+    const GameIssue now = gamecheck_classify(&game, hos);
     for (const GameFacts& g : this->cache.games) {
         if (g.app_id != game.app_id) continue;
-        const GameIssue was = gamecheck_classify(&g, si.hos_version);
+        const GameIssue was = gamecheck_classify(&g, hos);
         if (was != now) return true;
         // Listed: its line and its dialog are made from what was found.
         return now != GC_OK && std::memcmp(&g, &game, sizeof g) != 0;

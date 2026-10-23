@@ -50,23 +50,17 @@ void FirmwareGateActivity::onContentAvailable()
         return true;
     });
 
-    SysInfo si;
-    sysinfo_get(&si);
-    const uint32_t hos = si.hos_version;
-    std::weak_ptr<bool> weak = this->alive;
-    ui::in_background("update check", [this, weak, hos, fw]() {
-        const update::Result r = update::check(hos);
-        brls::sync([this, weak, r, fw]() {
-            if (weak.expired() || this->chosen) return;
-            this->status->setText(update_flow::status_text(r, fw));
-            const bool newer = r.verdict == update::Verdict::UpdateSupports || r.verdict == update::Verdict::UpdateNoSupport;
-            this->update->setDetailText(newer ? r.latest.version : "");
-            ui::set_visible(this->update.getView(), newer);
-            // Not from under the "risk" confirmation: its buttons keep the focus.
-            if (r.verdict == update::Verdict::UpdateSupports && ui::has_focus(this))
-                brls::Application::giveFocus(this->update.getView());
-        });
-    });
+    update_flow::check_once(ui::guarded(this->alive, [this, fw](const update_flow::Offer& o) {
+        if (this->chosen) return;
+        const update::Result& r = o.result;
+        this->status->setText(update_flow::status_text(r, fw));
+        const bool newer = r.verdict == update::Verdict::UpdateSupports || r.verdict == update::Verdict::UpdateNoSupport;
+        this->update->setDetailText(newer ? r.latest.version : "");
+        ui::set_visible(this->update.getView(), newer);
+        // Not from under the "risk" confirmation: its buttons keep the focus.
+        if (r.verdict == update::Verdict::UpdateSupports && ui::has_focus(this))
+            brls::Application::giveFocus(this->update.getView());
+    }));
 }
 
 void FirmwareGateActivity::choose(fw_gate::Choice choice)
