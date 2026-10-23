@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
+<!-- translated from docs/features.md, sha256 49029f67bfff -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -129,8 +129,8 @@ Dessous, ce qui arrêtera le jeu en premier :
 ### Les actions
 
 - **Temps en plus**, ses montants sur une rangée (+15 min, +30 min, +1 h), chacun à portée d'un appui, puis **…** pour tout autre (une durée, un autre jour) : un montant sélectionné déplace la fin du temps sur la ligne (*avec 15 min de plus*), ou dit sur la marque de l'alarme du coucher qu'elle arrive d'abord ; le premier ressort en sarcelle dès qu'il reste 15 min ou moins, ou plus rien.
-- **Arrêter pour aujourd'hui**, **Montrer à l'enfant**.
-- **Limite d'aujourd'hui…** : la limite du jour choisie sur place, écrite après une confirmation.
+- **Fini pour aujourd'hui**, **Écran enfant**.
+- **Limite du jour…** : la limite du jour choisie sur place, écrite après une confirmation.
 - **Le profil en vigueur**, par son nom, dès qu'un profil est enregistré (*Profils…* quand aucun ne correspond) : Ⓐ les liste, celui en vigueur coché, pour en appliquer un autre après une confirmation (les jours qui changent), ou *Gérer les profils…*.
 - Contrôle parental déverrouillé, **Réactiver** passe en premier, sur toute la largeur, et *Temps en plus* s'efface.
 - Sans limite sur aucun jour, **Définir les limites de la semaine** ouvre la semaine de *Temps de jeu*.
@@ -140,8 +140,8 @@ Dessous, ce qui arrêtera le jeu en premier :
 - L'**alarme du coucher** (l'heure où le jeu est de nouveau permis, ou dans combien de temps elle sonne quand la console ne le dit pas ; désactivée, *Désactivée* en grand et Ⓐ *La régler*), le **contrôle parental** et l'**horloge réseau**, en cartes.
 - L'état de la console en **pastilles** :
   - l'une dit si la redirection DNS d'Atmosphère bloque les serveurs de Nintendo, et Ⓐ dessus lesquels et ce que cela change : plus de synchro pour l'application mobile, une horloge réseau qui ne se règle plus seule ;
-  - une autre, ouvert par-dessus un jeu, que le temps passé dans PlayGuard est décompté, Ⓐ disant comment ;
-  - un jeu laissé ouvert sur le menu HOME apparaît en pastille orange (*toujours décompté*, Ⓐ disant pourquoi), quand la pastille sur PlayGuard ouvert par-dessus un jeu ne le dit pas déjà.
+  - une autre, ouvert en application, que le temps passé dans PlayGuard est décompté : comme ce jeu quand il est ouvert par-dessus un jeu (*Ouvert depuis un jeu*), sous le nom de son icône quand il est lancé par un forwarder du menu HOME (*Ouvert par son icône HOME*), Ⓐ disant comment ;
+  - un jeu laissé ouvert sur le menu HOME apparaît en pastille orange (*toujours décompté*, Ⓐ disant pourquoi), quand la pastille sur le temps de PlayGuard lui-même ne le dit pas déjà.
 - Les pastilles mettent d'abord ce qui demande le parent (orange, avec un triangle), puis ce qui est actif (sarcelle, avec une coche), puis le reste (gris, avec un point) : la forme le dit autant que la couleur.
 - Ce qui va bien et ce qui est seulement signalé se replient en une pastille après celles qui demandent le parent (*✓ 3 vérifications OK*) ; Ⓐ dessus les affiche, tant que l'onglet reste ouvert.
 - Sous les pastilles, le temps en plus encore à retirer (Ⓐ le retire) et l'alarme « temps écoulé » tant qu'elle est désactivée (Ⓐ la réactive).
@@ -179,7 +179,7 @@ La console affiche « temps écoulé », puis suspend le jeu (sans « continuer 
 
 ### L'écran enfant
 
-*Montrer à l'enfant* sur *Aujourd'hui*, pour confier la console :
+*Écran enfant* sur *Aujourd'hui*, pour confier la console :
 
 - seulement le temps restant (contrôle parental déverrouillé, la limite du jour, en pause), l'heure de fin (*Fin vers 16:40* ; quand l'alarme du coucher arrive avant, l'anneau fait le compte à rebours jusqu'à elle, *45 min avant le coucher*, comme dans la dernière heure d'un jour sans limite), le coucher et ce qui se passe quand le temps est écoulé ;
 - fait pour se lire de l'autre bout de la pièce, sur la TV ; son texte garde sa taille quelle que soit la taille du texte (seuls le titre et le pied de page la suivent, comme sur tous les écrans) ;
@@ -518,6 +518,7 @@ Le minuteur est celui de la console : PlayGuard le lit, il ne décompte rien lui
 | **Un jeu laissé ouvert sur le menu HOME** (suspendu en arrière-plan) | **Oui** : fermez-le, ou mettez la console en veille | Rapporté par des parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; cohérent avec les mesures (la console décompte tant qu'une application est ouverte) |
 | Mode veille | Non | Rapporté ([Arqade](https://gaming.stackexchange.com/questions/398954/)) ; pas mesuré par PlayGuard |
 | **PlayGuard ouvert par-dessus un jeu** (en application) | **Oui**, comme ce jeu | Mesuré (22.0.0) : ouvrez-le avec un utilisateur parent, ou depuis l'album pour un coup d'œil |
+| **PlayGuard lancé par un forwarder** (son icône du menu HOME, une application aussi) | **Oui**, sous le nom de l'icône | Déduit : une application comme une autre ; pas mesuré par PlayGuard |
 | PlayGuard ouvert depuis l'album (mode applet) | Non | Déduit : ce n'est pas une application, et le temps hors des applications ne semblait pas décompté |
 | Pendant un déverrouillage temporaire du contrôle parental | Peut-être pas | Pas mesuré : question ouverte |
 | Après un changement d'horloge | La journée repart de zéro ; après un retour en arrière, le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure | Observé (22.0.0) ; *Aujourd'hui* indique quand la console ne décompte pas |
