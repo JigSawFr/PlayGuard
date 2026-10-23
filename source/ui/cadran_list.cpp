@@ -1,5 +1,5 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 
 #include <algorithm>
 #include <cstdint>

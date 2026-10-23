@@ -8,7 +8,7 @@
 #include "action/hbmenu_lock.hpp"
 #include "activity/icon_sheet.hpp"
 #include "app.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/format_text.hpp"

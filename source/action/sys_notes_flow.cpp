@@ -9,7 +9,6 @@
 #include "action/sys_update_flow.hpp"
 #include "activity/sys_notes_activity.hpp"
 #include "app.hpp"
-#include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
@@ -79,7 +78,7 @@ void on_loaded(sys_notes::Cache read)
     sys_update_flow::refresh_entries();
     // Tools › Console: how far behind each one is, the firmware's advice;
     // About: how far behind PlayGuard is (nothing kept: nothing to say there either).
-    if (any) TabBase::refresh_shown();
+    if (any) ui::refresh_shown_tab();
 }
 }   // namespace
 

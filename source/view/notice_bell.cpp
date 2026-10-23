@@ -4,7 +4,7 @@
 #include <string>
 
 #include "action/notices.hpp"
-#include "activity/notices_activity.hpp"
+#include "ui/hooks.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "view/version_badge.hpp"
@@ -20,7 +20,9 @@ NoticeBell::NoticeBell()
     this->setHeight(SIZE);
     this->setAlignSelf(brls::AlignSelf::CENTER);
     // A tap opens the list, as Y does (hitTest finds it, focusable or not).
-    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, []() { NoticesActivity::open(); }));
+    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, []() {
+        if (ui::hooks::get().open_notices) ui::hooks::get().open_notices();
+    }));
     this->listener = notices::listen([this]() { this->update(); });
     this->update();
 }

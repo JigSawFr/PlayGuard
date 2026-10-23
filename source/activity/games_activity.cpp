@@ -10,7 +10,7 @@
 #include "action/games_logic.hpp"
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"

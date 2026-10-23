@@ -23,7 +23,7 @@
 #include "action/games_logic.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"

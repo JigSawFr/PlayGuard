@@ -33,6 +33,7 @@
 #include "activity/lock_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "activity/rescue_activity.hpp"
+#include "activity/screen_hooks.hpp"
 #include "app.hpp"
 #include "core/gate_nx.h"
 #include "core/platform.h"
@@ -426,6 +427,9 @@ int main(int argc, char* argv[])
     startup_mark(StartupStep_Rollback);
     select_nand_and_log_system();
     startup_mark(StartupStep_System);
+
+    // What ui/ and view/ ask of the screens above them, before any opens.
+    install_screen_hooks();
 
     // Preferences first: their language replaces the console's once borealis
     // has read it (live_prefs::start).

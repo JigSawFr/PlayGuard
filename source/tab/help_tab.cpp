@@ -21,7 +21,7 @@
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "core/sysinfo.h"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"

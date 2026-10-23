@@ -2,10 +2,8 @@
 #include "view/title_state.hpp"
 
 #include "action/fw_gate.hpp"
-#include "activity/firmware_gate_activity.hpp"
-#include "activity/main_activity.hpp"
-#include "tab/help_tab.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/hooks.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -17,18 +15,20 @@ static constexpr const char* READ_ONLY_ID = "title_state_read_only";
 static void open_unlocked()
 {
     // Today, on "Turn back on".
-    if (MainActivity* main = ui::main_activity()) main->open_tab(ui::tab::dashboard, "dash_relock");
+    ui::open_tab(ui::tab::dashboard, "dash_relock");
 }
 
 static void open_read_only()
 {
     // Untested firmware: the screen that chose read-only, where the choice changes.
+    const ui::hooks::Hooks& hooks = ui::hooks::get();
     if (fw_gate::needed()) {
-        brls::Application::pushActivity(new FirmwareGateActivity());
+        if (hooks.open_firmware_screen) hooks.open_firmware_screen();
         return;
     }
     // Else the developer switch turned it on: Help & diagnostics, on that switch.
-    auto* help = new HelpTab();
+    if (!hooks.make_help_tab) return;
+    brls::View* help = hooks.make_help_tab();
     ui::open_screen(help, "playguard/prefs/help"_i18n);
     brls::sync([help]() {
         brls::View* cell = help->getView("hp_dev_read_only");

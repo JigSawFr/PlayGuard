@@ -121,7 +121,7 @@ DashboardTab::DashboardTab()
     setup->setAlignItems(brls::AlignItems::CENTER);
     // No limit yet: the Play timer, on its week, where the days are set.
     setup->registerClickAction([](brls::View* view) {
-        if (MainActivity* main = ui::main_activity()) main->open_tab(ui::tab::play_timer, "cpt_week");
+        if (ui::main_screen()) ui::open_tab(ui::tab::play_timer, "cpt_week");
         else ui::go_to_tab(view, ui::tab::play_timer);
         return true;
     });

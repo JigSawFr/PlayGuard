@@ -19,12 +19,10 @@
 #include "action/pt_flow.hpp"
 #include "action/upload_flow.hpp"
 #include "action/week_qr.hpp"
-#include "activity/main_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
 #include "tab/clock_tab.hpp"
-#include "tab/tab_base.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/backup.hpp"
@@ -348,7 +346,7 @@ void note_security(const PctlStatus& s, bool writable)
            writable ? "playguard/security/banner_action"_i18n : "", []() {
                console_actions::relock("", []() {
                    sweep();
-                   TabBase::refresh_shown();
+                   ui::refresh_shown_tab();
                });
            });
 
@@ -387,7 +385,7 @@ void note_timer(const PtState& pt, Result accuracy_rc, bool accurate, bool writa
            "playguard/dashboard/extra_restore"_i18n, []() {
                pt_flow::offer_extra_time_restore([]() {
                    sweep();
-                   TabBase::refresh_shown();
+                   ui::refresh_shown_tab();
                }, true);
            });
 
@@ -407,7 +405,7 @@ void note_timer(const PtState& pt, Result accuracy_rc, bool accurate, bool writa
            "playguard/dashboard/outside_dismiss"_i18n, []() {
                outside_watch::dismiss();
                clear("outside");
-               TabBase::refresh_shown();   // Today's notice goes too
+               ui::refresh_shown_tab();   // Today's notice goes too
            });
 
     // The network clock the play timer counts on.
@@ -620,7 +618,7 @@ void sweep()
 
 void open_tab(int position, const std::string& row)
 {
-    if (MainActivity* main = ui::main_activity()) main->open_tab(position, row);
+    ui::open_tab(position, row);
 }
 
 }   // namespace notices

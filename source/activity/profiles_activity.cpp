@@ -6,7 +6,7 @@
 #include "action/profile_flow.hpp"
 #include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 

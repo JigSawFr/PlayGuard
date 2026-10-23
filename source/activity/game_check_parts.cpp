@@ -4,7 +4,7 @@
 #include <fmt/format.h>
 
 #include "app.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 
 using namespace brls::literals;
 

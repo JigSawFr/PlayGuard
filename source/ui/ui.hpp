@@ -18,8 +18,6 @@
 #include "util/prodinfo.hpp"
 #include "util/pctl_ops_c.hpp"
 
-class MainActivity;
-
 namespace ui
 {
 
@@ -381,7 +379,13 @@ bool has_focus(brls::Activity* activity);
 // pushed over it, one closing included.
 bool on_top(brls::Activity* activity);
 // The main screen, wherever it is in the stack; nullptr before it opens.
-MainActivity* main_activity();
+brls::Activity* main_screen();
+// Shows its tab `position` (ui::tab) and focuses its content: the view with
+// id `row` when given and shown, else its first one. Nothing before it opens.
+void open_tab(int position, const std::string& row = "");
+// Re-reads the tab on screen, if any (after the read-only or developer mode
+// changed, the language or the text size).
+void refresh_shown_tab();
 
 // Sidebar positions of the main screen tabs, in the order of
 // resources/xml/activity/main.xml (separators count as positions).

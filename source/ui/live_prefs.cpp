@@ -5,8 +5,7 @@
 #include <functional>
 #include <utility>
 
-#include "activity/main_activity.hpp"
-#include "tab/tab_base.hpp"
+#include "ui/hooks.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -29,7 +28,8 @@ int shown_tab()
         { "tab/preferences", ui::tab::preferences },
         { "tab/about", ui::tab::about },
     };
-    const std::string screen = TabBase::shown_screen();
+    const auto& shown = ui::hooks::get().shown_screen;
+    const std::string screen = shown ? shown() : "";
     for (const auto& [name, position] : tabs)
         if (screen == name) return position;
     return ui::tab::preferences;
@@ -45,11 +45,13 @@ void close_all(std::function<void()> next)
 // has one), "" when the focus is elsewhere (the rail, the header).
 std::string focused_row()
 {
+    const auto& is_tab = ui::hooks::get().is_tab;
+    if (!is_tab) return "";
     for (brls::View* v = brls::Application::getCurrentFocus(); v; v = v->getParent()) {
-        if (dynamic_cast<TabBase*>(v)) return "";
+        if (is_tab(v)) return "";
         if (!v->getId().empty()) {
             for (brls::View* up = v->getParent(); up; up = up->getParent())
-                if (dynamic_cast<TabBase*>(up)) return v->getId();
+                if (is_tab(up)) return v->getId();
             return "";
         }
     }
@@ -65,9 +67,7 @@ void rebuild()
         const int tab = shown_tab();
         const std::string row = focused_row();
         close_all([tab, row]() {
-            auto* main = new MainActivity();
-            brls::Application::pushActivity(main, brls::TransitionAnimation::NONE);
-            main->open_tab(tab, row);
+            if (ui::hooks::get().push_main) ui::hooks::get().push_main(tab, row);
         });
     });
 }

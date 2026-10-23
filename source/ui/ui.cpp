@@ -2,16 +2,12 @@
 // screen's state. The other ui/*.cpp hold the rest of ui.hpp by concern.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
-#include "action/notices.hpp"
 
 #include "action/error_hint_logic.hpp"
-#include "action/frame_stats_flow.hpp"
-#include "action/pt_log_flow.hpp"
 #include "action/write_queue_logic.hpp"
-#include "activity/main_activity.hpp"
-#include "tab/tab_base.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_text.hpp"
+#include "ui/hooks.hpp"
 #include "util/config.hpp"
 #include "util/worker_threads.hpp"
 
@@ -217,7 +213,9 @@ static bool queue_config(const std::string& saved_text, const std::string& faile
     *ticket = push_write("config", [text, saved_text, failed]() {
         const bool saved = config::write(text);
         s_config_saved = saved;
-        brls::sync([saved]() { notices::note_write("config", saved); });
+        brls::sync([saved]() {
+            if (hooks::get().note_write) hooks::get().note_write("config", saved);
+        });
         if (!saved) notify(failed, Toast::Refused);
         else if (!saved_text.empty()) notify(saved_text, Toast::Done);
     }, "config", Write::Whole, true);
@@ -246,6 +244,13 @@ void notify_result(Result rc, const std::string& ok_text, const std::string& err
 
 static bool s_unlocked = false;
 
+// "PlayGuard" and its icons, on the main screen.
+static void update_title()
+{
+    brls::Activity* main = main_screen();
+    if (main && hooks::get().update_title) hooks::get().update_title(main);
+}
+
 bool known_unlocked() { return s_unlocked; }
 
 void note_unlocked(bool valid, bool unlocked)
@@ -254,17 +259,15 @@ void note_unlocked(bool valid, bool unlocked)
     s_unlocked = unlocked;
     // Next frame: at start-up the first tab is read before the main screen is
     // on the activity stack.
-    brls::sync([]() {
-        if (MainActivity* main = main_activity()) main->update_title();
-    });
+    brls::sync([]() { update_title(); });
 }
 
 void on_mode_changed()
 {
-    pt_log_flow::apply();       // the recorder and the frame statistics only run
-    frame_stats_flow::apply();  // in developer mode
-    if (MainActivity* main = main_activity()) main->update_title();
-    TabBase::refresh_shown();
+    // The recorder and the frame statistics only run in developer mode.
+    if (hooks::get().mode_changed) hooks::get().mode_changed();
+    update_title();
+    refresh_shown_tab();
 }
 
 }   // namespace ui
