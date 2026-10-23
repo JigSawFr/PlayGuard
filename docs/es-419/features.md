@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 86861c409fdc -->
+<!-- translated from docs/features.md, sha256 584095baaee8 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Es nuevo en PlayGuard? Empiece por [primeros pasos](getting-started.md). Volver al [README](../../README.md).
@@ -28,7 +28,7 @@ Las capturas muestran el tema oscuro, el predeterminado de PlayGuard (en inglés
 | Ⓑ | Volver o cancelar (dos veces en la barra lateral para salir) |
 | Ⓧ | Actualizar (en las pestañas que leen la consola) |
 | Ⓨ | Notificaciones, desde cualquier pestaña |
-| **−** | Idioma y tema, desde cualquier pestaña (el pie de página no los muestra; la campana, el idioma y el tema del encabezado sí) |
+| **−** | Idioma y tema, desde cualquier pestaña (en el pie de página, lo primero que se omite cuando los botones propios de una pantalla necesitan el espacio) |
 | **+** | Guarda los límites por día (y la semana editada en *Tiempo de juego*) |
 | **ZR** | *Deshacer*, durante unos segundos después de guardar un cambio |
 
@@ -48,7 +48,7 @@ El aspecto de PlayGuard se llama Cadran: una barra de íconos para las pestañas
   - Un cuadro de diálogo largo se difumina en su parte inferior mientras hay más, y su advertencia (un juego a punto de suspenderse) va primero, en una tarjeta ámbar.
   - Un fallo lleva como título lo que falló, el código de error en pequeño debajo del motivo, y ofrece *Enviar un informe* cuando ayuda.
   - Los mensajes aparecen como tarjetas debajo del encabezado, con una marca de verificación turquesa para lo que se hizo y una marca ámbar para lo que se rechazó.
-- **Las demás pantallas** adoptan el mismo aspecto: el editor por día de un perfil muestra la semana como en *Tiempo de juego* (se edita de la misma forma, con el relleno rápido como mosaicos); *Comprobar los juegos instalados* y *Todos los juegos* presentan sus líneas en tarjetas; *Perfiles* y *Ayuda y diagnóstico* le dan a cada línea su ícono.
+- **Las demás pantallas** adoptan el mismo aspecto: el editor por día de un perfil muestra la semana como en *Tiempo de juego* (se edita de la misma forma, con el relleno rápido como mosaicos); *Juegos instalados* y *Todos los juegos* presentan sus líneas en tarjetas; *Perfiles* y *Ayuda y diagnóstico* le dan a cada línea su ícono.
 - **Tamaño del texto** (*Preferencias*, o **AA** en el encabezado):
   - *Automático*, la opción predeterminada, agranda todos los textos un 25 % mientras la consola está en la base, en la TV, y los devuelve a su tamaño en modo portátil; *Más grande* los mantiene agrandados, *Normal* nunca.
   - Los nombres de las pestañas de la barra lateral también crecen, un 25 % igualmente; el título, la etiqueta y la fecha del encabezado y las indicaciones de botones y el reloj del pie de página crecen un poco menos (del 15 al 20 %), porque sus filas ya están llenas. Un nombre demasiado largo para su lugar en un idioma se dibuja un poco más chico, nunca más que en tamaño normal, en vez de cortarse. Los nombres de los niveles de Restricciones conservan su tamaño, que ya es grande.
@@ -106,7 +106,7 @@ Las informativas: una compilación de la que se volvió atrás, un firmware no p
 
 - Cada sección enumera sus entradas en un orden fijo, sin importar qué comprobación terminó primero.
 - **En la barra lateral**, una insignia ámbar junto al nombre de una pestaña cuenta sus entradas pendientes, ahí donde se resuelven: la pestaña Seguridad (sin PIN, un PIN débil, PlayGuard sin su PIN, desbloqueado temporalmente), Tiempo de juego (la alarma desactivada, la consola que no cuenta), Hoy (cambios hechos fuera de PlayGuard, tiempo extra por restablecer), la Consola (sus entradas de arriba, y el reloj de red). Las entradas ignoradas y las informativas no se cuentan.
-- Dentro de la pestaña, la misma insignia está en la fila donde se resuelve cada una (*Reloj de red*, *Comprobar los juegos instalados*, *Almacenamiento*, *Parches de juegos*; *Definir o cambiar el PIN*, *Proteger PlayGuard con el PIN*; *Avanzado* de Tiempo de juego para la alarma), y la pestaña se abre en la primera de ellas. Una fila sin valor propio indica antes, en ámbar, para qué es la insignia (*Fácil de adivinar*, *Impreciso*).
+- Dentro de la pestaña, la misma insignia está en la fila donde se resuelve cada una (*Reloj de red*, *Juegos instalados*, *Almacenamiento*, *Parches de juegos*; *Definir o cambiar el PIN*, *Proteger PlayGuard con el PIN*; *Avanzado* de Tiempo de juego para la alarma), y la pestaña se abre en la primera de ellas. Una fila sin valor propio indica antes, en ámbar, para qué es la insignia (*Fácil de adivinar*, *Impreciso*).
 - **Ⓐ** en una entrada aplica la solución (*Activarla*, *Ajustarlo*, *Actualizar*…) o abre la pestaña donde se hace. Una entrada desaparece sola una vez que se resuelve lo que indica.
 - **Ⓧ** marca una entrada informativa como leída; **Ⓨ** las marca todas. Una entrada marcada como leída sigue leída en el siguiente inicio, hasta que su texto cambie.
 - **Ignorar:** algunas entradas pendientes se pueden ignorar con Ⓧ, tras una confirmación y el PIN: un PIN que cualquiera probaría primero, PlayGuard que se abre sin el PIN, la alarma de “Se acabó el tiempo” desactivada, la tarjeta SD casi llena (nunca la falta de PIN, el control desbloqueado, el reloj, el temporizador de juego que no cuenta ni los archivos propios de PlayGuard). Una entrada ignorada deja de contarse y aparece al final, en *Ignorados*, donde Ⓐ la vuelve a contar. Vuelve sola 30 días después (salvo que *Volver a contar los avisos ignorados después de 30 días* esté desactivado), cuando lo que indica se resuelve y luego vuelve a ocurrir, o, para el PIN, con un PIN nuevo de otra longitud.
@@ -298,7 +298,7 @@ Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir d
 - **Las opciones del nivel:** clasificación por edad, publicaciones en redes sociales, comunicación con otros usuarios. Con un nivel predefinido, son las suyas: cambiar una convierte el nivel en *Personalizado*, a partir de las opciones del nivel predefinido con ese cambio, después de preguntar (con las opciones enumeradas).
 - **En *Clasificación por edad*,** el **sistema de clasificación** (PEGI, ESRB, USK, CERO …): la lista indica los países para los que clasifica cada uno (PEGI: la mayor parte de Europa, ESRB: Estados Unidos, Canadá y Latinoamérica, USK: Alemania, PEGI BBFC: Reino Unido…).
 - **Juegos instalados que bloquea** (también en *Clasificación por edad*): cuántos de los juegos instalados bloquea el nivel vigente por su clasificación por edad (*3 de 15*), y Ⓐ los enumera con su clasificación (*PEGI 16*); el mosaico de cada nivel también lo indica (*Juegos bloqueados · 3*).
-  - Las clasificaciones son las de cada juego (sus datos de control, leídos por la comprobación de los juegos instalados al iniciar o desde *Consola › Comprobar los juegos instalados*), según el sistema de clasificación que usa la consola.
+  - Las clasificaciones son las de cada juego (sus datos de control, leídos por la comprobación de los juegos instalados al iniciar o desde *Consola › Juegos instalados*), según el sistema de clasificación que usa la consola.
   - Un juego que ese sistema no clasifica no se cuenta, ni tampoco las excepciones configuradas en la app para celular.
   - La pantalla de un juego en Actividad muestra su clasificación, y *bloqueado en el nivel actual* cuando lo está.
 - **En *Otros*,** el modo RV. Los juegos autorizados a comunicarse están en el informe de diagnóstico, sin procesar, hasta que se entienda su lista.
@@ -368,7 +368,7 @@ Dos confirmaciones, irreversible; antes se guarda un respaldo de la configuraci�
 
 *[Probarlo en el simulador ›](https://playguard.link/simulator/?tab=console)*
 
-**Arriba**, las herramientas como mosaicos (*Reloj de red*, *Comprobar los juegos instalados*, *Forwarders*, cada una con lo que requiere atención en su esquina), luego lo que ejecuta la consola como mosaicos (el firmware, Atmosphère, hekate cuando está en la tarjeta SD y sys-patch cuando está instalado; Ⓐ abre sus notas de la versión) y después las líneas de la consola, empezando por la compatibilidad (solo una marca de verificación turquesa cuando PlayGuard se comprobó en este firmware; si no, una advertencia y lo que falla).
+**Arriba**, lo que ejecuta la consola como mosaicos, en *Sistema* (el firmware, Atmosphère, hekate cuando está en la tarjeta SD y sys-patch cuando está instalado; Ⓐ abre sus notas de la versión), luego las herramientas como mosaicos, en *Herramientas* (*Reloj de red*, *Juegos instalados* y *Forwarders*; las dos primeras muestran lo que requiere atención en su esquina) y después las líneas de la consola, empezando por la compatibilidad (solo una marca de verificación turquesa cuando PlayGuard se comprobó en este firmware; si no, una advertencia y lo que falla).
 
 ### Reloj de red
 
@@ -390,7 +390,7 @@ En una consola sin Internet, *Usar el reloj de la consola* se ofrece en el cuadr
 
 ### Juegos instalados
 
-*Comprobar los juegos instalados* encuentra los juegos que el menú HOME no puede iniciar ni mostrar —un ícono que no termina de cargar, un “!”, un marco punteado— con lo que falla y qué hacer, debajo del ícono del juego, y cuántos juegos instalados tienen un problema.
+*Juegos instalados* (un mosaico en *Consola › Herramientas*) encuentra los juegos que el menú HOME no puede iniciar ni mostrar —un ícono que no termina de cargar, un “!”, un marco punteado— con lo que falla y qué hacer, debajo del ícono del juego, y cuántos juegos instalados tienen un problema.
 
 **Lo que encuentra:** nombre e ícono ilegibles, el juego en sí ausente detrás de su actualización, nada instalado ya, archivos faltantes, datos dañados que encontró la consola, un firmware más reciente que exige el juego o solo su actualización, claves demasiado nuevas para el firmware, una licencia (ticket) faltante, la consola que pide una actualización que se eliminó, la tarjeta SD ilegible, un inicio que la consola rechaza.
 
@@ -403,12 +403,13 @@ En una consola sin Internet, *Usar el reloj de la consola* se ofrece en el cuadr
 | **Reinstalar** | Archivos que ya no están o no se pueden usar, o datos que resultaron dañados: eliminar y luego volver a instalar |
 | **Firmware o tarjeta SD** | El juego está bien, la consola no |
 
-- **Comprobar los datos:** lo que encontró la comprobación de datos se guarda con el juego hasta que se instale otra versión: si están dañados, pasa a *Reinstalar* como *Dañado (comprobado)*, con la fecha y el código de la consola; si están intactos, sale de la lista. *Comprobar estos juegos* comprueba toda la sección *Por comprobar*, un juego tras otro en un solo cuadro de diálogo (*juego 2 de 5*), y luego indica cuántos están dañados, intactos o no se pudieron comprobar, con la opción de eliminar los dañados al alcance de la mano.
+- **Comprobar los datos:** lo que encontró la comprobación de datos se guarda con el juego hasta que se instale otra versión: si están dañados, pasa a *Reinstalar* como *Dañado (comprobado)*, con la fecha y el código de la consola; si están intactos, sale de la lista. *Comprobar estos juegos* comprueba toda la sección *Por comprobar*, un juego tras otro en un solo cuadro de diálogo, con sus portadas arriba (*juego 2 de 5*), y luego indica cuántos están dañados, intactos o no se pudieron comprobar, con la opción de eliminar los dañados al alcance de la mano.
 - **Varios juegos a la vez:** Ⓨ selecciona juegos (una marca de verificación delante); desde el primero seleccionado, una línea encima de las secciones indica cuántos, y A en ella también selecciona una sección entera; luego, una sola acción para todos: comprobar sus datos o eliminarlos (antes se guarda su lista, con una sola pregunta y un solo PIN).
+- **Eliminar varios:** las portadas se alejan flotando a medida que se elimina cada juego (un “!” coral en el que queda), la barra, un segmento por juego (hasta 20); al final, cuántos se eliminaron y cuánto espacio se liberó, y el cuadro de diálogo se cierra solo. Si quedan algunos: sus portadas con un borde coral, y *Reintentar* para ellos.
 - **En *Reinstalar*,** se puede guardar su lista (JSON y texto, en la carpeta de exportaciones: nombre, Title ID, versión, problema), y eliminarlos todos juntos tras una sola pregunta y un solo PIN: primero se guarda la lista y luego se eliminan los juegos, para que un instalador ya no los cuente como instalados.
 - **Las acciones:** cuando una acción es la solución, es el primer botón del cuadro de diálogo; las demás vienen después: volver a aceptar la versión instalada (cuando la consola pide una actualización que se eliminó), eliminar solo la actualización o un contenido adicional, comprobar si los datos están dañados (la comprobación propia de la consola, con su progreso y Cancelar) o eliminar el juego.
 - Las versiones se muestran como las muestra el juego (*versión 1.4.0*, *actualización n.º 4*); después de una reparación, un aviso breve indica si el juego vuelve a funcionar. Los datos de guardado siempre se conservan; cada cambio queda en el historial de cambios.
-- **Cuándo comprueba:** la última comprobación se muestra de inmediato; luego solo se vuelven a comprobar los juegos cuya entrada cambió (todos los juegos una vez al día, después de una actualización del firmware, o con Ⓧ *Comprobar de nuevo*), cada uno en cuanto se comprueba.
+- **Cuándo comprueba:** la última comprobación se muestra de inmediato; luego solo se vuelven a comprobar los juegos cuya entrada cambió (todos los juegos una vez al día, después de una actualización del firmware, o con Ⓧ *Comprobar de nuevo*), cada uno en cuanto se comprueba. Ⓧ *Comprobar de nuevo* abre un cuadro de diálogo: las portadas de los juegos pasando una tras otra, una barra y el conteo; *Cancelar* se detiene después del juego en curso, y lo ya comprobado se conserva. Si todavía no hay ningún juego en la lista, las portadas van pasando en la tarjeta mientras comprueba.
 - Varios juegos dañados a la vez apuntan a la tarjeta SD o a un juego instalado desde la otra memoria (sysMMC / emuMMC).
 - Ⓡ muestra los juegos como **lista** o como **portadas** (ícono, nombre y problema; la elección se conserva), como lo hace *Todos los juegos*.
 
@@ -460,7 +461,7 @@ En una consola sin Internet, *Usar el reloj de la consola* se ofrece en el cuadr
 ### Las líneas de la consola
 
 - **Firmware, Atmosphère, hekate** (cuando su `bootloader/update.bin` está en la tarjeta SD) **y sys-patch** (cuando está instalado; su versión, de su `config/sys-patch/log.ini`), cada uno un mosaico con la versión instalada y luego la versión más reciente que encontró la última búsqueda de actualizaciones en una píldora ámbar (*23.0.1 disponible*, el mosaico con borde ámbar, y debajo cuántas versiones de atraso cuando son más de una), o *Actualizado*; una advertencia en la esquina del mosaico del firmware cuando el firmware más reciente necesita primero un Atmosphère o un hekate más reciente, o todavía no es compatible con ellos (las notas de la versión del firmware explican por qué: las notas de versión de Atmosphère y hekate indican qué firmware admiten).
-- **Notas de la versión:** Ⓐ en cada uno las abre: una pestaña para la versión instalada, una por cada versión más reciente (cinco como máximo) y versiones más antiguas en las pestañas restantes (seis en total; Ⓛ / Ⓡ pasan de una a otra), que se abre en la siguiente, con etiquetas (instalada o más reciente, el firmware más reciente que admite, correcciones de seguridad, control parental modificado), las notas tal como se publicaron (en inglés), *Ver en línea* (un código QR) y cuándo se obtuvieron. Las de Atmosphère, hekate y sys-patch vienen de sus versiones en GitHub (las de sys-patch, de `impeeza/sys-patch`), las del firmware de switchbrew; se guardan en la tarjeta SD para leerlas sin conexión y se vuelven a obtener una vez al día (Ⓧ ahora).
+- **Notas de la versión:** Ⓐ en cada uno las abre: una pestaña para la versión instalada, una por cada versión más reciente (cinco como máximo) y versiones más antiguas en las pestañas restantes (seis en total; Ⓛ / Ⓡ pasan de una a otra), que se abre en la siguiente, con etiquetas (una marca de verificación para la versión instalada, un destello para una más reciente, el firmware más reciente que admite, correcciones de seguridad, control parental modificado), las notas tal como se publicaron (en inglés), *Ver en línea* (un código QR) y cuándo se obtuvieron. Las de Atmosphère, hekate y sys-patch vienen de sus versiones en GitHub (las de sys-patch, de `impeeza/sys-patch`), las del firmware de switchbrew; se guardan en la tarjeta SD para leerlas sin conexión y se vuelven a obtener una vez al día (Ⓧ ahora).
 - **La compatibilidad** y luego el **almacenamiento** (emuMMC o sysMMC, con un ícono de información cuando el otro sistema tiene su propio control parental: Ⓐ lo explica).
 - Si Atmosphère **oculta el número de serie** (*Sí (XAW00000000000)*, el número que ve entonces el sistema; en emuMMC, cuando no lo oculta, un ícono de advertencia, que Ⓐ explica), y luego el **número de serie real** de la consola, con su parte central oculta: cuando está oculto, se lee del respaldo de PRODINFO que Atmosphère guarda en `atmosphere/automatic_backups/` (el de esta consola, por su ID de dispositivo, cuando la tarjeta SD tiene varios). Ⓐ en su ícono de información lo muestra completo e indica de dónde viene.
 - **Parches de juegos** (sys-patch o archivos sigpatch, con la recomendación de sys-patch cuando solo se usan archivos: un ícono de información, o uno de advertencia cuando hay algo que revisar, que Ⓐ explica).
@@ -497,9 +498,10 @@ En una consola sin Internet, *Usar el reloj de la consola* se ofrece en el cuadr
 
 *Ayuda y diagnóstico ›*, una pantalla propia, debajo de *Buscar actualizaciones*:
 
+- **Arriba**, en *Para empezar*, dos mosaicos: *Primeros pasos* y *Enviar un informe…*; luego *Diagnóstico*.
 - **Primeros pasos** vuelve a abrir la guía (con un paso *Desvincular la app para celular* mientras está vinculada, un paso *Reactivar la alarma de “Se acabó el tiempo”* mientras está desactivada, un paso *Proteger PlayGuard* una vez definido el PIN —la opción *Proteger PlayGuard con el PIN*—, y un interruptor para que deje de aparecer al iniciar). Debajo de *Cerrar*, *Apoyar PlayGuard* muestra los códigos QR para apoyar el proyecto.
-- Cómo se inició PlayGuard (aplicación o applet) y su carpeta de datos.
-- **Exportar un informe de diagnóstico**, o **enviarlo en línea** (consulte [Reportar un error](troubleshooting.md#reportar-un-error)); cuántos informes guardados, archivos de fallo, registros de sesión y enlaces de informes enviados en línea se conservan, por cantidad, antigüedad o tamaño.
+- Cómo se inició PlayGuard (una aplicación sobre un juego o desde su ícono de HOME, o un applet) y su carpeta de datos.
+- **Exportar un informe de diagnóstico**, o **enviarlo en línea** (*Enviar un informe…*; consulte [Reportar un error](troubleshooting.md#reportar-un-error)); cuántos informes guardados, archivos de fallo, registros de sesión y enlaces de informes enviados en línea se conservan, por cantidad, antigüedad o tamaño.
 
 ### Créditos
 
