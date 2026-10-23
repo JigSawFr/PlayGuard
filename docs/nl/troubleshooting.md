@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
+<!-- translated from docs/troubleshooting.md, sha256 45158eaaf5a4 -->
 # Problemen oplossen
 
 Weer toegang krijgen tot een vergrendelde console, de veelvoorkomende problemen, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
@@ -28,7 +28,7 @@ De module moet de versie van PlayGuard volgen: pak bij elke update van PlayGuard
 *Console › Forwarders › Homebrewmenu vergrendelen* zorgt ervoor dat het album en een game die met R is gestart het homebrew-menu niet meer openen. Als de forwarder van PlayGuard en het beveiligde menu allebei weg zijn (verwijderd in de systeeminstellingen, of op het andere systeem: de vergrendeling staat op de SD-kaart en wordt door sysMMC en emuMMC allebei gelezen):
 
 - **Vanaf een computer:** verwijder `atmosphere/config/override_config.ini` op de SD-kaart (of zet `config/playguard/override_config.ini.backup` terug, het bestand zoals het was), en start de console daarna opnieuw op.
-- **Met de herstel-sysmodule geïnstalleerd** (optioneel): zet een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start opnieuw op; de module heft de vergrendeling op bij het opstarten, en PlayGuard meldt dat bij zijn volgende start. Een update van Atmosphère sinds de vergrendeling heft haar op dezelfde manier op.
+- **Met de herstel-sysmodule geïnstalleerd** (optioneel): zet een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start opnieuw op; de sysmodule heft de vergrendeling op bij het opstarten, en PlayGuard meldt dat bij zijn volgende start. Een update van Atmosphère sinds de vergrendeling heft haar op dezelfde manier op.
 
 ### Console niet gemod
 
@@ -43,7 +43,7 @@ PlayGuard kan niet helpen: het heeft Atmosphère nodig. De master-key-procedure 
 - **De netwerkklok is nooit ingesteld.** *Console › Netwerkklok › Tijdsverschil meten*, en stel hem daarna in ([netwerkklok](features.md#netwerkklok)).
 - **De klok is teruggezet.** Na een sprong terug stopt de telling tot de klok het oude tijdstip voorbij is; je hoeft niets te doen.
 - **Er is net een limiet geschreven.** Start een game voor een minuut en kijk dan opnieuw.
-- **Ouderlijk toezicht is tijdelijk ontgrendeld.** Speeltijd wordt dan mogelijk niet geteld: *Beveiliging › Ouderlijk toezicht weer inschakelen*.
+- **Ouderlijk toezicht is tijdelijk ontgrendeld.** Speeltijd wordt dan mogelijk niet geteld: *Vandaag › Weer inschakelen* (of een tik op de pil in de kopregel).
 
 ### Mijn limieten zijn vanzelf veranderd
 
@@ -54,7 +54,7 @@ PlayGuard kan niet helpen: het heeft Atmosphère nodig. De master-key-procedure 
 ### Het kind speelde langer dan de limiet
 
 - **De console waarschuwt alleen.** *Speeltijdtimer › Als de tijd om is*: kies *Software onderbreken*.
-- **Ouderlijk toezicht bleef ontgrendeld.** Zolang dat zo is, is de limiet van vandaag gepauzeerd: de pil in de kopregel zegt dat op elk tabblad; *Beveiliging › Ouderlijk toezicht weer inschakelen*. Een herstart van de console vergrendelt het ook.
+- **Ouderlijk toezicht bleef ontgrendeld.** Zolang dat zo is, is de limiet van vandaag gepauzeerd: de pil in de kopregel zegt dat op elk tabblad, en een tik erop leidt naar *Vandaag › Weer inschakelen*. Een herstart van de console vergrendelt het ook.
 - **De klok is teruggezet.** De telling stopt tot de klok het oude tijdstip voorbij is ([wat telt](features.md#wat-telt-als-speeltijd)).
 - **Het andere systeem.** emuMMC en sysMMC hebben elk hun eigen ouderlijk toezicht: stel het op beide in, of verberg het opstartmenu van hekate ([compatibiliteit](compatibility.md#emummc-en-sysmmc)).
 
@@ -171,6 +171,6 @@ Druk zeven keer op Ⓨ op *Info › Versie*; de ontwikkelaarstools verschijnen o
 - Een afgebroken download (netwerk weggevallen) gaat verder waar hij stopte de volgende keer dat dezelfde build wordt geïnstalleerd.
 - Artefacten verlopen na 90 dagen.
 
-**Teruggaan.** De vervangen build blijft bewaard (`playguard.nro.previous`): **Terug naar de vorige build** in dezelfde lijst wisselt ze weer om, na de pincode; het noemt die build bij zijn versie, zijn pull request en zijn commit. Als een build die hier (of via een update in PlayGuard zelf) is geïnstalleerd, crasht vóór zijn eerste scherm, biedt de volgende start van PlayGuard aan om terug te gaan naar de vorige build, op een eenvoudig tekstscherm, voordat er iets anders wordt geladen (A gaat terug, B start hem toch), zonder pincode, omdat juist het pincodescherm zelf kan crashen. Met dezelfde lijst kun je altijd terug naar elke release.
+**Teruggaan.** De vervangen build blijft bewaard (`playguard.nro.previous`): **Terug naar de vorige build** in dezelfde lijst wisselt ze weer om, na de pincode; het noemt die build bij zijn versie, zijn pull request en zijn commit. Als een build die hier (of via een update in PlayGuard zelf) is geïnstalleerd, crasht vóór zijn eerste scherm, biedt de volgende start van PlayGuard aan om terug te gaan naar de vorige build, op een eenvoudig tekstscherm, voordat er iets anders wordt geladen (A gaat terug, B start hem toch). Teruggaan vraagt om de pincode op het eigen pincodescherm van de console als er een is ingesteld (niet op het vergrendelscherm van PlayGuard, dat juist kan crashen); zonder pincode start de geïnstalleerde build. Met dezelfde lijst kun je altijd terug naar elke release.
 
 **Welke build draait:** *Info › Versie* toont de commit in ontwikkelaarsmodus. De kopregel van elk scherm toont de draaiende versie naast de titel: die van een release in een grijs label (`1.2.0`), die van elke andere build in een oranje label gevolgd door de commit, zodat een testbuild nooit voor de release wordt aangezien.

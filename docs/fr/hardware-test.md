@@ -1,4 +1,4 @@
-<!-- translated from docs/hardware-test.md, sha256 5341a83cb2d1 -->
+<!-- translated from docs/hardware-test.md, sha256 376b594d8f06 -->
 # Tester sur une console : forwarders et menu homebrew
 
 Ce que les simulateurs desktop et web ne peuvent pas montrer : le vrai menu HOME de la console, son écran du code PIN, Atmosphère qui lit `override_config.ini`, le sysmodule de récupération au démarrage. À dérouler sur une console après une modification de *Console › Forwarders* (les fichiers `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), en notant dans la pull request ce qui a été vérifié, et sur quels firmware et Atmosphère.
@@ -29,6 +29,8 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 - ☐ Refusé cinq fois de suite (la pause par défaut) : la cinquième dit *Il redemandera à …* ; relancé avant, il dit qu'il est en pause et n'affiche jamais l'écran du code PIN. Dans PlayGuard : la cloche signale la pause ; *Lever la pause* (code PIN demandé) et il le redemande aussitôt.
 - ☐ *Heures sans code PIN* incluant l'heure actuelle : il se lance sans code PIN, la porte le disant ; l'écran de la porte nomme les heures et montre un cadenas ouvert après *Protected by PlayGuard*, la ligne de sphaira dans PlayGuard la même icône, *Détails* les heures.
 - ☐ *Heures où il ne s'ouvre jamais* incluant l'heure actuelle : la porte dit *Pas à cette heure-ci* et les heures, même avec un code PIN sur la console ; en dehors, le code PIN de nouveau.
+- ☐ En pause, puis l'horloge de la console avancée d'un jour dans les Paramètres de la console (*Synchroniser l'horloge via Internet* désactivé) : toujours en pause, disant quand il redemande, comme avant.
+- ☐ *Heures sans code PIN* incluant l'heure actuelle, sur une console dont l'horloge réseau n'a jamais été réglée (jamais connectée) : le code PIN demandé quand même, la porte disant *Pas d'horaires libres : horloge réseau illisible* ; l'horloge réseau réglée (*Régler l'horloge réseau sur l'horloge de la console*), il se lance sans code PIN.
 - ☐ *Pause après des codes PIN refusés › Jamais* : refusé dix fois, pas de pause.
 - ☐ *Heures sans code PIN › Du lundi au vendredi, et le week-end à part* : un jour de semaine dans sa plage, pas de code PIN ; le week-end, la plage du week-end.
 - ☐ *Fermé une fois le temps de jeu du jour écoulé* activé, une minuterie sans temps restant aujourd'hui : la porte dit *Le temps de jeu du jour est écoulé*, même avec le code PIN saisi ; du temps ajouté (PlayGuard ou l'appli du parent), il redemande le code PIN.
@@ -52,6 +54,7 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 - ☐ Depuis un ordinateur : `atmosphere/config/override_config.ini` supprimé, la console redémarrée : l'album ouvre le menu homebrew ; l'ouverture suivante de PlayGuard signale que le verrou a été retiré (cloche, historique).
 - ☐ Avec le sysmodule de récupération : reverrouillé, un fichier vide `config/playguard/RESCUE`, un redémarrage : déverrouillé au démarrage, PlayGuard le signalant à son ouverture suivante.
 - ☐ Atmosphère mis à jour pendant le verrou (sysmodule de récupération installé) : déverrouillé au démarrage, PlayGuard le signalant.
+- ☐ Le sysmodule de récupération de ce PlayGuard, un fichier vide `config/playguard/RESCUE`, un redémarrage : l'écran de récupération propose ses actions (la preuve vérifiée). De même avec le module d'un PlayGuard précédent (dont la preuve ne dépendait que du code PIN) : aucune action, l'écran de récupération disant de mettre à jour le module.
 - ☐ Avec un emuMMC : verrouiller depuis un système prévient que le verrou est sur la carte SD ; démarré sur l'autre, l'album n'y ouvre plus non plus le menu homebrew, et ce système n'a aucun des forwarders.
 
 ## 5. Sauvegardes

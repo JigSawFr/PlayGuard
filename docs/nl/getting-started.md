@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
+<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
 # Aan de slag
 
 Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien minuten, en daarna de dagelijkse taken. Terug naar de [README](../../README.md).
