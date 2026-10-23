@@ -434,7 +434,7 @@ cadran::Progress cadran::progress_body(const std::string& heading, const std::st
     titles->addView(p.heading);
     p.title = kit::label(title, 22, "cadran/text");
     p.title->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
-    p.title->setMarginTop(2);
+    p.title->setMarginTop(6);
     titles->addView(p.title);
     head->addView(titles);
     p.box->addView(head);

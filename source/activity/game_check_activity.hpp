@@ -31,6 +31,8 @@
 
 #include "action/game_verify_flow.hpp"
 #include "ui/cadran_kit.hpp"
+#include "view/cover_strip.hpp"
+#include "view/loading_bar.hpp"
 #include "util/game_cache.hpp"
 
 #include "util/pctl_ops_c.hpp"
@@ -86,8 +88,20 @@ class GameCheckActivity : public brls::Activity
     brls::DetailCell* selection = nullptr;   // above the sections, once a game is picked: A for what to do
     // In the sections' place when no game has a problem: how many look fine,
     // when they were checked, and Check again (the focus).
+    // While a check runs, the covers leafed through and a bar in place of
+    // the check mark, and no Check again: the strip holds the focus.
     cadran::kit::Empty all_clear;
     brls::Box* check_again = nullptr;
+    CoverStrip* covers = nullptr;
+    LoadingBar* covers_bar = nullptr;
+    void card_layout();   // the card as the check is under way or not
+    // A full check (Ⓧ) asked with games listed: the covers leafed through in
+    // a dialog of their own, with Cancel, which stops the check there.
+    struct CheckDialog;
+    std::shared_ptr<CheckDialog> check_dialog;
+    void open_check_dialog();
+    void close_check_dialog();
+    bool x_greyed = false;   // Ⓧ unavailable while a check runs
     bool grid = false;
 
     // A list or covers: every section's games built again, next frame, the

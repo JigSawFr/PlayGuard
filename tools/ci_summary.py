@@ -12,6 +12,9 @@ Markdown on stdout: each job appends one section to $GITHUB_STEP_SUMMARY.
   map        that linker-map table alone (also for a local build:
              tools/ci_summary.py map build/borealis.map --nro playguard.nro)
   release    the assets attached to a release
+  tidy-files the files clang-tidy checks (.github/workflows/clang-tidy.yml):
+             the changed sources the desktop build compiles, on stdout
+  tidy       the findings of that run, by check, from run-clang-tidy's output
 
 A "baseline" is a small JSON file kept in the Actions cache by the builds of
 main (the .nro size, the coverage): --baseline reads the last one for the
@@ -315,7 +318,8 @@ def read_tsv(path):
 
 def cmd_smoke(a):
     # smoke-results.tsv: scenario, ok|fail, seconds, screens
-    # visual-results.tsv: scenario, ok|changed|none, screens compared, changed names, log file
+    # visual-results.tsv: scenario, ok|announced|changed|kept|none, screens compared, the changed
+    # (or announced, or kept: ~updated +added -removed) names, log file
     smoke = {r[0]: r for r in read_tsv(a.results)}
     visual_ran = bool(a.visual) and os.path.exists(a.visual)
     visual = {r[0]: r for r in read_tsv(a.visual)} if visual_ran else {}
@@ -343,6 +347,15 @@ def cmd_smoke(a):
         elif v[1] == "ok":
             compared += int(v[2]) if v[2].isdigit() else 0
             visual_cell = f"{OK} {v[2]} unchanged"
+        elif v[1] == "announced":
+            names = [x for x in (v[3] if len(v) > 3 else "").split(",") if x]
+            compared += int(v[2]) if v[2].isdigit() else 0
+            visual_cell = f"{OK} {v[2]} compared, {len(names)} announced or new: " + ", ".join(code(x) for x in names)
+        elif v[1] == "kept":
+            names = [x for x in (v[3] if len(v) > 3 else "").split(",") if x]
+            compared += int(v[2]) if v[2].isdigit() else 0
+            visual_cell = (f"{OK} {v[2]} kept as the references" +
+                           (f", {len(names)} changed: " + ", ".join(code(x) for x in names) if names else ", none changed"))
         else:
             names = [x for x in (v[3] if len(v) > 3 else "").split(",") if x]
             compared += int(v[2]) if v[2].isdigit() else 0
@@ -366,9 +379,9 @@ def cmd_smoke(a):
                "the smoke test's `app.log` next to them")
     if changed_all:
         out.append("")
-        out.append(f"{WARN} A changed screen fails the job. Its side-by-side image (reference | now | changes in red) "
-                   "is in `<scenario>/visual_diff/` of the artifact. If the change is meant, update the references "
-                   "(`tests/visual/README.md`): `python3 tools/visual_check.py <shots-dir> tests/visual/<scenario> --update`.")
+        out.append(f"{WARN} A screen changed against main's fails the job. Its side-by-side image (main | now | changes "
+                   "in red) is in `<scenario>/visual_diff/` of the artifact. If the change is meant, announce it on the "
+                   "pull request's `Screens:` line (`tests/visual/README.md`): `Screens: smoke/01_dashboard, cadran/*`, or `any`.")
         for sc, text in changed_logs:
             out.append("")
             out.append(details(f"Visual check ({sc})", "```\n" + text.strip() + "\n```", open_=True))
@@ -598,6 +611,104 @@ def cmd_release(a):
 
 # ---------------------------------------------------------------------- main
 
+# ---------------------------------------------------------------- clang-tidy
+
+SOURCE_EXT = (".c", ".cpp")
+HEADER_EXT = {".h": ".c", ".hpp": ".cpp"}
+
+
+def cmd_tidy_files(a):
+    """The files run-clang-tidy is given: of the changed files (one a line),
+    the sources under source/ and the source file of a changed header (the
+    same stem, .c for .h, .cpp for .hpp), those the compile commands hold,
+    as they name them (an absolute path, which run-clang-tidy matches)."""
+    db = read_json(a.compile_commands) or []
+    compiled = {os.path.normpath(e["file"]) for e in db if "file" in e}
+    wanted = set()
+    for line in (read_text(a.changed) or "").splitlines():
+        path = line.strip()
+        if not path.startswith("source/"):
+            continue
+        stem, ext = os.path.splitext(path)
+        if ext in SOURCE_EXT:
+            wanted.add(path)
+        elif ext in HEADER_EXT:
+            for src_ext in (HEADER_EXT[ext],) + SOURCE_EXT:
+                if os.path.exists(stem + src_ext):
+                    wanted.add(stem + src_ext)
+                    break
+    return "\n".join(sorted(f for f in compiled if os.path.relpath(f) in wanted))
+
+
+FINDING = re.compile(r"^(?P<file>[^\s:][^:]*?):(?P<line>\d+):(?P<col>\d+): (?P<kind>warning|error): (?P<text>.*?)"
+                     r"(?: \[(?P<checks>[\w.,-]+)\])?$")
+
+
+def cmd_tidy(a):
+    """run-clang-tidy's output as a report: the findings by check, each
+    once (a header's is printed once per file that includes it), and the
+    list of them, folded."""
+    log = read_text(a.log) or ""
+    root = os.getcwd() + os.sep
+    findings, errors = {}, []
+    for line in log.splitlines():
+        m = FINDING.match(line)
+        if not m:
+            continue
+        path = m["file"]
+        if path.startswith(root):
+            path = path[len(root):]
+        if "extern/" in path:   # borealis' own: the matcher leaves them out too
+            continue
+        checks = m["checks"] or ""
+        key = (path, int(m["line"]), int(m["col"]), checks, m["text"])
+        if m["kind"] == "error" and not checks:
+            errors.append(key)   # clang-tidy could not read the file (a compile error)
+        else:
+            findings[key] = checks.split(",")[0] if checks else "clang-diagnostic"
+    checked = [l for l in (read_text(a.files) or "").splitlines() if l.strip()]
+    changed = [l.strip() for l in (read_text(a.changed) or "").splitlines() if l.strip().startswith("source/")]
+    left_out = sorted(f for f in changed if os.path.splitext(f)[1] in SOURCE_EXT
+                      and not any(c.endswith(os.sep + f) or c == f for c in checked))
+    by_check = collections.Counter(findings.values())
+    files_hit = len({k[0] for k in findings})
+    n = len(findings)
+    if errors:
+        verdict = f"{FAIL} clang-tidy could not read {len({e[0] for e in errors})} file(s)"
+    elif not checked:
+        verdict = f"{SKIP} nothing to check"
+    elif n:
+        verdict = (f"{WARN} {n} finding{'s' if n != 1 else ''} in {files_hit} file{'s' if files_hit != 1 else ''}, "
+                   f"{len(checked)} checked")
+    else:
+        verdict = f"{OK} no finding in {len(checked)} file{'s' if len(checked) != 1 else ''}"
+    what = "bugprone, cert, performance" + (" and the static analyzer" if a.analyzer == "1" else "")
+    heading = f"## 🧹 clang-tidy — {verdict} · {what}" + (f" · clang-tidy {a.version}" if a.version else "")
+    out = [heading, ""]
+    if left_out:
+        out.append(f"{SKIP} Changed but not compiled by the desktop build (the Switch's alone), not checked: "
+                   + ", ".join(code(f) for f in left_out))
+        out.append("")
+    if errors:
+        out.append(table(["File", "Error"], [[code(f"{e[0]}:{e[1]}"), e[4][:200]] for e in errors[:20]]))
+        out.append("")
+    if n:
+        rows = [[c, code(name), len({k[0] for k, v in findings.items() if v == name})]
+                for name, c in by_check.most_common()]
+        out.append(table(["Findings", "Check", "Files"], rows, "rlr"))
+        out.append("")
+        lines = [f"{k[0]}:{k[1]}:{k[2]}: {k[4]} [{k[3]}]" for k in sorted(findings)]
+        shown = lines[: a.max_lines]
+        body = "```\n" + "\n".join(shown) + "\n```"
+        if len(lines) > len(shown):
+            body += f"\n\n… and {len(lines) - len(shown)} more: the `clang-tidy-<run>` artifact has them all."
+        out.append(details(f"Every finding ({n})", body))
+        out.append("")
+    out.append("A finding is a claim to check, not a failure: this job never fails on one. "
+               "The checks and why each left-out one is: `.clang-tidy`.")
+    return "\n".join(out)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0], formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="command", required=True)
@@ -684,6 +795,20 @@ def main():
     p.add_argument("--files", nargs="+", default=["playguard.nro", "playguard.zip", "playguard-rescue.zip", "compat.json",
                                                   "build-info.txt", "SHA256SUMS.txt"])
     p.set_defaults(func=cmd_release)
+
+    p = sub.add_parser("tidy-files", help="the files clang-tidy checks: the changed sources the desktop build compiles")
+    p.add_argument("changed", help="the changed files, one a line (a pull request's, or every file of source/)")
+    p.add_argument("compile_commands", help="build-tidy/compile_commands.json")
+    p.set_defaults(func=cmd_tidy_files)
+
+    p = sub.add_parser("tidy", help="the findings of run-clang-tidy, by check")
+    p.add_argument("log", help="run-clang-tidy's output")
+    p.add_argument("--files", default="files.txt", help="the files it was given")
+    p.add_argument("--changed", default="changed.txt", help="the changed files it was chosen from")
+    p.add_argument("--analyzer", default="0", help="1 when the static analyzer's checks ran")
+    p.add_argument("--version", default="")
+    p.add_argument("--max-lines", type=int, default=400, help="findings listed in the folded block")
+    p.set_defaults(func=cmd_tidy)
 
     a = ap.parse_args()
     print(a.func(a))
