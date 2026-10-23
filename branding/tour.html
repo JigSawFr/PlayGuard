@@ -1,46 +1,80 @@
 <!doctype html>
-<!-- PlayGuard 30-second tour: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4.
+<!-- PlayGuard tour: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4.
      window.TOUR, set before the page's script (tools/render_tour.mjs), is the website's tour in another language: its texts and its screenshots. -->
 <html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0B1424; --ink:#E8EEF7; --mute:#A9B6CC; --teal:#2EC4A6; --amber:#FFB547; --track:#1F3355; }
-  html,body { margin:0; width:1920px; height:1080px; overflow:hidden; background:var(--bg); font-family:Sora, sans-serif; color:var(--ink); }
-  #bar { position:absolute; left:0; top:0; height:10px; width:1920px; background:var(--amber); transform-origin:left; }
-  .glow { position:absolute; width:1400px; height:1400px; border-radius:50%; filter:blur(40px);
-          background:radial-gradient(circle, rgba(46,196,166,.16), rgba(46,196,166,0) 60%); }
+  /* Sora, the site's own copy (site/assets/fonts/, SIL Open Font License): nothing asked of Google Fonts. */
+  @font-face { font-family:"Sora"; src:url("../site/assets/fonts/sora.woff2") format("woff2"); font-weight:100 800; }
+  :root { --bg:#08101D; --bg2:#0D1A2E; --card:#111D31; --line:#22324F; --ink:#E8EEF7; --mute:#A9B6CC; --dim:#6F7F9A;
+          --teal:#2EC4A6; --teal-soft:rgba(46,196,166,.14); --amber:#FFB547; }
+  html,body { margin:0; width:1920px; height:1080px; overflow:hidden; background:var(--bg); font-family:Sora, "Noto Sans CJK JP", sans-serif; color:var(--ink); }
+  #bg { position:absolute; inset:0; background:radial-gradient(1400px 900px at 70% 40%, var(--bg2), var(--bg) 70%); }
+  .orb { position:absolute; border-radius:50%; filter:blur(60px); }
+  #orb1 { width:1100px; height:1100px; background:radial-gradient(circle, rgba(46,196,166,.20), rgba(46,196,166,0) 62%); }
+  #orb2 { width:900px; height:900px; background:radial-gradient(circle, rgba(255,181,71,.10), rgba(255,181,71,0) 62%); }
   .layer { position:absolute; inset:0; opacity:0; }
+  .center { position:absolute; left:0; right:0; text-align:center; }
+
   /* intro */
-  #mark { position:absolute; left:50%; top:330px; width:300px; height:300px; margin-left:-150px; }
-  #word { position:absolute; width:100%; top:640px; text-align:center; font-weight:700; font-size:132px; letter-spacing:-4px; }
-  #word span { color:var(--teal); }
-  #tag { position:absolute; width:100%; top:820px; text-align:center; font-size:40px; color:var(--mute); }
+  #mark { position:absolute; left:50%; top:300px; width:260px; height:260px; margin-left:-130px; }
+  #word { top:580px; font-weight:700; font-size:136px; letter-spacing:-4px; }
+  #word span, #oword span { color:var(--teal); }
+  #tag { top:770px; font-size:40px; color:var(--mute); }
+
   /* hook */
-  .hook { position:absolute; width:100%; text-align:center; font-weight:700; font-size:92px; letter-spacing:-2px; }
-  .hook s { text-decoration:none; color:var(--amber); }
-  #hooksub { position:absolute; width:100%; top:760px; text-align:center; font-size:40px; color:var(--mute); }
-  /* feature scenes */
-  .cap { position:absolute; left:0; right:0; top:56px; text-align:center; }
-  .cap h2 { margin:0; font-size:66px; font-weight:700; letter-spacing:-1.5px; }
-  .cap h2 em { font-style:normal; color:var(--teal); }
-  .cap p { margin:14px 0 0; font-size:32px; color:var(--mute); }
-  .shot { position:absolute; left:50%; top:262px; width:1280px; height:720px; margin-left:-640px; border-radius:26px; overflow:hidden;
-          box-shadow:0 30px 80px rgba(0,0,0,.55), 0 0 0 10px #1a2438, 0 0 0 12px #2a3854; }
-  .shot img { width:100%; height:100%; display:block; transform-origin:var(--ox,50%) var(--oy,50%); }
-  .step { position:absolute; left:64px; bottom:40px; font-size:26px; color:var(--track); font-weight:600; }
+  .hook { font-weight:700; font-size:96px; letter-spacing:-2.5px; }
+  .hook s { position:relative; text-decoration:none; color:var(--amber); }
+  .hook s::after { content:""; position:absolute; left:-6px; right:-6px; top:54%; height:9px; border-radius:5px; background:var(--amber);
+                   transform:scaleX(var(--k,0)); transform-origin:left; }
+  #hooksub { top:770px; font-size:38px; color:var(--mute); }
+  #hooksub b { color:var(--teal); font-weight:600; }
+
+  /* feature scenes: the words on the left, the screen on the right */
+  .brand { position:absolute; left:100px; top:72px; display:flex; align-items:center; gap:16px; font-size:30px; font-weight:600; color:var(--mute); }
+  .brand svg { width:44px; height:44px; }
+  .copy { position:absolute; left:100px; top:268px; width:540px; }
+  .kicker { display:inline-block; padding:8px 18px; border-radius:999px; background:var(--teal-soft); color:var(--teal); font-size:24px; font-weight:600; letter-spacing:.5px; }
+  .copy h2 { margin:26px 0 0; font-size:64px; line-height:1.08; font-weight:700; letter-spacing:-1.8px; }
+  .copy h2 em { font-style:normal; color:var(--teal); }
+  .copy p { margin:22px 0 0; font-size:29px; line-height:1.4; color:var(--mute); }
+  .copy ul { margin:34px 0 0; padding:0; list-style:none; }
+  .copy li { display:flex; gap:16px; align-items:flex-start; margin:0 0 18px; font-size:26px; line-height:1.35; }
+  .copy li svg { flex:none; width:34px; height:34px; margin-top:1px; }
+  .shot { position:absolute; left:676px; top:206px; width:1152px; height:648px; border-radius:28px; overflow:hidden; background:#0b1424;
+          box-shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06), 0 0 0 12px #121e33, 0 0 0 13px #2a3854; }
+  .zoom { position:absolute; inset:0; transform-origin:var(--ox,50%) var(--oy,50%); }
+  .zoom img { width:100%; height:100%; display:block; }
+  .hl { position:absolute; border-radius:22px; border:4px solid var(--teal); box-shadow:0 0 0 9999px rgba(4,9,18,.42), 0 0 40px rgba(46,196,166,.55); opacity:0; }
+  .dots { position:absolute; left:100px; bottom:84px; display:flex; gap:12px; }
+  .dots i { width:14px; height:14px; border-radius:7px; background:var(--line); }
+  .dots i.on { width:46px; background:var(--teal); }
+
+  /* bonus */
+  #btitle { top:120px; font-size:72px; font-weight:700; letter-spacing:-2px; }
+  #btitle span { color:var(--amber); }
+  #bsub { top:222px; font-size:32px; color:var(--mute); }
+  #grid { position:absolute; left:160px; top:330px; width:1600px; display:grid; grid-template-columns:repeat(3, 1fr); gap:32px; }
+  .card { min-height:270px; box-sizing:border-box; padding:38px 40px; border-radius:28px; background:linear-gradient(160deg, #14233b, #0f1a2d);
+          border:1px solid var(--line); box-shadow:0 20px 50px rgba(0,0,0,.35); opacity:0; }
+  .card .ic { width:68px; height:68px; border-radius:20px; background:var(--teal-soft); display:flex; align-items:center; justify-content:center; }
+  .card .ic svg { width:38px; height:38px; }
+  .card h3 { margin:26px 0 0; font-size:34px; font-weight:700; letter-spacing:-.6px; }
+  .card p { margin:12px 0 0; font-size:24px; line-height:1.4; color:var(--mute); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
   /* outro */
-  #omark { position:absolute; left:50%; top:200px; width:220px; height:220px; margin-left:-110px; }
-  #oword { position:absolute; width:100%; top:440px; text-align:center; font-weight:700; font-size:110px; letter-spacing:-3px; }
-  #oword span { color:var(--teal); }
-  #oline1 { position:absolute; width:100%; top:610px; text-align:center; font-size:42px; color:var(--ink); }
-  #ourl { position:absolute; left:50%; top:700px; transform:translateX(-50%); padding:18px 40px; border-radius:16px; background:#14213a;
-          border:2px solid var(--teal); font-size:40px; font-weight:600; color:var(--teal); white-space:nowrap; }
-  #onote { position:absolute; width:100%; top:850px; text-align:center; font-size:28px; color:var(--mute); }
+  #omark { position:absolute; left:50%; top:170px; width:200px; height:200px; margin-left:-100px; }
+  #oword { top:390px; font-weight:700; font-size:116px; letter-spacing:-3.5px; }
+  #oline1 { top:560px; font-size:40px; }
+  #octa { position:absolute; left:50%; top:650px; display:flex; gap:24px; transform:translateX(-50%); white-space:nowrap; }
+  #ourl { padding:20px 44px; border-radius:999px; background:var(--teal); color:#05140f; font-size:40px; font-weight:700; }
+  #ogit { padding:20px 40px; border-radius:999px; border:2px solid var(--line); color:var(--ink); font-size:34px; font-weight:600; display:flex; align-items:center; }
+  #onote { top:830px; font-size:28px; color:var(--mute); }
   #onote b { color:var(--amber); font-weight:600; }
 </style></head>
 <body>
-<div class="glow" id="glow"></div>
-<div id="bar"></div>
+<div id="bg"></div>
+<div class="orb" id="orb1"></div>
+<div class="orb" id="orb2"></div>
 
 <div class="layer" id="intro">
   <svg id="mark" viewBox="0 0 256 256">
@@ -48,18 +82,24 @@
     <circle id="ring" cx="128" cy="128" r="62" fill="none" stroke="#2EC4A6" stroke-width="16" stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 128 128)"/>
     <path id="play" d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round" style="transform-origin:136px 128px"/>
   </svg>
-  <div id="word">Play<span>Guard</span></div>
-  <div id="tag">Nintendo Switch parental controls, right on the console.</div>
+  <div class="center" id="word">Play<span>Guard</span></div>
+  <div class="center" id="tag">Nintendo Switch parental controls, right on the console.</div>
 </div>
 
 <div class="layer" id="hook">
-  <div class="hook" id="h1" style="top:300px">No <s>phone app</s>.</div>
-  <div class="hook" id="h2" style="top:430px">No <s>Nintendo account</s>.</div>
-  <div class="hook" id="h3" style="top:560px">No <s>internet</s>.</div>
-  <div id="hooksub">It drives the console's own parental controls. Nothing runs in the background.</div>
+  <div class="center hook" id="h1" style="top:270px">No <s>phone app</s>.</div>
+  <div class="center hook" id="h2" style="top:420px">No <s>Nintendo account</s>.</div>
+  <div class="center hook" id="h3" style="top:570px">No <s>internet</s>.</div>
+  <div class="center" id="hooksub">It drives the console's <b>own</b> parental controls. Nothing runs in the background.</div>
 </div>
 
 <div id="scenes"></div>
+
+<div class="layer" id="bonus">
+  <div class="center" id="btitle">And there's <span>more</span></div>
+  <div class="center" id="bsub">The little extras that make it a joy to use.</div>
+  <div id="grid"></div>
+</div>
 
 <div class="layer" id="outro">
   <svg id="omark" viewBox="0 0 256 256">
@@ -67,112 +107,187 @@
     <circle cx="128" cy="128" r="62" fill="none" stroke="#2EC4A6" stroke-width="16" stroke-linecap="round" stroke-dasharray="292 390" transform="rotate(-90 128 128)"/>
     <path d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round"/>
   </svg>
-  <div id="oword">Play<span>Guard</span></div>
-  <div id="oline1">Free &amp; open source · GPLv3</div>
-  <div id="ourl">github.com/JigSawFr/PlayGuard</div>
-  <div id="onote">Homebrew App Store · sphaira · <b>Requires Atmosphère CFW</b></div>
+  <div class="center" id="oword">Play<span>Guard</span></div>
+  <div class="center" id="oline1">Free &amp; open source · GPLv3</div>
+  <div id="octa"><div id="ourl">playguard.link</div><div id="ogit">github.com/JigSawFr/PlayGuard</div></div>
+  <div class="center" id="onote">Homebrew App Store · sphaira · <b>Requires Atmosphère CFW</b></div>
 </div>
 
 <script>
+// Each scene: its screen, its words, where the camera leans (ox, oy) and the part of the screen lit up
+// (hl: x, y, width, height in the screenshot's 1280x720 pixels).
 let SCENES = [
-  { img:'dashboard.png',        h:'Today, <em>at a glance</em>',        p:'Time played, time left, extra time, bedtime alarm',          ox:'60%', oy:'35%' },
-  { img:'play_timer.png',       h:'<em>Play-time</em> limits',          p:'The same every day, or one per day of the week',              ox:'65%', oy:'35%' },
-  { img:'activity.png',         h:'See the <em>activity</em>',          p:'Per game & per account · export CSV, JSON, XLSX or PDF',      ox:'65%', oy:'40%' },
-  { img:'restrictions.png',     h:'Restrictions & <em>PIN</em>',        p:'Age rating, social posting, console lock in one switch',      ox:'65%', oy:'30%' },
-  { img:'clock.png',            h:'A <em>network clock</em> that’s right', p:'Set from public NTP servers, so the timer counts true offline', ox:'65%', oy:'55%' },
-  { img:'console.png',          h:'The <em>console</em>, checked',      p:'Installed games that won’t start, firmware & Atmosphère',      ox:'65%', oy:'35%' },
-  { img:'dashboard_fr_dark.png',h:'Every <em>language</em>, light & dark', p:'All the console’s languages · every change logged & undoable', ox:'50%', oy:'50%' },
+  { img:'dashboard.png', k:'Today', h:'The whole day <em>at a glance</em>',
+    p:'Time left on a ring, when play ends, the bedtime coming.',
+    b:['Extra time in one press: +15 min, +30 min, +1 h', 'Stop for today, whenever you say', 'Child view to hand the console over'],
+    ox:'58%', oy:'30%', hl:[540, 228, 700, 126] },
+  { img:'play_timer.png', k:'Play timer', h:'A limit for <em>every day</em>',
+    p:'The week is the editor: move a bar with the stick, done.',
+    b:['Weekdays and weekends, each their own', 'Profiles for school weeks and holidays', 'Bedtime alarm · suspend or just warn'],
+    ox:'55%', oy:'40%', hl:[256, 180, 980, 344] },
+  { img:'activity.png', k:'Activity', h:'Who played <em>what</em>, and how long',
+    p:'Per game and per account, this week against the last.',
+    b:['Charts for the day, the week, all time', 'Export to CSV, JSON, XLSX or PDF', 'The week’s summary as a QR code'],
+    ox:'55%', oy:'25%', hl:[256, 150, 980, 158] },
+  { img:'restrictions.png', k:'Restrictions', h:'Right for their <em>age</em>',
+    p:'One press picks a level; every setting follows.',
+    b:['Young child, child, teen or your own', 'Age rating, social posting, communication', 'Games blocked one by one'],
+    ox:'55%', oy:'30%', hl:[256, 118, 980, 292] },
+  { img:'security.png', k:'Security', h:'A <em>PIN</em> that really protects',
+    p:'Easy-to-guess PINs flagged, never shown.',
+    b:['PlayGuard itself behind the PIN', 'Temporary unlock that turns itself back on', 'Lock the homebrew menu'],
+    ox:'55%', oy:'25%', hl:[256, 118, 980, 142] },
+  { img:'clock.png', k:'Network clock', h:'A clock that’s <em>never wrong</em>',
+    p:'Set from public time servers, so the timer counts true on a console that never reaches Nintendo.',
+    b:[],
+    ox:'50%', oy:'28%', hl:[66, 122, 1148, 160] },
+  { img:'console.png', k:'Console', h:'The console, <em>checked</em>',
+    p:'What needs a look, before it bites.',
+    b:['Installed games that won’t start, found', 'Firmware and Atmosphère, up to date', 'Forwarders: homebrew on the HOME menu, PIN-guarded'],
+    ox:'55%', oy:'22%', hl:[256, 116, 980, 136] },
+];
+const ICON = {
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  undo:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  unlink:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M3 3l18 18"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20"/>',
+  play:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M10 7.5l4.5 2.5L10 12.5z"/>',
+};
+let BONUS = [
+  { i:'bell', t:'Notifications', p:'A bell gathers what needs you, the fix one press away.' },
+  { i:'eye', t:'Child view', p:'The time left, big enough to read from the couch.' },
+  { i:'undo', t:'History & undo', p:'Every change logged and undoable, backups included.' },
+  { i:'unlink', t:'Companion app', p:'Unlink Nintendo’s app, even on a second-hand console.' },
+  { i:'globe', t:'15 languages', p:'Every language of the console, light and dark themes.' },
+  { i:'play', t:'Try it first', p:'The real PlayGuard runs in your browser.' },
 ];
 // Another language's tour: its texts (plain text, no markup) and its screenshots.
 const TOUR = window.TOUR;
+const escape = (s) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 if (TOUR) {
   document.documentElement.lang = TOUR.lang;
   const text = (id, value) => { document.getElementById(id).textContent = value; };
   text('tag', TOUR.tag);
   ['h1', 'h2', 'h3'].forEach((id, i) => text(id, TOUR.hooks[i] || ''));
   text('hooksub', TOUR.hooksub);
+  text('btitle', TOUR.more);
+  text('bsub', '');
   text('oline1', TOUR.line1);
   document.getElementById('onote').replaceChildren(`${TOUR.stores} · `, Object.assign(document.createElement('b'), { textContent: TOUR.cfw }));
-  const escape = (s) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-  SCENES = TOUR.scenes.map((s) => ({ ...s, h: escape(s.h), p: escape(s.p) }));
+  SCENES = TOUR.scenes.map((s) => ({ ...s, k: escape(s.k), h: escape(s.h), p: escape(s.p), b: [] }));
+  BONUS = TOUR.bonus.map((c) => ({ ...c, t: escape(c.t), p: escape(c.p || '') }));
 }
-// ?still: no drifting glow and no zoom on the screenshots, so a GIF only redraws what changes.
+// ?still: no drifting light and no camera move on the screenshots, so a GIF only redraws what changes.
 const STILL = new URLSearchParams(location.search).has('still');
-const T_INTRO = 3.6, T_HOOK = 3.6, T_SCENE = 3.4, T_OUTRO = 4.6;
+const T_INTRO = 3.2, T_HOOK = 3.4, T_SCENE = 3.1, T_BONUS = 5.0, T_OUTRO = 4.4;
 const T_SCENES0 = T_INTRO + T_HOOK;
-const T_OUTRO0 = T_SCENES0 + SCENES.length * T_SCENE;
+const T_BONUS0 = T_SCENES0 + SCENES.length * T_SCENE;
+const T_OUTRO0 = T_BONUS0 + T_BONUS;
 window.DURATION = T_OUTRO0 + T_OUTRO;
 
+const MARK = '<svg viewBox="0 0 256 256"><circle cx="128" cy="128" r="62" fill="none" stroke="#1F3355" stroke-width="18"/><circle cx="128" cy="128" r="62" fill="none" stroke="#2EC4A6" stroke-width="18" stroke-linecap="round" stroke-dasharray="292 390" transform="rotate(-90 128 128)"/><path d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="rgba(46,196,166,.16)"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#2EC4A6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const box = document.getElementById('scenes');
 const els = SCENES.map((s, i) => {
   const d = document.createElement('div');
   d.className = 'layer';
-  d.innerHTML = `<div class="cap"><h2>${s.h}</h2><p>${s.p}</p></div>
-    <div class="shot"><img src="${s.src || `../images/screenshots/${s.img}`}" style="--ox:${s.ox};--oy:${s.oy}"></div>
-    <div class="step">${String(i+1).padStart(2,'0')} / ${String(SCENES.length).padStart(2,'0')}</div>`;
+  const [x, y, w, h] = s.hl || [0, 0, 0, 0];
+  const pct = (v, of) => `${(100 * v / of).toFixed(3)}%`;
+  d.innerHTML = `<div class="brand">${MARK}PlayGuard</div>
+    <div class="copy">${s.k && s.k !== s.h ? `<span class="kicker">${s.k}</span>` : ''}<h2>${s.h}</h2><p>${s.p}</p>
+      <ul>${s.b.map((b) => `<li>${CHECK}<span>${b}</span></li>`).join('')}</ul></div>
+    <div class="shot"><div class="zoom" style="--ox:${s.ox};--oy:${s.oy}"><img src="${s.src || `../images/screenshots/${s.img}`}">
+      ${s.hl ? `<div class="hl" style="left:${pct(x, 1280)};top:${pct(y, 720)};width:${pct(w, 1280)};height:${pct(h, 720)}"></div>` : ''}</div></div>
+    <div class="dots">${SCENES.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</div>`;
   box.appendChild(d);
+  return d;
+});
+const grid = document.getElementById('grid');
+const cards = BONUS.map((c) => {
+  const d = document.createElement('div');
+  d.className = 'card';
+  d.innerHTML = `<div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2EC4A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[c.i]}</svg></div>
+    <h3>${c.t}</h3>${c.p ? `<p>${c.p}</p>` : ''}`;
+  grid.appendChild(d);
   return d;
 });
 
 const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
 const ease = x => { x = clamp(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2; };
 const out = x => 1 - Math.pow(1 - clamp(x), 3);
+const back = x => { x = clamp(x); const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
 const ramp = (t, a, b) => clamp((t - a) / (b - a));
 // fade in over [a, a+fi], hold, fade out over [b-fo, b]
 const win = (t, a, b, fi=.35, fo=.35) => Math.min(ramp(t, a, a+fi), 1 - ramp(t, b-fo, b));
+const rise = (el, k, dy=30, base='') => { el.style.opacity = k; el.style.transform = `${base}translateY(${dy*(1-k)}px)`; };
 
 const $ = id => document.getElementById(id);
 window.render = function (t) {
-  // background accents
-  $('bar').style.transform = `scaleX(${out(ramp(t, 0, 1.2))})`;
+  // the light behind, drifting slowly
   const drift = STILL ? 0 : t;
-  $('glow').style.left = (260 + 200*Math.sin(drift*0.25)) + 'px';
-  $('glow').style.top = (-300 + 120*Math.cos(drift*0.2)) + 'px';
+  $('orb1').style.left = (900 + 260*Math.sin(drift*0.22)) + 'px';
+  $('orb1').style.top = (-360 + 140*Math.cos(drift*0.18)) + 'px';
+  $('orb2').style.left = (-300 + 180*Math.cos(drift*0.16)) + 'px';
+  $('orb2').style.top = (420 + 120*Math.sin(drift*0.2)) + 'px';
 
   // intro
-  const ti = $('intro');
-  ti.style.opacity = 1 - ramp(t, T_INTRO - .4, T_INTRO);
-  $('ring').setAttribute('stroke-dasharray', `${292*ease(ramp(t, .1, 1.5))} 390`);
-  const ps = out(ramp(t, .5, 1.1));
-  $('play').style.transform = `scale(${ps})`;
-  $('word').style.opacity = out(ramp(t, .9, 1.5));
-  $('word').style.transform = `translateY(${40*(1-out(ramp(t, .9, 1.5)))}px)`;
-  $('tag').style.opacity = out(ramp(t, 1.4, 2.0));
-  $('tag').style.transform = `translateY(${30*(1-out(ramp(t, 1.4, 2.0)))}px)`;
+  $('intro').style.opacity = 1 - ramp(t, T_INTRO - .4, T_INTRO);
+  $('ring').setAttribute('stroke-dasharray', `${292*ease(ramp(t, .1, 1.4))} 390`);
+  $('play').style.transform = `scale(${back(ramp(t, .4, 1.0))})`;
+  rise($('word'), out(ramp(t, .8, 1.4)), 40);
+  rise($('tag'), out(ramp(t, 1.3, 1.9)));
 
-  // hook
+  // hook: each line in, then its words struck through
   const h0 = T_INTRO;
   $('hook').style.opacity = win(t, h0, h0 + T_HOOK, .2, .4);
   ['h1','h2','h3'].forEach((id, i) => {
-    const k = out(ramp(t, h0 + .15 + i*.5, h0 + .6 + i*.5));
+    const k = out(ramp(t, h0 + .1 + i*.45, h0 + .55 + i*.45));
     $(id).style.opacity = k;
-    $(id).style.transform = `translateX(${-80*(1-k)}px)`;
+    $(id).style.transform = `translateY(${40*(1-k)}px)`;
+    const s = $(id).querySelector('s');
+    if (s) s.style.setProperty('--k', ease(ramp(t, h0 + .5 + i*.45, h0 + .85 + i*.45)));
   });
-  const ks = out(ramp(t, h0 + 1.8, h0 + 2.3));
-  $('hooksub').style.opacity = ks;
+  rise($('hooksub'), out(ramp(t, h0 + 1.7, h0 + 2.2)));
 
   // features
   els.forEach((el, i) => {
     const a = T_SCENES0 + i*T_SCENE, b = a + T_SCENE;
-    const o = win(t, a, b, .35, .3);
+    const o = win(t, a, b, .3, .3);
     el.style.opacity = o;
     if (o <= 0) return;
     const k = out(ramp(t, a, a + .6));
-    el.querySelector('.cap').style.transform = `translateY(${-30*(1-k)}px)`;
-    el.querySelector('.shot').style.transform = `translateY(${60*(1-k)}px) scale(${.94 + .06*k})`;
-    el.querySelector('img').style.transform = STILL ? 'none' : `scale(${1 + .07*ease(ramp(t, a + .6, b))})`;
+    const kicker = el.querySelector('.kicker');
+    if (kicker) kicker.style.opacity = k;
+    rise(el.querySelector('h2'), out(ramp(t, a + .05, a + .6)), 30);
+    rise(el.querySelector('.copy p'), out(ramp(t, a + .2, a + .75)), 24);
+    el.querySelectorAll('li').forEach((li, j) => {
+      const kj = out(ramp(t, a + .55 + j*.22, a + 1.0 + j*.22));
+      li.style.opacity = kj;
+      li.style.transform = `translateX(${-30*(1-kj)}px)`;
+    });
+    el.querySelector('.shot').style.transform = `translateX(${80*(1-k)}px) scale(${.95 + .05*k})`;
+    el.querySelector('.zoom').style.transform = STILL ? 'none' : `scale(${1 + .05*ease(ramp(t, a + .5, b))})`;
+    const hl = el.querySelector('.hl');
+    if (hl) hl.style.opacity = out(ramp(t, a + .9, a + 1.3)) * (1 - ramp(t, b - .5, b - .2));
+  });
+
+  // bonus: the cards one after another
+  const b0 = T_BONUS0;
+  $('bonus').style.opacity = win(t, b0, b0 + T_BONUS, .3, .35);
+  rise($('btitle'), out(ramp(t, b0, b0 + .5)));
+  rise($('bsub'), out(ramp(t, b0 + .2, b0 + .7)), 20);
+  cards.forEach((c, i) => {
+    const k = ramp(t, b0 + .5 + i*.18, b0 + 1.05 + i*.18);
+    c.style.opacity = out(k);
+    c.style.transform = `translateY(${50*(1-out(k))}px) scale(${.92 + .08*back(k)})`;
   });
 
   // outro
   const o0 = T_OUTRO0;
   $('outro').style.opacity = ramp(t, o0, o0 + .4);
-  const seq = [['omark',0],['oword',.2],['oline1',.6],['ourl',.9],['onote',1.3]];
-  seq.forEach(([id, d]) => {
-    const k = out(ramp(t, o0 + d, o0 + d + .5));
-    const el = $(id);
-    el.style.opacity = k;
-    const base = id === 'ourl' ? 'translateX(-50%) ' : '';
-    el.style.transform = base + `translateY(${30*(1-k)}px)`;
+  [['omark',0],['oword',.2],['oline1',.5],['octa',.8],['onote',1.2]].forEach(([id, d]) => {
+    rise($(id), out(ramp(t, o0 + d, o0 + d + .5)), 30, id === 'octa' ? 'translateX(-50%) ' : '');
   });
 };
 window.render(0);

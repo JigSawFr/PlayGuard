@@ -5,7 +5,7 @@
 // repository (its file view says it is too big, its raw link downloads it).
 // The GIF is rendered with tour.html?still (no drifting glow, no zoom on the
 // screenshots), so most of each frame repeats the last one and it stays small.
-// Needs Node + Playwright (Chromium) and ffmpeg; loads the Sora font from Google Fonts.
+// Needs Node + Playwright (Chromium) and ffmpeg; the Sora font is the site's own (site/assets/fonts/).
 //   node tools/render_tour.mjs
 // The website's tour in the console's other languages: their texts (the
 // site's catalogs, site/i18n/) over their screenshots (tools/site_screenshots.mjs),
@@ -60,23 +60,36 @@ if (shots) {
     Object.assign(o, v && typeof v === 'object' ? flat(v, `${prefix}${k}/`) : { [`${prefix}${k}`]: v }), {});
   const english = json('site', 'i18n', 'en-US.json');
   const appEnglish = flat(json('resources', 'i18n', 'en-US', 'playguard.json'));
-  // The scenes of tour.html, each a screen and the site's texts for it.
+  // The scenes of tour.html, each a screen (its dark theme, PlayGuard's default), its tab's name
+  // (k, the app's own word) and the site's texts for it; the bullets stay English-only.
   const SCENES = [
-    { img: 'dashboard', h: 'shot_dashboard', p: 'f_notices_text', ox: '60%', oy: '35%' },
-    { img: 'play_timer', h: 'f_timer_title', p: 'f_timer_text', ox: '65%', oy: '35%' },
-    { img: 'activity', h: 'f_activity_title', p: 'f_activity_text', ox: '65%', oy: '40%' },
-    { img: 'restrictions', h: 'f_restrictions_title', p: 'f_restrictions_text', ox: '65%', oy: '30%' },
-    { img: 'clock', h: 'shot_clock', p: 'f_console_text', ox: '65%', oy: '55%' },
-    { img: 'dashboard-dark', h: 'f_languages_title', p: 'f_languages_text', ox: '50%', oy: '50%' },
+    { img: 'dashboard', k: 'app:tabs/dashboard', h: 'shot_dashboard', p: 'shot_dashboard_alt', ox: '58%', oy: '30%', hl: [540, 228, 700, 126] },
+    { img: 'play_timer', k: 'app:tabs/play_timer', h: 'f_timer_title', p: 'shot_play_timer_alt', ox: '55%', oy: '40%', hl: [256, 180, 980, 344] },
+    { img: 'activity', k: 'app:tabs/activity', h: 'f_activity_title', p: 'f_activity_text', ox: '55%', oy: '25%', hl: [256, 150, 980, 158] },
+    { img: 'restrictions', k: 'app:tabs/restrictions', h: 'f_restrictions_title', p: 'f_restrictions_text', ox: '55%', oy: '30%', hl: [256, 118, 980, 292] },
+    { img: 'clock', k: 'app:tabs/console', h: 'shot_clock', p: 'f_console_text', ox: '50%', oy: '28%', hl: [66, 122, 1148, 160] },
+  ];
+  // The "And there's more" cards: an icon of tour.html's, a title and a line from the site's catalog
+  // (app: the app's own word).
+  const BONUS = [
+    { i: 'bell', t: 'f_notices_title', p: 'f_notices_text' },
+    { i: 'eye', t: 'app:cadran/today/child' },
+    { i: 'undo', t: 'f_history_title', p: 'f_history_text' },
+    { i: 'unlink', t: 'f_app_title', p: 'f_app_text' },
+    { i: 'globe', t: 'f_languages_title', p: 'f_languages_text' },
+    { i: 'play', t: 'simulator_title', p: 'try' },
   ];
   // A few at once (TOUR_JOBS, 2 by default): a page draws on one core, ffmpeg on another.
-  const queue = (only.length ? only : LANGUAGES).filter((lang) => SCENES.every((s) => existsSync(join(shots, lang, `${s.img}.webp`))));
+  const queue = (only.length ? only : LANGUAGES).filter((lang) => SCENES.every((s) => existsSync(join(shots, lang, `${s.img}-dark.webp`))));
   await Promise.all(Array.from({ length: Math.max(1, Number(process.env.TOUR_JOBS) || 2) }, async () => {
     for (let lang; (lang = queue.shift());) {
       const own = json('site', 'i18n', `${lang}.json`);
       const app = flat(json('resources', 'i18n', lang, 'playguard.json'));
       // A catalog's text as build_site.py writes it: {{app:<key>}} the app's own words.
-      const t = (key) => (own[key] ?? english[key]).replace(/\{\{app:([^}]+)\}\}/g, (_, k) => (app[k] ?? appEnglish[k]).replace(/[.…]+$/, '').trim());
+      const word = (k) => (app[k] ?? appEnglish[k]).replace(/[.…]+$/, '').trim();
+      const t = (key) => key.startsWith('app:') ? word(key.slice(4)) : (own[key] ?? english[key]).replace(/\{\{app:([^}]+)\}\}/g, (_, k) => word(k));
+      // A screenshot's description without the screen's name before it ("Today: the time left…").
+      const alt = (key) => { const s = t(key).replace(/^[^:：]*[:：]\s*/, ''); return s.charAt(0).toUpperCase() + s.slice(1); };
       const data = (file) => `data:image/webp;base64,${readFileSync(file).toString('base64')}`;
       const TOUR = {
         lang,
@@ -84,7 +97,9 @@ if (shots) {
         // "No phone app, no Nintendo account, no internet." a line each.
         hooks: t('hero_sub').split(/[,、，]\s*/).map((s) => s.trim().replace(/[.。]$/, '')).map((s) => s.charAt(0).toUpperCase() + s.slice(1)),
         hooksub: t('faq_closed_a').replace(/^[^.!?。！？:：]*[.!?。！？]\s*/, ''),
-        scenes: SCENES.map((s) => ({ ...s, h: t(s.h), p: t(s.p), src: data(join(shots, lang, `${s.img}.webp`)) })),
+        scenes: SCENES.map((s) => ({ ...s, k: t(s.k), h: t(s.h), p: s.p.endsWith('_alt') ? alt(s.p) : t(s.p), src: data(join(shots, lang, `${s.img}-dark.webp`)) })),
+        more: t('features_more'),
+        bonus: BONUS.map((c) => ({ i: c.i, t: t(c.t), p: c.p ? t(c.p) : '' })),
         line1: t('footer_license'),
         stores: 'Homebrew App Store · sphaira',
         cfw: t('cfw_title'),
