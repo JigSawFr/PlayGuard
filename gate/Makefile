@@ -24,7 +24,11 @@ ROMFS       := build/romfs
 # them the gate had no romfs, and nothing after its code.
 APP_TITLE   := PlayGuard gate
 APP_AUTHOR  := JigSawFr
-APP_VERSION := 1.0.0
+# PlayGuard's version, which release-please moves at each release
+# (release-please-config.json's extra-files).
+# x-release-please-start-version
+APP_VERSION := 1.2.0
+# x-release-please-end
 
 # Only these: ../source/core also holds the app's service layer.
 CFILES      := main.c gate.c gate_nx.c gate_screen.c gate_text.c pg_stb.c

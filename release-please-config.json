@@ -27,7 +27,8 @@
       "package-name": "playguard",
       "changelog-path": "CHANGELOG.md",
       "extra-files": [
-        { "type": "generic", "path": "CMakeLists.txt" }
+        { "type": "generic", "path": "CMakeLists.txt" },
+        { "type": "generic", "path": "gate/Makefile" }
       ]
     }
   }
