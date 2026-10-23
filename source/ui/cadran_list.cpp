@@ -21,6 +21,9 @@ constexpr float ROW_PAD      = 24.0f;
 constexpr float ROW_PAD_END  = 24.0f;
 constexpr float ICON_SQUARE  = 36.0f;
 constexpr float ICON_GAP     = 14.0f;
+// An action tile's icon, before its title, and the space after it.
+constexpr float ACTION_ICON     = 24.0f;
+constexpr float ACTION_ICON_GAP = 14.0f;
 
 void append_utf8(std::string& out, uint32_t cp)
 {
@@ -99,29 +102,37 @@ CadranIcon* make_icon(const char* name, float size, NVGcolor color)
     return icon;
 }
 
-// An action tile's title and value, each on its one line: a text too long
-// for it gets smaller, a step a frame, down to 3/4 of its size, then ends in
-// "…" and scrolls while the tile has the focus. A new text, or a tile of
-// another width, starts again from the full size. Drawn as nothing (no size), once the tile is laid out.
+// An action tile's lines, each on its one: its title and every label under
+// it (its value, a notice's reason: TabBase::mark()). A text too long for
+// its line gets smaller, a step a frame, down to 3/4 of its size, then ends
+// in "…" and scrolls while the tile has the focus. A new text, or a tile of
+// another width, starts again from the full size. Drawn as nothing (no
+// size), once the tile is laid out.
 class TileFit : public brls::View
 {
   public:
-    TileFit(std::initializer_list<brls::Label*> labels)
+    TileFit(brls::Box* tile, brls::Label* title)
+        : tile(tile), title(title)
     {
         this->setFocusable(false);
         this->setPositionType(brls::PositionType::ABSOLUTE);
         this->setWidth(0);
         this->setHeight(0);
-        for (brls::Label* label : labels) {
-            label->setSingleLine(true);
-            label->setAutoAnimate(true);
-            this->fits.push_back({ label, label->getFontSize(), "" });
-        }
     }
     void draw(NVGcontext*, float, float, float, float, brls::Style, brls::FrameContext*) override
     {
+        // The labels as they are now: one added later (a reason) joins in.
+        std::vector<brls::Label*> labels = { this->title };
+        for (brls::View* child : this->tile->getChildren())
+            if (auto* label = dynamic_cast<brls::Label*>(child)) labels.push_back(label);
+        for (brls::Label* label : labels)
+            if (std::none_of(this->fits.begin(), this->fits.end(), [label](const Fit& f) { return f.label == label; })) {
+                label->setSingleLine(true);
+                label->setAutoAnimate(true);
+                this->fits.push_back({ label, label->getFontSize(), "" });
+            }
         // A wider tile (smaller text, the window) may take the full size again.
-        const float width = this->getParent() ? this->getParent()->getWidth() : 0.0f;
+        const float width = this->tile->getWidth();
         const bool resized = width != this->width;
         this->width = width;
         for (Fit& fit : this->fits) {
@@ -143,6 +154,8 @@ class TileFit : public brls::View
         float size;         // its own size, the largest
         std::string text;   // the text it was fitted to
     };
+    brls::Box* tile;
+    brls::Label* title;
     std::vector<Fit> fits;
     float width = 0;   // the tile's, when last fitted
 };
@@ -381,11 +394,11 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         auto* head = new brls::Box(brls::Axis::ROW);
         head->setAlignItems(brls::AlignItems::CENTER);
         head->setMarginBottom(status ? 10 : 0);
-        brls::View* icon = make_icon(cells[i].second, status ? 22 : 24, theme["cadran/teal"]);
+        brls::View* icon = make_icon(cells[i].second, status ? 22 : ACTION_ICON, theme["cadran/teal"]);
         head->addView(icon);
         cell->addView(head, 0);
         if (!status) {
-            icon->setMarginRight(14);
+            icon->setMarginRight(ACTION_ICON_GAP);
             cell->removeView(cell->title, false);
             head->addView(cell->title);
             cell->title->setShrink(1.0f);
@@ -403,8 +416,10 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         // too (TileFit).
         cell->detail->setSingleLine(status);
         if (!status) {
+            // Under the title, from where it starts: past the icon.
+            cell->detail->setMarginLeft(ACTION_ICON + ACTION_ICON_GAP);
             cell->detail->setTextColor(theme["cadran/text2"]);
-            cell->addView(new TileFit({ cell->title, cell->detail }));
+            cell->addView(new TileFit(cell, cell->title));
         }
         if (status) {
             // Its value after a mark of its state (state()), hidden until set.
