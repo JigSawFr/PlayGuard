@@ -1,7 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/week_qr.hpp"
 
-#include <algorithm>
 #include <borealis.hpp>
 #include <fmt/format.h>
 #include <vector>

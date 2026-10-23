@@ -1,7 +1,6 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "action/clock_flow.hpp"
 
-#include <algorithm>
 #include <atomic>
 #include <borealis.hpp>
 #include <fmt/format.h>

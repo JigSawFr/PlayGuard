@@ -17,7 +17,6 @@
 #include "core/pctl_ops.h"
 #include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
-#include "util/date.hpp"
 #include "util/forwarders.hpp"
 #include "util/gate_tally.hpp"
 #include "util/paths.hpp"
