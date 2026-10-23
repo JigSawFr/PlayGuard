@@ -342,6 +342,49 @@ void wrap(brls::View* row)
     if (row) YGNodeStyleSetFlexWrap(row->getYGNode(), YGWrapWrap);
 }
 
+void fit_button(brls::Button* button)
+{
+    auto* label = button ? dynamic_cast<brls::Label*>(button->getView("brls/button/label")) : nullptr;
+    if (!label) return;
+    label->setSingleLine(true);
+    label->setShrinkToFit(true);
+    // Its width at the normal size: the text's at the size asked, its
+    // padding, and the views beside it (an icon), whose sizes are fixed.
+    NVGcontext* vg = brls::Application::getNVGContext();
+    nvgFontSize(vg, label->getFontSize());
+    nvgFontFaceId(vg, label->getFont());
+    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+    float bounds[4];
+    nvgTextBounds(vg, 0, 0, label->getFullText().c_str(), nullptr, bounds);
+    YGNodeRef node = button->getYGNode();
+    const auto points = [](YGValue v) { return v.unit == YGUnitPoint ? v.value : 0.0f; };
+    float width = bounds[2] - bounds[0] + points(YGNodeStyleGetPadding(node, YGEdgeLeft))
+                  + points(YGNodeStyleGetPadding(node, YGEdgeRight)) + 1.0f;
+    for (brls::View* child : button->getChildren()) {
+        if (child == label || child->getVisibility() == brls::Visibility::GONE) continue;
+        YGNodeRef c = child->getYGNode();
+        width += points(YGNodeStyleGetWidth(c)) + points(YGNodeStyleGetMargin(c, YGEdgeLeft))
+                 + points(YGNodeStyleGetMargin(c, YGEdgeRight));
+    }
+    YGNodeStyleSetFlexBasis(node, width);
+    YGNodeStyleSetFlexShrink(node, 0);
+    button->invalidate();
+}
+
+void fit_head(brls::Box* row)
+{
+    if (!row || row->getChildren().size() < 2) return;
+    auto* title = dynamic_cast<brls::Label*>(row->getChildren()[0]);
+    auto* state = dynamic_cast<brls::Label*>(row->getChildren()[1]);
+    if (!title || !state) return;
+    wrap(row);
+    YGNodeStyleSetGap(row->getYGNode(), YGGutterColumn, 8);
+    YGNodeStyleSetGap(row->getYGNode(), YGGutterRow, 2);
+    title->setShrink(0.0f);
+    state->setSingleLine(true);
+    state->setShrink(0.0f);
+}
+
 void draw_more_below(NVGcontext* vg, brls::ScrollingFrame* frame, float x, float y, float width, float height,
                      const char* color_key, float corner)
 {
