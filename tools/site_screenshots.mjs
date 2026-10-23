@@ -25,11 +25,13 @@ const LANGUAGES = ['en-US', 'fr', 'fr-CA', 'de', 'es', 'es-419', 'it', 'nl', 'pt
 // per start of PlayGuard (a start takes the longest): the tab it opens on,
 // then each screen with the keys to it from the one before.
 const RUNS = [
-  // The tabs, down the sidebar, then Console's Network clock (the row with its
-  // badge, where the tab opens: the simulated clock is off).
+  // The tabs, down the sidebar, to Security.
   { tab: '', screens: [['dashboard'], ['play_timer', 'ArrowDown'], ['activity', 'ArrowDown'],
-    ['restrictions', 'ArrowDown'], ['security', 'ArrowDown'], ['console', 'ArrowDown'],
-    ['clock', 'ArrowRight', 'Enter']] },
+    ['restrictions', 'ArrowDown'], ['security', 'ArrowDown']] },
+  // Console on a start of its own (History is between it and Security, see
+  // below), then its Network clock (the tile with its badge, where the tab
+  // opens: the simulated clock is off).
+  { tab: 'console', screens: [['console'], ['clock', 'ArrowRight', 'Enter']] },
   // The week: the profiles' chip, Monday, Monday edited (the documentation's
   // "Play timer › editing a day").
   { tab: 'play_timer', screens: [['per_day', 'ArrowRight', 'ArrowDown', 'Enter']] },
