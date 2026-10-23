@@ -209,6 +209,9 @@ forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/b
 forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
 forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
+forwarder_rules_logic_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/util/date.cpp source/util/gate_tally.cpp source/action/forwarders_logic.cpp source/action/forwarder_rules_logic.cpp tests/forwarder_rules_logic/test.cpp
+forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
+forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
 markdown_SRC   := source/util/safe_text.cpp source/util/markdown.cpp tests/markdown/test.cpp

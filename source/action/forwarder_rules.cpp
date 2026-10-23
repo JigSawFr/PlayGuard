@@ -8,6 +8,7 @@
 #include <cstdio>
 
 #include "action/forwarder_flow_shared.hpp"
+#include "action/forwarder_rules_logic.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -34,13 +35,7 @@ namespace detail
 // from it (GATE_RULES_NAME, removed): the SD card could add some.
 void write_rules()
 {
-    std::string closed_text;
-    for (const forwarders::Made& m : forwarders::list()) {
-        if (!m.pin || m.carried) continue;
-        char line[0x400];
-        const GateHours c = { (uint8_t)m.closed_days, (uint16_t)m.closed_from, (uint16_t)m.closed_to };
-        if (m.closed_days && gate_rule_format(&c, m.nro.c_str(), line, sizeof(line))) closed_text += line;
-    }
+    const std::string closed_text = forwarder_rules_logic::closed_rules(forwarders::list());
     std::remove((paths::data_dir() + "/" + GATE_RULES_NAME).c_str());
     const std::string path = paths::data_dir() + "/" + GATE_CLOSED_NAME;
     if (closed_text.empty()) {
@@ -116,12 +111,7 @@ void set_hours(const forwarders_logic::Row& row, const Hours& h, std::function<v
     change_rule(
         row,
         [hours](forwarders::Made& m) {
-            m.free_days = hours.days;
-            m.free_from = hours.days ? hours.from : 0;
-            m.free_to = hours.days ? hours.to : 0;
-            m.free2_days = hours.days ? hours.days2 : 0;
-            m.free2_from = m.free2_days ? hours.from2 : 0;
-            m.free2_to = m.free2_days ? hours.to2 : 0;
+            forwarder_rules_logic::set_free(m, hours.days, hours.from, hours.to, hours.days2, hours.from2, hours.to2);
         },
         ask, "gate_hours",
         [hours](const forwarders::Made& m) {
@@ -138,11 +128,7 @@ void set_closed(const forwarders_logic::Row& row, int days, int from, int to, st
 {
     change_rule(
         row,
-        [days, from, to](forwarders::Made& m) {
-            m.closed_days = days;
-            m.closed_from = days ? from : 0;
-            m.closed_to = days ? to : 0;
-        },
+        [days, from, to](forwarders::Made& m) { forwarder_rules_logic::set_closed(m, days, from, to); },
         ask, "gate_closed_hours",
         [days, from, to](const forwarders::Made& m) {
             return history_label(m.name, m.id) + (days ? " · " + hours_label(days, from, to) : std::string());
@@ -207,10 +193,7 @@ void set_pause_rule(unsigned tries, unsigned minutes, std::function<void(bool)> 
 std::string until_label(uint64_t posix)
 {
     // The time alone today, else the day too ("2026-10-21 07:00").
-    const std::string full = ui::time_text(posix);
-    const std::string today = ui::today_date();
-    if (full.size() >= 16 && full.compare(0, 10, today) == 0) return full.substr(11, 5);
-    return full.size() >= 16 ? full.substr(0, 16) : full;
+    return forwarder_rules_logic::until_text(ui::time_text(posix), ui::today_date());
 }
 
 std::string pause_label(unsigned tries, unsigned minutes)
@@ -269,57 +252,8 @@ std::vector<forwarders_logic::Refusals> take_log()
     std::vector<forwarders::Made> made = forwarders::list();
     // Counted by day, for the week's tries (util/gate_tally.hpp).
     gate_tally::Tally tally = read_tally();
-    std::vector<std::pair<std::string, std::string>> refused;
-    std::vector<size_t> seen_working;
-    struct Tries
-    {
-        const char*              kind;
-        std::string              when, detail;
-        std::vector<std::string> times;
-    };
-    std::vector<Tries> tries;
-    size_t at = 0;
-    int n = 0;
-    while (at < text.size() && n < 200) {
-        size_t end = text.find('\n', at);
-        if (end == std::string::npos) end = text.size();
-        const char *when, *nro;
-        size_t wn, nn;
-        GateResult r;
-        if (gate_log_parse(text.data() + at, end - at, &when, &wn, &r, &nro, &nn)) {
-            const std::string path_s(nro, nn);
-            std::string name = forwarders_logic::file_title(path_s);
-            for (size_t i = 0; i < made.size(); i++) {
-                if (made[i].nro != path_s) continue;
-                name = made[i].name;
-                // The gate opened it: this way back works.
-                if ((r == GateResult_Pin || r == GateResult_Free) && made[i].pin && !made[i].verified)
-                    seen_working.push_back(i);
-            }
-            const char* kind = r == GateResult_Pin      ? "gate_open"
-                               : r == GateResult_Free   ? "gate_free"
-                               : r == GateResult_Paused ? "gate_paused"
-                               : r == GateResult_Closed ? "gate_closed"
-                               : r == GateResult_Limit  ? "gate_limit"
-                                                        : "gate_refused";
-            std::string w(when, wn);
-            if (w == "?") w.clear();
-            if (w.size() >= 10) gate_tally::add(tally, w.substr(0, 10), path_s, r);
-            if (r == GateResult_Refused) refused.push_back({ name, w });
-            const std::string detail = r == GateResult_Error ? name + " (error)" : name;
-            // One entry per kind, forwarder and day: the times in it.
-            bool joined = false;
-            for (Tries& t : tries)
-                if (t.kind == kind && t.detail == detail && t.when.substr(0, 10) == w.substr(0, 10) && !w.empty()) {
-                    t.times.push_back(w.size() > 11 ? w.substr(11) : w);
-                    joined = true;
-                }
-            if (!joined) tries.push_back({ kind, w, detail, { w.size() > 11 ? w.substr(11) : w } });
-            n++;
-        }
-        at = end + 1;
-    }
-    for (const Tries& t : tries) {
+    const forwarder_rules_logic::Log log = forwarder_rules_logic::fold_log(text, made, tally);
+    for (const auto& t : log.seen) {
         if (t.times.size() < 2) {
             history_flow::record_seen(t.kind, t.when, t.detail);
             continue;
@@ -329,7 +263,7 @@ std::vector<forwarders_logic::Refusals> take_log()
         history_flow::record_seen(t.kind, t.when,
                                   brls::getStr("playguard/forwarders/tries_grouped", t.detail, (int)t.times.size(), times));
     }
-    for (const size_t i : seen_working) {
+    for (const size_t i : log.seen_working) {
         if (made[i].verified) continue;
         made[i].verified = true;
         std::string err;
@@ -340,7 +274,7 @@ std::vector<forwarders_logic::Refusals> take_log()
     if (!paths::ensure_dir(paths::nand_dir()) || !paths::atomic_write(tally_path(), gate_tally::text(tally), &err))
         brls::Logger::warning("forwarders: the week's tries not kept ({})", err);
     std::remove(path.c_str());
-    return forwarders_logic::repeated_refusals(refused);
+    return forwarders_logic::repeated_refusals(log.refused);
 }
 
 void show_week()
@@ -362,13 +296,7 @@ void show_week()
         lines.push_back({ w.total.opened ? ui::Check::Ok : ui::Check::Info,
                           brls::getStr("playguard/forwarders/week_opened", w.total.opened) });
         // The refusals, and on which days.
-        std::string by_day;
-        for (size_t i = 0; i < w.days.size(); i++) {
-            if (!w.days[i].refused) continue;
-            const int wd = date::weekday(date::add_days(today, (int)i - 6));
-            by_day += (by_day.empty() ? "" : ", ") + (wd >= 0 ? day_names[(size_t)wd] : std::string("?")) + " " +
-                      std::to_string(w.days[i].refused);
-        }
+        const std::string by_day = forwarder_rules_logic::refused_by_day(w, today, day_names);
         lines.push_back({ w.total.refused ? ui::Check::Warn : ui::Check::Ok,
                           w.total.refused ? brls::getStr("playguard/forwarders/week_refused", w.total.refused, by_day)
                                           : "playguard/forwarders/week_none_refused"_i18n });
