@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 3aa9e7e92649 -->
+<!-- translated from docs/features.md, sha256 49029f67bfff -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
