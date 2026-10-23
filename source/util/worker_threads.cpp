@@ -3,6 +3,9 @@
 
 #include <exception>
 #include <iterator>
+#include <utility>
+
+WorkerThreads::WorkerThreads(OnThrow on_throw) : on_throw_(std::move(on_throw)) {}
 
 WorkerThreads::~WorkerThreads()
 {
@@ -30,12 +33,29 @@ bool WorkerThreads::start(Task task, std::string* error)
         w.done    = std::make_shared<bool>(false);
         try {
             w.thread = std::thread([this, task, done = w.done]() {
-                task();
                 // Said under the lock, so a wait sees the task over and the
-                // thread about to end together.
-                std::lock_guard<std::mutex> ended(lock_);
-                *done = true;
-                changed_.notify_all();
+                // thread about to end together; by a guard, so a task that
+                // throws is over too.
+                struct Over
+                {
+                    WorkerThreads*               self;
+                    const std::shared_ptr<bool>& done;
+                    ~Over()
+                    {
+                        std::lock_guard<std::mutex> ended(self->lock_);
+                        *done = true;
+                        self->changed_.notify_all();
+                    }
+                } over{ this, done };
+                // An exception out of a thread's function ends the app: the
+                // task's is caught here and said.
+                try {
+                    task();
+                } catch (const std::exception& e) {
+                    if (on_throw_) on_throw_(e.what());
+                } catch (...) {
+                    if (on_throw_) on_throw_("unknown exception");
+                }
             });
         } catch (const std::exception& e) {   // std::system_error: no thread to be had
             workers_.pop_back();

@@ -59,7 +59,8 @@ std::atomic<bool> s_config_saved{ true };   // the last config.json write went t
 // screen to say why.
 WorkerThreads& workers()
 {
-    static WorkerThreads* const instance = new WorkerThreads();
+    static WorkerThreads* const instance = new WorkerThreads(
+        [](const std::string& what) { brls::Logger::error("background task threw: {}", what); });
     return *instance;
 }
 }   // namespace
