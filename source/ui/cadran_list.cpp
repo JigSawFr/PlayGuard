@@ -112,8 +112,8 @@ CadranIcon* make_icon(const char* name, float size, NVGcolor color)
 class TileFit : public brls::View
 {
   public:
-    TileFit(brls::Box* tile, brls::Label* title)
-        : tile(tile), title(title)
+    TileFit(brls::Box* cell, brls::Label* its_title)
+        : tile(cell), title(its_title)
     {
         this->setFocusable(false);
         this->setPositionType(brls::PositionType::ABSOLUTE);
@@ -133,9 +133,8 @@ class TileFit : public brls::View
                 this->fits.push_back({ label, label->getFontSize(), "" });
             }
         // A wider tile (smaller text, the window) may take the full size again.
-        const float width = this->tile->getWidth();
-        const bool resized = width != this->width;
-        this->width = width;
+        const bool resized = this->tile->getWidth() != this->width;
+        this->width = this->tile->getWidth();
         for (Fit& fit : this->fits) {
             const std::string text = fit.label->getFullText();
             if (text != fit.text || resized) {
