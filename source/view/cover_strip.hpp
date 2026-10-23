@@ -24,6 +24,10 @@ class CoverStrip : public brls::View
 
     // The games in the order they are checked; back to the first.
     void set_games(const std::vector<u64>& ids);
+    // What became of a game (a removal's): gone, its cover floats away and
+    // fades; failed, it stays, a coral "!" on its corner.
+    enum class Mark { NONE, GONE, FAILED };
+    void mark(size_t index, Mark what);
     // `done` games checked: the next one moves to the middle.
     void set_done(u32 done);
     // The games whose icons are wanted soon (around the middle), for
@@ -38,6 +42,8 @@ class CoverStrip : public brls::View
     float at(brls::Time now) const;   // the position drawn (a game's index, fractional between two)
 
     std::vector<u64> ids;
+    std::vector<Mark> marks;            // by game, as `ids`
+    std::vector<brls::Time> marked_at;  // when each was marked (µs)
     std::map<u64, int> owned;   // textures made for this strip, freed with it
     float from = 0, to = 0;     // the position eases from `from` to `to` ...
     brls::Time since = 0;       // ... since then (µs)

@@ -109,6 +109,8 @@ typedef struct {
     u32 flags;
     u8 rest[0x40];
 } NsApplicationView;
+typedef struct { u8 unk_x0[0x80]; } NsApplicationOccupiedSize;
+Result nsCalculateApplicationOccupiedSize(u64 application_id, NsApplicationOccupiedSize *out);
 typedef struct { Service s; bool open; } NsProgressAsyncResult;
 typedef struct { s64 current_size; s64 total_size; } NsSystemUpdateProgress;
 

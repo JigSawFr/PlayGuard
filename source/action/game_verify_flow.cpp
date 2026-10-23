@@ -11,8 +11,6 @@ using namespace brls::literals;
 namespace game_verify_flow
 {
 
-namespace
-{
 // "850 MB", "3.8 GB" (the language's decimal mark).
 std::string size_text(u64 bytes)
 {
@@ -25,6 +23,8 @@ std::string size_text(u64 bytes)
     return brls::getStr("playguard/games/size_gb", gb);
 }
 
+namespace
+{
 // What the dialog says at `current` of `total` bytes: the share done, how
 // much, and the time left once it can be told (a few seconds in).
 void show_progress(State* s, u64 current, u64 total)

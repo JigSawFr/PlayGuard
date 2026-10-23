@@ -414,6 +414,34 @@ static Result record_push(Service *am, u64 app_id, const RecordMeta *metas, s32 
     );
 }
 
+u64 gamecheck_occupied_sum(const u8 raw[0x80])
+{
+    u64 total = 0;
+    for (int i = 0; i < 4; i++) {
+        const u8 *entry = raw + i * 0x20;
+        if (entry[0] == 0) continue;   // no storage
+        for (int k = 1; k <= 3; k++) {
+            s64 size;
+            memcpy(&size, entry + k * 8, sizeof size);
+            if (size > 0) total += (u64)size;
+        }
+    }
+    return total;
+}
+
+Result gamecheck_occupied(u64 app_id, u64 *bytes)
+{
+    *bytes = 0;
+    Result rc = nsInitialize();
+    if (R_FAILED(rc)) return rc;
+    NsApplicationOccupiedSize size;
+    memset(&size, 0, sizeof size);
+    rc = nsCalculateApplicationOccupiedSize(app_id, &size);
+    if (R_SUCCEEDED(rc)) *bytes = gamecheck_occupied_sum((const u8 *)&size);
+    nsExit();
+    return rc;
+}
+
 Result gamecheck_remove(u64 app_id)
 {
     const Result gate = core_change_allowed();

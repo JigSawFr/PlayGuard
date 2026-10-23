@@ -154,7 +154,8 @@ class GameCheckActivity : public brls::Activity
     struct Removal;
     void remove_next(std::shared_ptr<Removal> removal, size_t at);
     // Short of some games, or stopped: how many went, the ones left, the list.
-    static void removal_summary(const Removal& removal);
+    // Its covers in coral, and Try again for them.
+    void removal_summary(const Removal& removal);
     // Ⓨ on a game; the actions on the games picked.
     void toggle(u64 id);
     void selection_menu();

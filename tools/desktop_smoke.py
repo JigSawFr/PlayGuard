@@ -755,6 +755,13 @@ def messages():
     return out
 
 
+def removal_done(count):
+    """A removal's dialog said every game went ("N games removed", its last
+    state before it closes by itself, in place of a toast)."""
+    log.flush()
+    return any("removal: %d games removed" % count in l for l in open(os.path.join(OUT, "app.log"), errors="replace"))
+
+
 def fail(msg):
     log.flush()
     print("SMOKE FAILED:", msg)
@@ -2357,8 +2364,10 @@ key("Return")
 shot("27_games_remove_selected")
 key("Right")               # Remove
 key("Return")
-time.sleep(2)
-if not any(m.startswith("2 games removed.") for m in messages()):
+time.sleep(1.4)
+shot("27_games_removed_selected")   # its last state: a check, 2 games removed, what that freed
+time.sleep(2)              # it closes by itself
+if not removal_done(2):
     fail("the games picked were not removed: " + repr(messages()[-3:]))
 # To reinstall: Garden Defenders (an update without its game), removed.
 key("Up", 7)               # Reinstall's buttons, at the top
@@ -2405,9 +2414,9 @@ key("Return")
 shot("27_games_remove_all")
 key("Right")               # Remove
 key("Return")
-time.sleep(2)
+time.sleep(4.5)            # a step a game, the dialog's last state, then it closes by itself
 shot("27_games_removed_all")
-if not any(m.startswith("3 games removed.") for m in messages()):
+if not removal_done(3):
     fail("the games to reinstall were not all removed: " + repr(messages()[-3:]))
 # Firmware or SD card: Star Pilots, the last game.
 key("Down", 4)
