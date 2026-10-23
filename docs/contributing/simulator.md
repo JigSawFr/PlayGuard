@@ -32,7 +32,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_FROM_FORWARDER=1` | Started from a forwarder's HOME menu icon, not over a game (Today's pill and Help say so) |
 | `PLAYGUARD_SIM_NO_GAME=1` | No game open (applet mode with nothing behind it): no "game left open keeps counting" line, no "the game in progress is suspended" warning |
 | `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text |
-| `PLAYGUARD_SIM_BATTERY=1` | The console on its battery (no charger): *Visual effects › Lighter on battery* (not the default) leaves out the glow and every movement of the look (`ui/effects`, `ui/motion`) |
+| `PLAYGUARD_SIM_BATTERY=1` | The console in hand, off its dock (unset: the simulator draws the effects as on the dock, whatever `PLAYGUARD_SIM_DOCKED` says): *Visual effects › Automatic*, the default, leaves out the glow and every movement of the look (`ui/effects`, `ui/motion`) |
 | `PLAYGUARD_SIM_LEFT_MIN=4` | That many minutes left today while the timer counts (the child screen's last minutes) |
 | `PLAYGUARD_SIM_NO_PDM=1` | No activity log |
 | `PLAYGUARD_SIM_NO_PLAY=1` | Nothing played for weeks (the all-time totals stay): the Activity tab's empty state |

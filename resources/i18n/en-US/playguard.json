@@ -1345,7 +1345,7 @@
         "effects": "Visual effects",
         "effects_values": {
             "full": "Always full",
-            "auto": "Lighter on battery",
+            "auto": "Automatic: full on the TV",
             "reduced": "Reduced motion"
         }
     },

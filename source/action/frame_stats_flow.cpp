@@ -84,7 +84,7 @@ std::string mode()
     std::string m = "desktop";
 #endif
     // The glow turned off (Developer): its cost is the difference; the
-    // lighter effects on the battery (ui/effects) leave it out too, and
+    // lighter effects off the dock (ui/effects) leave it out too, and
     // Reduced motion keeps it still.
     if (!config::get().cadran_glow) m += "-noglow";
     else if (effects::light()) m += "-light";

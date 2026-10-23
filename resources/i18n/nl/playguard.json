@@ -1345,7 +1345,7 @@
         "effects": "Visuele effecten",
         "effects_values": {
             "full": "Altijd volledig",
-            "auto": "Lichter op de accu",
+            "auto": "Automatisch: volledig op de tv",
             "reduced": "Minder beweging"
         }
     },
