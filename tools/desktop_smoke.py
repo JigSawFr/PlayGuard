@@ -2449,10 +2449,8 @@ shot("28c_activity_games_list")
 key("y")                   # covers again (the config keeps the choice)
 key("Escape")
 key_to_end("Up", hold=0.15)   # the top: the accounts' chips
-key_to_end("Right")        # the row's last chip: Export or share
-key("Return")
-go_to("Save to the SD card…")   # the formats (the other line: the week as a QR code)
-key("Return")
+key_to_end("Right")        # the row's last chip: Export
+key("Return")              # the formats
 go_to("PDF")
 key("Return")
 shot("29_activity_export")

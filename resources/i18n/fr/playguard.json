@@ -441,11 +441,7 @@
             "late": "Joué entre 21:00 et 06:00"
         },
         "rating": "Classification par âge",
-        "rating_blocked": "{} · bloqué au niveau actuel",
-        "qr": "Le résumé de la semaine en QR code",
-        "share_sd": "Enregistrer sur la carte SD…",
-        "qr_body": "Scannez-le avec l'appareil photo d'un téléphone : les 7 derniers jours s'affichent en texte. Rien ne passe par Internet.",
-        "qr_days": "Chaque jour"
+        "rating_blocked": "{} · bloqué au niveau actuel"
     },
     "library": {
         "title": "Jeux",
@@ -1873,7 +1869,6 @@
         "sd_space_detail": "Il reste {} Mo : PlayGuard risque de ne plus pouvoir enregistrer ses réglages, son historique et ses journaux.",
         "week": "7 derniers jours : {} de jeu",
         "week_detail": "{} par jour en moyenne.",
-        "week_qr": "Afficher son QR code",
         "week_top": "Le plus joué : {} ({}).",
         "over_limit": "La limite a été dépassée {} jours sur les 7 derniers",
         "over_limit_detail": "Quand le temps est écoulé, la console se contente de prévenir : le jeu continue au-delà de la limite (Temps de jeu › Quand le temps est écoulé).",
@@ -2026,7 +2021,7 @@
             "done_day": "Fini pour {}"
         },
         "activity": {
-            "share": "Exporter ou partager",
+            "export": "Exporter",
             "games": "{} jeux",
             "games_one": "1 jeu",
             "on_limit": "sur une limite de {}",

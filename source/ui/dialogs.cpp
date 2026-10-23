@@ -422,15 +422,6 @@ void hold_confirm(brls::Box* body, const std::string& hold_label, std::function<
     dialog->open();
 }
 
-void qr_text_dialog(const std::string& body, const std::string& text)
-{
-    brls::Box* code = cadran::kit::qr(text, 400, "", "");
-    code->setAlignSelf(brls::AlignSelf::CENTER);
-    auto* dialog = body_dialog(body, code);
-    dialog->addButton("hints/ok"_i18n, []() {});
-    dialog->open();
-}
-
 void prompt_minutes(const std::string& header, uint16_t current, std::function<void(uint16_t)> on_value)
 {
     // The stick, not the number pad.

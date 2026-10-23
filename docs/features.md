@@ -82,7 +82,7 @@ Each with an "i", a dot on the bell; it can be marked as read:
 - a limit still lowered by *No more play today* on an earlier day (*Put back*);
 - a new version installed (*What's new*; after an update in place, the previous build kept), or a newer version of PlayGuard;
 - a report sent online (*Show the link*), or PlayGuard closed unexpectedly last time (*Send a report*);
-- the week's play time (every 7 days until read; with how it compares with the week before, per day; *Show its QR code* opens the week's summary on *Activity*), and a limit passed on two or more of the last 7 days while the console only warns;
+- the week's play time (every 7 days until read; with how it compares with the week before, per day), and a limit passed on two or more of the last 7 days while the console only warns;
 - a settings backup to make (none yet, or none for 30 days);
 - all games blocked for a week;
 - a new user account;
@@ -259,7 +259,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 ### At the top
 
-- The accounts as chips, the period and *Export or share*.
+- The accounts as chips, the period and *Export*.
 - Today, the last 7 days and all time as figures. Under the last 7 days, how they compare with the 7 before, per day: ▲ *+20 min/day vs last week* in amber, ▼ less in teal, *same as last week* within 5 minutes.
 - The four games most played as cards (Ⓐ opens one); over the last 7 days, the one played most more than the week before says by how much, from half an hour (▲ *+2 h vs last week*).
 - Nothing played over the period: a card says so, with *See all time* when there is something to see.
@@ -282,10 +282,9 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 - A game's time that no user account holds (some games never ask for one, or the account was deleted since) shows as *No account*, from a minute up.
 - A user account PlayGuard never saw before is flagged in amber on the tab for 30 days (*New account since …*, a fresh account is a known way to start over) and recorded in the change history; the accounts there when PlayGuard first lists them are not flagged.
 
-### Export and sharing
+### Export
 
-- **Export to the SD card** (*Export or share › Save to the SD card*) as CSV, JSON, XLSX (Excel) or PDF, one column per day, then the last 7 days, the last 30 days and all time.
-- **The week's summary as a QR code** (*Export or share*, or the bell's *Show its QR code*): a phone's camera reads it as a few lines of text, in the language shown — the last 7 days and their average, the trend, each day, the three games most played, the sessions, the longest one and the time played between 21:00 and 06:00. Nothing goes online.
+- **Export to the SD card** (*Export*) as CSV, JSON, XLSX (Excel) or PDF, one column per day, then the last 7 days, the last 30 days and all time.
 - Opens at once on the last figures read (kept on the SD card between runs), refreshed in the background when over a minute old; Ⓧ reads them again now, with a spinner.
 - Times are approximate if the console clock was changed.
 
