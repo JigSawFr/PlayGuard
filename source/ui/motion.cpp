@@ -60,7 +60,7 @@ class Mover : public brls::View
 
     Mover(brls::Box* owner, Kind what, float move_x, float move_y, float low_alpha, int ms, int delay_ms)
         : box(owner), kind(what), dx(move_x), dy(move_y), low(low_alpha), duration((float)ms * 1000.0f),
-          since(now() + (brls::Time)delay_ms * 1000), rest_alpha(owner->getAlpha())
+          since(now() + (brls::Time)delay_ms * 1000), rest_alpha(own_alpha(owner))
     {
         this->setFocusable(false);
         this->setPositionType(brls::PositionType::ABSOLUTE);
@@ -79,6 +79,19 @@ class Mover : public brls::View
     }
 
   private:
+    // The box's own alpha at rest. getAlpha() is the product down from the
+    // root: read inside a screen still rising, it is that screen's near
+    // clear, and the box would stay there (About › Help & diagnostics drawn
+    // blank, its icons only). A mover still running on the box knows its
+    // alpha at rest better than the box, which it has dimmed.
+    static float own_alpha(brls::Box* box)
+    {
+        for (brls::View* child : box->getChildren())
+            if (auto* m = dynamic_cast<Mover*>(child); m && !m->done) return m->rest_alpha;
+        const float above = box->hasParent() ? box->getParent()->getAlpha() : 1.0f;
+        return above > 0.0f ? std::min(1.0f, box->getAlpha() / above) : 1.0f;
+    }
+
     void apply(float t)
     {
         // Nearly clear, not clear: a view at alpha 0 is not drawn at all, and
