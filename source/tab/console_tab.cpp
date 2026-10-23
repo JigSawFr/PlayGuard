@@ -118,10 +118,10 @@ ConsoleTab::ConsoleTab()
     // things to do (mark()) in its corner rather than under its title.
     if (brls::Box* tools = this->list.tiles({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" } }, false)) {
         tools->setMarginBottom(20);
-        for (const char* id : { "cn_clock", "cn_games" }) {
-            auto* cell = (brls::DetailCell*)this->getView(id);
+        for (const char* tile : { "cn_clock", "cn_games" }) {
+            auto* cell = (brls::DetailCell*)this->getView(tile);
             TabBadge* badge = TabBadge::on_row(cell);
-            brls::Box* head = this->list.head(id);
+            brls::Box* head = this->list.head(tile);
             if (!badge || !head) continue;
             cell->removeView(badge, false);
             auto* push = new brls::Box();
