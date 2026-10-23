@@ -1,7 +1,8 @@
 // The PIN gate's screen (source/core/gate_screen.c) as PNG files, one per
 // state, to look at it on a computer:
-//   make gate-preview [GATE_LANG=2]   ->  build/gate-preview/<state>.png
-// (the language as libnx's SetLanguage numbers it: 1 American English, 2 French …)
+//   make gate-preview [GATE_LANG=2] [GATE_THEME=light]  ->  build/gate-preview/<state>.png
+// (the language as libnx's SetLanguage numbers it: 1 American English, 2 French …;
+// PlayGuard's dark theme unless GATE_THEME is light)
 // With PlayGuard's own font for all text (the console draws the name and
 // the lines in its own font, which has every language) and a made-up
 // homebrew's icon (source/sim/sim_homebrew_icons.h).
@@ -46,6 +47,7 @@ int main(int argc, char **argv)
         return 1;
     }
     const int lang = argc > 2 ? atoi(argv[2]) : 1;
+    const int light = argc > 3 && strcmp(argv[3], "light") == 0;
     static const struct {
         const char *file;
         GateText status, hint;
@@ -61,8 +63,6 @@ int main(int argc, char **argv)
         { "closed", GateText_Closed, GateText_ClosedHint, GateScreen_Closed },
         { "limit", GateText_Limit, GateText_LimitHint, GateScreen_Limit },
     };
-    char footer[160];
-    snprintf(footer, sizeof(footer), "PlayGuard \xC2\xB7 %s", gate_text(lang, GateText_Tagline));
     // Asking: its free hours (the weekend, 09:00 to 20:00); refused: the
     // day's second refusal.
     const GateHours weekend = { 0x41, 540, 1200 };
@@ -90,8 +90,7 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < sizeof(SHOTS) / sizeof(SHOTS[0]); i++) {
         const GateScreen s = { font, font, i == 5 ? NULL : SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS),
                                "Star Atlas", gate_text(lang, SHOTS[i].status),
-                               SHOTS[i].hint == GateText_Count ? NULL : gate_text(lang, SHOTS[i].hint), footer, "21:03",
-                               SHOTS[i].state,
+                               SHOTS[i].hint == GateText_Count ? NULL : gate_text(lang, SHOTS[i].hint), SHOTS[i].state,
                                SHOTS[i].state == GateScreen_Asking || SHOTS[i].state == GateScreen_Loading ? hours
                                : SHOTS[i].state == GateScreen_Refused ? tried
                                : SHOTS[i].state == GateScreen_Paused  ? paused
@@ -108,7 +107,7 @@ int main(int argc, char **argv)
                                SHOTS[i].state == GateScreen_Refused ? gate_text(lang, GateText_RetryA) : NULL,
                                SHOTS[i].state == GateScreen_Refused ? gate_text(lang, GateText_RetryB) : NULL,
                                // Opening: its bar and the mark's arc part of the way.
-                               0.6f, 0.1f };
+                               0.6f, 0.1f, light };
         gate_screen_draw(px, GATE_SCREEN_W, GATE_SCREEN_H, GATE_SCREEN_W, &s);
         char path[512];
         snprintf(path, sizeof(path), "%s/%s.png", out, SHOTS[i].file);

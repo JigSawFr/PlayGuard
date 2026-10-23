@@ -387,19 +387,19 @@ void RestrictionsTab::refresh()
 namespace
 {
 // What a line is about in `name`; its state: a padlock in coral when
-// `restricts`, else "Allowed" in words (a check could read as "protected");
-// `words` beside the padlock (a count), "—" when not `known`.
+// `restricts`, else a check in green; `words` beside the padlock (a count),
+// "—" when not `known`.
 void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::string& what, bool known,
           bool restricts, const std::string& words = "")
 {
     name->setText(what);
-    const std::string said = !words.empty() ? words : restricts ? "" : "playguard/cadran/restrictions/allowed"_i18n;
-    state->setText(known ? said : "\u2014");
-    state->setTextColor(brls::Application::getTheme()[known && !restricts && words.empty() ? "cadran/text2" : "cadran/text"]);
+    state->setText(known ? words : "\u2014");
+    state->setTextColor(brls::Application::getTheme()["cadran/text"]);
     ui::set_visible(state, !state->getFullText().empty());
-    icon->setIcon("lock");
-    icon->setColor(brls::Application::getTheme()["cadran/coral_fill"]);
-    icon->setVisibility(known && restricts ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    const bool allowed = known && !restricts && words.empty();
+    icon->setIcon(allowed ? "check" : "lock");
+    icon->setColor(brls::Application::getTheme()[allowed ? "cadran/teal_fill" : "cadran/coral_fill"]);
+    icon->setVisibility(known && (restricts || allowed) ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
 }
 }   // namespace
 

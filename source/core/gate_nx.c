@@ -182,9 +182,8 @@ typedef struct {
     unsigned char *icon;     // the homebrew's, from its .nro
     size_t         icon_size;
     char           name[0x201];
-    char           clock[8];
-    char           footer[160];
     int            language;
+    bool           light;    // PlayGuard's light theme
     unsigned       rules;    // GATE_RULE_*: its icons by the badge
 } Screen;
 
@@ -255,16 +254,36 @@ static void read_nro(const char *nro, Screen *sc)
     fclose(f);
 }
 
-static void screen_open(Screen *sc, const char *nro, const char *when)
+// PlayGuard's language and theme (its config.json, GateLook): its language
+// unless "system", then the console's (American English when it cannot be
+// read); its theme, the console's own for "system".
+static void screen_look(Screen *sc)
 {
-    memset(sc, 0, sizeof(*sc));
+    size_t n = 0;
+    char *json = (char *)read_all(GATE_DIR GATE_CONFIG_NAME, 0x40000, &n);
+    GateLook look;
+    gate_look_parse(json, n, &look);
+    free(json);
     sc->language = 1;   // American English
-    u64 code = 0;
-    SetLanguage lang;
-    if (R_SUCCEEDED(setInitialize())) {
+    if (look.language >= 0) sc->language = look.language;
+    else if (R_SUCCEEDED(setInitialize())) {
+        u64 code = 0;
+        SetLanguage lang;
         if (R_SUCCEEDED(setGetSystemLanguage(&code)) && R_SUCCEEDED(setMakeLanguage(code, &lang))) sc->language = (int)lang;
         setExit();
     }
+    sc->light = look.theme == GateTheme_Light;
+    if (look.theme == GateTheme_System && R_SUCCEEDED(setsysInitialize())) {
+        ColorSetId color;
+        if (R_SUCCEEDED(setsysGetColorSetId(&color))) sc->light = color != ColorSetId_Dark;
+        setsysExit();
+    }
+}
+
+static void screen_open(Screen *sc, const char *nro)
+{
+    memset(sc, 0, sizeof(*sc));
+    screen_look(sc);
     static const PlSharedFontType TYPE[] = { PlSharedFontType_Standard, PlSharedFontType_ChineseSimplified,
                                              PlSharedFontType_ChineseTraditional, PlSharedFontType_KO };
     PlFontData font;
@@ -275,9 +294,6 @@ static void screen_open(Screen *sc, const char *nro, const char *when)
     sc->brand = read_all("romfs:/font/sora_bold_latin.ttf", 0x100000, &n);
     if (!sc->text) sc->text = sc->brand;
     read_nro(nro, sc);
-    // "2026-10-20 21:03": its time.
-    const char *space = strchr(when, ' ');
-    if (space) snprintf(sc->clock, sizeof(sc->clock), "%.5s", space + 1);
     // Two buffers: with one, the compositor keeps it while it is shown, and
     // the next frame (how it went, after the PIN) waited for it for ever.
     if (R_FAILED(framebufferCreate(&sc->fb, nwindowGetDefault(), GATE_SCREEN_W, GATE_SCREEN_H, PIXEL_FORMAT_RGBA_8888, 2)))
@@ -301,13 +317,12 @@ static GateScreen screen_of(Screen *sc, GateScreenState state, const char *note,
                           : state == GateScreen_Closed  ? GateText_ClosedHint
                           : state == GateScreen_Limit   ? GateText_LimitHint
                                                         : GateText_Count;
-    snprintf(sc->footer, sizeof(sc->footer), "PlayGuard \xC2\xB7 %s", gate_text(sc->language, GateText_Tagline));
     const GateScreen s = {
         sc->brand, sc->text, sc->icon, sc->icon_size, sc->name, gate_text(sc->language, STATUS[state]),
-        hint == GateText_Count ? NULL : gate_text(sc->language, hint), sc->footer, sc->clock, state, note, note_warn,
+        hint == GateText_Count ? NULL : gate_text(sc->language, hint), state, note, note_warn,
         sc->rules, gate_text(sc->language, GateText_Badge),
         buttons ? gate_text(sc->language, GateText_RetryA) : NULL, buttons ? gate_text(sc->language, GateText_RetryB) : NULL,
-        1.0f, 0.0f,
+        1.0f, 0.0f, sc->light,
     };
     return s;
 }
@@ -504,7 +519,7 @@ bool gate_nx_run(void)
     char when[32] = "?";
     bool timed = local_time(&wday, &minute, when, sizeof(when));
     Screen sc;
-    screen_open(&sc, nro, when);
+    screen_open(&sc, nro);
     ueventCreate(&g_watch_done, false);
     Thread watch;
     const bool watching = R_SUCCEEDED(threadCreate(&watch, watchdog, NULL, NULL, 0x2000, 0x2C, -2)) &&

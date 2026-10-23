@@ -424,8 +424,44 @@ static void test_wait(void)
     CHECK(gate_wait_parse("5000\n", 2) == 50);   // only `len` read
 }
 
+// PlayGuard's language and theme from its config.json: the top-level keys
+// alone, the defaults (the console's language, dark) for what it cannot read.
+static void test_look(void)
+{
+    GateLook l;
+    gate_look_parse(NULL, 0, &l);
+    CHECK(l.language == -1 && l.theme == GateTheme_Dark);
+    static const char CONFIG[] = "{\n  \"schema\": 1,\n  \"language\": \"fr\",\n  \"theme\": \"light\",\n"
+                                 "  \"custom_servers\": [\"a\", \"theme\"],\n  \"advanced\": false\n}\n";
+    gate_look_parse(CONFIG, sizeof(CONFIG) - 1, &l);
+    CHECK(l.language == 2 && l.theme == GateTheme_Light);
+    static const char SYSTEM[] = "{\"language\":\"system\",\"theme\":\"system\"}";
+    gate_look_parse(SYSTEM, sizeof(SYSTEM) - 1, &l);
+    CHECK(l.language == -1 && l.theme == GateTheme_System);
+    // A nested "theme", an escaped quote, a value that reads as a key: not taken.
+    static const char NESTED[] = "{\"x\":{\"theme\":\"light\",\"language\":\"de\"},\"n\":\"a\\\"\",\"s\":\"theme\","
+                                 "\"language\":\"pt-BR\"}";
+    gate_look_parse(NESTED, sizeof(NESTED) - 1, &l);
+    CHECK(l.language == 17 && l.theme == GateTheme_Dark);
+    // Cut short, unknown values: the defaults.
+    static const char CUT[] = "{\"theme\": \"light\", \"language\": \"fr";
+    gate_look_parse(CUT, sizeof(CUT) - 1, &l);
+    CHECK(l.language == -1 && l.theme == GateTheme_Light);
+    gate_look_parse("{\"theme\":\"", 10, &l);
+    CHECK(l.theme == GateTheme_Dark);
+    gate_look_parse("{\"theme\":\"blue\",\"language\":\"xx\"}", 33, &l);
+    CHECK(l.language == -1 && l.theme == GateTheme_Dark);
+    // Every one of PlayGuard's languages.
+    static const char *const CODES[] = { "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl",
+                                         "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
+    static const int NX[] = { 1, 2, 13, 3, 5, 14, 4, 8, 9, 17, 10, 0, 7, 15, 16 };
+    for (size_t i = 0; i < sizeof(CODES) / sizeof(CODES[0]); i++) CHECK(gate_language_of(CODES[i], strlen(CODES[i])) == NX[i]);
+    CHECK(gate_language_of("system", 6) == -1 && gate_language_of("fr", 1) == -1 && gate_language_of(NULL, 0) == -1);
+}
+
 int main(void)
 {
+    test_look();
     test_wait();
     test_until();
     test_carried();
@@ -437,5 +473,5 @@ int main(void)
     test_log();
     test_clocks();
     test_steady_pause();
-    return CHECK_DONE("gate argv, free hours, rules, log and opening time assertions passed");
+    return CHECK_DONE("gate argv, free hours, rules, log and opening time, look assertions passed");
 }

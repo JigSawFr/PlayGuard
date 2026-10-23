@@ -544,11 +544,13 @@ void quick_settings(std::function<void()> after)
     const std::vector<std::string> labels = { "playguard/tools/language"_i18n + " · " + language_name(),
                                               "playguard/tools/theme"_i18n + " · " + theme_name(),
                                               "playguard/prefs/text_size"_i18n + " · " + text_size_name() };
+    // As the tiles of Preferences draw them (tab/preferences_tab.cpp).
+    const std::vector<std::string> icons = { "language", "contrast", "eye" };
     pick("playguard/quick/title_text"_i18n, labels, 0, [after](int i) {
         if (i == 0) pick_language(after);
         else if (i == 1) pick_theme(after);
         else pick_text_size(after);
-    }, false);
+    }, false, {}, icons);
 }
 
 namespace

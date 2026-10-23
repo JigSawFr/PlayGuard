@@ -2053,8 +2053,7 @@
             "to_settings": "Le sue impostazioni",
             "games": "Giochi bloccati",
             "games_none": "nessuno",
-            "current": "Attuale",
-            "allowed": "Consentito"
+            "current": "Attuale"
         },
         "clock": {
             "console": "Console",
@@ -2089,7 +2088,6 @@
         "date": "{0} {1}",
         "cell": "Profilo programmato",
         "note": "Un profilo per un periodo (vacanze, un viaggio): all'apertura, PlayGuard propone di applicarlo quando inizia il periodo e di rimettere i limiti precedenti quando finisce.",
-        "none": "Nessuno",
         "value": "{} · dal {} al {}",
         "pick_profile": "Profilo per il periodo",
         "pick_from": "Primo giorno",
@@ -2108,7 +2106,9 @@
         "keep_remove": "Tenere questi limiti e toglierlo",
         "change": "Modifica…",
         "remove": "Toglierlo",
-        "removed": "Profilo programmato tolto."
+        "removed": "Profilo programmato tolto.",
+        "soon": "Presto",
+        "soon_note": "Arriverà con il ponte MQTT (Home Assistant): PlayGuard funziona solo mentre è aperto, quindi non può cambiare profilo da solo il giorno giusto. Lo farà un'automazione della casa, da un calendario o dalle vacanze scolastiche."
     },
     "sigpatch": {
         "set_aside": "Metti da parte i file sigpatch",

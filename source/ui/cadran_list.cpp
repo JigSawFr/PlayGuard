@@ -154,8 +154,8 @@ class TileGlow : public brls::View
     NVGcolor ink, far;
 };
 
-// The action tiles' inks, one per tile in turn, never the warnings' (amber,
-// coral).
+// The tiles' inks, one per tile in turn, never the warnings' (amber, coral):
+// an action tile's icon and light, a status tile's icon.
 constexpr const char* TILE_INKS[] = { "cadran/teal", "cadran/blue", "cadran/violet", "cadran/pink" };
 
 // An action tile's lines, each on its one: its title and every label under
@@ -460,10 +460,10 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         auto* head = new brls::Box(brls::Axis::ROW);
         head->setAlignItems(brls::AlignItems::CENTER);
         head->setMarginBottom(status ? 10 : 0);
-        // An action tile's ink: its icon, its light (TileGlow).
+        // A tile's ink: its icon, and an action tile's light (TileGlow).
         const size_t inks = sizeof(TILE_INKS) / sizeof(TILE_INKS[0]);
-        const char* ink = status ? "cadran/teal" : TILE_INKS[i % inks];
-        brls::View* icon = make_icon(cells[i].second, status ? 22 : ACTION_ICON, theme[ink]);
+        const char* ink = TILE_INKS[i % inks];
+        brls::View* icon = make_icon(cells[i].second, ACTION_ICON, theme[ink]);
         head->addView(icon);
         cell->addView(head, 0);
         this->heads.push_back({ cell, head });

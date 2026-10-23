@@ -22,6 +22,7 @@ CadranDigits::CadranDigits()
     this->registerFloatXMLAttribute("fontSize", [this](float value) { this->setFontSize(value); });
     this->registerColorXMLAttribute("textColor", [this](NVGcolor value) { this->setTextColor(value); });
     this->registerFloatXMLAttribute("fitWidth", [this](float value) { this->setFitWidth(value); });
+    this->registerBoolXMLAttribute("fitParent", [this](bool value) { this->setFitParent(value); });
     this->registerBoolXMLAttribute("followsTextSize", [this](bool value) { this->setFollowsTextSize(value); });
     this->measure();
 }
@@ -60,6 +61,8 @@ void CadranDigits::setFitWidth(float width)
     this->fitWidth = width;
     this->measure();
 }
+
+void CadranDigits::setFitParent(bool fit) { this->fitParent = fit; }
 
 void CadranDigits::setSmallUnits(bool small)
 {
@@ -146,6 +149,12 @@ void CadranDigits::draw(NVGcontext* vg, float x, float y, float width, float hei
 {
     (void)style;
     (void)ctx;
+    // The parent's width known once laid out, or changed: the text fitted
+    // to it, drawn at that size from the next frame.
+    if (this->fitParent && this->getParent()) {
+        const float room = std::floor(this->getParent()->getWidth());
+        if (room > 0.0f && room != this->fitWidth) this->setFitWidth(room);
+    }
     this->drawn = true;
     nvgFontFaceId(vg, this->font);
     const float t = motion::progress(this->roll_since, ROLL_US);

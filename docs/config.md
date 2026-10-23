@@ -199,8 +199,8 @@ over (unless that day's limit was changed since). All four keys go together.
 
 ### Scheduled profile
 
-*Play timer › Profiles › Scheduled profile*: a profile for a period. When the
-period begins, PlayGuard asks to put it in force (once a day, when it is
+*Play timer › Profiles › Scheduled profile*: a profile for a period, set by
+an earlier version (a new one waits for the MQTT bridge). When the period begins, PlayGuard asks to put it in force (once a day, when it is
 opened); once it is over, to put back the limits it replaced. A period that
 went by with the profile never in force is forgotten. The six keys go
 together.
