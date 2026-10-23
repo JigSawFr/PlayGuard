@@ -18,7 +18,7 @@
  "source": "Source code",
  "cfw_title": "Requires custom firmware (Atmosphère).",
  "cfw_text": "PlayGuard uses the console's restricted parental-control service, some of it through debug commands. Use at your own risk.",
- "tour_title": "PlayGuard in 30 seconds",
+ "tour_title": "PlayGuard in a minute",
  "video_pause": "Pause the video",
  "video_play": "Play the video",
  "features_title": "Everything the phone app does, on the console",

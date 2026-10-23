@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- PlayGuard tour: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4.
+<!-- PlayGuard's tour, about a minute: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4.
      window.TOUR, set before the page's script (tools/render_tour.mjs), is the website's tour in another language: its texts and its screenshots. -->
 <html><head><meta charset="utf-8">
 <style>
@@ -119,16 +119,32 @@
 let SCENES = [
   { img:'dashboard.png', k:'Today', h:'The whole day <em>at a glance</em>',
     p:'Time left on a ring, when play ends, the bedtime coming.',
-    b:['Extra time in one press: +15 min, +30 min, +1 h', 'Stop for today, whenever you say', 'Child view to hand the console over'],
+    b:['Extra time, stop for today, child view', 'Bedtime, parental controls and clock as cards', 'What needs you comes first, in amber'],
     ox:'58%', oy:'30%', hl:[528, 226, 714, 126] },
+  { img:'extra_time.png', k:'Extra time', h:'More time? <em>One press.</em>',
+    p:'A well-earned bonus, given in a second, taken back by itself.',
+    b:['+15 min, +30 min, +1 h or any amount', 'Today, or a day still to come', 'The usual limit back the next day'],
+    ox:'50%', oy:'60%', hl:[196, 296, 888, 334] },
+  { img:'child_view.png', k:'Child view', h:'Hand it over, <em>worry-free</em>',
+    p:'Just the time left, big enough to read from the couch.',
+    b:['When play ends, when it’s bedtime', 'The ring pulses in the last 5 minutes', 'Back to your screens with the PIN'],
+    ox:'50%', oy:'60%', hl:[326, 508, 640, 68] },
   { img:'play_timer.png', k:'Play timer', h:'A limit for <em>every day</em>',
-    p:'The week is the editor: move a bar with the stick, done.',
+    p:'The whole week on one screen, with the time played each day.',
     b:['Weekdays and weekends, each their own', 'Profiles for school weeks and holidays', 'Bedtime alarm · suspend or just warn'],
     ox:'55%', oy:'40%', hl:[256, 180, 980, 344] },
+  { img:'per_day.png', k:'Play timer', h:'Change a day <em>with the stick</em>',
+    p:'±15 min a press, then the week saved in one go.',
+    b:['Copy to Mon → Fri, or to the weekend', 'Days over the limit marked in coral', 'Discard or save, nothing written before'],
+    ox:'30%', oy:'45%', hl:[276, 190, 146, 272] },
   { img:'activity.png', k:'Activity', h:'Who played <em>what</em>, and how long',
     p:'Per game and per account, this week against the last.',
     b:['Charts for the day, the week, all time', 'Export to CSV, JSON, XLSX or PDF', 'The week’s summary as a QR code'],
     ox:'55%', oy:'25%', hl:[256, 150, 980, 158] },
+  { img:'activity_game.png', k:'Activity', h:'Every game, <em>its own page</em>',
+    p:'Its last 7 days at a glance, then its time today, this week and in all.',
+    b:[],
+    ox:'50%', oy:'35%', hl:[70, 170, 1150, 206] },
   { img:'restrictions.png', k:'Restrictions', h:'Right for their <em>age</em>',
     p:'One press picks a level; every setting follows.',
     b:['Young child, child, teen or your own', 'Age rating, social posting, communication', 'Games blocked one by one'],
@@ -137,6 +153,10 @@ let SCENES = [
     p:'Easy-to-guess PINs flagged, never shown.',
     b:['PlayGuard itself behind the PIN', 'Temporary unlock that turns itself back on', 'Lock the homebrew menu'],
     ox:'55%', oy:'25%', hl:[256, 118, 980, 142] },
+  { img:'notifications.png', k:'Notifications', h:'What needs you, <em>in one place</em>',
+    p:'A bell gathers it all, Ⓨ from any tab, the fix one press away.',
+    b:['A weak PIN, a drifting clock, an alarm off', 'Changes made outside PlayGuard', 'The week’s play time, every 7 days'],
+    ox:'50%', oy:'25%', hl:[64, 94, 1150, 236] },
   { img:'clock.png', k:'Network clock', h:'A clock that’s <em>never wrong</em>',
     p:'Set from public time servers, so the timer counts true on a console that never reaches Nintendo.',
     b:[],
@@ -145,6 +165,10 @@ let SCENES = [
     p:'What needs a look, before it bites.',
     b:['Installed games that won’t start, found', 'Firmware and Atmosphère, up to date', 'Forwarders: homebrew on the HOME menu, PIN-guarded'],
     ox:'55%', oy:'48%', hl:[256, 292, 980, 92] },
+  { img:'dashboard_fr_dark.png', k:'Every language', h:'In <em>their</em> language',
+    p:'The console’s 15 languages, a light and a dark theme, larger text on the TV.',
+    b:[],
+    ox:'50%', oy:'50%' },
 ];
 const ICON = {
   bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
@@ -153,13 +177,16 @@ const ICON = {
   unlink:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M3 3l18 18"/>',
   globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20"/>',
   play:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M10 7.5l4.5 2.5L10 12.5z"/>',
+  qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h7M17.5 17.5V21"/>',
+  text:'<path d="M3 20l5-14 5 14M4.8 15h6.4"/><path d="M14 20l3.5-9 3.5 9M15.2 17h4.6"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
 };
 let BONUS = [
-  { i:'bell', t:'Notifications', p:'A bell gathers what needs you, the fix one press away.' },
-  { i:'eye', t:'Child view', p:'The time left, big enough to read from the couch.' },
   { i:'undo', t:'History & undo', p:'Every change logged and undoable, backups included.' },
   { i:'unlink', t:'Companion app', p:'Unlink Nintendo’s app, even on a second-hand console.' },
-  { i:'globe', t:'15 languages', p:'Every language of the console, light and dark themes.' },
+  { i:'qr', t:'The week on your phone', p:'Its summary as a QR code, scanned off the screen. Nothing goes online.' },
+  { i:'text', t:'Larger text on the TV', p:'Automatic: bigger when docked, back to normal in handheld.' },
+  { i:'shield', t:'Nothing in the background', p:'The console’s own parental controls do the work, PlayGuard closed.' },
   { i:'play', t:'Try it first', p:'The real PlayGuard runs in your browser.' },
 ];
 // Another language's tour: its texts (plain text, no markup) and its screenshots.
@@ -180,7 +207,7 @@ if (TOUR) {
 }
 // ?still: no drifting light and no camera move on the screenshots, so a GIF only redraws what changes.
 const STILL = new URLSearchParams(location.search).has('still');
-const T_INTRO = 3.2, T_HOOK = 3.4, T_SCENE = 3.1, T_BONUS = 5.0, T_OUTRO = 4.4;
+const T_INTRO = 3.4, T_HOOK = 3.6, T_SCENE = 3.4, T_BONUS = 5.6, T_OUTRO = 4.8;
 const T_SCENES0 = T_INTRO + T_HOOK;
 const T_BONUS0 = T_SCENES0 + SCENES.length * T_SCENE;
 const T_OUTRO0 = T_BONUS0 + T_BONUS;

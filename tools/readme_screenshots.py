@@ -23,8 +23,10 @@ import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP = os.path.join(ROOT, "build-desktop", "playguard")
-OUT = os.path.join(ROOT, "images", "screenshots")
-VERSION = json.load(open(os.path.join(ROOT, ".release-please-manifest.json")))["."]
+# README_SHOTS_OUT: another folder; README_SHOTS_VERSION: another badge (the
+# release about to be made, 1.3.0, while its pull request is open).
+OUT = os.environ.get("README_SHOTS_OUT") or os.path.join(ROOT, "images", "screenshots")
+VERSION = os.environ.get("README_SHOTS_VERSION") or json.load(open(os.path.join(ROOT, ".release-please-manifest.json")))["."]
 
 # name: (language, tab, keys from the tab's first screen)
 SCREENS = {
@@ -42,6 +44,11 @@ SCREENS = {
     "clock": ("en-US", "console", ["Right", "Return"]),
     "preferences": ("en-US", "preferences", []),
     "dashboard_fr_dark": ("fr", "", []),
+    # For the tour (branding/tour.html): Today's Extra time "…", its Child
+    # view, and the notifications (Y).
+    "extra_time": ("en-US", "", ["Right", "Right", "Right", "Right", "Return"]),
+    "child_view": ("en-US", "", ["Right", "Down", "Right", "Return"]),
+    "notifications": ("en-US", "", ["y"]),
 }
 IM = ["magick"] if shutil.which("magick") else []
 
@@ -92,5 +99,11 @@ def take(name, lang, tab, keys):
         shutil.rmtree(run, ignore_errors=True)
 
 
+# A screen not in SCREENS: <name>=<language>:<tab>:<key>,<key>… (to try keys out).
 for name in sys.argv[1:] or SCREENS:
-    take(name, *SCREENS[name])
+    if "=" in name:
+        name, spec = name.split("=", 1)
+        lang, tab, keys = spec.split(":", 2)
+        take(name, lang, tab, [k for k in keys.split(",") if k])
+    else:
+        take(name, *SCREENS[name])
