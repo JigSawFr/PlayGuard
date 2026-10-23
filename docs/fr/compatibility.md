@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
+<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
 # Compatibilité
 
 Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la comparaison avec un sysmodule de remplacement. Retour au [README](../../README.md).
@@ -34,7 +34,7 @@ PlayGuard vérifie qu'Atmosphère tourne, pas sa version : c'est le firmware qu'
 
 ### Lanceurs
 
-Le lancement par-dessus un jeu (title override) est recommandé. L'application indique si elle tourne en application ou en applet (album). Par-dessus un jeu, la console compte le temps passé dans PlayGuard comme celui de ce jeu. Dans l'activité, il va au compte choisi au lancement : ouvrez-le avec le compte d'un parent, pas celui d'un enfant. Le minuteur est celui de la console, le même pour tous les comptes : il compte ce temps quel que soit le compte (sauf minuteur désactivé).
+Le lancement par-dessus un jeu (title override) est recommandé. L'application indique si elle tourne en application (par-dessus un jeu, ou depuis son propre forwarder sur le menu HOME) ou en applet (album). Par-dessus un jeu, la console compte le temps passé dans PlayGuard comme celui de ce jeu. Dans l'activité, il va au compte choisi au lancement : ouvrez-le avec le compte d'un parent, pas celui d'un enfant. Le minuteur est celui de la console, le même pour tous les comptes : il compte ce temps quel que soit le compte, sauf minuteur désactivé ou contrôle parental mis en pause par le code PIN ([détails](features.md#le-code-pin-met-le-contrôle-parental-en-pause-pendant-votre-visite)).
 
 ### Nintendo Switch 2
 
