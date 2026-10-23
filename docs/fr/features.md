@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 80c3e00e21f9 -->
+<!-- translated from docs/features.md, sha256 450d0e04da92 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -17,7 +17,7 @@ Les captures montrent le thème sombre, celui par défaut (en anglais).
 | **Restrictions** | **Console › Horloge réseau** |
 | ![Restrictions](../../images/screenshots/restrictions.png) | ![Horloge réseau](../../images/screenshots/clock.png) |
 | **Sécurité** | **Préférences** |
-| ![Code PIN](../../images/screenshots/security.png) | ![Préférences](../../images/screenshots/preferences.png) |
+| ![Sécurité](../../images/screenshots/security.png) | ![Préférences](../../images/screenshots/preferences.png) |
 
 ## Commandes
 

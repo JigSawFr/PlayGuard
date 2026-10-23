@@ -16,7 +16,7 @@ The screenshots show the dark theme, PlayGuard's default.
 | **Restrictions** | **Console › Network clock** |
 | ![Restrictions](../images/screenshots/restrictions.png) | ![Network clock](../images/screenshots/clock.png) |
 | **Security** | **Preferences** |
-| ![PIN](../images/screenshots/security.png) | ![Preferences](../images/screenshots/preferences.png) |
+| ![Security](../images/screenshots/security.png) | ![Preferences](../images/screenshots/preferences.png) |
 
 ## Controls
 
