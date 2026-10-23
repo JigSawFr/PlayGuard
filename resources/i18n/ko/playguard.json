@@ -706,7 +706,9 @@
         "weekdays": "월요일~금요일...",
         "weekend": "주말...",
         "copy_today": "{} 제한을 모든 요일에 복사",
-        "text_size_auto": "자동: TV에서는 크게"
+        "text_size_auto": "자동: TV에서는 크게",
+        "text_size": "글자 크기",
+        "start_tab": "시작 탭"
     },
     "tools": {
         "section_diag": "진단",

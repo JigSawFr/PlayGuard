@@ -706,7 +706,9 @@
         "weekdays": "De lunes a viernes...",
         "weekend": "Fin de semana...",
         "copy_today": "Copiar el {} a todos",
-        "text_size_auto": "Auto: más grande en la tele"
+        "text_size_auto": "Auto: más grande en la tele",
+        "text_size": "Texto",
+        "start_tab": "Abrir en"
     },
     "tools": {
         "section_diag": "Diagnóstico",

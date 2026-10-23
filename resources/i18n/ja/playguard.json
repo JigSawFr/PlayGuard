@@ -701,12 +701,14 @@
         "note_old_module": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。パソコンでモジュールを更新してください：PlayGuard {}のplayguard-rescue.zipをSDカードのルートに展開し、RESCUEファイルを置き直してから本体を再起動します。"
     },
     "tiles": {
-        "games": "インストール済みのゲーム",
+        "games": "インストール済み",
         "upload": "レポートを送信…",
         "weekdays": "月曜日～金曜日…",
         "weekend": "週末…",
         "copy_today": "{}を全曜日にコピー",
-        "text_size_auto": "自動：テレビでは大きめ"
+        "text_size_auto": "自動：テレビでは大きめ",
+        "text_size": "文字の大きさ",
+        "start_tab": "起動時のタブ"
     },
     "tools": {
         "section_diag": "診断",

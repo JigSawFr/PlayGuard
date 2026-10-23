@@ -701,12 +701,14 @@
         "note_old_module": "Zonder de pincode kan hier niets worden gewijzigd, en PlayGuard opent zoals gewoonlijk. Werk de module bij vanaf een computer: pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart, zet het RESCUE-bestand terug en start de console opnieuw."
     },
     "tiles": {
-        "games": "Geïnstalleerde games",
+        "games": "Games",
         "upload": "Rapport versturen...",
         "weekdays": "Maandag t/m vrijdag...",
         "weekend": "Weekend...",
         "copy_today": "{} naar elke dag",
-        "text_size_auto": "Auto: groter op de tv"
+        "text_size_auto": "Auto: groter op de tv",
+        "text_size": "Tekstgrootte",
+        "start_tab": "Starttabblad"
     },
     "tools": {
         "section_diag": "Diagnose",

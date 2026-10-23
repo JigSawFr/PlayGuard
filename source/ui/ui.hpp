@@ -420,12 +420,13 @@ void open_screen(brls::View* content, const std::string& title);
 // screen's header: save the choice and apply it at once (a language or a
 // theme makes every screen again, live_prefs; the text size runs `after`, a
 // refresh). language_name / theme_name: the choice saved, as text;
-// text_size_name its shorter words on a tile (Preferences).
+// text_size_name and language_name their shorter words on a tile
+// (Preferences).
 void        pick_language(std::function<void()> after = nullptr);
 void        pick_theme(std::function<void()> after = nullptr);
 void        pick_text_size(std::function<void()> after = nullptr);
 std::string text_size_name(bool tile = false);
-std::string language_name();
+std::string language_name(bool tile = false);
 std::string theme_name();
 // − on the main screen: a list of the two, each opening its picker.
 void        quick_settings(std::function<void()> after = nullptr);

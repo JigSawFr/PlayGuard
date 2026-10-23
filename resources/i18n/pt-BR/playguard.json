@@ -706,7 +706,9 @@
         "weekdays": "Segunda a sexta...",
         "weekend": "Fim de semana...",
         "copy_today": "Copiar {} para todos",
-        "text_size_auto": "Auto: maior na TV"
+        "text_size_auto": "Auto: maior na TV",
+        "text_size": "Texto",
+        "start_tab": "Abrir em"
     },
     "tools": {
         "section_diag": "Diagnóstico",

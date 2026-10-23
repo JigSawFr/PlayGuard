@@ -520,8 +520,17 @@ std::string text_size_name(bool tile)
     return brls::getStr("playguard/prefs/text_sizes/" + std::string(config::TEXT_SIZES[index_of(config::TEXT_SIZES, config::get().text_size)]));
 }
 
-std::string language_name()
+std::string language_name(bool tile)
 {
+    // The names of a language spoken in two places, shorter on a tile: the
+    // place as its code.
+    static const std::pair<const char*, const char*> SHORT[] = {
+        { "fr", "Français (FR)" }, { "fr-CA", "Français (CA)" }, { "es", "Español (ES)" },
+        { "es-419", "Español (LatAm)" }, { "pt", "Português (PT)" }, { "pt-BR", "Português (BR)" },
+    };
+    if (tile)
+        for (const auto& [code, name] : SHORT)
+            if (config::get().language == code) return name;
     return brls::getStr("playguard/tools/languages/" + std::string(config::LANGUAGES[index_of(config::LANGUAGES, config::get().language)]));
 }
 

@@ -706,7 +706,9 @@
         "weekdays": "Montag bis Freitag...",
         "weekend": "Wochenende...",
         "copy_today": "{} auf alle kopieren",
-        "text_size_auto": "Auto: größer am TV"
+        "text_size_auto": "Auto: größer am TV",
+        "text_size": "Textgröße",
+        "start_tab": "Start-Tab"
     },
     "tools": {
         "section_diag": "Diagnose",
