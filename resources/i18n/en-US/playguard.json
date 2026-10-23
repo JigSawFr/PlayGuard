@@ -646,6 +646,7 @@
         "no_pin": "Set a PIN first (Set or change the PIN).",
         "set": "Protect PlayGuard with the PIN: {}",
         "ask_again": "Ask for the PIN again after 5 minutes",
+        "pauses": "Pause parental controls while I'm in PlayGuard",
         "again_on": {
             "changes": "Asked again after 5 minutes.",
             "open": "It comes back after 5 minutes away from PlayGuard."

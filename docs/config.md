@@ -51,6 +51,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
 | `auto_relock` | boolean | turns parental controls back on right after a change that needed the temporary unlock | `true` | Security |
 | `pin_ask_again` | boolean | the PIN, once entered, holds 5 minutes instead of until PlayGuard closes: *Before a change* asks again after them, *To open PlayGuard* locks again after 5 minutes or more out of focus | `false` | Security (*Ask for the PIN again after 5 minutes*) |
+| `pin_pauses` | boolean | once the PIN is entered, parental controls are paused (unlocked temporarily) while PlayGuard is open and in focus, so the time spent in it does not take from the child's; they come back on as it is left. Off, entering the PIN changes nothing on the console | `false` | Security (*Pause parental controls while I'm in PlayGuard*) |
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
 | `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Console › Network clock |
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
@@ -248,6 +249,7 @@ line; the order does not matter when it reads them:
   "advanced": false,
   "auto_relock": true,
   "pin_ask_again": false,
+  "pin_pauses": false,
   "onboarding_at_start": true,
   "clock_check_at_start": false,
   "intro": true,

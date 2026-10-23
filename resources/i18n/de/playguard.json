@@ -646,6 +646,7 @@
         "no_pin": "Legen Sie zuerst eine Geheimzahl fest (Geheimzahl festlegen oder ändern).",
         "set": "PlayGuard mit der Geheimzahl schützen: {}",
         "ask_again": "Geheimzahl nach 5 Minuten erneut abfragen",
+        "pauses": "Jugendschutz pausieren, solange ich in PlayGuard bin",
         "again_on": {
             "changes": "Erneute Abfrage nach 5 Minuten.",
             "open": "Er erscheint erneut nach 5 Minuten außerhalb von PlayGuard."

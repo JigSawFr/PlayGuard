@@ -197,4 +197,19 @@ void set_ask_again(bool on, std::function<void()> done)
     if (done) done();
 }
 
+void set_pauses(bool on, std::function<void()> done)
+{
+    if (on == config::get().pin_pauses) return;
+    // It unlocks parental controls: only the parent may choose it.
+    if (on && !confirm()) {
+        ui::refuse(refusal_text());
+        if (done) done();   // the switch shows the setting again
+        return;
+    }
+    config::get().pin_pauses = on;
+    ui::save_config();
+    session_pause::setting_changed();
+    if (done) done();
+}
+
 }   // namespace pin_lock

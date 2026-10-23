@@ -34,6 +34,7 @@
             <brls:DetailCell id="sc_set_pin" title="@i18n/playguard/security/set_pin"/>
             <brls:DetailCell id="sc_pin_lock" title="@i18n/playguard/pin_lock/title"/>
             <brls:BooleanCell id="sc_pin_ask_again"/>
+            <brls:BooleanCell id="sc_pin_pauses"/>
             <brls:DetailCell id="sc_hbmenu_lock" title="@i18n/playguard/hbmenu/cell"/>
             <brls:DetailCell id="sc_show_pin" title="@i18n/playguard/security/show_pin"/>
             <brls:DetailCell id="sc_unlock" title="@i18n/playguard/security/unlock"/>

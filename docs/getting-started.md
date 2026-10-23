@@ -23,7 +23,7 @@ Open PlayGuard **over a game** (hold R while starting a game, with hbmenu, sphai
 
 - over a game, PlayGuard runs as an application, with all its memory; from the album it runs as an applet, with less;
 - the console counts the time spent in PlayGuard as that game's, and gives it to the user picked at launch: a parent's, not a child's;
-- once the PIN is entered, PlayGuard pauses parental controls while you are in it, so that time does not take from the child's; they come back on as you leave.
+- that time counts as the child's play time, unless *Security › Pause parental controls while I'm in PlayGuard* is on (off by default): then, once the PIN is entered, PlayGuard pauses parental controls while you are in it, and they come back on as you leave.
 
 ## 3. Follow *First steps*
 

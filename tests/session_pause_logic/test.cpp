@@ -10,6 +10,7 @@ using session_pause_logic::wanted;
 static Inputs parent_in()
 {
     Inputs in;
+    in.enabled = true;
     in.pin_holds = true;
     in.in_focus = true;
     in.application = true;
@@ -21,7 +22,13 @@ int main()
     // The parent in PlayGuard, PIN entered: paused.
     CHECK(wanted(parent_in()));
 
+    // Off by default: the PIN alone pauses nothing.
+    CHECK(!wanted(Inputs()));
     Inputs in = parent_in();
+    in.enabled = false;
+    CHECK(!wanted(in));
+
+    in = parent_in();
     in.pin_holds = false;   // no PIN entered yet, or no longer holding
     CHECK(!wanted(in));
 

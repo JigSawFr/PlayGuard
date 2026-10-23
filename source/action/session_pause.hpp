@@ -1,5 +1,7 @@
 // session_pause — parental controls paused while the parent is in PlayGuard.
 //
+// Only with Security › Pause parental controls while I'm in PlayGuard on
+// (config pin_pauses, off by default: the PIN alone then changes nothing).
 // Once the parent's PIN is entered (pin_lock::ask: the lock screen, the
 // first change, the child screen's way back…), PlayGuard unlocks parental
 // controls temporarily (pt_flow::unlock_temporarily, the same unlock as
@@ -29,6 +31,10 @@ void install();
 
 // pin_lock::ask: the PIN was just entered.
 void pin_entered();
+
+// Pause parental controls while I'm in PlayGuard (config pin_pauses) was
+// just turned on or off: pauses now, the PIN holding, or locks again.
+void setting_changed();
 
 // PlayGuard's own pause is on: parental controls unlocked by it, until it is left.
 bool active();
