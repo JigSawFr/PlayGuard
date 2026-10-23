@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
+<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Nuovo su PlayGuard? Comincia da [Per iniziare](getting-started.md). Torna al [README](../../README.md).
@@ -51,7 +51,7 @@ L'aspetto di PlayGuard si chiama Cadran: una barra di icone per le schede, una t
 - **Le altre schermate** prendono lo stesso aspetto: l'editor per giorno di un profilo mostra la settimana come in *Tempo di gioco* (modificata allo stesso modo, i riempimenti rapidi come tessere); *Controlla i giochi installati* e *Tutti i giochi* mettono le loro righe in riquadri; *Profili* e *Aiuto e diagnostica* danno a ogni riga la sua icona.
 - **Dimensione del testo** (*Preferenze*, o **AA** nell'intestazione):
   - *Automatica*, l'impostazione predefinita, ingrandisce tutti i testi del 25 % quando la console è nella base, sulla TV, e li riporta com'erano in modalità portatile; *Più grande* li tiene ingranditi, *Normale* mai.
-  - L'intestazione, la barra laterale e il piè di pagina mantengono la loro dimensione (non hanno spazio per crescere), così come i nomi dei livelli di Limitazioni, già grandi.
+  - Anche i nomi delle schede della barra laterale crescono, sempre del 25 %; il titolo, l'etichetta e la data dell'intestazione e i suggerimenti dei tasti e l'orologio del piè di pagina crescono un po' meno (dal 15 al 20 %), perché le loro righe sono già piene. Un nome troppo lungo per il suo spazio in una lingua viene disegnato un po' più piccolo, mai meno che nella dimensione normale, invece di essere tagliato. I nomi dei livelli di Limitazioni mantengono la loro dimensione, già grande.
   - Il cambio è immediato, su ogni schermata, senza riavviare.
   - Il 25 % viene da una TV da 55" in 4K: il testo più piccolo (15 px) è allora alto 14,6 mm in maiuscolo, 20′ d'arco da 2,5 m, dove la lettura è comoda (16′ in dimensione normale, il minimo indispensabile).
 - **Effetti visivi** (*Preferenze*): *Più leggeri a batteria*, l'impostazione predefinita, toglie l'alone di sfondo, il battito dell'anello della schermata del bambino nei suoi ultimi minuti e lo scorrimento dell'arco verso un nuovo valore finché non è collegato un caricatore (in modalità portatile, senza alimentazione); *Sempre completi* li mantiene. Viene riletto ogni 5 secondi, quindi collegare la console all'alimentazione li fa tornare.
@@ -182,7 +182,7 @@ La console mostra "Tempo scaduto", poi sospende il gioco (senza "continua") o si
 *Mostra al bambino* in *Oggi*, per consegnare la console:
 
 - solo il tempo rimanente (mentre il filtro famiglia è sbloccato, il limite di oggi, in pausa), quando finisce il gioco (*Finisce verso le 16:40*; quando Sogni d'oro arriva prima, l'anello fa invece il conto alla rovescia fino ad esso, *45 min prima di dormire*, come nell'ultima ora di un giorno senza limite), l'ora di andare a letto e cosa succede quando il tempo è scaduto;
-- pensata per essere letta dall'altra parte della stanza, sulla TV; il suo testo mantiene la sua dimensione qualunque sia la dimensione del testo;
+- pensata per essere letta dall'altra parte della stanza, sulla TV; il suo testo mantiene la sua dimensione qualunque sia la dimensione del testo (solo il titolo e il piè di pagina la seguono, come in ogni schermata);
 - negli ultimi 5 minuti (di gioco o prima dell'ora di andare a letto), la fine diventa ambra e l'anello pulsa lentamente; l'ora di andare a letto diventa ambra negli ultimi 30;
 - Ⓐ e Ⓨ, i tasti del genitore, sono indicati in piccolo in alto a destra, così il piè di pagina mostra solo quello del bambino;
 - Ⓐ torna alle schermate del genitore con il PIN; Ⓨ dà tempo extra da lì, dopo il PIN (le quantità di *Tempo extra*, restando sulla schermata del bambino); Ⓑ esce da PlayGuard (chiedendo prima di riattivare il filtro famiglia, come quando si esce).

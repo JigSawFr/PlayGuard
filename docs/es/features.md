@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
+<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Nuevo en PlayGuard? Empieza por la [guía de inicio](getting-started.md). Volver al [README](../../README.md).
@@ -51,7 +51,7 @@ El aspecto de PlayGuard se llama Cadran: una barra de iconos para las pestañas,
 - **Las demás pantallas** adoptan el mismo aspecto: el editor por día de un perfil muestra la semana como en *Tiempo de juego* (se edita igual, con los atajos como mosaicos); *Comprobar los juegos instalados* y *Todos los juegos* presentan sus líneas en tarjetas; *Perfiles* y *Ayuda y diagnóstico* dan a cada línea su icono.
 - **Tamaño del texto** (*Preferencias*, o **AA** en la cabecera):
   - *Automático*, la opción predeterminada, agranda todos los textos un 25 % mientras la consola está en la base, en la tele, y los devuelve a su tamaño en modo portátil; *Más grande* los mantiene agrandados, *Normal* nunca.
-  - La cabecera, la barra lateral y el pie de página conservan su tamaño (no tienen sitio para más), igual que los nombres de los niveles de Restricciones, que ya son grandes.
+  - Los nombres de las pestañas de la barra lateral también crecen, un 25 % igualmente; el título, la etiqueta y la fecha de la cabecera y las indicaciones de botones y el reloj del pie de página crecen algo menos (del 15 al 20 %), pues sus filas ya están llenas. Un nombre demasiado largo para su sitio en un idioma se dibuja algo más pequeño, nunca más que en tamaño normal, en lugar de cortarse. Los nombres de los niveles de Restricciones conservan su tamaño, que ya es grande.
   - Cambia al instante, en todas las pantallas, sin reiniciar.
   - El 25 % sale de una tele de 55" en 4K: el texto más pequeño (15 px) mide entonces 14,6 mm de alto en mayúsculas, 20′ de arco a 2,5 m, donde la lectura es cómoda (16′ en tamaño normal, el mínimo indispensable).
 - **Efectos visuales** (*Preferencias*): *Más ligeros con batería*, la opción predeterminada, prescinde del halo de fondo, del latido del anillo de la pantalla del niño en sus últimos minutos y del barrido del arco hasta un nuevo valor mientras no hay ningún cargador conectado (en modo portátil, desenchufada); *Siempre completos* los mantiene. Se vuelve a leer cada 5 segundos, así que al enchufar la consola vuelven.
@@ -182,7 +182,7 @@ La consola muestra «Se acabó el tiempo» y luego suspende el juego (sin «cont
 *Mostrar al niño* en *Hoy*, para entregar la consola:
 
 - solo el tiempo restante (mientras el control parental está desbloqueado, el límite de hoy, en pausa), cuándo termina el juego (*Termina hacia las 16:40*; cuando la alarma de hora de dormir llega antes, el anillo cuenta atrás hasta ella, *45 min antes de dormir*, como en la última hora de un día sin límite), la hora de dormir y lo que pasa cuando se acaba el tiempo;
-- pensada para leerse desde el otro lado de la habitación, en la tele; su texto conserva su tamaño sea cual sea el tamaño del texto;
+- pensada para leerse desde el otro lado de la habitación, en la tele; su texto conserva su tamaño sea cual sea el tamaño del texto (solo el título y el pie de página lo siguen, como en todas las pantallas);
 - en los últimos 5 minutos (de juego o antes de la hora de dormir), el final se vuelve ámbar y el anillo late despacio; la hora de dormir se vuelve ámbar en sus últimos 30;
 - Ⓐ e Ⓨ, los botones del padre o la madre, aparecen en pequeño arriba a la derecha, para que el pie de página muestre solo el del niño;
 - Ⓐ vuelve a las pantallas del padre o la madre con el PIN; Ⓨ da tiempo extra desde ahí, tras el PIN (las cantidades de *Tiempo extra*, sin salir de la pantalla del niño); Ⓑ sale de PlayGuard (preguntando antes si reactivar el control parental, como al salir).

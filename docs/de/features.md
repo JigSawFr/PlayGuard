@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
+<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -51,7 +51,7 @@ Das Aussehen von PlayGuard heißt Cadran: eine schmale Leiste mit Symbolen für 
 - **Die anderen Bildschirme** bekommen dasselbe Aussehen: Der Editor pro Tag eines Profils zeigt die Woche wie in *Spielzeit* (auf dieselbe Weise bearbeitet, die Schnellvorgaben als Kacheln); *Installierte Spiele prüfen* und *Alle Spiele* setzen ihre Zeilen in Karten; *Profile* und *Hilfe & Diagnose* geben jeder Zeile ihr Symbol.
 - **Textgröße** (*Optionen*, oder **AA** in der Kopfzeile):
   - *Automatisch*, der Standard, macht jeden Text 25 % größer, solange die Konsole im TV-Modus ist, am Fernseher, und setzt ihn im Handheld-Modus zurück; *Größer* lässt ihn immer vergrößert, *Normal* nie.
-  - Kopfzeile, Seitenleiste und Fußzeile behalten ihre Größe (sie haben keinen Platz für mehr), ebenso die Namen der Kategorien in *Einschränkungen*, die schon groß sind.
+  - Die Namen der Tabs in der Seitenleiste wachsen mit, ebenfalls um 25 %; Titel, Plakette und Datum der Kopfzeile sowie Tastenhinweise und Uhr der Fußzeile etwas weniger (15 bis 20 %), da ihre Zeilen schon voll sind. Ein Name, der in einer Sprache zu lang für seinen Platz ist, wird etwas kleiner gezeichnet, nie kleiner als in normaler Größe, statt abgeschnitten zu werden. Die Namen der Kategorien in *Einschränkungen* behalten ihre Größe, sie sind schon groß.
   - Die Änderung wirkt sofort, auf jedem Bildschirm, ohne Neustart.
   - Die 25 % stammen von einem 55"-Fernseher in 4K: Der kleinste Text (15 px) ist dann in Großbuchstaben 14,6 mm hoch, 20′ Sehwinkel aus 2,5 m, wo das Lesen angenehm ist (16′ in normaler Größe, das absolute Minimum).
 - **Visuelle Effekte** (*Optionen*): *Sparsamer im Akkubetrieb*, der Standard, lässt den Hintergrundschein, das Pulsieren des Rings auf dem Kinderbildschirm in seinen letzten Minuten und das Gleiten des Bogens zu einem neuen Wert weg, solange kein Ladegerät angeschlossen ist (Handheld, ohne Kabel); *Immer vollständig* behält sie. Alle 5 Sekunden neu geprüft: Wird die Konsole angeschlossen, kommen sie zurück.
@@ -182,7 +182,7 @@ Die Konsole zeigt „Zeit ist um“ an und unterbricht dann das Spiel (ohne „W
 *Dem Kind zeigen* in *Heute*, um die Konsole zu übergeben:
 
 - nur die verbleibende Zeit (solange der Jugendschutz aufgehoben ist, das heutige Limit, ausgesetzt), wann das Spielen endet (*Ende gegen 16:40*; kommt der Gute-Nacht-Alarm zuerst, zählt der Ring stattdessen bis zu ihm herunter, *45 min bis zum Schlafen*, wie in der letzten Stunde eines Tages ohne Limit), die Schlafenszeit und was passiert, wenn die Zeit um ist;
-- so groß, dass er quer durch den Raum lesbar ist, am Fernseher; sein Text behält seine Größe, egal welche Textgröße eingestellt ist;
+- so groß, dass er quer durch den Raum lesbar ist, am Fernseher; sein Text behält seine Größe, egal welche Textgröße eingestellt ist (nur Titel und Fußzeile folgen ihr, wie auf jedem Bildschirm);
 - in den letzten 5 Minuten (des Spielens oder vor der Schlafenszeit) wird das Ende bernsteinfarben und der Ring pulsiert langsam; die Schlafenszeit wird in ihren letzten 30 bernsteinfarben;
 - Ⓐ und Ⓨ, die Tasten der Eltern, stehen klein oben rechts, sodass die Fußzeile nur die des Kindes zeigt;
 - Ⓐ kehrt mit der Geheimzahl zu den Bildschirmen der Eltern zurück; Ⓨ gibt von dort aus Zusatzzeit, nach der Geheimzahl (die Mengen von *Zusatzzeit*, der Kinderbildschirm bleibt stehen); Ⓑ verlässt PlayGuard (und fragt zuerst, ob der Jugendschutz wieder aktiviert werden soll, wie beim Beenden).

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
+<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -51,7 +51,7 @@ Het uiterlijk van PlayGuard heet Cadran: een smalle balk met iconen voor de tabb
 - **De andere schermen** krijgen dezelfde look: de editor per dag van een profiel toont de week zoals in *Speeltijdtimer* (op dezelfde manier bewerkt, de snelle waarden als tegels); *Geïnstalleerde games controleren* en *Alle games* zetten hun regels in kaarten; *Profielen* en *Hulp en diagnose* geven elke regel een eigen icoon.
 - **Tekstgrootte** (*Voorkeuren*, of **AA** in de kopregel):
   - *Automatisch*, de standaard, maakt alle tekst 25 % groter zolang de console in het dock staat, op de tv, en zet hem terug in handheldmodus; *Groter* houdt hem altijd groter, *Normaal* nooit.
-  - De kopregel, de zijbalk en de voettekst houden hun grootte (ze hebben geen ruimte voor meer), net als de namen van de niveaus in *Beperkingen*, die al groot zijn.
+  - De namen van de tabbladen in de zijbalk groeien mee, ook met 25 %; de titel, het label en de datum van de kopregel en de knopaanwijzingen en de klok van de voettekst groeien iets minder (15 tot 20 %), omdat hun regels al vol zijn. Een naam die in een taal te lang is voor zijn ruimte wordt iets kleiner getekend, nooit kleiner dan op normale grootte, in plaats van afgekapt. De namen van de niveaus in *Beperkingen* houden hun grootte, die al groot zijn.
   - Het verandert meteen, op elk scherm, zonder herstart.
   - De 25 % komen van een 55"-tv in 4K: de kleinste tekst (15 px) is dan 14,6 mm hoog in hoofdletters, 20′ gezichtshoek op 2,5 m, waar lezen comfortabel is (16′ in normale grootte, het absolute minimum).
 - **Visuele effecten** (*Voorkeuren*): *Lichter op de accu*, de standaard, laat de achtergrondgloed weg, het kloppen van de ring op het kinderscherm in de laatste minuten en het glijden van de boog naar een nieuwe waarde, zolang er geen lader is aangesloten (handheld, zonder kabel); *Altijd volledig* houdt ze. Elke 5 seconden opnieuw gelezen, dus de console aansluiten brengt ze terug.
@@ -182,7 +182,7 @@ De console toont "Tijd is om" en onderbreekt daarna de game (geen "doorgaan") of
 *Aan het kind tonen* op *Vandaag*, om de console over te dragen:
 
 - alleen de resterende tijd (zolang ouderlijk toezicht ontgrendeld is, de limiet van vandaag, gepauzeerd), wanneer het spelen eindigt (*Eindigt rond 16:40*; als het bedtijdalarm eerst komt, telt de ring in plaats daarvan daarnaar af, *45 min tot bedtijd*, zoals in het laatste uur van een dag zonder limiet), de bedtijd en wat er gebeurt als de tijd om is;
-- groot genoeg om vanaf de andere kant van de kamer op de tv te lezen; de tekst houdt zijn grootte, welke tekstgrootte ook is ingesteld;
+- groot genoeg om vanaf de andere kant van de kamer op de tv te lezen; de tekst houdt zijn grootte, welke tekstgrootte ook is ingesteld (alleen de titel en de voettekst volgen die, zoals op elk scherm);
 - in de laatste 5 minuten (van het spelen of vóór de bedtijd) wordt het einde oranje en pulseert de ring langzaam; de bedtijd wordt oranje in de laatste 30;
 - Ⓐ en Ⓨ, de knoppen van de ouder, staan klein rechtsboven, zodat de voettekst alleen die van het kind toont;
 - Ⓐ gaat met de pincode terug naar de schermen van de ouder; Ⓨ geeft van daaruit extra tijd, na de pincode (de hoeveelheden van *Extra tijd*, terwijl het kinderscherm blijft staan); Ⓑ sluit PlayGuard af (en vraagt eerst of ouderlijk toezicht weer moet worden ingeschakeld, zoals bij afsluiten).
