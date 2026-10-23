@@ -132,6 +132,11 @@ bool gate_clocks_differ(uint64_t console, bool network_ok, uint64_t network)
     return apart > GATE_CLOCK_SLACK;
 }
 
+bool gate_free_trusted(bool network_ok, bool clocks_differ)
+{
+    return network_ok && !clocks_differ;
+}
+
 static bool valid(const GateHours *h)
 {
     return h && (h->days & 0x7F) && !(h->days & 0x80) && h->from <= 1440 && h->to <= 1440 && h->from != h->to;
@@ -458,6 +463,70 @@ static bool entry_of(const char *line, size_t n, unsigned *streak, uint64_t *unt
     return true;
 }
 
+// A steady line: its end on the steady clock, its .nro.
+static bool steady_of(const char *line, size_t n, GateSteady *until, const char **nro, size_t *nro_len)
+{
+    static const char head[] = "steady\t";
+    const size_t h = sizeof(head) - 1;
+    if (n < h + 32 + 1 || memcmp(line, head, h) != 0 || line[h + 32] != '\t') return false;
+    GateSteady st;
+    for (size_t i = 0; i < 32; i++) {
+        const char c = line[h + i];
+        const int v = c >= '0' && c <= '9' ? c - '0' : c >= 'a' && c <= 'f' ? c - 'a' + 10 : -1;
+        if (v < 0) return false;
+        st.source[i / 2] = (uint8_t)(i % 2 ? st.source[i / 2] | v : v << 4);
+    }
+    const char *p = line + h + 33, *end = line + n;
+    uint64_t u;
+    if (!decimal(&p, end, '\t', UINT64_MAX / 10, &u) || p >= end) return false;
+    st.seconds = u;
+    *until = st;
+    *nro = p;
+    *nro_len = (size_t)(end - p);
+    return true;
+}
+
+struct SteadyCtx {
+    const char *nro;
+    size_t      nro_len;
+    bool        found;
+    GateSteady  until;
+};
+static bool steady_line(const char *line, size_t n, void *ctx)
+{
+    struct SteadyCtx *c = (struct SteadyCtx *)ctx;
+    GateSteady st;
+    const char *p;
+    size_t pn;
+    if (steady_of(line, n, &st, &p, &pn) && pn == c->nro_len && memcmp(p, c->nro, pn) == 0) {
+        c->found = true;
+        c->until = st;
+        return false;
+    }
+    return true;
+}
+
+bool gate_pause_steady_find(const char *text, size_t len, const char *nro, GateSteady *until)
+{
+    if (!nro) return false;
+    struct SteadyCtx c = { nro, strlen(nro), false, { { 0 }, 0 } };
+    each_line(text, len, steady_line, &c);
+    if (c.found && until) *until = c.until;
+    return c.found;
+}
+
+bool gate_pause_holds(uint64_t until, uint64_t now, const GateSteady *steady_until, const GateSteady *steady_now,
+                      uint64_t *left)
+{
+    uint64_t by_time = until > now ? until - now : 0, by_steady = 0;
+    if (steady_until && steady_now && memcmp(steady_until->source, steady_now->source, 16) == 0 &&
+        steady_until->seconds > steady_now->seconds)
+        by_steady = steady_until->seconds - steady_now->seconds;
+    const uint64_t l = by_time > by_steady ? by_time : by_steady;
+    if (left) *left = l;
+    return l > 0;
+}
+
 struct FindCtx {
     const char *nro;
     size_t      nro_len;
@@ -521,11 +590,14 @@ static bool copy_line(const char *line, size_t n, void *ctx)
     uint64_t u;
     const char *p;
     size_t pn;
+    GateSteady st;
     if (n >= 5 && memcmp(line, "rule\t", 5) == 0) {
         // Only one that reads as a rule.
         struct RuleCtx r = { { 1001, 0 } };
         rule_line(line, n, &r);
         if (!c->rule || r.rule.tries > 1000) return true;
+    } else if (steady_of(line, n, &st, &p, &pn)) {
+        if (c->skip && pn == c->skip_len && memcmp(p, c->skip, pn) == 0) return true;
     } else if (!entry_of(line, n, &s, &u, &p, &pn)) {
         return true;   // nothing PlayGuard or the gate wrote
     } else if (c->skip && pn == c->skip_len && memcmp(p, c->skip, pn) == 0) {
@@ -554,6 +626,12 @@ size_t gate_pause_update(const char *text, size_t len, const char *nro, GateResu
 size_t gate_pause_update_with(const char *text, size_t len, const char *nro, GateResult r, uint64_t now,
                               const GatePauseRule *carried, char *out, size_t size)
 {
+    return gate_pause_update_steady(text, len, nro, r, now, carried, NULL, out, size);
+}
+
+size_t gate_pause_update_steady(const char *text, size_t len, const char *nro, GateResult r, uint64_t now,
+                                const GatePauseRule *carried, const GateSteady *steady, char *out, size_t size)
+{
     if (!out || size == 0 || !nro || !*nro || strpbrk(nro, "\t\r\n")) return 0;
     out[0] = '\0';
     struct Out o = { out, size, 0, false };
@@ -579,6 +657,22 @@ size_t gate_pause_update_with(const char *text, size_t len, const char *nro, Gat
         if (n > 0) put(&o, line, (size_t)n);
         put(&o, nro, strlen(nro));
         put(&o, "\n", 1);
+        // A pause starting now: its end on the steady clock too, which
+        // moving the time does not move.
+        if (until && steady) {
+            static const char hex[] = "0123456789abcdef";
+            char source[33];
+            for (size_t i = 0; i < 16; i++) {
+                source[2 * i] = hex[steady->source[i] >> 4];
+                source[2 * i + 1] = hex[steady->source[i] & 15];
+            }
+            source[32] = '\0';
+            const int k = snprintf(line, sizeof(line), "steady\t%s\t%llu\t", source,
+                                   (unsigned long long)(steady->seconds + (uint64_t)rule.minutes * 60u));
+            if (k > 0) put(&o, line, (size_t)k);
+            put(&o, nro, strlen(nro));
+            put(&o, "\n", 1);
+        }
     }
     return finish(&o);
 }

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # Compatibilidad
 
 Firmware, Atmosphère y lanzadores compatibles, emuMMC y sysMMC, y cómo se compara PlayGuard con un sysmodule de sustitución. Volver al [README](../../README.md).
@@ -16,7 +16,7 @@ Firmware, Atmosphère y lanzadores compatibles, emuMMC y sysMMC, y cómo se comp
 - **Firmware 23.0.0** — Atmosphère 1.12.0. Los mismos comandos que 23.0.1 en la tabla de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services).
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Todas las funciones.
 
-**Antes de 21.0.0, todo menos el temporizador de juego** — las restricciones, el PIN, el desbloqueo temporal, la actividad, el reloj de red, la aplicación móvil y el historial funcionan. El bloque de ajustes del temporizador (0x44 bytes) solo tiene esta estructura desde 21.0.0, así que PlayGuard desactiva lo que depende de él: los límites diarios, la alarma de hora de dormir, el tiempo extra y el bloqueo de la consola.
+**Antes de 21.0.0, todo menos el temporizador de juego** — las restricciones, el PIN, el desbloqueo temporal, la actividad, el reloj de red, la aplicación móvil y el historial funcionan. El bloque de ajustes del temporizador (0x44 bytes) solo tiene esta estructura desde 21.0.0, así que PlayGuard desactiva lo que depende de él: los límites diarios, la alarma de hora de dormir, el tiempo extra y *Bloquear todos los juegos*.
 
 - **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
 - **Firmware 19.0.x** — Atmosphère 1.8.0

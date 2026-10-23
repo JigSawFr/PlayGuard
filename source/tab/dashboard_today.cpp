@@ -40,35 +40,47 @@ void DashboardTab::show_headline(int today, bool unlocked, const TodayLog& log)
     } else if (!pt.valid || !pt.enabled_valid) {
         ui::set_text(headline, "playguard/dashboard/gauge_unknown"_i18n);
     } else {
-        const uint16_t limit = pt.day_min[today];
-        const int over = pt_logic::over_limit_min(pt, today);
-        if (limit == 0 && (unlocked || pt.enabled)) {
-            // A day without play in words ("0 min (no play)" said it twice).
-            ui::set_text(headline, unlocked ? "playguard/cadran/today/head_unlocked_no_play"_i18n
-                                            : "playguard/cadran/today/head_no_play"_i18n);
-        } else if (limit != PT_DAY_NOLIMIT && unlocked) {
-            // The countdown may be off while unlocked: the limit is on hold.
-            ui::set_text(headline, brls::getStr("playguard/cadran/today/head_unlocked", ui::fmt_minutes(limit)));
-        } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
-            ui::set_text(headline, log.ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_play_time(log.played_s))
-                                          : "playguard/dashboard/gauge_none"_i18n);
-        } else if (pt.restricted_valid && pt.restricted) {
-            ui::set_text(headline, "playguard/dashboard/gauge_reached"_i18n);
-        } else if (over >= 0) {
-            // Past the limit, the console only warning: the time over it.
-            ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_over", ui::fmt_played((uint16_t)(limit + over)),
-                                                ui::fmt_minutes(limit), ui::fmt_played((uint16_t)over)));
-        } else if (pt.remaining_valid && pt.remaining_ns > 0 && limit > 0) {
-            const uint64_t left = (uint64_t)pt.remaining_ns / 60000000000ULL;
-            const uint16_t used = left >= limit ? 0 : (uint16_t)(limit - left);
-            ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_known", ui::fmt_played(used), ui::fmt_minutes(limit)));
-        } else if (log.ok) {
-            // No game counted yet by the timer: the log's figure, marked as an
-            // estimate (it counts PlayGuard opened over a game, for instance).
-            ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_log", ui::fmt_play_time(log.played_s),
-                                                ui::fmt_minutes(limit)));
-        } else {
-            ui::set_text(headline, "playguard/dashboard/gauge_idle"_i18n);
+        const pt_logic::RingState st = pt_logic::ring_state(pt, today, unlocked);
+        const uint16_t limit = st.limit;
+        switch (st.kind) {
+            case pt_logic::RingState::NO_PLAY:
+                // A day without play in words ("0 min (no play)" said it twice).
+                ui::set_text(headline, st.unlocked ? "playguard/cadran/today/head_unlocked_no_play"_i18n
+                                                   : "playguard/cadran/today/head_no_play"_i18n);
+                break;
+            case pt_logic::RingState::FREE:
+                ui::set_text(headline, log.ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_play_time(log.played_s))
+                                              : "playguard/dashboard/gauge_none"_i18n);
+                break;
+            case pt_logic::RingState::ON_HOLD:
+                // The countdown may be off while unlocked: the limit is on hold.
+                ui::set_text(headline, brls::getStr("playguard/cadran/today/head_unlocked", ui::fmt_minutes(limit)));
+                break;
+            case pt_logic::RingState::TIME_UP:
+                if (st.over < 0 || (pt.restricted_valid && pt.restricted)) {
+                    ui::set_text(headline, "playguard/dashboard/gauge_reached"_i18n);
+                } else {
+                    // Past the limit, the console only warning: the time over it.
+                    ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_over", ui::fmt_played((uint16_t)st.played),
+                                                        ui::fmt_minutes(limit), ui::fmt_played((uint16_t)st.over)));
+                }
+                break;
+            case pt_logic::RingState::COUNTING:
+                ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_known", ui::fmt_played((uint16_t)st.played),
+                                                    ui::fmt_minutes(limit)));
+                break;
+            case pt_logic::RingState::IDLE:
+                if (log.ok) {
+                    // No game counted yet by the timer: the log's figure, marked as an
+                    // estimate (it counts PlayGuard opened over a game, for instance).
+                    ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_log", ui::fmt_play_time(log.played_s),
+                                                        ui::fmt_minutes(limit)));
+                } else {
+                    ui::set_text(headline, "playguard/dashboard/gauge_idle"_i18n);
+                }
+                break;
+            case pt_logic::RingState::UNKNOWN:   // said above
+                break;
         }
     }
 }
@@ -81,7 +93,7 @@ void DashboardTab::show_ring(bool unlocked)
     if (brls::Label::getFontScale() > 1.0f) {
         const uint16_t limit = pt.valid ? pt.day_min[today] : PT_DAY_NOLIMIT;
         const std::string value = !pt.valid ? "—"
-                                  : limit == 0 ? "playguard/cadran/today/no_play"_i18n
+                                  : limit == 0 && (unlocked || pt.enabled) ? "playguard/cadran/today/no_play"_i18n
                                   : limit == PT_DAY_NOLIMIT || !pt.enabled ? "playguard/cadran/today/free"_i18n
                                                                            : ui::fmt_minutes(limit);
         // The day in capitals, as the kicker; the limit as everywhere else.
@@ -89,40 +101,40 @@ void DashboardTab::show_ring(bool unlocked)
     } else {
         kicker->setText(cadran::upper(brls::getStr("playguard/cadran/today/kicker", ui::day_name_in_text(today))));
     }
-    float frac = -1.0f;
+    const pt_logic::RingState st = pt_logic::ring_state(pt, today, unlocked);
     std::string left = "—", caption;
-    if (pt.fw_supported && pt.valid && pt.enabled_valid) {
-        const uint16_t limit = pt.day_min[today];
-        const int over = pt_logic::over_limit_min(pt, today);
-        // Unlocked first: the console reports the timer off while
-        // unlocked, though today's limit still stands.
-        if (limit == 0) {
+    switch (st.kind) {
+        case pt_logic::RingState::NO_PLAY:
             // A day without play: said in words, not as "0 min".
-            frac = unlocked ? -1.0f : 1.0f;
             left = "playguard/cadran/today/no_play"_i18n;
-            caption = unlocked ? "playguard/cadran/today/unlocked"_i18n : "playguard/cadran/today/today"_i18n;
-        } else if (unlocked && limit != PT_DAY_NOLIMIT) {
-            left = ui::fmt_minutes(limit);
+            caption = st.unlocked ? "playguard/cadran/today/unlocked"_i18n : "playguard/cadran/today/today"_i18n;
+            break;
+        case pt_logic::RingState::ON_HOLD:
+            left = ui::fmt_minutes(st.limit);
             caption = "playguard/cadran/today/unlocked"_i18n;
-        } else if (limit == PT_DAY_NOLIMIT || !pt.enabled) {
+            break;
+        case pt_logic::RingState::FREE:
             left = "playguard/cadran/today/free"_i18n;
             caption = "playguard/cadran/today/no_limit"_i18n;
-        } else if (over >= 0 || (pt.restricted_valid && pt.restricted)) {
-            frac = 1.0f;
+            break;
+        case pt_logic::RingState::TIME_UP:
             left = ui::fmt_played(0);
             caption = "playguard/cadran/today/time_up"_i18n;
-        } else if (pt.remaining_valid && pt.remaining_ns > 0 && limit > 0) {
-            const uint64_t left_min = (uint64_t)pt.remaining_ns / 60000000000ULL;
-            const uint16_t used = left_min >= limit ? 0 : (uint16_t)(limit - left_min);
-            frac = (float)used / (float)limit;
+            break;
+        case pt_logic::RingState::COUNTING:
             left = ui::fmt_duration_ns((uint64_t)pt.remaining_ns);
             caption = "playguard/cadran/today/left"_i18n;
-        } else {
-            left = ui::fmt_minutes(limit);
+            break;
+        case pt_logic::RingState::IDLE:
+            left = ui::fmt_minutes(st.limit);
             caption = "playguard/cadran/today/today"_i18n;
-        }
+            break;
+        case pt_logic::RingState::UNKNOWN:
+            break;
     }
-    ring->setFraction(frac);
+    // Nothing counted yet: the track alone (the child screen's ring shows it
+    // whole, as the time left).
+    ring->setFraction(st.kind == pt_logic::RingState::IDLE ? -1.0f : st.fraction);
     // Today's extra time, the end of today's limit.
     const uint16_t limit = pt.valid ? pt.day_min[today] : PT_DAY_NOLIMIT;
     const int extra = pt.valid ? pt_flow::extra_today_minutes(pt) : 0;

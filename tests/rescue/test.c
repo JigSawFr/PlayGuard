@@ -1,8 +1,9 @@
 // Host tests for source/core/rescue.c: the request's mode, the report's
 // format and parsing (round trip, any line order, Windows line ends,
 // malformed values refused), and its proof (the challenge, the message the
-// MAC covers, the proof's lines; the MAC itself is libnx's or util/sha256's,
-// tested in tests/dev_builds).
+// MAC covers, how its key is made, the proof's lines; the HMAC itself is
+// libnx's or util/sha256's, tested in tests/dev_builds, and the simulator's
+// MAC against a known answer in tests/sim_backend).
 #include "check.h"
 #include <stdio.h>
 #include <string.h>
@@ -213,7 +214,7 @@ static void test_mac_message(void)
 {
     const RescueReport r = { RescueMode_Unlock, RescueResult_Ok, 0, 1, RescueRequest_Removed };
     char buf[256];
-    const char *want = "playguard-rescue/1\nnonce=000102030405060708090a0bfcfdfeff\n"
+    const char *want = "playguard-rescue/2\nnonce=000102030405060708090a0bfcfdfeff\n"
                        "mode=unlock\nresult=ok\nrc=0x00000000\nunlocks=1\nrequest=removed\n";
     CHECK(rescue_mac_message(&r, NONCE, buf, sizeof(buf)) == strlen(want) && strcmp(buf, want) == 0);
     // A report parsed back from the file gives the same message, whatever
@@ -287,6 +288,64 @@ static void test_proof(void)
     CHECK(!q.present);
 }
 
+// A recording HMAC: each call's key and message, and a MAC made of the call's
+// number, so the second call's key shows it is the first one's output.
+static struct {
+    unsigned calls;
+    uint8_t key[2][40], msg[2][64];
+    size_t key_size[2], msg_size[2];
+} rec;
+
+static void fake_hmac(void *dst, const void *key, size_t key_size, const void *msg, size_t size)
+{
+    const unsigned i = rec.calls < 2 ? rec.calls : 1;
+    rec.calls++;
+    rec.key_size[i] = key_size;
+    memcpy(rec.key[i], key, key_size < sizeof(rec.key[i]) ? key_size : sizeof(rec.key[i]));
+    rec.msg_size[i] = size;
+    memcpy(rec.msg[i], msg, size < sizeof(rec.msg[i]) ? size : sizeof(rec.msg[i]));
+    memset(dst, 0x10 + (int)i, RESCUE_MAC_SIZE);
+}
+
+static void test_proof_mac(void)
+{
+    uint8_t secret[RESCUE_SECRET_SIZE], mac[RESCUE_MAC_SIZE];
+    for (size_t i = 0; i < sizeof(secret); i++) secret[i] = (uint8_t)(0xC0 + i);
+    memset(&rec, 0, sizeof(rec));
+    // The key: HMAC(secret, label + the PIN's digits); then the message
+    // under that key. The PIN is never a key by itself.
+    CHECK(rescue_proof_mac(fake_hmac, secret, "12345678", 8, "msg", 3, mac));
+    CHECK(rec.calls == 2);
+    CHECK(rec.key_size[0] == RESCUE_SECRET_SIZE && memcmp(rec.key[0], secret, sizeof(secret)) == 0);
+    const char *want = "playguard-rescue-key/2\n12345678";
+    CHECK(rec.msg_size[0] == strlen(want) && memcmp(rec.msg[0], want, strlen(want)) == 0);
+    CHECK(rec.key_size[1] == RESCUE_MAC_SIZE && rec.key[1][0] == 0x10 && rec.key[1][31] == 0x10);
+    CHECK(rec.msg_size[1] == 3 && memcmp(rec.msg[1], "msg", 3) == 0 && mac[0] == 0x11);
+    // Only the digits given: a shorter PIN, the rest of its buffer left out.
+    memset(&rec, 0, sizeof(rec));
+    CHECK(rescue_proof_mac(fake_hmac, secret, "1234\0\0\0\0", 4, "m", 1, mac));
+    CHECK(rec.msg_size[0] == strlen("playguard-rescue-key/2\n1234"));
+
+    // Nothing to key with: no MAC, nothing hashed, the MAC zeroed.
+    const uint8_t zeros[RESCUE_SECRET_SIZE] = { 0 };
+    struct {
+        const uint8_t *secret;
+        const char *pin;
+        size_t pin_len;
+    } none[] = { { zeros, "1234", 4 }, { NULL, "1234", 4 }, { secret, "1234", 0 }, { secret, "123456789", 9 },
+                 { secret, NULL, 4 } };
+    for (size_t i = 0; i < sizeof(none) / sizeof(none[0]); i++) {
+        memset(&rec, 0, sizeof(rec));
+        memset(mac, 0x5A, sizeof(mac));
+        CHECK(!rescue_proof_mac(fake_hmac, none[i].secret, none[i].pin, none[i].pin_len, "m", 1, mac));
+        CHECK(rec.calls == 0 && mac[0] == 0 && mac[31] == 0);
+    }
+    memset(mac, 0x5A, sizeof(mac));
+    CHECK(!rescue_proof_mac(NULL, secret, "1234", 4, "m", 1, mac) && mac[0] == 0);
+    CHECK(!rescue_proof_mac(fake_hmac, secret, "1234", 4, NULL, 0, mac) && mac[0] == 0);
+    CHECK(!rescue_proof_mac(fake_hmac, secret, "1234", 4, "m", 1, NULL));
+}
+
 static void test_mac_equal_and_pin_length(void)
 {
     uint8_t a[RESCUE_MAC_SIZE], b[RESCUE_MAC_SIZE];
@@ -322,6 +381,7 @@ int main(void)
     test_nonce();
     test_mac_message();
     test_proof();
+    test_proof_mac();
     test_mac_equal_and_pin_length();
     return CHECK_DONE("rescue request, report and proof assertions passed");
 }

@@ -307,6 +307,7 @@ Result pctl_pin_weak(bool *weak)
 typedef struct {
     const void *msg;
     size_t      size;
+    const u8   *secret;
     u8         *mac;
 } PinMac;
 
@@ -317,8 +318,21 @@ static Result pin_mac(Service *srv, const char *pin, u32 len, void *ctx)
     // The key the recovery sysmodule takes (rescue_pin_length, as it does).
     const size_t n = rescue_pin_length(pin, PIN_BUF, len);
     if (n == 0) return NXM_RC_NO_PIN;
-    hmacSha256CalculateMac(m->mac, pin, n, m->msg, m->size);
-    return 0;
+    return rescue_proof_mac(hmacSha256CalculateMac, m->secret, pin, n, m->msg, m->size, m->mac) ? 0
+                                                                                                 : NXM_RC_STATE_UNKNOWN;
+}
+
+// The console's secret the recovery sysmodule reads too (rescue.h).
+static Result read_secret(u8 out[RESCUE_SECRET_SIZE])
+{
+    Result rc = setsysInitialize();
+    if (R_FAILED(rc)) return rc;
+    Uuid id;
+    rc = setsysGetMiiAuthorId(&id);
+    setsysExit();
+    if (R_SUCCEEDED(rc)) memcpy(out, id.uuid, RESCUE_SECRET_SIZE);
+    secure_zero(&id, sizeof(id));
+    return rc;
 }
 
 Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
@@ -326,11 +340,17 @@ Result pctl_pin_hmac(const void *msg, size_t size, u8 *mac)
     if (!mac) return NXM_RC_INVALID_ARGUMENT;
     memset(mac, 0, 32);
     if (!msg) return NXM_RC_INVALID_ARGUMENT;
-    Result rc = pctl_ops_reinit();
-    if (R_FAILED(rc)) return rc;
-    PinMac m = { msg, size, mac };
+    u8 secret[RESCUE_SECRET_SIZE];
+    Result rc = read_secret(secret);
+    if (R_SUCCEEDED(rc)) rc = pctl_ops_reinit();
+    if (R_FAILED(rc)) {
+        secure_zero(secret, sizeof(secret));
+        return rc;
+    }
+    PinMac m = { msg, size, secret, mac };
     rc = with_pin(pctlGetServiceSession_Service(), pin_mac, &m);
     pctl_ops_exit();
+    secure_zero(secret, sizeof(secret));
     return rc;
 }
 

@@ -13,7 +13,8 @@
 // holds no service and no memory for the rest of the session. An unlock's
 // report carries a proof (core/rescue.h, RescueProof): the challenge PlayGuard
 // left in rescue_nonce, and an HMAC-SHA256 of the report keyed with the stored
-// PIN, which PlayGuard checks before it opens the recovery actions.
+// PIN and a secret of the console that is not on the SD card (its Mii author
+// ID), which PlayGuard checks before it opens the recovery actions.
 //
 // At every boot it also removes atmosphere/contents/<id>/restart_pending,
 // which PlayGuard leaves when it updates the module: the bell says to restart
@@ -31,7 +32,8 @@
 //
 // This needs no applet and no screen, which is why it can run while everything
 // else is blocked. It only reads a PIN the console already stores; it never
-// writes one anywhere (only the MAC made with it). The pctl command IDs and
+// writes one anywhere (only the MAC made with it and the console's secret,
+// which does not give it back). The pctl command IDs and
 // the buffer details (HIPC pointer buffers, the NUL-terminated PIN) are the
 // app's, proven on hardware: the PIN read and the unlock come from
 // source/core/pctl_ops_internal.h.
@@ -128,24 +130,40 @@ static Result pctl_unlock_with_stored_pin(Service* srv)
     return rc;
 }
 
-// The report's proof (core/rescue.h): HMAC-SHA256 of rescue_mac_message,
-// keyed with the stored PIN, read again (1208) here and wiped. False, and
-// *out left absent, when the PIN cannot be read or there is none.
+// The console's secret in the proof's key (core/rescue.h, RESCUE_SECRET_SIZE):
+// set:sys GetMiiAuthorId, which the app reads too. False when it cannot be read.
+static bool read_secret(u8* out)
+{
+    if (R_FAILED(setsysInitialize())) return false;
+    Uuid id;
+    const bool ok = R_SUCCEEDED(setsysGetMiiAuthorId(&id));
+    setsysExit();
+    if (ok) memcpy(out, id.uuid, RESCUE_SECRET_SIZE);
+    secure_zero(&id, sizeof(id));
+    return ok;
+}
+
+// The report's proof (core/rescue.h): rescue_proof_mac of rescue_mac_message,
+// keyed with the stored PIN, read again (1208) here and wiped, and the
+// console's secret. False, and *out left absent, when either cannot be read
+// or there is no PIN.
 static bool sign_report(Service* srv, const RescueReport* r, const u8* nonce, RescueProof* out)
 {
     static char msg[256];
     const size_t m = rescue_mac_message(r, nonce, msg, sizeof(msg));
     if (m == 0) return false;
+    u8 secret[RESCUE_SECRET_SIZE];
+    if (!read_secret(secret)) return false;
     char pin[PIN_BUF];
     size_t n = 0;
     const Result rc = read_stored_pin(srv, pin, &n);
-    const bool ok = R_SUCCEEDED(rc) && n > 0;
+    const bool ok = R_SUCCEEDED(rc) && rescue_proof_mac(hmacSha256CalculateMac, secret, pin, n, msg, m, out->mac);
     if (ok) {
-        hmacSha256CalculateMac(out->mac, pin, n, msg, m);
         memcpy(out->nonce, nonce, RESCUE_NONCE_SIZE);
         out->present = true;
     }
     secure_zero(pin, sizeof(pin));
+    secure_zero(secret, sizeof(secret));
     return ok;
 }
 
