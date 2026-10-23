@@ -441,11 +441,7 @@
             "late": "21:00 至 06:00 之间的游玩"
         },
         "rating": "年龄分级",
-        "rating_blocked": "{} · 当前限制等级下被限制",
-        "qr": "以二维码显示本周摘要",
-        "share_sd": "保存到SD卡…",
-        "qr_body": "用手机相机扫描：最近7天会以文字显示。不会上传任何内容。",
-        "qr_days": "每天"
+        "rating_blocked": "{} · 当前限制等级下被限制"
     },
     "library": {
         "title": "游戏",
@@ -650,6 +646,7 @@
         "no_pin": "请先设置PIN（设置或更改PIN）。",
         "set": "用PIN保护PlayGuard：{}",
         "ask_again": "5分钟后再次要求输入PIN",
+        "pauses": "我在PlayGuard中时暂停家长控制",
         "again_on": {
             "changes": "5分钟后需再次输入。",
             "open": "离开PlayGuard 5分钟后再次显示。"
@@ -1873,7 +1870,6 @@
         "sd_space_detail": "剩余 {} MB：PlayGuard 可能无法保存设置、记录和日志。",
         "week": "最近 7 天：游玩 {}",
         "week_detail": "平均每天 {}。",
-        "week_qr": "显示二维码",
         "week_top": "玩得最多：{}（{}）。",
         "over_limit": "最近 7 天中有 {} 天超过了限制",
         "over_limit_detail": "时间到时主机只会提醒：超过限制后仍可继续游玩（游戏时间 › 时间到时）。",
@@ -2026,7 +2022,7 @@
             "done_day": "完成{}"
         },
         "activity": {
-            "share": "导出或分享",
+            "export": "导出",
             "games": "{} 款游戏",
             "games_one": "1 款游戏",
             "on_limit": "限制 {}",

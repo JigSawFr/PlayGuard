@@ -21,7 +21,8 @@ Each step: what to do, then what must happen. ☐ is to tick.
 
 ## 2. The PIN gate
 
-- ☐ *Ask for the PIN* switched on for sphaira, then start it from the HOME menu: the gate's screen (night blue, *Protected by PlayGuard*, sphaira's icon and name, in the console's language), then the console's PIN screen.
+- ☐ *Ask for the PIN* switched on for sphaira, then start it from the HOME menu: the gate's screen (as PlayGuard's loading screen, *Protected by PlayGuard*, sphaira's icon and name, in PlayGuard's language and theme), then the console's PIN screen.
+- ☐ PlayGuard's *Preferences* set to another language than the console's and to the light theme, then sphaira started again: the gate in that language, on the light theme's white; *Theme* on *System*, it follows the console's theme. B on the PIN screen: how it went laid out as the loading screen, in the same language and theme.
 - ☐ The switch turned off, then ZR within 8 seconds: protected again (the PIN asked first when turning it off).
 - ☐ The PIN entered: sphaira starts. In PlayGuard: *History* has *Forwarder opened with the PIN*, and sphaira's icon has a check.
 - ☐ B on the PIN screen: back to the HOME menu, the gate saying *PIN not entered*, then *Refused today: 1*; once more: *Refused today: 2* while it asks.

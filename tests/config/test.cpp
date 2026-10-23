@@ -283,7 +283,7 @@ static void test_preferences()
     CHECK(d.activity_period == 1 && d.games_grid && !d.check_grid && d.export_format == 0 && d.backup_keep == 0);
     CHECK(d.activity_account == "last" && d.activity_account_last.empty());
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
-    CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again);
+    CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again && !d.pin_pauses);
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
     CHECK(d.effects == "auto");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
@@ -297,9 +297,9 @@ static void test_preferences()
     write_config(R"({"onboarding_at_start": false})");
     config::load();
     CHECK(!config::get().onboarding_at_start);
-    write_config(R"({"pin_lock": "open", "pin_ask_again": true})");
+    write_config(R"({"pin_lock": "open", "pin_ask_again": true, "pin_pauses": true})");
     config::load();
-    CHECK(config::get().pin_lock == "open" && config::get().pin_ask_again);
+    CHECK(config::get().pin_lock == "open" && config::get().pin_ask_again && config::get().pin_pauses);
     write_config(R"({"pin_lock": "off"})");
     config::load();
     CHECK(config::get().pin_lock == "off");   // chosen on purpose: kept

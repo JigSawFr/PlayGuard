@@ -78,6 +78,17 @@ class Mover : public brls::View
         if (t >= 1.0f) this->done = true;
     }
 
+    // Taken off its box (clearViews: a list built again under a line still
+    // rising, as Console › Forwarders' cards) or gone with its screen: the
+    // movement ends now, or the box stays where it was, nearly clear.
+    void willDisappear(bool resetState) override
+    {
+        brls::View::willDisappear(resetState);
+        if (this->done) return;
+        this->apply(1.0f);
+        this->done = true;
+    }
+
   private:
     // The box's own alpha at rest. getAlpha() is the product down from the
     // root: read inside a screen still rising, it is that screen's near

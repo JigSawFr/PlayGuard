@@ -72,7 +72,7 @@ Eine Konsole ohne Internet: Wenn kein Server antwortet, bietet PlayGuard an, die
 | Für heute aufzuhören | *Heute › Für heute beenden*: jetzt, oder in 5 Minuten, um zu speichern. |
 | Das Limit eines Tages zu ändern | *Spielzeit*: Ⓐ auf dem Tag, ↑/↓, dann **+** zum Speichern. |
 | Zwischen Schulzeit und Ferien zu wechseln | *Spielzeit › Profile*; *Geplantes Profil* für einen im Voraus gewählten Zeitraum. |
-| Zu sehen, wer was gespielt hat | *Aktivität*: pro Spiel, pro Benutzerkonto, heute, 7 Tage, insgesamt; Export oder ein QR-Code. |
+| Zu sehen, wer was gespielt hat | *Aktivität*: pro Spiel, pro Benutzerkonto, heute, 7 Tage, insgesamt; Export. |
 | Vorerst alle Spiele zu sperren | *Spielzeit › Alle Spiele sperren*. Ausgeschaltet kommen die vorherigen Limits zurück. |
 | Eine Änderung rückgängig zu machen | **ZR** *Rückgängig* direkt danach, oder jederzeit *Verlauf › Änderungen durch PlayGuard*. |
 | Eine Kopie der Einstellungen zu behalten | *Verlauf › Einstellungen sichern* (nie die Geheimzahl). |

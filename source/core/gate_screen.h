@@ -1,8 +1,9 @@
 // gate_screen — what the PIN gate of a protected forwarder shows around the
-// system's PIN screen (core/gate_nx.h): the homebrew's icon and name,
-// "Protected by PlayGuard", and how it went, on Cadran's night blue with its
-// dial; once it starts, an opening as PlayGuard's loading screen (centred,
-// a bar filling, the mark's arc turning). Drawn into a 32-bit RGBA buffer:
+// system's PIN screen (core/gate_nx.h), as PlayGuard's loading screen in
+// every state: centred, the homebrew's icon and name, "Protected by
+// PlayGuard", then a bar filling while it opens (the mark's arc turning),
+// else how it went in the state's colour; Cadran's dial behind, in
+// PlayGuard's theme (dark or light). Drawn into a 32-bit RGBA buffer:
 // the console's framebuffer, or an image on a computer (tools/gate_preview.c,
 // tests/gate_screen).
 //
@@ -39,15 +40,13 @@ typedef enum {
 #define GATE_RULE_LIMIT  4u   // closed once today's play time is used up: a timer
 
 typedef struct {
-    const unsigned char *brand_font;   // Sora (Latin): "PlayGuard", the badge, the clock
+    const unsigned char *brand_font;   // Sora (Latin): "PlayGuard", the badge, the keys
     const unsigned char *text_font;    // any language (the console's own font): the name, the lines
     const unsigned char *icon_jpeg;    // the homebrew's icon, or NULL
     size_t               icon_size;
     const char          *name;         // UTF-8
     const char          *status;       // the line under the badge, as the state says it
     const char          *hint;         // a smaller one under it, or NULL
-    const char          *footer;       // PlayGuard's tagline, bottom left
-    const char          *clock;        // "21:03", top right, or NULL
     GateScreenState      state;
     // A line under the hint, or NULL: the tries refused today (`note_warn`,
     // amber), or when it starts without the PIN (teal).
@@ -55,8 +54,7 @@ typedef struct {
     int                  note_warn;
     unsigned             rules;        // GATE_RULE_*, 0: none shown
     const char          *badge;        // "Protected by PlayGuard" in its language, or NULL (English)
-    // Ⓐ's and Ⓑ's labels, bottom right in place of the site, as the HOME
-    // menu puts its buttons ("Try again", "HOME menu"); NULL: none.
+    // Ⓐ's and Ⓑ's labels, bottom right, as the HOME menu puts its buttons ("Try again", "HOME menu"); NULL: none.
     const char          *button_a;
     const char          *button_b;
     // The opening (GateScreen_Loading, _Opening, _Free), as PlayGuard's
@@ -64,11 +62,12 @@ typedef struct {
     // PlayGuard's mark turned by `spin` (in turns).
     float                progress;
     float                spin;
+    int                  light;        // PlayGuard's light theme (0: its dark one)
 } GateScreen;
 
 // Draws `s` into `px` (`w` x `h` pixels, `stride` pixels a row, RGBA: R in
-// the lowest byte). The layout is made for 1280 x 720: the text keeps left
-// of the dial, the status and the hint on up to two lines each; a missing
+// the lowest byte). The layout is made for 1280 x 720: the text centred,
+// clear of the dial, the status and the hint on up to two lines each; a missing
 // font draws no text, a missing icon PlayGuard's mark in its place.
 void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *s);
 

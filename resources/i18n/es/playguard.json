@@ -441,11 +441,7 @@
             "late": "Jugado entre las 21:00 y las 06:00"
         },
         "rating": "Clasificación por edad",
-        "rating_blocked": "{} · bloqueado en el nivel actual",
-        "qr": "Resumen de la semana en código QR",
-        "share_sd": "Guardar en la tarjeta SD…",
-        "qr_body": "Escanéalo con la cámara de un teléfono: los últimos 7 días aparecen como texto. Nada pasa por internet.",
-        "qr_days": "Cada día"
+        "rating_blocked": "{} · bloqueado en el nivel actual"
     },
     "library": {
         "title": "Juegos",
@@ -650,6 +646,7 @@
         "no_pin": "Defina primero un PIN («Definir o cambiar el PIN»).",
         "set": "Proteger PlayGuard con el PIN: {}",
         "ask_again": "Volver a pedir el PIN pasados 5 minutos",
+        "pauses": "Pausar el control parental mientras estoy en PlayGuard",
         "again_on": {
             "changes": "Se vuelve a pedir pasados 5 minutos.",
             "open": "Vuelve tras 5 minutos fuera de PlayGuard."
@@ -1873,7 +1870,6 @@
         "sd_space_detail": "Quedan {} MB: PlayGuard podría no poder guardar sus ajustes, su historial ni sus registros.",
         "week": "Últimos 7 días: {} de juego",
         "week_detail": "{} al día de media.",
-        "week_qr": "Mostrar su código QR",
         "week_top": "Lo más jugado: {} ({}).",
         "over_limit": "Se superó el límite {} de los últimos 7 días",
         "over_limit_detail": "Cuando se acaba el tiempo, la consola solo avisa: se sigue jugando pasado el límite (Tiempo de juego › Cuando se acaba el tiempo).",
@@ -2026,7 +2022,7 @@
             "done_day": "Listo el {}"
         },
         "activity": {
-            "share": "Exportar o compartir",
+            "export": "Exportar",
             "games": "{} juegos",
             "games_one": "1 juego",
             "on_limit": "de un límite de {}",

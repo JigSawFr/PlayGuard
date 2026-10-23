@@ -441,11 +441,7 @@
             "late": "Gespeeld tussen 21:00 en 06:00"
         },
         "rating": "Leeftijdsclassificatie",
-        "rating_blocked": "{} · geblokkeerd op het huidige niveau",
-        "qr": "Weekoverzicht als QR-code",
-        "share_sd": "Opslaan op de SD-kaart…",
-        "qr_body": "Scan hem met de camera van een telefoon: de afgelopen 7 dagen verschijnen als tekst. Er gaat niets online.",
-        "qr_days": "Per dag"
+        "rating_blocked": "{} · geblokkeerd op het huidige niveau"
     },
     "library": {
         "title": "Games",
@@ -650,6 +646,7 @@
         "no_pin": "Stel eerst een pincode in (Pincode instellen of wijzigen).",
         "set": "PlayGuard beveiligen met de pincode: {}",
         "ask_again": "Na 5 minuten opnieuw om de pincode vragen",
+        "pauses": "Ouderlijk toezicht pauzeren zolang ik in PlayGuard ben",
         "again_on": {
             "changes": "Na 5 minuten wordt opnieuw gevraagd.",
             "open": "Het komt terug na 5 minuten buiten PlayGuard."
@@ -1873,7 +1870,6 @@
         "sd_space_detail": "Nog {} MB vrij: PlayGuard kan zijn instellingen, geschiedenis en logboeken misschien niet meer opslaan.",
         "week": "Afgelopen 7 dagen: {} gespeeld",
         "week_detail": "Gemiddeld {} per dag.",
-        "week_qr": "QR-code tonen",
         "week_top": "Meest gespeeld: {} ({}).",
         "over_limit": "De limiet is overschreden op {} van de afgelopen 7 dagen",
         "over_limit_detail": "Als de tijd om is, waarschuwt de console alleen: er wordt verder gespeeld na de limiet (Speeltijd › Als de tijd om is).",
@@ -2026,7 +2022,7 @@
             "done_day": "Klaar met {}"
         },
         "activity": {
-            "share": "Exporteren of delen",
+            "export": "Exporteren",
             "games": "{} spellen",
             "games_one": "1 spel",
             "on_limit": "van {} limiet",

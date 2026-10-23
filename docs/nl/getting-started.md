@@ -72,7 +72,7 @@ Een console zonder internet: als geen enkele server antwoordt, biedt PlayGuard a
 | Te stoppen voor vandaag | *Vandaag › Stoppen voor vandaag*: nu, of over 5 minuten om op te slaan. |
 | De limiet van één dag te wijzigen | *Speeltijdtimer*: Ⓐ op de dag, ↑/↓, dan **+** om op te slaan. |
 | Te wisselen tussen schooltijd en vakantie | *Speeltijdtimer › Profielen*; *Gepland profiel* voor een vooraf gekozen periode. |
-| Te zien wie wat speelde | *Activiteit*: per game, per account, vandaag, 7 dagen, altijd; exporteren of een QR-code. |
+| Te zien wie wat speelde | *Activiteit*: per game, per account, vandaag, 7 dagen, altijd; exporteren. |
 | Voorlopig alle games te blokkeren | *Speeltijdtimer › Alle games blokkeren*. Zet je het uit, dan komen de vorige limieten terug. |
 | Een wijziging ongedaan te maken | **ZR** *Ongedaan maken* er direct na, of *Geschiedenis › Wijzigingen via PlayGuard* op elk moment. |
 | Een kopie van de instellingen te bewaren | *Geschiedenis › Back-up van de instellingen maken* (nooit de pincode). |

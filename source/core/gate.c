@@ -256,6 +256,70 @@ unsigned gate_wait_parse(const char *text, size_t len)
     return ms > GATE_WAIT_MAX_MS ? GATE_WAIT_MAX_MS : ms;
 }
 
+int gate_language_of(const char *code, size_t len)
+{
+    // config::LANGUAGES, by libnx's SetLanguage (gate_text.c's order).
+    static const struct {
+        const char *code;
+        int         language;
+    } CODES[] = {
+        { "ja", 0 },  { "en-US", 1 }, { "fr", 2 },       { "de", 3 },       { "it", 4 },  { "es", 5 },
+        { "ko", 7 },  { "nl", 8 },    { "pt", 9 },       { "ru", 10 },      { "fr-CA", 13 }, { "es-419", 14 },
+        { "zh-Hans", 15 }, { "zh-Hant", 16 }, { "pt-BR", 17 },
+    };
+    for (size_t i = 0; code && i < sizeof(CODES) / sizeof(CODES[0]); i++)
+        if (strlen(CODES[i].code) == len && memcmp(CODES[i].code, code, len) == 0) return CODES[i].language;
+    return -1;
+}
+
+// Past the JSON string that opens at json[i] ('"'): the index after its
+// closing quote, 0 when it does not close.
+static size_t past_string(const char *json, size_t len, size_t i)
+{
+    for (i++; i < len; i++) {
+        if (json[i] == '\\') i++;
+        else if (json[i] == '"') return i + 1;
+    }
+    return 0;
+}
+
+void gate_look_parse(const char *json, size_t len, GateLook *out)
+{
+    out->language = -1;
+    out->theme = GateTheme_Dark;
+    if (!json) return;
+    // A key of the top-level object: a string at depth 1 followed by ':';
+    // its value read when it is a string. Nested objects' keys are skipped.
+    int depth = 0;
+    for (size_t i = 0; i < len;) {
+        const char c = json[i];
+        if (c == '{' || c == '[') depth++, i++;
+        else if (c == '}' || c == ']') depth--, i++;
+        else if (c != '"') i++;
+        else {
+            const size_t key = i + 1, end = past_string(json, len, i);
+            if (end == 0) return;
+            i = end;
+            if (depth != 1) continue;
+            const size_t key_len = end - 1 - key;
+            size_t v = end;
+            while (v < len && (json[v] == ' ' || json[v] == '\t' || json[v] == '\r' || json[v] == '\n')) v++;
+            if (v >= len || json[v] != ':') continue;   // a value, not a key
+            for (v++; v < len && (json[v] == ' ' || json[v] == '\t' || json[v] == '\r' || json[v] == '\n');) v++;
+            if (v >= len || json[v] != '"') continue;
+            const size_t val = v + 1, val_end = past_string(json, len, v);
+            if (val_end == 0) return;
+            const size_t val_len = val_end - 1 - val;
+            i = val_end;
+            if (key_len == 8 && memcmp(json + key, "language", 8) == 0) out->language = gate_language_of(json + val, val_len);
+            else if (key_len == 5 && memcmp(json + key, "theme", 5) == 0)
+                out->theme = val_len == 5 && memcmp(json + val, "light", 5) == 0    ? GateTheme_Light
+                             : val_len == 6 && memcmp(json + val, "system", 6) == 0 ? GateTheme_System
+                                                                                    : GateTheme_Dark;
+        }
+    }
+}
+
 size_t gate_log_format(const char *when, GateResult r, const char *nro, char *buf, size_t size)
 {
     if (!buf || size == 0) return 0;

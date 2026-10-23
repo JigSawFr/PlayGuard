@@ -10,7 +10,7 @@
 #   make test         -> host unit tests (plain gcc/g++, ASan + UBSan + libstdc++'s assertions; parallel, all suites)
 #   make check        -> make test, then the resource checks and compat.json
 #   make fuzz         -> libFuzzer runs of the parsers (clang; FUZZ_SECONDS=30 each, parallel)
-#   make gate-preview -> build/gate-preview/*.png    (the PIN gate's screen, one per state; GATE_LANG=n)
+#   make gate-preview -> build/gate-preview/*.png    (the PIN gate's screen, one per state; GATE_LANG=n, GATE_THEME=light)
 #   make nxlink       -> push to a Switch running hbmenu (press Y there first)
 #
 # GL=1 builds the Switch .nro with OpenGL (mesa) instead of deko3d.
@@ -88,7 +88,7 @@ gate-preview:
 	@$(CC) -std=gnu11 -O2 -Isource/core -Iextern/stb -isystem extern/borealis/library/include tools/gate_preview.c source/core/gate.c \
 		source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c extern/stb/stb_image_write.c -lm \
 		-o build/gate-preview/gate_preview
-	@build/gate-preview/gate_preview build/gate-preview $(or $(GATE_LANG),1)
+	@build/gate-preview/gate_preview build/gate-preview $(or $(GATE_LANG),1) $(or $(GATE_THEME),dark)
 
 dist-rescue: rescue
 	@echo making rescue dist ...

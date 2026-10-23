@@ -140,9 +140,6 @@ void info(const std::string& body);
 // A web page to open on a phone: `body`, the QR code of `url`, then `url`
 // itself, shortened (text::short_url), and OK.
 void qr_dialog(const std::string& body, const std::string& url);
-// The same for a text to read on a phone (not a link): larger, without the
-// line under the code.
-void qr_text_dialog(const std::string& body, const std::string& text);
 
 // A list of checks in a dialog: each line with its mark (a teal check for
 // what is ready, an amber or coral triangle for what is not, a grey dot for

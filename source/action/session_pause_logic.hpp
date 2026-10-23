@@ -9,6 +9,7 @@ namespace session_pause_logic
 
 struct Inputs
 {
+    bool enabled = false;      // the parent asked for it (config pin_pauses, off by default)
     bool pin_holds = false;    // the parent's PIN entered in this run, and it still holds (pin_lock)
     bool in_focus = false;     // PlayGuard has the screen (not the HOME menu, nor sleep)
     int holds = 0;             // screens open during which play counts as usual (the child's, the lock screen)
