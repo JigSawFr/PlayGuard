@@ -236,6 +236,10 @@ format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/exter
 cadran_text_SRC   := source/ui/cadran_text.cpp tests/cadran_text/test.cpp
 contrast_SRC      := tests/contrast/test.cpp
 cadran_text_FLAGS := $(format_text_FLAGS)
+forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp source/action/forwarders_text.cpp tests/forwarders_text/test.cpp
+forwarders_text_FLAGS := $(format_text_FLAGS)
+forwarders_text_CSRC   := source/core/calendar.c
+forwarders_text_CFLAGS := -std=gnu11 -Isource/core
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_CSRC   := source/core/gamecheck_rules.c
 game_check_text_CFLAGS := -std=gnu11 -Isource/core

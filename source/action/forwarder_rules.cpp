@@ -9,6 +9,7 @@
 
 #include "action/forwarder_flow_shared.hpp"
 #include "action/forwarder_rules_logic.hpp"
+#include "action/forwarders_text.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -226,19 +227,12 @@ void lift_pause(const forwarders_logic::Row& row, std::function<void(bool)> done
 
 std::string hours_label(const Hours& h)
 {
-    std::string out = hours_label(h.days, h.from, h.to);
-    if (h.days && h.days2) out += ", " + hours_label(h.days2, h.from2, h.to2);
-    return out;
+    return forwarders_text::hours_label(h.days, h.from, h.to, h.days2, h.from2, h.to2);
 }
 
 std::string hours_label(int days, int from, int to)
 {
-    const std::vector<std::string> names = {
-        "playguard/forwarders/day_sun"_i18n, "playguard/forwarders/day_mon"_i18n, "playguard/forwarders/day_tue"_i18n,
-        "playguard/forwarders/day_wed"_i18n, "playguard/forwarders/day_thu"_i18n, "playguard/forwarders/day_fri"_i18n,
-        "playguard/forwarders/day_sat"_i18n,
-    };
-    return forwarders_logic::hours_text(days, from, to, names);
+    return forwarders_text::hours_label(days, from, to);
 }
 
 std::vector<forwarders_logic::Refusals> take_log()
@@ -283,11 +277,7 @@ void show_week()
     const std::vector<gate_tally::Week> week = gate_tally::week(read_tally(), today);
     std::vector<ui::CheckLine> lines;
     const std::vector<forwarders::Made> made = forwarders::list();
-    const std::vector<std::string> day_names = {
-        "playguard/forwarders/day_sun"_i18n, "playguard/forwarders/day_mon"_i18n, "playguard/forwarders/day_tue"_i18n,
-        "playguard/forwarders/day_wed"_i18n, "playguard/forwarders/day_thu"_i18n, "playguard/forwarders/day_fri"_i18n,
-        "playguard/forwarders/day_sat"_i18n,
-    };
+    const std::vector<std::string> day_names = forwarders_text::day_names();
     for (const gate_tally::Week& w : week) {
         std::string name = forwarders_logic::file_title(w.nro);
         for (const forwarders::Made& m : made)

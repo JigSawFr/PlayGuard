@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "action/forwarder_flow.hpp"
+#include "action/forwarders_text.hpp"
 #include "action/game_icons.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "activity/icon_sheet.hpp"
@@ -28,19 +29,30 @@ using forwarders_logic::State;
 namespace
 {
 
-std::string state_only(const Row& r)
+using forwarders_text::state_only;
+
+// When its pause ends, for the texts below ("" when not paused).
+std::string until(const Row& r)
 {
-    switch (r.state) {
-        case State::Ready:        return "playguard/forwarders/state_ready"_i18n;
-        case State::NroMissing:   return "playguard/forwarders/state_nro_missing"_i18n;
-        case State::GateMissing:  return "playguard/forwarders/state_gate_missing"_i18n;
-        case State::NotInstalled: return "playguard/forwarders/state_not_installed"_i18n;
-        case State::Elsewhere:    return "playguard/forwarders/state_elsewhere"_i18n;
-    }
-    return "";
+    return r.paused_until ? forwarder_flow::until_label(r.paused_until) : "";
 }
 
-std::string state_text_pin(const Row& r, bool full);
+std::string state_text(const Row& r, bool full = false)
+{
+    return forwarders_text::state_text(r, until(r), full);
+}
+
+std::string list_text(const Row& r)
+{
+    return forwarders_text::list_text(r, until(r));
+}
+
+std::vector<GameCell::Mark> list_marks(const Row& r)
+{
+    std::vector<GameCell::Mark> out;
+    for (const forwarders_text::Mark& m : forwarders_text::list_marks(r)) out.push_back({ m.icon, m.color_key });
+    return out;
+}
 
 // A box of the grouped list: the focus coming from below goes to its last
 // line, from above to its first (borealis' own: the line focused last),
@@ -66,67 +78,6 @@ class Nearest : public Base
         return nullptr;
     }
 };
-
-// Its state, and whether it asks for the PIN (and when it does not); a
-// protected menu seen working through its gate. In the list (`full` false)
-// a forwarder with more than one rule says so in a word: Details has them.
-std::string state_text(const Row& r, bool full = false)
-{
-    if (!r.pin) return state_only(r);
-    if (r.verified && forwarders_logic::is_menu(r.nro))
-        return state_text_pin(r, full) + " · " + "playguard/forwarders/state_verified"_i18n;
-    return state_text_pin(r, full);
-}
-
-// Protected: the PIN, and when it is not asked.
-std::string state_text_pin(const Row& r, bool full)
-{
-    std::string out = state_only(r) + " · ";
-    // Paused after refused PINs: that first, it is what the child sees now.
-    if (r.paused_until) return out + brls::getStr("playguard/forwarders/state_paused", forwarder_flow::until_label(r.paused_until));
-    // Made before it carried its rules: its free hours wait for it to be made again.
-    const std::string remake = r.carried ? "" : " · " + "playguard/forwarders/state_remake"_i18n;
-    const int rules = (r.free_days ? 1 : 0) + (r.closed_days ? 1 : 0) + (r.limit ? 1 : 0);
-    if (!full && rules > 1) return out + "playguard/forwarders/state_pin_rules"_i18n + remake;
-    const forwarder_flow::Hours free = { r.free_days, r.free_from, r.free_to, r.free2_days, r.free2_from, r.free2_to };
-    out += !r.free_days ? "playguard/forwarders/state_pin"_i18n
-                        : brls::getStr("playguard/forwarders/state_pin_hours", forwarder_flow::hours_label(free));
-    if (r.closed_days)
-        out += " · " + brls::getStr("playguard/forwarders/state_closed",
-                                    forwarder_flow::hours_label(r.closed_days, r.closed_from, r.closed_to));
-    if (r.limit) out += " · " + "playguard/forwarders/state_limit"_i18n;
-    return out + remake;
-}
-
-// In the list, a protected forwarder's rules are icons (list_marks), so its
-// text is only what they cannot say: a state other than ready, the pause's
-// end, made before it carried its rules.
-std::string list_text(const Row& r)
-{
-    if (!r.pin) return state_only(r);
-    std::string out = r.state == State::Ready ? "" : state_only(r);
-    const auto add = [&out](const std::string& part) { out += (out.empty() ? "" : " · ") + part; };
-    if (r.paused_until) add(brls::getStr("playguard/forwarders/state_paused", forwarder_flow::until_label(r.paused_until)));
-    else if (!r.carried) add("playguard/forwarders/state_remake"_i18n);
-    return out;
-}
-
-// One icon per thing turned on: the PIN (a key), hours without it (open
-// lock), hours it never opens (stop), closed once today's time is used up
-// (timer); paused after refused PINs, only that, as state_text_pin says.
-std::vector<GameCell::Mark> list_marks(const Row& r)
-{
-    if (!r.pin) return {};
-    std::vector<GameCell::Mark> out = { { "key", "cadran/teal" } };
-    if (r.paused_until) {
-        out.push_back({ "pause", "cadran/amber" });
-        return out;
-    }
-    if (r.free_days) out.push_back({ "unlock", "cadran/teal" });
-    if (r.closed_days) out.push_back({ "stop", "cadran/teal" });
-    if (r.limit) out.push_back({ "timer", "cadran/teal" });
-    return out;
-}
 
 // Under the protected ones: what each icon at their lines' end says, those
 // shown only (`used`: their icons' names).
