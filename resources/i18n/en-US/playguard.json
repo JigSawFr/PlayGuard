@@ -2087,7 +2087,6 @@
         "date": "{1} {0}",
         "cell": "Scheduled profile",
         "note": "A profile for a period (holidays, a trip): PlayGuard offers to put it in force when the period begins, and the limits from before back once it is over, when it is opened.",
-        "none": "None",
         "value": "{} · {} to {}",
         "pick_profile": "Profile for the period",
         "pick_from": "First day",
@@ -2106,7 +2105,9 @@
         "keep_remove": "Keep these limits and remove it",
         "change": "Change…",
         "remove": "Remove it",
-        "removed": "Scheduled profile removed."
+        "removed": "Scheduled profile removed.",
+        "soon": "Soon",
+        "soon_note": "Coming with the MQTT bridge (Home Assistant): PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself. A home automation will do it, from a calendar or the school holidays."
     },
     "sigpatch": {
         "set_aside": "Set the sigpatch files aside",

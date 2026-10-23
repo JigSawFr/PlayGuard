@@ -25,9 +25,15 @@ void ProfilesActivity::onContentAvailable()
         return true;
     });
     // A profile for a period (holidays): offered when it begins, the limits
-    // from before once it is over.
+    // from before once it is over. PlayGuard acts only while it is open, so
+    // a new one waits for the MQTT bridge (Home Assistant) to switch it on
+    // the day; one set by an earlier version can still be changed or ended.
     schedule_note->setSingleLine(false);
     schedule->registerClickAction([this](brls::View*) {
+        if (schedule_flow::summary().empty()) {
+            ui::info("playguard/schedule/soon_note"_i18n);
+            return true;
+        }
         schedule_flow::choose([this]() {
             // The profile put in force, or the limits back: the list's mark too.
             pctl_play_timer_query(&this->live);
@@ -37,16 +43,24 @@ void ProfilesActivity::onContentAvailable()
         });
         return true;
     });
-    this->show_schedule();
     pctl_play_timer_query(&this->live);
     cadran::List(this->getContentView(), true).apply({ { "pf_save", "save" }, { "pf_new", "plus" }, { "pf_schedule", "calendar" } });
+    this->show_schedule();   // after the list's look: its colour stays
     this->rebuild();
 }
 
 void ProfilesActivity::show_schedule()
 {
     const std::string s = schedule_flow::summary();
-    schedule->setDetailText(ui::opens(s.empty() ? "playguard/schedule/none"_i18n : s));
+    if (s.empty()) {
+        schedule->setDetailText("playguard/schedule/soon"_i18n);
+        schedule->setDetailTextColor(cadran::kit::color("cadran/amber"));
+        schedule_note->setText("playguard/schedule/soon_note"_i18n);
+        return;
+    }
+    schedule->setDetailText(ui::opens(s));
+    schedule->setDetailTextColor(cadran::kit::color("cadran/text2"));
+    schedule_note->setText("playguard/schedule/note"_i18n);
 }
 
 void ProfilesActivity::rebuild(const std::string& focus_file)

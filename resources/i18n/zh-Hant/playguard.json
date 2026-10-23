@@ -2087,7 +2087,6 @@
         "date": "{1}{0}日",
         "cell": "排定的設定檔",
         "note": "為一段時間（假期、旅行）設定的設定檔：開啟 PlayGuard 時，會在開始時提議套用，結束後提議改回之前的上限。",
-        "none": "無",
         "value": "{} · {} 至 {}",
         "pick_profile": "這段時間的設定檔",
         "pick_from": "第一天",
@@ -2106,7 +2105,9 @@
         "keep_remove": "保留目前上限並移除排程",
         "change": "變更…",
         "remove": "移除",
-        "removed": "已移除排定的設定檔。"
+        "removed": "已移除排定的設定檔。",
+        "soon": "即將推出",
+        "soon_note": "將隨 MQTT 橋接（Home Assistant）推出：PlayGuard 只在開啟時執行，因此無法在指定的日子自行切換設定檔。家庭自動化會依據行事曆或學校假期來切換。"
     },
     "sigpatch": {
         "set_aside": "將Sigpatch檔案移到一旁",
