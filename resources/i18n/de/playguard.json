@@ -321,7 +321,6 @@
             "section_presets": "Schnell ausfüllen",
             "weekdays": "Montag bis Freitag festlegen…",
             "weekend": "Samstag und Sonntag festlegen…",
-            "copy_today": "{} auf alle Tage kopieren",
             "copy_today_body": "Das Limit von {} ({}) für alle Tage verwenden?",
             "copy_today_confirm": "Kopieren",
             "revert": "Änderungen verwerfen",
@@ -702,6 +701,21 @@
         "note_unconfirmed": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Ausgesperrt? Legen Sie die RESCUE-Datei wieder auf die SD-Karte, mit installiertem Wiederherstellungs-Sysmodul, und starten Sie die Konsole neu.",
         "note_old_module": "Ohne Geheimzahl kann hier nichts geändert werden, und PlayGuard öffnet sich wie gewohnt. Aktualisieren Sie das Modul an einem Computer: Entpacken Sie playguard-rescue.zip von PlayGuard {} ins Stammverzeichnis der SD-Karte, legen Sie die RESCUE-Datei wieder darauf und starten Sie die Konsole neu."
     },
+    "tiles": {
+        "games": "Installierte Spiele",
+        "upload": "Bericht senden…",
+        "weekdays": "Montag bis Freitag…",
+        "weekend": "Wochenende…",
+        "copy_today": "{} auf alle kopieren",
+        "text_size_auto": "Auto: größer am TV",
+        "text_size": "Textgröße",
+        "start_tab": "Start-Tab",
+        "themes": {
+            "system": "System",
+            "light": "Hell",
+            "dark": "Dunkel"
+        }
+    },
     "tools": {
         "section_diag": "Diagnose",
         "section_tools": "Werkzeuge",
@@ -816,7 +830,6 @@
         "update_last": "Zuletzt geprüft: {}",
         "flag_read_only": "schreibgeschützt",
         "flag_dev": "Entwickler",
-        "upload": "Bericht online senden…",
         "upload_note": "Sendet einen Bericht in einen geheimen Gist Ihres GitHub-Kontos (bei Bedarf zuerst anmelden) und zeigt seinen Link mit einem QR-Code: Geben Sie ihn an die Person weiter, die Ihnen hilft, oder eröffnen Sie damit einen Fehlerbericht.",
         "storage_note_emummc": "Dies ist die emuMMC: Die sysMMC hat eigene Altersbeschränkungen, die PlayGuard von hier aus nicht sieht. Legen Sie sie dort ebenfalls fest oder blenden Sie das Startmenü von hekate aus.",
         "storage_note_sysmmc": "Dies ist die sysMMC, und auf dieser SD-Karte ist eine emuMMC eingerichtet: Sie hat eigene Altersbeschränkungen, die PlayGuard von hier aus nicht sieht. Legen Sie sie dort ebenfalls fest oder blenden Sie das Startmenü von hekate aus.",

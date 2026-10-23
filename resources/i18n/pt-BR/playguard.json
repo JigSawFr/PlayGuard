@@ -321,7 +321,6 @@
             "section_presets": "Preenchimento rápido",
             "weekdays": "Definir de segunda a sexta…",
             "weekend": "Definir sábado e domingo…",
-            "copy_today": "Copiar {} para todos os dias",
             "copy_today_body": "Usar o limite de {} ({}) em todos os dias?",
             "copy_today_confirm": "Copiar",
             "revert": "Descartar alterações",
@@ -702,6 +701,21 @@
         "note_unconfirmed": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como de costume. Sem acesso? Coloque o arquivo RESCUE de volta no cartão SD, com o sysmodule de recuperação instalado, e reinicie o console.",
         "note_old_module": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como de costume. Atualize o módulo em um computador: extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD, coloque o arquivo RESCUE de volta e reinicie o console."
     },
+    "tiles": {
+        "games": "Jogos instalados",
+        "upload": "Enviar um relatório…",
+        "weekdays": "Segunda a sexta…",
+        "weekend": "Fim de semana…",
+        "copy_today": "Copiar {} para todos",
+        "text_size_auto": "Auto: maior na TV",
+        "text_size": "Texto",
+        "start_tab": "Abrir em",
+        "themes": {
+            "system": "Sistema",
+            "light": "Claro",
+            "dark": "Escuro"
+        }
+    },
     "tools": {
         "section_diag": "Diagnóstico",
         "section_tools": "Ferramentas",
@@ -816,7 +830,6 @@
         "update_last": "Última verificação: {}",
         "flag_read_only": "somente leitura",
         "flag_dev": "desenvolvedor",
-        "upload": "Enviar um relatório online…",
         "upload_note": "Envia um relatório para um gist secreto da sua conta do GitHub (faça login antes, se precisar) e mostra o link com um QR code: passe-o para quem está ajudando ou abra um relatório de bug com ele.",
         "storage_note_emummc": "Você está na emuMMC: a sysMMC tem seu próprio controle dos pais, que o PlayGuard não consegue ver daqui. Configure-o lá também ou oculte o menu de inicialização do hekate.",
         "storage_note_sysmmc": "Você está na sysMMC e há uma emuMMC configurada neste cartão SD: ela tem seu próprio controle dos pais, que o PlayGuard não consegue ver daqui. Configure-o lá também ou oculte o menu de inicialização do hekate.",
