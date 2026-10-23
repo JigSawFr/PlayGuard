@@ -174,23 +174,18 @@ struct GameCheckActivity::Removal
     bool cancel = false;
     bool open = true;   // the dialog is on screen
     brls::Dialog* dialog = nullptr;
-    // Centred, as the full check's: the covers leafed through, a bar, the
-    // game's place in the batch, its name, how many were removed and not,
-    // and what stays.
+    // As the data check's: its heading the game's place in the batch, its
+    // title the game's name, under the bar how many were removed and not,
+    // its note what stays; a batch's covers leafed through above.
+    cadran::Progress body;
     CoverStrip* strip = nullptr;
-    LoadingBar* bar = nullptr;
-    brls::Label* title = nullptr;
-    brls::Label* name = nullptr;
-    brls::Label* counts = nullptr;
 };
 
-// A line of a centred dialog: `size` px in `color_key`, as wide as the
-// dialog (centred text wraps there, or is cut on one line).
-static brls::Label* centred(const std::string& text, float size, const char* color_key, float top)
+// A line of the removal's summary: `size` px in `color_key`, `top` px
+// below the one before.
+static brls::Label* line(const std::string& text, float size, const char* color_key, float top)
 {
     brls::Label* label = cadran::kit::label(text, size, color_key);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    label->setAlignSelf(brls::AlignSelf::STRETCH);
     label->setMarginTop(top);
     return label;
 }
@@ -221,31 +216,13 @@ void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
             removal->games = games;
             removal->path = path;
             const std::string file = path.substr(path.find_last_of('/') + 1);
-            auto* box = new brls::Box(brls::Axis::COLUMN);
-            box->setAlignItems(brls::AlignItems::CENTER);
-            box->setPadding(30, 36, 22, 36);
-            std::vector<u64> ids;
-            for (const GameFacts& g : games) ids.push_back(g.app_id);
-            removal->strip = new CoverStrip();
-            removal->strip->setFocusable(false);   // Cancel keeps it
-            removal->strip->setHeight(112);
-            removal->strip->setAlignSelf(brls::AlignSelf::STRETCH);
-            removal->strip->set_games(ids);
-            box->addView(removal->strip);
-            removal->bar = new LoadingBar();
-            removal->bar->setHeight(6);
-            removal->bar->setWidth(360);
-            removal->bar->setMarginTop(20);
-            box->addView(removal->bar);
-            removal->title = centred("", 20, "cadran/text", 12);
-            box->addView(removal->title);
-            removal->name = centred("", 16, "cadran/text2", 2);
-            removal->name->setSingleLine(true);   // a long name is cut, not wrapped over the dialog
-            box->addView(removal->name);
-            removal->counts = centred("", 15, "cadran/text3", 6);
-            box->addView(removal->counts);
-            box->addView(centred(brls::getStr("playguard/games/remove_note", file), 14, "cadran/text3", 14));
-            removal->dialog = new brls::Dialog(box);
+            removal->body = cadran::progress_body("", "", brls::getStr("playguard/games/remove_note", file));
+            if (games.size() > 1) {
+                std::vector<u64> ids;
+                for (const GameFacts& g : games) ids.push_back(g.app_id);
+                removal->strip = cover_strip_above(removal->body, ids);
+            }
+            removal->dialog = new brls::Dialog(removal->body.box);
             ui::add_cancel(removal->dialog, [removal]() {
                 removal->cancel = true;
                 removal->open = false;   // the dialog closes itself
@@ -262,32 +239,25 @@ void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
 // games left by name (in coral), what stays and where their list is.
 void GameCheckActivity::removal_summary(const Removal& r)
 {
+    // Laid out as the progress it follows (cadran::progress_body): the
+    // heading small, the outcome as the title, then the games left and the
+    // note.
     auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
-    box->setPadding(30, 36, 22, 36);
-    // A warning in a soft coral circle: not everything went.
-    auto* circle = new brls::Box(brls::Axis::ROW);
-    circle->setWidth(64);
-    circle->setHeight(64);
-    circle->setCornerRadius(32);
-    circle->setBackgroundColor(brls::Application::getTheme()["cadran/coral_soft"]);
-    circle->setAlignItems(brls::AlignItems::CENTER);
-    circle->setJustifyContent(brls::JustifyContent::CENTER);
-    circle->addView(cadran::kit::icon(r.cancel ? "pause" : "alert", 28, "cadran/coral"));
-    box->addView(circle);
-    box->addView(centred(r.cancel ? "playguard/games/remove_stopped"_i18n : "playguard/games/remove_finished"_i18n, 16,
-                         "cadran/text3", 16));
+    box->setAlignItems(brls::AlignItems::STRETCH);
+    box->setPadding(26, 36, 20, 36);
+    box->addView(line(r.cancel ? "playguard/games/remove_stopped"_i18n : "playguard/games/remove_finished"_i18n, 18,
+                      "cadran/text3", 0));
     const std::string summary = r.removed == 1
                                     ? brls::getStr("playguard/games/remove_summary_one", (int)r.games.size())
                                     : brls::getStr("playguard/games/remove_summary", (int)r.removed, (int)r.games.size());
-    box->addView(centred(summary, 22, "cadran/text", 2));
+    box->addView(line(summary, 22, "cadran/text", 6));
     if (!r.failed.empty()) {
-        box->addView(centred(brls::getStr("playguard/games/remove_count_err", (int)r.failed.size()), 17, "cadran/coral", 16));
+        box->addView(line(brls::getStr("playguard/games/remove_count_err", (int)r.failed.size()), 18, "cadran/coral", 18));
         std::string names = game_check_text::name_lines(r.failed, words());
         if (!names.empty() && names[0] == '\n') names.erase(0, 1);
-        box->addView(centred(names, 16, "cadran/text2", 4));
+        box->addView(line(names, 17, "cadran/text2", 4));
     }
-    box->addView(centred(brls::getStr("playguard/games/remove_note", r.path), 14, "cadran/text3", 16));
+    box->addView(line(brls::getStr("playguard/games/remove_note", r.path), 15.5f, "cadran/text3", 18));
     brls::Dialog* dialog = ui::box_dialog(box);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
@@ -322,12 +292,17 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
         return;
     }
     const GameFacts& g = games[at];
-    removal->strip->set_done((u32)at);
-    cover_strip_read(removal->strip);
-    removal->bar->setProgress((float)at / (float)total);
-    removal->title->setText(total == 1 ? "playguard/games/remove_title"_i18n
-                                       : brls::getStr("playguard/games/remove_title_n", (int)at + 1, (int)total));
-    removal->name->setText(game_name(g));
+    if (removal->strip) {
+        removal->strip->set_done((u32)at);
+        cover_strip_read(removal->strip);
+    } else {
+        const std::vector<unsigned char> icon = icon_of(g.app_id);
+        if (!icon.empty()) removal->body.image->setImageFromMem(icon.data(), (int)icon.size());
+    }
+    ui::set_visible(removal->body.image, !removal->strip);
+    removal->body.heading->setText(total == 1 ? "playguard/games/remove_title"_i18n
+                                              : brls::getStr("playguard/games/remove_title_n", (int)at + 1, (int)total));
+    removal->body.title->setText(game_name(g));
     const u32 removed = removal->removed;
     const size_t failed = removal->failed.size();
     std::string detail = removed == 1 ? "playguard/games/remove_done_one"_i18n
@@ -336,9 +311,8 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
     if (failed)
         detail += (detail.empty() ? "" : " · ") + (failed == 1 ? "playguard/games/remove_failed_one"_i18n
                                                                : brls::getStr("playguard/games/remove_failed", (int)failed));
-    removal->counts->setText(detail);
-    ui::set_visible(removal->counts, !detail.empty());
-    if (failed) removal->counts->setTextColor(cadran::kit::color("cadran/coral"));
+    removal->body.show((float)at / (float)total, detail);
+    if (failed) removal->body.detail->setTextColor(cadran::kit::color("cadran/coral"));
     // On the UI thread, as the PIN it may ask for: the first game once the
     // dialog is fully on screen, each next one a frame later.
     std::weak_ptr<bool> weak = this->alive;
