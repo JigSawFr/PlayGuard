@@ -47,6 +47,14 @@ CLOCK_AREA = (30, 655, 220, 50)         # x, y, width, height: the clock only (a
 CLOCK_TEXT = "16:00"
 CLOCK_ORIGIN = (55, 692)                # the label's text origin (baseline)
 CLOCK_SIZE = "21.5"                     # brls/hints/time fontSize
+# With Preferences › Text size's larger text, the footer's clock is 1.15
+# times that (HINTS_SCALE, source/ui/cadran_frame.cpp), its baseline a pixel
+# lower: a clock at least this tall (its ink, in pixels; 17 to 19 at the
+# normal size, drawn here or by the app; 20 to 21 at the larger one) is
+# redrawn at that size.
+CLOCK_LARGE_SIZE = "24.725"
+CLOCK_LARGE_ORIGIN = (55, 693)
+CLOCK_LARGE_HEIGHT = 20
 CLOCK_FONT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
                           "extern", "borealis", "resources", "font", "switch_font.ttf")
 INK = 60   # a pixel this far (sum of the RGB differences) from the background is text
@@ -84,8 +92,11 @@ def masked(src, dst):
         # The pixels fully inside a stroke: the text colour.
         far = max(distance(c) for c in ink)
         fg = collections.Counter(c for c in ink if distance(c) >= 0.9 * far).most_common(1)[0][0]
-        cmd += ["-font", CLOCK_FONT, "-pointsize", CLOCK_SIZE, "-fill", hex_colour(fg),
-                "-annotate", f"+{CLOCK_ORIGIN[0]}+{CLOCK_ORIGIN[1]}", CLOCK_TEXT]
+        rows = [y for (_, y), c in px.items() if distance(c) > INK]
+        large = max(rows) - min(rows) + 1 >= CLOCK_LARGE_HEIGHT
+        size, origin = (CLOCK_LARGE_SIZE, CLOCK_LARGE_ORIGIN) if large else (CLOCK_SIZE, CLOCK_ORIGIN)
+        cmd += ["-font", CLOCK_FONT, "-pointsize", size, "-fill", hex_colour(fg),
+                "-annotate", f"+{origin[0]}+{origin[1]}", CLOCK_TEXT]
     subprocess.run(cmd + [dst], check=True)
 
 

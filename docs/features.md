@@ -50,7 +50,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
 - **The other screens** take the same look: a profile's per-day editor shows the week as on *Play timer* (edited the same way, the quick fills as tiles); *Check the installed games* and *All games* put their lines in cards; *Profiles* and *Help & diagnostics* give each line its icon.
 - **Text size** (*Preferences*, or **AA** in the header):
   - *Automatic*, the default, makes every text 25 % bigger while the console is docked, on the TV, and puts it back in handheld mode; *Larger* keeps it bigger, *Normal* never.
-  - The header, the sidebar and the footer keep their size (they have no room for more), and so do the Restrictions levels' names, large already.
+  - The sidebar's tab names grow too, by 25 % as well; the header's title, pill and date and the footer's button hints and clock grow a little less (15 to 20 %), their rows being full already. A name too long for its room in a language is drawn a little smaller, never smaller than in normal size, rather than cut. The Restrictions levels' names keep their size, large already.
   - It changes at once, on every screen, with no restart.
   - The 25 % come from a 55" TV in 4K: the smallest text (15 px) is then 14.6 mm high in capitals, 20′ of arc from 2.5 m, where reading is comfortable (16′ in normal size, the bare minimum).
 - **Visual effects** (*Preferences*): *Lighter on battery*, the default, leaves out the background glow, the beat of the child screen's ring in its last minutes and the arc's sweep to a new value while no charger is connected (handheld, unplugged); *Always full* keeps them. Read again every 5 seconds, so plugging the console in brings them back.
@@ -181,7 +181,7 @@ The console shows "Time's up", then suspends the game (no "continue") or only wa
 *Child view* on *Today*, to hand the console over:
 
 - only the time left (while parental controls are unlocked, today's limit, on hold), when play ends (*Ends around 16:40*; when the bedtime alarm comes first, the ring counts down to it instead, *45 min until bedtime*, as it does in the last hour of a day without a limit), the bedtime and what happens when time is up;
-- sized to be read from across the room, on the TV; its text keeps its size whatever the text size;
+- sized to be read from across the room, on the TV; its text keeps its size whatever the text size (only the title and the footer, as on every screen, follow it);
 - in the last 5 minutes (of play or before the bedtime), the end turns amber and the ring pulses slowly; the bedtime turns amber in its last 30;
 - Ⓐ and Ⓨ, the parent's keys, are said small at the top right, so the footer shows the child's alone;
 - Ⓐ goes back to the parent's screens with the PIN; Ⓨ gives extra time from there, after the PIN (the amounts of *Extra time*, the child screen staying); Ⓑ leaves PlayGuard (asking first to turn parental controls back on, as quitting does).

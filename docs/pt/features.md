@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
+<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Novo no PlayGuard? Comece por [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -51,7 +51,7 @@ O aspeto do PlayGuard chama-se Cadran: uma barra de ícones para os separadores,
 - **Os outros ecrãs** ganham o mesmo aspeto: o editor por dia de um perfil mostra a semana como em *Tempo de jogo* (editada da mesma forma, com os preenchimentos rápidos em mosaicos); *Verificar os jogos instalados* e *Todos os jogos* põem as suas linhas em cartões; *Perfis* e *Ajuda e diagnóstico* dão a cada linha o seu ícone.
 - **Tamanho do texto** (*Preferências*, ou **AA** no cabeçalho):
   - *Automático*, a predefinição, aumenta todos os textos em 25 % enquanto a consola está na base, na TV, e repõe-nos no modo portátil; *Maior* mantém-nos maiores, *Normal* nunca.
-  - O cabeçalho, a barra lateral e o rodapé mantêm o seu tamanho (não têm espaço para mais), tal como os nomes dos níveis de Restrições, que já são grandes.
+  - Os nomes dos separadores da barra lateral também crescem, igualmente 25 %; o título, a etiqueta e a data do cabeçalho e as indicações dos botões e o relógio do rodapé crescem um pouco menos (15 a 20 %), pois as suas linhas já estão cheias. Um nome demasiado longo para o seu espaço numa língua é desenhado um pouco mais pequeno, nunca menos do que no tamanho normal, em vez de ser cortado. Os nomes dos níveis de Restrições mantêm o seu tamanho, que já é grande.
   - A mudança é imediata, em todos os ecrãs, sem reiniciar.
   - Os 25 % vêm de uma TV de 55" em 4K: o texto mais pequeno (15 px) tem então 14,6 mm de altura em maiúsculas, 20′ de arco a 2,5 m, onde a leitura é confortável (16′ no tamanho normal, o mínimo indispensável).
 - **Efeitos visuais** (*Preferências*): *Mais leves com bateria*, a predefinição, deixa de fora o halo de fundo, a pulsação do anel do ecrã da criança nos últimos minutos e o deslizar do arco até um novo valor enquanto nenhum carregador está ligado (modo portátil, sem cabo); *Sempre completos* mantém-nos. É lido de novo a cada 5 segundos, por isso ligar a consola à corrente trá-los de volta.
@@ -182,7 +182,7 @@ A consola mostra "Tempo esgotado" e depois suspende o jogo (sem "continuar") ou 
 *Mostrar à criança* em *Hoje*, para entregar a consola:
 
 - só o tempo restante (enquanto o controlo parental está desbloqueado, o limite de hoje, em pausa), a hora a que o jogo termina (*Termina por volta das 16:40*; quando o alarme de hora de dormir vem primeiro, o anel faz antes a contagem decrescente até ele, *45 min antes de dormir*, como na última hora de um dia sem limite), a hora de dormir e o que acontece quando o tempo acaba;
-- feito para ser lido do outro lado da sala, na TV; o seu texto mantém o tamanho seja qual for o tamanho do texto;
+- feito para ser lido do outro lado da sala, na TV; o seu texto mantém o tamanho seja qual for o tamanho do texto (só o título e o rodapé o seguem, como em todos os ecrãs);
 - nos últimos 5 minutos (de jogo ou antes da hora de dormir), o fim passa a âmbar e o anel pulsa devagar; a hora de dormir passa a âmbar nos seus últimos 30;
 - Ⓐ e Ⓨ, os botões do adulto, aparecem em pequeno no canto superior direito, para que o rodapé mostre só o da criança;
 - Ⓐ volta aos ecrãs do adulto com o PIN; Ⓨ dá tempo extra a partir dali, depois do PIN (as quantidades de *Tempo extra*, sem sair do ecrã da criança); Ⓑ sai do PlayGuard (perguntando primeiro se deve reativar o controlo parental, como ao sair).

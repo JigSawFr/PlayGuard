@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 16b951a8abc6 -->
+<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
 # Recursos
 
 O que cada aba faz, como o PlayGuard grava as configurações com segurança e o que o console conta como tempo de jogo. Novo no PlayGuard? Comece pelos [primeiros passos](getting-started.md). Volte ao [README](../../README.md).
@@ -51,7 +51,7 @@ O visual do PlayGuard se chama Cadran: uma barra de ícones para as abas, uma pa
 - **As outras telas** ganham o mesmo visual: o editor por dia de um perfil mostra a semana como em *Tempo de jogo* (editada do mesmo jeito, com os preenchimentos rápidos em blocos); *Verificar os jogos instalados* e *Todos os jogos* colocam as linhas em cartões; *Perfis* e *Ajuda e diagnóstico* dão a cada linha seu ícone.
 - **Tamanho do texto** (*Preferências*, ou **AA** no cabeçalho):
   - *Automático*, o padrão, aumenta todos os textos em 25 % enquanto o console está na base, na TV, e volta ao normal no modo portátil; *Maior* mantém o texto maior, *Normal* nunca.
-  - O cabeçalho, a barra lateral e o rodapé mantêm o tamanho (não há espaço para mais), assim como os nomes dos níveis de Restrições, que já são grandes.
+  - Os nomes das abas da barra lateral também crescem, igualmente 25 %; o título, a etiqueta e a data do cabeçalho e as dicas de botões e o relógio do rodapé crescem um pouco menos (15 a 20 %), já que as linhas deles estão cheias. Um nome longo demais para o seu espaço em um idioma é desenhado um pouco menor, nunca menor que no tamanho normal, em vez de ser cortado. Os nomes dos níveis de Restrições mantêm o tamanho, que já é grande.
   - A mudança é imediata, em todas as telas, sem reiniciar.
   - Os 25 % vêm de uma TV de 55" em 4K: o menor texto (15 px) tem então 14,6 mm de altura em maiúsculas, 20′ de arco a 2,5 m, onde a leitura é confortável (16′ no tamanho normal, o mínimo indispensável).
 - **Efeitos visuais** (*Preferências*): *Mais leves com bateria*, o padrão, deixa de fora o halo de fundo, a pulsação do anel da tela da criança nos últimos minutos e o deslizar do arco até um novo valor enquanto nenhum carregador estiver conectado (modo portátil, fora da tomada); *Sempre completos* mantém tudo. A configuração é lida de novo a cada 5 segundos, então ligar o console na tomada traz os efeitos de volta.
@@ -182,7 +182,7 @@ O console mostra "Tempo esgotado" e depois suspende o jogo (sem "continuar") ou 
 *Mostrar à criança* em *Hoje*, para entregar o console:
 
 - só o tempo restante (enquanto o controle parental estiver desbloqueado, o limite de hoje, em pausa), quando o jogo termina (*Termina por volta das 16:40*; quando o alarme de hora de dormir vem antes, o anel faz a contagem regressiva até ele, *45 min antes de dormir*, como na última hora de um dia sem limite), a hora de dormir e o que acontece quando o tempo acaba;
-- feita para ser lida do outro lado da sala, na TV; o texto dela mantém o tamanho seja qual for o tamanho do texto;
+- feita para ser lida do outro lado da sala, na TV; o texto dela mantém o tamanho seja qual for o tamanho do texto (só o título e o rodapé o seguem, como em todas as telas);
 - nos últimos 5 minutos (de jogo ou antes da hora de dormir), o fim fica âmbar e o anel pulsa devagar; a hora de dormir fica âmbar nos últimos 30;
 - Ⓐ e Ⓨ, os botões do responsável, aparecem em tamanho pequeno no canto superior direito, para que o rodapé mostre só o da criança;
 - Ⓐ volta às telas do responsável com o PIN; Ⓨ dá tempo extra dali mesmo, depois do PIN (os valores de *Tempo extra*, sem sair da tela da criança); Ⓑ sai do PlayGuard (perguntando antes se deve reativar o controle parental, como ao sair).

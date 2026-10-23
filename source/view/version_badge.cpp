@@ -38,7 +38,7 @@ VersionBadge::VersionBadge()
     auto* number = new brls::Label();
     number->setText(version);
     number->setFontSize(18);
-    number->setFontScaled(false);   // the header has no room for larger text
+    number->setFontScaled(false);   // a tag: the same size with the larger text
     number->setSingleLine(true);
     number->setTextColor(brls::Application::getTheme()["brls/background"]);
     tag->addView(number);
