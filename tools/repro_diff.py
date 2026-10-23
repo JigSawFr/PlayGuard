@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """What differs between two builds of the same commit (CI builds the zips
-twice to check they come out the same, CONTRIBUTING.md "Reproducible zips").
+twice to check they come out the same, docs/contributing/releases.md "Reproducible zips").
 
 Compares <first> and <second>, two folders holding the outputs of a build:
 the zips (entry by entry: name, size, CRC-32), playguard.nro (the bytes that

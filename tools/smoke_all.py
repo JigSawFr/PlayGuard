@@ -10,9 +10,10 @@ default), each on its own X display and D-Bus session
 output in <out-dir>/<scenario>.log.
 
 Then tools/visual_check.py compares each scenario that passed and has
-tests/visual/<scenario>/ with its references. With --update, a scenario
-whose screens changed gets its references replaced (visual_check.py
---update): look at the new images before committing them.
+tests/visual/<scenario>/SCREENS with its references, .visual-refs/<scenario>/
+(main's screens: `tools/visual_refs.py fetch` takes the latest release's,
+or a run's with --run). With --update, this run's screens become the
+local references instead (visual_refs.py keep), to compare the next run with.
 
 It fails when a scenario fails, or when a screen changed (unless --update).
 
@@ -32,7 +33,9 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SMOKE = os.path.join(ROOT, "tools", "desktop_smoke.py")
 VISUAL = os.path.join(ROOT, "tools", "visual_check.py")
-REFERENCES = os.path.join(ROOT, "tests", "visual")
+VISUAL_REFS = os.path.join(ROOT, "tools", "visual_refs.py")
+SCREENS = os.path.join(ROOT, "tests", "visual")
+REFERENCES = os.environ.get("PLAYGUARD_VISUAL_REFS") or os.path.join(ROOT, ".visual-refs")
 DEFAULT = "smoke"   # the scenario run with no argument, as tests/visual/ names it
 XVFB = ["xvfb-run", "-a", "-s", "-screen 0 1280x720x24", "dbus-run-session"]
 
@@ -59,24 +62,30 @@ def run_smoke(out_dir, name):
     return code == 0, time.monotonic() - start
 
 
-def visual_check(shots, reference, update):
+def visual_check(shots, name, update):
     """Compares a scenario's screens with its references. Returns (state,
-    changed screens): state is "ok", "changed" or "updated"."""
-    out = subprocess.run([sys.executable, VISUAL, shots, reference], capture_output=True, text=True)
+    changed screens): state is "ok", "changed", "none" (no references of
+    main's here: `tools/visual_refs.py fetch`) or "updated"."""
+    reference = os.path.join(REFERENCES, name)
+    if update:
+        out = subprocess.run([sys.executable, VISUAL_REFS, "keep", shots, name], capture_output=True, text=True)
+        with open(shots + "-visual.txt", "w") as f:
+            f.write(out.stdout + out.stderr)
+        changed = re.findall(r"^(?:updated|added) (\S+)$", out.stdout, re.M)
+        return ("updated" if out.returncode == 0 else "changed"), changed
+    if not os.path.isdir(reference):
+        return "none", []
+    out = subprocess.run([sys.executable, VISUAL, shots, reference, "--screens", os.path.join(SCREENS, name, "SCREENS"),
+                          "--scenario", name], capture_output=True, text=True)
     with open(shots + "-visual.txt", "w") as f:
         f.write(out.stdout + out.stderr)
     if out.returncode == 0:
         return "ok", []
     m = re.search(r"^visual check: \d+ screen\(s\) changed: (.*)$", out.stdout, re.M)
-    if not m:   # no reference image, an ImageMagick error...: its last line says what
+    if not m:   # an ImageMagick error...: its last line says what
         lines = (out.stdout + out.stderr).strip().splitlines()
         return "changed", [lines[-1] if lines else "visual check failed"]
-    changed = [s.strip() for s in m.group(1).split(",")]
-    if update:
-        subprocess.run([sys.executable, VISUAL, shots, reference, "--update"], check=True,
-                       stdout=subprocess.DEVNULL)
-        return "updated", changed
-    return "changed", changed
+    return "changed", [s.strip() for s in m.group(1).split(",")]
 
 
 def main():
@@ -84,7 +93,7 @@ def main():
     ap.add_argument("out_dir")
     ap.add_argument("scenarios", nargs="*", metavar="scenario", help="only these (default: all of them)")
     ap.add_argument("-j", "--jobs", type=int, default=3, help="scenarios run at the same time (3)")
-    ap.add_argument("--update", action="store_true", help="replace the references of the screens that changed")
+    ap.add_argument("--update", action="store_true", help="make this run's screens the local references")
     ap.add_argument("--dry-run", action="store_true", help="print the scenarios and their commands, run nothing")
     args = ap.parse_args()
 
@@ -97,8 +106,8 @@ def main():
 
     if args.dry_run:
         for name in todo:
-            ref = os.path.join(REFERENCES, name)
-            check = f"   then visual_check.py against tests/visual/{name}" if os.path.isdir(ref) else "   (no references)"
+            listed = os.path.exists(os.path.join(SCREENS, name, "SCREENS"))
+            check = f"   then visual_check.py against {os.path.relpath(REFERENCES, ROOT)}/{name}" if listed else "   (no stable screen)"
             print(f"{name}: {shlex.join(smoke_command(out_dir, name))}\n{check}")
         print(f"{len(todo)} scenario(s), {args.jobs} at a time")
         return 0
@@ -119,14 +128,13 @@ def main():
     failed = False
     for name in todo:
         passed, seconds = smoke[name]
-        ref = os.path.join(REFERENCES, name)
         if not passed:
             state, changed = "-", []
             failed = True
-        elif not os.path.isdir(ref):
+        elif not os.path.exists(os.path.join(SCREENS, name, "SCREENS")):
             state, changed = "none", []
         else:
-            state, changed = visual_check(os.path.join(out_dir, name), ref, args.update)
+            state, changed = visual_check(os.path.join(out_dir, name), name, args.update)
             failed |= state == "changed"
         rows.append((name, "ok" if passed else "FAIL", f"{seconds:.0f} s", state, ", ".join(changed)))
 
@@ -140,8 +148,11 @@ def main():
             print(f"{name}: see {os.path.join(out_dir, name + '.log')}")
         elif state == "changed":
             print(f"{name}: side-by-side images in {os.path.join(out_dir, name, 'visual_diff')}")
+    if any(r[3] == "none" for r in rows):
+        print(f"No references of main's in {os.path.relpath(REFERENCES, ROOT)}/ for some scenarios: "
+              "`python3 tools/visual_refs.py fetch` takes the latest release's.")
     if any(r[3] == "updated" for r in rows):
-        print("References updated: look at the new images in tests/visual/ before committing them.")
+        print(f"This run's screens are now the local references ({os.path.relpath(REFERENCES, ROOT)}/).")
     return 1 if failed else 0
 
 
