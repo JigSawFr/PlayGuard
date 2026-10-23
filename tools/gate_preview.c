@@ -105,7 +105,9 @@ int main(int argc, char **argv)
                                GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT, gate_text(lang, GateText_Badge),
                                // Refused: Ⓐ to try again, Ⓑ for the HOME menu.
                                SHOTS[i].state == GateScreen_Refused ? gate_text(lang, GateText_RetryA) : NULL,
-                               SHOTS[i].state == GateScreen_Refused ? gate_text(lang, GateText_RetryB) : NULL };
+                               SHOTS[i].state == GateScreen_Refused ? gate_text(lang, GateText_RetryB) : NULL,
+                               // Opening: its bar and the mark's arc part of the way.
+                               0.6f, 0.1f };
         gate_screen_draw(px, GATE_SCREEN_W, GATE_SCREEN_H, GATE_SCREEN_W, &s);
         char path[512];
         snprintf(path, sizeof(path), "%s/%s.png", out, SHOTS[i].file);

@@ -45,6 +45,7 @@
             <brls:DetailCell id="fw_lock" title="@i18n/playguard/hbmenu/cell"/>
             <brls:DetailCell id="fw_protect_all" title="@i18n/playguard/forwarders/protect_all"/>
             <brls:DetailCell id="fw_pause" title="@i18n/playguard/forwarders/pause_cell"/>
+            <brls:DetailCell id="fw_wait" title="@i18n/playguard/forwarders/wait_cell"/>
             <brls:DetailCell id="fw_week" title="@i18n/playguard/forwarders/week_cell"/>
             <brls:DetailCell id="fw_lock_check" title="@i18n/playguard/hbmenu/check"/>
             <brls:Label id="fw_lock_note" text="@i18n/playguard/hbmenu/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>

@@ -30,4 +30,8 @@ void hours(const forwarders_logic::Row& row, bool closed, std::weak_ptr<bool> al
 // then `done` on the UI thread.
 void pause(std::weak_ptr<bool> alive, std::function<void()> done);
 
+// How long the opening screen stays once a protected one starts
+// (forwarder_flow::set_launch_wait), then `done` on the UI thread.
+void wait(std::weak_ptr<bool> alive, std::function<void()> done);
+
 }   // namespace forwarders_pickers

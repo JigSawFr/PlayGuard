@@ -45,7 +45,7 @@ static void draw_rules(GateScreenState state, const unsigned char *icon, size_t 
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
     const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", "PlayGuard · tagline", "21:03", state,
-                           note, warn, rules, NULL, NULL, NULL };
+                           note, warn, rules, NULL, NULL, NULL, 0, 0 };
     gate_screen_draw(px, W, H, STRIDE, &s);
 }
 
@@ -106,7 +106,7 @@ static void test_screen(void)
 
     // A broken icon, no font: drawn all the same, without text.
     static const unsigned char broken[] = { 0xFF, 0xD8, 0xFF, 0x00, 1, 2, 3 };
-    draw(GateScreen_Opening, broken, sizeof(broken), NULL);
+    draw(GateScreen_Refused, broken, sizeof(broken), NULL);
     CHECK(count_near(400, 245, 640, 295, 0xEE, 0xF2, 0xF8, 30) == 0);
     gate_screen_draw(NULL, W, H, STRIDE, NULL);   // nothing to draw into: nothing happens
     const GateScreen empty = { 0 };
@@ -120,7 +120,7 @@ static void test_wrap(void)
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0;
     const char *longer = "Code PIN non saisi : retour au menu HOME, puis encore un peu de texte pour la seconde ligne.";
     GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", longer, "A hint",
-                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, "Protégé par PlayGuard", NULL, NULL };
+                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, "Protégé par PlayGuard", NULL, NULL, 0, 0 };
     gate_screen_draw(px, W, H, STRIDE, &s);
     CHECK(count_near(400, 420, 900, 460, 0xFF, 0x7A, 0x7A, 40) > 150);   // its first line
     CHECK(count_near(400, 470, 900, 505, 0xFF, 0x7A, 0x7A, 40) > 150);   // its second one
@@ -139,7 +139,7 @@ static void test_buttons(void)
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0;
     GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", "Refused", "A hint",
-                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, NULL, NULL, NULL };
+                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, NULL, NULL, NULL, 0, 0 };
     gate_screen_draw(px, W, H, STRIDE, &s);
     const int site = count_near(800, 655, W - 60, 690, 0xEE, 0xF2, 0xF8, 20);
     const int frame = count_near(100, 202, 112, 458, 0xFF, 0x7A, 0x7A, 60);
@@ -152,6 +152,55 @@ static void test_buttons(void)
     s.state = GateScreen_Asking;
     gate_screen_draw(px, W, H, STRIDE, &s);
     CHECK(count_near(100, 202, 112, 458, 0xFF, 0x7A, 0x7A, 60) == 0);
+}
+
+// Once it starts: centred, as PlayGuard's loading screen; the bar filled
+// as far as `progress` says, drawn by the motion alone over the still.
+static void test_opening(void)
+{
+    for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
+    GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", "Starting", NULL,
+                     "PlayGuard · tagline", "21:03", GateScreen_Opening, "45 min left", 0, GATE_RULE_FREE, NULL, NULL, NULL,
+                     0.5f, 0.25f };
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(px[W] == 0x12345678u);                                          // the stride's margin left alone
+    CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);   // the name, centred
+    CHECK(count_near(0, 0, 400, H, 0xEE, 0xF2, 0xF8, 30) == 0);          // no text on the left
+    CHECK(count_near(560, 425, 720, 455, 0x2E, 0xC4, 0xA6, 40) > 200);   // the badge
+    CHECK(count_near(1000, 100, W, 600, 0x2E, 0xC4, 0xA6, 40) == 0);     // no dial, no chips
+    const int half = count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30);
+    CHECK(half > 1200);                                                   // the bar's first half filled
+    CHECK(count_near(652, 508, 848, 516, 0x2E, 0xC4, 0xA6, 30) == 0);    // its second not yet
+    const size_t bytes = sizeof(uint32_t) * STRIDE * H;
+    uint32_t *whole = (uint32_t *)malloc(bytes);
+    memcpy(whole, px, bytes);
+
+    // The still: the bar's track alone; with the motion over it, the same as the whole.
+    gate_screen_draw_still(px, W, H, STRIDE, &s);
+    CHECK(count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30) == 0);
+    gate_screen_draw_motion(px, W, H, STRIDE, &s);
+    CHECK(memcmp(px, whole, bytes) == 0);
+
+    // Full at the end; free hours the same screen; no motion in the other states.
+    s.progress = 1.0f;
+    s.state = GateScreen_Free;
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(count_near(652, 508, 848, 516, 0x2E, 0xC4, 0xA6, 30) > 1200);
+    s.state = GateScreen_Refused;
+    gate_screen_draw_still(px, W, H, STRIDE, &s);
+    memcpy(whole, px, bytes);
+    gate_screen_draw_motion(px, W, H, STRIDE, &s);
+    CHECK(memcmp(px, whole, bytes) == 0);
+    CHECK(count_near(400, 245, 640, 295, 0xEE, 0xF2, 0xF8, 30) > 400);   // the gate's own layout, its name on the left
+    free(whole);
+
+    // No icon: PlayGuard's mark in its place; no font: no text, no fault.
+    s.state = GateScreen_Opening;
+    s.icon_jpeg = NULL;
+    s.brand_font = s.text_font = NULL;
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(count_near(548, 130, 732, 314, 0x2E, 0xC4, 0xA6, 30) > 2000);
+    CHECK(count_near(400, 350, 880, 620, 0xEE, 0xF2, 0xF8, 30) == 0);
 }
 
 static void test_text(void)
@@ -184,6 +233,7 @@ int main(void)
     test_rules();
     test_wrap();
     test_buttons();
+    test_opening();
     test_text();
     free(px);
     free(font);

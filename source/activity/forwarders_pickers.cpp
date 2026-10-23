@@ -116,4 +116,26 @@ void pause(std::weak_ptr<bool> alive, std::function<void()> done)
     }, true, { "", "", "playguard/forwarders/pause_default"_i18n, "", "" });
 }
 
+void wait(std::weak_ptr<bool> alive, std::function<void()> done)
+{
+    // Off, then seconds: the default (2 s, as PlayGuard's intro) among them.
+    static const unsigned MS[] = { 0, 1000, 2000, 3000, 5000 };
+    const unsigned now = forwarder_flow::launch_wait();
+    std::vector<std::string> names;
+    int current = -1;
+    for (size_t i = 0; i < 5; i++) {
+        names.push_back(forwarder_flow::wait_label(MS[i]));
+        if (now == MS[i]) current = (int)i;
+    }
+    std::weak_ptr<bool> weak = alive;
+    ui::pick("playguard/forwarders/wait_cell"_i18n, names, current, [weak, done](int index) {
+        if (weak.expired() || index < 0 || index > 4) return;
+        forwarder_flow::set_launch_wait(MS[index], [weak, done](bool) {
+            brls::sync([weak, done]() {
+                if (!weak.expired()) done();
+            });
+        });
+    }, true, { "", "", "playguard/forwarders/pause_default"_i18n, "", "" });
+}
+
 }   // namespace forwarders_pickers

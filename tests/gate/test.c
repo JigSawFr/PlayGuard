@@ -410,8 +410,23 @@ static void test_steady_pause(void)
     CHECK(n == 0 && next[0] == '\0');
 }
 
+// The opening's time (GATE_WAIT_NAME): the file's milliseconds, at most
+// GATE_WAIT_MAX_MS; the default without one or for one it cannot read.
+static void test_wait(void)
+{
+    CHECK(gate_wait_parse(NULL, 0) == GATE_WAIT_MS && GATE_WAIT_MS == 2000);
+    CHECK(gate_wait_parse("3500\n", 5) == 3500);
+    CHECK(gate_wait_parse("0\n", 2) == 0);
+    CHECK(gate_wait_parse("1000", 4) == 1000 && gate_wait_parse("1000\r\n", 6) == 1000);
+    CHECK(gate_wait_parse("99999999999999999999\n", 21) == GATE_WAIT_MAX_MS);
+    CHECK(gate_wait_parse("", 0) == GATE_WAIT_MS && gate_wait_parse("\n", 1) == GATE_WAIT_MS);
+    CHECK(gate_wait_parse("-5\n", 3) == GATE_WAIT_MS && gate_wait_parse("2s\n", 3) == GATE_WAIT_MS);
+    CHECK(gate_wait_parse("5000\n", 2) == 50);   // only `len` read
+}
+
 int main(void)
 {
+    test_wait();
     test_until();
     test_carried();
     test_pause();
@@ -422,5 +437,5 @@ int main(void)
     test_log();
     test_clocks();
     test_steady_pause();
-    return CHECK_DONE("gate argv, free hours, rules and log assertions passed");
+    return CHECK_DONE("gate argv, free hours, rules, log and opening time assertions passed");
 }

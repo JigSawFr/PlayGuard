@@ -149,14 +149,27 @@ static void play(Canvas *cv, float cx, float cy, float size, float round, Rgb c)
 }
 
 // PlayGuard's mark (branding/mark.svg): the play button inside the daily
-// play-time ring, `r` its radius.
-static void mark(Canvas *cv, float cx, float cy, float r)
+// play-time ring, `r` its radius. Its arc apart, for the opening's to turn:
+// 292 of the ring's 390 units, from `from` (radians, 0 at the top).
+#define MARK_ARC (6.2831853f * 292.0f / 390.0f)
+static void mark_still(Canvas *cv, float cx, float cy, float r)
 {
     const float k = r / 78.0f;
     fill_circle(cv, cx, cy, r, NAVY, 1);
     arc(cv, cx, cy, 62 * k, 16 * k, 0, 6.2831853f, TRACK, 1);
-    arc(cv, cx, cy, 62 * k, 16 * k, 0, 6.2831853f * 292.0f / 390.0f, TEAL, 1);
     play(cv, cx + 0 * k, cy, 56 * k, 4 * k, TEXT);
+}
+
+static void mark_arc(Canvas *cv, float cx, float cy, float r, float from)
+{
+    const float k = r / 78.0f;
+    arc(cv, cx, cy, 62 * k, 16 * k, from, MARK_ARC, TEAL, 1);
+}
+
+static void mark(Canvas *cv, float cx, float cy, float r)
+{
+    mark_still(cv, cx, cy, r);
+    mark_arc(cv, cx, cy, r, 0);
 }
 
 // A padlock, `s` high, its body's top left at (x, y).
@@ -410,18 +423,103 @@ static bool icon(Canvas *cv, const unsigned char *jpeg, size_t n, float x, float
 
 // ---------------------------------------------------------------- the screen
 
-void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *s)
+// Night blue, a little lighter at the top.
+static void night(Canvas *cv)
 {
-    if (!px || w <= 0 || h <= 0 || stride < w || !s) return;
-    Canvas cv = { px, w, h, stride };
-
-    // Night blue, a little lighter at the top.
-    for (int y = 0; y < h; y++) {
-        const float t = (float)y / (float)h;
+    for (int y = 0; y < cv->h; y++) {
+        const float t = (float)y / (float)cv->h;
         const uint32_t r = (uint32_t)(0x0E + (0x07 - 0x0E) * t), g = (uint32_t)(0x1A + (0x0E - 0x1A) * t),
                        b = (uint32_t)(0x2E + (0x1A - 0x2E) * t);
-        for (int x = 0; x < w; x++) px[(size_t)y * (size_t)stride + (size_t)x] = 0xFF000000u | b << 16 | g << 8 | r;
+        for (int x = 0; x < cv->w; x++) cv->px[(size_t)y * (size_t)cv->stride + (size_t)x] = 0xFF000000u | b << 16 | g << 8 | r;
     }
+}
+
+// `s` centred on `cx`, at most `max` wide.
+static void centred(Canvas *cv, const unsigned char *font, float px_size, float cx, float baseline, const char *s, Rgb c,
+                    float max)
+{
+    const float tw = measure(font, px_size, s);
+    text(cv, font, px_size, cx - (tw < max ? tw : max) / 2, baseline, s, c, 1, max);
+}
+
+// ---------------------------------------------------------------- the opening
+
+// Once it starts: centred, as PlayGuard's loading screen (activity/
+// loading.xml): the homebrew's icon over a soft teal glow, its name,
+// "Protected by PlayGuard", a bar filling, how it goes; at the bottom,
+// PlayGuard's mark, its arc turning, and its name.
+#define OPEN_ICON  184.0f
+#define OPEN_ICON_Y 130.0f
+#define OPEN_BAR_W 420.0f
+#define OPEN_BAR_H 8.0f
+#define OPEN_BAR_Y 508.0f
+#define OPEN_MARK_R 17.0f
+#define OPEN_FOOT_Y 664.0f
+
+static bool opening(const GateScreen *s)
+{
+    return s->state == GateScreen_Opening || s->state == GateScreen_Free;
+}
+
+// Where the bottom's mark goes: left of "PlayGuard", the two centred.
+static float opening_mark_x(const GateScreen *s, float w)
+{
+    const float group = OPEN_MARK_R * 2 + 12 + measure(s->brand_font, 24, "PlayGuard");
+    return w / 2 - group / 2 + OPEN_MARK_R;
+}
+
+static void opening_still(Canvas *cv, const GateScreen *s)
+{
+    night(cv);
+    const float cx = (float)cv->w / 2, max = (float)cv->w - 160;
+    // The icon over its glow, in a hairline frame (else PlayGuard's mark).
+    const float ix = cx - OPEN_ICON / 2, iy = OPEN_ICON_Y;
+    glow(cv, cx, iy + OPEN_ICON / 2, 330, TEAL, 0.13f);
+    fill_rrect(cv, ix - 5, iy - 5, OPEN_ICON + 10, OPEN_ICON + 10, 44, SURF2, 0.9f);
+    if (!s->icon_jpeg || !icon(cv, s->icon_jpeg, s->icon_size, ix, iy, OPEN_ICON, 40)) {
+        fill_rrect(cv, ix, iy, OPEN_ICON, OPEN_ICON, 40, NAVY, 1);
+        mark(cv, cx, iy + OPEN_ICON / 2, 68);
+    }
+    stroke_rrect(cv, ix - 5, iy - 5, OPEN_ICON + 10, OPEN_ICON + 10, 44, 2, TEAL, 0.35f);
+
+    // Its name; the badge under it, its padlock first, in teal.
+    centred(cv, s->text_font, 50, cx, 400, s->name, TEXT, max);
+    const char *badge = s->badge && *s->badge ? s->badge : "Protected by PlayGuard";
+    const unsigned char *badge_font = covers(s->brand_font, badge) ? s->brand_font : s->text_font;
+    const float bw = measure(badge_font, 22, badge), lock = 22, left = cx - (bw + lock + 12) / 2;
+    padlock(cv, left, 428, lock, TEAL);
+    text(cv, badge_font, 22, left + lock + 12, 448, badge, TEAL, 1, 0);
+
+    // The bar's track, then how it goes and the note under it.
+    fill_rrect(cv, cx - OPEN_BAR_W / 2, OPEN_BAR_Y, OPEN_BAR_W, OPEN_BAR_H, OPEN_BAR_H / 2, TRACK, 1);
+    centred(cv, s->text_font, 22, cx, OPEN_BAR_Y + 48, s->status, TEXT2, max);
+    if (s->note && *s->note) centred(cv, s->text_font, 20, cx, OPEN_BAR_Y + 82, s->note, s->note_warn ? AMBER : TEAL, max);
+
+    // PlayGuard, quietly at the bottom.
+    const float mx = opening_mark_x(s, (float)cv->w);
+    mark_still(cv, mx, OPEN_FOOT_Y, OPEN_MARK_R);
+    text(cv, s->brand_font, 24, mx + OPEN_MARK_R + 12, OPEN_FOOT_Y + 9, "PlayGuard", TEXT2, 1, 0);
+}
+
+static void opening_motion(Canvas *cv, const GateScreen *s)
+{
+    const float cx = (float)cv->w / 2;
+    const float p = clampf(s->progress, 0.0f, 1.0f);
+    // At least its round ends, so it shows from the start.
+    if (p > 0) {
+        const float fw = fmaxf(OPEN_BAR_H, OPEN_BAR_W * p);
+        fill_rrect(cv, cx - OPEN_BAR_W / 2, OPEN_BAR_Y, fw, OPEN_BAR_H, OPEN_BAR_H / 2, TEAL, 1);
+    }
+    const float turn = s->spin - floorf(s->spin);
+    mark_arc(cv, opening_mark_x(s, (float)cv->w), OPEN_FOOT_Y, OPEN_MARK_R, turn * 6.2831853f);
+}
+
+// ---------------------------------------------------------------- the gate
+
+static void gate_still(Canvas *cv, const GateScreen *s)
+{
+    const int w = cv->w, h = cv->h;
+    night(cv);
 
     // Cadran's dial on the right, past the text: its glow, two rings, the
     // minutes, the day's arc.
@@ -429,99 +527,126 @@ void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *
                        : s->state == GateScreen_Error || s->state == GateScreen_Paused ? AMBER
                                                                                          : TEAL;
     const float dx = 1196, dy = 340;
-    glow(&cv, dx, dy, 290, accent, 0.09f);
-    arc(&cv, dx, dy, 226, 1.5f, 0, 6.2831853f, WHITE, 0.05f);
-    arc(&cv, dx, dy, 138, 1.5f, 0, 6.2831853f, WHITE, 0.04f);
+    glow(cv, dx, dy, 290, accent, 0.09f);
+    arc(cv, dx, dy, 226, 1.5f, 0, 6.2831853f, WHITE, 0.05f);
+    arc(cv, dx, dy, 138, 1.5f, 0, 6.2831853f, WHITE, 0.04f);
     for (int i = 0; i < 60; i++) {
         const float ang = i * 6.2831853f / 60.0f, len = i % 5 == 0 ? 16.0f : 7.0f;
         const float sx = sinf(ang), sy = -cosf(ang);
         for (float t = 0; t < len; t += 0.5f) {
             const float rr = 235 + t;
-            blend(&cv, (int)(dx + sx * rr), (int)(dy + sy * rr), WHITE, i % 5 == 0 ? 0.12f : 0.06f);
+            blend(cv, (int)(dx + sx * rr), (int)(dy + sy * rr), WHITE, i % 5 == 0 ? 0.12f : 0.06f);
         }
     }
-    arc(&cv, dx, dy, 182, 18, 0, 6.2831853f, TRACK, 0.28f);
-    arc(&cv, dx, dy, 182, 18, 0, 6.2831853f * 0.75f, accent, 0.16f);
+    arc(cv, dx, dy, 182, 18, 0, 6.2831853f, TRACK, 0.28f);
+    arc(cv, dx, dy, 182, 18, 0, 6.2831853f * 0.75f, accent, 0.16f);
 
     // The header: PlayGuard's mark and name; the clock.
-    mark(&cv, 92, 76, 30);
-    text(&cv, s->brand_font, 30, 136, 87, "PlayGuard", TEXT, 1, 0);
+    mark(cv, 92, 76, 30);
+    text(cv, s->brand_font, 30, 136, 87, "PlayGuard", TEXT, 1, 0);
     if (s->clock && *s->clock) {
         const float cw = measure(s->brand_font, 30, s->clock);
-        text(&cv, s->brand_font, 30, (float)w - 64 - cw, 87, s->clock, TEXT2, 1, 0);
+        text(cv, s->brand_font, 30, (float)w - 64 - cw, 87, s->clock, TEXT2, 1, 0);
     }
 
     // The homebrew: its icon over a glow (else PlayGuard's mark), its name.
     const float ix = 112, iy = 214, isz = 232;
-    glow(&cv, ix + isz / 2, iy + isz / 2, 220, accent, 0.18f);
-    fill_rrect(&cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, SURF2, 0.9f);
-    if (!s->icon_jpeg || !icon(&cv, s->icon_jpeg, s->icon_size, ix, iy, isz, 32)) {
-        fill_rrect(&cv, ix, iy, isz, isz, 32, NAVY, 1);
-        mark(&cv, ix + isz / 2, iy + isz / 2, 86);
+    glow(cv, ix + isz / 2, iy + isz / 2, 220, accent, 0.18f);
+    fill_rrect(cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, SURF2, 0.9f);
+    if (!s->icon_jpeg || !icon(cv, s->icon_jpeg, s->icon_size, ix, iy, isz, 32)) {
+        fill_rrect(cv, ix, iy, isz, isz, 32, NAVY, 1);
+        mark(cv, ix + isz / 2, iy + isz / 2, 86);
     }
     // Its frame: the state's colour once it is known, how it went at a glance.
-    if (s->state == GateScreen_Asking) stroke_rrect(&cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 2, WHITE, 0.08f);
-    else stroke_rrect(&cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 4, accent, 0.85f);
+    if (s->state == GateScreen_Asking) stroke_rrect(cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 2, WHITE, 0.08f);
+    else stroke_rrect(cv, ix - 6, iy - 6, isz + 12, isz + 12, 38, 4, accent, 0.85f);
 
     // The text, left of the dial's minutes.
     const float tx = 400, right = 940;
-    text(&cv, s->text_font, 58, tx, 290, s->name, TEXT, 1, right - tx);
+    text(cv, s->text_font, 58, tx, 290, s->name, TEXT, 1, right - tx);
 
     // "Protected by PlayGuard", a teal badge with its padlock: in PlayGuard's
     // font when it has the language's letters, else the console's.
     const char *badge = s->badge && *s->badge ? s->badge : "Protected by PlayGuard";
     const unsigned char *badge_font = covers(s->brand_font, badge) ? s->brand_font : s->text_font;
     const float bw = measure(badge_font, 26, badge) + 92;
-    fill_rrect(&cv, tx, 322, bw, 54, 27, TEAL, 0.14f);
-    stroke_rrect(&cv, tx, 322, bw, 54, 27, 2, TEAL, 0.55f);
-    padlock(&cv, tx + 26, 334, 30, TEAL);
-    text(&cv, badge_font, 26, tx + 70, 358, badge, TEAL, 1, 0);
+    fill_rrect(cv, tx, 322, bw, 54, 27, TEAL, 0.14f);
+    stroke_rrect(cv, tx, 322, bw, 54, 27, 2, TEAL, 0.55f);
+    padlock(cv, tx + 26, 334, 30, TEAL);
+    text(cv, badge_font, 26, tx + 70, 358, badge, TEAL, 1, 0);
     // After it, the rules it carries, a round chip each.
     float rx = tx + bw + 14;
     void (*const DRAW[])(Canvas *, float, float, float, Rgb) = { open_padlock, stop_square, timer };
     for (unsigned i = 0; i < 3; i++) {
         if (!(s->rules & (1u << i))) continue;
-        fill_circle(&cv, rx + 27, 349, 27, TEAL, 0.14f);
-        arc(&cv, rx + 27, 349, 26, 2, 0, 6.2831853f, TEAL, 0.55f);
-        DRAW[i](&cv, rx + 12, 334, 30, TEAL);
+        fill_circle(cv, rx + 27, 349, 27, TEAL, 0.14f);
+        arc(cv, rx + 27, 349, 26, 2, 0, 6.2831853f, TEAL, 0.55f);
+        DRAW[i](cv, rx + 12, 334, 30, TEAL);
         rx += 54 + 10;
     }
 
     // How it goes, then what to do, each on up to two lines; the note under them.
     const Rgb line = s->state == GateScreen_Asking ? TEXT2 : accent;
     const float sx = s->state == GateScreen_Asking ? tx : tx + 28;
-    if (s->state != GateScreen_Asking) fill_circle(&cv, tx + 9, 442, 7, accent, 1);
+    if (s->state != GateScreen_Asking) fill_circle(cv, tx + 9, 442, 7, accent, 1);
     // A size smaller when two lines are not enough (German's longer words),
     // and a third line for the status then.
     const float ss = fitting(s->text_font, 32, 28, s->status, right - sx, 2), hs = fitting(s->text_font, 26, 23, s->hint, right - tx, 2);
-    int lines = paragraph(&cv, s->text_font, ss, sx, 454, ss * 1.25f, s->status, line, right - sx, ss < 32 ? 3 : 2);
+    int lines = paragraph(cv, s->text_font, ss, sx, 454, ss * 1.25f, s->status, line, right - sx, ss < 32 ? 3 : 2);
     float y = 454 + (lines > 0 ? lines - 1 : 0) * ss * 1.25f + 46;
-    lines = paragraph(&cv, s->text_font, hs, tx, y, hs * 1.23f, s->hint, TEXT3, right - tx, 2);
+    lines = paragraph(cv, s->text_font, hs, tx, y, hs * 1.23f, s->hint, TEXT3, right - tx, 2);
     if (lines > 0) y += (lines - 1) * hs * 1.23f + 48;
     if (s->note && *s->note) {
         const Rgb tone = s->note_warn ? AMBER : TEAL;
-        fill_circle(&cv, tx + 7, y - 9, 5, tone, 1);
-        text(&cv, s->text_font, 24, tx + 22, y, s->note, tone, 1, right - tx - 22);
+        fill_circle(cv, tx + 7, y - 9, 5, tone, 1);
+        text(cv, s->text_font, 24, tx + 22, y, s->note, tone, 1, right - tx - 22);
     }
 
     // The footer: a hairline, PlayGuard's tagline; its site, or the buttons
     // (each a light disc with its letter, then its label, from the right).
-    for (int x = 64; x < w - 64; x++) blend(&cv, x, h - 82, WHITE, 0.08f);
+    for (int x = 64; x < w - 64; x++) blend(cv, x, h - 82, WHITE, 0.08f);
     float left = (float)w - 64;
     if (s->button_a && *s->button_a && s->button_b && *s->button_b) {
         const char *const keys[2] = { "B", "A" }, *const labels[2] = { s->button_b, s->button_a };
         for (int i = 0; i < 2; i++) {
             left -= measure(s->text_font, 24, labels[i]);
-            text(&cv, s->text_font, 24, left, (float)h - 40, labels[i], TEXT2, 1, 0);
+            text(cv, s->text_font, 24, left, (float)h - 40, labels[i], TEXT2, 1, 0);
             left -= 10 + 30;
-            fill_circle(&cv, left + 15, (float)h - 48, 15, TEXT, 1);
-            text(&cv, s->brand_font, 20, left + 15 - measure(s->brand_font, 20, keys[i]) / 2, (float)h - 41, keys[i], NAVY, 1, 0);
+            fill_circle(cv, left + 15, (float)h - 48, 15, TEXT, 1);
+            text(cv, s->brand_font, 20, left + 15 - measure(s->brand_font, 20, keys[i]) / 2, (float)h - 41, keys[i], NAVY, 1, 0);
             left -= 28;
         }
     } else {
         static const char SITE[] = "playguard.link";
         left -= measure(s->brand_font, 24, SITE);
-        text(&cv, s->brand_font, 24, left, (float)h - 40, SITE, TEXT3, 1, 0);
+        text(cv, s->brand_font, 24, left, (float)h - 40, SITE, TEXT3, 1, 0);
     }
-    text(&cv, s->text_font, 24, 64, (float)h - 40, s->footer, TEXT3, 1, left - 64 - 32);
+    text(cv, s->text_font, 24, 64, (float)h - 40, s->footer, TEXT3, 1, left - 64 - 32);
+}
+
+static bool canvas(Canvas *cv, uint32_t *px, int w, int h, int stride, const GateScreen *s)
+{
+    if (!px || w <= 0 || h <= 0 || stride < w || !s) return false;
+    *cv = (Canvas){ px, w, h, stride };
+    return true;
+}
+
+void gate_screen_draw_still(uint32_t *px, int w, int h, int stride, const GateScreen *s)
+{
+    Canvas cv;
+    if (!canvas(&cv, px, w, h, stride, s)) return;
+    if (opening(s)) opening_still(&cv, s);
+    else gate_still(&cv, s);
+}
+
+void gate_screen_draw_motion(uint32_t *px, int w, int h, int stride, const GateScreen *s)
+{
+    Canvas cv;
+    if (canvas(&cv, px, w, h, stride, s) && opening(s)) opening_motion(&cv, s);
+}
+
+void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *s)
+{
+    gate_screen_draw_still(px, w, h, stride, s);
+    gate_screen_draw_motion(px, w, h, stride, s);
 }

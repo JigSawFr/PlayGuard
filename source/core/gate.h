@@ -28,6 +28,7 @@ extern "C" {
 #define GATE_CLOSED_NAME "gate_closed.txt" // the hours it never opens, as GATE_RULES_NAME's lines
 #define GATE_PAUSE_NAME "gate_pause.txt"   // the pause after refusals: its rule, then each forwarder's
 #define GATE_PAUSE_MAX  0x4000
+#define GATE_WAIT_NAME  "gate_wait.txt"    // how long the opening screen stays, in ms (gate_wait_parse)
 
 // The homebrew to start, from the gate's argv as one string ("<gate path>
 // --pin-gate [rules] <argv>"): its path ("sdmc:/…", unquoted, into `nro`)
@@ -116,6 +117,17 @@ bool gate_log_parse(const char *line, size_t len, const char **when, size_t *whe
                     const char **nro, size_t *nro_len);
 
 const char *gate_result_name(GateResult r);   // "pin", "free", "refused", "error", "paused", "closed", "limit"
+
+// The opening screen once it starts (the PIN entered, or its free hours),
+// as PlayGuard's own intro: its bar fills over that long, Ⓐ or Ⓑ skip the
+// rest. Its file (GATE_WAIT_NAME, PlayGuard's, Console › Forwarders): the
+// milliseconds, "2000\n"; 0 for none (a glimpse, as before it). Not a rule:
+// on the SD card, not in the forwarder, read at each start.
+#define GATE_WAIT_MS     2000
+#define GATE_WAIT_MAX_MS 10000
+// The file's milliseconds, at most GATE_WAIT_MAX_MS; GATE_WAIT_MS without
+// a file (NULL) or one it cannot read.
+unsigned gate_wait_parse(const char *text, size_t len);
 
 // The pause after refusals (GATE_PAUSE_NAME): `tries` refused in a row (the
 // PIN screen left with B) and the forwarder does not ask again for
