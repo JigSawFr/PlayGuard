@@ -69,6 +69,8 @@ class ForwardersActivity : public brls::Activity
     void pick_icon(const forwarders_logic::Row& row);
     // The pause after refused PINs: its rule (forwarders_pickers::pause).
     void pick_pause();
+    // How long the opening screen stays (forwarders_pickers::wait).
+    void pick_wait();
     // After a change: the list again, the focus on `id` when it is there.
     std::function<void(bool)> then_rebuild(uint64_t id = 0);
 
@@ -87,5 +89,6 @@ class ForwardersActivity : public brls::Activity
     BRLS_BIND(brls::DetailCell, protect_all, "fw_protect_all");
     BRLS_BIND(brls::DetailCell, lock_check, "fw_lock_check");
     BRLS_BIND(brls::DetailCell, pause_cell, "fw_pause");
+    BRLS_BIND(brls::DetailCell, wait_cell, "fw_wait");
     BRLS_BIND(brls::DetailCell, week_cell, "fw_week");
 };

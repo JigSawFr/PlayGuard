@@ -166,6 +166,12 @@ void ForwardersActivity::onContentAvailable()
         return true;
     });
     ui::show_writable(pause_cell, !app::read_only());
+    wait_cell->registerClickAction([this](brls::View*) {
+        if (ui::refuse_read_only()) return true;
+        this->pick_wait();
+        return true;
+    });
+    ui::show_writable(wait_cell, !app::read_only());
     week_cell->setDetailText(ui::opens());
     week_cell->registerClickAction([](brls::View*) {
         forwarder_flow::show_week();
@@ -180,7 +186,7 @@ void ForwardersActivity::onContentAvailable()
     ui::show_writable(protect_all, !app::read_only());
     cadran::List(this->getContentView(), true)
         .apply({ { "fw_self", "home" }, { "fw_other", "plus" }, { "fw_reinstall", "refresh" }, { "fw_lock", "lock" },
-                 { "fw_protect_all", "shield" }, { "fw_pause", "timer" }, { "fw_week", "calendar" }, { "fw_lock_check", "eye" } });
+                 { "fw_protect_all", "shield" }, { "fw_pause", "timer" }, { "fw_wait", "bolt" }, { "fw_week", "calendar" }, { "fw_lock_check", "eye" } });
     // Without the forwarders' program (a build from elsewhere), nothing can
     // be added: said instead of the two lines.
     if (!forwarder_flow::loader_present()) {
@@ -195,6 +201,7 @@ void ForwardersActivity::onContentAvailable()
         ui::set_visible(protect_all.getView(), false);
         ui::set_visible(lock_check.getView(), false);
         ui::set_visible(pause_cell.getView(), false);
+        ui::set_visible(wait_cell.getView(), false);
         ui::set_visible(week_cell.getView(), false);
     } else {
         this->show_patches();
@@ -303,6 +310,7 @@ void ForwardersActivity::show_lock()
     ui::show_writable(lock_cell, !app::read_only(), cadran::kit::color("cadran/text"), on ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
     const GatePauseRule rule = forwarder_flow::pause_rule();
     pause_cell->setDetailText(forwarder_flow::pause_label(rule.tries, rule.minutes));
+    wait_cell->setDetailText(forwarder_flow::wait_label(forwarder_flow::launch_wait()));
     if (!forwarder_flow::loader_present()) {
         ui::set_visible(summary.getView(), false);
         return;
@@ -731,6 +739,11 @@ void ForwardersActivity::pin(const Row& r, bool on)
 void ForwardersActivity::pick_pause()
 {
     forwarders_pickers::pause(this->alive, [this]() { this->show_lock(); });
+}
+
+void ForwardersActivity::pick_wait()
+{
+    forwarders_pickers::wait(this->alive, [this]() { this->show_lock(); });
 }
 
 void ForwardersActivity::pick_icon(const Row& row)
