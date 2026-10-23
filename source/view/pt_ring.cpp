@@ -51,27 +51,27 @@ PtRing::PtRing()
     this->addView(this->caption);
 }
 
-void PtRing::setFraction(float value)
+void PtRing::setFraction(float fraction)
 {
-    value = value > 1.0f ? 1.0f : value;
-    if (value == this->used) return;
+    fraction = fraction > 1.0f ? 1.0f : fraction;
+    if (fraction == this->used) return;
     // From one known value to another: the arc travels there (not with the
     // lighter effects).
-    const bool travel = this->used >= 0.0f && value >= 0.0f && !effects::light();
-    this->used = value;
+    const bool travel = this->used >= 0.0f && fraction >= 0.0f && !effects::light();
+    this->used = fraction;
     if (travel) {
         const float from = this->shown.getValue();
         this->shown.stop();
         this->shown.reset(from);
-        this->shown.addStep(value, 450, brls::EasingFunction::quadraticOut);
+        this->shown.addStep(fraction, 450, brls::EasingFunction::quadraticOut);
         this->shown.start();
     } else {
         this->shown.stop();
-        this->shown.reset(value);
+        this->shown.reset(fraction);
     }
 }
 
-void PtRing::setExtra(float value) { this->extra = value < 0.0f ? 0.0f : value > 1.0f ? 1.0f : value; }
+void PtRing::setExtra(float fraction) { this->extra = fraction < 0.0f ? 0.0f : fraction > 1.0f ? 1.0f : fraction; }
 void PtRing::setValue(const std::string& text)
 {
     this->value->setText(text);

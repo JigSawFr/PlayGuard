@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "app.hpp"
 #include "core/sim_env.h"
 #include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
@@ -20,6 +21,19 @@
 
 using namespace brls::literals;
 namespace kit = cadran::kit;
+
+namespace
+{
+// How much the frame's texts grow with the larger text (the content's:
+// text_size::LARGE): the rail's labels as much, as their room allows (the
+// rail keeps its width, the screens theirs), the header's and the footer's
+// a little less, their rows being full already.
+constexpr float RAIL_SCALE   = 1.25f;
+constexpr float TITLE_SCALE  = 28.0f / 24.0f;
+constexpr float PILL_SCALE   = 1.2f;
+constexpr float DATE_SCALE   = 1.15f;
+constexpr float HINTS_SCALE  = 1.15f;
+}   // namespace
 
 void cadran::install_theme()
 {
@@ -122,6 +136,9 @@ void cadran::install_theme()
         brls::setHintsSteady(true);
     }
 #endif
+    // The footer's hints and clock grow less than the rest with the larger
+    // text: a footer full of hints still has room for them (patches/borealis/0007).
+    brls::setHintsFontScaleMax(HINTS_SCALE);
     brls::Style style = brls::getStyle();
     // The corners of the kit, for the XML (@style/cadran/radius/card…).
     style.addMetric("cadran/radius/row", kit::RADIUS_ROW);
@@ -169,19 +186,22 @@ void cadran::install_theme()
 
 namespace
 {
-// The frame (header, rail) keeps its size with Preferences › Text size's
-// larger text: it has no room to grow (ui/text_size).
-void chrome(brls::Label* label, float size)
+// The frame (header, rail) with Preferences › Text size's larger text
+// (ui/text_size): at most `scale` times its size, as the room allows, and
+// smaller again, down to its size, where a language's words need it
+// (patches/borealis/0007). The normal text size leaves it as it is.
+void chrome(brls::Label* label, float size, float scale)
 {
     label->setFontSize(size);
-    label->setFontScaled(false);
+    label->setFontScaleMax(scale);
+    label->setShrinkToFit(true);
 }
 
 class Glow : public brls::View
 {
   public:
-    Glow(float cx, float cy, float radius, const char* color_key)
-        : cx(cx), cy(cy), radius(radius), glow(brls::Application::getTheme()[color_key]), clear(nvgRGBA(0x2E, 0xC4, 0xA6, 0))
+    Glow(float centre_x, float centre_y, float r, const char* color_key)
+        : cx(centre_x), cy(centre_y), radius(r), glow(brls::Application::getTheme()[color_key]), clear(nvgRGBA(0x2E, 0xC4, 0xA6, 0))
     {
         this->setFocusable(false);
         this->setPositionType(brls::PositionType::ABSOLUTE);
@@ -283,12 +303,15 @@ void cadran::set_pill(const std::string& text, const char* glyph, Tone tone)
 void cadran::refresh_pill()
 {
     if (!s_main_pill || !s_main_pill_label || !s_main_pill_icon) return;
-    // Unlocked: that first, on every screen (what a tab says comes back
-    // once locked again).
+    // Unlocked, then read-only: that first, on every screen (what a tab
+    // says comes back once locked again, or writable).
     const bool unlocked = ui::known_unlocked();
-    const std::string text = unlocked ? "playguard/cadran/pill/unlocked"_i18n : s_pill_text;
-    const char* glyph = unlocked ? "unlock" : s_pill_glyph.c_str();
-    const Tone tone = unlocked ? Tone::WARN : s_pill_tone;
+    const bool read_only = !unlocked && app::read_only();
+    const std::string text = unlocked    ? "playguard/cadran/pill/unlocked"_i18n
+                             : read_only ? "playguard/cadran/pill/read_only"_i18n
+                                         : s_pill_text;
+    const char* glyph = unlocked ? "unlock" : read_only ? "pencil-off" : s_pill_glyph.c_str();
+    const Tone tone = unlocked || read_only ? Tone::WARN : s_pill_tone;
     brls::Theme theme = brls::Application::getTheme();
     const NVGcolor ink = tone == Tone::DANGER ? theme["cadran/coral"]
                          : tone == Tone::WARN ? theme["cadran/amber"]
@@ -334,7 +357,7 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
         left->addView(mark, 0);
     }
     if (auto* title = dynamic_cast<brls::Label*>(frame->getView("brls/applet_frame/title_label"))) {
-        chrome(title, 24);
+        chrome(title, 24, TITLE_SCALE);
         title->setMarginTop(0);
     }
     if (!pill_icon) return;   // a screen of its own: the mark and the title
@@ -358,21 +381,22 @@ void cadran::style_header(brls::AppletFrame* frame, const char* pill_icon, const
     pill->addView(glyph);
     auto* pill_label = new brls::Label();
     pill_label->setText(pill_text);
-    chrome(pill_label, 15);
+    chrome(pill_label, 15, PILL_SCALE);
     pill_label->setTextColor(ink);
     pill->addView(pill_label);
     right->addView(pill);
     if (with_date) {   // the main screen: its pill is the one set_pill() changes
-        // Touched while unlocked, it goes where the padlock it replaces went.
+        // Touched while unlocked or read-only, it goes where that is undone.
         pill->addGestureRecognizer(new brls::TapGestureRecognizer(pill, []() {
             if (ui::known_unlocked()) TitleState::open(TitleState::Kind::UNLOCKED);
+            else if (app::read_only()) TitleState::open(TitleState::Kind::READ_ONLY);
         }));
         s_main_pill = pill;
         s_main_pill_label = pill_label;
         s_main_pill_icon = glyph;
         auto* date = new brls::Label();
         date->setText(cadran::kit::long_date());
-        chrome(date, 16);
+        chrome(date, 16, DATE_SCALE);
         date->setTextColor(theme["cadran/text3"]);
         date->setMarginLeft(10);
         right->addView(date);
@@ -509,7 +533,7 @@ void cadran::style_rail(brls::View* tab_frame)
             accent->setVisibility(brls::Visibility::GONE);
         }
         if (auto* label = dynamic_cast<brls::Label*>(item->getView("brls/sidebar/item_label"))) {
-            chrome(label, 17);
+            chrome(label, 17, RAIL_SCALE);
             label->setMarginTop(0);
             label->setMarginBottom(0);
             label->setMarginRight(0);

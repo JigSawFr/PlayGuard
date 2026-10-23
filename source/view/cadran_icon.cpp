@@ -308,6 +308,10 @@ void CadranIcon::draw(NVGcontext* vg, float x, float y, float width, float heigh
     } else if (i == "pencil") {
         nvgBeginPath(vg); nvgMoveTo(vg, 4, 20); nvgLineTo(vg, 8, 20); nvgLineTo(vg, 19, 9); nvgLineTo(vg, 15, 5);
         nvgLineTo(vg, 4, 16); nvgClosePath(vg); nvgMoveTo(vg, 13, 7); nvgLineTo(vg, 17, 11); nvgStroke(vg);
+    } else if (i == "pencil-off") {   // read-only: the pencil, crossed out
+        nvgBeginPath(vg); nvgMoveTo(vg, 4, 20); nvgLineTo(vg, 8, 20); nvgLineTo(vg, 19, 9); nvgLineTo(vg, 15, 5);
+        nvgLineTo(vg, 4, 16); nvgClosePath(vg); nvgStroke(vg);
+        nvgBeginPath(vg); nvgMoveTo(vg, 3, 3); nvgLineTo(vg, 21, 21); nvgStroke(vg);
     } else if (i == "tag") {
         nvgBeginPath(vg); nvgMoveTo(vg, 3, 3); nvgLineTo(vg, 11, 3); nvgLineTo(vg, 21, 13); nvgLineTo(vg, 13, 21);
         nvgLineTo(vg, 3, 11); nvgClosePath(vg); nvgStroke(vg);

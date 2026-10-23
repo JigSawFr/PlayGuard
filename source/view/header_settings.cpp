@@ -32,20 +32,20 @@ static std::string language_code()
     return code.empty() ? "?" : code;
 }
 
-HeaderSetting::HeaderSetting(Kind kind)
-    : kind(kind)
+HeaderSetting::HeaderSetting(Kind setting)
+    : kind(setting)
 {
-    this->setId(kind == Kind::LANGUAGE ? LANGUAGE_ID : kind == Kind::THEME ? THEME_ID : TEXT_ID);
+    this->setId(setting == Kind::LANGUAGE ? LANGUAGE_ID : setting == Kind::THEME ? THEME_ID : TEXT_ID);
     this->setFocusable(false);
-    this->setWidth(kind == Kind::LANGUAGE ? SIZE * 1.3f : SIZE);
+    this->setWidth(setting == Kind::LANGUAGE ? SIZE * 1.3f : SIZE);
     this->setHeight(SIZE);
     this->setAlignSelf(brls::AlignSelf::CENTER);
-    this->setMarginRight(14);
+    this->setMarginRight(10);
     // A tap opens its list (hitTest finds it, focusable or not); the tab on
     // screen shows the new choice (Preferences says it too).
-    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [kind]() {
-        if (kind == Kind::LANGUAGE) ui::pick_language(ui::refresh_shown_tab);
-        else if (kind == Kind::THEME) ui::pick_theme(ui::refresh_shown_tab);
+    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [setting]() {
+        if (setting == Kind::LANGUAGE) ui::pick_language(ui::refresh_shown_tab);
+        else if (setting == Kind::THEME) ui::pick_theme(ui::refresh_shown_tab);
         else ui::pick_text_size(ui::refresh_shown_tab);
     }));
 }
@@ -174,9 +174,21 @@ static void settings_screen_of(brls::View* focus)
     if (!frame || !frame->getView("main_tabs")) return;
     auto* tools = VersionBadge::header_tools(frame);
     if (!tools || tools->getView(LANGUAGE_ID)) return;
-    tools->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 0);
-    tools->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 1);
-    tools->addView(new HeaderSetting(HeaderSetting::Kind::TEXT_SIZE), 2);
+    // The keys that open them from any tab, which the footer leaves out
+    // (MainActivity): ⊖ before the language, theme and text size, Ⓨ before
+    // the bell. As the keys under the week are drawn (kit::key).
+    const auto key = [](const char* letter, float right) {
+        brls::Box* k = cadran::kit::key(letter, 18);
+        k->setFocusable(false);
+        k->setAlignSelf(brls::AlignSelf::CENTER);
+        k->setMarginRight(right);
+        return k;
+    };
+    tools->addView(key("−", 5), 0);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::LANGUAGE), 1);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::THEME), 2);
+    tools->addView(new HeaderSetting(HeaderSetting::Kind::TEXT_SIZE), 3);
+    tools->addView(key("Y", 3), 4);   // the bell is there already (main.cpp installs it first)
 }
 
 void HeaderSetting::install()

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- History: what PlayGuard changed (the change history) and the settings
-     backups, with where they stand as tiles first (in Preferences before). -->
+     backups, with a line saying so (what was played is Activity's), then
+     where they stand as tiles (in Preferences before). -->
 
 <brls:Box
     width="auto"
@@ -22,6 +23,7 @@
             paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
+            <brls:Label id="hs_intro" text="@i18n/playguard/history/tab_intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
             <brls:DetailCell id="hs_changes" focusable="false" title="@i18n/playguard/history/tile_changes"/>
             <brls:DetailCell id="hs_last_backup" focusable="false" title="@i18n/playguard/backup/tile_last"/>
             <brls:Header title="@i18n/playguard/history/title" marginTop="24" marginBottom="8"/>

@@ -271,8 +271,8 @@ void cadran::Card::draw(NVGcontext* vg, float x, float y, float width, float hei
 
 // ---------------------------------------------------------------------------
 
-cadran::Switch::Switch(brls::BooleanCell* cell)
-    : cell(cell)
+cadran::Switch::Switch(brls::BooleanCell* boolean_cell)
+    : cell(boolean_cell)
 {
     brls::Theme theme = brls::Application::getTheme();
     this->on = theme["cadran/teal_fill"];
@@ -308,10 +308,10 @@ void cadran::Switch::draw(NVGcontext* vg, float x, float y, float width, float h
 
 // ---------------------------------------------------------------------------
 
-cadran::List::List(brls::View* tab, bool sub_screen)
-    : tab(tab)
+cadran::List::List(brls::View* screen, bool sub_screen)
+    : tab(screen)
 {
-    if (brls::ScrollingFrame* frame = find_scroll(tab))
+    if (brls::ScrollingFrame* frame = find_scroll(screen))
         for (brls::View* child : frame->getChildren())
             if (auto* column = dynamic_cast<brls::Box*>(child)) this->box = column;
     if (!this->box) return;
@@ -444,11 +444,11 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
             mark->setMarginRight(10);
             mark->setShrink(0);
             mark->setVisibility(brls::Visibility::GONE);
-            const int at = index_in(cell, cell->detail);
+            const int detail_at = index_in(cell, cell->detail);
             cell->removeView(cell->detail, false);
             value->addView(mark);
             value->addView(cell->detail);
-            cell->addView(value, at);
+            cell->addView(value, detail_at);
             this->marks.push_back({ cell, mark });
             // Its pill under the value (tag()), hidden until set: as wide as
             // its words, which wrap rather than end in "…".
@@ -463,12 +463,12 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
             brls::Label* words = kit::label("", kit::TEXT_META, "cadran/text2");
             words->setSingleLine(false);
             pill->addView(words);
-            cell->addView(pill, at + 1);
+            cell->addView(pill, detail_at + 1);
             brls::Label* note = kit::label("", kit::TEXT_META, "cadran/text3");
             note->setSingleLine(false);
             note->setMarginTop(6);
             note->setVisibility(brls::Visibility::GONE);
-            cell->addView(note, at + 2);
+            cell->addView(note, detail_at + 2);
             this->tags.push_back({ cell, pill });
         }
     }

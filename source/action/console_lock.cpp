@@ -27,7 +27,7 @@ void set_flag(bool on)
 // Turn the lock on: save the seven limits, set them all to 0.
 void lock(std::function<void()> refresh)
 {
-    uint16_t zero[7] = { 0, 0, 0, 0, 0, 0, 0 };
+    uint16_t new_days[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
     pt_flow::confirm_write("playguard/console_lock/on_body"_i18n, "playguard/console_lock/on_confirm"_i18n,
                            [refresh](bool did_unlock) {
@@ -62,7 +62,7 @@ void lock(std::function<void()> refresh)
         }
         pt_flow::finish_write(rc, did_unlock, "playguard/console_lock/on_done"_i18n,
                               "playguard/play_timer/write_err"_i18n, refresh);
-    }, zero, true);
+    }, new_days, true);
 }
 
 // Turn it off: put the saved limits back, or clear the limit if none saved.

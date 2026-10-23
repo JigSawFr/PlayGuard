@@ -86,7 +86,10 @@ PlayTimerTab::PlayTimerTab()
     kit::wrap(this->getView("pt_chips"));
     this->list.apply({ { "pt_split", "calendar" }, { "pt_today", "today" }, { "pt_console_lock", "gamepad" },
                        { "pt_bedtime_reset", "moon" }, { "pt_extra_amounts", "plus" },
-                       { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" } });
+                       { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" }, { "pt_remove", "trash" } });
+    // Removing the limit: last, apart, in coral (as Security's "Delete all").
+    if (cadran::Card* danger = this->list.card_of("pt_remove"))
+        danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
 
     // The week: edited here, saved together (+ or Save), as in the per-day editor.
     week_editor->set_can_edit([this]() {
@@ -151,7 +154,7 @@ PlayTimerTab::PlayTimerTab()
         pt_flow::choose_time_up(this->pt, this->refresher());
         return true;
     });
-    remove_chip->registerClickAction([this](brls::View*) {
+    remove_cell->registerClickAction([this](brls::View*) {
         if (!ui::refuse_read_only()) this->remove_limit();
         return true;
     });
@@ -175,9 +178,9 @@ PlayTimerTab::PlayTimerTab()
     console_lock_note->setSingleLine(false);
     console_lock_cell->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        PtState pt;   // read again: the tab's is up to 5 s old
-        pctl_play_timer_query(&pt);
-        if (!pt.fw_supported) {
+        PtState fresh;   // read again: the tab's is up to 5 s old
+        pctl_play_timer_query(&fresh);
+        if (!fresh.fw_supported) {
             ui::error("", NXM_RC_FW_UNSUPPORTED);
             return true;
         }
@@ -187,7 +190,7 @@ PlayTimerTab::PlayTimerTab()
             ui::info("playguard/console_lock/needs_pin"_i18n);
             return true;
         }
-        console_lock::set(!console_lock::active(), pt, this->refresher());
+        console_lock::set(!console_lock::active(), fresh, this->refresher());
         return true;
     });
     ui::set_detail(split, ui::opens());
@@ -265,8 +268,10 @@ void PlayTimerTab::refresh()
                            (brls::View*)bedtime_note.getView() })
         ui::set_visible(v, fw_ok);
     for (brls::View* v : { (brls::View*)extra_header.getView(), (brls::View*)extra_amounts.getView(),
-                           (brls::View*)extra_auto.getView(), (brls::View*)advanced.getView() })
+                           (brls::View*)extra_auto.getView(), (brls::View*)advanced.getView(),
+                           (brls::View*)remove_cell.getView() })
         ui::set_visible(v, fw_ok);
+    ui::show_writable(remove_cell, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
     const auto& cfg = config::get();
     ui::set_detail(extra_amounts, amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
     extra_auto->setOn(cfg.extra_auto_restore, false);
@@ -396,15 +401,15 @@ void PlayTimerTab::show_played_key(int day)
 void PlayTimerTab::rerender()
 {
     brls::Theme theme = brls::Application::getTheme();
-    const PtState& pt = this->pt;
+    const PtState& timer = this->pt;
     cadran::kit::set_kicker(kicker, "playguard/play_timer/week_title"_i18n);
-    summary->setText(pt.valid ? summary_of(this->pending) : "playguard/common/unavailable"_i18n);
-    if (pt.valid) week_editor->show(this->pending, pt.day_min);
+    summary->setText(timer.valid ? summary_of(this->pending) : "playguard/common/unavailable"_i18n);
+    if (timer.valid) week_editor->show(this->pending, timer.day_min);
 
     // The profile these limits are, else the one the console's are or how
     // many are saved.
-    const std::string profile = pt.valid ? profiles::match(this->pending) : "";
-    const std::string current = pt.valid ? profiles::match(pt.day_min) : "";
+    const std::string profile = timer.valid ? profiles::match(this->pending) : "";
+    const std::string current = timer.valid ? profiles::match(timer.day_min) : "";
     const size_t count = current.empty() ? profiles::count() : 0;
     const std::string saved = !current.empty() ? current
                               : count == 1 ? "playguard/play_timer/profiles_count_one"_i18n
@@ -416,7 +421,7 @@ void PlayTimerTab::rerender()
     // The changes not saved yet: how many, the first one.
     int changed = 0, first = -1;
     for (int d : { 1, 2, 3, 4, 5, 6, 0 })   // Monday first
-        if (pt.valid && this->pending[d] != pt.day_min[d]) {
+        if (timer.valid && this->pending[d] != timer.day_min[d]) {
             changed++;
             if (first < 0) first = d;
         }
@@ -424,7 +429,7 @@ void PlayTimerTab::rerender()
         pending_text->setText((changed == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : brls::getStr("playguard/play_timer/perday/unsaved_count", changed)) + " · " +
                               brls::getStr("playguard/cadran/week/first_change",
                                            brls::getStr(fmt::format("playguard/days_short/{}", first)),
-                                           limit_text(pt.day_min[first]), limit_text(this->pending[first])));
+                                           limit_text(timer.day_min[first]), limit_text(this->pending[first])));
         pending_text->setTextColor(theme["cadran/amber"]);
     } else {
         // A bonus planned raises its day for now: said, so that day's bar is
@@ -458,26 +463,26 @@ void PlayTimerTab::rerender()
     // Bedtime: the time and when play is allowed again, every day.
     PtBedtime same;
     std::string start = "—", end;
-    if (pt_logic::bedtime_layout_ok(pt, ui::today_weekday())) {
-        if (!pt_logic::bedtime_uniform(pt, &same)) start = pt_flow::bedtime_days_text(pt);
+    if (pt_logic::bedtime_layout_ok(timer, ui::today_weekday())) {
+        if (!pt_logic::bedtime_uniform(timer, &same)) start = pt_flow::bedtime_days_text(timer);
         else if (!same.on) start = "playguard/common/off"_i18n;
         else {
             start = fmt::format("{:02d}:{:02d}", same.hour, same.minute);
             end = fmt::format("{:02d}:{:02d}", same.end_hour, same.end_minute);
         }
-    } else if (pt.bedtime_valid) {
-        start = pt.bedtime_enabled ? fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute) : "playguard/common/off"_i18n;
+    } else if (timer.bedtime_valid) {
+        start = timer.bedtime_enabled ? fmt::format("{:02d}:{:02d}", timer.bedtime_hour, timer.bedtime_minute) : "playguard/common/off"_i18n;
     }
     // Each day's under the week, when they differ.
     std::string beds[7];
-    if (pt_logic::bedtime_layout_ok(pt, ui::today_weekday()) && pt.valid && !pt_logic::bedtime_uniform(pt, nullptr))
-        for (int d = 0; d < 7; d++) beds[d] = pt.bed[d].on ? fmt::format("{:02d}:{:02d}", pt.bed[d].hour, pt.bed[d].minute) : "—";
+    if (pt_logic::bedtime_layout_ok(timer, ui::today_weekday()) && timer.valid && !pt_logic::bedtime_uniform(timer, nullptr))
+        for (int d = 0; d < 7; d++) beds[d] = timer.bed[d].on ? fmt::format("{:02d}:{:02d}", timer.bed[d].hour, timer.bed[d].minute) : "—";
     week_editor->show_bedtimes(beds);
     bed_value->setText(start);
     bed_end->setText(end);
     bed_arrow->setVisibility(end.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
     bed_end->setVisibility(end.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
-    time_up_value->setText(pt_flow::time_up_text(pt));
+    time_up_value->setText(pt_flow::time_up_text(timer));
 }
 
 void PlayTimerTab::remove_limit()

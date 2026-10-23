@@ -46,7 +46,7 @@ bool WorkerThreads::start(Task task, std::string* error)
                         *done = true;
                         self->changed_.notify_all();
                     }
-                } over{ this, done };
+                } guard{ this, done };
                 // An exception out of a thread's function ends the app: the
                 // task's is caught here and said.
                 try {

@@ -9,6 +9,7 @@
 #include "util/markdown.hpp"
 #include "util/text.hpp"
 #include "view/build_cell.hpp"
+#include "view/cadran_icon.hpp"
 #include "view/markdown_view.hpp"
 #include "view/release_notes.hpp"
 
@@ -53,7 +54,7 @@ void SysNotesActivity::loaded()
     s_open->fill();
 }
 
-SysNotesActivity::SysNotesActivity(Which which) : which(which)
+SysNotesActivity::SysNotesActivity(Which kind) : which(kind)
 {
     s_open = this;
 }
@@ -79,6 +80,13 @@ void SysNotesActivity::onContentAvailable()
         b->setStyle(&brls::BUTTONSTYLE_DEFAULT);
         b->setMarginRight(12);
         b->setText(" ");
+        // After the version, a check on the installed one's tab (fill()).
+        auto* check = new CadranIcon();
+        check->setIcon("check");
+        check->setWidth(18);
+        check->setHeight(18);
+        check->setMarginLeft(8);
+        b->addView(check);
         b->registerClickAction([this, i](brls::View*) {
             this->show_tab(i);
             return true;
@@ -148,7 +156,7 @@ void SysNotesActivity::fill()
         this->tab = newer_from < this->shown.size() ? newer_from : this->shown.empty() ? 0 : this->shown.size() - 1;
     if (this->tab >= this->shown.size()) this->tab = this->shown.empty() ? 0 : this->shown.size() - 1;
 
-    // The tabs: the installed one says so; one alone is no choice.
+    // The tabs: the installed one has a check; one alone is no choice.
     auto& buttons = tab_list->getChildren();
     for (size_t i = 0; i < buttons.size(); i++) {
         auto* b = (brls::Button*)buttons[i];
@@ -156,9 +164,13 @@ void SysNotesActivity::fill()
         ui::set_visible(b, here);
         if (!here) continue;
         const sys_notes::Release& r = list.releases[this->shown[i]];
-        b->setText((int)this->shown[i] == installed_at ? brls::getStr("playguard/sys_notes/tab_installed", r.version)
-                                                        : r.version);
-        b->setStyle(i == this->tab ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT);
+        const brls::ButtonStyle* style = i == this->tab ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT;
+        b->setText(r.version);
+        b->setStyle(style);
+        // The check in the tab's ink: dark on the chosen tab's teal.
+        auto* check = (CadranIcon*)b->getChildren().back();
+        check->setColor(brls::Application::getTheme()[style->enabledLabelColor]);
+        ui::set_visible(check, (int)this->shown[i] == installed_at);
     }
     brls::View* focus = brls::Application::getCurrentFocus();
     const bool tabs_go = this->shown.size() < 2;
@@ -189,7 +201,7 @@ void SysNotesActivity::fill()
         const auto lines = own ? release_notes::bundled() : std::vector<changelog::Line>{};
         if (!lines.empty()) {
             release_notes::current(&date);
-            tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 18));
+            tags->addView(tag_view({ "", accent, "check" }, 18));
             header->setTitle(title_of(this->which) + " " + mine);
             header->setSubtitle(date);
             release_notes::fill_release(notes, lines);
@@ -203,12 +215,12 @@ void SysNotesActivity::fill()
     } else {
         const sys_notes::Release& r = list.releases[this->shown[this->tab]];
         this->page = r.page;
-        // Tags: installed or new; what it supports; for the firmware, security
+        // Tags: installed (a check) or newer (a sparkle); what it supports; for the firmware, security
         // fixes and a change to the parental-control service.
         if ((int)this->shown[this->tab] == installed_at)
-            tags->addView(tag_view({ "playguard/sys_notes/tag_installed"_i18n, accent }, 18));
+            tags->addView(tag_view({ "", accent, "check" }, 18));
         else if (!mine.empty() && this->tab >= newer_from)
-            tags->addView(tag_view({ "playguard/sys_notes/tag_new"_i18n, cadran::kit::color("cadran/amber") }, 18));
+            tags->addView(tag_view({ "", cadran::kit::color("cadran/amber"), "sparkle" }, 18));
         if (!r.supports.empty())
             tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), cadran::kit::color("cadran/text2") }, 18));
         if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, cadran::kit::color("cadran/amber") }, 18));

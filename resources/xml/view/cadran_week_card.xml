@@ -20,7 +20,8 @@
         <brls:Label text="@i18n/playguard/cadran/week/pick_day" fontSize="15" textColor="@theme/cadran/text2"/>
         <brls:Box grow="1.0"/>
         <brls:Box id="cpt_over_key" axis="row" alignItems="center" visibility="gone" marginRight="16">
-            <brls:Rectangle width="12" height="12" cornerRadius="3" color="@theme/cadran/coral_fill" marginRight="8"/>
+            <brls:Rectangle width="12" height="12" cornerRadius="3" color="@theme/cadran/coral_fill" marginRight="6"/>
+            <CadranIcon icon="alert" width="14" height="14" color="@theme/cadran/coral" marginRight="8"/>
             <brls:Label text="@i18n/playguard/cadran/week/over_key" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
         </brls:Box>
         <brls:Box id="cpt_played_key" axis="row" alignItems="center" visibility="gone">

@@ -20,11 +20,11 @@ TabBadge::TabBadge()
     this->setVisibility(brls::Visibility::GONE);
 }
 
-void TabBadge::set_count(int count)
+void TabBadge::set_count(int n)
 {
-    if (count == this->count) return;
-    this->count = count;
-    this->setVisibility(count > 0 ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    if (n == this->count) return;
+    this->count = n;
+    this->setVisibility(n > 0 ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
 }
 
 void TabBadge::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,

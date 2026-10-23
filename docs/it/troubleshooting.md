@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 47f82b2df28c -->
+<!-- translated from docs/troubleshooting.md, sha256 45158eaaf5a4 -->
 # Risoluzione dei problemi
 
 Riprendere il controllo di una console bloccata, i problemi comuni, segnalare un bug, e la modalità sviluppatore. Torna al [README](../../README.md).
@@ -28,7 +28,7 @@ Il modulo deve seguire la versione di PlayGuard: a ogni aggiornamento di PlayGua
 *Console › Forwarder › Blocca il menu homebrew* impedisce all'album e a un gioco avviato con R di aprire il menu homebrew. Se il forwarder di PlayGuard e il menu protetto sono spariti entrambi (eliminati nelle Impostazioni di sistema, o sull'altro sistema: il blocco è sulla scheda SD, letto sia dal sysMMC sia dall'emuMMC):
 
 - **Da un computer:** elimina `atmosphere/config/override_config.ini` sulla scheda SD (o rimetti `config/playguard/override_config.ini.backup`, il file com'era), poi riavvia la console.
-- **Con il sysmodule di ripristino installato** (facoltativo): metti un file vuoto `config/playguard/RESCUE` sulla scheda SD e riavvia; il modulo toglie il blocco all'avvio, e PlayGuard lo segnala al suo avvio successivo. Un aggiornamento di Atmosphère dopo il blocco lo toglie allo stesso modo.
+- **Con il sysmodule di ripristino installato** (facoltativo): metti un file vuoto `config/playguard/RESCUE` sulla scheda SD e riavvia; il sysmodule toglie il blocco all'avvio, e PlayGuard lo segnala al suo avvio successivo. Un aggiornamento di Atmosphère dopo il blocco lo toglie allo stesso modo.
 
 ### Console non modificata
 
@@ -43,7 +43,7 @@ PlayGuard non può aiutare: richiede Atmosphère. La procedura della master key 
 - **L'orologio di rete non è mai stato impostato.** *Console › Orologio di rete › Misura la differenza oraria*, poi impostalo ([orologio di rete](features.md#orologio-di-rete)).
 - **L'orologio è stato portato indietro.** Dopo un salto indietro, il conteggio si ferma finché l'orologio non supera l'ora precedente; non c'è niente da fare.
 - **Un limite è appena stato scritto.** Avvia un gioco per un minuto, poi controlla di nuovo.
-- **Il filtro famiglia è sbloccato temporaneamente.** Il tempo di gioco potrebbe allora non essere contato: *Sicurezza › Riattiva il filtro famiglia*.
+- **Il filtro famiglia è sbloccato temporaneamente.** Il tempo di gioco potrebbe allora non essere contato: *Oggi › Riattiva* (o un tocco sulla pillola dell'intestazione).
 
 ### I miei limiti sono cambiati da soli
 
@@ -54,7 +54,7 @@ PlayGuard non può aiutare: richiede Atmosphère. La procedura della master key 
 ### Il bambino ha giocato oltre il limite
 
 - **La console si limita ad avvisare.** *Tempo di gioco › Quando il tempo è scaduto*: scegli *Sospendi il software*.
-- **Il filtro famiglia è rimasto sbloccato.** Finché lo è, il limite di oggi è in pausa: la pillola dell'intestazione lo dice su ogni scheda; *Sicurezza › Riattiva il filtro famiglia*. Anche un riavvio della console lo blocca.
+- **Il filtro famiglia è rimasto sbloccato.** Finché lo è, il limite di oggi è in pausa: la pillola dell'intestazione lo dice su ogni scheda, e toccarla porta a *Oggi › Riattiva*. Anche un riavvio della console lo blocca.
 - **L'orologio è stato portato indietro.** Il conteggio si ferma finché l'orologio non supera l'ora precedente ([cosa conta](features.md#cosa-conta-come-tempo-di-gioco)).
 - **L'altro sistema.** emuMMC e sysMMC hanno ognuno il proprio filtro famiglia: impostalo su entrambi, o nascondi il menu di avvio di hekate ([compatibilità](compatibility.md#emummc-e-sysmmc)).
 
@@ -171,6 +171,6 @@ Premi Ⓨ sette volte su *Informazioni › Versione*; gli strumenti per sviluppa
 - Un download interrotto (rete persa) riprende da dove si era fermato la volta successiva che si installa la stessa build.
 - Gli artefatti scadono dopo 90 giorni.
 
-**Tornare indietro.** La build sostituita viene conservata (`playguard.nro.previous`): **Torna alla build precedente** nello stesso elenco le scambia di nuovo, dopo il PIN; indica quella build con la sua versione, la sua pull request e il suo commit. Se una build installata da qui (o dall'aggiornamento *In PlayGuard*) va in crash prima della sua prima schermata, l'avvio successivo di PlayGuard propone di tornare alla build precedente su una semplice schermata di testo, prima che venga caricata qualsiasi altra cosa (A torna indietro, B la avvia comunque), senza il PIN, perché ad andare in crash potrebbe essere proprio la schermata del PIN. Lo stesso elenco permette di tornare a qualsiasi versione pubblicata in qualsiasi momento.
+**Tornare indietro.** La build sostituita viene conservata (`playguard.nro.previous`): **Torna alla build precedente** nello stesso elenco le scambia di nuovo, dopo il PIN; indica quella build con la sua versione, la sua pull request e il suo commit. Se una build installata da qui (o dall'aggiornamento *In PlayGuard*) va in crash prima della sua prima schermata, l'avvio successivo di PlayGuard propone di tornare alla build precedente su una semplice schermata di testo, prima che venga caricata qualsiasi altra cosa (A torna indietro, B la avvia comunque). Tornare indietro chiede il PIN sulla schermata del PIN della console stessa, quando ne è impostato uno (non sulla schermata di blocco di PlayGuard, che potrebbe essere proprio ciò che va in crash); senza PIN, si avvia la build installata. Lo stesso elenco permette di tornare a qualsiasi versione pubblicata in qualsiasi momento.
 
 **Quale build è in esecuzione:** *Informazioni › Versione* mostra il commit in modalità sviluppatore. L'intestazione di ogni schermata mostra la versione in esecuzione accanto al titolo: quella di una versione pubblicata in un'etichetta grigia (`1.2.0`), quella di qualsiasi altra build in un'etichetta ambra seguita dal suo commit, così una build di prova non viene mai scambiata per la versione pubblicata.

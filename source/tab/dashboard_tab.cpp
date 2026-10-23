@@ -256,9 +256,9 @@ void DashboardTab::refresh()
     // network clock's accuracy flag alone.
     PctlStatus s;
     pctl_overview_fetch(&s, &this->pt);
-    const PtState& pt = this->pt;
-    bool accurate = false;
-    const Result accuracy_rc = time_network_accuracy(&accurate);
+    const PtState& timer = this->pt;
+    bool network_accurate = false;
+    const Result network_rc = time_network_accuracy(&network_accurate);
     SysInfo si;
     sysinfo_get(&si);
 
@@ -269,29 +269,29 @@ void DashboardTab::refresh()
     const TodayLog log = read_today_log();
 
     // Changes seen outside PlayGuard, and whether the console counts at all.
-    outside_watch::observe(pt);
+    outside_watch::observe(timer);
     outside_watch::observe_accounts();   // once per run; flagged in the Activity tab
-    const std::vector<std::string> outside_lines = outside_watch::notice_lines();
-    const bool stalled = timer_health::observe(pt);
+    const std::vector<std::string> outside_notes = outside_watch::notice_lines();
+    const bool stalled = timer_health::observe(timer);
     // The same readings for the notification bell.
     notices::note_timer_stalled(stalled);
-    notices::refresh_status(s, pt, si, accuracy_rc, accurate);
+    notices::refresh_status(s, timer, si, network_rc, network_accurate);
 
     this->status = s;
     this->sys = si;
-    this->accuracy_rc = accuracy_rc;
-    this->accurate = accurate;
-    this->clock_inaccurate = R_SUCCEEDED(accuracy_rc) && !accurate;
+    this->accuracy_rc = network_rc;
+    this->accurate = network_accurate;
+    this->clock_inaccurate = R_SUCCEEDED(network_rc) && !network_accurate;
     this->unlocked_now = unlocked;
 
     const int today = ui::today_weekday();
     this->show_headline(today, unlocked, log);
 
     // Visibility last, so a vanished focused view hands the focus to a neighbour.
-    const bool pending = pt_flow::restore_pending(pt);
+    const bool pending = pt_flow::restore_pending(timer);
     if (pending) extra_pending->setText(pt_flow::restore_label());
     ui::set_visible_all({ { extra_pending.getView(), pending },
-                          { alarm.getView(), pt_flow::alarm_off(pt) },
+                          { alarm.getView(), pt_flow::alarm_off(timer) },
                           { applet.getView(), si.applet_mode },
                           { not_counting.getView(), stalled } });
 
@@ -305,16 +305,21 @@ void DashboardTab::refresh()
     this->show_cards(unlocked, has_pin);
     this->show_pills();
     // The actions while they can do something.
-    const bool can_extra = pt_logic::can_add_extra_time(pt, today, false);
+    const bool can_extra = pt_logic::can_add_extra_time(timer, today, false);
     ui::set_visible(chips.getView(), can_extra);
-    ui::set_visible(stop.getView(), pt_logic::can_stop_today(pt, today, false));
+    ui::set_visible(stop.getView(), pt_logic::can_stop_today(timer, today, false));
+    // Read-only: the actions that write stay in sight, greyed (A says why
+    // and where it is turned off), as on the other tabs.
+    const float actions_alpha = app::read_only() ? 0.45f : 1.0f;
+    for (brls::View* v : { (brls::View*)chips.getView(), (brls::View*)stop.getView(), (brls::View*)profile.getView() })
+        v->setAlpha(actions_alpha);
     ui::set_visible(relock.getView(), unlocked && !app::read_only());
-    ui::set_visible(setup.getView(), !unlocked && !app::read_only() && pt.fw_supported && pt.valid &&
-                                         !pt_configured(pt.block));
+    ui::set_visible(setup.getView(), !unlocked && !app::read_only() && timer.fw_supported && timer.valid &&
+                                         !pt_configured(timer.block));
     this->show_profile();
     this->fit_text_size();
     this->show_low(unlocked);
-    this->show_outside_card(outside_lines);
+    this->show_outside_card(outside_notes);
     this->show_steps_card(has_pin);
 }
 

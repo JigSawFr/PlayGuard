@@ -46,6 +46,6 @@ class ScrollView : public brls::ScrollingFrame
     brls::View* neighbour(brls::FocusDirection direction) const;
     float bottom_limit();
     brls::View* visible_line(bool first);
-    void reveal(brls::View* focused, bool animated);
+    void reveal(brls::View* view, bool animated);
     bool step(brls::FocusDirection direction);
 };

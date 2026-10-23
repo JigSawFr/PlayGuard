@@ -34,7 +34,7 @@ The screenshots show the dark theme, PlayGuard's default.
 The app is organised in tabs, like System Settings; each has its section below.
 
 - **What failed is said in a dialog, what worked in a toast.** A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync.
-- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and shows a crossed-out pencil right of the title when the app is read-only; a tap on either goes where it is undone (*Today › Turn back on*, the firmware screen).
+- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and while the app is read-only (its pill then says *Read-only*, the actions that would write greyed and refused with where to turn it off); a tap on it goes where it is undone (*Today › Turn back on*, the firmware screen or *Help & diagnostics*). A small ⊖ before the language and Ⓨ before the bell say the keys that open them from any tab.
 - **In read-only mode**, actions stay in place, greyed, and say why when pressed.
 
 ## The look: Cadran
@@ -50,7 +50,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
 - **The other screens** take the same look: a profile's per-day editor shows the week as on *Play timer* (edited the same way, the quick fills as tiles); *Check the installed games* and *All games* put their lines in cards; *Profiles* and *Help & diagnostics* give each line its icon.
 - **Text size** (*Preferences*, or **AA** in the header):
   - *Automatic*, the default, makes every text 25 % bigger while the console is docked, on the TV, and puts it back in handheld mode; *Larger* keeps it bigger, *Normal* never.
-  - The header, the sidebar and the footer keep their size (they have no room for more), and so do the Restrictions levels' names, large already.
+  - The sidebar's tab names grow too, by 25 % as well; the header's title, pill and date and the footer's button hints and clock grow a little less (15 to 20 %), their rows being full already. A name too long for its room in a language is drawn a little smaller, never smaller than in normal size, rather than cut. The Restrictions levels' names keep their size, large already.
   - It changes at once, on every screen, with no restart.
   - The 25 % come from a 55" TV in 4K: the smallest text (15 px) is then 14.6 mm high in capitals, 20′ of arc from 2.5 m, where reading is comfortable (16′ in normal size, the bare minimum).
 - **Visual effects** (*Preferences*): *Lighter on battery*, the default, leaves out the background glow, the beat of the child screen's ring in its last minutes and the arc's sweep to a new value while no charger is connected (handheld, unplugged); *Always full* keeps them. Read again every 5 seconds, so plugging the console in brings them back.
@@ -109,7 +109,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 - **Ⓐ** on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
 - **Ⓧ** marks an entry for information as read; **Ⓨ** marks them all. An entry marked as read stays read at the next start, until its text changes.
 - **Ignoring:** a few entries to do can be ignored with Ⓧ, after a confirmation and the PIN: a PIN anyone would try first, PlayGuard opening without the PIN, the "time's up" alarm off, the SD card almost full (never no PIN, unlocked controls, the clock, the play timer not counting or PlayGuard's own files). An ignored entry is no longer counted, and is listed last under *Ignored*, where Ⓐ counts it again. It comes back by itself 30 days later (unless *Count ignored warnings again after 30 days* is off), once what it says is fixed and then happens again, or, for the PIN, for a new PIN of another length.
-- *Preferences › Notifications* turns off three kinds: Atmosphère, hekate and firmware releases; the week's play time; reminders (backups, the other system, all games blocked).
+- *Preferences › Notifications* turns off three kinds: Atmosphère, hekate and firmware releases; the week's play time; reminders (backups, the console's second system, blocked games).
 - The state behind it is read when PlayGuard starts, every minute on the main screen, and every 5 s while *Today* is shown.
 
 ## Today — the day at a glance
@@ -128,7 +128,7 @@ Under it, what stops play first:
 ### The actions
 
 - **Extra time**, its amounts in one row (+15 min, +30 min, +1 h), each one press away, then **…** for any other (a duration, another day): an amount focused moves the time up on the line (*with 15 min more*), or says on the bedtime alarm's mark that it still comes first; the first one stands out in teal once 15 min or less are left, or none.
-- **Stop for today**, **Show the child**.
+- **Stop for today**, **Child view**.
 - **Today's limit…**: today's limit picked there and then, written after one confirmation.
 - **The profile in force**, by its name, once a profile is saved (*Profiles…* when none matches): Ⓐ lists them, the one in force ticked, to put another in force after one confirmation (the days that change), or *Manage the profiles…*.
 - While parental controls are unlocked, **Turn back on** comes first, the row's whole width, and *Extra time* steps aside.
@@ -178,10 +178,10 @@ The console shows "Time's up", then suspends the game (no "continue") or only wa
 
 ### The child screen
 
-*Show the child* on *Today*, to hand the console over:
+*Child view* on *Today*, to hand the console over:
 
 - only the time left (while parental controls are unlocked, today's limit, on hold), when play ends (*Ends around 16:40*; when the bedtime alarm comes first, the ring counts down to it instead, *45 min until bedtime*, as it does in the last hour of a day without a limit), the bedtime and what happens when time is up;
-- sized to be read from across the room, on the TV; its text keeps its size whatever the text size;
+- sized to be read from across the room, on the TV; its text keeps its size whatever the text size (only the title and the footer, as on every screen, follow it);
 - in the last 5 minutes (of play or before the bedtime), the end turns amber and the ring pulses slowly; the bedtime turns amber in its last 30;
 - Ⓐ and Ⓨ, the parent's keys, are said small at the top right, so the footer shows the child's alone;
 - Ⓐ goes back to the parent's screens with the PIN; Ⓨ gives extra time from there, after the PIN (the amounts of *Extra time*, the child screen staying); Ⓑ leaves PlayGuard (asking first to turn parental controls back on, as quitting does).
@@ -215,7 +215,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 ### Chips and quick settings
 
-**Chips** above and below the week open their choices at once: the profiles (how many are saved), the same limit every day, the bedtime alarm, *When the time is up* and the removal.
+**Chips** above and below the week open their choices at once: the profiles (how many are saved), the same limit every day, the bedtime alarm and *When the time is up*. *Remove the limit* is the tab's last line, apart (History undoes it).
 
 - **Same limit every day:** a quick list or an exact duration (*Enter a duration…*: ↑/↓ by 15 min, by the hour once held, Ⓛ/Ⓡ by 5 min).
 - **Weekdays and weekend ›:** the editor, asking for Monday–Friday then for the weekend.
@@ -254,7 +254,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=activity)*
 
-Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account by default* (every account, or one; at the bottom of the tab, with *All games*).
+Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account shown first* (every account, or one; at the bottom of the tab, with *All games*).
 
 ### At the top
 
@@ -414,7 +414,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 - **Another homebrew**: any `.nro` of the SD card's `/switch` folder (and one folder down), its name asked first (the `.nro`'s own, to keep or change), then confirmed with what the HOME menu will show: its icon, its name and its publisher. Its icon is the `.nro`'s, made the 256 × 256 JPEG the HOME menu draws when it is another size or a PNG (a controller in its place when the `.nro` has none), as sphaira does. A path with a space is handed to the homebrew quoted.
 - **The forwarders on the HOME menu**, each with its icon: those PlayGuard made (Ⓐ: details, rename, change the publisher, install again, delete) and those another app made (details, delete). Ⓐ opens a sheet in sections (*This forwarder*, *At launch*, *Protection*, *Install and delete*) under its icon and its state, each line with its icon and what is set now (its hours; a switch for *Ask for the PIN*, *Closed once today's play time is used up* and each launch option), *Delete* in red; B or a touch outside it closes it. *Details* lists its rules the same way, then its publisher, version, `.nro` and program ID; Ⓐ on a rule (or the publisher) changes it, as in the sheet. Under the protected ones, a line says what each icon shown there means. One whose `.nro` is gone says so; one deleted in System Settings stays listed until it is installed again or forgotten. Installing again keeps its program ID, so the HOME menu's entry is replaced, not doubled; a forwarder another tool made for the same `.nro` is replaced too.
 - **Protected with the PIN** (Ⓐ › *Protect with the PIN*, for one PlayGuard made other than its own): started from the HOME menu, the forwarder first opens a small gate (`config/playguard/gate.nro`, a few hundred kilobytes that PlayGuard writes from its own files), which shows the console's PIN screen at once, then the homebrew once the PIN is right; B there goes back to the HOME menu. Around the PIN screen, the gate's own: the homebrew's icon and name, *Protected by PlayGuard*, and how it went (starting, in its free hours, PIN not entered), in the console's language, on Cadran's night blue (`make gate-preview` draws it on a computer). It keeps its program ID and its icon, and the change history has it. Its row shows its rules as icons, one for each turned on: a key for the PIN, an open lock for hours without it, a square (stop) for hours it never opens, a timer for closed once today's play time is used up; *Details* (Ⓐ) has them in words. It needs a PIN on the console. *No longer ask for the PIN* asks for it first, whatever *Protect PlayGuard with the PIN* says, and so do deleting it and making it again without the PIN (*Add a forwarder* for the same `.nro`). It guards the HOME menu's icon only: the `.nro` still starts from the homebrew menu, unless that is locked (below). A forwarder protected by an earlier PlayGuard starts PlayGuard itself as its gate, which still works; *Install them all again* moves it to the small gate.
-  - **Hours without the PIN** (Ⓐ on a protected one): every day, Monday to Friday or the weekend, from one hour to another (past midnight too), or *Monday to Friday, and the weekend apart* (a span for each); *Details* says when. Setting them asks for the PIN. They follow the console clock, which System Settings can change: once it is more than 5 minutes away from the network clock, the gate asks for the PIN in them all the same (*No free hours: the console clock differs from the network clock*), and so it does when the network clock cannot be read to check it (*No free hours: the network clock cannot be read to check the console clock*); *Console › Network clock* sets both right, on a console without Internet too.
+  - **Hours without the PIN** (Ⓐ on a protected one): every day, Monday to Friday or the weekend, from one hour to another (past midnight too), or *Monday to Friday, and the weekend apart* (a span for each); *Details* says when. Setting them asks for the PIN. They follow the console clock, which System Settings can change: once it is more than 5 minutes away from the network clock, the gate asks for the PIN in them all the same (*No free hours: the console clock differs from the network clock*), and so it does when the network clock cannot be read to check it (*No free hours: the network clock cannot be read.*); *Console › Network clock* sets both right, on a console without Internet too.
   - **Hours it never opens** (Ⓐ on a protected one), set the same way: then the gate says *Not at this time* and the hours, and goes back to the HOME menu, even with a PIN entered (bedtime for homebrew). They come before the hours without the PIN. With the console clock more than 5 minutes away from the network clock, it stays closed when either clock is in them, and a pause after refusals counts by the network clock and by the console's steady clock (which no setting moves), so moving the time does not get round them.
   - **Closed once today's play time is used up** (Ⓐ on a protected one): when the console's play timer has no time left today, the gate says *Today's play time is used up* and goes back to the HOME menu, PIN or not. Off unless set.
   - **The rules are in the forwarder, not on the SD card:** the hours, the day's limit and the pause after refusals go into the forwarder's own data (on the console's storage), so a computer cannot add free hours by editing a file; changing one makes the forwarder again, in a few seconds. The forwarder also keeps the gate's SHA-256 (`config/playguard/gate-<hash>.nro`): a gate changed on the SD card is not started (error 2347-0100, [troubleshooting](troubleshooting.md#a-protected-forwarder-shows-error-2347-0100)). One protected by an earlier PlayGuard reads its rules from the card: its hours without the PIN are not honoured then, and the bell offers *Make again*.
