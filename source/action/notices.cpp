@@ -17,6 +17,7 @@
 #include "action/pin_lock.hpp"
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
+#include "action/session_pause.hpp"
 #include "action/upload_flow.hpp"
 #include "action/week_qr.hpp"
 #include "activity/onboarding_activity.hpp"
@@ -340,8 +341,9 @@ void note_security(const PctlStatus& s, bool writable)
            "playguard/notices/pin_missing_detail"_i18n, "playguard/onboarding/open"_i18n,
            []() { brls::Application::pushActivity(new OnboardingActivity()); });
 
-    // Unlocked temporarily: no limit at all until locked again.
-    const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked;
+    // Unlocked temporarily: no limit at all until locked again. Not
+    // PlayGuard's own pause while the parent is in it (it ends as it is left).
+    const bool unlocked = s.temp_unlocked_ok && s.temp_unlocked && !session_pause::active();
     toggle(unlocked, "unlocked", Level::Action, "playguard/notices/unlocked"_i18n, "playguard/notices/unlocked_detail"_i18n,
            writable ? "playguard/security/banner_action"_i18n : "", []() {
                console_actions::relock("", []() {

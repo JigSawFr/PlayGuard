@@ -8,6 +8,8 @@
 
 #include <borealis.hpp>
 
+#include "action/session_pause.hpp"
+
 class LockActivity : public brls::Activity
 {
   public:
@@ -23,6 +25,7 @@ class LockActivity : public brls::Activity
 
   private:
     bool over;
+    session_pause::Hold hold;   // play counts as usual until the PIN uncovers PlayGuard
 
     void try_unlock();
 

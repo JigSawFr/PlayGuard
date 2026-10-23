@@ -1981,6 +1981,7 @@
             "pc_on": "Parental controls on",
             "pc_off": "Off",
             "unlocked": "Unlocked",
+            "paused": "Parental controls paused",
             "read_only": "Read-only",
             "timer_on": "Play timer on",
             "timer_off": "Countdown paused",
@@ -1988,6 +1989,10 @@
             "level": "Level · {}",
             "pin_set": "PIN set",
             "pin_none": "No PIN"
+        },
+        "paused": {
+            "body": "Parental controls are paused while you are in PlayGuard: the time spent here does not take from the child's play time. They come back on by themselves as soon as PlayGuard is left (HOME menu, sleep) or closed, and while the child's screen is up.\n\nTurned back on now, they stay on until the PIN is entered again.",
+            "relock": "Turn back on now"
         },
         "week": {
             "no_limit": "no limit",

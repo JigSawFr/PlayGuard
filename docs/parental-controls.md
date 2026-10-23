@@ -468,7 +468,8 @@ From the same 20:10 report:
 - What turned the header's byte `07` from `06` to `00`.
 - The `01` byte of each free-communication list entry.
 - Whether time spent counts while temporarily unlocked (the app says it
-  *may* not).
+  *may* not). PlayGuard's pause while the parent is in it relies on it not
+  counting: compare 1454 before and after a few minutes paused.
 - Whether a game left open on the HOME menu counts (parents report it does;
   it fits "while an application is open") and sleep mode does not: not
   measured by PlayGuard.

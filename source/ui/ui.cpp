@@ -247,6 +247,7 @@ void notify_result(Result rc, const std::string& ok_text, const std::string& err
 }
 
 static bool s_unlocked = false;
+static bool s_paused = false;     // that unlock is session_pause's
 
 // "PlayGuard" and its icons, on the main screen.
 static void update_title()
@@ -256,6 +257,15 @@ static void update_title()
 }
 
 bool known_unlocked() { return s_unlocked; }
+
+bool known_paused() { return s_paused && s_unlocked; }
+
+void note_paused(bool paused)
+{
+    if (paused == s_paused) return;
+    s_paused = paused;
+    brls::sync([]() { update_title(); });
+}
 
 void note_unlocked(bool valid, bool unlocked)
 {

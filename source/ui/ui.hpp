@@ -435,6 +435,10 @@ void        quick_settings(std::function<void()> after = nullptr);
 // keep the previous value). The main screen's title says it while unlocked.
 void note_unlocked(bool valid, bool unlocked);
 bool known_unlocked();
+// That unlock is PlayGuard's own pause while the parent is in it
+// (action/session_pause), not one to turn back on: said calmly.
+void note_paused(bool paused);
+bool known_paused();
 
 // After app::set_read_only / set_dev_mode: updates the main screen title,
 // starts or stops the play-timer recorder (action/pt_log_flow) and re-reads

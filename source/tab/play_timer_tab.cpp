@@ -11,6 +11,7 @@
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
+#include "action/session_pause.hpp"
 #include "activity/play_timer_advanced_activity.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "activity/profiles_activity.hpp"
@@ -238,13 +239,15 @@ void PlayTimerTab::refresh()
     ui::SameTime same_time;
 
     pctl_play_timer_query(&this->pt);
+    ui::note_unlocked(this->pt.temporary_unlocked_valid, this->pt.temporary_unlocked);
+    // Paused for the parent here: the timer as it is for the child.
+    session_pause::shown_as_locked(nullptr, &this->pt);
     state_header->show(this->pt);
     outside_watch::observe(this->pt);
 
     const bool fw_ok    = this->pt.fw_supported;
     const bool writable = fw_ok && !app::read_only();
 
-    ui::note_unlocked(this->pt.temporary_unlocked_valid, this->pt.temporary_unlocked);
     ui::set_visible(fw_note.getView(), !fw_ok);
     for (brls::View* v : { (brls::View*)limit_header.getView(), (brls::View*)split.getView(),
                            (brls::View*)today.getView(), (brls::View*)limit_note.getView(),

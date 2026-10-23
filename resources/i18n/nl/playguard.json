@@ -1981,6 +1981,7 @@
             "pc_on": "Ouderlijk toezicht actief",
             "pc_off": "Uitgeschakeld",
             "unlocked": "Ontgrendeld",
+            "paused": "Ouderlijk toezicht gepauzeerd",
             "read_only": "Alleen-lezen",
             "timer_on": "Timer actief",
             "timer_off": "Aftellen gepauzeerd",
@@ -1988,6 +1989,10 @@
             "level": "Niveau · {}",
             "pin_set": "Pincode ingesteld",
             "pin_none": "Geen pincode"
+        },
+        "paused": {
+            "body": "Ouderlijk toezicht is gepauzeerd zolang u in PlayGuard bent: de tijd hier telt niet mee voor de speeltijd van het kind. Het gaat vanzelf weer aan zodra PlayGuard wordt verlaten (HOME-menu, slaapstand) of gesloten, en zolang het kinderscherm open is.\n\nNu weer aangezet, blijft het aan tot de pincode opnieuw wordt ingevoerd.",
+            "relock": "Nu weer aanzetten"
         },
         "week": {
             "no_limit": "geen limiet",

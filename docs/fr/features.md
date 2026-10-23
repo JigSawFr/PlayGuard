@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 49029f67bfff -->
+<!-- translated from docs/features.md, sha256 7c792cbf4634 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -42,7 +42,7 @@ L'application est organisée en onglets, comme les paramètres de la console ; c
 
 L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets, une palette bleu nuit ou blanc froid (selon le thème), des cartes au lieu des listes. Chaque onglet s'ouvre sur l'essentiel (un anneau, des tuiles, des cartes, des puces), ses autres réglages en dessous.
 
-- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Aujourd'hui › Réactiver*. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé. L'horloge du pied de page affiche les heures et les minutes (*16:00*).
+- **La pastille de l'en-tête** dit de quoi parle l'onglet (*Contrôle parental actif*, *Minuteur actif*…) ; contrôle parental déverrouillé, elle le dit sur chaque onglet, et la toucher ouvre *Aujourd'hui › Réactiver* ; en pause pendant votre visite (voir [plus bas](#le-code-pin-met-le-contrôle-parental-en-pause-pendant-votre-visite)), elle dit *Contrôle parental en pause*, sans alerte, et la toucher explique ce que c'est. Le texte secondaire ne descend jamais sous 15 px, pour se lire depuis le canapé sur une télé. L'horloge du pied de page affiche les heures et les minutes (*16:00*).
 - **Les dialogues** sont des cartes aux boutons en pilules, la confirmation en turquoise (en corail quand elle supprime ou arrête quelque chose).
   - Les choix s'ouvrent en carte au-dessus des aides, le choix actuel sur un turquoise léger avec sa coche. Le contour turquoise n'est qu'au focus, partout : un niveau, un compte, un choix en vigueur garde le fond léger.
   - Un long dialogue s'estompe en bas tant que la suite continue, et son avertissement (une partie sur le point d'être suspendue) vient en premier, dans une carte orange.
@@ -141,7 +141,8 @@ Dessous, ce qui arrêtera le jeu en premier :
 - L'état de la console en **pastilles** :
   - l'une dit si la redirection DNS d'Atmosphère bloque les serveurs de Nintendo, et Ⓐ dessus lesquels et ce que cela change : plus de synchro pour l'application mobile, une horloge réseau qui ne se règle plus seule ;
   - une autre, ouvert en application, que le temps passé dans PlayGuard est décompté : comme ce jeu quand il est ouvert par-dessus un jeu (*Ouvert depuis un jeu*), sous le nom de son icône quand il est lancé par un forwarder du menu HOME (*Ouvert par son icône HOME*), Ⓐ disant comment ;
-  - un jeu laissé ouvert sur le menu HOME apparaît en pastille orange (*toujours décompté*, Ⓐ disant pourquoi), quand la pastille sur le temps de PlayGuard lui-même ne le dit pas déjà.
+  - un jeu laissé ouvert sur le menu HOME apparaît en pastille orange (*toujours décompté*, Ⓐ disant pourquoi), quand la pastille sur le temps de PlayGuard lui-même ne le dit pas déjà ;
+  - ni l'une ni l'autre quand le contrôle parental est en pause pendant votre visite : le temps passé ici n'est alors pas celui de l'enfant.
 - Les pastilles mettent d'abord ce qui demande le parent (orange, avec un triangle), puis ce qui est actif (sarcelle, avec une coche), puis le reste (gris, avec un point) : la forme le dit autant que la couleur.
 - Ce qui va bien et ce qui est seulement signalé se replient en une pastille après celles qui demandent le parent (*✓ 3 vérifications OK*) ; Ⓐ dessus les affiche, tant que l'onglet reste ouvert.
 - Sous les pastilles, le temps en plus encore à retirer (Ⓐ le retire) et l'alarme « temps écoulé » tant qu'elle est désactivée (Ⓐ la réactive).
@@ -152,7 +153,7 @@ Tant que le code PIN et les limites de la semaine ne sont pas définis, une cart
 
 ### La console décompte-t-elle ?
 
-Le temps de PlayGuard lui-même compte quand il tourne comme une application : avec une limite aujourd'hui, le temps restant doit donc baisser tant qu'il est ouvert. S'il n'a pas bougé pendant environ 90 s à l'écran (minuteur actif, limite aujourd'hui, pas de déverrouillage, pas d'ouverture depuis l'album), une ligne orange sous le temps joué indique *La console ne décompte pas le temps de jeu en ce moment*, avec les causes probables :
+Le temps de PlayGuard lui-même compte quand il tourne comme une application : avec une limite aujourd'hui, le temps restant doit donc baisser tant qu'il est ouvert. S'il n'a pas bougé pendant environ 90 s à l'écran (minuteur actif, limite aujourd'hui, ni déverrouillage ni pause pendant votre visite, pas d'ouverture depuis l'album), une ligne orange sous le temps joué indique *La console ne décompte pas le temps de jeu en ce moment*, avec les causes probables :
 
 - l'horloge a été reculée (le décompte reprendra plus tard) ;
 - l'horloge réseau n'a jamais été réglée (*Console › Horloge réseau*) ;
@@ -323,8 +324,15 @@ Le code PIN dans PlayGuard lui-même :
 
 - Une fois saisi, le code vaut jusqu'à la fermeture de PlayGuard ; *Redemander le code PIN après 5 minutes* (désactivé par défaut) le redemande après ce délai, et ramène l'écran verrouillé de *Pour ouvrir PlayGuard* quand PlayGuard revient après 5 min ou plus hors de l'écran.
 - Vérifié dans la couche service, donc aucune modification n'y échappe ; reverrouiller ne le demande jamais. *Afficher le code PIN* le demande à chaque fois, dans tous les modes et même juste après sa saisie, et un `config.json` absent ou abîmé compte comme *Avant une modification*.
+#### Le code PIN met le contrôle parental en pause pendant votre visite
+
+- Une fois le code PIN saisi (l'écran verrouillé de *Pour ouvrir PlayGuard*, la première modification avec *Avant une modification*, le retour depuis l'écran enfant…), PlayGuard déverrouille temporairement le contrôle parental : le temps passé dedans ne compte pas dans le temps de jeu de l'enfant, et *Ouvert depuis un jeu* quitte Aujourd'hui.
+- La pastille de l'en-tête dit *Contrôle parental en pause*, en sarcelle ; la toucher explique ce que c'est, avec *Réactiver maintenant* (plus de pause ensuite jusqu'à la prochaine saisie du code PIN). Aujourd'hui montre la journée telle qu'elle est pour l'enfant, et la tuile de Sécurité dit *Contrôle parental en pause*, sans alerte.
+- Il se réactive de lui-même dès que PlayGuard est quitté (menu HOME, veille) ou fermé, depuis le menu HOME aussi (la fermeture l'attend), et tant que l'écran enfant ou l'écran verrouillé est affiché. De retour dans PlayGuard, le code PIN valant toujours, il se remet en pause.
+- Pas depuis l'album (le temps n'y compte pas, et un jeu peut rester ouvert derrière), pas en lecture seule, et jamais par-dessus un déverrouillage fait avec *Déverrouiller temporairement*, qui reste tel quel.
+- Noté comme tout déverrouillage : si PlayGuard s'arrête sans reverrouiller, son prochain lancement reverrouille, et un redémarrage de la console le fait de lui-même. Cela repose sur le fait que le temps ne compte pas pendant un déverrouillage, déduit mais pas encore mesuré ([plus bas](#ce-qui-compte-comme-temps-de-jeu)).
 - **Verrouiller le menu homebrew ›** ouvre *Console › Forwarders*, où il se verrouille après ses vérifications (voir [Forwarders](#forwarders)).
-- **Quitter** alors que le contrôle parental est encore déverrouillé propose de le reverrouiller (*Réactiver et quitter* ferme aussi le jeu par-dessus lequel PlayGuard a été ouvert, retour au menu HOME plutôt qu'à hbmenu) ; fermé depuis le menu HOME à la place, PlayGuard le reverrouille à son prochain lancement, et un redémarrage de la console le reverrouille de lui-même.
+- **Quitter** alors que le contrôle parental est encore déverrouillé propose de le reverrouiller (*Réactiver et quitter* ferme aussi le jeu par-dessus lequel PlayGuard a été ouvert, retour au menu HOME plutôt qu'à hbmenu) ; fermé depuis le menu HOME à la place, PlayGuard le reverrouille à son prochain lancement, et un redémarrage de la console le reverrouille de lui-même. La pause de PlayGuard lui-même ne demande rien : elle se termine à la fermeture.
 
 ### Application mobile
 
@@ -520,5 +528,5 @@ Le minuteur est celui de la console : PlayGuard le lit, il ne décompte rien lui
 | **PlayGuard ouvert par-dessus un jeu** (en application) | **Oui**, comme ce jeu | Mesuré (22.0.0) : ouvrez-le avec un utilisateur parent, ou depuis l'album pour un coup d'œil |
 | **PlayGuard lancé par un forwarder** (son icône du menu HOME, une application aussi) | **Oui**, sous le nom de l'icône | Déduit : une application comme une autre ; pas mesuré par PlayGuard |
 | PlayGuard ouvert depuis l'album (mode applet) | Non | Déduit : ce n'est pas une application, et le temps hors des applications ne semblait pas décompté |
-| Pendant un déverrouillage temporaire du contrôle parental | Peut-être pas | Pas mesuré : question ouverte |
+| Pendant un déverrouillage temporaire du contrôle parental (la pause de PlayGuard pendant votre visite aussi) | Peut-être pas | Pas mesuré : question ouverte |
 | Après un changement d'horloge | La journée repart de zéro ; après un retour en arrière, le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure | Observé (22.0.0) ; *Aujourd'hui* indique quand la console ne décompte pas |

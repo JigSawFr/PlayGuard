@@ -10,6 +10,7 @@
 
 #include <borealis.hpp>
 
+#include "action/session_pause.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/cadran_digits.hpp"
 #include "view/cadran_icon.hpp"
@@ -24,6 +25,7 @@ class CadranChildActivity : public brls::Activity
 
   private:
     brls::RepeatingTimer timer;
+    session_pause::Hold hold;   // the child's: play counts as usual while it is up
 
     void refresh();
 

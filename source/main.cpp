@@ -28,6 +28,7 @@
 #include "action/pt_log_flow.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
+#include "action/session_pause.hpp"
 #include "activity/init_error_activity.hpp"
 #include "activity/loading_activity.hpp"
 #include "activity/lock_activity.hpp"
@@ -238,6 +239,9 @@ brls::Activity* choose_first()
     pin_lock::install();
     // ... and again after a while away, over whatever is open.
     pin_lock::watch_focus([]() { LockActivity::lock_again(); });
+    // The PIN entered pauses parental controls while PlayGuard is open; left
+    // or closed, they are back on (after the lock screen's own check).
+    session_pause::install();
     // The playguard-rescue sysmodule acted on a RESCUE file: show what it
     // did and let the parent finish, before (and instead of) the lock
     // screen — they are here because they forgot the PIN. Only when the
@@ -349,7 +353,10 @@ void register_views()
 // writes still running finished, the services closed, the session ended.
 void shut_down()
 {
-    // "Turn back on and quit": locked now that the screen is gone (pt_flow.hpp).
+    // The pause of parental controls over (closed from the HOME menu too:
+    // the exit waits for this), then "Turn back on and quit": locked now
+    // that the screen is gone (pt_flow.hpp).
+    session_pause::end();
     pt_flow::lock_at_exit_if_asked();
 
     // Network tasks still running (an update check, a sign-in waiting for its

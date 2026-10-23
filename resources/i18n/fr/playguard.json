@@ -1981,6 +1981,7 @@
             "pc_on": "Contrôle parental actif",
             "pc_off": "Désactivé",
             "unlocked": "Déverrouillé",
+            "paused": "Contrôle parental en pause",
             "read_only": "Lecture seule",
             "timer_on": "Temps de jeu actif",
             "timer_off": "Décompte en pause",
@@ -1988,6 +1989,10 @@
             "level": "Niveau · {}",
             "pin_set": "PIN défini",
             "pin_none": "Pas de code PIN"
+        },
+        "paused": {
+            "body": "Le contrôle parental est en pause tant que vous êtes dans PlayGuard : le temps passé ici ne compte pas dans le temps de jeu de l'enfant. Il se réactive de lui-même dès que PlayGuard est quitté (menu HOME, veille) ou fermé, et tant que l'écran enfant est affiché.\n\nRéactivé maintenant, il le reste jusqu'à la prochaine saisie du code PIN.",
+            "relock": "Réactiver maintenant"
         },
         "week": {
             "no_limit": "pas de limite",

@@ -1981,6 +1981,7 @@
             "pc_on": "家長監護已開啟",
             "pc_off": "已關閉",
             "unlocked": "已解除",
+            "paused": "家長監護已暫停",
             "read_only": "唯讀",
             "timer_on": "計時中",
             "timer_off": "計時已暫停",
@@ -1988,6 +1989,10 @@
             "level": "級別 · {}",
             "pin_set": "已設 PIN",
             "pin_none": "未設 PIN"
+        },
+        "paused": {
+            "body": "您在PlayGuard中時，家長監護處於暫停狀態：在這裡花的時間不會計入孩子的遊玩時間。一旦離開PlayGuard（HOME選單、睡眠模式）或將其關閉，以及顯示孩子畫面期間，家長監護會自動恢復。\n\n現在恢復後，將保持開啟，直到再次輸入PIN碼。",
+            "relock": "立即恢復"
         },
         "week": {
             "no_limit": "無限制",

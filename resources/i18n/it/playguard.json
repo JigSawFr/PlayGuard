@@ -1981,6 +1981,7 @@
             "pc_on": "Filtro famiglia attivo",
             "pc_off": "Disattivato",
             "unlocked": "Sbloccato",
+            "paused": "Filtro famiglia in pausa",
             "read_only": "Sola lettura",
             "timer_on": "Timer attivo",
             "timer_off": "Conteggio in pausa",
@@ -1988,6 +1989,10 @@
             "level": "Livello · {}",
             "pin_set": "PIN impostato",
             "pin_none": "Nessun PIN"
+        },
+        "paused": {
+            "body": "Il filtro famiglia è in pausa mentre sei in PlayGuard: il tempo trascorso qui non conta nel tempo di gioco del bambino. Si riattiva da solo appena si esce da PlayGuard (menu HOME, standby) o lo si chiude, e mentre è aperta la schermata del bambino.\n\nRiattivato ora, resta attivo finché il PIN non viene inserito di nuovo.",
+            "relock": "Riattiva ora"
         },
         "week": {
             "no_limit": "nessun limite",

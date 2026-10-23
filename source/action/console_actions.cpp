@@ -7,6 +7,7 @@
 #include "action/backup_flow.hpp"
 #include "action/history_flow.hpp"
 #include "action/pairing_state.hpp"
+#include "action/session_pause.hpp"
 #include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -77,6 +78,7 @@ void delete_all(const std::string& source, std::function<void()> after)
 void relock(const std::string& source, std::function<void()> after)
 {
     if (ui::refuse_read_only()) return;
+    session_pause::stop();   // by hand: not paused again until the PIN is entered again
     Result rc = pctl_relock();
     record("relock", rc, source);
     ui::notify_result(rc, "playguard/toast/relocked"_i18n, "playguard/toast/relock_err"_i18n);

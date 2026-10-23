@@ -23,6 +23,12 @@ extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_setenv(const char* name, const
     if (!name || std::strncmp(name, "PLAYGUARD_SIM_", 14) != 0)
         return 0;
     sim_env_set(name, value);
+    // The HOME menu taking the screen, or giving it back: the console tells
+    // PlayGuard (its focus event), which locks again, pauses, asks for the PIN.
+    if (std::strcmp(name, "PLAYGUARD_SIM_BACKGROUND") == 0) {
+        const bool focused = !sim_env_flag(name);
+        brls::sync([focused]() { brls::Application::getWindowFocusChangedEvent()->fire(focused); });
+    }
     return 1;
 }
 
