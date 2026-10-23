@@ -132,16 +132,15 @@ async function run(lang, theme, { tab, screens }) {
     if (version) query.set('version', `${version}:`);
     await page.goto(`${base}?${query}`);
     await page.waitForFunction(() => document.getElementById('overlay')?.hidden, null, { timeout: 120000 });
-    // PlayGuard's loading screen is navy (red 11), either theme of its first
-    // screen is grey (red 45 dark, 235 light): wait for the first screen (a
-    // corner of the header), then for its icons.
-    await page.waitForFunction(() => {
-      const c = document.createElement('canvas');
-      c.width = c.height = 1;
-      const g = c.getContext('2d');
-      g.drawImage(document.getElementById('canvas'), 8, 8, 1, 1, 0, 0, 1, 1);
-      return g.getImageData(0, 0, 1, 1).data[0] > 25;
-    }, null, { timeout: 120000, polling: 250 });
+    // The first screen, as the page says it (web/simulator.js: "start-up:
+    // first screen ready" in PlayGuard's log), as tools/web_smoke.py waits
+    // for it: Cadran's dark theme is the loading screen's navy, so no pixel
+    // tells them apart. Then a moment for its icons.
+    await page.waitForFunction(() => ['ready', 'error'].includes(document.body?.dataset.playguard),
+      null, { timeout: 120000, polling: 250 });
+    if (await page.evaluate(() => document.body.dataset.playguard) === 'error') {
+      throw new Error(`${lang}/${theme}: PlayGuard did not start`);
+    }
     await sleep(1000);
     await page.focus('#canvas');
     for (const [name, ...keys] of screens) {
