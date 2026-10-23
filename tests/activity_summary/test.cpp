@@ -94,6 +94,55 @@ static void test_week_trend()
     CHECK(!week_trend_min(*s, d));
 }
 
+static void test_week_trend_words()
+{
+    auto s = sample();   // 150 min over the last 7 days
+    CHECK(!week_trend(*s).known);                       // the week before not read
+    s->prev_week_ok = true;
+    s->prev_week_s = 10 * 60;                           // 20 min a day more
+    WeekTrend t = week_trend(*s);
+    CHECK(t.known && t.trend == Trend::More && t.per_day_min == 20 && t.amount_min == 20);
+    s->prev_week_s = 290 * 60;                          // 20 min a day fewer
+    t = week_trend(*s);
+    CHECK(t.known && t.trend == Trend::Less && t.per_day_min == -20 && t.amount_min == 20);
+    // Within TREND_SAME_MIN either way: about the same; at it, more or less.
+    s->prev_week_s = (150 - 7 * (TREND_SAME_MIN - 1)) * 60;
+    CHECK(week_trend(*s).trend == Trend::Same && week_trend(*s).amount_min == TREND_SAME_MIN - 1);
+    s->prev_week_s = (150 - 7 * TREND_SAME_MIN) * 60;
+    CHECK(week_trend(*s).trend == Trend::More);
+    s->prev_week_s = (150 + 7 * (TREND_SAME_MIN - 1)) * 60;
+    CHECK(week_trend(*s).trend == Trend::Same && week_trend(*s).per_day_min == -(TREND_SAME_MIN - 1));
+    s->prev_week_s = (150 + 7 * TREND_SAME_MIN) * 60;
+    CHECK(week_trend(*s).trend == Trend::Less);
+    s->prev_week_s = 150 * 60;
+    t = week_trend(*s);
+    CHECK(t.trend == Trend::Same && t.amount_min == 0);
+    // At most a day: more than 24 h a day apart says 24 h.
+    s->prev_week_s = 7 * 30 * 3600ULL;
+    t = week_trend(*s);
+    CHECK(t.trend == Trend::Less && t.per_day_min < -24 * 60 && t.amount_min == 24 * 60);
+}
+
+static void test_today_and_days()
+{
+    auto s = sample();
+    TodayPlay t = today_play(*s);
+    CHECK(t.total_s == 30 * 60 && t.games == 1);
+    s->games[1].today_s = 5;
+    t = today_play(*s);
+    CHECK(t.total_s == 30 * 60 + 5 && t.games == 2);
+    s->count = 0;
+    t = today_play(*s);
+    CHECK(t.total_s == 0 && t.games == 0);
+
+    s = sample();
+    uint64_t days[7];
+    std::memset(days, 0xff, sizeof days);   // every day written, not added to
+    day_totals(*s, days);
+    CHECK(days[0] == 30 * 60 && days[1] == 0 && days[2] == 120 * 60);
+    for (int k = 3; k < 7; k++) CHECK(days[k] == 0);
+}
+
 static void test_hours()
 {
     auto s = sample();
@@ -228,6 +277,51 @@ static void test_sort()
     CHECK(names(games) == "Kart,Farm,Old,New");   // total_s still breaks the tie, then the last play
 }
 
+static void test_ranked_and_grew()
+{
+    auto s = sample();
+    add(*s, "Old", 100, 1, 20);   // nothing this week
+    GameStat& n = add(*s, "New", 50, 1, 10);
+    n.week_s = 10 * 60;
+    // Only the games played in the period, most played first.
+    CHECK(names(ranked_games(*s, Week)) == "Farm,Kart,New");
+    CHECK(names(ranked_games(*s, Today)) == "Kart");
+    CHECK(names(ranked_games(*s, AllTime)) == "Kart,Farm,Old,New");
+    s->games[0].totals_ok = false;   // all time without Kart's totals: left out
+    CHECK(names(ranked_games(*s, AllTime)) == "Farm,Old,New");
+    s->games[0].totals_ok = true;
+
+    std::vector<const GameStat*> games = ranked_games(*s, Week);
+    CHECK(grew_most(*s, games, 4, Week).game == nullptr);   // the week before not read
+    s->prev_week_ok = true;
+    // Farm 80 min (20 the week before), Kart 70 (69 before), New 10 (0).
+    s->games[1].prev_week_s = 20 * 60;
+    s->games[0].prev_week_s = 1;
+    Grew g = grew_most(*s, games, 4, Week);
+    CHECK(g.game == &s->games[0] && g.more_s == 70 * 60 - 1);   // Kart: the most, not the first
+    // Only the cards shown count.
+    g = grew_most(*s, games, 1, Week);
+    CHECK(g.game == &s->games[1] && g.more_s == 60 * 60);
+    CHECK(grew_most(*s, games, 0, Week).game == nullptr);
+    // GREW_MIN at least: 29 min 59 s more is not enough.
+    s->games[0].prev_week_s = s->games[0].week_s;
+    s->games[1].prev_week_s = s->games[1].week_s - (uint64_t)GREW_MIN * 60 + 1;
+    CHECK(grew_most(*s, games, 4, Week).game == nullptr);
+    s->games[1].prev_week_s -= 1;
+    g = grew_most(*s, games, 4, Week);
+    CHECK(g.game == &s->games[1] && g.more_s == (uint64_t)GREW_MIN * 60);
+    // Played less: never.
+    s->games[1].prev_week_s = 500 * 60;
+    CHECK(grew_most(*s, games, 4, Week).game == nullptr);
+    // Another period, or the last 7 days not read: none.
+    s->games[1].prev_week_s = 0;
+    CHECK(grew_most(*s, games, 4, Week).game == &s->games[1]);
+    CHECK(grew_most(*s, games, 4, Today).game == nullptr);
+    CHECK(grew_most(*s, games, 4, Month).game == nullptr);
+    s->windows_ok = false;
+    CHECK(grew_most(*s, games, 4, Week).game == nullptr);
+}
+
 static ExportText words()
 {
     ExportText t;
@@ -326,10 +420,13 @@ int main()
 {
     test_periods();
     test_week_trend();
+    test_week_trend_words();
+    test_today_and_days();
     test_hours();
     test_edges();
     test_unattributed();
     test_sort();
+    test_ranked_and_grew();
     test_export();
     test_start_account();
     return CHECK_DONE("activity_summary assertions passed");

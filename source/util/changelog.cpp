@@ -154,39 +154,19 @@ std::vector<Line> parse(const std::string& md, int max_releases)
     };
 
     // HTML comments, invisible on GitHub: skipped, except the console's own
-    //   <!-- console: a line -->              that line, read here only;
-    //   <!-- console:only  …  -->             the lines between, here only;
-    //   <!-- console:hide --> … <!-- /console -->   the lines between, not here.
-    enum { Plain, Comment, Hide, Only } block = Plain;
+    // (text::ConsoleComments). A comment or a block ends the item before it.
+    text::ConsoleComments comments;
     while (!stop && std::getline(in, raw)) {
         if (!raw.empty() && raw.back() == '\r') raw.pop_back();
         const std::string t = text::trim_space(raw);
-        if (block == Comment) {
-            if (t.find("-->") != std::string::npos) block = Plain;
-            continue;
-        }
-        if (block == Hide) {
-            if (t == "<!-- /console -->") block = Plain;
-            continue;
-        }
-        if (block == Only && t == "-->") {
-            block = Plain;
+        std::string inner;
+        const auto step = comments.next(t, inner);
+        if (step == text::ConsoleComments::Skip) continue;
+        if (step != text::ConsoleComments::Show) {
             in_item = false;
-            continue;
-        }
-        if (block == Plain && text::starts_with(t, "<!--")) {
-            in_item = false;
-            const bool closed = t.size() >= 7 && t.compare(t.size() - 3, 3, "-->") == 0;
-            if (t == "<!-- console:hide -->") {
-                block = Hide;
-            } else if (t == "<!-- console:only") {
-                block = Only;
-            } else if (closed && text::starts_with(t, "<!-- console:")) {
-                const std::string inner = text::trim_space(t.substr(13, t.size() - 16));
+            if (step == text::ConsoleComments::Directive) {
                 line(inner, inner);
                 in_item = false;
-            } else if (!closed) {
-                block = Comment;
             }
             continue;
         }

@@ -4,14 +4,11 @@
 
 #include <string>
 
+#include "util/diagnostics_logic.hpp"
 #include "util/pctl_ops_c.hpp"
 
 namespace diagnostic
 {
-
-// The storage the console started from, as the reports name it: "emuMMC",
-// "sysMMC", nullptr when unknown.
-const char* storage_name(SysStorage storage);
 
 // Header (app version, read-only / developer modes, firmware, Atmosphère, launch mode) +
 // this run's start-up times + the logs (this run's session file, how the

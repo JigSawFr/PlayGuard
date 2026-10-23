@@ -481,14 +481,12 @@ void note_play_data(const PtState& pt)
     if (notice_logic::week_due(week.known, week.total_s, cfg.summary_seen, ui::today_date())) {
         std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_play_time(week.per_day_s));
         // Against the 7 days before, as on Activity.
-        int64_t diff = 0;
-        if (activity_summary::week_trend_min(*stats, diff)) {
-            const int64_t same = activity_summary::TREND_SAME_MIN;
-            const uint16_t amount = (uint16_t)std::min<int64_t>(24 * 60, diff < 0 ? -diff : diff);
-            detail += " " + (diff >= same    ? brls::getStr("playguard/notices/week_more", ui::fmt_minutes(amount))
-                             : diff <= -same ? brls::getStr("playguard/notices/week_less", ui::fmt_minutes(amount))
-                                             : "playguard/notices/week_same"_i18n);
-        }
+        using activity_summary::Trend;
+        const auto trend = activity_summary::week_trend(*stats);
+        if (trend.known)
+            detail += " " + (trend.trend == Trend::More   ? brls::getStr("playguard/notices/week_more", ui::fmt_minutes(trend.amount_min))
+                             : trend.trend == Trend::Less ? brls::getStr("playguard/notices/week_less", ui::fmt_minutes(trend.amount_min))
+                                                          : "playguard/notices/week_same"_i18n);
         if (week.top >= 0 && stats->games[week.top].name[0])
             detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
                                           ui::fmt_play_time(week.top_s));

@@ -190,6 +190,7 @@ ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 dns_hosts_SRC   := source/util/dns_hosts.cpp tests/dns_hosts/test.cpp
 sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
+clock_logic_SRC   := source/action/clock_logic.cpp tests/clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
 games_logic_SRC   := source/action/games_logic.cpp tests/games_logic/test.cpp
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
@@ -212,6 +213,9 @@ forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/b
 forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
 forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
+forwarder_rules_logic_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/util/date.cpp source/util/gate_tally.cpp source/action/forwarders_logic.cpp source/action/forwarder_rules_logic.cpp tests/forwarder_rules_logic/test.cpp
+forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
+forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
 markdown_SRC   := source/util/safe_text.cpp source/util/markdown.cpp tests/markdown/test.cpp
@@ -229,6 +233,9 @@ play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
 perf_SRC   := source/util/perf.cpp tests/perf/test.cpp
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
+# fmt header-only: the report's lines are formatted with it.
+diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
+diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY
 # The text helpers that only translate, over ui/tr.hpp's stand-in for
 # borealis' getStr and fmt header-only (the catalogs read by the test).
 format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
@@ -236,6 +243,10 @@ format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/exter
 cadran_text_SRC   := source/ui/cadran_text.cpp tests/cadran_text/test.cpp
 contrast_SRC      := tests/contrast/test.cpp
 cadran_text_FLAGS := $(format_text_FLAGS)
+forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp source/action/forwarders_text.cpp tests/forwarders_text/test.cpp
+forwarders_text_FLAGS := $(format_text_FLAGS)
+forwarders_text_CSRC   := source/core/calendar.c
+forwarders_text_CFLAGS := -std=gnu11 -Isource/core
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_CSRC   := source/core/gamecheck_rules.c
 game_check_text_CFLAGS := -std=gnu11 -Isource/core
