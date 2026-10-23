@@ -2,7 +2,7 @@
 // screen drawn into a buffer as the console's framebuffer (a stride wider
 // than the screen left alone), the night blue at its corners, the badge's
 // teal and the name's light text where they go, the state's colour on its
-// line, a long one wrapped left of the dial; drawn with no font, no icon or a broken one without a fault; the
+// line, a long one wrapped clear of the dial, the light theme; drawn with no font, no icon or a broken one without a fault; the
 // lines there in every language libnx names, the console's font for each.
 // The look itself: make gate-preview.
 #include "check.h"
@@ -40,19 +40,19 @@ static int count_near(int x0, int y0, int x1, int y1, int r, int g, int b, int t
     return n;
 }
 
-static void draw_rules(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f,
-                       const char *note, int warn, unsigned rules)
+static void draw_look(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f,
+                      const char *note, int warn, unsigned rules, int light)
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
-    const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", "PlayGuard · tagline", "21:03", state,
-                           note, warn, rules, NULL, NULL, NULL, 0, 0 };
+    const GateScreen s = { f, f, icon, icon_n, "Star Atlas", "Status line", "A hint", state,
+                           note, warn, rules, NULL, NULL, NULL, 0, 0, light };
     gate_screen_draw(px, W, H, STRIDE, &s);
 }
 
 static void draw_note(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f,
                       const char *note, int warn)
 {
-    draw_rules(state, icon, icon_n, f, note, warn, 0);
+    draw_look(state, icon, icon_n, f, note, warn, 0, 0);
 }
 
 static void draw(GateScreenState state, const unsigned char *icon, size_t icon_n, const unsigned char *f)
@@ -60,20 +60,22 @@ static void draw(GateScreenState state, const unsigned char *icon, size_t icon_n
     draw_note(state, icon, icon_n, f, NULL, 0);
 }
 
-// The rules' chips after the badge: teal there with them, none without.
+// The rules' icons after the badge: teal there with them, more for three.
 static void test_rules(void)
 {
-    draw_rules(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, 0);
-    const int none = count_near(750, 322, 1000, 376, 0x2E, 0xC4, 0xA6, 40);
-    draw_rules(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0,
-               GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT);
-    const int three = count_near(750, 322, 1000, 376, 0x2E, 0xC4, 0xA6, 40);
-    draw_rules(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, GATE_RULE_LIMIT);
-    const int one = count_near(750, 322, 1000, 376, 0x2E, 0xC4, 0xA6, 40);
-    CHECK(none < 20);
-    CHECK(one > 150 && three > 2 * one);
+    draw_look(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, 0, 0);
+    const int none = count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40);
+    draw_look(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0,
+              GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT, 0);
+    const int three = count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40);
+    draw_look(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, GATE_RULE_LIMIT, 0);
+    const int one = count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40);
+    CHECK(none > 300);
+    CHECK(one > none + 40 && three > one + 80);
 }
 
+// Every state centred, as the opening: the icon, the name, the badge in
+// the same places; how it went under them in the state's colour.
 static void test_screen(void)
 {
     draw(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font);
@@ -85,89 +87,115 @@ static void test_screen(void)
     CHECK(r < 0x14 && g < 0x1C && b < 0x2C);
     CHECK(px[W] == 0x12345678u && px[(size_t)(H - 1) * STRIDE + W + 15] == 0x12345678u);
     // The badge's teal, the name's light text, the icon's own colours.
-    CHECK(count_near(470, 335, 720, 366, 0x2E, 0xC4, 0xA6, 40) > 300);
-    CHECK(count_near(400, 245, 640, 295, 0xEE, 0xF2, 0xF8, 30) > 400);
-    CHECK(count_near(112, 214, 344, 446, 0x0B, 0x14, 0x24, 6) < 2000);   // not the empty mark's navy
+    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 300);
+    CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);
+    CHECK(count_near(548, 130, 732, 314, 0x0B, 0x14, 0x24, 6) < 2000);   // not the empty mark's navy
+    CHECK(count_near(0, 0, 400, H, 0xEE, 0xF2, 0xF8, 30) == 0);          // nothing on the left any more
 
     // Refused: its line in coral; an error in amber.
     draw(GateScreen_Refused, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font);
-    CHECK(count_near(400, 420, 700, 460, 0xFF, 0x7A, 0x7A, 40) > 150);
+    CHECK(count_near(380, 495, 900, 530, 0xFF, 0x7A, 0x7A, 40) > 150);
+    CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);   // the name where the opening has it
     draw(GateScreen_Error, NULL, 0, font);
-    CHECK(count_near(400, 420, 700, 460, 0xFF, 0xB5, 0x47, 40) > 150);
+    CHECK(count_near(380, 495, 900, 530, 0xFF, 0xB5, 0x47, 40) > 150);
     // A note under the hint: amber for the day's refusals, teal for the free hours; none, nothing there.
-    CHECK(count_near(400, 525, 800, 556, 0xFF, 0xB5, 0x47, 40) == 0);
+    CHECK(count_near(380, 574, 900, 604, 0xFF, 0xB5, 0x47, 40) == 0);
     draw_note(GateScreen_Refused, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Refused today: 3", 1);
-    CHECK(count_near(400, 525, 800, 556, 0xFF, 0xB5, 0x47, 40) > 100);
+    CHECK(count_near(380, 574, 900, 604, 0xFF, 0xB5, 0x47, 40) > 100);
     draw_note(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Without the PIN: Sat-Sun", 0);
-    CHECK(count_near(400, 525, 800, 556, 0x2E, 0xC4, 0xA6, 40) > 100);
+    CHECK(count_near(380, 574, 900, 604, 0x2E, 0xC4, 0xA6, 40) > 100);
     draw(GateScreen_Error, NULL, 0, font);
     // No icon: PlayGuard's mark in its place (its teal ring).
-    CHECK(count_near(112, 214, 344, 446, 0x2E, 0xC4, 0xA6, 30) > 2000);
+    CHECK(count_near(548, 130, 732, 314, 0x2E, 0xC4, 0xA6, 30) > 2000);
+    // Above PlayGuard's mark at the bottom, with its arc whole.
+    CHECK(count_near(540, 640, 740, 690, 0x2E, 0xC4, 0xA6, 30) > 100);
 
     // A broken icon, no font: drawn all the same, without text.
     static const unsigned char broken[] = { 0xFF, 0xD8, 0xFF, 0x00, 1, 2, 3 };
     draw(GateScreen_Refused, broken, sizeof(broken), NULL);
-    CHECK(count_near(400, 245, 640, 295, 0xEE, 0xF2, 0xF8, 30) == 0);
+    CHECK(count_near(380, 350, 900, 630, 0xEE, 0xF2, 0xF8, 30) == 0);
     gate_screen_draw(NULL, W, H, STRIDE, NULL);   // nothing to draw into: nothing happens
     const GateScreen empty = { 0 };
     gate_screen_draw(px, 64, 32, 64, &empty);     // a tiny buffer: clipped
 }
 
-// A long status wraps under itself, left of the dial; the badge in the
-// console's language, in the console's font when PlayGuard's lacks its letters.
+// PlayGuard's light theme: its cool white, the text in navy, each state's
+// ink darkened for it.
+static void test_light(void)
+{
+    draw_look(GateScreen_Refused, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Refused today: 3", 1, 0, 1);
+    int r, g, b;
+    rgb(2, 2, &r, &g, &b);
+    CHECK(r > 0xE8 && g > 0xE8 && b > 0xE8);
+    rgb(2, H - 3, &r, &g, &b);
+    CHECK(r > 0xD8 && b > r);
+    CHECK(count_near(560, 350, 720, 405, 0x0B, 0x14, 0x24, 30) > 400);   // the name in navy
+    CHECK(count_near(380, 495, 900, 530, 0xB7, 0x1C, 0x1C, 40) > 150);   // the coral ink
+    CHECK(count_near(380, 574, 900, 604, 0x8A, 0x52, 0x00, 40) > 100);   // the amber ink
+    CHECK(count_near(380, 424, 900, 454, 0x0A, 0x70, 0x5F, 40) > 300);   // the badge's teal ink
+    // The opening the same: its bar in the teal fill, its track light.
+    GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", "Starting", NULL,
+                     GateScreen_Opening, NULL, 0, 0, NULL, NULL, NULL, 0.5f, 0.0f, 1 };
+    gate_screen_draw(px, W, H, STRIDE, &s);
+    CHECK(count_near(432, 508, 628, 516, 0x14, 0xA3, 0x8A, 30) > 1200);
+    CHECK(count_near(652, 508, 848, 516, 0xD3, 0xD9, 0xE2, 10) > 1200);
+}
+
+// A long status wraps under itself, centred, clear of the dial; the badge
+// in the console's language, in the console's font when PlayGuard's lacks its letters.
 static void test_wrap(void)
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0;
     const char *longer = "Code PIN non saisi : retour au menu HOME, puis encore un peu de texte pour la seconde ligne.";
     GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", longer, "A hint",
-                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, "Protégé par PlayGuard", NULL, NULL, 0, 0 };
+                     GateScreen_Refused, NULL, 0, 0, "Protégé par PlayGuard", NULL, NULL, 0, 0, 0 };
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(count_near(400, 420, 900, 460, 0xFF, 0x7A, 0x7A, 40) > 150);   // its first line
-    CHECK(count_near(400, 470, 900, 505, 0xFF, 0x7A, 0x7A, 40) > 150);   // its second one
-    CHECK(count_near(945, 400, W, 560, 0xFF, 0x7A, 0x7A, 40) == 0);      // none over the dial
-    CHECK(count_near(470, 335, 720, 366, 0x2E, 0xC4, 0xA6, 40) > 300);   // the badge
+    CHECK(count_near(330, 498, 950, 528, 0xFF, 0x7A, 0x7A, 40) > 150);   // its first line
+    CHECK(count_near(330, 530, 950, 558, 0xFF, 0x7A, 0x7A, 40) > 150);   // its second one
+    CHECK(count_near(945, 400, W, 640, 0xFF, 0x7A, 0x7A, 40) == 0);      // none over the dial
+    CHECK(count_near(0, 400, 320, 640, 0xFF, 0x7A, 0x7A, 40) == 0);      // nor far left
+    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 300);   // the badge
     // Letters Sora has not: drawn all the same (the console's font, here Sora too).
     s.badge = "\xE5\x8F\x97 PlayGuard \xE4\xBF\x9D\xE6\x8A\xA4";
     s.status = "\xE8\xAF\xB7\xE8\xBE\x93\xE5\x85\xA5\xE5\xAE\xB6\xE9\x95\xBF\xE6\x8E\xA7\xE5\x88\xB6PIN\xE4\xBB\xA5\xE5\x90\xAF\xE5\x8A\xA8\xE3\x80\x82";
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(count_near(400, 322, 500, 376, 0x2E, 0xC4, 0xA6, 40) > 100);   // the badge, its padlock
+    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 100);   // the badge, its padlock
 }
 
-// Once refused: Ⓐ and Ⓑ bottom right, in place of the site; the icon's
-// frame in the state's colour, none while it asks.
+// Once refused: Ⓐ and Ⓑ bottom right, level with the mark; the icon's
+// frame in the state's colour, a faint one while it asks.
 static void test_buttons(void)
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0;
     GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", "Refused", "A hint",
-                     "PlayGuard · tagline", "21:03", GateScreen_Refused, NULL, 0, 0, NULL, NULL, NULL, 0, 0 };
+                     GateScreen_Refused, NULL, 0, 0, NULL, NULL, NULL, 0, 0, 0 };
     gate_screen_draw(px, W, H, STRIDE, &s);
-    const int site = count_near(800, 655, W - 60, 690, 0xEE, 0xF2, 0xF8, 20);
-    const int frame = count_near(100, 202, 112, 458, 0xFF, 0x7A, 0x7A, 60);
+    const int none = count_near(860, 645, W - 60, 685, 0xEE, 0xF2, 0xF8, 20);
+    const int frame = count_near(536, 140, 548, 300, 0xFF, 0x7A, 0x7A, 60);
     s.button_a = "Try again";
     s.button_b = "HOME menu";
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(site < 20);
-    CHECK(count_near(800, 655, W - 60, 690, 0xEE, 0xF2, 0xF8, 20) > 800);   // two light discs
+    CHECK(none < 20);
+    CHECK(count_near(860, 645, W - 60, 685, 0xEE, 0xF2, 0xF8, 20) > 800);   // two light discs
     CHECK(frame > 300);
     s.state = GateScreen_Asking;
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(count_near(100, 202, 112, 458, 0xFF, 0x7A, 0x7A, 60) == 0);
+    CHECK(count_near(536, 140, 548, 300, 0xFF, 0x7A, 0x7A, 60) == 0);
 }
 
-// Once it starts: centred, as PlayGuard's loading screen; the bar filled
-// as far as `progress` says, drawn by the motion alone over the still.
+// Once it starts: the bar filled as far as `progress` says, drawn by the
+// motion alone over the still.
 static void test_opening(void)
 {
     for (size_t i = 0; i < (size_t)STRIDE * H; i++) px[i] = 0x12345678u;
     GateScreen s = { font, font, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), "Star Atlas", "Starting", NULL,
-                     "PlayGuard · tagline", "21:03", GateScreen_Opening, "45 min left", 0, GATE_RULE_FREE, NULL, NULL, NULL,
-                     0.5f, 0.25f };
+                     GateScreen_Opening, "45 min left", 0, GATE_RULE_FREE, NULL, NULL, NULL, 0.5f, 0.25f, 0 };
     gate_screen_draw(px, W, H, STRIDE, &s);
     CHECK(px[W] == 0x12345678u);                                          // the stride's margin left alone
     CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);   // the name, centred
     CHECK(count_near(0, 0, 400, H, 0xEE, 0xF2, 0xF8, 30) == 0);          // no text on the left
-    CHECK(count_near(560, 425, 720, 455, 0x2E, 0xC4, 0xA6, 40) > 200);   // the badge
-    CHECK(count_near(960, 100, W, 600, 0x2E, 0xC4, 0xA6, 40) == 0);      // no chips, no text over the dial
+    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 200);   // the badge
+    CHECK(count_near(960, 100, W, 600, 0x2E, 0xC4, 0xA6, 40) == 0);      // no text over the dial
     CHECK(count_near(1000, 100, W, 600, 0x1F, 0x33, 0x55, 30) > 2000);   // the dial's track, behind
     const int half = count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30);
     CHECK(half > 1200);                                                   // the bar's first half filled
@@ -183,7 +211,7 @@ static void test_opening(void)
     CHECK(memcmp(px, whole, bytes) == 0);
 
     // Before the PIN screen the same screen; full at the end; free hours the
-    // same screen; no motion in the other states.
+    // same screen; no motion in the other states, no bar either.
     s.state = GateScreen_Loading;
     gate_screen_draw(px, W, H, STRIDE, &s);
     CHECK(count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30) == half);
@@ -197,7 +225,8 @@ static void test_opening(void)
     memcpy(whole, px, bytes);
     gate_screen_draw_motion(px, W, H, STRIDE, &s);
     CHECK(memcmp(px, whole, bytes) == 0);
-    CHECK(count_near(400, 245, 640, 295, 0xEE, 0xF2, 0xF8, 30) > 400);   // the gate's own layout, its name on the left
+    CHECK(count_near(430, 506, 850, 518, 0x1F, 0x33, 0x55, 10) < 200);   // no bar's track
+    CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);   // the same name, centred
     free(whole);
 
     // No icon: PlayGuard's mark in its place; no font: no text, no fault.
@@ -239,6 +268,7 @@ int main(void)
     test_rules();
     test_wrap();
     test_buttons();
+    test_light();
     test_opening();
     test_text();
     free(px);
