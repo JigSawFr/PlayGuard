@@ -650,6 +650,7 @@
         "no_pin": "Defina primeiro um PIN (Definir ou alterar o PIN).",
         "set": "Proteger o PlayGuard com o PIN: {}",
         "ask_again": "Pedir o PIN novamente após 5 minutos",
+        "pauses": "Pausar o controlo parental enquanto estou no PlayGuard",
         "again_on": {
             "changes": "Pedido novamente após 5 minutos.",
             "open": "Volta após 5 minutos fora do PlayGuard."

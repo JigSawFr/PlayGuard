@@ -40,6 +40,7 @@ class SecurityTab : public TabBase
     BRLS_BIND(brls::DetailCell, unlock,         "sc_unlock");
     BRLS_BIND(brls::BooleanCell, auto_relock,   "sc_auto_relock");
     BRLS_BIND(brls::BooleanCell, pin_ask_again, "sc_pin_ask_again");
+    BRLS_BIND(brls::BooleanCell, pin_pauses,    "sc_pin_pauses");
     BRLS_BIND(brls::DetailCell, pr_active,      "pr_active");
     BRLS_BIND(brls::DetailCell, pr_updated,     "pr_updated");
     BRLS_BIND(brls::DetailCell, pr_decode,      "pr_decode");

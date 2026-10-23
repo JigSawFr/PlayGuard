@@ -325,6 +325,7 @@ The PIN in PlayGuard itself:
 - Checked in the service layer, so no change skips it; locking again never asks. *Show the PIN* asks for it every time, in every mode and even right after it was entered, and a missing or damaged `config.json` counts as *Before a change*.
 #### The PIN pauses parental controls while you are in PlayGuard
 
+- Only with *Security › Pause parental controls while I'm in PlayGuard* on (off by default: then entering the PIN leaves parental controls as they are, and the time spent in PlayGuard counts as play time). Turning it on asks for the PIN.
 - Once the PIN is entered (the lock screen of *To open PlayGuard*, the first change with *Before a change*, the child screen's way back…), PlayGuard unlocks parental controls temporarily, so the time spent in it does not take from the child's play time; *Opened from a game* leaves Today.
 - The header's pill says *Parental controls paused*, in teal; a tap says what that is, with *Turn back on now* (then not paused again until the PIN is entered again). Today shows the day as it is for the child, and the Security tile says *Parental controls paused* with no warning.
 - They come back on by themselves as soon as PlayGuard is left (HOME menu, sleep) or closed, from the HOME menu too (the exit waits for it), and while the child screen or the lock screen is up. Back in PlayGuard with the PIN still holding, they pause again.

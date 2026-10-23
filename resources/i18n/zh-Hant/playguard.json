@@ -650,6 +650,7 @@
         "no_pin": "請先設定PIN碼（「設定或變更PIN碼」）。",
         "set": "用PIN碼保護PlayGuard：{}",
         "ask_again": "5分鐘後再次詢問PIN碼",
+        "pauses": "我在PlayGuard中時暫停家長監護",
         "again_on": {
             "changes": "5分鐘後會再次詢問。",
             "open": "離開PlayGuard 5分鐘後會再次顯示。"

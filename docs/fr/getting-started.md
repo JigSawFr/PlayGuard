@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 150621760428 -->
+<!-- translated from docs/getting-started.md, sha256 e238b54ad0b1 -->
 # Prise en main
 
 De la carte SD à une console réglée pour votre enfant, en une dizaine de minutes, puis les tâches du quotidien. Retour au [README](../../README.md).
@@ -24,7 +24,7 @@ Ouvrez PlayGuard **par-dessus un jeu** (maintenez R en lançant un jeu, avec hbm
 
 - par-dessus un jeu, PlayGuard tourne en application, avec toute sa mémoire ; depuis l'album, il tourne en applet, avec moins ;
 - la console compte le temps passé dans PlayGuard comme celui de ce jeu, et l'attribue au compte choisi au lancement : celui d'un parent, pas d'un enfant ;
-- une fois le code PIN saisi, PlayGuard met le contrôle parental en pause tant que vous y êtes, pour que ce temps ne soit pas pris sur celui de l'enfant ; il revient dès que vous en sortez.
+- ce temps compte dans le temps de jeu de l'enfant, sauf si *Sécurité › Mettre le contrôle parental en pause pendant que je suis dans PlayGuard* est activé (désactivé par défaut) : une fois le code PIN saisi, PlayGuard met alors le contrôle parental en pause tant que vous y êtes, et il revient dès que vous en sortez.
 
 ## 3. Suivre *Premiers pas*
 

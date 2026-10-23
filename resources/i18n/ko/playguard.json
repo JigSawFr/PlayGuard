@@ -650,6 +650,7 @@
         "no_pin": "먼저 PIN을 설정하세요(PIN 설정 또는 변경).",
         "set": "PIN으로 PlayGuard 보호: {}",
         "ask_again": "5분 후 PIN 다시 요구",
+        "pauses": "PlayGuard 사용 중에는 자녀 보호 일시 중지",
         "again_on": {
             "changes": "5분이 지나면 다시 요구합니다.",
             "open": "PlayGuard를 5분 이상 벗어나면 다시 표시됩니다."

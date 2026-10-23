@@ -650,6 +650,7 @@
         "no_pin": "Prima imposta un PIN (Sicurezza e app › Imposta o cambia il PIN).",
         "set": "Proteggi PlayGuard con il PIN: {}",
         "ask_again": "Richiedi di nuovo il PIN dopo 5 minuti",
+        "pauses": "Metti in pausa il filtro famiglia mentre sono in PlayGuard",
         "again_on": {
             "changes": "Richiesto di nuovo dopo 5 minuti.",
             "open": "Ritorna dopo 5 minuti fuori da PlayGuard."

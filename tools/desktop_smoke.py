@@ -391,6 +391,14 @@ if CADRANUNLOCKED:
     env.setdefault("PLAYGUARD_SIM_UNLOCKED", "1")
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "pin_lock": "open", "theme": "light"}, open(config_file, "w"))
+if CADRAN:
+    # The PIN entered on the way back from the child screen pauses parental
+    # controls (Security › Pause parental controls while I'm in PlayGuard,
+    # off by default): the rest of the file as an earlier run left it.
+    os.makedirs(os.path.dirname(config_file), exist_ok=True)
+    cadran_config = json.load(open(config_file)) if os.path.exists(config_file) else {"schema": 1}
+    cadran_config["pin_pauses"] = True
+    json.dump(cadran_config, open(config_file, "w"))
 if CADRANLARGE:
     # The text 25 % bigger, as the console docked draws it by default.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)

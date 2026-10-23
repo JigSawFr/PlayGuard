@@ -53,7 +53,8 @@ void watch_focus(std::function<void()> lock);
 bool at_start();
 
 // Asks for the PIN now. True when it was entered, or when no PIN is set.
-// Entered, it pauses parental controls while PlayGuard is open (session_pause).
+// Entered, it pauses parental controls while PlayGuard is open, when
+// pin_pauses asks for it (session_pause).
 bool ask();
 // The PIN was entered in this run and still holds (as confirm() lets through).
 bool holds();
@@ -87,5 +88,10 @@ void choose(std::function<void()> done);
 // "Ask for the PIN again" (config pin_ask_again). Turning it off asks for
 // the PIN first (confirm()). `done` runs after a change.
 void set_ask_again(bool on, std::function<void()> done);
+
+// "Pause parental controls while I'm in PlayGuard" (config pin_pauses,
+// session_pause). Turning it on asks for the PIN first (confirm()). `done`
+// runs after a change.
+void set_pauses(bool on, std::function<void()> done);
 
 }   // namespace pin_lock

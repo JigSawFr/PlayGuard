@@ -75,6 +75,10 @@ struct Config
     // PIN › Ask for the PIN again: the PIN holds 5 minutes, not until
     // PlayGuard closes ("open" locks again after 5 minutes away).
     bool pin_ask_again = false;
+    // PIN › Pause parental controls while I'm in PlayGuard: the PIN, once
+    // entered, unlocks them until PlayGuard is left (action/session_pause).
+    // Off by default: entering the PIN changes nothing on the console.
+    bool pin_pauses = false;
     // First steps opens by itself at start-up while no PIN is set, unless
     // its "Show at start-up" switch was turned off.
     bool onboarding_at_start = true;

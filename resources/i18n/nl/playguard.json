@@ -650,6 +650,7 @@
         "no_pin": "Stel eerst een pincode in (Pincode instellen of wijzigen).",
         "set": "PlayGuard beveiligen met de pincode: {}",
         "ask_again": "Na 5 minuten opnieuw om de pincode vragen",
+        "pauses": "Ouderlijk toezicht pauzeren zolang ik in PlayGuard ben",
         "again_on": {
             "changes": "Na 5 minuten wordt opnieuw gevraagd.",
             "open": "Het komt terug na 5 minuten buiten PlayGuard."

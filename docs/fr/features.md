@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 584095baaee8 -->
+<!-- translated from docs/features.md, sha256 608b261208f7 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -326,6 +326,7 @@ Le code PIN dans PlayGuard lui-même :
 - Vérifié dans la couche service, donc aucune modification n'y échappe ; reverrouiller ne le demande jamais. *Afficher le code PIN* le demande à chaque fois, dans tous les modes et même juste après sa saisie, et un `config.json` absent ou abîmé compte comme *Avant une modification*.
 #### Le code PIN met le contrôle parental en pause pendant votre visite
 
+- Seulement avec *Sécurité › Mettre le contrôle parental en pause pendant que je suis dans PlayGuard* activé (désactivé par défaut : saisir le code PIN laisse alors le contrôle parental tel quel, et le temps passé dans PlayGuard compte comme du temps de jeu). L'activer demande le code PIN.
 - Une fois le code PIN saisi (l'écran verrouillé de *Pour ouvrir PlayGuard*, la première modification avec *Avant une modification*, le retour depuis l'écran enfant…), PlayGuard déverrouille temporairement le contrôle parental : le temps passé dedans ne compte pas dans le temps de jeu de l'enfant, et *Ouvert depuis un jeu* quitte Aujourd'hui.
 - La pastille de l'en-tête dit *Contrôle parental en pause*, en sarcelle ; la toucher explique ce que c'est, avec *Réactiver maintenant* (plus de pause ensuite jusqu'à la prochaine saisie du code PIN). Aujourd'hui montre la journée telle qu'elle est pour l'enfant, et la tuile de Sécurité dit *Contrôle parental en pause*, sans alerte.
 - Il se réactive de lui-même dès que PlayGuard est quitté (menu HOME, veille) ou fermé, depuis le menu HOME aussi (la fermeture l'attend), et tant que l'écran enfant ou l'écran verrouillé est affiché. De retour dans PlayGuard, le code PIN valant toujours, il se remet en pause.
