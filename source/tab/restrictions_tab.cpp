@@ -273,8 +273,8 @@ void RestrictionsTab::choose_level(int index)
 
 std::string RestrictionsTab::settings_text(const PctlCustomSettings& s) const
 {
-    const std::string org = this->st.rating_org_ok ? std::string(" (") + pctl_rating_org_name(this->st.rating_org) + ")" : "";
-    return cadran_text::table({ { "playguard/restrictions/age"_i18n, ui::age_text(s.rating_age) + org },
+    const std::string org_suffix = this->st.rating_org_ok ? std::string(" (") + pctl_rating_org_name(this->st.rating_org) + ")" : "";
+    return cadran_text::table({ { "playguard/restrictions/age"_i18n, ui::age_text(s.rating_age) + org_suffix },
                                 { "playguard/restrictions/sns"_i18n, ui::yes_no(s.sns_post_restriction) },
                                 { "playguard/restrictions/comm"_i18n, ui::yes_no(s.free_communication_restriction) } });
 }
@@ -404,15 +404,15 @@ void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::st
 void RestrictionsTab::show_tiles(bool custom)
 {
     brls::Theme theme = brls::Application::getTheme();
-    const PctlStatus& st = this->st;
-    const std::string org = st.rating_org_ok ? pctl_rating_org_name(st.rating_org) : "";
+    const PctlStatus& status = this->st;
+    const std::string org_name = status.rating_org_ok ? pctl_rating_org_name(status.rating_org) : "";
     for (Tile& t : this->tiles) {
-        const bool selected = st.safety_level_ok && st.safety_level == t.level;
+        const bool selected = status.safety_level_ok && status.safety_level == t.level;
         PctlCustomSettings s = {};
         bool known = true;   // no restriction: nothing restricted
         if (t.level == PctlSafetyLevel_Custom) {
-            known = st.settings_ok;
-            s = st.settings;
+            known = status.settings_ok;
+            s = status.settings;
         } else if (t.level != PctlSafetyLevel_None) {
             known = R_SUCCEEDED(pctl_get_level_settings(t.level, &s));
         }
@@ -435,7 +435,7 @@ void RestrictionsTab::show_tiles(bool custom)
         t.age->setText(!known ? "—" : ui::age_text(s.rating_age));
         // "PEGI 12" kept on one line; Custom says its own settings too.
         const std::string rated = known && s.rating_age
-            ? brls::getStr("playguard/cadran/restrictions/up_to", (org.empty() ? "—" : org) + "\u00A0" + std::to_string((int)s.rating_age))
+            ? brls::getStr("playguard/cadran/restrictions/up_to", (org_name.empty() ? "—" : org_name) + "\u00A0" + std::to_string((int)s.rating_age))
             : "playguard/cadran/restrictions/any_age"_i18n;
         t.note->setText(t.level == PctlSafetyLevel_Custom ? rated + "\n" + "playguard/cadran/restrictions/custom"_i18n : rated);
         line(t.sns, t.sns_state, t.sns_icon, "playguard/cadran/restrictions/sns"_i18n, known, s.sns_post_restriction);
@@ -443,7 +443,7 @@ void RestrictionsTab::show_tiles(bool custom)
              s.free_communication_restriction);
         // The installed games it blocks, once a game check was made.
         size_t n = 0, of = 0;
-        const bool counted = known && rating_flow::count_blocked(st, s.rating_age, &n, &of);
+        const bool counted = known && rating_flow::count_blocked(status, s.rating_age, &n, &of);
         ui::set_visible(t.games_row, counted);
         if (counted) {
             line(t.games, t.games_state, t.games_icon, "playguard/cadran/restrictions/games"_i18n, true, n > 0,

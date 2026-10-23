@@ -21,7 +21,7 @@ namespace icon_logic
 class Lru
 {
   public:
-    explicit Lru(size_t capacity) : capacity(capacity) { }
+    explicit Lru(size_t most) : capacity(most) { }
 
     // The bytes for `id`, now the most recently used; nullptr when not kept.
     // Valid until the next put().

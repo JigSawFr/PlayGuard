@@ -94,9 +94,9 @@ std::string day_word(const forwarders_logic::ShotTime& t, bool caption)
 class Sheet : public brls::Box
 {
   public:
-    Sheet(const forwarders_logic::Row& row, std::vector<std::string> shots,
-          std::function<void(const std::string&, int)> done)
-        : brls::Box(brls::Axis::COLUMN), row(row), done(std::move(done))
+    Sheet(const forwarders_logic::Row& forwarder, std::vector<std::string> shots,
+          std::function<void(const std::string&, int)> on_done)
+        : brls::Box(brls::Axis::COLUMN), row(forwarder), done(std::move(on_done))
     {
         // Its .nro's own first, then the screenshots; the one in use focused.
         this->choices.push_back(Choice{});
@@ -105,15 +105,15 @@ class Sheet : public brls::Box
             Choice c;
             c.shot = shots[i];
             c.seconds = same[i];
-            if (row.custom_icon && c.shot == row.icon) {
-                c.x = row.icon_x;
+            if (forwarder.custom_icon && c.shot == forwarder.icon) {
+                c.x = forwarder.icon_x;
                 this->focus = this->choices.size();
             }
             this->choices.push_back(std::move(c));
         }
         // In use: its .nro's own, or a screenshot (none of these when it is
         // older than the newest thirty).
-        this->in_use = !row.custom_icon ? 0 : this->focus ? this->focus : this->choices.size();
+        this->in_use = !forwarder.custom_icon ? 0 : this->focus ? this->focus : this->choices.size();
 
         brls::Theme theme = brls::Application::getTheme();
         this->setId("cadran_sheet");
@@ -471,11 +471,11 @@ class Sheet : public brls::Box
                                          : this->row.custom_icon && c.shot == this->row.icon && c.x == this->row.icon_x;
         std::function<void()> then;
         if (!same) {
-            const auto done = this->done;
+            const auto picked = this->done;
             const std::string shot = c.shot;
             const int x = c.x;
-            then = [done, shot, x]() {
-                if (done) done(shot, x);
+            then = [picked, shot, x]() {
+                if (picked) picked(shot, x);
             };
         }
         ui::close_sheet(then);

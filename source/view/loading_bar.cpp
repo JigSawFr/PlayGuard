@@ -42,7 +42,7 @@ void LoadingBar::reset()
     this->since = brls::getCPUTimeUsec();
 }
 
-void LoadingBar::moveTo(float value, float duration_us, bool steady)
+void LoadingBar::moveTo(float value, float duration_us, bool at_steady_pace)
 {
     // From where the fill is drawn now, not from the last value asked.
     const brls::Time now = brls::getCPUTimeUsec();
@@ -50,7 +50,7 @@ void LoadingBar::moveTo(float value, float duration_us, bool steady)
     this->to       = std::clamp(value, 0.0f, 1.0f);
     this->since    = now;
     this->duration = std::max(duration_us, 1.0f);
-    this->steady   = steady;
+    this->steady   = at_steady_pace;
 }
 
 float LoadingBar::drawn(brls::Time now) const

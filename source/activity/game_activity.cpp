@@ -12,9 +12,9 @@
 
 using namespace brls::literals;
 
-GameActivity::GameActivity(GameStat game, std::shared_ptr<const PlayStats> stats, std::vector<unsigned char> icon,
-                           bool every_account)
-    : game(game), stats(std::move(stats)), icon_bytes(std::move(icon)), every_account(every_account)
+GameActivity::GameActivity(GameStat shown, std::shared_ptr<const PlayStats> play_stats, std::vector<unsigned char> cover,
+                           bool all_accounts)
+    : game(shown), stats(std::move(play_stats)), icon_bytes(std::move(cover)), every_account(all_accounts)
 {
 }
 

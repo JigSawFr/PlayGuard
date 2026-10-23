@@ -313,14 +313,14 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
             this->remove_next(removal, at);
             return;
         }
-        const GameFacts& g = removal->games[at];
-        const Result rc = gamecheck_remove(g.app_id);
+        const GameFacts& game = removal->games[at];
+        const Result rc = gamecheck_remove(game.app_id);
         if (R_SUCCEEDED(rc)) {
-            history_flow::record_event("remove_game", "", history_label(g));
+            history_flow::record_event("remove_game", "", history_label(game));
             removal->removed++;
         } else {
-            removal->failed.push_back(g);
-            brls::Logger::warning("games: {} not removed ({})", id_text(g.app_id), ui::rc_text(rc));
+            removal->failed.push_back(game);
+            brls::Logger::warning("games: {} not removed ({})", id_text(game.app_id), ui::rc_text(rc));
         }
         this->remove_next(removal, at + 1);
     };

@@ -145,12 +145,12 @@ void HistoryActivity::rebuild()
         for (size_t i = 0; i < this->shown.size(); i++) ui::set_visible(slots[i], true);
     });
     if (this->empty_card.box) {
-        const bool all = this->filter == Filter::All;
+        const bool unfiltered = this->filter == Filter::All;
         ui::set_visible(empty.getView(), false);
         ui::set_visible(this->empty_card.box, this->shown.empty());
-        this->empty_card.title->setText(all ? "playguard/history/empty_title"_i18n : "playguard/history/none_shown"_i18n);
-        this->empty_card.text->setText(all ? "playguard/history/empty_text"_i18n : "");
-        ui::set_visible(this->empty_card.text, all);
+        this->empty_card.title->setText(unfiltered ? "playguard/history/empty_title"_i18n : "playguard/history/none_shown"_i18n);
+        this->empty_card.text->setText(unfiltered ? "playguard/history/empty_text"_i18n : "");
+        ui::set_visible(this->empty_card.text, unfiltered);
     } else {
         ui::set_visible(empty.getView(), this->shown.empty());
         empty->setText(this->filter == Filter::All ? "playguard/history/none"_i18n : "playguard/history/none_shown"_i18n);
