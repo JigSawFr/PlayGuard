@@ -22,7 +22,8 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 
 ## 2. La porte du code PIN
 
-- ☐ *Demander le code PIN* activé pour sphaira, puis le lancer depuis le menu HOME : l'écran de la porte (bleu nuit, *Protected by PlayGuard*, l'icône et le nom de sphaira, dans la langue de la console), puis l'écran du code PIN de la console.
+- ☐ *Demander le code PIN* activé pour sphaira, puis le lancer depuis le menu HOME : l'écran de la porte (à la manière de l'écran de chargement de PlayGuard, *Protégé par PlayGuard*, l'icône et le nom de sphaira, dans la langue et le thème de PlayGuard), puis l'écran du code PIN de la console.
+- ☐ Les *Préférences* de PlayGuard réglées sur une autre langue que celle de la console et sur le thème clair, puis sphaira relancé : la porte dans cette langue, sur le blanc du thème clair ; *Thème* sur *Console*, elle suit le thème de la console. B sur l'écran du code PIN : l'issue présentée comme l'écran de chargement, dans la même langue et le même thème.
 - ☐ L'interrupteur désactivé, puis ZR dans les 8 secondes : de nouveau protégé (le code PIN demandé d'abord pour le désactiver).
 - ☐ Le code PIN saisi : sphaira se lance. Dans PlayGuard : l'*Historique* a *Forwarder ouvert avec le code PIN*, et l'icône de sphaira porte une coche.
 - ☐ B sur l'écran du code PIN : retour au menu HOME, la porte disant *Code PIN non saisi*, puis *Refus aujourd'hui : 1* ; encore une fois : *Refus aujourd'hui : 2* pendant qu'il le demande.

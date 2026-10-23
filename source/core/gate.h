@@ -129,6 +129,24 @@ const char *gate_result_name(GateResult r);   // "pin", "free", "refused", "erro
 // a file (NULL) or one it cannot read.
 unsigned gate_wait_parse(const char *text, size_t len);
 
+// PlayGuard's own language and theme (Preferences), from its config.json
+// (GATE_CONFIG_NAME): the gate speaks and looks as PlayGuard does, not as
+// the console does. `language`: libnx's SetLanguage number (gate_text.h),
+// -1 for the console's ("system", none, or one it does not know). `theme`:
+// GateTheme_*, dark without a file or a key, as PlayGuard's default.
+#define GATE_CONFIG_NAME "config.json"
+enum { GateTheme_Dark = 0, GateTheme_Light, GateTheme_System };
+typedef struct {
+    int language;
+    int theme;
+} GateLook;
+// The top-level "language" and "theme" of `json` (`len` bytes, NULL for
+// none); what it cannot read keeps its default.
+void gate_look_parse(const char *json, size_t len, GateLook *out);
+// "fr-CA" (config::LANGUAGES) as a SetLanguage number; -1 for "system" or
+// one it does not know.
+int gate_language_of(const char *code, size_t len);
+
 // The pause after refusals (GATE_PAUSE_NAME): `tries` refused in a row (the
 // PIN screen left with B) and the forwarder does not ask again for
 // `minutes`. Its file: "rule\t<tries>\t<minutes>\n" (PlayGuard's; tries 0:
