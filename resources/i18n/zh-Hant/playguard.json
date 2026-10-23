@@ -2052,8 +2052,7 @@
             "to_settings": "查看設定",
             "games": "被限制的遊戲",
             "games_none": "無",
-            "current": "目前",
-            "allowed": "允許"
+            "current": "目前"
         },
         "clock": {
             "console": "主機",

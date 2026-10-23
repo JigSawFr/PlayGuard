@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 86861c409fdc -->
+<!-- translated from docs/features.md, sha256 2b62c2fbd0de -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Novo no PlayGuard? Comece por [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -294,7 +294,7 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **no total**, a partir do pr�
 
 *[Experimentar no simulador ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **O nível de restrição:** Criança pequena, Criança, Adolescente e Personalizado lado a lado em mosaicos, cada um com o que restringe (um cadeado para o que é restrito, *Permitido* por extenso no resto, e os jogos instalados que bloqueia; Ⓐ escolhe-o; com *Personalizado* em vigor, Ⓐ leva às suas definições, mais abaixo); *Nenhum* por baixo deles. O nível em vigor diz *✓ Atual*; o contorno verde-azulado só está onde está o foco. O que um nível restringe (limite de idade, publicações, comunicação) é dito de novo antes de ser aplicado; *Nenhum* pergunta a coral, pois levanta todas as restrições.
+- **O nível de restrição:** Criança pequena, Criança, Adolescente e Personalizado lado a lado em mosaicos, cada um com o que restringe (um cadeado coral para o que é restrito, um visto verde no resto, e os jogos instalados que bloqueia; Ⓐ escolhe-o; com *Personalizado* em vigor, Ⓐ leva às suas definições, mais abaixo); *Nenhum* por baixo deles. O nível em vigor diz *✓ Atual*; o contorno verde-azulado só está onde está o foco. O que um nível restringe (limite de idade, publicações, comunicação) é dito de novo antes de ser aplicado; *Nenhum* pergunta a coral, pois levanta todas as restrições.
 - **As definições do nível:** classificação etária, publicação nas redes sociais, comunicação com outras pessoas. Num nível predefinido, são as dele: alterar uma torna o nível *Personalizado*, a partir das definições do nível predefinido com essa alteração, depois de perguntar (com as definições listadas).
 - **Em *Classificação etária*,** o **organismo de classificação** (PEGI, ESRB, USK, CERO …): a lista diz para que países cada um classifica (PEGI: a maior parte da Europa, ESRB: Estados Unidos, Canadá e América Latina, USK: Alemanha, PEGI BBFC: Reino Unido…).
 - **Jogos instalados bloqueados** (também em *Classificação etária*): quantos dos jogos instalados o nível em vigor bloqueia pela sua classificação etária (*3 de 15*), com Ⓐ a listá-los com a sua classificação (*PEGI 16*); o mosaico de cada nível também o indica (*Jogos bloqueados · 3*).

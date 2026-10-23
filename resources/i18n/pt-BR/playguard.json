@@ -2052,8 +2052,7 @@
             "to_settings": "Configurações",
             "games": "Jogos bloqueados",
             "games_none": "nenhum",
-            "current": "Atual",
-            "allowed": "Permitido"
+            "current": "Atual"
         },
         "clock": {
             "console": "Console",

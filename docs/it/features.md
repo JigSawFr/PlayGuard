@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 86861c409fdc -->
+<!-- translated from docs/features.md, sha256 2b62c2fbd0de -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Nuovo su PlayGuard? Comincia da [Per iniziare](getting-started.md). Torna al [README](../../README.md).
@@ -294,7 +294,7 @@ Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registr
 
 *[Provalo nel simulatore ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **Il livello limitazioni:** Bambino piccolo, Bambino, Adolescente e Personalizzato affiancati come tessere, ognuno con ciò che limita (un lucchetto per ciò che è limitato, *Consentito* scritto per il resto, e i giochi installati che blocca; Ⓐ lo imposta; con *Personalizzato* in vigore, Ⓐ porta alle sue impostazioni qui sotto); *Nessuno* sotto di esse. Il livello in vigore dice *✓ Attuale*; il contorno verde acqua è solo dove si trova il focus. Ciò che un livello limita (limite di età, pubblicazione, comunicazione) viene ripetuto prima di impostarlo; *Nessuno* lo chiede in corallo, perché toglie ogni limitazione.
+- **Il livello limitazioni:** Bambino piccolo, Bambino, Adolescente e Personalizzato affiancati come tessere, ognuno con ciò che limita (un lucchetto corallo per ciò che è limitato, una spunta verde per il resto, e i giochi installati che blocca; Ⓐ lo imposta; con *Personalizzato* in vigore, Ⓐ porta alle sue impostazioni qui sotto); *Nessuno* sotto di esse. Il livello in vigore dice *✓ Attuale*; il contorno verde acqua è solo dove si trova il focus. Ciò che un livello limita (limite di età, pubblicazione, comunicazione) viene ripetuto prima di impostarlo; *Nessuno* lo chiede in corallo, perché toglie ogni limitazione.
 - **Le impostazioni del livello:** classificazione per età, pubblicazione sui social media, comunicazione con altri utenti. Con un livello predefinito sono le sue: cambiarne una rende il livello *Personalizzato*, dalle impostazioni del livello predefinito con quella modifica, dopo una domanda (con le impostazioni elencate).
 - **In *Classificazione*,** il **sistema di classificazione** (PEGI, ESRB, USK, CERO …): l'elenco indica i paesi per cui classifica ognuno (PEGI: gran parte dell'Europa, ESRB: Stati Uniti, Canada e America Latina, USK: Germania, PEGI BBFC: Regno Unito…).
 - **Giochi installati bloccati** (anche in *Classificazione*): quanti dei giochi installati il livello in vigore blocca in base alla loro classificazione per età (*3 su 15*), con Ⓐ che li elenca con la loro classificazione (*PEGI 16*); lo dice anche la tessera di ogni livello (*Giochi bloccati · 3*).

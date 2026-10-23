@@ -2052,8 +2052,7 @@
             "to_settings": "Настройки",
             "games": "Заблокировано игр",
             "games_none": "нет",
-            "current": "Текущий",
-            "allowed": "Разрешено"
+            "current": "Текущий"
         },
         "clock": {
             "console": "Консоль",

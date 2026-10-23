@@ -2052,8 +2052,7 @@
             "to_settings": "設定を見る",
             "games": "制限されるソフト",
             "games_none": "なし",
-            "current": "現在",
-            "allowed": "許可"
+            "current": "現在"
         },
         "clock": {
             "console": "本体",

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 86861c409fdc -->
+<!-- translated from docs/features.md, sha256 2b62c2fbd0de -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Es nuevo en PlayGuard? Empiece por [primeros pasos](getting-started.md). Volver al [README](../../README.md).
@@ -294,7 +294,7 @@ Tiempo por juego **hoy**, en los **últimos 7 días** y **en total**, a partir d
 
 *[Probarlo en el simulador ›](https://playguard.link/simulator/?tab=restrictions)*
 
-- **El nivel de restricción:** Niños pequeños, Niños, Adolescentes y Personalizado, uno al lado del otro como mosaicos, cada uno con lo que restringe (un candado para lo restringido, *Permitido* escrito en los demás casos, y los juegos instalados que bloquea; Ⓐ lo aplica; en *Personalizado* ya vigente, Ⓐ lleva a sus opciones de abajo); *Ninguno* debajo. El nivel vigente indica *✓ Actual*; el contorno turquesa solo está donde está el foco. Lo que restringe un nivel (límite de edad, publicaciones, comunicación) se vuelve a indicar antes de aplicarlo; *Ninguno* lo pregunta en coral, ya que quita todas las restricciones.
+- **El nivel de restricción:** Niños pequeños, Niños, Adolescentes y Personalizado, uno al lado del otro como mosaicos, cada uno con lo que restringe (un candado coral para lo restringido, una marca de verificación verde en los demás casos, y los juegos instalados que bloquea; Ⓐ lo aplica; en *Personalizado* ya vigente, Ⓐ lleva a sus opciones de abajo); *Ninguno* debajo. El nivel vigente indica *✓ Actual*; el contorno turquesa solo está donde está el foco. Lo que restringe un nivel (límite de edad, publicaciones, comunicación) se vuelve a indicar antes de aplicarlo; *Ninguno* lo pregunta en coral, ya que quita todas las restricciones.
 - **Las opciones del nivel:** clasificación por edad, publicaciones en redes sociales, comunicación con otros usuarios. Con un nivel predefinido, son las suyas: cambiar una convierte el nivel en *Personalizado*, a partir de las opciones del nivel predefinido con ese cambio, después de preguntar (con las opciones enumeradas).
 - **En *Clasificación por edad*,** el **sistema de clasificación** (PEGI, ESRB, USK, CERO …): la lista indica los países para los que clasifica cada uno (PEGI: la mayor parte de Europa, ESRB: Estados Unidos, Canadá y Latinoamérica, USK: Alemania, PEGI BBFC: Reino Unido…).
 - **Juegos instalados que bloquea** (también en *Clasificación por edad*): cuántos de los juegos instalados bloquea el nivel vigente por su clasificación por edad (*3 de 15*), y Ⓐ los enumera con su clasificación (*PEGI 16*); el mosaico de cada nivel también lo indica (*Juegos bloqueados · 3*).

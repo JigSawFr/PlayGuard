@@ -2052,8 +2052,7 @@
             "to_settings": "查看设置",
             "games": "被限制的游戏",
             "games_none": "无",
-            "current": "当前",
-            "allowed": "允许"
+            "current": "当前"
         },
         "clock": {
             "console": "主机",
