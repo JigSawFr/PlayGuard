@@ -25,6 +25,12 @@
             paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
+            <!-- A on each: its release notes (activity/sys_notes_activity.hpp). -->
+            <brls:Header title="@i18n/playguard/tools/section_system" marginBottom="8"/>
+            <brls:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>
+            <brls:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
+            <brls:DetailCell id="cn_hekate" title="hekate"/>
+            <brls:DetailCell id="cn_syspatch" title="sys-patch"/>
             <!-- Tiles: the screens of their own (the network clock, the
                  installed games, homebrew on the HOME menu:
                  activity/forwarders_activity.hpp). -->
@@ -32,12 +38,6 @@
             <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
             <brls:DetailCell id="cn_games" title="@i18n/playguard/games/open"/>
             <brls:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
-            <!-- A on each: its release notes (activity/sys_notes_activity.hpp). -->
-            <brls:Header title="@i18n/playguard/tools/section_system" marginBottom="8"/>
-            <brls:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>
-            <brls:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
-            <brls:DetailCell id="cn_hekate" title="hekate"/>
-            <brls:DetailCell id="cn_syspatch" title="sys-patch"/>
             <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>
             <brls:DetailCell id="cn_storage" focusable="false" title="@i18n/playguard/tools/storage"/>

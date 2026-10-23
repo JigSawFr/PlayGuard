@@ -312,11 +312,13 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->setJustifyContent(brls::JustifyContent::FLEX_START);
         cell->setGrow(1.0f);
         cell->setWidth(0);
-        // At least this tall, taller when a title takes two lines (larger text).
+        // At least this tall, taller when a title takes two lines (larger
+        // text); an action tile as tall as its line (and its words, if any).
         cell->setHeight(brls::View::AUTO);
-        cell->setMinHeight(status ? 128 : 120);
+        cell->setMinHeight(status ? 128 : 0);
         if (status) this->readings.push_back(cell);
-        cell->setPadding(20, 22, 18, 22);
+        if (status) cell->setPadding(20, 22, 18, 22);
+        else cell->setPadding(17, 20, 15, 20);
         cell->setMarginRight(0);
         cell->setCornerRadius(kit::RADIUS_CARD);
         cell->setHighlightCornerRadius(kit::RADIUS_CARD);
@@ -324,11 +326,20 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->setBorderColor(theme["cadran/line"]);
         cell->setBorderThickness(1);
         cell->setLineBottom(0);
+        // The icon on its own line above a status tile's title; before an
+        // action tile's, on the same line.
         auto* head = new brls::Box(brls::Axis::ROW);
         head->setAlignItems(brls::AlignItems::CENTER);
-        head->setMarginBottom(status ? 10 : 14);
-        head->addView(make_icon(cells[i].second, status ? 22 : 26, theme["cadran/teal"]));
+        head->setMarginBottom(status ? 10 : 0);
+        brls::View* icon = make_icon(cells[i].second, status ? 22 : 24, theme["cadran/teal"]);
+        head->addView(icon);
         cell->addView(head, 0);
+        if (!status) {
+            icon->setMarginRight(14);
+            cell->removeView(cell->title, false);
+            head->addView(cell->title);
+            cell->title->setShrink(1.0f);
+        }
         cell->title->setGrow(0);
         cell->title->setMarginRight(0);
         cell->title->setSingleLine(false);
