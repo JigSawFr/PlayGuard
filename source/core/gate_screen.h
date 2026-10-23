@@ -1,8 +1,10 @@
 // gate_screen — what the PIN gate of a protected forwarder shows around the
 // system's PIN screen (core/gate_nx.h): the homebrew's icon and name,
 // "Protected by PlayGuard", and how it went, on Cadran's night blue with its
-// dial. Drawn into a 32-bit RGBA buffer: the console's framebuffer, or an
-// image on a computer (tools/gate_preview.c, tests/gate_screen).
+// dial; once it starts, an opening as PlayGuard's loading screen (centred,
+// a bar filling, the mark's arc turning). Drawn into a 32-bit RGBA buffer:
+// the console's framebuffer, or an image on a computer (tools/gate_preview.c,
+// tests/gate_screen).
 //
 // Plain C, no libnx; text and the icon through extern/stb/pg_stb.h.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -27,6 +29,7 @@ typedef enum {
     GateScreen_Paused,       // paused after refusals: back to the HOME menu, the PIN not asked
     GateScreen_Closed,       // in its hours without any access: back to the HOME menu
     GateScreen_Limit,        // the day's play time used up: back to the HOME menu
+    GateScreen_Loading,      // the opening, before the system's PIN screen
 } GateScreenState;
 
 // The rules a forwarder carries (GateScreen.rules), each an icon by the
@@ -56,6 +59,11 @@ typedef struct {
     // menu puts its buttons ("Try again", "HOME menu"); NULL: none.
     const char          *button_a;
     const char          *button_b;
+    // The opening (GateScreen_Loading, _Opening, _Free), as PlayGuard's
+    // loading screen: its bar filled to `progress` (0..1), the arc of
+    // PlayGuard's mark turned by `spin` (in turns).
+    float                progress;
+    float                spin;
 } GateScreen;
 
 // Draws `s` into `px` (`w` x `h` pixels, `stride` pixels a row, RGBA: R in
@@ -63,6 +71,12 @@ typedef struct {
 // of the dial, the status and the hint on up to two lines each; a missing
 // font draws no text, a missing icon PlayGuard's mark in its place.
 void gate_screen_draw(uint32_t *px, int w, int h, int stride, const GateScreen *s);
+
+// The same in two parts, for the opening's animation: what stays, once,
+// then each frame, over a copy of it, what moves (the bar, the mark's arc;
+// nothing in the other states). gate_screen_draw draws both.
+void gate_screen_draw_still(uint32_t *px, int w, int h, int stride, const GateScreen *s);
+void gate_screen_draw_motion(uint32_t *px, int w, int h, int stride, const GateScreen *s);
 
 #ifdef __cplusplus
 }

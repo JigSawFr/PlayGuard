@@ -10,6 +10,7 @@ void LoadingActivity::onContentAvailable()
     // its tile). Else the brand's navy, as the store banner.
     const bool light = brls::Application::getPlatform()->getThemeVariant() == brls::ThemeVariant::LIGHT;
     this->bar->setBrand(!light);
+    this->dial->setLight(light);
     if (light) {
         brls::Theme theme = brls::Application::getTheme();
         this->root->setBackgroundColor(theme["brls/background"]);

@@ -1452,7 +1452,7 @@ if HBMENU:
         fail("override_config.ini is not locked: " + repr(text))
     if not os.path.exists(hbmenu_state) or len(recorded("lock_hbmenu")) != 1:
         fail("the lock's state file or its history entry is missing")
-    key("Down", 4)             # Protect every forwarder, Pause after refused PINs, Tries this week, Check the homebrew menu
+    key("Down", 5)             # Protect every forwarder, Pause after refused PINs, Opening screen, Tries this week, Check the homebrew menu
     key("Return")
     shot("05_check")           # the album and R closed, the ways back, the module
     key("Return")              # OK
@@ -1460,7 +1460,7 @@ if HBMENU:
     key("Return")
     shot("08_week")            # sphaira: refused 3 times on the 7th, opened once
     key("Return")              # OK
-    key("Up", 9)               # Pause after refused PINs, Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas, sphaira
+    key("Up", 10)              # Opening screen, Pause after refused PINs, Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas, sphaira
     key("Return")
     go_to("Delete")
     key("Return")              # refused: the last way back through a menu
@@ -1477,7 +1477,7 @@ if HBMENU:
     if os.path.exists(hbmenu_state) or len(recorded("unlock_hbmenu")) != 1:
         fail("the state file stayed, or the unlock is not in the history")
     shot("07_unlocked")
-    key("Down", 4)             # Protect every forwarder, Pause after refused PINs, Tries this week, Check the homebrew menu
+    key("Down", 5)             # Protect every forwarder, Pause after refused PINs, Opening screen, Tries this week, Check the homebrew menu
     key("Return")
     shot("09_check_open")      # not locked, said first; the album and R open; Lock offered; the module of PlayGuard 1.2.0
     finish()
@@ -1554,7 +1554,15 @@ if HOMEBREW:
     time.sleep(3)
     if not data("gate_pause.txt").startswith("rule\t5\t60\n") or len(recorded("gate_pause")) != 1:
         fail("the pause's rule was not written: " + repr(data("gate_pause.txt")))
-    key("Up", 7)               # Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas
+    key("Down")                # Opening screen: 2 s, the default, without its file
+    key("Return")
+    shot("03_wait")            # off, 1 s, 2 s (the default, checked), 3 s, 5 s
+    go_to("3 s")
+    key("Return")
+    time.sleep(1)
+    if data("gate_wait.txt") != "3000\n":
+        fail("the opening screen's time was not written: " + repr(data("gate_wait.txt")))
+    key("Up", 8)               # Pause after refused PINs, Protect every forwarder, Lock, Install them all again, Another homebrew, PlayGuard's line, Save Keeper, Star Atlas
     key("Return")
     go_to("Change the icon")
     key("Return")
@@ -1582,7 +1590,7 @@ if HOMEBREW:
     made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
     if [e.get("icon") for e in made] != [None]:
         fail("Star Atlas's own icon was not put back: " + repr(made))
-    key("Down", 9)             # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Tries this week, Check
+    key("Down", 10)            # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Opening screen, Tries this week, Check
     key("Return")
     key("Left")                # Rescue sheet
     key("Return")

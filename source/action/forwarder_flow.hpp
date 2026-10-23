@@ -133,6 +133,13 @@ std::string pause_label(unsigned tries, unsigned minutes);
 std::string until_label(uint64_t posix);
 void lift_pause(const forwarders_logic::Row& row, std::function<void(bool)> done);
 
+// The opening screen once a protected forwarder starts (GATE_WAIT_NAME,
+// read by the gate at each start): how long, in milliseconds (the gate's
+// GATE_WAIT_MS without the file); set; "2 s", or "Off" for 0.
+unsigned launch_wait();
+void set_launch_wait(unsigned ms, std::function<void(bool)> done);
+std::string wait_label(unsigned ms);
+
 // Its HOME menu icon from a screenshot (`shot`, "sdmc:/Nintendo/Album/…"),
 // its square at `x` (0 the left edge, 100 the right one), or its .nro's
 // again (""): made again, the same program ID.

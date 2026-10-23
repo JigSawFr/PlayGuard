@@ -183,6 +183,7 @@ typedef struct {
     size_t         icon_size;
     char           name[0x201];
     char           clock[8];
+    char           footer[160];
     int            language;
     unsigned       rules;    // GATE_RULE_*: its icons by the badge
 } Screen;
@@ -288,26 +289,33 @@ static void screen_open(Screen *sc, const char *nro, const char *when)
     sc->on = true;
 }
 
-// `buttons`: Ⓐ to try again, Ⓑ for the HOME menu (once refused).
-static void screen_show(Screen *sc, GateScreenState state, const char *note, int note_warn, bool buttons)
+// What `state` shows. `buttons`: Ⓐ to try again, Ⓑ for the HOME menu (once refused).
+static GateScreen screen_of(Screen *sc, GateScreenState state, const char *note, int note_warn, bool buttons)
 {
-    if (!sc->on) return;
     static const GateText STATUS[] = { GateText_Asking, GateText_Opening, GateText_Free,  GateText_Refused,
-                                       GateText_Error,  GateText_Paused,  GateText_Closed, GateText_Limit };
+                                       GateText_Error,  GateText_Paused,  GateText_Closed, GateText_Limit,
+                                       GateText_Asking };
     const GateText hint = state == GateScreen_Asking    ? GateText_AskingHint
                           : state == GateScreen_Refused ? GateText_RefusedHint
                           : state == GateScreen_Paused  ? GateText_PausedHint
                           : state == GateScreen_Closed  ? GateText_ClosedHint
                           : state == GateScreen_Limit   ? GateText_LimitHint
                                                         : GateText_Count;
-    char footer[160];
-    snprintf(footer, sizeof(footer), "PlayGuard \xC2\xB7 %s", gate_text(sc->language, GateText_Tagline));
+    snprintf(sc->footer, sizeof(sc->footer), "PlayGuard \xC2\xB7 %s", gate_text(sc->language, GateText_Tagline));
     const GateScreen s = {
         sc->brand, sc->text, sc->icon, sc->icon_size, sc->name, gate_text(sc->language, STATUS[state]),
-        hint == GateText_Count ? NULL : gate_text(sc->language, hint), footer, sc->clock, state, note, note_warn,
+        hint == GateText_Count ? NULL : gate_text(sc->language, hint), sc->footer, sc->clock, state, note, note_warn,
         sc->rules, gate_text(sc->language, GateText_Badge),
         buttons ? gate_text(sc->language, GateText_RetryA) : NULL, buttons ? gate_text(sc->language, GateText_RetryB) : NULL,
+        1.0f, 0.0f,
     };
+    return s;
+}
+
+static void screen_show(Screen *sc, GateScreenState state, const char *note, int note_warn, bool buttons)
+{
+    if (!sc->on) return;
+    const GateScreen s = screen_of(sc, state, note, note_warn, buttons);
     u32 stride = 0;
     uint32_t *px = (uint32_t *)framebufferBegin(&sc->fb, &stride);
     if (!px) return;
@@ -404,6 +412,61 @@ static void watchdog(void *arg)
     }
 }
 
+// ---------------------------------------------------------------- the opening
+
+// One turn of the mark's arc, as PlayGuard's loading screen (view/loading_mark.cpp).
+#define TURN_NS 1600000000ULL
+
+// The opening screen's time (GATE_WAIT_NAME), in nanoseconds.
+static u64 wait_ns(void)
+{
+    char text[32];
+    FILE *f = fopen(GATE_DIR GATE_WAIT_NAME, "rb");
+    if (!f) return (u64)GATE_WAIT_MS * 1000000ULL;
+    const size_t n = fread(text, 1, sizeof(text), f);
+    fclose(f);
+    return (u64)gate_wait_parse(text, n) * 1000000ULL;
+}
+
+// The opening, before the PIN screen (or in its free hours, before the
+// homebrew): its bar filling over `wait` (its arc turning), as PlayGuard's
+// intro; Ⓐ or Ⓑ skip the rest. No wait: drawn full at once. Its last frame
+// stays under the PIN screen, then until the homebrew draws its own.
+static void screen_opening(Screen *sc, GateScreenState state, const char *note, int note_warn, u64 wait)
+{
+    if (!sc->on) return;
+    GateScreen s = screen_of(sc, state, note, note_warn, false);
+    // What stays, drawn once; each frame a copy of it and what moves.
+    uint32_t *still = wait ? (uint32_t *)malloc(sizeof(uint32_t) * GATE_SCREEN_W * GATE_SCREEN_H) : NULL;
+    if (!still) {
+        screen_show(sc, state, note, note_warn, false);
+        return;
+    }
+    s.progress = 0;
+    gate_screen_draw_still(still, GATE_SCREEN_W, GATE_SCREEN_H, GATE_SCREEN_W, &s);
+    PadState pad;
+    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+    padInitializeDefault(&pad);
+    padUpdate(&pad);   // what is held from the PIN screen is not a press
+    const u64 start = armGetSystemTick();
+    for (bool last = false; !last && appletMainLoop();) {
+        watch_kick();
+        const u64 ns = armTicksToNs(armGetSystemTick() - start);
+        padUpdate(&pad);
+        last = ns >= wait || (padGetButtonsDown(&pad) & (HidNpadButton_A | HidNpadButton_B));
+        s.progress = last ? 1.0f : (float)((double)ns / (double)wait);
+        s.spin = (float)((double)(ns % TURN_NS) / (double)TURN_NS);
+        u32 stride = 0;
+        uint32_t *px = (uint32_t *)framebufferBegin(&sc->fb, &stride);
+        if (!px) break;
+        for (int y = 0; y < GATE_SCREEN_H; y++)
+            memcpy(px + (size_t)y * (stride / 4), still + (size_t)y * GATE_SCREEN_W, sizeof(uint32_t) * GATE_SCREEN_W);
+        gate_screen_draw_motion(px, GATE_SCREEN_W, GATE_SCREEN_H, (int)(stride / 4), &s);
+        framebufferEnd(&sc->fb);   // the next Begin waits for a free buffer: one a frame
+    }
+    free(still);
+}
+
 // ---------------------------------------------------------------- once refused
 
 // How long the refused screen waits for Ⓐ or Ⓑ before the HOME menu.
@@ -472,6 +535,7 @@ bool gate_nx_run(void)
     GateResult r = GateResult_Error;
     char note[256] = "", span[256];
     bool shown = false;   // how it went already on the screen (refused, Ⓐ not pressed)
+    bool loaded = false;  // the opening shown before the PIN screen
     // Each try; once refused, Ⓐ tries again (until a pause starts).
     for (bool first = true;; first = false) {
         if (!first) timed = local_time(&wday, &minute, when, sizeof(when));
@@ -531,8 +595,11 @@ bool gate_nx_run(void)
                 snprintf(note, sizeof(note), "%s", gate_text(sc.language, GateText_ClockDiffers));
             else if (!netted && timed && gate_spans_hold(free_spans, free_n, wday, minute))
                 snprintf(note, sizeof(note), "%s", gate_text(sc.language, GateText_ClockUnknown));
+            // The opening first (once: not again when Ⓐ tries again), then
+            // the PIN screen over it; the PIN entered, the homebrew at once.
             watch_kick();
-            screen_show(&sc, GateScreen_Asking, note, refused > 0, false);
+            screen_opening(&sc, GateScreen_Loading, note[0] ? note : NULL, refused > 0, loaded ? 0 : wait_ns());
+            loaded = true;
             watch_pause();
             r = ask_pin(&code);
         }
@@ -576,14 +643,19 @@ bool gate_nx_run(void)
         }
         break;
     }
-    // How it went, a moment: shorter when it starts (the homebrew waits),
-    // longer when it does not. Once refused, the screen above was it.
+    // How it went: in its free hours, the opening (GATE_WAIT_NAME's time);
+    // the PIN entered, nothing (it had its opening before); else a moment.
+    // Once refused, the screen above was it.
     static const GateScreenState SHOWN[] = { GateScreen_Opening, GateScreen_Free,   GateScreen_Refused, GateScreen_Error,
                                              GateScreen_Paused,  GateScreen_Closed, GateScreen_Limit };
     const bool opens = r == GateResult_Pin || r == GateResult_Free;
     if (sc.on && !shown) {
-        screen_show(&sc, SHOWN[r], note[0] ? note : NULL, !opens, false);
-        svcSleepThread(opens ? 250000000ULL : 2500000000ULL);
+        if (opens) {
+            if (!loaded) screen_opening(&sc, SHOWN[r], note[0] ? note : NULL, 0, wait_ns());
+        } else {
+            screen_show(&sc, SHOWN[r], note[0] ? note : NULL, 1, false);
+            svcSleepThread(2500000000ULL);
+        }
     }
     screen_close(&sc);
     if (watching) {

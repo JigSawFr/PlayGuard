@@ -69,6 +69,7 @@
 #include "view/footer_hints.hpp"
 #include "view/header_settings.hpp"
 #include "view/loading_bar.hpp"
+#include "view/loading_dial.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
 #include "view/notice_bell.hpp"
@@ -324,6 +325,7 @@ void register_views()
     brls::Application::registerXMLView("AboutTab",        AboutTab::create);
 
     brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
+    brls::Application::registerXMLView("LoadingDial",     LoadingDial::create);
     brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
     brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
     brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
