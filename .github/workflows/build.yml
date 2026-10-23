@@ -7,6 +7,9 @@ on:
   # The merge queue: a pull request is built once more on top of main and of
   # the pull requests queued before it, so two that are green apart cannot
   # turn main red together (as #326 and #327 did, merged a minute apart).
+  # Only a repository owned by an organization can turn the queue on: until
+  # then main's rules want a pull request up to date with main instead, which
+  # guards the same way, one *Update branch* at a time.
   merge_group:
   workflow_dispatch:
   # Weekly, on main: a runner image or Docker Hub change shows up here before
