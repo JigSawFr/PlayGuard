@@ -321,7 +321,6 @@
             "section_presets": "Quick fill",
             "weekdays": "Set Monday to Friday…",
             "weekend": "Set Saturday and Sunday…",
-            "copy_today": "Copy {} to every day",
             "copy_today_body": "Use the {} limit ({}) for every day?",
             "copy_today_confirm": "Copy",
             "revert": "Discard changes",
@@ -702,6 +701,21 @@
         "note_unconfirmed": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Locked out? Put the RESCUE file back on the SD card with the recovery sysmodule installed, then restart the console.",
         "note_old_module": "Nothing can be changed from here without the PIN, and PlayGuard opens as usual. Update the module from a computer: extract playguard-rescue.zip of PlayGuard {} at the SD card root, put the RESCUE file back, then restart the console."
     },
+    "tiles": {
+        "games": "Installed games",
+        "upload": "Send a report…",
+        "weekdays": "Monday to Friday…",
+        "weekend": "Weekend…",
+        "copy_today": "Copy {} to all",
+        "text_size_auto": "Auto: larger on TV",
+        "text_size": "Text size",
+        "start_tab": "Start on",
+        "themes": {
+            "system": "System",
+            "light": "Light",
+            "dark": "Dark"
+        }
+    },
     "tools": {
         "section_diag": "Diagnostics",
         "section_tools": "Tools",
@@ -816,7 +830,6 @@
         "update_last": "Last checked {}",
         "flag_read_only": "read-only",
         "flag_dev": "developer",
-        "upload": "Send a report online…",
         "upload_note": "Sends a report to a secret gist in your GitHub account (sign in first if needed) and shows its link with a QR code: give it to whoever helps you, or open a bug report with it.",
         "storage_note_emummc": "This is emuMMC: sysMMC has its own parental controls, which PlayGuard cannot see from here. Set them there too, or hide the hekate boot menu.",
         "storage_note_sysmmc": "This is sysMMC, and an emuMMC is set up on this SD card: it has its own parental controls, which PlayGuard cannot see from here. Set them there too, or hide the hekate boot menu.",

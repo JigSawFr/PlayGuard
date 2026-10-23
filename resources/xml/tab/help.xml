@@ -27,7 +27,7 @@
             <brls:Header title="@i18n/playguard/tools/section_start" marginBottom="8"/>
             <!-- Tiles: the first steps, sending a report (cadran::List::tiles). -->
             <brls:DetailCell id="hp_first_steps" title="@i18n/playguard/onboarding/open"/>
-            <brls:DetailCell id="hp_upload" title="@i18n/playguard/tools/upload"/>
+            <brls:DetailCell id="hp_upload" title="@i18n/playguard/tiles/upload"/>
             <brls:Label id="hp_upload_note" text="@i18n/playguard/tools/upload_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <brls:Header title="@i18n/playguard/tools/section_diag" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="hp_export" title="@i18n/playguard/tools/export"/>

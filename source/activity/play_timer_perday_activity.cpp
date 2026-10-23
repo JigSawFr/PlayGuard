@@ -48,7 +48,7 @@ void PlayTimerPerDayActivity::bind_cells()
         return true;
     });
     const int today = ui::today_weekday();
-    pt_copy_today->setText(brls::getStr("playguard/play_timer/perday/copy_today", ui::day_name_in_text(today)));
+    pt_copy_today->setText(brls::getStr("playguard/tiles/copy_today", ui::day_name_in_text(today)));
     pt_copy_today->registerClickAction([this, today](brls::View*) {
         if (!this->live.valid) {
             ui::notify("playguard/play_timer/perday/unavailable"_i18n);

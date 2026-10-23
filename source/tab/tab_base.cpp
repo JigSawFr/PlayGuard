@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/tab_base.hpp"
 
+#include <yoga/Yoga.h>
+
 #include "action/notices.hpp"
 #include "action/frame_stats_flow.hpp"
 #include "action/play_data.hpp"
@@ -45,7 +47,7 @@ void TabBase::mark(brls::Box* row, std::vector<std::string> ids)
     auto* reason = cadran::kit::label("", cadran::kit::TEXT_BODY, "cadran/amber");
     reason->setSingleLine(true);
     // Placed as its row places it: centred on a row's height, under the
-    // title of a tile (a column), at its left.
+    // title of a tile (a column), where its value starts (update_marks()).
     reason->setHorizontalAlign(brls::HorizontalAlign::LEFT);
     reason->setVisibility(brls::Visibility::GONE);
     row->addView(reason, row->getChildren().size() - 1);
@@ -67,9 +69,12 @@ void TabBase::update_marks()
                 cell->detail->setVisibility(count > 0 ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
                 if (count > 0) reason = notices::reason_of(m.ids);
             }
-        // On a tile (a column, as narrow as a third of the screen), on two
-        // lines when it has to; on a row, one.
-        m.reason->setSingleLine(m.row->getAxis() != brls::Axis::COLUMN);
+        // On a tile (a column), where its value starts, under its title (its
+        // line fitted by the tile: cadran::List::tiles()).
+        if (auto* cell = dynamic_cast<brls::DetailCell*>(m.row); cell && m.row->getAxis() == brls::Axis::COLUMN) {
+            const YGValue indent = YGNodeStyleGetMargin(cell->detail->getYGNode(), YGEdgeLeft);
+            m.reason->setMarginLeft(indent.unit == YGUnitPoint ? indent.value : 0.0f);
+        }
         ui::set_text(m.reason, reason);
         ui::set_visible(m.reason, !reason.empty());
     }

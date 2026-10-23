@@ -36,8 +36,8 @@
 
             <brls:Header title="@i18n/playguard/play_timer/perday/section_presets" marginTop="16" marginBottom="8"/>
 
-            <brls:DetailCell id="pt_weekdays" title="@i18n/playguard/play_timer/perday/weekdays"/>
-            <brls:DetailCell id="pt_weekend"  title="@i18n/playguard/play_timer/perday/weekend"/>
+            <brls:DetailCell id="pt_weekdays" title="@i18n/playguard/tiles/weekdays"/>
+            <brls:DetailCell id="pt_weekend"  title="@i18n/playguard/tiles/weekend"/>
             <brls:DetailCell id="pt_copy_today"/>
             <brls:DetailCell id="pt_revert"   title="@i18n/playguard/play_timer/perday/revert"/>
 

@@ -305,6 +305,7 @@ DYNAMIC_KEYS = {
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
     "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
     "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
+    "tiles/themes/": array_of("source/util/config.hpp", "THEMES"),
     "prefs/text_sizes/": array_of("source/util/config.hpp", "TEXT_SIZES"),
     "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),

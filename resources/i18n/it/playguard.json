@@ -321,7 +321,6 @@
             "section_presets": "Compilazione rapida",
             "weekdays": "Imposta da lunedì a venerdì…",
             "weekend": "Imposta sabato e domenica…",
-            "copy_today": "Copia {} su tutti i giorni",
             "copy_today_body": "Vuoi usare il limite di {} ({}) per tutti i giorni?",
             "copy_today_confirm": "Copia",
             "revert": "Annulla le modifiche",
@@ -702,6 +701,21 @@
         "note_unconfirmed": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Bloccato? Rimetti il file RESCUE sulla scheda SD, con il sysmodule di recupero installato, poi riavvia la console.",
         "note_old_module": "Senza il PIN qui non si può modificare nulla, e PlayGuard si apre come al solito. Aggiorna il modulo da un computer: estrai playguard-rescue.zip di PlayGuard {} nella radice della scheda SD, rimetti il file RESCUE, poi riavvia la console."
     },
+    "tiles": {
+        "games": "Giochi installati",
+        "upload": "Invia un rapporto…",
+        "weekdays": "Da lunedì a venerdì…",
+        "weekend": "Fine settimana…",
+        "copy_today": "Copia {} su tutti",
+        "text_size_auto": "Auto: maggiore in TV",
+        "text_size": "Testo",
+        "start_tab": "All'avvio",
+        "themes": {
+            "system": "Console",
+            "light": "Chiaro",
+            "dark": "Scuro"
+        }
+    },
     "tools": {
         "section_diag": "Diagnostica",
         "section_tools": "Strumenti",
@@ -816,7 +830,6 @@
         "update_last": "Ultima ricerca: {}",
         "flag_read_only": "sola lettura",
         "flag_dev": "sviluppatore",
-        "upload": "Invia un rapporto online…",
         "upload_note": "Invia un rapporto in un gist segreto del tuo account GitHub (accedi prima, se serve) e ne mostra il link con un codice QR: dallo a chi ti aiuta, o apri una segnalazione di bug con esso.",
         "storage_note_emummc": "Sei sulla emuMMC: la sysMMC ha un proprio filtro famiglia, che PlayGuard non può vedere da qui. Impostalo anche lì, oppure nascondi il menu di avvio di hekate.",
         "storage_note_sysmmc": "Sei sulla sysMMC e su questa scheda SD è configurata una emuMMC: ha un proprio filtro famiglia, che PlayGuard non può vedere da qui. Impostalo anche lì, oppure nascondi il menu di avvio di hekate.",

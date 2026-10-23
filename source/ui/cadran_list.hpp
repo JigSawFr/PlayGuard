@@ -6,7 +6,7 @@
 // card (surf, 1 px border, kit::RADIUS_CARD, a line between rows); a cell
 // gets an icon in a soft square before its title, a chevron when it opens
 // something, a switch for a BooleanCell; the notes go to kit::TEXT_NOTE. tiles() turns a few cells into
-// the boards' tiles instead (a row of cards, the icon on top).
+// the boards' tiles instead (a row of cards; the icon on top, or before an action's title).
 //
 // The tab keeps every view it binds (they move, they are not rebuilt), and
 // its own show / hide logic: a card or a tile row with all its lines hidden
@@ -75,7 +75,8 @@ class List
 
     // Turns these cells (direct lines of the column) into tiles on one row,
     // where the first one was: `status` tiles show a reading (title small,
-    // value large, no chevron), the others an action (icon, title). Before
+    // value large, no chevron), the others an action (icon then title on one
+    // line, its words on the next, each smaller rather than on two). Before
     // apply(). Returns the row.
     brls::Box* tiles(const std::vector<std::pair<const char*, const char*>>& cells, bool status);
 
