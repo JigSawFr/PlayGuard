@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 450d0e04da92 -->
+<!-- translated from docs/features.md, sha256 40e1bd0a81b3 -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Nuovo su PlayGuard? Comincia da [Per iniziare](getting-started.md). Torna al [README](../../README.md).

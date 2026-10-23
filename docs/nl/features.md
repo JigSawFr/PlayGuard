@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 450d0e04da92 -->
+<!-- translated from docs/features.md, sha256 40e1bd0a81b3 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).

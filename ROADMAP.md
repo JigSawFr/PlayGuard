@@ -120,7 +120,7 @@ background".
 | | Why |
 |---|---|
 | A limit per user account | The console's timer has one limit for the whole console. A replacement sysmodule does this ([compared](docs/compatibility.md#playguard-or-a-replacement-sysmodule)) |
-| Anything running in the background | PlayGuard only changes the console's own settings; the optional rescue sysmodule acts at boot, and only on request |
+| Anything running in the background | PlayGuard only changes the console's own settings; the optional recovery sysmodule acts at boot, and only on request |
 | Remote control through Nintendo's servers, a second parent's Nintendo Account | PlayGuard runs on the console, offline; remote control through a home server is the [horizon](#horizon) instead |
 | GameChat settings | Nintendo Switch 2 only, which Atmosphère does not run on |
 | Purchase restrictions | Nintendo Account settings, on Nintendo's servers |

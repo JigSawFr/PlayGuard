@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 450d0e04da92 -->
+<!-- translated from docs/features.md, sha256 40e1bd0a81b3 -->
 # 功能
 
 每個分頁能做什麼、PlayGuard 如何安全地寫入設定，以及主機把哪些時間算作遊玩時間。第一次使用 PlayGuard？請從[開始使用](getting-started.md)開始。返回 [README](../../README.md)。
