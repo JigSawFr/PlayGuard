@@ -1,9 +1,9 @@
-<!-- translated from docs/hardware-test.md, sha256 8263acf73db0 -->
+<!-- translated from docs/hardware-test.md, sha256 5341a83cb2d1 -->
 # Tester sur une console : forwarders et menu homebrew
 
-Ce que les simulateurs desktop et web ne peuvent pas montrer : le vrai menu HOME de la console, son écran du code PIN, Atmosphère qui lit `override_config.ini`, le module rescue au démarrage. À dérouler sur une console après une modification de *Console › Forwarders* (les fichiers `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), en notant dans la pull request ce qui a été vérifié, et sur quels firmware et Atmosphère.
+Ce que les simulateurs desktop et web ne peuvent pas montrer : le vrai menu HOME de la console, son écran du code PIN, Atmosphère qui lit `override_config.ini`, le sysmodule de récupération au démarrage. À dérouler sur une console après une modification de *Console › Forwarders* (les fichiers `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), en notant dans la pull request ce qui a été vérifié, et sur quels firmware et Atmosphère.
 
-Avant de commencer : un code PIN sur la console, sys-patch (ou des fichiers sigpatch), sphaira dans `/switch/sphaira/`, un ordinateur avec un lecteur de carte SD à portée de main, et de préférence le module rescue installé (`playguard-rescue.zip`). Utilisez une console que vous pouvez remettre dans son état d'origine.
+Avant de commencer : un code PIN sur la console, sys-patch (ou des fichiers sigpatch), sphaira dans `/switch/sphaira/`, un ordinateur avec un lecteur de carte SD à portée de main, et de préférence le sysmodule de récupération installé (`playguard-rescue.zip`). Utilisez une console que vous pouvez remettre dans son état d'origine.
 
 D'abord, *Aide et diagnostic › Auto-test de la console* (mode développeur, [dépannage](troubleshooting.md#mode-développeur-examiner-un-nouveau-firmware)) : il vérifie ce que PlayGuard peut vérifier seul et écrit `config/playguard/self-test.md` ; collez-le dans la pull request. Les étapes ci-dessous sont ce qu'il ne peut pas vérifier : elles demandent une main sur la console.
 
@@ -50,8 +50,8 @@ Chaque étape : ce qu'il faut faire, puis ce qui doit se passer. ☐ est à coch
 
 - ☐ Verrouillé, le forwarder de sphaira supprimé dans Paramètres › Gestion des données : à l'ouverture suivante, la cloche dit qu'un chemin de retour manque ; le verrou reste.
 - ☐ Depuis un ordinateur : `atmosphere/config/override_config.ini` supprimé, la console redémarrée : l'album ouvre le menu homebrew ; l'ouverture suivante de PlayGuard signale que le verrou a été retiré (cloche, historique).
-- ☐ Avec le module rescue : reverrouillé, un fichier vide `config/playguard/RESCUE`, un redémarrage : déverrouillé au démarrage, PlayGuard le signalant à son ouverture suivante.
-- ☐ Atmosphère mis à jour pendant le verrou (module rescue installé) : déverrouillé au démarrage, PlayGuard le signalant.
+- ☐ Avec le sysmodule de récupération : reverrouillé, un fichier vide `config/playguard/RESCUE`, un redémarrage : déverrouillé au démarrage, PlayGuard le signalant à son ouverture suivante.
+- ☐ Atmosphère mis à jour pendant le verrou (sysmodule de récupération installé) : déverrouillé au démarrage, PlayGuard le signalant.
 - ☐ Avec un emuMMC : verrouiller depuis un système prévient que le verrou est sur la carte SD ; démarré sur l'autre, l'album n'y ouvre plus non plus le menu homebrew, et ce système n'a aucun des forwarders.
 
 ## 5. Sauvegardes

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # 호환성
 
 지원하는 펌웨어, Atmosphère, 런처, emuMMC와 sysMMC, 그리고 PlayGuard와 대체 sysmodule의 비교를 설명합니다. 처음으로 돌아가기: [README](../../README.md).
@@ -16,7 +16,7 @@
 - **펌웨어 23.0.0** — Atmosphère 1.12.0. [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) 표에서 23.0.1과 명령이 같습니다.
 - **펌웨어 21.0.0 → 21.2.0** — Atmosphère 1.10.x. 모든 기능.
 
-**21.0.0 이전에는 플레이 타이머를 뺀 모든 기능** — 제한, PIN, 일시 해제, 플레이 기록, 네트워크 시계, 스마트폰 앱, 변경 기록은 작동합니다. 플레이 타이머의 설정 블록(0x44바이트)은 21.0.0부터 지금의 구조이므로, PlayGuard는 이 블록에 들어 있는 기능을 끕니다. 하루 제한, 취침 알람, 추가 시간, 본체 잠금입니다.
+**21.0.0 이전에는 플레이 타이머를 뺀 모든 기능** — 제한, PIN, 일시 해제, 플레이 기록, 네트워크 시계, 스마트폰 앱, 변경 기록은 작동합니다. 플레이 타이머의 설정 블록(0x44바이트)은 21.0.0부터 지금의 구조이므로, PlayGuard는 이 블록에 들어 있는 기능을 끕니다. 하루 제한, 취침 알람, 추가 시간, *모든 소프트웨어 차단*입니다.
 
 - **펌웨어 20.0.0 → 20.5.0** — Atmosphère 1.9.x
 - **펌웨어 19.0.x** — Atmosphère 1.8.0

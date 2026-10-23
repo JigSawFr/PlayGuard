@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # 兼容性
 
 支持的系统版本、Atmosphère 和启动器，emuMMC 和 sysMMC，以及 PlayGuard 与替代型 sysmodule 的比较。返回 [README](../../README.md)。
@@ -16,7 +16,7 @@
 - **系统版本 23.0.0**——Atmosphère 1.12.0。在 [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) 的表格中，命令与 23.0.1 相同。
 - **系统版本 21.0.0 → 21.2.0**——Atmosphère 1.10.x。所有功能可用。
 
-**21.0.0 之前，除游戏时间计时器外都可用**——限制、PIN、暂时解除、游玩记录、网络时钟、手机应用和历史记录都可用。游戏时间计时器的设置数据块（0x44 字节）从 21.0.0 起才是这种格式，所以 PlayGuard 会关闭存放在其中的功能：每日限制、就寝提醒、加时和阻止所有游戏。
+**21.0.0 之前，除游戏时间计时器外都可用**——限制、PIN、暂时解除、游玩记录、网络时钟、手机应用和历史记录都可用。游戏时间计时器的设置数据块（0x44 字节）从 21.0.0 起才是这种格式，所以 PlayGuard 会关闭存放在其中的功能：每日限制、就寝提醒、加时和 *阻止所有游戏*。
 
 - **系统版本 20.0.0 → 20.5.0**——Atmosphère 1.9.x
 - **系统版本 19.0.x**——Atmosphère 1.8.0

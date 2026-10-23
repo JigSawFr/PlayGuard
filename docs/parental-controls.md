@@ -74,7 +74,7 @@ Public reference: [switchbrew, Parental Control services](https://switchbrew.org
   locked, PlayGuard or not (observed, 23.0.1).
 - Registering or changing the PIN goes through the `pctlauth` applet; the
   direct `SetPinCode` command is refused.
-- The rescue sysmodule uses the same 1208 → 1201 sequence at boot, with no
+- The recovery sysmodule uses the same 1208 → 1201 sequence at boot, with no
   applet and no screen, so it still works while the play timer blocks every
   program.
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 395c2eb35838 -->
+<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
 # Como começar
 
 Do cartão SD a uma consola configurada para o seu filho, em cerca de dez minutos, e depois as tarefas do dia a dia. Voltar ao [README](../../README.md).
