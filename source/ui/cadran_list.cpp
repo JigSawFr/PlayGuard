@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <string>
+#include <vector>
 #include <yoga/Yoga.h>
 
 #include "ui/cadran_kit.hpp"
@@ -96,6 +98,54 @@ CadranIcon* make_icon(const char* name, float size, NVGcolor color)
     icon->setColor(color);
     return icon;
 }
+
+// An action tile's title and value, each on its one line: a text too long
+// for it gets smaller, a step a frame, down to 3/4 of its size, then ends in
+// "…" and scrolls while the tile has the focus. A new text, or a tile of
+// another width, starts again from the full size. Drawn as nothing (no size), once the tile is laid out.
+class TileFit : public brls::View
+{
+  public:
+    TileFit(std::initializer_list<brls::Label*> labels)
+    {
+        this->setFocusable(false);
+        this->setPositionType(brls::PositionType::ABSOLUTE);
+        this->setWidth(0);
+        this->setHeight(0);
+        for (brls::Label* label : labels) {
+            label->setSingleLine(true);
+            label->setAutoAnimate(true);
+            this->fits.push_back({ label, label->getFontSize(), "" });
+        }
+    }
+    void draw(NVGcontext*, float, float, float, float, brls::Style, brls::FrameContext*) override
+    {
+        // A wider tile (smaller text, the window) may take the full size again.
+        const float width = this->getParent() ? this->getParent()->getWidth() : 0.0f;
+        const bool resized = width != this->width;
+        this->width = width;
+        for (Fit& fit : this->fits) {
+            const std::string text = fit.label->getFullText();
+            if (text != fit.text || resized) {
+                fit.text = text;
+                if (fit.label->getFontSize() != fit.size) fit.label->setFontSize(fit.size);
+                continue;   // laid out again first
+            }
+            if (fit.label->getWidth() > 0 && fit.label->isTruncated() && fit.label->getFontSize() > fit.size * 0.75f + 0.5f)
+                fit.label->setFontSize(fit.label->getFontSize() - 1.0f);
+        }
+    }
+
+  private:
+    struct Fit
+    {
+        brls::Label* label;
+        float size;         // its own size, the largest
+        std::string text;   // the text it was fitted to
+    };
+    std::vector<Fit> fits;
+    float width = 0;   // the tile's, when last fitted
+};
 
 // The icon before a row's title, in a soft rounded square.
 brls::Box* row_icon(const char* name)
@@ -350,10 +400,12 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         cell->detail->setFontSize(status ? 22.0f : kit::TEXT_META);
         cell->detail->setMarginTop(status ? 4 : 2);
         // A status tile's value is a figure, on one line; another's words
-        // (a language's name, "Español (Latinoamérica)") take two rather than
-        // end in "…".
+        // too (TileFit).
         cell->detail->setSingleLine(status);
-        if (!status) cell->detail->setTextColor(theme["cadran/text2"]);
+        if (!status) {
+            cell->detail->setTextColor(theme["cadran/text2"]);
+            cell->addView(new TileFit({ cell->title, cell->detail }));
+        }
         if (status) {
             // Its value after a mark of its state (state()), hidden until set.
             auto* value = new brls::Box(brls::Axis::ROW);
