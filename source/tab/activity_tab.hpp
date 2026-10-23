@@ -89,7 +89,7 @@ class ActivityTab : public TabBase
     // rebuild()'s sections: the totals and the chart, and the line under All
     // games.
     void show_totals(const PlayStats& s, const PlayAccount* who);
-    void show_status(const PlayStats& s, bool empty);
+    void show_status(const PlayStats& s, bool none_played);
     // The summary over the period.
     void show_summary(const std::shared_ptr<const PlayStats>& data);
     // When the last 7 days were played: the hours, the sessions (whatever

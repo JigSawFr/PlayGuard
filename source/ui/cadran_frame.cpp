@@ -181,8 +181,8 @@ void chrome(brls::Label* label, float size)
 class Glow : public brls::View
 {
   public:
-    Glow(float cx, float cy, float radius, const char* color_key)
-        : cx(cx), cy(cy), radius(radius), glow(brls::Application::getTheme()[color_key]), clear(nvgRGBA(0x2E, 0xC4, 0xA6, 0))
+    Glow(float centre_x, float centre_y, float r, const char* color_key)
+        : cx(centre_x), cy(centre_y), radius(r), glow(brls::Application::getTheme()[color_key]), clear(nvgRGBA(0x2E, 0xC4, 0xA6, 0))
     {
         this->setFocusable(false);
         this->setPositionType(brls::PositionType::ABSOLUTE);

@@ -106,7 +106,7 @@ std::string mb_text(uint64_t bytes)
 class DownloadProgress
 {
   public:
-    DownloadProgress(const std::string& name, uint64_t size, const std::string& replaces) : size(size)
+    DownloadProgress(const std::string& name, uint64_t bytes, const std::string& replaces) : size(bytes)
     {
         this->body = cadran::progress_body("playguard/dev_build/downloading"_i18n, name, replaces);
         // Its own button, not the dialog's: a dialog's button acts once the
@@ -130,7 +130,7 @@ class DownloadProgress
                 return true;
             },
             false, false, brls::SOUND_BACK);
-        this->show(0, size);
+        this->show(0, bytes);
         this->dialog->open();
     }
 
@@ -138,8 +138,8 @@ class DownloadProgress
     void received(uint64_t done, uint64_t total)
     {
         if (!total) total = this->size;
-        const int percent = total ? (int)std::min<uint64_t>(100, done * 100 / total) : 0;
-        if (percent == this->percent.exchange(percent)) return;
+        const int now = total ? (int)std::min<uint64_t>(100, done * 100 / total) : 0;
+        if (now == this->percent.exchange(now)) return;
         // `this` outlives every update: the shared_ptr is held by the
         // close() task, queued after them.
         brls::sync([this, done, total]() { this->show(done, total); });
@@ -265,12 +265,12 @@ void install(const dev_builds::Build& b)
                 ui::notify("playguard/dev_build/cancelled"_i18n);
                 return;
             }
-            auto end = [b, progress](bool ok, std::string err) {
+            auto end = [b, progress](bool done, std::string why) {
                 s_busy = false;
                 progress->close();
                 // The one reason a user can act on, said in their language.
-                if (err == dev_builds::NO_DIGEST) err = "playguard/dev_build/no_digest"_i18n;
-                if (!ok) ui::error(brls::getStr("playguard/dev_build/failed", err));
+                if (why == dev_builds::NO_DIGEST) why = "playguard/dev_build/no_digest"_i18n;
+                if (!done) ui::error(brls::getStr("playguard/dev_build/failed", why));
                 else installed_now(b);
             };
             if (!ok) {
@@ -284,12 +284,12 @@ void install(const dev_builds::Build& b)
                 // resources), and the SD card will not rename an open file:
                 // released for the two renames, here on the UI thread so that
                 // nothing reads romfs:/ meanwhile, then mounted again.
-                std::string err;
+                std::string replace_err;
                 platform_romfs_release();
-                const bool ok = dev_builds::replace(target, fresh, &err, rollback::previous_file(target));
+                const bool replaced = dev_builds::replace(target, fresh, &replace_err, rollback::previous_file(target));
                 platform_romfs_mount();
-                if (!ok) std::remove(fresh.c_str());
-                end(ok, err);
+                if (!replaced) std::remove(fresh.c_str());
+                end(replaced, replace_err);
             });
         });
     });

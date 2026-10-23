@@ -22,7 +22,7 @@ class DevBuildActivity : public brls::Activity
     // `newer`: it came after the running build (the list knows).
     static void show(const dev_builds::Build& build, bool newer = false);
 
-    DevBuildActivity(const dev_builds::Build& build, bool newer) : build(build), newer(newer) {}
+    DevBuildActivity(const dev_builds::Build& shown, bool after_running) : build(shown), newer(after_running) {}
 
     void onContentAvailable() override;
 

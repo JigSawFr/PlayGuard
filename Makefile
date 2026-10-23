@@ -35,8 +35,9 @@ TESTOUT := $(BUILD)/host-tests
 JOBS    ?= $(shell nproc 2>/dev/null || echo 4)
 SAN     ?= -fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined
 COV     ?=
-# -Itests: tests/check.h, the CHECK() every suite uses.
-CWARN   := -Wall -Wextra -Werror $(SAN) $(COV) -Itests
+# -Wshadow as the app is built (CMakeLists.txt); -Itests: tests/check.h, the
+# CHECK() every suite uses.
+CWARN   := -Wall -Wextra -Wshadow -Werror $(SAN) $(COV) -Itests
 SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 # A zip that depends only on the files: one date for all, entries in a fixed
 # order, no extra file attributes (-X), and TZ=UTC as a zip keeps local times.
@@ -336,7 +337,7 @@ FUZZ_SECONDS ?= 30
 FUZZ_CC      ?= clang
 FUZZ_CXX     ?= clang++
 FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -g -O1
-FUZZ_CFLAGS  := -Wall -Wextra -Werror $(FUZZ_SAN) -Itests/fuzz -Isource -isystem extern/borealis/library/include
+FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror $(FUZZ_SAN) -Itests/fuzz -Isource -isystem extern/borealis/library/include
 zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
 markdown_FUZZ      := $(filter-out tests/%,$(markdown_SRC)) tests/fuzz/markdown/fuzz.cpp

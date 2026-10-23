@@ -32,20 +32,20 @@ static std::string language_code()
     return code.empty() ? "?" : code;
 }
 
-HeaderSetting::HeaderSetting(Kind kind)
-    : kind(kind)
+HeaderSetting::HeaderSetting(Kind setting)
+    : kind(setting)
 {
-    this->setId(kind == Kind::LANGUAGE ? LANGUAGE_ID : kind == Kind::THEME ? THEME_ID : TEXT_ID);
+    this->setId(setting == Kind::LANGUAGE ? LANGUAGE_ID : setting == Kind::THEME ? THEME_ID : TEXT_ID);
     this->setFocusable(false);
-    this->setWidth(kind == Kind::LANGUAGE ? SIZE * 1.3f : SIZE);
+    this->setWidth(setting == Kind::LANGUAGE ? SIZE * 1.3f : SIZE);
     this->setHeight(SIZE);
     this->setAlignSelf(brls::AlignSelf::CENTER);
     this->setMarginRight(10);
     // A tap opens its list (hitTest finds it, focusable or not); the tab on
     // screen shows the new choice (Preferences says it too).
-    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [kind]() {
-        if (kind == Kind::LANGUAGE) ui::pick_language(ui::refresh_shown_tab);
-        else if (kind == Kind::THEME) ui::pick_theme(ui::refresh_shown_tab);
+    this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [setting]() {
+        if (setting == Kind::LANGUAGE) ui::pick_language(ui::refresh_shown_tab);
+        else if (setting == Kind::THEME) ui::pick_theme(ui::refresh_shown_tab);
         else ui::pick_text_size(ui::refresh_shown_tab);
     }));
 }

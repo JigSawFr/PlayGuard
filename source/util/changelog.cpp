@@ -109,8 +109,8 @@ std::vector<Line> parse(const std::string& md, int max_releases)
     int  releases = 0;
     bool in_item  = false;   // an indented line continues the last item
     bool stop     = false;   // past `max_releases`
-    // One line of Markdown; `raw` keeps its indentation, `t` is trimmed.
-    auto line = [&](const std::string& raw, const std::string& t) {
+    // One line of Markdown; `indented` keeps its indentation, `t` is trimmed.
+    auto line = [&](const std::string& indented, const std::string& t) {
         if (t.empty()) {
             in_item = false;
             return;
@@ -133,7 +133,7 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             lines.back().icon = leading_icon(t.substr(4));
             in_item = false;
         } else if (text::starts_with(t, "* ") || text::starts_with(t, "- ")) {
-            const size_t indent = raw.find_first_not_of(' ');
+            const size_t indent = indented.find_first_not_of(' ');
             Line item{ Line::Item, clean(t.substr(2)), (int)(indent / 2) };
             if (item.depth == 0) {
                 split_title(t.substr(2), &item.title, &item.text);
@@ -141,7 +141,7 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             }
             lines.push_back(std::move(item));
             in_item = true;
-        } else if (in_item && raw[0] == ' ') {
+        } else if (in_item && indented[0] == ' ') {
             // "* **Title**:" then its text on the next line (the release page's
             // two-line bullets): no leading space.
             std::string& text = lines.back().text;

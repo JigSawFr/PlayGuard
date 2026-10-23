@@ -53,7 +53,7 @@ void SysNotesActivity::loaded()
     s_open->fill();
 }
 
-SysNotesActivity::SysNotesActivity(Which which) : which(which)
+SysNotesActivity::SysNotesActivity(Which kind) : which(kind)
 {
     s_open = this;
 }

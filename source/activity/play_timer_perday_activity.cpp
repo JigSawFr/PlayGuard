@@ -24,8 +24,8 @@ PlayTimerPerDayActivity::PlayTimerPerDayActivity(std::string title, const Days& 
     for (int i = 0; i < 7; i++) this->live.day_min[i] = this->pending[i] = days[i];
 }
 
-PlayTimerPerDayActivity::PlayTimerPerDayActivity(int start_day)
-    : start_day(start_day >= 0 && start_day <= 6 ? start_day : -1)
+PlayTimerPerDayActivity::PlayTimerPerDayActivity(int first_day)
+    : start_day(first_day >= 0 && first_day <= 6 ? first_day : -1)
 {
 }
 

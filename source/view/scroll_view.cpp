@@ -122,24 +122,24 @@ ScrollView::Span ScrollView::context_of(brls::View* view) const
     bool up = true, down = true;
     brls::View* node = view;
     while (node != this->contentView && node->getParent() && (up || down)) {
-        brls::Box* parent = node->getParent();
-        const auto& children = parent->getChildren();
-        const auto at = std::find(children.begin(), children.end(), node);
-        if (at == children.end()) break;
-        const int index = (int)(at - children.begin());
-        for (int i = index + 1; down && i < (int)children.size(); i++) {
-            brls::View* child = children[i];
+        brls::Box* box = node->getParent();
+        const auto& siblings = box->getChildren();
+        const auto at = std::find(siblings.begin(), siblings.end(), node);
+        if (at == siblings.end()) break;
+        const int index = (int)(at - siblings.begin());
+        for (int i = index + 1; down && i < (int)siblings.size(); i++) {
+            brls::View* child = siblings[i];
             if (child->getVisibility() == brls::Visibility::GONE) continue;
             if (child->getDefaultFocus()) down = false;
             else span.bottom = std::max(span.bottom, this->span_of(child).bottom);
         }
         for (int i = index - 1; up && i >= 0; i--) {
-            brls::View* child = children[i];
+            brls::View* child = siblings[i];
             if (child->getVisibility() == brls::Visibility::GONE) continue;
             if (child->getDefaultFocus()) up = false;
             else span.top = std::min(span.top, this->span_of(child).top);
         }
-        node = parent;
+        node = box;
     }
     if (node == this->contentView) {
         if (up) span.top = 0;   // with the screen's top padding
@@ -163,10 +163,10 @@ float ScrollView::bottom_limit()
     return std::max(0.0f, this->getContentHeight() - this->getScrollingAreaHeight());
 }
 
-void ScrollView::reveal(brls::View* focused, bool animated)
+void ScrollView::reveal(brls::View* view, bool animated)
 {
-    const Span line = this->span_of(focused);
-    const Span around = this->context_of(focused);
+    const Span line = this->span_of(view);
+    const Span around = this->context_of(view);
     const float height = this->getScrollingAreaHeight();
     float target = this->getContentOffsetY();
     if (around.height() <= height) {

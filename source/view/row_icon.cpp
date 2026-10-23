@@ -7,8 +7,8 @@
 static constexpr float SIZE = 26;
 static constexpr const char* ICON_ID = "row_icon";
 
-RowIcon::RowIcon(Kind kind)
-    : kind(kind)
+RowIcon::RowIcon(Kind shown)
+    : kind(shown)
 {
     this->setId(ICON_ID);
     this->setFocusable(false);
@@ -24,9 +24,9 @@ void RowIcon::set_shown(bool shown)
     this->setVisibility(shown ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
 }
 
-void RowIcon::set_kind(Kind kind)
+void RowIcon::set_kind(Kind shown)
 {
-    this->kind = kind;
+    this->kind = shown;
 }
 
 void RowIcon::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,

@@ -187,7 +187,7 @@ void GameCheckActivity::refresh(bool all, u64 also)
     this->checking = true;
     this->checking_text("playguard/games/searching"_i18n);
     std::weak_ptr<bool> weak = this->alive;
-    const auto list = [this, weak, all, also]() {
+    const auto read_list = [this, weak, all, also]() {
         auto records = std::make_shared<std::vector<GameRecord>>(GAMECHECK_MAX);
         u32 count = 0;
         bool truncated = false;
@@ -233,10 +233,10 @@ void GameCheckActivity::refresh(bool all, u64 also)
     };
     // After the start-up check when it is still under way (game_scan): what
     // it checked first.
-    game_scan::when_free([this, weak, list](bool waited) {
+    game_scan::when_free([this, weak, read_list](bool waited) {
         if (weak.expired()) return;
         if (waited && game_scan::load(&this->cache)) this->show();
-        ui::in_background("games list", list);
+        ui::in_background("games list", read_list);
     });
 }
 
@@ -292,14 +292,14 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         GameCheckTiming t;
         gamecheck_last_timing(&t);
         const auto ms = [](u64 ns) { return (unsigned long long)(ns / 1000000ULL); };
-        const std::string timing = fmt::format("{} games in {} ms: setup {}, control {}, contents {}, state {}", t.games,
-                                               ms(t.total_ns), ms(t.setup_ns), ms(t.control_ns), ms(t.contents_ns), ms(t.state_ns));
-        brls::Logger::info("games check: {}", timing);
+        const std::string spent = fmt::format("{} games in {} ms: setup {}, control {}, contents {}, state {}", t.games,
+                                              ms(t.total_ns), ms(t.setup_ns), ms(t.control_ns), ms(t.contents_ns), ms(t.state_ns));
+        brls::Logger::info("games check: {}", spent);
         perf::record("Installed games check", (double)t.total_ns / 1e6);
         if (ui::quitting()) return;
-        brls::sync(ui::guarded(weak, [this, complete, full, timing]() {
+        brls::sync(ui::guarded(weak, [this, complete, full, spent]() {
             this->checking = false;
-            this->timing = timing;
+            this->timing = spent;
             this->check_total = 0;
             if (complete && full) {
                 u64 now = 0;

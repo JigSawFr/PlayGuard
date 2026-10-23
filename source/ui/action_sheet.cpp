@@ -94,9 +94,9 @@ class Panel : public brls::Box
 class Sheet : public brls::Box
 {
   public:
-    Sheet(const std::string& title, const std::string& subtitle, int image, std::vector<Line> lines, size_t focus,
+    Sheet(const std::string& title, const std::string& subtitle, int image, std::vector<Line> choices, size_t first,
           int columns = 0)
-        : brls::Box(brls::Axis::COLUMN), lines(std::move(lines)), focus(focus)
+        : brls::Box(brls::Axis::COLUMN), lines(std::move(choices)), focus(first)
     {
         brls::Theme theme = brls::Application::getTheme();
         this->setId("cadran_sheet");
@@ -154,8 +154,8 @@ class Sheet : public brls::Box
             ? (TILE_HEIGHT + TILE_GAP) * (float)((this->lines.size() + columns - 1) / columns)
             : 60.0f * (float)this->lines.size();
         panel->setHeight(std::min((subtitle.empty() ? 70.0f : 92.0f) + body + 40, most));
-        column->measured = [panel, head, most](float lines) {
-            const float want = std::min(head->getHeight() + lines + 2, most);
+        column->measured = [panel, head, most](float lines_height) {
+            const float want = std::min(head->getHeight() + lines_height + 2, most);
             if (std::abs(want - panel->getHeight()) > 1) brls::sync([panel, want]() { panel->setHeight(want); });
         };
 

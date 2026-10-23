@@ -203,13 +203,13 @@ void DashboardTab::show_low(bool unlocked)
     // Little or no time left today: the first amount stands out, the one
     // most likely wanted: ringed in teal on the soft fill, not filled (a
     // filled pill is the screen's main action, and a chosen chip).
-    const PtState& pt = this->pt;
+    const PtState& timer = this->pt;
     const int today = ui::today_weekday();
     bool low = false;
-    if (!unlocked && pt.fw_supported && pt.valid && pt.enabled_valid && pt.enabled && pt.day_min[today] != PT_DAY_NOLIMIT) {
+    if (!unlocked && timer.fw_supported && timer.valid && timer.enabled_valid && timer.enabled && timer.day_min[today] != PT_DAY_NOLIMIT) {
         constexpr int64_t QUARTER_NS = 15LL * 60 * 1000000000LL;
-        const bool up = pt_logic::over_limit_min(pt, today) >= 0 || (pt.restricted_valid && pt.restricted);
-        low = up || (pt.remaining_valid && pt.remaining_ns > 0 && pt.remaining_ns <= QUARTER_NS);
+        const bool up = pt_logic::over_limit_min(timer, today) >= 0 || (timer.restricted_valid && timer.restricted);
+        low = up || (timer.remaining_valid && timer.remaining_ns > 0 && timer.remaining_ns <= QUARTER_NS);
     }
     brls::Theme theme = brls::Application::getTheme();
     for (size_t i = 0; i < this->amount_chips.size(); i++) {
@@ -227,41 +227,41 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
 {
     brls::Theme theme = brls::Application::getTheme();
     const std::string na = "playguard/common/unavailable"_i18n;
-    const PtState& pt = this->pt;
+    const PtState& timer = this->pt;
     const PctlStatus& s = this->status;
 
     // Bedtime. Off, the card says so in large rather than an alarm time that
     // does not ring, and A sets it.
-    const bool bed_off = pt.bedtime_valid && !pt.bedtime_enabled;
+    const bool bed_off = timer.bedtime_valid && !timer.bedtime_enabled;
     ui::set_visible(bed_key.getView(), bed_off && !app::read_only());
     bed_value->setTextColor(theme[bed_off ? "cadran/text2" : "cadran/text"]);
     if (bed_off) {
         bed_value->setText("playguard/cadran/today/bed_off_value"_i18n);
         bed_state->setText("");
         bed_sub->setText(app::read_only() ? "" : "playguard/cadran/today/bed_set"_i18n);
-    } else if (pt.bedtime_valid) {
-        bed_value->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
+    } else if (timer.bedtime_valid) {
+        bed_value->setText(fmt::format("{:02d}:{:02d}", timer.bedtime_hour, timer.bedtime_minute));
         bed_state->setText("playguard/cadran/today/on"_i18n);
         bed_state->setTextColor(theme["cadran/teal"]);
         std::string sub;
-        if (pt.bedtime_reset_valid) {
+        if (timer.bedtime_reset_valid) {
             // The time kept with the word before it: "again at / 06:00" never
             // breaks there (patches/borealis/0010).
-            const std::string at = fmt::format("{:02d}:{:02d}", pt.bedtime_reset_hour, pt.bedtime_reset_minute);
+            const std::string at = fmt::format("{:02d}:{:02d}", timer.bedtime_reset_hour, timer.bedtime_reset_minute);
             sub = brls::getStr("playguard/cadran/today/bed_sub", at);
             const size_t pos = sub.find(" " + at);
             if (pos != std::string::npos) sub.replace(pos, 1, "\u00A0");
-        } else if (pt.bedtime_enabled) {
+        } else if (timer.bedtime_enabled) {
             // No morning time from the console: in how long the alarm rings.
             const LocalTime now = ui::local_now();
-            const int in = (pt.bedtime_hour * 60 + pt.bedtime_minute) - (now.hour * 60 + now.minute);
+            const int in = (timer.bedtime_hour * 60 + timer.bedtime_minute) - (now.hour * 60 + now.minute);
             if (in > 0) sub = brls::getStr("playguard/cadran/today/bed_in", ui::fmt_minutes((uint16_t)in));
         }
         bed_sub->setText(sub);
     } else {
         bed_value->setText("—");
         bed_state->setText("");
-        bed_sub->setText(pt.fw_supported ? na : "");
+        bed_sub->setText(timer.fw_supported ? na : "");
     }
 
     // Parental controls: the level, the PIN, the overall state.
