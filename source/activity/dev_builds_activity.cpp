@@ -107,14 +107,14 @@ void DevBuildsActivity::failed(const std::string& text)
     s_open->loading_text->setText(text);
 }
 
-DevBuildsActivity::DevBuildsActivity(const dev_builds::Cache& cache) : cache(cache)
+DevBuildsActivity::DevBuildsActivity(const dev_builds::Cache& fetched) : cache(fetched)
 {
     s_open = this;
     if (s_tab_chosen) {
         this->tab = s_tab;
         return;
     }
-    for (const dev_builds::Build& b : cache.builds)
+    for (const dev_builds::Build& b : fetched.builds)
         if (dev_build_flow::installed(b)) this->tab = b.kind;
 }
 
@@ -246,9 +246,9 @@ void DevBuildsActivity::fill()
     // Newer than the running build: a release with a higher version (on a
     // release build or not), a commit of main built after the running one.
     const dev_builds::Build* running = dev_build_flow::running_build(this->cache.builds);
-    auto newer_count = [running](const std::vector<dev_builds::Build>& list) {
+    auto newer_count = [running](const std::vector<dev_builds::Build>& kind_builds) {
         size_t n = 0;
-        for (const dev_builds::Build& b : list) n += dev_builds::newer(b, app::version(), running) ? 1 : 0;
+        for (const dev_builds::Build& b : kind_builds) n += dev_builds::newer(b, app::version(), running) ? 1 : 0;
         return n;
     };
     tab_release->setText(brls::getStr("playguard/dev_build/section_release", (int)releases.size()));

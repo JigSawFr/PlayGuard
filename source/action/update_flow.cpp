@@ -127,7 +127,7 @@ void run_check(std::function<void(const Offer&)> done)
             record_check(o.result);
             std::vector<std::function<void(const Offer&)>> waiting;
             waiting.swap(s_waiting);
-            for (const auto& done : waiting) done(o);
+            for (const auto& tell : waiting) tell(o);
         });
     });
 }

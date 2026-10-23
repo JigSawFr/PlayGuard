@@ -27,7 +27,7 @@ class LoadingActivity : public brls::Activity
         Closing,   // "Turn back on and quit": the last screen, the bar full, until PlayGuard is gone
     };
 
-    explicit LoadingActivity(Mode mode = Mode::Start) : mode(mode) {}
+    explicit LoadingActivity(Mode shown = Mode::Start) : mode(shown) {}
 
     // The start-up steps, in order.
     enum class Step

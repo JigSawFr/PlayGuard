@@ -14,7 +14,7 @@ class LockActivity : public brls::Activity
     CONTENT_FROM_XML_RES("activity/lock.xml");
 
     // `over`: pushed over the screens already open, which the PIN uncovers.
-    explicit LockActivity(bool over = false) : over(over) {}
+    explicit LockActivity(bool pushed_over = false) : over(pushed_over) {}
 
     void onContentAvailable() override;
 

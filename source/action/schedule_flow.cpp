@@ -163,9 +163,9 @@ void pick_period(const profiles::Profile& p, std::function<void()> after)
     ui::pick("playguard/schedule/pick_from"_i18n, labels, 0, [p, starts, after](int i) {
         const std::string from = starts[(size_t)i];
         const std::vector<std::string> ends = schedule_logic::dates_from(from, PERIOD_DAYS);
-        std::vector<std::string> labels;
-        for (const std::string& d : ends) labels.push_back(cadran::kit::long_date(d));
-        ui::pick("playguard/schedule/pick_to"_i18n, labels, std::min(6, (int)ends.size() - 1), [p, from, ends, after](int j) {
+        std::vector<std::string> end_labels;
+        for (const std::string& d : ends) end_labels.push_back(cadran::kit::long_date(d));
+        ui::pick("playguard/schedule/pick_to"_i18n, end_labels, std::min(6, (int)ends.size() - 1), [p, from, ends, after](int j) {
             auto& c = config::get();
             c.schedule_file    = p.file;
             c.schedule_name    = p.name;

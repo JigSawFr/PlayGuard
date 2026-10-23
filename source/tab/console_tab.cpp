@@ -140,7 +140,7 @@ void ConsoleTab::refresh()
     // Each tile: the installed version, then a pill with the newer release
     // the last update check found (sys_update_flow) and how many releases
     // behind, in amber, or "Up to date" once a check knows the newest.
-    const auto version_tile = [this](brls::DetailCell* cell, const char* id, sys_notes::Which which) {
+    const auto version_tile = [this](brls::DetailCell* cell, const char* tile_id, sys_notes::Which which) {
         const sys_notes_flow::Status s = sys_notes_flow::status(which);
         cell->setDetailText(s.installed.empty() ? "playguard/common/unavailable"_i18n : s.installed);
         cell->setDetailTextColor(cadran::kit::color(s.installed.empty() ? "cadran/text2" : "cadran/text"));
@@ -151,7 +151,7 @@ void ConsoleTab::refresh()
         } else if (!s.installed.empty() && !s.latest.empty()) {
             tag = "playguard/tools/tile_current"_i18n;
         }
-        this->list.tag(id, tag, s.newer, note);
+        this->list.tag(tile_id, tag, s.newer, note);
     };
     version_tile(fw, "cn_fw", sys_notes::Which::Firmware);
     version_tile(ams, "cn_ams", sys_notes::Which::Atmosphere);

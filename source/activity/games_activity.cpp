@@ -42,8 +42,8 @@ std::string period_label(int period)
 }
 }   // namespace
 
-GamesActivity::GamesActivity(int period, int account)
-    : period(period), account_index(account)
+GamesActivity::GamesActivity(int shown_period, int account)
+    : period(shown_period), account_index(account)
 {
 }
 
@@ -154,12 +154,12 @@ void GamesActivity::switch_view()
 void GamesActivity::pick_period()
 {
     std::vector<std::string> labels;
-    int selected = 0;
+    int current = 0;
     for (int i = 0; i < activity_summary::PERIOD_COUNT; i++) {
         labels.push_back(period_label(activity_summary::PERIODS[i]));
-        if (activity_summary::PERIODS[i] == this->period) selected = i;
+        if (activity_summary::PERIODS[i] == this->period) current = i;
     }
-    ui::pick("playguard/activity/period"_i18n, labels, selected, [this](int index) {
+    ui::pick("playguard/activity/period"_i18n, labels, current, [this](int index) {
         if (activity_summary::PERIODS[index] == this->period) return;
         this->period = activity_summary::PERIODS[index];
         this->show_all = false;

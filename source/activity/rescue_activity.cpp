@@ -12,8 +12,8 @@
 
 using namespace brls::literals;
 
-RescueActivity::RescueActivity(RescueReport report, bool confirmed, bool old_module)
-    : report(report), confirmed(confirmed), old_module(old_module && !confirmed)
+RescueActivity::RescueActivity(RescueReport found, bool verified, bool old_sysmodule)
+    : report(found), confirmed(verified), old_module(old_sysmodule && !verified)
 {
 }
 
