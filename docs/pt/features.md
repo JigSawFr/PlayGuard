@@ -83,7 +83,7 @@ Cada um com um "i", um ponto no sino; pode ser marcado como lido:
 - um limite ainda reduzido por *Terminar o jogo por hoje* num dia anterior (*Repor*);
 - uma nova versão instalada (*Novidades*; depois de uma atualização no lugar, a compilação anterior mantida), ou uma versão mais recente do PlayGuard;
 - um relatório enviado online (*Mostrar a ligação*), ou o PlayGuard fechado inesperadamente da última vez (*Enviar um relatório*);
-- o tempo de jogo da semana (a cada 7 dias até ser lido; com a comparação, por dia, com a semana anterior; *Mostrar o código QR* abre o resumo da semana em *Atividade*), e um limite ultrapassado em dois ou mais dos últimos 7 dias quando a consola só avisa;
+- o tempo de jogo da semana (a cada 7 dias até ser lido; com a comparação, por dia, com a semana anterior), e um limite ultrapassado em dois ou mais dos últimos 7 dias quando a consola só avisa;
 - uma cópia de segurança das definições por fazer (nenhuma ainda, ou nenhuma há 30 dias);
 - todos os jogos bloqueados há uma semana;
 - uma nova conta de utilizador;
@@ -260,7 +260,7 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **no total**, a partir do pr�
 
 ### No topo
 
-- As contas em botões, o período e *Exportar ou partilhar*.
+- As contas em botões, o período e *Exportar*.
 - Hoje, os últimos 7 dias e desde sempre em números. Por baixo dos últimos 7 dias, a comparação, por dia, com os 7 anteriores: ▲ *+20 min/dia vs semana anterior* a âmbar, ▼ menos a verde-azulado, *como na semana anterior* com uma diferença de até 5 minutos.
 - Os quatro jogos mais jogados em cartões (Ⓐ abre um); nos últimos 7 dias, aquele cujo tempo mais aumentou em relação à semana anterior diz em quanto, a partir de meia hora (▲ *+2 h vs semana anterior*).
 - Nada jogado no período: um cartão di-lo, com *Ver desde sempre* quando há alguma coisa para ver.
@@ -283,10 +283,9 @@ Tempo por jogo **hoje**, nos **últimos 7 dias** e **no total**, a partir do pr�
 - O tempo de um jogo que nenhuma conta de utilizador tem (alguns jogos nunca pedem uma, ou a conta foi eliminada entretanto) aparece como *Sem conta*, a partir de um minuto.
 - Uma conta de utilizador que o PlayGuard nunca tinha visto é assinalada a âmbar no separador durante 30 dias (*Conta nova desde …*: uma conta nova é uma forma conhecida de recomeçar do zero) e registada no histórico de alterações; as contas que existem quando o PlayGuard as lista pela primeira vez não são assinaladas.
 
-### Exportação e partilha
+### Exportação
 
-- **Exportação para o cartão SD** (*Exportar ou partilhar › Guardar no cartão SD*) em CSV, JSON, XLSX (Excel) ou PDF, uma coluna por dia, e depois os últimos 7 dias, os últimos 30 dias e desde sempre.
-- **O resumo da semana num código QR** (*Exportar ou partilhar*, ou *Mostrar o código QR* no sino): a câmara de um telemóvel lê-o como algumas linhas de texto, no idioma mostrado — os últimos 7 dias e a sua média, a tendência, cada dia, os três jogos mais jogados, as sessões, a mais longa e o tempo jogado entre as 21:00 e as 06:00. Nada vai para a Internet.
+- **Exportação para o cartão SD** (*Exportar*) em CSV, JSON, XLSX (Excel) ou PDF, uma coluna por dia, e depois os últimos 7 dias, os últimos 30 dias e desde sempre.
 - Abre logo com os últimos números lidos (guardados no cartão SD entre utilizações), atualizados em segundo plano quando têm mais de um minuto; Ⓧ volta a lê-los já, com um indicador de carregamento.
 - Os tempos são aproximados se o relógio da consola foi alterado.
 

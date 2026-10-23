@@ -72,7 +72,7 @@ Una console senza Internet: quando nessun server risponde, PlayGuard propone inv
 | Fermare il gioco per oggi | *Oggi › Basta per oggi*: adesso, o tra 5 minuti per salvare. |
 | Cambiare il limite di un giorno | *Tempo di gioco*: Ⓐ sul giorno, ↑/↓, poi **+** per salvare. |
 | Passare dal periodo scolastico alle vacanze | *Tempo di gioco › Profili*; *Profilo programmato* per un periodo scelto in anticipo. |
-| Vedere chi ha giocato a cosa | *Attività*: per gioco, per utente, oggi, 7 giorni, da sempre; esportazione o un codice QR. |
+| Vedere chi ha giocato a cosa | *Attività*: per gioco, per utente, oggi, 7 giorni, da sempre; esportazione. |
 | Bloccare tutti i giochi per ora | *Tempo di gioco › Blocca tutti i giochi*. Una volta disattivato, i limiti precedenti tornano. |
 | Annullare una modifica | **ZR** *Annulla* subito dopo, o *Cronologia › Modifiche fatte da PlayGuard* in qualsiasi momento. |
 | Conservare una copia delle impostazioni | *Cronologia › Esegui il backup delle impostazioni* (mai il PIN). |

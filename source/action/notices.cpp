@@ -19,7 +19,6 @@
 #include "action/pt_flow.hpp"
 #include "action/session_pause.hpp"
 #include "action/upload_flow.hpp"
-#include "action/week_qr.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
@@ -491,14 +490,11 @@ void note_play_data(const PtState& pt)
             detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
                                           ui::fmt_play_time(week.top_s));
         set("week", Level::Info, brls::getStr("playguard/notices/week", ui::fmt_play_time(week.total_s)), detail,
-            "playguard/notices/week_qr"_i18n, []() {
+            open_label("activity"), []() {
                 config::get().summary_seen = ui::today_date();
                 ui::save_config();
                 clear("week");
-                // On Activity, its QR code over it: the week on a phone.
                 open_tab(ui::tab::activity);
-                if (const auto latest = play_data::latest(""))
-                    week_qr::show(*latest, "playguard/activity/account_all"_i18n);
             });
     } else {
         clear("week");

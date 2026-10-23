@@ -83,7 +83,7 @@ Chacune avec un « i », un point sur la cloche ; elle peut être marquée comme
 - une limite encore abaissée par *Arrêter le jeu pour aujourd'hui* un jour précédent (*Remettre*) ;
 - une nouvelle version installée (*Nouveautés* ; après une mise à jour sur place, la version précédente gardée), ou une nouvelle version de PlayGuard ;
 - un rapport envoyé en ligne (*Afficher le lien*), ou PlayGuard fermé de façon inattendue la dernière fois (*Envoyer un rapport*) ;
-- le temps de jeu de la semaine (tous les 7 jours jusqu'à lecture ; avec la comparaison par jour avec la semaine d'avant ; *Afficher son QR code* ouvre le résumé de la semaine sur *Activité*), et une limite dépassée deux jours ou plus sur les 7 derniers quand la console se contente de prévenir ;
+- le temps de jeu de la semaine (tous les 7 jours jusqu'à lecture ; avec la comparaison par jour avec la semaine d'avant), et une limite dépassée deux jours ou plus sur les 7 derniers quand la console se contente de prévenir ;
 - une sauvegarde des réglages à faire (aucune, ou aucune depuis 30 jours) ;
 - tous les jeux bloqués depuis une semaine ;
 - un nouveau compte utilisateur ;
@@ -257,7 +257,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 
 ### En haut
 
-- Les comptes en puces, la période et *Exporter ou partager*.
+- Les comptes en puces, la période et *Exporter*.
 - Aujourd'hui, les 7 derniers jours et depuis toujours en chiffres. Sous les 7 derniers jours, la comparaison avec les 7 d'avant, par jour : ▲ *+20 min/jour vs semaine d'avant* en orange, ▼ de moins en sarcelle, *comme la semaine d'avant* à 5 minutes près.
 - Les quatre jeux les plus joués en cartes (Ⓐ en ouvre un) ; sur les 7 derniers jours, celui qui a le plus augmenté par rapport à la semaine d'avant le dit, dès une demi-heure (▲ *+2 h vs semaine d'avant*).
 - Rien de joué sur la période : une carte le dit, avec *Voir depuis toujours* quand il y a quelque chose à voir.
@@ -280,10 +280,9 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 - Le temps d'un jeu qu'aucun compte utilisateur ne porte (certains jeux n'en demandent pas, ou le compte a été supprimé depuis) apparaît en *Sans compte*, à partir d'une minute.
 - Un compte utilisateur que PlayGuard n'avait jamais vu est signalé en orange dans l'onglet pendant 30 jours (*Nouveau compte depuis le …* : créer un compte est une astuce connue pour repartir de zéro) et noté dans l'historique des modifications ; les comptes présents quand PlayGuard les liste pour la première fois ne sont pas signalés.
 
-### Export et partage
+### Export
 
-- **Export sur la carte SD** (*Exporter ou partager › Enregistrer sur la carte SD*) en CSV, JSON, XLSX (Excel) ou PDF, une colonne par jour, puis les 7 derniers jours, les 30 derniers jours et depuis toujours.
-- **Le résumé de la semaine en QR code** (*Exporter ou partager*, ou *Afficher son QR code* dans la cloche) : l'appareil photo d'un téléphone le lit comme quelques lignes de texte, dans la langue affichée — les 7 derniers jours et leur moyenne, la tendance, chaque jour, les trois jeux les plus joués, les sessions, la plus longue et le temps joué entre 21:00 et 06:00. Rien ne passe par Internet.
+- **Export sur la carte SD** (*Exporter*) en CSV, JSON, XLSX (Excel) ou PDF, une colonne par jour, puis les 7 derniers jours, les 30 derniers jours et depuis toujours.
 - S'ouvre aussitôt sur les derniers chiffres lus (gardés sur la carte SD d'un lancement à l'autre), actualisés en arrière-plan au-delà d'une minute ; Ⓧ les relit tout de suite, avec un indicateur de chargement.
 - Durées approximatives si l'horloge de la console a été modifiée.
 
