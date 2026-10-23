@@ -32,7 +32,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_FROM_FORWARDER=1` | Started from a forwarder's HOME menu icon, not over a game (Today's pill and Help say so) |
 | `PLAYGUARD_SIM_NO_GAME=1` | No game open (applet mode with nothing behind it): no "game left open keeps counting" line, no "the game in progress is suspended" warning |
 | `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text |
-| `PLAYGUARD_SIM_BATTERY=1` | The console on its battery (no charger): *Visual effects › Lighter on battery* leaves out the glow, the ring's pulse and its arc's animation |
+| `PLAYGUARD_SIM_BATTERY=1` | The console on its battery (no charger): *Visual effects › Lighter on battery* (not the default) leaves out the glow and every movement of the look (`ui/effects`, `ui/motion`) |
 | `PLAYGUARD_SIM_LEFT_MIN=4` | That many minutes left today while the timer counts (the child screen's last minutes) |
 | `PLAYGUARD_SIM_NO_PDM=1` | No activity log |
 | `PLAYGUARD_SIM_NO_PLAY=1` | Nothing played for weeks (the all-time totals stay): the Activity tab's empty state |
@@ -54,7 +54,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_HBLOADER=1` | A homebrew loader that can hand an update over to a store |
 | `PLAYGUARD_SIM_FORWARDERS=1` | Console › Forwarders in use: PlayGuard's own, sphaira protected and seen working, Star Atlas without the PIN, the signature patches, four screenshots in the album dated from the console's day (two in Star Kart Racers the same minute today, one yesterday, one on the HOME menu nine days ago) |
 | `PLAYGUARD_SIM_NOW=<POSIX seconds>` | A frozen console time (with `TZ=` for its time zone) |
-| `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, the loading screen's ring still, and the footer's hints never greyed while a screen or a dialog opens or closes (borealis patch `0014`), for screenshots that compare |
+| `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, the loading screen's ring still, every movement of the look drawn at its end (`effects::motion()`: no entrance, no pulse, no slide), and the footer's hints never greyed while a screen or a dialog opens or closes (borealis patch `0014`), for screenshots that compare |
 | `PLAYGUARD_SIM_VERSION=1.0.0:1a2b3c4` | Not the console: the version and commit the header's badge shows (`1.0.0:` for a release), not the build's own, for screenshots that compare |
 | `PLAYGUARD_SIM_HOLD_LOADING=1` | Not the console: the start-up stops on the loading screen, at its last step (the `loading` smoke scenario's screenshot) |
 | `PLAYGUARD_SIM_CADRAN_NOGLOW=1` | Not the console: no background glow (`PLAYGUARD_SIM_CADRAN_NORING=1`: no ring on Today), the two custom draws of the look after the design boards (`source/view/cadran_*.cpp`: the rail's icons, today's ring, the figures in Sora from `resources/font/`, OFL), to weigh them |

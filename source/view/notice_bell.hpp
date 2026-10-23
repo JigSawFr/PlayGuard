@@ -28,6 +28,9 @@ class NoticeBell : public brls::View
     int listener = 0;
     int actions  = 0;
     int infos    = 0;
+    bool counted = false;        // update() ran once: a change after that moves
+    brls::Time swing_since = 0;  // a new entry to do: the bell swings (µs; 0 at rest)
+    brls::Time pop_since   = 0;  // the number changed: its disc pops
 
     void update();
 };

@@ -1340,8 +1340,9 @@
         },
         "effects": "Effets visuels",
         "effects_values": {
+            "full": "Toujours complets",
             "auto": "Allégés sur batterie",
-            "full": "Toujours complets"
+            "reduced": "Mouvements réduits"
         }
     },
     "backup": {

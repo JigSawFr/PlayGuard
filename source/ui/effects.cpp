@@ -55,4 +55,20 @@ bool light()
     return config::get().effects == "auto" && on_battery();
 }
 
+bool reduced()
+{
+    return config::get().effects == "reduced";
+}
+
+bool motion()
+{
+    // The smoke test's screenshots compare frames: nothing may depend on when
+    // they are taken (the same flag holds the focus highlight still).
+    static const bool still = sim_env_flag("PLAYGUARD_SIM_STILL_FOCUS");
+    if (still) return false;
+    const std::string& setting = config::get().effects;
+    if (setting == "reduced") return false;
+    return setting != "auto" || !on_battery();
+}
+
 }   // namespace effects

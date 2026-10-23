@@ -3,14 +3,21 @@
 
 #include <string>
 
+#include <cmath>
+
 #include "action/notices.hpp"
+#include "ui/effects.hpp"
 #include "ui/hooks.hpp"
+#include "ui/motion.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "view/version_badge.hpp"
 
 static constexpr float SIZE = 40;
 static constexpr const char* BELL_ID = "notice_bell";
+// The swing of a new entry (µs), and the pop of a changed number.
+static constexpr float SWING_US = 700000.0f;
+static constexpr float POP_US   = 380000.0f;
 
 NoticeBell::NoticeBell()
 {
@@ -41,8 +48,17 @@ brls::View* NoticeBell::hitTest(brls::Point point)
 
 void NoticeBell::update()
 {
-    this->actions = notices::action_count();
-    this->infos   = notices::info_count();
+    const int to_do = notices::action_count();
+    const int said  = notices::info_count();
+    // Something new to do rings the bell once; a number that changed pops
+    // (not the first reading: the bell is drawn as it is).
+    if (this->counted && effects::motion()) {
+        if (to_do > this->actions) this->swing_since = motion::now();
+        if (to_do != this->actions || (to_do == 0 && (said > 0) != (this->infos > 0))) this->pop_since = motion::now();
+    }
+    this->actions = to_do;
+    this->infos   = said;
+    this->counted = true;
 }
 
 void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
@@ -55,6 +71,19 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
     const NVGcolor ink = this->actions || this->infos ? cadran::kit::color("cadran/text") : cadran::kit::color("cadran/text3");
     const float cx = x + width * 0.42f, top = y + height * 0.14f;
     const float w = width * 0.62f, h = height * 0.6f;
+    // Swinging: the bell turns about its crown, less and less.
+    nvgSave(vg);
+    if (this->swing_since) {
+        const float t = motion::progress(this->swing_since, SWING_US);
+        if (t >= 1.0f) {
+            this->swing_since = 0;
+        } else {
+            const float angle = 0.21f * std::sin(t * 3.0f * NVG_PI) * (1.0f - t);   // 12° at most
+            nvgTranslate(vg, cx, top);
+            nvgRotate(vg, angle);
+            nvgTranslate(vg, -cx, -top);
+        }
+    }
     nvgBeginPath(vg);
     nvgMoveTo(vg, cx - w * 0.5f, top + h);
     nvgBezierTo(vg, cx - w * 0.38f, top + h * 0.78f, cx - w * 0.38f, top + h * 0.55f, cx - w * 0.36f, top + h * 0.42f);
@@ -67,10 +96,23 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
     nvgBeginPath(vg);
     nvgCircle(vg, cx, top + h + height * 0.08f, height * 0.07f);
     nvgFill(vg);
+    nvgRestore(vg);
 
     // What it holds: the number to do on an amber disc, else a dot for
-    // information alone.
+    // information alone. A changed number pops in.
     const float bx = x + width * 0.76f, by = y + height * 0.24f;
+    nvgSave(vg);
+    if (this->pop_since) {
+        const float t = motion::progress(this->pop_since, POP_US);
+        if (t >= 1.0f) {
+            this->pop_since = 0;
+        } else {
+            const float scale = motion::back_out(t);
+            nvgTranslate(vg, bx, by);
+            nvgScale(vg, scale, scale);
+            nvgTranslate(vg, -bx, -by);
+        }
+    }
     if (this->actions > 0) {
         const std::string n = this->actions > 9 ? "9+" : std::to_string(this->actions);
         const float r = height * 0.24f;
@@ -89,6 +131,7 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
         nvgFillColor(vg, cadran::kit::color("cadran/text3"));
         nvgFill(vg);
     }
+    nvgRestore(vg);
 }
 
 // The main screen (its tab frame) holding `focus`: the bell goes in the

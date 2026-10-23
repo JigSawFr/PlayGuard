@@ -94,6 +94,10 @@ class DashboardTab : public TabBase
     brls::Box*   steps_card  = nullptr;
     brls::Label* steps_count = nullptr;
     Step         steps[3];
+    bool         steps_shown = false;      // the card is up (it bows out once all is done)
+    bool         steps_done[3] = {};       // each step as last shown (a step just done: its check pops)
+    bool         steps_read  = false;      // steps_done read once (the first reading pops nothing)
+    bool         low_lit     = false;      // the first amount stands out (show_low; lit anew: one breath)
     // What stops play first today, under the time played (show_next).
     brls::Box*   next      = nullptr;
     CadranIcon*  next_icon = nullptr;

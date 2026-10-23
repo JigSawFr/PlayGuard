@@ -55,15 +55,17 @@ void PtRing::setFraction(float fraction)
 {
     fraction = fraction > 1.0f ? 1.0f : fraction;
     if (fraction == this->used) return;
-    // From one known value to another: the arc travels there (not with the
-    // lighter effects).
-    const bool travel = this->used >= 0.0f && fraction >= 0.0f && !effects::light();
+    // From one known value to another, the arc travels there; from none to
+    // the first, it draws itself from nothing (the time left: from the full
+    // ring down to it). Not with the motion off.
+    const bool known  = this->used >= 0.0f;
+    const bool travel = fraction >= 0.0f && effects::motion();
     this->used = fraction;
     if (travel) {
-        const float from = this->shown.getValue();
+        const float from = known ? this->shown.getValue() : this->show_left ? 1.0f : 0.0f;
         this->shown.stop();
         this->shown.reset(from);
-        this->shown.addStep(fraction, 450, brls::EasingFunction::quadraticOut);
+        this->shown.addStep(fraction, known ? 450 : 650, known ? brls::EasingFunction::quadraticOut : brls::EasingFunction::cubicOut);
         this->shown.start();
     } else {
         this->shown.stop();
@@ -79,7 +81,13 @@ void PtRing::setValue(const std::string& text)
 }
 void PtRing::setCaption(const std::string& text) { this->caption->setText(text); }
 void PtRing::setShowLeft(bool left) { this->show_left = left; }
-void PtRing::setPulse(bool on) { this->pulse = on; }
+void PtRing::setPulse(bool on, bool fast)
+{
+    this->pulse = on;
+    this->pulse_fast = fast;
+}
+void PtRing::setTip(bool on) { this->tip = on; }
+void PtRing::setRolls(bool rolls) { this->value->setRolls(rolls); }
 void PtRing::setValueSize(float size)
 {
     this->value->setFontSize(size);
@@ -127,20 +135,40 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
         const float f = this->shown.getValue();
         const float to = this->used;
         NVGcolor color = to >= 1.0f ? this->coral : to >= 0.75f ? this->amber : this->teal;
-        if (this->pulse && !effects::light()) {
-            // Once every 1.4 s, from full to a little over half, and back.
-            const double t = (double)(brls::getCPUTimeUsec() % 1400000) / 1400000.0;
+        if (this->pulse && effects::motion()) {
+            // Once every 1.4 s (every second in the last minute: never faster,
+            // nothing on screen may flicker), from full to a little over half,
+            // and back.
+            const unsigned period = this->pulse_fast ? 1000000u : 1400000u;
+            const double t = (double)(brls::getCPUTimeUsec() % period) / (double)period;
             color.a *= 0.55f + 0.45f * (0.5f + 0.5f * (float)std::cos(t * 2.0 * NVG_PI));
         }
         const float arc = this->show_left ? 1.0f - f : f;
         if (arc <= 0.0f) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
+        const float end = -NVG_PI / 2.0f + arc * 2.0f * NVG_PI;
         nvgBeginPath(vg);
-        nvgArc(vg, cx, cy, r, -NVG_PI / 2.0f, -NVG_PI / 2.0f + arc * 2.0f * NVG_PI, NVG_CW);
+        nvgArc(vg, cx, cy, r, -NVG_PI / 2.0f, end, NVG_CW);
         nvgLineCap(vg, NVG_ROUND);
         nvgStrokeWidth(vg, stroke);
         nvgStrokeColor(vg, color);
         nvgStroke(vg);
         nvgLineCap(vg, NVG_BUTT);
+        // Where the time is: a brighter point at the arc's end, a soft light
+        // around it (one gradient, a small square).
+        if (this->tip) {
+            const float tx = cx + r * std::cos(end), ty = cy + r * std::sin(end);
+            NVGcolor light = nvgRGBA(255, 255, 255, 0);
+            NVGcolor core  = nvgRGBA(255, 255, 255, (unsigned char)(color.a * 110.0f));
+            nvgBeginPath(vg);
+            nvgCircle(vg, tx, ty, stroke * 0.9f);
+            nvgFillPaint(vg, nvgRadialGradient(vg, tx, ty, 0.0f, stroke * 0.9f, core, light));
+            nvgFill(vg);
+            nvgBeginPath(vg);
+            nvgCircle(vg, tx, ty, stroke * 0.22f);
+            core.a = color.a * 0.85f;
+            nvgFillColor(vg, core);
+            nvgFill(vg);
+        }
     }
 
     brls::Box::draw(vg, x, y, width, height, style, ctx);   // the figure and its caption

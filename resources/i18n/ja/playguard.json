@@ -1340,8 +1340,9 @@
         },
         "effects": "視覚効果",
         "effects_values": {
+            "full": "常にすべて",
             "auto": "バッテリー時は軽く",
-            "full": "常にすべて"
+            "reduced": "動きを減らす"
         }
     },
     "backup": {

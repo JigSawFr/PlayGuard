@@ -1340,8 +1340,9 @@
         },
         "effects": "Visuelle Effekte",
         "effects_values": {
+            "full": "Immer vollständig",
             "auto": "Sparsamer im Akkubetrieb",
-            "full": "Immer vollständig"
+            "reduced": "Weniger Bewegung"
         }
     },
     "backup": {

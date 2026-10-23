@@ -20,6 +20,7 @@
 #include "util/config.hpp"
 #include "util/date.hpp"
 #include "util/text.hpp"
+#include "view/footer_hints.hpp"
 
 using namespace brls::literals;
 
@@ -435,6 +436,7 @@ void withdraw_undo()
     brls::cancelDelay(s_undo_timer);
     s_undo_view->unregisterAction(s_undo_action);
     s_undo_view = nullptr;
+    FooterHints::set_timed("", 0, 0);
     brls::Application::getGlobalHintsUpdateEvent()->fire();
 }
 }   // namespace
@@ -458,6 +460,9 @@ void offer_undo(std::function<void()> refresh)
         return true;
     });
     brls::Application::getGlobalHintsUpdateEvent()->fire();
+    // The footer shows how long the offer stands (a line draining under it).
+    FooterHints::set_timed("playguard/history/undo_hint"_i18n, brls::getCPUTimeUsec() + (brls::Time)OFFER_MS * 1000,
+                           (brls::Time)OFFER_MS * 1000);
     s_undo_timer = brls::delay(OFFER_MS, []() { withdraw_undo(); });
 }
 

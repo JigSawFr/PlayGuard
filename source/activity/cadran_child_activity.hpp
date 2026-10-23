@@ -26,6 +26,7 @@ class CadranChildActivity : public brls::Activity
   private:
     brls::RepeatingTimer timer;
     session_pause::Hold hold;   // the child's: play counts as usual while it is up
+    bool was_counting = false;   // the last refresh saw the timer counting (the time up after it: one breath)
 
     void refresh();
 

@@ -1,13 +1,18 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/game_tile.hpp"
 
+#include <algorithm>
+
 #include "action/game_icons.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/effects.hpp"
+#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 
 namespace
 {
 constexpr float MARGIN = 8;
+constexpr float FADE_US = 180000.0f;   // a cover's arrival
 constexpr float PADDING = 8;
 constexpr float COVER = GameTile::WIDTH - 2 * MARGIN - 2 * PADDING;   // 144
 }   // namespace
@@ -79,12 +84,30 @@ void GameTile::set_icon_texture(int texture, bool owned)
     this->icon->setScalingType(brls::ImageScalingType::FIT);
     this->icon->innerSetImage(texture);
     this->icon->setFreeTexture(owned);
+    // Arriving in place of the placeholder: the cover fades in.
+    if (!this->iconed && effects::motion()) {
+        this->icon_since = motion::now();
+        this->icon->setAlpha(0.02f);
+    }
     this->iconed = true;
+}
+
+void GameTile::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
+                    brls::FrameContext* ctx)
+{
+    if (this->icon_since) {
+        const float t = motion::progress(this->icon_since, FADE_US);
+        this->icon->setAlpha(std::max(0.02f, motion::ease_out(t)));
+        if (t >= 1.0f) this->icon_since = 0;
+    }
+    brls::Box::draw(vg, x, y, width, height, style, ctx);
 }
 
 void GameTile::clear_icon()
 {
     if (!this->iconed) return;
     this->icon->clear();
+    this->icon->setAlpha(1.0f);
+    this->icon_since = 0;
     this->iconed = false;
 }

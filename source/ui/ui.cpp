@@ -8,6 +8,7 @@
 #include "action/write_queue_logic.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_text.hpp"
+#include "ui/effects.hpp"
 #include "ui/hooks.hpp"
 #include "util/config.hpp"
 #include "util/worker_threads.hpp"
@@ -142,8 +143,17 @@ void notify(const std::string& text, Toast kind)
     });
 }
 
+// A refusal: the line that asked shakes its head (its focus ring, as the
+// console does at the end of a list), with the toast that says why.
+static void shake_focus()
+{
+    if (!effects::motion()) return;
+    if (brls::View* focus = brls::Application::getCurrentFocus()) focus->shakeHighlight(brls::FocusDirection::LEFT);
+}
+
 void refuse(const std::string& text)
 {
+    brls::sync([]() { shake_focus(); });
     notify(text, Toast::Refused);
 }
 
@@ -156,6 +166,7 @@ void refuse(Result rc)
     brls::sync([rc]() {
         const std::string text = rc_text(rc);
         brls::Logger::info("toast: {}", text);
+        shake_focus();
         brls::Application::notify(text, cadran::toast_icon(false));
     });
 }
