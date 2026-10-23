@@ -2088,7 +2088,6 @@
         "date": "{1}{0}日",
         "cell": "计划的配置",
         "note": "为一段时间（假期、旅行）设置的配置：打开 PlayGuard 时，会在开始时提议应用它，结束后提议恢复之前的限制。",
-        "none": "无",
         "value": "{} · {} 至 {}",
         "pick_profile": "这段时间的配置",
         "pick_from": "第一天",
@@ -2107,7 +2106,9 @@
         "keep_remove": "保留当前限制并移除计划",
         "change": "更改…",
         "remove": "移除",
-        "removed": "已移除计划的配置。"
+        "removed": "已移除计划的配置。",
+        "soon": "即将推出",
+        "soon_note": "将随 MQTT 桥接（Home Assistant）推出：PlayGuard 只在打开时运行，因此无法在指定的日子自行切换配置。家庭自动化会根据日历或学校假期来切换。"
     },
     "sigpatch": {
         "set_aside": "将签名补丁文件移到一旁",
