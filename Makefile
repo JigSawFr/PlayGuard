@@ -259,7 +259,9 @@ $(I18N_COPY)/i18n.cpp: $(I18N_PATCHES) | $(TESTOUT)
 	@git -C extern/borealis show HEAD:library/lib/core/i18n.cpp > $(I18N_COPY)/library/lib/core/i18n.cpp
 	@git -C extern/borealis show HEAD:library/include/borealis/core/i18n.hpp > $(I18N_COPY)/library/include/borealis/core/i18n.hpp
 	@for p in $(I18N_PATCHES); do patch -s -p1 -d $(I18N_COPY) -i $(CURDIR)/$$p || exit 1; done
-	@cp $(I18N_COPY)/library/lib/core/i18n.cpp $@
+	@# The suffix without a space, as newer clang wants it (-Wdeprecated-literal-operator),
+	@# in this copy only: borealis itself is built as it is.
+	@sed 's/operator"" _i18n/operator""_i18n/' $(I18N_COPY)/library/lib/core/i18n.cpp > $@
 i18n_threads_SRC   := $(I18N_COPY)/i18n.cpp tests/i18n_threads/test.cpp
 i18n_threads_FLAGS := -std=c++17 -isystem $(I18N_COPY)/library/include -isystem extern/borealis/library/include \
                       -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
