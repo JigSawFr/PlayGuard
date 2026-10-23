@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 2b62c2fbd0de -->
+<!-- translated from docs/features.md, sha256 194c5e251f6e -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -28,7 +28,7 @@ De schermafbeeldingen tonen het donkere thema, de standaard van PlayGuard (in he
 | Ⓑ | Terug of annuleren (twee keer in de zijbalk om af te sluiten) |
 | Ⓧ | Vernieuwen (op de tabbladen die de console lezen) |
 | Ⓨ | Meldingen, vanuit elk tabblad |
-| **−** | Taal en thema, vanuit elk tabblad (de voettekst laat ze weg; de bel, de taal en het thema in de kopregel tonen ze) |
+| **−** | Taal en thema, vanuit elk tabblad (in de voettekst, als eerste weggelaten wanneer de eigen knoppen van een scherm de ruimte nodig hebben) |
 | **+** | Slaat de limieten per dag op (en de week die in *Speeltijdtimer* is bewerkt) |
 | **ZR** | *Ongedaan maken*, een paar seconden nadat een wijziging is opgeslagen |
 
@@ -48,7 +48,7 @@ Het uiterlijk van PlayGuard heet Cadran: een smalle balk met iconen voor de tabb
   - Een lang dialoogvenster vervaagt onderaan zolang er meer volgt, en de waarschuwing erin (een game die op het punt staat te worden onderbroken) komt eerst, in een oranje kaart.
   - Een mislukking heeft als titel wat er mislukt is, de foutcode klein onder de reden, en biedt *Rapport versturen* aan als dat helpt.
   - Meldingen verschijnen als kaarten onder de kopregel, met een blauwgroen vinkje voor wat is gedaan en een oranje teken voor wat is geweigerd.
-- **De andere schermen** krijgen dezelfde look: de editor per dag van een profiel toont de week zoals in *Speeltijdtimer* (op dezelfde manier bewerkt, de snelle waarden als tegels); *Geïnstalleerde games controleren* en *Alle games* zetten hun regels in kaarten; *Profielen* en *Hulp en diagnose* geven elke regel een eigen icoon.
+- **De andere schermen** krijgen dezelfde look: de editor per dag van een profiel toont de week zoals in *Speeltijdtimer* (op dezelfde manier bewerkt, de snelle waarden als tegels); *Geïnstalleerde games* en *Alle games* zetten hun regels in kaarten; *Profielen* en *Hulp en diagnose* geven elke regel een eigen icoon.
 - **Tekstgrootte** (*Voorkeuren*, of **AA** in de kopregel):
   - *Automatisch*, de standaard, maakt alle tekst 25 % groter zolang de console in het dock staat, op de tv, en zet hem terug in handheldmodus; *Groter* houdt hem altijd groter, *Normaal* nooit.
   - De namen van de tabbladen in de zijbalk groeien mee, ook met 25 %; de titel, het label en de datum van de kopregel en de knopaanwijzingen en de klok van de voettekst groeien iets minder (15 tot 20 %), omdat hun regels al vol zijn. Een naam die in een taal te lang is voor zijn ruimte wordt iets kleiner getekend, nooit kleiner dan op normale grootte, in plaats van afgekapt. De namen van de niveaus in *Beperkingen* houden hun grootte, die al groot zijn.
@@ -106,7 +106,7 @@ Ter informatie: een build waarvan is teruggegaan, een firmware die niet met deze
 
 - Elke sectie toont haar meldingen in een vaste volgorde, welke controle ook als eerste klaar was.
 - **In de zijbalk** telt een oranje badge naast de naam van een tabblad de meldingen die te doen zijn, op de plek waar ze worden opgelost: het tabblad Beveiliging (geen pincode, een zwakke pincode, PlayGuard zonder pincode, tijdelijk ontgrendeld), de Speeltijdtimer (het alarm uit, de console die niet telt), *Vandaag* (wijzigingen buiten PlayGuard, extra tijd om terug te zetten), de Console (de meldingen hierboven, en de netwerkklok). Genegeerde meldingen en meldingen ter informatie worden niet geteld.
-- In het tabblad staat dezelfde badge op de regel waar elke melding wordt opgelost (*Netwerkklok*, *Geïnstalleerde games controleren*, *Opslag*, *Gamepatches*; *Pincode instellen of wijzigen*, *PlayGuard beveiligen met de pincode*; *Geavanceerd* van de Speeltijdtimer voor het alarm), en het tabblad opent op de eerste daarvan. Een regel zonder eigen waarde zegt ervoor, in oranje, waarvoor de badge is (*Makkelijk te raden*, *Niet nauwkeurig*).
+- In het tabblad staat dezelfde badge op de regel waar elke melding wordt opgelost (*Netwerkklok*, *Games*, *Opslag*, *Gamepatches*; *Pincode instellen of wijzigen*, *PlayGuard beveiligen met de pincode*; *Geavanceerd* van de Speeltijdtimer voor het alarm), en het tabblad opent op de eerste daarvan. Een regel zonder eigen waarde zegt ervoor, in oranje, waarvoor de badge is (*Makkelijk te raden*, *Niet nauwkeurig*).
 - **Ⓐ** op een melding voert de oplossing uit (*Inschakelen*, *Instellen*, *Bijwerken*…) of opent het tabblad waar je het oplost. Een melding verdwijnt vanzelf zodra wat ze meldt is opgelost.
 - **Ⓧ** markeert een melding ter informatie als gelezen; **Ⓨ** markeert ze allemaal. Een melding die als gelezen is gemarkeerd, blijft gelezen bij de volgende start, tot de tekst ervan verandert.
 - **Negeren:** een paar meldingen die te doen zijn, kun je met Ⓧ negeren, na een bevestiging en de pincode: een pincode die iedereen als eerste zou proberen, PlayGuard dat zonder pincode opent, het alarm "Tijd is om" uit, een bijna volle SD-kaart (nooit: geen pincode, ontgrendeld toezicht, de klok, de speeltijdtimer die niet telt of de bestanden van PlayGuard zelf). Een genegeerde melding telt niet meer mee en staat als laatste onder *Genegeerd*, waar Ⓐ hem weer laat meetellen. Hij komt vanzelf terug na 30 dagen (tenzij *Genegeerde waarschuwingen na 30 dagen weer meetellen* uit staat), zodra wat hij meldt is opgelost en daarna opnieuw gebeurt, of, voor de pincode, bij een nieuwe pincode met een andere lengte.
@@ -298,7 +298,7 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 - **De instellingen van het niveau:** leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen. Bij een vooraf ingesteld niveau zijn het diens eigen instellingen: er één wijzigen maakt het niveau *Aangepast*, vanuit de instellingen van dat niveau met die wijziging, na een vraag (met de instellingen op een rij).
 - **Onder *Leeftijdsclassificatie*** de **classificatie-instantie** (PEGI, ESRB, USK, CERO …): de lijst zegt voor welke landen elke instantie classificeert (PEGI: het grootste deel van Europa, ESRB: de Verenigde Staten, Canada en Latijns-Amerika, USK: Duitsland, PEGI BBFC: het Verenigd Koninkrijk…).
 - **Geblokkeerde geïnstalleerde games** (ook onder *Leeftijdsclassificatie*): hoeveel van de geïnstalleerde games het geldende niveau blokkeert op hun leeftijdsclassificatie (*3 van 15*), waarbij Ⓐ ze toont met hun classificatie (*PEGI 16*); de tegel van elk niveau zegt het ook (*Geblokkeerde games · 3*).
-  - De classificaties zijn die van elke game zelf (de controlegegevens van de game, gelezen door de controle van de geïnstalleerde games bij het opstarten of via *Console › Geïnstalleerde games controleren*), volgens de instantie die de console gebruikt.
+  - De classificaties zijn die van elke game zelf (de controlegegevens van de game, gelezen door de controle van de geïnstalleerde games bij het opstarten of via *Console › Games*), volgens de instantie die de console gebruikt.
   - Een game die deze instantie niet classificeert, telt niet mee, en ook de uitzonderingen die in de smartphone-app zijn ingesteld niet.
   - Het scherm van een game in Activiteit toont de classificatie, en *geblokkeerd op het huidige niveau* als dat zo is.
 - **Onder *Overig*** de VR-modus. De games die mogen communiceren staan ruw in het diagnoserapport, tot hun lijst wordt begrepen.
@@ -368,7 +368,7 @@ Twee bevestigingen, onomkeerbaar; eerst wordt een back-up van de instellingen op
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**Bovenaan** de hulpmiddelen als tegels (*Netwerkklok*, *Geïnstalleerde games controleren*, *Forwarders*, elk met in de hoek wat aandacht nodig heeft), dan wat de console draait, als tegels (de firmware, Atmosphère, hekate als het op de SD-kaart staat en sys-patch als het is geïnstalleerd; Ⓐ opent de release-opmerkingen), dan de regels van de console, compatibiliteit eerst (alleen een blauwgroen vinkje als PlayGuard op deze firmware is gecontroleerd, anders een waarschuwing en wat er mis is).
+**Bovenaan** wat de console draait, als tegels, onder *Systeem* (de firmware, Atmosphère, hekate als het op de SD-kaart staat en sys-patch als het is geïnstalleerd; Ⓐ opent de release-opmerkingen), dan de hulpmiddelen als tegels, onder *Hulpmiddelen* (*Netwerkklok*, *Games* en *Forwarders*; de eerste twee tonen in hun hoek wat aandacht nodig heeft), dan de regels van de console, compatibiliteit eerst (alleen een blauwgroen vinkje als PlayGuard op deze firmware is gecontroleerd, anders een waarschuwing en wat er mis is).
 
 ### Netwerkklok
 
@@ -390,7 +390,7 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 
 ### Geïnstalleerde games
 
-*Geïnstalleerde games controleren* vindt de games die het HOME-menu niet kan starten of tonen — een icoon dat blijft laden, een "!", een gestippeld kader — met wat er mis is en wat je moet doen, onder het icoon van de game, en hoeveel geïnstalleerde games een probleem hebben.
+*Games* (een tegel onder *Console › Hulpmiddelen*) vindt de games die het HOME-menu niet kan starten of tonen — een icoon dat blijft laden, een "!", een gestippeld kader — met wat er mis is en wat je moet doen, onder het icoon van de game, en hoeveel geïnstalleerde games een probleem hebben.
 
 **Wat het vindt:** naam en icoon onleesbaar, de game zelf ontbreekt achter zijn update, niets meer geïnstalleerd, ontbrekende bestanden, beschadigde data die de console vond, een nieuwere firmware die de game of alleen zijn update nodig heeft, sleutels die te nieuw zijn voor de firmware, een ontbrekende licentie (ticket), de console die om een verwijderde update vraagt, een onleesbare SD-kaart, een start die de console weigert.
 
@@ -403,12 +403,13 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 | **Opnieuw installeren** | Bestanden weg of onbruikbaar, of data beschadigd gevonden: verwijderen en opnieuw installeren |
 | **Firmware of SD-kaart** | De game is in orde, de console niet |
 
-- **Data controleren:** wat de datacontrole vond, blijft bij de game tot er een andere versie wordt geïnstalleerd: beschadigd, dan gaat hij naar *Opnieuw installeren* als *Beschadigd (gecontroleerd)*, met de datum en de code van de console; intact, dan verdwijnt hij uit de lijst. *Deze spellen controleren* controleert de hele sectie *Te controleren*, de ene game na de andere in één dialoogvenster (*spel 2 van 5*), en zegt dan hoeveel er beschadigd, intact of niet te controleren zijn, met het verwijderen van de beschadigde binnen handbereik.
+- **Data controleren:** wat de datacontrole vond, blijft bij de game tot er een andere versie wordt geïnstalleerd: beschadigd, dan gaat hij naar *Opnieuw installeren* als *Beschadigd (gecontroleerd)*, met de datum en de code van de console; intact, dan verdwijnt hij uit de lijst. *Deze spellen controleren* controleert de hele sectie *Te controleren*, de ene game na de andere in één dialoogvenster, met hun covers erboven (*spel 2 van 5*), en zegt dan hoeveel er beschadigd, intact of niet te controleren zijn, met het verwijderen van de beschadigde binnen handbereik.
 - **Meerdere games tegelijk:** Ⓨ selecteert games (een vinkje ervoor); vanaf de eerste geselecteerde zegt een regel boven de secties hoeveel het er zijn, en A daarop selecteert ook een hele sectie, daarna één actie voor allemaal: hun data controleren, of ze verwijderen (eerst wordt hun lijst opgeslagen, één vraag, één pincode).
+- **Meerdere verwijderen:** de covers zweven weg zodra elke game verdwijnt (een koraalrood "!" op een die blijft), de balk een segment per game (tot 20); aan het eind hoeveel er zijn verwijderd en hoeveel ruimte dat vrijmaakte, en het dialoogvenster sluit vanzelf. Blijven er over: hun covers koraalrood omrand, en *Opnieuw* voor die games.
 - **Onder *Opnieuw installeren*** kun je hun lijst opslaan (JSON en tekst, in de exportmap: naam, titel-ID, versie, probleem), en ze allemaal tegelijk verwijderen na één vraag en één pincode: eerst wordt de lijst opgeslagen, daarna worden de games verwijderd zodat een installatieprogramma ze niet meer als geïnstalleerd telt.
 - **De acties:** als één actie de oplossing is, is die de eerste knop van het dialoogvenster; de andere volgen: de geïnstalleerde versie weer accepteren (als de console om een verwijderde update vraagt), alleen de update of extra content verwijderen, de data op beschadiging controleren (de eigen controle van de console, met de voortgang en Annuleren), of de game verwijderen.
 - Versies worden getoond zoals de game ze toont (*versie 1.4.0*, *update nr. 4*); na een reparatie zegt een korte melding of de game weer werkt. Opgeslagen spelgegevens blijven altijd staan; elke wijziging staat in de wijzigingsgeschiedenis.
-- **Wanneer het controleert:** de laatste controle verschijnt meteen; daarna worden alleen de games waarvan de vermelding is veranderd opnieuw gecontroleerd (alle games één keer per dag, na een firmware-update, of met Ⓧ *Opnieuw controleren*), elk getoond zodra hij is gecontroleerd.
+- **Wanneer het controleert:** de laatste controle verschijnt meteen; daarna worden alleen de games waarvan de vermelding is veranderd opnieuw gecontroleerd (alle games één keer per dag, na een firmware-update, of met Ⓧ *Opnieuw controleren*), elk getoond zodra hij is gecontroleerd. Ⓧ *Opnieuw controleren* opent een dialoogvenster: de covers van de games die worden doorgebladerd, een balk en het aantal; *Annuleren* stopt na de game die bezig is, wat is gecontroleerd blijft. Staat er nog geen game in de lijst, dan trekken de covers tijdens de controle door de kaart voorbij.
 - Meerdere kapotte games tegelijk wijzen op de SD-kaart of op een game die vanaf de andere opslag (sysMMC / emuMMC) is geïnstalleerd.
 - Ⓡ toont de games als **lijst** of als **covers** (icoon, naam en probleem; de keuze wordt onthouden), zoals *Alle games* dat doet.
 
@@ -460,7 +461,7 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 ### De regels van de console
 
 - **Firmware, Atmosphère, hekate** (als zijn `bootloader/update.bin` op de SD-kaart staat) **en sys-patch** (als het is geïnstalleerd; zijn versie uit zijn `config/sys-patch/log.ini`), elk een tegel met de geïnstalleerde versie, dan de nieuwere versie die de laatste updatecontrole vond in een oranje pil (*23.0.1 beschikbaar*, de tegel oranje omrand, en hoeveel versies achter eronder als het er meer dan één zijn), of *Up-to-date*; een waarschuwing in de hoek van de firmwaretegel als de nieuwste firmware eerst een nieuwere Atmosphère of hekate nodig heeft, of door die nog niet wordt ondersteund (de release-opmerkingen van de firmware zeggen waarom: hun release-opmerkingen zeggen welke firmware ze ondersteunen).
-- **Release-opmerkingen:** Ⓐ op elk ervan opent ze: een tabblad voor de geïnstalleerde versie, één voor elke nieuwere (hoogstens vijf) en oudere in de overige tabbladen (zes in totaal; Ⓛ / Ⓡ wisselen ertussen), geopend op de volgende versie, met labels (geïnstalleerd of nieuwer, de nieuwste firmware die wordt ondersteund, beveiligingsfixes, ouderlijk toezicht gewijzigd), de opmerkingen zoals gepubliceerd (in het Engels), *Online bekijken* (een QR-code) en wanneer ze zijn opgehaald. Die van Atmosphère, hekate en sys-patch komen uit hun GitHub-releases (die van sys-patch uit `impeeza/sys-patch`), die van de firmware van switchbrew; ze worden op de SD-kaart bewaard om offline te lezen en één keer per dag opnieuw opgehaald (Ⓧ nu).
+- **Release-opmerkingen:** Ⓐ op elk ervan opent ze: een tabblad voor de geïnstalleerde versie, één voor elke nieuwere (hoogstens vijf) en oudere in de overige tabbladen (zes in totaal; Ⓛ / Ⓡ wisselen ertussen), geopend op de volgende versie, met labels (een vinkje voor de geïnstalleerde versie, een glinstering voor een nieuwere, de nieuwste firmware die wordt ondersteund, beveiligingsfixes, ouderlijk toezicht gewijzigd), de opmerkingen zoals gepubliceerd (in het Engels), *Online bekijken* (een QR-code) en wanneer ze zijn opgehaald. Die van Atmosphère, hekate en sys-patch komen uit hun GitHub-releases (die van sys-patch uit `impeeza/sys-patch`), die van de firmware van switchbrew; ze worden op de SD-kaart bewaard om offline te lezen en één keer per dag opnieuw opgehaald (Ⓧ nu).
 - **Compatibiliteit**, dan **opslag** (emuMMC of sysMMC, met een info-icoon als het andere systeem een eigen ouderlijk toezicht heeft: Ⓐ legt het uit).
 - Of Atmosphère **het serienummer afschermt** (*Ja (XAW00000000000)*, het nummer dat het systeem dan ziet; op emuMMC, als het niet is afgeschermd, een waarschuwingsicoon, dat Ⓐ uitlegt), dan het **echte serienummer** van de console, met het midden gemaskeerd: als het is afgeschermd, gelezen uit de PRODINFO-back-up die Atmosphère in `atmosphere/automatic_backups/` bewaart (die van deze console, op zijn apparaat-ID, als de SD-kaart er meerdere bevat). Ⓐ op het info-icoon toont het helemaal en waar het vandaan komt.
 - **Gamepatches** (sys-patch of sigpatch-bestanden, met sys-patch als aanbeveling als er alleen bestanden worden gebruikt: een info-icoon, of een waarschuwingsicoon als er iets moet worden nagekeken, dat Ⓐ uitlegt).
@@ -497,9 +498,10 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 
 *Hulp en diagnose ›*, een eigen scherm, onder *Op updates controleren*:
 
+- **Bovenaan**, onder *Aan de slag*, twee tegels: *Eerste stappen* en *Rapport versturen…*; daarna *Diagnose*.
 - **Eerste stappen** opent de gids opnieuw (met een stap *De smartphone-app ontkoppelen* zolang die gekoppeld is, een stap *Alarm "Tijd is om" weer inschakelen* zolang het uit staat, een stap *PlayGuard beveiligen* zodra er een pincode is — de keuze *PlayGuard beveiligen met de pincode* —, en een schakelaar zodat de gids niet meer bij het opstarten verschijnt). Onder *Sluiten* toont *PlayGuard steunen* de QR-codes voor een bijdrage.
-- Hoe PlayGuard is gestart (applicatie of applet) en zijn gegevensmap.
-- **Een diagnoserapport exporteren**, of **online versturen** (zie [Een bug melden](troubleshooting.md#een-bug-melden)); hoeveel opgeslagen rapporten, crashbestanden, sessielogs en links van online verstuurde rapporten er bewaard blijven, op aantal, leeftijd of grootte.
+- Hoe PlayGuard is gestart (een applicatie boven een game of vanuit zijn HOME-pictogram, of een applet) en zijn gegevensmap.
+- **Een diagnoserapport exporteren**, of **online versturen** (*Rapport versturen…*; zie [Een bug melden](troubleshooting.md#een-bug-melden)); hoeveel opgeslagen rapporten, crashbestanden, sessielogs en links van online verstuurde rapporten er bewaard blijven, op aantal, leeftijd of grootte.
 
 ### Met dank aan
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 2b62c2fbd0de -->
+<!-- translated from docs/features.md, sha256 194c5e251f6e -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -28,7 +28,7 @@ Die Screenshots zeigen das dunkle Design, die Voreinstellung von PlayGuard (auf 
 | Ⓑ | Zurück oder abbrechen (zweimal in der Seitenleiste zum Beenden) |
 | Ⓧ | Aktualisieren (in den Tabs, die die Konsole lesen) |
 | Ⓨ | Benachrichtigungen, aus jedem Tab |
-| **−** | Sprache und Design, aus jedem Tab (die Fußzeile lässt sie weg; die Glocke, die Sprache und das Design in der Kopfzeile zeigen sie) |
+| **−** | Sprache und Design, aus jedem Tab (in der Fußzeile, als Erstes weggelassen, wenn die eigenen Tasten eines Bildschirms den Platz brauchen) |
 | **+** | Speichert die Limits pro Tag (und die in *Spielzeit* bearbeitete Woche) |
 | **ZR** | *Rückgängig*, einige Sekunden lang, nachdem eine Änderung gespeichert wurde |
 
@@ -48,7 +48,7 @@ Das Aussehen von PlayGuard heißt Cadran: eine schmale Leiste mit Symbolen für 
   - Ein langer Dialog wird an seinem unteren Rand ausgeblendet, solange noch etwas folgt, und seine Warnung (ein Spiel, das gleich unterbrochen wird) steht zuerst, in einer bernsteinfarbenen Karte.
   - Ein Fehlschlag nennt als Titel, was fehlgeschlagen ist, den Fehlercode klein unter dem Grund, und bietet *Bericht senden* an, wenn das hilft.
   - Meldungen erscheinen als Karten unter der Kopfzeile, mit einem Häkchen in Petrol für das, was erledigt wurde, und einem bernsteinfarbenen Zeichen für das, was abgelehnt wurde.
-- **Die anderen Bildschirme** bekommen dasselbe Aussehen: Der Editor pro Tag eines Profils zeigt die Woche wie in *Spielzeit* (auf dieselbe Weise bearbeitet, die Schnellvorgaben als Kacheln); *Installierte Spiele prüfen* und *Alle Spiele* setzen ihre Zeilen in Karten; *Profile* und *Hilfe & Diagnose* geben jeder Zeile ihr Symbol.
+- **Die anderen Bildschirme** bekommen dasselbe Aussehen: Der Editor pro Tag eines Profils zeigt die Woche wie in *Spielzeit* (auf dieselbe Weise bearbeitet, die Schnellvorgaben als Kacheln); *Installierte Spiele* und *Alle Spiele* setzen ihre Zeilen in Karten; *Profile* und *Hilfe & Diagnose* geben jeder Zeile ihr Symbol.
 - **Textgröße** (*Optionen*, oder **AA** in der Kopfzeile):
   - *Automatisch*, der Standard, macht jeden Text 25 % größer, solange die Konsole im TV-Modus ist, am Fernseher, und setzt ihn im Handheld-Modus zurück; *Größer* lässt ihn immer vergrößert, *Normal* nie.
   - Die Namen der Tabs in der Seitenleiste wachsen mit, ebenfalls um 25 %; Titel, Plakette und Datum der Kopfzeile sowie Tastenhinweise und Uhr der Fußzeile etwas weniger (15 bis 20 %), da ihre Zeilen schon voll sind. Ein Name, der in einer Sprache zu lang für seinen Platz ist, wird etwas kleiner gezeichnet, nie kleiner als in normaler Größe, statt abgeschnitten zu werden. Die Namen der Kategorien in *Einschränkungen* behalten ihre Größe, sie sind schon groß.
@@ -106,7 +106,7 @@ Die zur Information: ein Build, von dem zurückgekehrt wurde, eine mit dieser Ve
 
 - Jeder Abschnitt listet seine Einträge in einer festen Reihenfolge, egal welche Prüfung zuerst fertig war.
 - **In der Seitenleiste** zählt ein bernsteinfarbenes Abzeichen neben dem Namen eines Tabs dessen zu erledigende Einträge, dort, wo sie behoben werden: der Tab Sicherheit (keine Geheimzahl, eine schwache Geheimzahl, PlayGuard ohne seine Geheimzahl, vorübergehend aufgehoben), die Spielzeit (der Alarm aus, die Konsole zählt nicht), *Heute* (Änderungen außerhalb von PlayGuard, Zusatzzeit zum Zurücknehmen), die Konsole (ihre Einträge oben und die Netzwerkuhr). Ignorierte Einträge und die zur Information werden nicht gezählt.
-- Im Tab steht dasselbe Abzeichen in der Zeile, in der jeder behoben wird (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Speicher*, *Spiel-Patches*; *Geheimzahl festlegen oder ändern*, *PlayGuard mit der Geheimzahl schützen*; *Erweitert* der Spielzeit für den Alarm), und der Tab öffnet beim ersten davon. Eine Zeile ohne eigenen Wert sagt davor in Bernstein, wofür das Abzeichen steht (*Leicht zu erraten*, *Ungenau*).
+- Im Tab steht dasselbe Abzeichen in der Zeile, in der jeder behoben wird (*Netzwerkuhr*, *Installierte Spiele*, *Speicher*, *Spiel-Patches*; *Geheimzahl festlegen oder ändern*, *PlayGuard mit der Geheimzahl schützen*; *Erweitert* der Spielzeit für den Alarm), und der Tab öffnet beim ersten davon. Eine Zeile ohne eigenen Wert sagt davor in Bernstein, wofür das Abzeichen steht (*Leicht zu erraten*, *Ungenau*).
 - **Ⓐ** auf einem Eintrag führt die Lösung aus (*Einschalten*, *Stellen*, *Aktualisieren*…) oder öffnet den Tab, in dem sie gemacht wird. Ein Eintrag verschwindet von selbst, sobald behoben ist, was er meldet.
 - **Ⓧ** markiert einen Eintrag zur Information als gelesen; **Ⓨ** markiert alle. Ein als gelesen markierter Eintrag bleibt beim nächsten Start gelesen, bis sich sein Text ändert.
 - **Ignorieren:** Einige zu erledigende Einträge können mit Ⓧ ignoriert werden, nach einer Bestätigung und der Geheimzahl: eine Geheimzahl, die jeder zuerst ausprobieren würde, PlayGuard, das ohne die Geheimzahl öffnet, der Alarm „Zeit ist um“ ausgeschaltet, die SD-Karte fast voll (nie die fehlende Geheimzahl, der aufgehobene Jugendschutz, die Uhr, die Spielzeit, die nicht gezählt wird, oder PlayGuards eigene Dateien). Ein ignorierter Eintrag wird nicht mehr gezählt und steht zuletzt unter *Ignoriert*, wo Ⓐ ihn wieder zählen lässt. Er kommt von selbst 30 Tage später zurück (außer *Ignorierte Warnungen nach 30 Tagen wieder zählen* ist aus), sobald das Gemeldete behoben ist und dann erneut auftritt, oder, bei der Geheimzahl, bei einer neuen Geheimzahl mit anderer Länge.
@@ -298,7 +298,7 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 - **Die Einstellungen der Kategorie:** Altersfreigabe, Posten in sozialen Netzwerken, Kommunikation mit anderen. Bei einer vorgegebenen Kategorie sind es ihre eigenen: Eine davon zu ändern macht die Kategorie zu *Nutzerdefiniert*, ausgehend von den Einstellungen der vorgegebenen mit dieser Änderung, nach einer Nachfrage (die Einstellungen aufgelistet).
 - **Unter *Alterseinstufung*:** das **Alterseinstufungssystem** (PEGI, ESRB, USK, CERO …): Die Liste sagt, für welche Länder jedes einstuft (PEGI: der größte Teil Europas, ESRB: die USA, Kanada und Lateinamerika, USK: Deutschland, PEGI BBFC: das Vereinigte Königreich…).
 - **Blockierte installierte Spiele** (ebenfalls unter *Alterseinstufung*): wie viele der installierten Spiele die geltende Kategorie wegen ihrer Altersfreigabe blockiert (*3 von 15*), Ⓐ listet sie mit ihrer Freigabe auf (*PEGI 16*); die Kachel jeder Kategorie sagt es auch (*Blockierte Spiele · 3*).
-  - Die Freigaben sind die jedes Spiels selbst (seine Steuerdaten, gelesen von der Prüfung der installierten Spiele beim Start oder über *Konsole › Installierte Spiele prüfen*), nach dem System, das die Konsole verwendet.
+  - Die Freigaben sind die jedes Spiels selbst (seine Steuerdaten, gelesen von der Prüfung der installierten Spiele beim Start oder über *Konsole › Installierte Spiele*), nach dem System, das die Konsole verwendet.
   - Ein Spiel, das dieses System nicht einstuft, wird nicht gezählt, ebenso wenig die in der Smart-Geräte-App festgelegten Ausnahmen.
   - Der Bildschirm eines Spiels in Aktivität zeigt seine Freigabe, und *auf der aktuellen Stufe blockiert*, wenn es das ist.
 - **Unter *Sonstiges*:** VR-Modus. Die Spiele, die kommunizieren dürfen, stehen im Diagnosebericht, roh, bis ihre Liste verstanden ist.
@@ -368,7 +368,7 @@ Zwei Bestätigungen, unumkehrbar; vorher wird eine Sicherung der Einstellungen g
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=console)*
 
-**Oben** die Werkzeuge als Kacheln (*Netzwerkuhr*, *Installierte Spiele prüfen*, *Forwarder*, jede mit dem, was einen Blick braucht, in ihrer Ecke), dann, was auf der Konsole läuft, als Kacheln (die Firmware, Atmosphère, hekate, wenn es auf der SD-Karte liegt, und sys-patch, wenn es installiert ist; Ⓐ öffnet seine Versionshinweise), dann die Zeilen der Konsole, die Kompatibilität zuerst (nur ein Häkchen in Petrol, wenn PlayGuard auf dieser Firmware geprüft wurde, sonst eine Warnung und was nicht stimmt).
+**Oben**, was auf der Konsole läuft, als Kacheln, unter *System* (die Firmware, Atmosphère, hekate, wenn es auf der SD-Karte liegt, und sys-patch, wenn es installiert ist; Ⓐ öffnet seine Versionshinweise), dann die Werkzeuge als Kacheln, unter *Werkzeuge* (*Netzwerkuhr*, *Installierte Spiele* und *Forwarder*; die ersten beiden zeigen in ihrer Ecke, was einen Blick braucht), dann die Zeilen der Konsole, die Kompatibilität zuerst (nur ein Häkchen in Petrol, wenn PlayGuard auf dieser Firmware geprüft wurde, sonst eine Warnung und was nicht stimmt).
 
 ### Netzwerkuhr
 
@@ -390,7 +390,7 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 
 ### Installierte Spiele
 
-*Installierte Spiele prüfen* findet die Spiele, die das HOME-Menü nicht starten oder darstellen kann — ein Symbol, das ewig lädt, ein „!“, ein gestrichelter Rahmen — mit dem, was nicht stimmt, und was zu tun ist, unter dem Symbol des Spiels, und der Anzahl der installierten Spiele, die ein Problem haben.
+*Installierte Spiele* (eine Kachel unter *Konsole › Werkzeuge*) findet die Spiele, die das HOME-Menü nicht starten oder darstellen kann — ein Symbol, das ewig lädt, ein „!“, ein gestrichelter Rahmen — mit dem, was nicht stimmt, und was zu tun ist, unter dem Symbol des Spiels, und der Anzahl der installierten Spiele, die ein Problem haben.
 
 **Was es findet:** Name und Symbol unlesbar, das Spiel selbst fehlt hinter seinem Update, nichts mehr installiert, fehlende Dateien, von der Konsole gefundene beschädigte Daten, eine neuere Firmware, die das Spiel oder nur sein Update braucht, Schlüssel zu neu für die Firmware, eine fehlende Lizenz (Ticket), die Konsole verlangt ein entferntes Update, die SD-Karte nicht lesbar, ein Start, den die Konsole ablehnt.
 
@@ -403,12 +403,13 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 | **Neu installieren** | Dateien weg oder unbrauchbar, oder Daten beschädigt gefunden: entfernen, dann neu installieren |
 | **Firmware oder SD-Karte** | Das Spiel ist in Ordnung, die Konsole nicht |
 
-- **Daten prüfen:** Was die Datenprüfung gefunden hat, bleibt beim Spiel, bis eine andere Version installiert wird: beschädigt, wandert es nach *Neu installieren* als *Beschädigt (geprüft)*, mit dem Datum und dem Code der Konsole; intakt, verlässt es die Liste. *Diese Spiele prüfen* prüft den ganzen Abschnitt *Zu prüfen*, ein Spiel nach dem anderen in einem Dialog (*Spiel 2 von 5*), und sagt dann, wie viele beschädigt, intakt oder nicht prüfbar waren, mit dem Entfernen der beschädigten gleich zur Hand.
+- **Daten prüfen:** Was die Datenprüfung gefunden hat, bleibt beim Spiel, bis eine andere Version installiert wird: beschädigt, wandert es nach *Neu installieren* als *Beschädigt (geprüft)*, mit dem Datum und dem Code der Konsole; intakt, verlässt es die Liste. *Diese Spiele prüfen* prüft den ganzen Abschnitt *Zu prüfen*, ein Spiel nach dem anderen in einem Dialog, ihre Cover darüber (*Spiel 2 von 5*), und sagt dann, wie viele beschädigt, intakt oder nicht prüfbar waren, mit dem Entfernen der beschädigten gleich zur Hand.
 - **Mehrere Spiele auf einmal:** Ⓨ wählt Spiele aus (ein Häkchen davor); ab dem ersten ausgewählten sagt eine Zeile über den Abschnitten, wie viele, und A darauf wählt auch einen ganzen Abschnitt, dann eine Aktion für alle: ihre Daten prüfen oder sie entfernen (ihre Liste zuerst gespeichert, eine Frage, eine Geheimzahl).
+- **Mehrere entfernen:** Die Cover schweben davon, sobald ein Spiel nach dem anderen geht (ein korallenrotes „!“ auf einem, das bleibt), der Balken ein Segment pro Spiel (bis zu 20); am Ende, wie viele entfernt wurden und wie viel Platz das freigegeben hat, und der Dialog schließt sich von selbst. Sind welche übrig: ihre Cover korallenrot umrandet, und *Erneut versuchen* für sie.
 - **Unter *Neu installieren*** kann ihre Liste gespeichert werden (JSON und Text, im Export-Ordner: Name, Title-ID, Version, Problem), und alle auf einmal entfernt werden, nach einer Frage und einer Geheimzahl: Die Liste wird zuerst gespeichert, dann werden die Spiele entfernt, damit ein Installationsprogramm sie nicht mehr als installiert zählt.
 - **Die Aktionen:** Wenn eine Aktion die Lösung ist, ist sie die erste Schaltfläche des Dialogs; die anderen folgen: die installierte Version wieder akzeptieren (wenn die Konsole ein entferntes Update verlangt), nur das Update oder einen Zusatzinhalt entfernen, die Daten auf Beschädigung prüfen (die eigene Prüfung der Konsole, mit ihrem Fortschritt und Abbrechen) oder das Spiel entfernen.
 - Versionen werden so angezeigt, wie das Spiel sie zeigt (*Version 1.4.0*, *Update Nr. 4*); nach einer Reparatur sagt eine Meldung, ob das Spiel wieder funktioniert. Spielstände bleiben immer erhalten; jede Änderung steht im Änderungsverlauf.
-- **Wann es prüft:** Die letzte Prüfung wird sofort angezeigt; dann werden nur die Spiele erneut geprüft, deren Eintrag sich geändert hat (jedes Spiel einmal am Tag, nach einem Firmware-Update oder mit Ⓧ *Erneut prüfen*), jedes angezeigt, sobald es geprüft ist.
+- **Wann es prüft:** Die letzte Prüfung wird sofort angezeigt; dann werden nur die Spiele erneut geprüft, deren Eintrag sich geändert hat (jedes Spiel einmal am Tag, nach einem Firmware-Update oder mit Ⓧ *Erneut prüfen*), jedes angezeigt, sobald es geprüft ist. Ⓧ *Erneut prüfen* öffnet einen Dialog: die Cover der Spiele, die durchgeblättert werden, ein Balken und die Anzahl; *Abbrechen* hält nach dem laufenden Spiel an, was geprüft wurde, bleibt. Ist noch kein Spiel aufgelistet, ziehen die Cover während der Prüfung in der Karte vorbei.
 - Mehrere defekte Spiele auf einmal deuten auf die SD-Karte oder auf ein Spiel, das aus dem anderen Speicher installiert wurde (sysMMC / emuMMC).
 - Ⓡ zeigt die Spiele als **Liste** oder als **Cover** (Symbol, Name und Problem; die Wahl wird gemerkt), wie *Alle Spiele*.
 
@@ -460,7 +461,7 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 ### Die Zeilen der Konsole
 
 - **Firmware, Atmosphère, hekate** (wenn seine `bootloader/update.bin` auf der SD-Karte liegt) **und sys-patch** (wenn es installiert ist; seine Version aus seiner `config/sys-patch/log.ini`), jedes eine Kachel mit der installierten Version, dann der neueren Version, die die letzte Update-Suche gefunden hat, in einer bernsteinfarbenen Kapsel (*23.0.1 verfügbar*, die Kachel bernsteinfarben umrandet, und wie viele Versionen zurück darunter, wenn es mehr als eine ist), oder *Aktuell*; ein Warnzeichen in der Ecke der Firmware-Kachel, wenn die neueste Firmware zuerst ein neueres Atmosphère oder hekate braucht oder von ihnen noch nicht unterstützt wird (die Versionshinweise der Firmware sagen, warum: Deren Versionshinweise sagen, welche Firmware sie unterstützen).
-- **Versionshinweise:** Ⓐ auf jedem öffnet sie: ein Tab für die installierte Version, einer für jede neuere (höchstens fünf) und ältere in den übrigen Tabs (sechs insgesamt; Ⓛ / Ⓡ wechseln zwischen ihnen), geöffnet bei der nächsten, mit Etiketten (installiert oder neuer, die neueste unterstützte Firmware, Sicherheitskorrekturen, Jugendschutz geändert), den Hinweisen wie veröffentlicht (auf Englisch), *Online ansehen* (ein QR-Code) und wann sie abgerufen wurden. Die von Atmosphère, hekate und sys-patch kommen aus ihren GitHub-Releases (die von sys-patch aus `impeeza/sys-patch`), die der Firmware von switchbrew; sie werden auf der SD-Karte zum Offline-Lesen aufbewahrt und einmal am Tag neu abgerufen (Ⓧ sofort).
+- **Versionshinweise:** Ⓐ auf jedem öffnet sie: ein Tab für die installierte Version, einer für jede neuere (höchstens fünf) und ältere in den übrigen Tabs (sechs insgesamt; Ⓛ / Ⓡ wechseln zwischen ihnen), geöffnet bei der nächsten, mit Etiketten (ein Häkchen für die installierte Version, ein Funkeln für eine neuere, die neueste unterstützte Firmware, Sicherheitskorrekturen, Jugendschutz geändert), den Hinweisen wie veröffentlicht (auf Englisch), *Online ansehen* (ein QR-Code) und wann sie abgerufen wurden. Die von Atmosphère, hekate und sys-patch kommen aus ihren GitHub-Releases (die von sys-patch aus `impeeza/sys-patch`), die der Firmware von switchbrew; sie werden auf der SD-Karte zum Offline-Lesen aufbewahrt und einmal am Tag neu abgerufen (Ⓧ sofort).
 - **Kompatibilität**, dann **Speicher** (emuMMC oder sysMMC, mit einem Infosymbol, wenn das andere System seinen eigenen Jugendschutz hat: Ⓐ erklärt es).
 - Ob Atmosphère **die Seriennummer anonymisiert** (*Ja (XAW00000000000)*, die Nummer, die das System dann sieht; auf emuMMC, wenn nicht, ein Warnsymbol, das Ⓐ erklärt), dann die **echte Seriennummer** der Konsole, ihre Mitte maskiert: wenn anonymisiert, gelesen aus der PRODINFO-Sicherung, die Atmosphère in `atmosphere/automatic_backups/` aufbewahrt (der dieser Konsole, nach ihrer Geräte-ID, wenn die SD-Karte mehrere enthält). Ⓐ auf ihrem Infosymbol zeigt sie ganz und woher sie stammt.
 - **Spiel-Patches** (sys-patch oder Sigpatch-Dateien, mit der Empfehlung von sys-patch, wenn nur Dateien verwendet werden: ein Infosymbol, oder ein Warnsymbol, wenn etwas einen Blick braucht, das Ⓐ erklärt).
@@ -497,9 +498,10 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 
 *Hilfe & Diagnose ›*, ein eigener Bildschirm, unter *Nach Updates suchen*:
 
+- **Oben**, unter *Erste Schritte*, zwei Kacheln: *Erste Schritte* und *Bericht senden…*; dann *Diagnose*.
 - **Erste Schritte** öffnet die Anleitung erneut (mit einem Schritt *Smart-Geräte-App trennen*, solange sie verknüpft ist, einem Schritt *Alarm „Zeit ist um“ wieder einschalten*, solange er aus ist, einem Schritt *PlayGuard schützen*, sobald eine Geheimzahl festgelegt ist — die Wahl *PlayGuard mit der Geheimzahl schützen* —, und einem Schalter, damit sie beim Start nicht mehr erscheint). Unter *Schließen* zeigt *PlayGuard unterstützen* die QR-Codes zur Unterstützung.
-- Wie PlayGuard gestartet wurde (Anwendung oder Applet) und sein Datenordner.
-- **Diagnosebericht exportieren** oder **online senden** (siehe [Einen Fehler melden](troubleshooting.md#einen-fehler-melden)); wie viele gespeicherte Berichte, Absturzdateien, Sitzungsprotokolle und Links online gesendeter Berichte aufbewahrt werden, nach Anzahl, Alter oder Größe.
+- Wie PlayGuard gestartet wurde (eine Anwendung über einem Spiel oder über sein HOME-Symbol, oder ein Applet) und sein Datenordner.
+- **Diagnosebericht exportieren** oder **online senden** (*Bericht senden…*; siehe [Einen Fehler melden](troubleshooting.md#einen-fehler-melden)); wie viele gespeicherte Berichte, Absturzdateien, Sitzungsprotokolle und Links online gesendeter Berichte aufbewahrt werden, nach Anzahl, Alter oder Größe.
 
 ### Danksagungen
 

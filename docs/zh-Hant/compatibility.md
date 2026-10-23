@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
+<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
 # 相容性
 
 支援的韌體、Atmosphère 和啟動器，emuMMC 和 sysMMC，以及 PlayGuard 與替代型 sysmodule 的比較。返回 [README](../../README.md)。
@@ -34,7 +34,7 @@ PlayGuard 只檢查 Atmosphère 是否在執行，不檢查它的版本：重要
 
 ### 啟動器
 
-建議在遊戲之上啟動（title override）。應用程式會顯示它是以應用程式還是 applet（相簿）的方式執行。在遊戲之上執行時，主機會把在 PlayGuard 裡的時間算成那款遊戲的時間。在活動紀錄中，這段時間會算在啟動時選擇的使用者身上：請用家長的使用者開啟，不要用孩子的。遊玩時間限制是主機的，所有使用者共用同一個：不管是誰開啟 PlayGuard，這段時間都會被計算（除非計時器已關閉）。
+建議在遊戲之上啟動（title override）。應用程式會顯示它是以應用程式（在遊戲之上，或從 HOME 選單上它自己的轉發器）還是 applet（相簿）的方式執行。在遊戲之上執行時，主機會把在 PlayGuard 裡的時間算成那款遊戲的時間。在活動紀錄中，這段時間會算在啟動時選擇的使用者身上：請用家長的使用者開啟，不要用孩子的。遊玩時間限制是主機的，所有使用者共用同一個：不管是誰開啟 PlayGuard，這段時間都會被計算，除非計時器已關閉，或PIN碼已暫停家長監護（[詳細說明](features.md#輸入pin碼後你在-playguard-中時家長監護會暫停)）。
 
 ### Nintendo Switch 2
 

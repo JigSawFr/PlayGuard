@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 150621760428 -->
 # Aan de slag
 
 Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien minuten, en daarna de dagelijkse taken. Terug naar de [README](../../README.md).
@@ -23,7 +23,8 @@ Pak `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGu
 Open PlayGuard **boven een game** (houd R ingedrukt terwijl je een game start, met hbmenu, sphaira of de Homebrew App Store), met **de gebruiker van een ouder**:
 
 - boven een game draait PlayGuard als applicatie, met al zijn geheugen; vanuit het album draait het als applet, met minder;
-- de console telt de tijd in PlayGuard als tijd van die game, en geeft die aan de gebruiker die bij het starten is gekozen: die van een ouder, niet van een kind.
+- de console telt de tijd in PlayGuard als tijd van die game, en geeft die aan de gebruiker die bij het starten is gekozen: die van een ouder, niet van een kind;
+- zodra de pincode is ingevoerd, pauzeert PlayGuard ouderlijk toezicht zolang je erin bent, zodat die tijd niet van die van het kind afgaat; het gaat weer aan zodra je het verlaat.
 
 ## 3. Volg *Eerste stappen*
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
+<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
 # Compatibiliteit
 
 Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGuard zich verhoudt tot een vervangende sysmodule. Terug naar de [README](../../README.md).
@@ -34,7 +34,7 @@ PlayGuard controleert of Atmosphère draait, niet welke versie: wat telt, is de 
 
 ### Launchers
 
-Starten boven een game (title override) wordt aanbevolen. De app zegt of hij als applicatie of als applet (album) draait. Boven een game telt de console de tijd in PlayGuard als tijd van die game. In de activiteit gaat die naar de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder, niet van een kind. De speeltijdtimer is die van de console, dezelfde voor elke gebruiker: hij telt die tijd mee, wie PlayGuard ook opende (tenzij de timer uit staat).
+Starten boven een game (title override) wordt aanbevolen. De app zegt of hij als applicatie (boven een game, of vanuit zijn eigen forwarder in het HOME-menu) of als applet (album) draait. Boven een game telt de console de tijd in PlayGuard als tijd van die game. In de activiteit gaat die naar de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder, niet van een kind. De speeltijdtimer is die van de console, dezelfde voor elke gebruiker: hij telt die tijd mee, wie PlayGuard ook opende, tenzij de timer uit staat of de pincode ouderlijk toezicht heeft gepauzeerd ([details](features.md#de-pincode-pauzeert-ouderlijk-toezicht-zolang-je-in-playguard-bent)).
 
 ### Nintendo Switch 2
 

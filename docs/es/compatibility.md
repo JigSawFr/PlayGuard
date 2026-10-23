@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
+<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
 # Compatibilidad
 
 Firmware, Atmosphère y lanzadores compatibles, emuMMC y sysMMC, y cómo se compara PlayGuard con un sysmodule de sustitución. Volver al [README](../../README.md).
@@ -34,7 +34,7 @@ PlayGuard comprueba que Atmosphère está en marcha, no su versión: lo que cuen
 
 ### Lanzadores
 
-Se recomienda abrirlo sobre un juego (title override). La aplicación indica si se ejecuta como aplicación o como applet (álbum). Sobre un juego, la consola cuenta el tiempo de PlayGuard como el de ese juego. En la actividad, va al usuario elegido al iniciar: ábrelo con el usuario de un padre o una madre, no con el de un niño. El temporizador de juego es el de la consola, el mismo para todos los usuarios: cuenta ese tiempo sea quien sea quien haya abierto PlayGuard (salvo si el temporizador está desactivado).
+Se recomienda abrirlo sobre un juego (title override). La aplicación indica si se ejecuta como aplicación (sobre un juego, o desde su propio forwarder en el menú HOME) o como applet (álbum). Sobre un juego, la consola cuenta el tiempo de PlayGuard como el de ese juego. En la actividad, va al usuario elegido al iniciar: ábrelo con el usuario de un padre o una madre, no con el de un niño. El temporizador de juego es el de la consola, el mismo para todos los usuarios: cuenta ese tiempo sea quien sea quien haya abierto PlayGuard, salvo si el temporizador está desactivado o si el PIN ha puesto en pausa el control parental ([detalles](features.md#el-pin-pone-en-pausa-el-control-parental-mientras-estás-en-playguard)).
 
 ### Nintendo Switch 2
 
