@@ -52,8 +52,9 @@ std::vector<BuildTag> build_tags(const dev_builds::Build& b, bool newer)
         case dev_builds::Ci::Running: tags.push_back({ "playguard/dev_build/tag_ci_running"_i18n, cadran::kit::color("cadran/amber") }); break;
         case dev_builds::Ci::Unknown: break;
     }
-    if (dev_build_flow::installed(b)) tags.push_back({ "playguard/dev_build/installed"_i18n, cadran::kit::color("cadran/teal") });
-    else if (newer) tags.push_back({ "playguard/dev_build/new"_i18n, cadran::kit::color("cadran/teal") });
+    // Installed or new: an icon, no word (the tabs' count of new ones has the same sparkle).
+    if (dev_build_flow::installed(b)) tags.push_back({ "", cadran::kit::color("cadran/teal"), "check" });
+    else if (newer) tags.push_back({ "", cadran::kit::color("cadran/teal"), "sparkle" });
     return tags;
 }
 
@@ -82,6 +83,16 @@ brls::Box* tag_view(const BuildTag& tag, float font_size)
     box->setPadding(0, 10, 0, 10);
     box->setMarginRight(8);
     box->setShrink(0.0f);
+    if (tag.icon) {
+        CadranIcon* glyph = new CadranIcon();
+        glyph->setIcon(tag.icon);
+        glyph->setColor(tag.color);
+        glyph->setWidth(font_size - 2);
+        glyph->setHeight(font_size - 2);
+        if (!tag.text.empty()) glyph->setMarginRight(6);
+        box->addView(glyph);
+    }
+    if (tag.text.empty()) return box;
     auto* l = new brls::Label();
     l->setSingleLine(true);
     l->setFontSize(font_size);
