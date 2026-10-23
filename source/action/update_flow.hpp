@@ -34,6 +34,12 @@ extern const std::vector<std::string> METHODS;
 // newer version, else says what it found.
 void check_now();
 
+// This session's update check, for a screen that only reads it (the firmware
+// screen, its toast): the request under way, or the last one that reached
+// the server, else a new one. `done` runs on the UI thread with the result,
+// recorded as check_now() records it (the notification bell, the day).
+void check_once(std::function<void(const Offer&)> done);
+
 // At start-up: checks when Check for updates every day is on (at most once a
 // day) or when the last check found a newer version; the update screen comes
 // up on `main` once nothing else is in front of it, unless postponed.

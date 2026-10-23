@@ -248,9 +248,7 @@ backup::Snapshot capture()
     pctl_play_timer_query(&pt);
     backup::Snapshot s = backup_logic::snapshot_of(st, pt);
 
-    SysInfo si;
-    sysinfo_get(&si);
-    const std::string fw = ui::hos_text(si.hos_version);
+    const std::string fw = ui::hos_text(sysinfo_hos_version());
     s.firmware = fw;
 
     s.created = ui::now_stamp();

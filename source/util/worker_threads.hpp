@@ -23,9 +23,12 @@
 class WorkerThreads
 {
 public:
-    using Task = std::function<void()>;
+    using Task    = std::function<void()>;
+    using OnThrow = std::function<void(const std::string& what)>;
 
-    WorkerThreads() = default;
+    // `on_throw` is told of a task that threw (on that task's thread): the
+    // task is over all the same.
+    explicit WorkerThreads(OnThrow on_throw = {});
     WorkerThreads(const WorkerThreads&)            = delete;
     WorkerThreads& operator=(const WorkerThreads&) = delete;
     // Waits for every task still running, then joins its thread.
@@ -56,4 +59,5 @@ private:
     std::mutex              lock_;
     std::condition_variable changed_;
     std::list<Worker>       workers_;
+    const OnThrow           on_throw_;
 };

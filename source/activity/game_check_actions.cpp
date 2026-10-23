@@ -23,7 +23,7 @@
 #include "action/games_logic.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
@@ -119,12 +119,12 @@ void GameCheckActivity::run(const GameFacts& g, u32 action, const GameContent& c
 void GameCheckActivity::remove(const GameFacts& g, bool asked)
 {
     const std::string label = history_label(g), name = game_name(g);
-    std::weak_ptr<bool> weak = this->alive;
-    auto now = [this, weak, id = g.app_id, label, name]() {
+    const auto read_again = ui::guarded(this->alive, [this, id = g.app_id]() { this->refresh(false, id); });
+    auto now = [read_again, id = g.app_id, label, name]() {
         const Result rc = gamecheck_remove(id);
         if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
         ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
-        if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
+        if (R_SUCCEEDED(rc)) read_again();
     };
     if (asked) now();
     else ui::confirm_danger(name + "\n\n" + "playguard/games/remove_body"_i18n, "playguard/games/remove"_i18n, now);
@@ -135,8 +135,7 @@ void GameCheckActivity::remove(const GameFacts& g, bool asked)
 void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
                                   std::function<void(const std::string& path, const std::string& error)> done) const
 {
-    SysInfo si;
-    sysinfo_get(&si);
+    const u32 hos = sysinfo_hos_version();
     table_export::Table t;
     t.title = "playguard/games/list_title"_i18n;
     t.sheet = t.title;
@@ -145,7 +144,7 @@ void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
                   { "version", "playguard/games/col_version"_i18n, false },
                   { "problem", "playguard/games/col_problem"_i18n, false } };
     for (const GameFacts& g : games) {
-        const GameIssue issue = gamecheck_classify(&g, si.hos_version);
+        const GameIssue issue = gamecheck_classify(&g, hos);
         t.rows.push_back({ game_name(g), id_text(g.app_id), g.display_version, short_text(g, issue) });
     }
     const std::string text = list_text(games);
@@ -356,12 +355,11 @@ std::vector<GameFacts> GameCheckActivity::selected_games() const
 // whole section, or none. With none picked yet: the sections only.
 void GameCheckActivity::selection_menu()
 {
-    SysInfo si;
-    sysinfo_get(&si);
+    const u32 hos = sysinfo_hos_version();
     const std::vector<GameFacts> games = this->selected_games();
     std::vector<GameFacts> to_verify, to_remove;
     for (const GameFacts& g : games) {
-        const u32 actions = gamecheck_actions(&g, gamecheck_classify(&g, si.hos_version));
+        const u32 actions = gamecheck_actions(&g, gamecheck_classify(&g, hos));
         if (actions & GA_VERIFY) to_verify.push_back(g);
         if (actions & GA_REMOVE) to_remove.push_back(g);
     }
@@ -527,12 +525,11 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
             if (R_FAILED(v.rc)) continue;
             u64 now = 0;
             time_local_now(&now, nullptr);
-            brls::sync([this, weak, v, now]() {
-                if (weak.expired()) return;
+            brls::sync(ui::guarded(weak, [this, v, now]() {
                 if (game_cache::set_verified(&this->cache, v.game.app_id, v.corrupt ? GC_VERIFIED_CORRUPT : GC_VERIFIED_INTACT,
                                              (int64_t)now, v.found))
                     this->save();
-            });
+            }));
         }
         brls::sync([this, weak, state, results, total = games.size()]() {
             game_verify_flow::close(state, [this, weak, results, total]() { report_verified(this, weak, *results, total); });

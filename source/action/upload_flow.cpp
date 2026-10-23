@@ -104,9 +104,9 @@ void send_gist(const Parts& parts, const Kind& kind)
     if (kind.report) body += " " + "playguard/upload/confirm_public"_i18n;
     const std::string token = github_auth::token();
     ui::confirm(body, "playguard/upload/send"_i18n, [parts, files, token, kind]() {
-        ui::notify("playguard/upload/sending"_i18n);
         if (s_sending) return;
         s_sending = true;
+        ui::notify("playguard/upload/sending"_i18n);
         ui::in_background("gist upload", [parts, files, token, kind]() {
             const log_upload::Result r = log_upload::upload_gist(*files, token, app::version(), kind.what);
             brls::sync([parts, r, kind]() {

@@ -2,11 +2,11 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include "action/upload_flow.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/cadran_modal.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_text.hpp"
+#include "ui/hooks.hpp"
 #include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
 #include "util/config.hpp"
@@ -167,7 +167,9 @@ void show_failure(const cadran_text::Failure& f)
         }
     }
     if (report) {
-        dialog->addButton("playguard/notices/send_report"_i18n, []() { upload_flow::choose(); });
+        dialog->addButton("playguard/notices/send_report"_i18n, []() {
+            if (hooks::get().send_report) hooks::get().send_report();
+        });
     }
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->setCancelable(true);

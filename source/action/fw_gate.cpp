@@ -3,6 +3,7 @@
 
 #include <borealis.hpp>
 
+#include "action/update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -48,9 +49,7 @@ bool needed()
 
 std::string firmware()
 {
-    SysInfo si;
-    sysinfo_get(&si);
-    return ui::hos_text(si.hos_version);
+    return ui::hos_text(sysinfo_hos_version());
 }
 
 std::string tested_max()
@@ -79,15 +78,9 @@ void on_main_screen()
         brls::sync([]() { brls::Application::pushActivity(new FirmwareGateActivity()); });
         return;
     }
-    SysInfo si;
-    sysinfo_get(&si);
-    const uint32_t hos = si.hos_version;
-    ui::in_background("update check", [hos]() {
-        const update::Result r = update::check(hos);
-        if (r.verdict != update::Verdict::UpdateSupports) return;
-        brls::sync([r]() {
-            ui::notify(brls::getStr("playguard/fw_gate/update_toast", r.latest.version, firmware()));
-        });
+    update_flow::check_once([](const update_flow::Offer& o) {
+        if (o.result.verdict != update::Verdict::UpdateSupports) return;
+        ui::notify(brls::getStr("playguard/fw_gate/update_toast", o.result.latest.version, firmware()));
     });
 }
 

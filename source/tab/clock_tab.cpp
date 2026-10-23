@@ -329,15 +329,15 @@ void ClockTab::measure()
     // the late answer.
     auto cancelled = std::make_shared<bool>(false);
     auto* progress = new brls::Dialog(cadran::wait_body(brls::getStr("playguard/clock/measuring", this->server)));
-    std::weak_ptr<bool> weak = this->alive;
-    ui::add_cancel(progress, [this, weak, cancelled]() {
+    ui::add_cancel(progress, [cancelled, idle = ui::guarded(this->alive, [this]() { this->busy = false; })]() {
         *cancelled = true;
-        if (!weak.expired()) this->busy = false;
+        idle();
     });
     progress->open();
 
-    clock_flow::measure(this->server, [this, weak, progress, cancelled](const clock_flow::Measurement& m) {
-        if (weak.expired() || *cancelled) return;   // the tab or the dialog was closed meanwhile
+    // Nothing once the tab is gone meanwhile.
+    clock_flow::measure(this->server, ui::guarded(this->alive, [this, progress, cancelled](const clock_flow::Measurement& m) {
+        if (*cancelled) return;   // the dialog was closed meanwhile
         *cancelled = true;
         this->busy = false;
         this->last = m;
@@ -355,12 +355,10 @@ void ClockTab::measure()
         ui::set_text(warning, warn);
         ui::set_visible(warning.getView(), !warn.empty());
         this->refresh();   // shows "Set the network clock"
-        progress->close([this, weak, m, warn]() {
-            brls::sync([this, weak, m, warn]() {
-                if (!weak.expired()) this->show_measurement(m, warn);
-            });
+        progress->close([show = ui::guarded(this->alive, [this, m, warn]() { this->show_measurement(m, warn); })]() {
+            brls::sync(show);
         });
-    });
+    }));
 }
 
 size_t ClockTab::answered(const clock_flow::Measurement& m)
@@ -512,21 +510,17 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     }
 
     auto* dialog = ui::box_dialog(body);
-    std::weak_ptr<bool> weak = this->alive;
     if (can_set) {
         // On time: closing is the answer, setting stays offered.
         dialog->addButton(on_time ? "hints/ok"_i18n : "hints/cancel"_i18n, []() {});
         dialog->addButton(on_time ? "playguard/clock/dialog_set_anyway"_i18n : "playguard/clock/apply_confirm"_i18n,
-                          [this, weak]() {
-            brls::sync([this, weak]() { if (!weak.expired()) this->apply(); });
-        });
+                          [apply = ui::guarded(this->alive, [this]() { this->apply(); })]() { brls::sync(apply); });
         dialog->setCancelable(true);
         cadran::style_dialog(dialog, on_time ? cadran::Emphasis::NONE : cadran::Emphasis::PRIMARY);
     } else if (!m.ok && this->offline && !app::read_only()) {
         dialog->addButton("hints/cancel"_i18n, []() {});
-        dialog->addButton("playguard/clock/guided_copy"_i18n, [this, weak]() {
-            brls::sync([this, weak]() { if (!weak.expired()) this->copy(); });
-        });
+        dialog->addButton("playguard/clock/guided_copy"_i18n,
+                          [copy = ui::guarded(this->alive, [this]() { this->copy(); })]() { brls::sync(copy); });
         dialog->setCancelable(true);
         cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     } else {

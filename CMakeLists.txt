@@ -180,7 +180,8 @@ else ()
     else ()
         list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/sim/web_.*")
     endif ()
-    # The console-free parts are shared with the simulator: one implementation.
+    # The console-free parts are shared with the simulator: one implementation
+    # (tools/check_sources.py fails on one left out).
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
@@ -209,7 +210,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen exter
 # Warnings on PlayGuard's own sources (not borealis, not the vendored
 # qrcodegen and stb); CI turns them into errors with -DPLAYGUARD_WERROR=ON.
 option(PLAYGUARD_WERROR "Treat PlayGuard's compiler warnings as errors" OFF)
-set(PLAYGUARD_WARNINGS -Wall -Wextra)
+# Also a switch case falling into the next unmarked, and a class with virtual
+# functions whose destructor is not virtual (C++ only).
+# Not -Wshadow: a hundred names in some forty files shadow another one.
+set(PLAYGUARD_WARNINGS -Wall -Wextra -Wimplicit-fallthrough $<$<COMPILE_LANGUAGE:CXX>:-Wnon-virtual-dtor>)
 if (PLAYGUARD_WERROR)
     list(APPEND PLAYGUARD_WARNINGS -Werror)
 endif ()

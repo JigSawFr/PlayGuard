@@ -6,7 +6,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 
 class SecurityTab : public TabBase

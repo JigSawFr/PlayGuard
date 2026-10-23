@@ -1,13 +1,16 @@
 // Host tests for source/util/worker_threads.cpp: each task runs on a thread
 // of its own, in parallel with the others; a task still running is waited
 // for up to the time given, and no longer; a task may start another; the
-// destructor waits for the tasks still running.
+// destructor waits for the tasks still running; a task that throws is over
+// all the same.
 #include "check.h"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <set>
+#include <stdexcept>
+#include <string>
 #include <thread>
 
 #include "util/worker_threads.hpp"
@@ -143,6 +146,40 @@ static void test_destructor_waits()
     CHECK(over);   // the destructor waited for it
 }
 
+static void test_task_throws()
+{
+    // A task that throws is over all the same: said to on_throw, waited for,
+    // joined, and the next task runs.
+    std::mutex lock;
+    std::string said;
+    WorkerThreads w([&](const std::string& what) {
+        std::lock_guard<std::mutex> l(lock);
+        said = what;
+    });
+    CHECK(w.start([]() { throw std::runtime_error("boom"); }));
+    CHECK(w.wait_all(5s));
+    CHECK(w.running() == 0);
+    {
+        std::lock_guard<std::mutex> l(lock);
+        CHECK(said == "boom");
+    }
+    CHECK(w.start([]() { throw 42; }));
+    CHECK(w.wait_all(5s));
+    {
+        std::lock_guard<std::mutex> l(lock);
+        CHECK(said == "unknown exception");
+    }
+    std::atomic<bool> ran{ false };
+    CHECK(w.start([&]() { ran = true; }));
+    CHECK(w.wait_all(5s));
+    CHECK(ran);
+    // No on_throw: still caught.
+    WorkerThreads quiet;
+    CHECK(quiet.start([]() { throw std::runtime_error("unheard"); }));
+    CHECK(quiet.wait_all(5s));
+    CHECK(quiet.running() == 0);
+}
+
 int main()
 {
     test_own_thread();
@@ -151,5 +188,6 @@ int main()
     test_task_starts_task();
     test_wait_all_no_time();
     test_destructor_waits();
+    test_task_throws();
     return CHECK_DONE("worker_threads tests passed");
 }

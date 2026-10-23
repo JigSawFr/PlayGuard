@@ -2,10 +2,10 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include "activity/main_activity.hpp"
 #include "app.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/hooks.hpp"
 
 #include <algorithm>
 #include <yoga/Yoga.h>
@@ -150,11 +150,24 @@ bool on_top(brls::Activity* activity)
     return !stack.empty() && stack.back() == activity;
 }
 
-MainActivity* main_activity()
+brls::Activity* main_screen()
 {
+    const auto& is_main = hooks::get().is_main;
+    if (!is_main) return nullptr;
     for (brls::Activity* a : brls::Application::getActivitiesStack())
-        if (auto* main = dynamic_cast<MainActivity*>(a)) return main;
+        if (is_main(a)) return a;
     return nullptr;
+}
+
+void open_tab(int position, const std::string& row)
+{
+    brls::Activity* main = main_screen();
+    if (main && hooks::get().open_tab) hooks::get().open_tab(main, position, row);
+}
+
+void refresh_shown_tab()
+{
+    if (hooks::get().refresh_shown) hooks::get().refresh_shown();
 }
 
 void go_to_tab(brls::View* from, int position)

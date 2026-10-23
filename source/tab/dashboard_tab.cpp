@@ -85,14 +85,14 @@ DashboardTab::DashboardTab()
     today_text->addView(this->timeline, 3);
     this->list.apply({ { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" } });
     extra_pending->registerClickAction([this](brls::View*) {
-        pt_flow::offer_extra_time_restore([this]() { this->refresh(); }, true);
+        pt_flow::offer_extra_time_restore(this->refresher(), true);
         return true;
     });
     // Shown only while the alarm is off: A turns it back on (the dialog says why).
     ui::set_detail(alarm, "playguard/dashboard/alarm_off"_i18n);
     alarm->setDetailTextColor(cadran::kit::color("cadran/amber"));
     alarm->registerClickAction([this](brls::View*) {
-        pt_flow::turn_alarm_on("overview", [this]() { this->refresh(); });
+        pt_flow::turn_alarm_on("overview", this->refresher());
         return true;
     });
     this->enable_auto_refresh(5000);
@@ -121,7 +121,7 @@ DashboardTab::DashboardTab()
     setup->setAlignItems(brls::AlignItems::CENTER);
     // No limit yet: the Play timer, on its week, where the days are set.
     setup->registerClickAction([](brls::View* view) {
-        if (MainActivity* main = ui::main_activity()) main->open_tab(ui::tab::play_timer, "cpt_week");
+        if (ui::main_screen()) ui::open_tab(ui::tab::play_timer, "cpt_week");
         else ui::go_to_tab(view, ui::tab::play_timer);
         return true;
     });
@@ -137,7 +137,7 @@ DashboardTab::DashboardTab()
     // The saved profiles, the one in force checked: one press to change week.
     profile->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        profile_flow::pick([this]() { this->refresh(); });
+        profile_flow::pick(this->refresher());
         return true;
     });
     // Stop, the child screen, today's limit, the profile: on a second line
@@ -175,7 +175,7 @@ DashboardTab::DashboardTab()
     }
 
     relock->registerClickAction([this](brls::View*) {
-        console_actions::relock("", [this]() { this->refresh(); });
+        console_actions::relock("", this->refresher());
         return true;
     });
     limit->registerClickAction([this](brls::View*) {
@@ -195,7 +195,7 @@ DashboardTab::DashboardTab()
         amount->setMarginRight(10);
         amount->registerClickAction([this, minutes](brls::View*) {
             if (ui::refuse_read_only()) return true;
-            pt_flow::add_extra_minutes(this->pt, (uint16_t)minutes, [this]() { this->refresh(); });
+            pt_flow::add_extra_minutes(this->pt, (uint16_t)minutes, this->refresher());
             return true;
         });
         // Focused, the next stop's line says when play would end with it.
@@ -214,14 +214,14 @@ DashboardTab::DashboardTab()
         brls::Box* other = kit::chip("\u2026");
         other->registerClickAction([this](brls::View*) {
             if (ui::refuse_read_only()) return true;
-            pt_flow::add_extra_time(this->pt, [this]() { this->refresh(); });
+            pt_flow::add_extra_time(this->pt, this->refresher());
             return true;
         });
         chips->addView(other);
     }
     stop->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        pt_flow::stop_today(this->pt, [this]() { this->refresh(); });
+        pt_flow::stop_today(this->pt, this->refresher());
         return true;
     });
     child->registerClickAction([](brls::View*) {
@@ -239,7 +239,7 @@ DashboardTab::DashboardTab()
     });
     // Inaccurate and writable: the guided measure-and-set path; else the clock's screen.
     clock_card->registerClickAction([this](brls::View*) {
-        if (this->clock_inaccurate && !app::read_only()) clock_flow::guided([this]() { this->refresh(); });
+        if (this->clock_inaccurate && !app::read_only()) clock_flow::guided(this->refresher());
         else ClockTab::open_screen();
         return true;
     });

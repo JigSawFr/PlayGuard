@@ -264,7 +264,7 @@ void DashboardTab::choose_today_limit()
         pt_flow::confirm_write("", "playguard/play_timer/confirm_set"_i18n, [this, days](bool did_unlock) {
             Result rc = pt_flow::write_days(days.data(), "per_day");
             pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
-                                  "playguard/play_timer/write_err"_i18n, [this]() { this->refresh(); });
+                                  "playguard/play_timer/write_err"_i18n, this->refresher());
         }, days.data(), false, brls::getStr("playguard/cadran/today/limit_title", ui::day_name_in_text(today)));
     });
 }

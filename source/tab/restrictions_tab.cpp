@@ -292,7 +292,7 @@ void RestrictionsTab::write_custom(const PctlCustomSettings& s, const std::strin
                    (loosens.empty() ? "" : "\n\n" + loosens) + "\n\n" + this->settings_text(s);
         }
         ui::confirm(pt_flow::with_link_note(body, &this->st), "playguard/play_timer/confirm_set"_i18n,
-                    [this, s, to_custom]() { this->apply_custom(s, to_custom); }, [this]() { this->refresh(); });
+                    [this, s, to_custom]() { this->apply_custom(s, to_custom); }, this->refresher());
         return;
     }
     this->apply_custom(s, false);

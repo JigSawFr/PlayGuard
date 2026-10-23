@@ -6,12 +6,11 @@
 #include <string>
 #include <vector>
 
-#include "activity/main_activity.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
-#include "tab/cadran_list.hpp"
-#include "tab/tab_base.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
+#include "ui/hooks.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_palette.hpp"
 #include "ui/effects.hpp"
@@ -426,7 +425,8 @@ std::string crumb_of(brls::AppletFrame* frame)
     if (!below && !stack.empty() && stack.back()->getContentView() != frame) below = stack.back()->getContentView();
     if (!below) return "";
     if (below->getView("main_tabs")) {
-        const std::string tab = TabBase::main_screen();   // "tab/console"
+        const auto& main_tab = ui::hooks::get().main_screen;
+        const std::string tab = main_tab ? main_tab() : "";   // "tab/console"
         return tab.rfind("tab/", 0) == 0 ? brls::getStr("playguard/tabs/" + tab.substr(4)) : "";
     }
     auto* title = dynamic_cast<brls::Label*>(below->getView("brls/applet_frame/title_label"));

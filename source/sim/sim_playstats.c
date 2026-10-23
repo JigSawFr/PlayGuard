@@ -2,6 +2,9 @@
 // (sim_games.h), shared between made-up accounts (PLAYGUARD_SIM_ACCOUNTS,
 // 2 by default: Alice and Léo), each playing twice what the next one does:
 // Alice 2/3 of everything and Léo 1/3 (but the time on no account).
+// The figures are made here, not read from a raw play log: so core/
+// playstats_logic.c (the log's entries, its walk, the names and icons kept on
+// the SD card), which works on that log, is not part of the simulator.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include <stdatomic.h>
 #include <stdio.h>

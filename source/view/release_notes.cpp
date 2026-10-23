@@ -2,7 +2,7 @@
 #include "view/release_notes.hpp"
 
 #include "app.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"

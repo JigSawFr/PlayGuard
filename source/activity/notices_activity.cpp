@@ -8,7 +8,7 @@
 #include "action/notices.hpp"
 #include "action/notice_logic.hpp"
 #include "action/pin_lock.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_frame.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
@@ -68,11 +68,11 @@ void NoticesActivity::onContentAvailable()
     // as the dialog gives the focus back to a cell a rebuild deletes, and
     // closing would close the dialog instead.
     this->listener = notices::listen([this]() {
-        brls::sync([this, alive = this->alive]() {
-            if (!*alive || this->closing) return;
+        brls::sync(ui::guarded(this->alive, [this]() {
+            if (this->closing) return;
             if (ui::has_focus(this)) this->rebuild();
             else this->stale = true;
-        });
+        }));
     });
 }
 
@@ -82,9 +82,7 @@ void NoticesActivity::onResume()
     this->stale = false;
     // Next frame: borealis first gives the focus back to the cell that
     // opened the dialog, which rebuild() then moves away before deleting it.
-    brls::sync([this, alive = this->alive]() {
-        if (*alive && !this->closing) this->rebuild();
-    });
+    brls::sync(ui::guarded(this->alive, [this]() { if (!this->closing) this->rebuild(); }));
 }
 
 // The console's entries folded into one line, with their count: A opens them.
@@ -100,9 +98,7 @@ brls::DetailCell* NoticesActivity::console_line(const std::vector<notices::Entry
     more->registerClickAction([this](brls::View*) {
         // Next frame: the rebuild deletes this cell.
         this->console_open = true;
-        brls::sync([this, alive = this->alive]() {
-            if (*alive && !this->closing) this->rebuild();
-        });
+        brls::sync(ui::guarded(this->alive, [this]() { if (!this->closing) this->rebuild(); }));
         return true;
     });
     return more;
