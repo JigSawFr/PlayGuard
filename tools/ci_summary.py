@@ -315,7 +315,8 @@ def read_tsv(path):
 
 def cmd_smoke(a):
     # smoke-results.tsv: scenario, ok|fail, seconds, screens
-    # visual-results.tsv: scenario, ok|changed|none, screens compared, changed names, log file
+    # visual-results.tsv: scenario, ok|announced|changed|kept|none, screens compared, the changed
+    # (or announced, or kept: ~updated +added -removed) names, log file
     smoke = {r[0]: r for r in read_tsv(a.results)}
     visual_ran = bool(a.visual) and os.path.exists(a.visual)
     visual = {r[0]: r for r in read_tsv(a.visual)} if visual_ran else {}
@@ -343,6 +344,15 @@ def cmd_smoke(a):
         elif v[1] == "ok":
             compared += int(v[2]) if v[2].isdigit() else 0
             visual_cell = f"{OK} {v[2]} unchanged"
+        elif v[1] == "announced":
+            names = [x for x in (v[3] if len(v) > 3 else "").split(",") if x]
+            compared += int(v[2]) if v[2].isdigit() else 0
+            visual_cell = f"{OK} {v[2]} compared, {len(names)} announced or new: " + ", ".join(code(x) for x in names)
+        elif v[1] == "kept":
+            names = [x for x in (v[3] if len(v) > 3 else "").split(",") if x]
+            compared += int(v[2]) if v[2].isdigit() else 0
+            visual_cell = (f"{OK} {v[2]} kept as the references" +
+                           (f", {len(names)} changed: " + ", ".join(code(x) for x in names) if names else ", none changed"))
         else:
             names = [x for x in (v[3] if len(v) > 3 else "").split(",") if x]
             compared += int(v[2]) if v[2].isdigit() else 0
@@ -366,9 +376,9 @@ def cmd_smoke(a):
                "the smoke test's `app.log` next to them")
     if changed_all:
         out.append("")
-        out.append(f"{WARN} A changed screen fails the job. Its side-by-side image (reference | now | changes in red) "
-                   "is in `<scenario>/visual_diff/` of the artifact. If the change is meant, update the references "
-                   "(`tests/visual/README.md`): `python3 tools/visual_check.py <shots-dir> tests/visual/<scenario> --update`.")
+        out.append(f"{WARN} A screen changed against main's fails the job. Its side-by-side image (main | now | changes "
+                   "in red) is in `<scenario>/visual_diff/` of the artifact. If the change is meant, announce it on the "
+                   "pull request's `Screens:` line (`tests/visual/README.md`): `Screens: smoke/01_dashboard, cadran/*`, or `any`.")
         for sc, text in changed_logs:
             out.append("")
             out.append(details(f"Visual check ({sc})", "```\n" + text.strip() + "\n```", open_=True))

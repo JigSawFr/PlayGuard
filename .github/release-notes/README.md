@@ -13,8 +13,10 @@ Once a release exists, the build's release job lays out its page
 3. **what changed**: what a user notices (features, changes, fixes, polish),
    then **for contributors** (build, tests, docs): release-please's lists,
    folded;
-4. **🖼️ On screen**: the screens whose visual-check reference
-   (`tests/visual/`) changed since the previous release, before and after;
+4. **🖼️ On screen**: the screens that look different from the previous
+   release (its `playguard-screens.zip` against this one's,
+   `tools/visual_refs.py diff`), before and after on one image attached to
+   the release;
 5. **📦 Install**: three steps (new install, update, locked out) with the
    assets and their size, the firmware checked (from `compat.json`);
 6. **🔍 Build**: the build's report (the run page: the `.nro` size, the tests
