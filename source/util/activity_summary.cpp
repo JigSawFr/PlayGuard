@@ -110,6 +110,62 @@ bool week_trend_min(const PlayStats& s, int64_t& per_day_min)
     return true;
 }
 
+WeekTrend week_trend(const PlayStats& s)
+{
+    WeekTrend out;
+    int64_t diff = 0;
+    out.known = week_trend_min(s, diff);
+    if (!out.known) return out;
+    out.per_day_min = diff;
+    out.amount_min  = (uint16_t)std::min<int64_t>(24 * 60, diff < 0 ? -diff : diff);
+    out.trend = diff >= TREND_SAME_MIN ? Trend::More : diff <= -TREND_SAME_MIN ? Trend::Less : Trend::Same;
+    return out;
+}
+
+TodayPlay today_play(const PlayStats& s)
+{
+    TodayPlay out;
+    for (uint32_t g = 0; g < s.count; g++) {
+        out.total_s += s.games[g].today_s;
+        out.games += s.games[g].today_s > 0;
+    }
+    return out;
+}
+
+void day_totals(const PlayStats& s, uint64_t (&out)[7])
+{
+    for (int k = 0; k < 7; k++) out[k] = 0;
+    for (uint32_t g = 0; g < s.count; g++)
+        for (int k = 0; k < 7; k++) out[k] += s.games[g].day_s[k];
+}
+
+std::vector<const GameStat*> ranked_games(const PlayStats& s, int period)
+{
+    std::vector<const GameStat*> games;
+    for (uint32_t g = 0; g < s.count; g++)
+        if (value(s.games[g], period) > 0) games.push_back(&s.games[g]);
+    std::sort(games.begin(), games.end(), [period](const GameStat* a, const GameStat* b) {
+        return value(*a, period) > value(*b, period);
+    });
+    return games;
+}
+
+Grew grew_most(const PlayStats& s, const std::vector<const GameStat*>& ranked, size_t shown, int period)
+{
+    Grew out;
+    if (period != Week || !s.windows_ok || !s.prev_week_ok) return out;
+    int64_t best = GREW_MIN * 60 - 1;
+    for (size_t i = 0; i < ranked.size() && i < shown; i++) {
+        const int64_t d = (int64_t)ranked[i]->week_s - (int64_t)ranked[i]->prev_week_s;
+        if (d > best) {
+            out.game = ranked[i];
+            best     = d;
+        }
+    }
+    if (out.game) out.more_s = (uint64_t)best;
+    return out;
+}
+
 uint64_t unattributed_s(uint64_t total_s, const AccountPlay* accounts, size_t count)
 {
     uint64_t gap = total_s;

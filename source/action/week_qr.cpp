@@ -42,18 +42,15 @@ std::string text(const PlayStats& s, const std::string& who)
     lines.push_back(line("playguard/activity/week"_i18n, ui::fmt_play_time(week.total_s) + " · " +
                                                             brls::getStr("playguard/cadran/activity/per_day",
                                                                          ui::fmt_play_time(week.per_day_s))));
-    int64_t diff = 0;
-    if (activity_summary::week_trend_min(s, diff)) {
-        const uint16_t amount = (uint16_t)std::min<int64_t>(24 * 60, diff < 0 ? -diff : diff);
-        const int64_t same = activity_summary::TREND_SAME_MIN;
-        lines.push_back(diff >= same    ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(amount))
-                        : diff <= -same ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(amount))
-                                        : "playguard/cadran/activity/trend_same"_i18n);
-    }
+    using activity_summary::Trend;
+    const auto trend = activity_summary::week_trend(s);
+    if (trend.known)
+        lines.push_back(trend.trend == Trend::More   ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(trend.amount_min))
+                        : trend.trend == Trend::Less ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(trend.amount_min))
+                                                     : "playguard/cadran/activity/trend_same"_i18n);
     // Each day, the oldest first.
-    uint64_t day_total[7] = {};
-    for (uint32_t g = 0; g < s.count; g++)
-        for (int k = 0; k < 7; k++) day_total[k] += s.games[g].day_s[k];
+    uint64_t day_total[7];
+    activity_summary::day_totals(s, day_total);
     std::string days;
     for (int k = 6; k >= 0; k--) {
         if (!days.empty()) days += ", ";

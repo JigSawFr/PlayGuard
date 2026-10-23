@@ -75,6 +75,44 @@ Hours hours(const PlayStats& stats);
 constexpr int64_t TREND_SAME_MIN = 5;
 bool week_trend_min(const PlayStats& stats, int64_t& per_day_min);
 
+// The same as Activity, the bell and the week's QR code say it: more or
+// less by `amount_min` a day (at most a day), or about the same.
+enum class Trend { More, Less, Same };
+struct WeekTrend
+{
+    bool     known = false;   // week_trend_min's answer: nothing below otherwise
+    Trend    trend = Trend::Same;
+    int64_t  per_day_min = 0;
+    uint16_t amount_min = 0;  // |per_day_min|, at most 24 h
+};
+WeekTrend week_trend(const PlayStats& stats);
+
+// Today's play, every game added up, and how many games were played.
+struct TodayPlay
+{
+    uint64_t total_s = 0;
+    int      games = 0;
+};
+TodayPlay today_play(const PlayStats& stats);
+
+// Each of the last 7 days' play, every game added up (k days ago, as
+// PlayStats.day_s).
+void day_totals(const PlayStats& stats, uint64_t (&out)[7]);
+
+// The games played in `period`, most played first: the tab's cards.
+std::vector<const GameStat*> ranked_games(const PlayStats& stats, int period);
+
+// Over the last 7 days, the game of the first `shown` of `ranked` whose play
+// grew most against the week before, by GREW_MIN at least (none for another
+// period, or when either week was not read).
+constexpr int64_t GREW_MIN = 30;
+struct Grew
+{
+    const GameStat* game = nullptr;
+    uint64_t more_s = 0;
+};
+Grew grew_most(const PlayStats& stats, const std::vector<const GameStat*>& ranked, size_t shown, int period);
+
 // A game's all-time play time that no user account holds (`total_s` is the
 // game's, every account): played without choosing an account (some games
 // never ask) or by an account deleted since. Never negative: several accounts
