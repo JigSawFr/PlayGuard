@@ -44,10 +44,10 @@
                     <brls:Label id="db_tab_r" text=" " fontSize="25.5" textColor="@theme/cadran/text3"/>
                 </brls:Box>
                 <brls:Box width="auto" height="auto" grow="1.0"/>
-                <brls:Box id="db_loading" width="300" height="auto" axis="column" alignItems="flexEnd"
+                <brls:Box id="db_loading" width="440" height="auto" axis="column" alignItems="flexEnd"
                     marginLeft="16" visibility="gone">
-                    <LoadingBar id="db_loading_bar" width="300" height="8" marginBottom="10"/>
-                    <brls:Label id="db_loading_text" text=" " fontSize="18" horizontalAlign="right"
+                    <LoadingBar id="db_loading_bar" width="300" height="8" marginBottom="8"/>
+                    <brls:Label id="db_loading_text" text=" " fontSize="16" horizontalAlign="right"
                         textColor="@theme/cadran/text3"/>
                 </brls:Box>
             </brls:Box>
