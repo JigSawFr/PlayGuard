@@ -229,6 +229,9 @@ play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
 perf_SRC   := source/util/perf.cpp tests/perf/test.cpp
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
+# fmt header-only: the report's lines are formatted with it.
+diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
+diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY
 # The text helpers that only translate, over ui/tr.hpp's stand-in for
 # borealis' getStr and fmt header-only (the catalogs read by the test).
 format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
