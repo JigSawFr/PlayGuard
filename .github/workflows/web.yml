@@ -360,9 +360,11 @@ jobs:
       # documentation or its texts; main has had it. In the Playwright of the
       # simulator's smoke test when this build made it, else Chromium's
       # headless shell alone.
-      - name: The website on a phone, a tablet and a desktop
+      # Playwright and its system packages first, apart: a slow Ubuntu mirror
+      # can take minutes over the fonts alone, which is not the check's time.
+      - name: Playwright for the website's layout
         if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
-        timeout-minutes: 5
+        timeout-minutes: 20
         run: |
           py="$RUNNER_TEMP/playwright/bin/python"
           if [ ! -x "$py" ]; then
@@ -370,6 +372,11 @@ jobs:
             "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
             "$py" -m playwright install --with-deps --only-shell chromium
           fi
+      - name: The website on a phone, a tablet and a desktop
+        if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
+        timeout-minutes: 5
+        run: |
+          py="$RUNNER_TEMP/playwright/bin/python"
           curl -sfL --retry 3 -o "$RUNNER_TEMP/axe.tgz" "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
           echo "$AXE_SHA256  $RUNNER_TEMP/axe.tgz" | sha256sum -c --quiet
           # axe.min.js alone, read out of the package by Python rather than

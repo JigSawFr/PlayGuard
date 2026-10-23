@@ -144,8 +144,8 @@ void AboutTab::refresh()
     version->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
     this->list.sync();
     if (this->version_line) {
-        const std::string version = app::commit().empty() ? app::version() : app::version() + " · " + app::commit();
-        this->version_line->setText(brls::getStr("playguard/cadran/about/version", version));
+        const std::string version_text = app::commit().empty() ? app::version() : app::version() + " · " + app::commit();
+        this->version_line->setText(brls::getStr("playguard/cadran/about/version", version_text));
     }
     cadran::set_pill("");
 }

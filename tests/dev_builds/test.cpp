@@ -359,7 +359,7 @@ static void test_artifacts()
     CHECK(builds[1].kind == Kind::Main && builds[1].commit == "aaaaaaa" && builds[1].date == "2026-10-08T12:05:00Z");
     // Pull requests by number, highest first, each its newest build.
     CHECK(builds[2].kind == Kind::PullRequest && builds[2].pr == 41 && builds[2].commit == "ddddddd");
-    for (const auto& b : builds) CHECK(b.pr != 42);
+    for (const auto& build : builds) CHECK(build.pr != 42);
     CHECK(dev_builds::combine(arts, pulls, 1).size() == 2);   // main kept to 1
 
     std::vector<dev_builds::Artifact> none;

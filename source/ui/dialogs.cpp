@@ -342,7 +342,7 @@ double held_part(Held& h, int64_t now)
 class HoldFill : public brls::View
 {
   public:
-    explicit HoldFill(std::shared_ptr<Held> held) : held(std::move(held))
+    explicit HoldFill(std::shared_ptr<Held> hold) : held(std::move(hold))
     {
         this->setFocusable(false);
         this->setPositionType(brls::PositionType::ABSOLUTE);

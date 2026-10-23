@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 e84c84f4627e -->
+<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
 # 시작하기
 
 SD 카드에서 시작해 아이에게 맞게 설정된 본체까지 약 10분, 그다음 매일 하는 일을 설명합니다. 처음으로 돌아가기: [README](../../README.md).

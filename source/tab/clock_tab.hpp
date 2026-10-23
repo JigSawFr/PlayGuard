@@ -64,7 +64,7 @@ class ClockTab : public TabBase
     void copy();
     // The result under Measure: plain text, or, no server answering, an
     // amber card that says so first, the servers' lines under it.
-    void show_result(const std::string& text, bool offline = false);
+    void show_result(const std::string& text, bool no_answer = false);
     // Both clocks large, the network one amber while it is inaccurate
     // (`known` false: not read).
     void show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate);

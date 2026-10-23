@@ -230,10 +230,10 @@ void pick_marked(const std::string& title, const std::vector<std::string>& value
 struct Choice
 {
     enum class Tone { PLAIN, ON, WARN, DANGER };
-    Choice(std::string label, std::function<void()> run, const char* icon = nullptr, std::string detail = "",
-           std::string group = "", Tone tone = Tone::PLAIN)
-        : label(std::move(label)), run(std::move(run)), icon(icon), detail(std::move(detail)), group(std::move(group)),
-          tone(tone)
+    Choice(std::string text, std::function<void()> action, const char* icon_name = nullptr, std::string detail_text = "",
+           std::string group_name = "", Tone line_tone = Tone::PLAIN)
+        : label(std::move(text)), run(std::move(action)), icon(icon_name), detail(std::move(detail_text)),
+          group(std::move(group_name)), tone(line_tone)
     {
     }
     Choice& switched(bool on)

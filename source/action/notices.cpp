@@ -495,8 +495,8 @@ void note_play_data(const PtState& pt)
                 clear("week");
                 // On Activity, its QR code over it: the week on a phone.
                 open_tab(ui::tab::activity);
-                if (const auto stats = play_data::latest(""))
-                    week_qr::show(*stats, "playguard/activity/account_all"_i18n);
+                if (const auto latest = play_data::latest(""))
+                    week_qr::show(*latest, "playguard/activity/account_all"_i18n);
             });
     } else {
         clear("week");

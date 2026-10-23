@@ -4,6 +4,7 @@
 #include "ui/ui.hpp"
 
 #include "action/error_hint_logic.hpp"
+#include "action/fw_gate.hpp"
 #include "action/write_queue_logic.hpp"
 #include "ui/cadran_modal.hpp"
 #include "ui/cadran_text.hpp"
@@ -23,6 +24,9 @@ namespace ui
 static std::string hint_for(Result rc)
 {
     const std::string key = error_hint_logic::hint_key(rc);
+    // Read-only for a firmware not checked yet: the firmware screen turns it
+    // off, not the developer switch.
+    if (key == "read_only" && fw_gate::needed()) return "playguard/error/read_only_fw"_i18n;
     return key.empty() ? std::string() : brls::getStr("playguard/error/" + key);
 }
 

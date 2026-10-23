@@ -25,8 +25,8 @@ constexpr int   STEP       = 15;
 class CadranWeekView::Column : public brls::Box
 {
   public:
-    Column(CadranWeekView* owner, int day)
-        : brls::Box(brls::Axis::COLUMN), owner(owner), day(day) {}
+    Column(CadranWeekView* week, int weekday)
+        : brls::Box(brls::Axis::COLUMN), owner(week), day(weekday) {}
     void onFocusGained() override
     {
         brls::Box::onFocusGained();
@@ -88,10 +88,21 @@ CadranWeekView::CadranWeekView()
         c.up->setColor(theme["cadran/teal"]);
         c.up->setMarginBottom(4);
         c.box->addView(c.up);
+        auto* value_row = new brls::Box(brls::Axis::ROW);
+        value_row->setAlignItems(brls::AlignItems::CENTER);
+        value_row->setMarginBottom(8);
+        c.over = new CadranIcon();
+        c.over->setIcon("alert");
+        c.over->setWidth(16);
+        c.over->setHeight(16);
+        c.over->setColor(theme["cadran/coral"]);
+        c.over->setMarginRight(5);
+        c.over->setVisibility(brls::Visibility::GONE);
+        value_row->addView(c.over);
         c.value = new CadranDigits();
         c.value->setFontSize(20);
-        c.value->setMarginBottom(8);
-        c.box->addView(c.value);
+        value_row->addView(c.value);
+        c.box->addView(value_row);
         c.bar = new brls::Box();
         c.bar->setWidth(56);
         c.bar->setHeight(BAR_MIN);
@@ -262,11 +273,11 @@ void CadranWeekView::nudge(int day, int delta)
     this->on_change(day, (uint16_t)pt_logic::held_step(this->held, v, delta, brls::getCPUTimeUsec()));
 }
 
-void CadranWeekView::show(const uint16_t days[7], const uint16_t live[7])
+void CadranWeekView::show(const uint16_t shown[7], const uint16_t saved[7])
 {
     for (int d = 0; d < 7; d++) {
-        this->days[d] = days[d];
-        this->live[d] = live[d];
+        this->days[d] = shown[d];
+        this->live[d] = saved[d];
     }
     this->valid = true;
     this->render();
@@ -310,16 +321,19 @@ void CadranWeekView::render()
     for (int d = 0; d < 7; d++) {
         Col& c = this->cols[d];
         const uint16_t m = this->days[d];
-        const bool focused = d == this->focused;
+        const bool is_focused = d == this->focused;
         const bool changed = this->valid && m != this->live[d];
         const bool over = this->valid && this->played_ok && m != PT_DAY_NOLIMIT && m > 0 && this->played[d] >= m;
         c.value->setText(!this->valid ? "—" : m == PT_DAY_NOLIMIT ? "—" : ui::fmt_played(m));
-        // A limit gone past in coral, as its bar (the key says so); one not
+        // A limit gone past in coral, as its bar (the key says so), after a
+        // triangle; one not
         // saved in amber, its bar ringed in amber too.
-        c.value->setTextColor(focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : over ? theme["cadran/coral"] : theme["cadran/text"]);
+        c.value->setTextColor(is_focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : over ? theme["cadran/coral"] : theme["cadran/text"]);
+        // Not the colour alone: a triangle before it too (the key shows one).
+        c.over->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         const float bar = !this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top);
         c.bar->setHeight(bar);
-        c.bar->setBackgroundColor(focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
+        c.bar->setBackgroundColor(is_focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
         c.bar->setBorderColor(theme["cadran/amber_fill"]);
         c.bar->setBorderThickness(changed ? 2 : 0);
         // What was played that day, against its limit: up to the top. Past
@@ -333,26 +347,26 @@ void CadranWeekView::render()
             // On the focused bar (teal itself), the teal darkened.
             NVGcolor shade = theme["cadran/navy"];
             shade.a = 0.35f;
-            NVGcolor played = focused ? shade : theme["cadran/teal_fill"];
+            NVGcolor played_color = is_focused ? shade : theme["cadran/teal_fill"];
             NVGcolor past = theme["cadran/coral_fill"];
             // Fainter: towards the bar's own colour, still opaque (the part
             // within the limit is drawn over the coral).
-            if (last_week(d) && !focused) {
+            if (last_week(d) && !is_focused) {
                 const NVGcolor under = theme["cadran/bar"];
-                played = nvgLerpRGBA(under, played, 0.45f);
+                played_color = nvgLerpRGBA(under, played_color, 0.45f);
                 past = nvgLerpRGBA(under, past, 0.45f);
             }
             const float within = over ? std::min(2.0f / 3.0f, (float)m / (float)this->played[d]) : 1.0f;
-            c.fill->setBackgroundColor(over ? past : played);
+            c.fill->setBackgroundColor(over ? past : played_color);
             c.within->setHeight(bar * within);
-            c.within->setBackgroundColor(played);
+            c.within->setBackgroundColor(played_color);
             c.within->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         }
         c.fill->setVisibility(fills ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         c.day->setTextColor(d == today ? theme["cadran/teal"] : theme["cadran/text3"]);
         // The day being edited on the soft teal, its arrows shown.
-        const bool editing = focused && this->edit;
-        c.box->setBackgroundColor(editing ? theme["cadran/teal_soft"] : focused ? theme["cadran/surf2"] : theme["cadran/none"]);
+        const bool editing = is_focused && this->edit;
+        c.box->setBackgroundColor(editing ? theme["cadran/teal_soft"] : is_focused ? theme["cadran/surf2"] : theme["cadran/none"]);
         c.up->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
         c.down->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
     }

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 02e95b37e53f -->
+<!-- translated from docs/features.md, sha256 7a87d8f03fd4 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -35,7 +35,7 @@ Les captures montrent le thème sombre, celui par défaut (en anglais).
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
 
 - **Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification.** Un dialogue ne dit que ce qui s'applique à cette console maintenant : que le jeu en cours serait suspendu, seulement quand un jeu est ouvert ; que l'application compagnon pourrait écraser une modification, seulement quand elle est associée et peut se synchroniser.
-- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et affiche un crayon barré à droite du titre quand l'application est en lecture seule ; toucher l'un ou l'autre mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware).
+- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et que l'application est en lecture seule (sa pastille dit alors *Lecture seule*, les actions qui écriraient sont grisées et refusées en disant où la désactiver) ; la toucher mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware ou *Aide et diagnostic*). Un petit ⊖ avant la langue et un Ⓨ avant la cloche indiquent les touches qui les ouvrent depuis n'importe quel onglet.
 - **En lecture seule**, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 ## L'apparence : Cadran
@@ -51,7 +51,7 @@ L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets
 - **Les autres écrans** prennent la même allure : l'éditeur par jour d'un profil montre la semaine comme *Temps de jeu* (modifiée de la même façon, les remplissages rapides en tuiles) ; *Vérifier les jeux installés* et *Tous les jeux* mettent leurs lignes en cartes ; *Profils* et *Aide et diagnostic* donnent son icône à chaque ligne.
 - **Taille du texte** (*Préférences*, ou **AA** dans l'en-tête) :
   - *Automatique*, par défaut, agrandit tous les textes de 25 % quand la console est sur sa station, sur la TV, et les remet en mode portable ; *Plus grande* les garde agrandis, *Normale* jamais.
-  - L'en-tête, la barre latérale et le pied de page gardent leur taille (ils n'ont pas la place), comme les noms des niveaux de *Restrictions*, déjà grands.
+  - Les noms d'onglets de la barre latérale grandissent aussi, de 25 % eux aussi ; le titre, la pastille et la date de l'en-tête, les touches et l'heure du pied de page grandissent un peu moins (de 15 à 20 %), leurs lignes étant déjà pleines. Un nom trop long pour sa place dans une langue est dessiné un peu plus petit, jamais plus petit qu'en taille normale, plutôt que coupé. Les noms des niveaux de *Restrictions* gardent leur taille, déjà grands.
   - Le changement est immédiat, sur tous les écrans, sans relancer.
   - Les 25 % viennent d'une TV 55" en 4K : le plus petit texte (15 px) y fait alors 14,6 mm de haut en capitales, 20′ d'arc à 2,5 m, où la lecture est confortable (16′ en taille normale, le strict minimum).
 - **Effets visuels** (*Préférences*) : *Allégés sur batterie*, par défaut, retire le halo de fond, le battement de l'anneau de l'écran enfant dans ses dernières minutes et le glissement de l'arc vers une nouvelle valeur tant qu'aucun chargeur n'est branché (en portable, débranchée) ; *Toujours complets* les garde. Relu toutes les 5 secondes : brancher la console les fait revenir.
@@ -110,7 +110,7 @@ Celles pour information : un retour à la version précédente, un firmware non 
 - **Ⓐ** sur une entrée fait la correction (*L'activer*, *La régler*, *Mettre à jour*…) ou ouvre l'onglet où elle se fait. Une entrée disparaît d'elle-même une fois réglé ce qu'elle signale.
 - **Ⓧ** marque une entrée pour information comme lue ; **Ⓨ** les marque toutes. Une entrée marquée comme lue le reste au lancement suivant, jusqu'à ce que son texte change.
 - **Ignorer :** quelques entrées à faire peuvent être ignorées avec Ⓧ, après une confirmation et le code PIN : un code PIN que tout le monde essaierait en premier, PlayGuard qui s'ouvre sans le code PIN, l'alarme « temps écoulé » désactivée, la carte SD presque pleine (jamais l'absence de PIN, le contrôle parental déverrouillé, l'horloge, le minuteur qui ne compte pas ni les fichiers de PlayGuard). Une entrée ignorée n'est plus comptée et s'affiche en dernier sous *Ignorés*, où Ⓐ la fait compter de nouveau. Elle revient d'elle-même 30 jours plus tard (sauf si *Rappeler les avertissements ignorés après 30 jours* est désactivé), dès que le problème a été corrigé puis se reproduit, ou, pour le code PIN, avec un nouveau code d'une autre longueur.
-- *Préférences › Notifications* désactive trois types : versions d'Atmosphère, de hekate et du firmware ; temps de jeu de la semaine ; rappels (sauvegardes, autre système, jeux bloqués).
+- *Préférences › Notifications* désactive trois types : versions d'Atmosphère, de hekate et du firmware ; temps de jeu de la semaine ; rappels (sauvegardes, second système de la console, jeux bloqués).
 - L'état derrière est relu au lancement de PlayGuard, toutes les minutes sur l'écran principal, et toutes les 5 s tant qu'*Aujourd'hui* est affiché.
 
 ## Aujourd'hui — la journée en un coup d'œil
@@ -182,7 +182,7 @@ La console affiche « temps écoulé », puis suspend le jeu (sans « continuer 
 *Montrer à l'enfant* sur *Aujourd'hui*, pour confier la console :
 
 - seulement le temps restant (contrôle parental déverrouillé, la limite du jour, en pause), l'heure de fin (*Fin vers 16:40* ; quand l'alarme du coucher arrive avant, l'anneau fait le compte à rebours jusqu'à elle, *45 min avant le coucher*, comme dans la dernière heure d'un jour sans limite), le coucher et ce qui se passe quand le temps est écoulé ;
-- fait pour se lire de l'autre bout de la pièce, sur la TV ; son texte garde sa taille quelle que soit la taille du texte ;
+- fait pour se lire de l'autre bout de la pièce, sur la TV ; son texte garde sa taille quelle que soit la taille du texte (seuls le titre et le pied de page la suivent, comme sur tous les écrans) ;
 - dans les 5 dernières minutes (de jeu ou avant le coucher), la fin passe en orange et l'anneau pulse lentement ; le coucher passe en orange dans ses 30 dernières ;
 - Ⓐ et Ⓨ, les touches du parent, sont indiquées en petit en haut à droite, pour que le pied de page ne montre que celle de l'enfant ;
 - Ⓐ revient aux écrans du parent avec le code PIN ; Ⓨ donne du temps en plus depuis là, après le code PIN (les montants de *Temps en plus*, l'écran enfant restant affiché) ; Ⓑ quitte PlayGuard (en proposant d'abord de réactiver le contrôle parental, comme en quittant).
@@ -216,7 +216,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 ### Puces et réglages rapides
 
-**Des puces** au-dessus et en dessous de la semaine ouvrent directement leurs choix : les profils (combien sont enregistrés), la même limite tous les jours, l'alarme du coucher, *Quand le temps est écoulé* et la suppression.
+**Des puces** au-dessus et en dessous de la semaine ouvrent directement leurs choix : les profils (combien sont enregistrés), la même limite tous les jours, l'alarme du coucher et *Quand le temps est écoulé*. *Supprimer la limite* est la dernière ligne de l'onglet, à part (l'historique l'annule).
 
 - **Même limite tous les jours :** liste rapide ou durée exacte (*Saisir une durée…* : ↑/↓ par 15 min, par heure une fois maintenus, Ⓛ/Ⓡ par 5 min).
 - **Semaine et week-end › :** l'éditeur, qui demande la limite du lundi au vendredi puis celle du week-end.
@@ -255,7 +255,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=activity)*
 
-Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **depuis toujours**, lu dans le journal d'activité de la console — pour tous les comptes ou **un seul compte utilisateur** (les comptes en puces en haut, quand la console en a plusieurs). PlayGuard s'ouvre sur le dernier compte affiché, ou sur celui choisi dans *Compte par défaut* (tous les comptes, ou un seul ; en bas de l'onglet, avec *Tous les jeux*).
+Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **depuis toujours**, lu dans le journal d'activité de la console — pour tous les comptes ou **un seul compte utilisateur** (les comptes en puces en haut, quand la console en a plusieurs). PlayGuard s'ouvre sur le dernier compte affiché, ou sur celui choisi dans *Compte affiché en premier* (tous les comptes, ou un seul ; en bas de l'onglet, avec *Tous les jeux*).
 
 ### En haut
 

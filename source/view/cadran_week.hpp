@@ -62,6 +62,7 @@ class CadranWeekView : public brls::Box
         Column*       box   = nullptr;
         CadranIcon*   up    = nullptr;
         CadranDigits* value = nullptr;
+        CadranIcon*   over  = nullptr;   // a triangle before the value of a limit gone past (not the colour alone)
         brls::Box*    bar   = nullptr;
         brls::Box*    fill  = nullptr;   // the time played, from the bar's foot
         brls::Box*    within = nullptr;  // in the fill, from its foot: the part within the limit, when past it

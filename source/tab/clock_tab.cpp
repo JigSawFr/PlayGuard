@@ -266,17 +266,17 @@ void ClockTab::choose_region()
     for (const auto& r : ntp::regions()) { ids.push_back(r.id); labels.push_back(region_label(r.id)); }
     if (!config::get().custom_servers.empty()) { ids.push_back("custom"); labels.push_back(region_label("custom")); }
     std::vector<std::string> icons;
-    for (const std::string& id : ids) icons.push_back(region_icon(id));
+    for (const std::string& region_key : ids) icons.push_back(region_icon(region_key));
     int selected = (int)(std::find(ids.begin(), ids.end(), this->region_id) - ids.begin());
     if (selected >= (int)ids.size()) selected = 0;
     ui::pick("playguard/clock/region"_i18n, labels, selected, [this, ids](int index) {
-        const std::string id = ids[index];
-        if (id == "custom") {
-            this->set_server(config::get().custom_servers.front(), id);
+        const std::string region_key = ids[index];
+        if (region_key == "custom") {
+            this->set_server(config::get().custom_servers.front(), region_key);
             return;
         }
         for (const auto& r : ntp::regions())
-            if (id == r.id) this->set_server(r.hosts.front(), id);
+            if (region_key == r.id) this->set_server(r.hosts.front(), region_key);
     }, true, {}, icons);
 }
 
@@ -304,10 +304,10 @@ void ClockTab::enter_custom()
             ui::refuse(NXM_RC_INVALID_ARGUMENT);
             return;
         }
-        auto& list = config::get().custom_servers;
-        list.erase(std::remove(list.begin(), list.end(), host), list.end());
-        list.insert(list.begin(), host);
-        if (list.size() > 10) list.resize(10);
+        auto& servers = config::get().custom_servers;
+        servers.erase(std::remove(servers.begin(), servers.end(), host), servers.end());
+        servers.insert(servers.begin(), host);
+        if (servers.size() > 10) servers.resize(10);
         this->set_server(host, find_region(host));
     });
 }
@@ -531,24 +531,24 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     dialog->open();
 }
 
-void ClockTab::show_result(const std::string& text, bool offline)
+void ClockTab::show_result(const std::string& text, bool no_answer)
 {
     brls::Theme theme = brls::Application::getTheme();
     std::string title, body = text;
-    if (offline) {
+    if (no_answer) {
         // The report's last line ("No server answered…") is what matters.
-        const size_t last = text.find_last_of('\n');
-        title = last == std::string::npos ? text : text.substr(last + 1);
-        body = (last == std::string::npos ? "" : text.substr(0, last) + "\n\n") + "playguard/clock/offline_hint"_i18n;
+        const size_t last_line = text.find_last_of('\n');
+        title = last_line == std::string::npos ? text : text.substr(last_line + 1);
+        body = (last_line == std::string::npos ? "" : text.substr(0, last_line) + "\n\n") + "playguard/clock/offline_hint"_i18n;
     }
     ui::set_text(result_title, title);
     ui::set_visible(result_title.getView(), !title.empty());
     ui::set_text(result, body);
-    result->setTextColor(theme[offline ? "cadran/text2" : "cadran/text"]);
-    result_card->setBackgroundColor(theme[offline ? "cadran/amber_surf" : "cadran/none"]);
+    result->setTextColor(theme[no_answer ? "cadran/text2" : "cadran/text"]);
+    result_card->setBackgroundColor(theme[no_answer ? "cadran/amber_surf" : "cadran/none"]);
     result_card->setBorderColor(theme["cadran/amber_line"]);
-    result_card->setBorderThickness(offline ? 1 : 0);
-    const float pad = offline ? 18 : 0;
+    result_card->setBorderThickness(no_answer ? 1 : 0);
+    const float pad = no_answer ? 18 : 0;
     result_card->setPadding(pad - 4, pad, pad - 4, pad);
 }
 

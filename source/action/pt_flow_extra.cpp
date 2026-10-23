@@ -202,10 +202,10 @@ static void plan_bonus(std::function<void()> refresh)
             return;
         }
         const std::vector<int> amounts = config::get().extra_amounts;
-        std::vector<std::string> labels;
-        for (int e : amounts) labels.push_back("+" + ui::fmt_minutes((uint16_t)e));
+        std::vector<std::string> amount_labels;
+        for (int e : amounts) amount_labels.push_back("+" + ui::fmt_minutes((uint16_t)e));
         const uint16_t base = pt.day_min[day.weekday];
-        ui::pick(brls::getStr("playguard/dashboard/bonus_amount_title", ui::day_name(day.weekday)), labels, 0,
+        ui::pick(brls::getStr("playguard/dashboard/bonus_amount_title", ui::day_name(day.weekday)), amount_labels, 0,
                  [day, base, amounts, refresh](int i) {
             const uint16_t value = pt_logic::plan_extra(base, (uint16_t)amounts[(size_t)i], false, base).value;
             const std::string body = brls::getStr("playguard/dashboard/bonus_body", ui::day_name(day.weekday),
@@ -217,9 +217,9 @@ static void plan_bonus(std::function<void()> refresh)
                     finish_write(NXM_RC_STATE_UNKNOWN, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
                     return;
                 }
-                uint16_t days[7];
-                for (int d = 0; d < 7; d++) days[d] = now.day_min[d];
-                days[day.weekday] = value;
+                uint16_t new_days[7];
+                for (int d = 0; d < 7; d++) new_days[d] = now.day_min[d];
+                new_days[day.weekday] = value;
                 const pt_logic::BonusRecord prev = bonus_record();
                 pt_logic::BonusRecord rec;
                 rec.weekday = day.weekday;
@@ -230,7 +230,7 @@ static void plan_bonus(std::function<void()> refresh)
                     finish_write(NXM_RC_NOT_SAVED, did_unlock, "", "playguard/play_timer/write_err"_i18n, refresh);
                     return;
                 }
-                const Result rc = write_days(days, "bonus");
+                const Result rc = write_days(new_days, "bonus");
                 if (R_FAILED(rc)) save_bonus_record(prev);
                 finish_write(rc, did_unlock,
                              brls::getStr("playguard/dashboard/bonus_done", ui::day_name(day.weekday),

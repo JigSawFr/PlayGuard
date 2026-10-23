@@ -131,10 +131,10 @@ ActivityTab::ActivityTab()
     });
     account_default->registerClickAction([this](brls::View*) {
         // The last one shown, every account, then each account.
-        const auto& list = play_data::accounts();
+        const auto& accounts = play_data::accounts();
         const std::vector<std::string> keys = account_keys();
         std::vector<std::string> labels = { "playguard/activity/account_last"_i18n, account_label(nullptr) };
-        for (const auto& a : list) labels.push_back(account_label(&a));
+        for (const auto& a : accounts) labels.push_back(account_label(&a));
         const std::string& setting = config::get().activity_account;
         const int selected = setting == "last" ? 0 : activity_summary::start_account(setting, "", keys) + 2;
         ui::pick("playguard/activity/account_default"_i18n, labels, selected, [this, keys](int index) {
@@ -279,16 +279,16 @@ void ActivityTab::show_totals(const PlayStats& s, const PlayAccount* who)
         // Every account: each day's current limit as a line (the limit is the
         // console's, not an account's). A day above it is drawn in amber.
         uint16_t limits[7];
-        const PtState* pt = who ? nullptr : &this->play_timer();
-        const bool with_limits = pt && pt->fw_supported && pt->valid;
-        for (int k = 0; k < 7; k++) limits[k] = with_limits ? pt->day_min[s.day_wday[k] % 7] : PT_DAY_NOLIMIT;
+        const PtState* timer = who ? nullptr : &this->play_timer();
+        const bool with_limits = timer && timer->fw_supported && timer->valid;
+        for (int k = 0; k < 7; k++) limits[k] = with_limits ? timer->day_min[s.day_wday[k] % 7] : PT_DAY_NOLIMIT;
         days->show(s, with_limits ? limits : nullptr);
     }
     ui::set_visible(days.getView(), s.windows_ok);
 }
 
 // Under All games: why it is empty, or what could not be read.
-void ActivityTab::show_status(const PlayStats& s, bool empty)
+void ActivityTab::show_status(const PlayStats& s, bool none_played)
 {
     const int p = this->period;
     std::string text;
@@ -299,7 +299,7 @@ void ActivityTab::show_status(const PlayStats& s, bool empty)
         text = "playguard/activity/err_log"_i18n + " — " + ui::rc_text(s.events_rc);
     else if (p == AllTime && R_FAILED(s.stats_rc))
         text = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(s.stats_rc);
-    else if (empty) {
+    else if (none_played) {
         text  = brls::getStr(fmt::format("playguard/activity/none/{}", p));
         error = false;
     }
@@ -502,10 +502,10 @@ void ActivityTab::build_cards()
     });
     this->empty.box->addView(this->see_all);
     this->empty.box->setVisibility(brls::Visibility::GONE);
-    if (auto* parent = dynamic_cast<brls::Box*>(games_grid->getParent())) {
-        const auto& views = parent->getChildren();
+    if (auto* grid_box = dynamic_cast<brls::Box*>(games_grid->getParent())) {
+        const auto& views = grid_box->getChildren();
         const auto at = std::find(views.begin(), views.end(), games_grid.getView());
-        parent->addView(this->empty.box, at - views.begin());
+        grid_box->addView(this->empty.box, at - views.begin());
     }
 }
 
@@ -604,8 +604,8 @@ void ActivityTab::show_top()
     std::string sub = today.games == 1 ? "playguard/cadran/activity/games_one"_i18n
                                        : brls::getStr("playguard/cadran/activity/games", today.games);
     if (who < 0) {
-        const PtState& pt = this->play_timer();
-        const uint16_t limit = pt.fw_supported && pt.valid ? pt.day_min[ui::today_weekday()] : PT_DAY_NOLIMIT;
+        const PtState& timer = this->play_timer();
+        const uint16_t limit = timer.fw_supported && timer.valid ? timer.day_min[ui::today_weekday()] : PT_DAY_NOLIMIT;
         sub = (limit == PT_DAY_NOLIMIT ? "playguard/cadran/week/no_limit"_i18n
                                        : brls::getStr("playguard/cadran/activity/on_limit", ui::fmt_minutes(limit))) + " · " + sub;
     }
@@ -624,7 +624,6 @@ void ActivityTab::show_top()
     using activity_summary::Trend;
     const auto trend = activity_summary::week_trend(s);
     if (trend.known) {
-        brls::Theme theme = brls::Application::getTheme();
         const bool more = trend.trend == Trend::More, less = trend.trend == Trend::Less;
         ui::set_text(week_trend, more   ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_minutes(trend.amount_min))
                                  : less ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_minutes(trend.amount_min))
@@ -646,29 +645,29 @@ void ActivityTab::show_top()
     total_sub->setText(all.known && all.top >= 0 ? brls::getStr("playguard/cadran/activity/top", play_data::game_name(s.games[all.top])) : "");
 
     // The games of the period, most played first.
-    const std::vector<const GameStat*> games = activity_summary::ranked_games(s, p);
+    const std::vector<const GameStat*> ranked = activity_summary::ranked_games(s, p);
     // Unread (the line under All games says why), or nothing played: the
     // empty card says so instead of that line.
     const bool unread = R_FAILED(s.rc) || !activity_summary::period_read(s, p);
-    const bool none   = games.empty() && !unread;
+    const bool none   = ranked.empty() && !unread;
     ui::set_visible(games_note, false);
     ui::set_visible(this->empty.box, none);
     ui::set_visible(this->see_all, p != AllTime && all.known && all.total_s > 0);
     if (none) this->empty.title->setText(brls::getStr(fmt::format("playguard/activity/none/{}", p)));
-    if (brls::View* status = this->getView("ac_status"); status && none) ui::set_visible(status, false);
+    if (brls::View* status_view = this->getView("ac_status"); status_view && none) ui::set_visible(status_view, false);
     // Over the last 7 days, the card of the game played most more than the
     // week before says by how much (half an hour at least).
-    const auto grew = activity_summary::grew_most(s, games, this->cards.size(), p);
+    const auto grew = activity_summary::grew_most(s, ranked, this->cards.size(), p);
     std::vector<u64> ids;
     for (size_t i = 0; i < this->cards.size(); i++) {
         Card& c = this->cards[i];
-        const bool shown = i < games.size();
+        const bool shown = i < ranked.size();
         ui::set_visible(c.box, shown);
         if (!shown) continue;
-        ui::set_visible(c.grew_row, games[i] == grew.game);
-        if (games[i] == grew.game)
+        ui::set_visible(c.grew_row, ranked[i] == grew.game);
+        if (ranked[i] == grew.game)
             ui::set_text(c.grew, brls::getStr("playguard/cadran/activity/grew", ui::fmt_play_time(grew.more_s)));
-        const GameStat& g = *games[i];
+        const GameStat& g = *ranked[i];
         c.app_id = g.app_id;
         ids.push_back(g.app_id);
         c.name->setText(play_data::game_name(g));
