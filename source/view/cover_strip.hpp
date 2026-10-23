@@ -13,6 +13,7 @@
 #include <map>
 #include <vector>
 
+#include "ui/cadran_modal.hpp"
 #include "util/pctl_ops_c.hpp"
 
 class CoverStrip : public brls::View
@@ -33,7 +34,7 @@ class CoverStrip : public brls::View
               brls::FrameContext* ctx) override;
 
   private:
-    int texture(u64 id);    // its icon, the placeholder, or 0
+    int texture(u64 game);    // its icon, the placeholder, or 0
     float at(brls::Time now) const;   // the position drawn (a game's index, fractional between two)
 
     std::vector<u64> ids;
@@ -41,3 +42,9 @@ class CoverStrip : public brls::View
     float from = 0, to = 0;     // the position eases from `from` to `to` ...
     brls::Time since = 0;       // ... since then (µs)
 };
+
+// A dialog's strip (a batch's: the data checked, the games removed), on top
+// of its progress body, not a focus stop (the dialog's buttons keep it).
+CoverStrip* cover_strip_above(cadran::Progress& body, const std::vector<u64>& ids);
+// The icons the strip is about to show, read (game_icons).
+void cover_strip_read(CoverStrip* strip);

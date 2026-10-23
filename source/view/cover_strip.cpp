@@ -28,7 +28,7 @@ CoverStrip::CoverStrip()
 CoverStrip::~CoverStrip()
 {
     NVGcontext* vg = brls::Application::getNVGContext();
-    for (const auto& [id, tex] : this->owned) nvgDeleteImage(vg, tex);
+    for (const auto& [game, tex] : this->owned) nvgDeleteImage(vg, tex);
 }
 
 void CoverStrip::set_games(const std::vector<u64>& games)
@@ -64,12 +64,12 @@ float CoverStrip::at(brls::Time now) const
     return this->from + (this->to - this->from) * eased(t);
 }
 
-int CoverStrip::texture(u64 id)
+int CoverStrip::texture(u64 game)
 {
-    if (const auto it = this->owned.find(id); it != this->owned.end()) return it->second;
+    if (const auto it = this->owned.find(game); it != this->owned.end()) return it->second;
     bool own = false;
-    if (const int tex = game_icons::texture(id, own)) {
-        if (own) this->owned[id] = tex;
+    if (const int tex = game_icons::texture(game, own)) {
+        if (own) this->owned[game] = tex;
         return tex;
     }
     return game_icons::placeholder();
@@ -106,31 +106,31 @@ void CoverStrip::draw(NVGcontext* vg, float x, float y, float width, float heigh
         const float cx = mid + offset;
         const float left = cx - w / 2, top = y + (height - h) / 2;
         // Fading out toward the ends; the games checked dimmed.
-        float alpha = 1.0f - std::min(far / (SIDE - 1.0f), 1.0f) * 0.85f;
-        if (d < -0.5f) alpha *= 0.55f;
+        float fade = 1.0f - std::min(far / (SIDE - 1.0f), 1.0f) * 0.85f;
+        if (d < -0.5f) fade *= 0.55f;
         const float radius = 10 * w / size + 2;
 
         const int tex = this->texture(this->ids[i]);
         nvgBeginPath(vg);
         nvgRoundedRect(vg, left, top, w, h, radius);
         if (tex) {
-            nvgFillPaint(vg, nvgImagePattern(vg, left, top, w, h, 0, tex, this->getAlpha() * alpha));
+            nvgFillPaint(vg, nvgImagePattern(vg, left, top, w, h, 0, tex, this->getAlpha() * fade));
         } else {
             NVGcolor well = theme["cadran/well"];
-            well.a *= this->getAlpha() * alpha;
+            well.a *= this->getAlpha() * fade;
             nvgFillColor(vg, well);
         }
         nvgFill(vg);
         // A turned page darker toward its outer edge, as if it curved away.
         if (near > 0) {
-            const float shade = 0.45f * near * this->getAlpha() * alpha;
+            const float shade = 0.45f * near * this->getAlpha() * fade;
             const float inner = d < 0 ? left + w : left, outer = d < 0 ? left : left + w;
             nvgFillPaint(vg, nvgLinearGradient(vg, inner, top, outer, top, nvgRGBAf(0, 0, 0, 0), nvgRGBAf(0, 0, 0, shade)));
             nvgFill(vg);
         }
         // A line round each cover, as the covers of the list have.
         NVGcolor line = theme["cadran/line"];
-        line.a *= this->getAlpha() * alpha;
+        line.a *= this->getAlpha() * fade;
         nvgStrokeColor(vg, line);
         nvgStrokeWidth(vg, 1);
         nvgStroke(vg);
@@ -148,4 +148,22 @@ void CoverStrip::draw(NVGcontext* vg, float x, float y, float width, float heigh
             it = this->owned.erase(it);
         }
     }
+}
+
+CoverStrip* cover_strip_above(cadran::Progress& body, const std::vector<u64>& ids)
+{
+    auto* strip = new CoverStrip();
+    strip->setFocusable(false);
+    strip->setHeight(96);
+    strip->setMarginBottom(18);
+    strip->set_games(ids);
+    body.box->addView(strip, 0);
+    return strip;
+}
+
+void cover_strip_read(CoverStrip* strip)
+{
+    if (!game_icons::wanted()) return;
+    const std::vector<u64> wanted = strip->wanted();
+    if (!wanted.empty()) game_icons::load(wanted, []() {});
 }
