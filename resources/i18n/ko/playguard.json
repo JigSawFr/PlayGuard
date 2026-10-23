@@ -1342,7 +1342,7 @@
         "effects": "시각 효과",
         "effects_values": {
             "full": "항상 전체",
-            "auto": "배터리 사용 시 가볍게",
+            "auto": "자동: TV에서는 전체",
             "reduced": "움직임 줄이기"
         }
     },

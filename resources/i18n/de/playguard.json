@@ -1342,7 +1342,7 @@
         "effects": "Visuelle Effekte",
         "effects_values": {
             "full": "Immer vollständig",
-            "auto": "Sparsamer im Akkubetrieb",
+            "auto": "Automatisch: vollständig am Fernseher",
             "reduced": "Weniger Bewegung"
         }
     },

@@ -1342,7 +1342,7 @@
         "effects": "視覺效果",
         "effects_values": {
             "full": "始終完整",
-            "auto": "電池供電時精簡",
+            "auto": "自動：電視上完整",
             "reduced": "減少動態效果"
         }
     },

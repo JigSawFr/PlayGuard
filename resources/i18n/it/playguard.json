@@ -1342,7 +1342,7 @@
         "effects": "Effetti visivi",
         "effects_values": {
             "full": "Sempre completi",
-            "auto": "Più leggeri a batteria",
+            "auto": "Automatico: completi sulla TV",
             "reduced": "Meno movimento"
         }
     },

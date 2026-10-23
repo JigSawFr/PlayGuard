@@ -45,7 +45,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `schema` | integer | `1` | `1` | written by PlayGuard, not read |
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"dark"`, `"system"` (the console's), `"light"` | `"dark"` | Preferences |
-| `effects` | string | `"full"` (the glow and every movement of the look, on the battery too), `"auto"` (lighter on the battery: no background glow, no pulse of the child screen's ring, no movement at all while no charger is connected) or `"reduced"` (no decorative movement, the glow kept) | `"full"` | Preferences › Visual effects |
+| `effects` | string | `"auto"` (in full on the dock, lighter in hand: no background glow, no pulse of the child screen's ring, no movement at all while the console is off its dock, charging or not), `"full"` (the glow and every movement of the look, in hand too) or `"reduced"` (no decorative movement, the glow kept) | `"auto"` | Preferences › Visual effects |
 | `text_size` | string | `"auto"` (larger while the console is docked, on a TV), `"normal"` or `"large"`; larger text draws every label 25 % bigger, the sidebar's too, and the header's and the footer's 15 to 20 %, at once (no restart) | `"auto"` | Preferences › Text size, the header's AA |
 | `start_tab` | string | the tab shown at start-up: `"dashboard"` (Today), `"play_timer"`, `"activity"`, `"restrictions"`, `"security"` (Security), `"console"`, `"history"`, `"preferences"`, `"about"`; `"clock"` and `"tools"`, from before they became Console, read as `"console"` | `"dashboard"` | Preferences |
 | `advanced` | boolean | shows the play timer's debug-class actions | `false` | Play timer › Advanced |
@@ -244,7 +244,7 @@ line; the order does not matter when it reads them:
   "language": "fr",
   "theme": "dark",
   "text_size": "auto",
-  "effects": "full",
+  "effects": "auto",
   "start_tab": "dashboard",
   "advanced": false,
   "auto_relock": true,
