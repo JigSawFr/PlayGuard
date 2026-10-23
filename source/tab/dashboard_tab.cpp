@@ -102,10 +102,6 @@ DashboardTab::DashboardTab()
     this->build_pills();
 
     // The buttons' icons, before their label.
-    CadranIcon* plus = kit::icon("plus", 20, "cadran/navy");
-    plus->setMarginRight(10);
-    extra->addView(plus, 0);
-    extra->setAlignItems(brls::AlignItems::CENTER);
     CadranIcon* square = kit::icon("stop", 18, "cadran/coral");
     square->setMarginRight(10);
     stop->addView(square, 0);
@@ -186,11 +182,14 @@ DashboardTab::DashboardTab()
         this->choose_today_limit();
         return true;
     });
-    extra->registerClickAction([this](brls::View*) {
-        if (ui::refuse_read_only()) return true;
-        pt_flow::add_extra_time(this->pt, [this]() { this->refresh(); });
-        return true;
-    });
+    // Extra time: its words, the amounts, then "…" for any other (a
+    // duration, another day: the picker). One row, one way in.
+    {
+        brls::Label* words = kit::label("playguard/cadran/today/extra"_i18n, kit::TEXT_LEAD, "cadran/text2");
+        words->setSingleLine(true);
+        words->setMarginRight(16);
+        chips->addView(words);
+    }
     for (int minutes : config::get().extra_amounts) {
         brls::Box* amount = kit::chip("+" + ui::fmt_minutes((uint16_t)minutes));
         amount->setMarginRight(10);
@@ -210,6 +209,15 @@ DashboardTab::DashboardTab()
         });
         chips->addView(amount);
         this->amount_chips.push_back(amount);
+    }
+    {
+        brls::Box* other = kit::chip("\u2026");
+        other->registerClickAction([this](brls::View*) {
+            if (ui::refuse_read_only()) return true;
+            pt_flow::add_extra_time(this->pt, [this]() { this->refresh(); });
+            return true;
+        });
+        chips->addView(other);
     }
     stop->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
@@ -298,7 +306,6 @@ void DashboardTab::refresh()
     this->show_pills();
     // The actions while they can do something.
     const bool can_extra = pt_logic::can_add_extra_time(pt, today, false);
-    ui::set_visible(extra.getView(), can_extra);
     ui::set_visible(chips.getView(), can_extra);
     ui::set_visible(stop.getView(), pt_logic::can_stop_today(pt, today, false));
     ui::set_visible(relock.getView(), unlocked && !app::read_only());

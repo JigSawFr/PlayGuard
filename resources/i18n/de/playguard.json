@@ -1979,7 +1979,6 @@
             "summary": "{} unter der Woche · {} am Wochenende",
             "profile": "Profil · {}",
             "edit": "Ändern",
-            "done": "Fertig",
             "pick": "Genaue Dauer",
             "edit_day": "einen Tag ändern",
             "pick_day": "genaue Dauer oder kein Limit",
@@ -1997,7 +1996,8 @@
             "played_day": "{}: {} von {} gespielt",
             "played_day_free": "{}: {} gespielt, ohne Limit",
             "bonus": "{}: {} für diesen Tag geplant",
-            "last_week_day": "{} letzte Woche"
+            "last_week_day": "{} letzte Woche",
+            "done_day": "Fertig mit {}"
         },
         "activity": {
             "share": "Exportieren oder teilen",

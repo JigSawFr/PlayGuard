@@ -1979,7 +1979,6 @@
             "summary": "{} doordeweeks · {} in het weekend",
             "profile": "Profiel · {}",
             "edit": "Wijzigen",
-            "done": "Klaar",
             "pick": "Exacte duur",
             "edit_day": "een dag wijzigen",
             "pick_day": "exacte duur of geen limiet",
@@ -1997,7 +1996,8 @@
             "played_day": "{}: {} gespeeld van {}",
             "played_day_free": "{}: {} gespeeld, geen limiet",
             "bonus": "{}: {} gepland voor die dag",
-            "last_week_day": "Vorige {}"
+            "last_week_day": "Vorige {}",
+            "done_day": "Klaar met {}"
         },
         "activity": {
             "share": "Exporteren of delen",

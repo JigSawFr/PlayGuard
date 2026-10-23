@@ -1,7 +1,7 @@
 # Reference screenshots
 
 What `tools/desktop_smoke.py` shows on screens that come out the same in every
-run (console time fixed, footer clock redrawn at the console's time, 16:00:00), one folder per scenario:
+run (console time fixed, footer clock redrawn at the console's time, 16:00), one folder per scenario:
 `smoke/`, `games/`, `errors/`, `gate/`, `rescue/`, `forged/`, `lock/`, `outside/`, `library/`, `devbuild/`, `alarm/`, `cadran/`, `cadranstates/`, `cadranunlocked/`, `cadranlarge/`, `bedtime/`, `forwarders/`, `hbmenu/`.
 CI compares each new run with them
 (`tools/visual_check.py`) and uploads the side-by-side images of any screen

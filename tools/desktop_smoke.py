@@ -1869,7 +1869,7 @@ if SYSNOTES:
     key("Down", steps("dashboard", "console"))
     key("Right")               # Network clock
     shot("01_tools_console")   # the tiles: 2 versions behind, and 23.0.1 needs hekate 6.5.4 first
-    key("Up")                  # Firmware, the first tile
+    key("Down")                # Firmware, the first of the system's tiles, under the tools
     key("Return")
     wait_logged("release notes: firmware fetched", "firmware notes")
     shot("02_firmware_next")   # the closest newer one, 23.0.0: security fixes, parental controls changed

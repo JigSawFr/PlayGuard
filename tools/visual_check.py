@@ -5,7 +5,7 @@ Compares every reference image of <reference-dir> (tests/visual/<scenario>/
 NAME.png) with NAME.png in <shots-dir>, the output folder of
 tools/desktop_smoke.py, and fails when a screen changed. The smoke test fixes
 the console's time (PLAYGUARD_SIM_NOW, TZ), so only the footer clock follows
-the host (borealis reads it): it is redrawn at the console's time, 16:00:00,
+the host (borealis reads it): it is redrawn at the console's time, 16:00,
 in the clock's own font, colours and place, in the references as in the
 screenshots compared with them. A pixel counts as changed when its colour moves by
 more than --fuzz (15 %: anti-aliasing noise stays below that; the smoke test draws
@@ -44,7 +44,7 @@ import tempfile
 # It is redrawn as the console's time in the smoke test (PLAYGUARD_SIM_NOW
 # 1791475200, TZ=UTC), in borealis' footer font, where the label is drawn.
 CLOCK_AREA = (30, 655, 220, 50)         # x, y, width, height: the clock only (a dialog starts at x 280)
-CLOCK_TEXT = "16:00:00"
+CLOCK_TEXT = "16:00"
 CLOCK_ORIGIN = (55, 692)                # the label's text origin (baseline)
 CLOCK_SIZE = "21.5"                     # brls/hints/time fontSize
 CLOCK_FONT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
