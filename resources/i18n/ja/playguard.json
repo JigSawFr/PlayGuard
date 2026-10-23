@@ -320,7 +320,6 @@
             "section_presets": "まとめて設定",
             "weekdays": "月曜日～金曜日を設定…",
             "weekend": "土曜日と日曜日を設定…",
-            "copy_today": "{}の上限を全曜日にコピー",
             "copy_today_body": "{}の上限（{}）をすべての曜日に使いますか？",
             "copy_today_confirm": "コピー",
             "revert": "変更を破棄",
@@ -701,6 +700,14 @@
         "note_unconfirmed": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。締め出された場合は、復旧用sysmoduleをインストールした状態でRESCUEファイルをSDカードに置き直し、本体を再起動してください。",
         "note_old_module": "暗証番号なしではここから何も変更できません。PlayGuardは通常どおり起動します。パソコンでモジュールを更新してください：PlayGuard {}のplayguard-rescue.zipをSDカードのルートに展開し、RESCUEファイルを置き直してから本体を再起動します。"
     },
+    "tiles": {
+        "games": "インストール済みのゲーム",
+        "upload": "レポートを送信…",
+        "weekdays": "月曜日～金曜日…",
+        "weekend": "週末…",
+        "copy_today": "{}を全曜日にコピー",
+        "text_size_auto": "自動：テレビでは大きめ"
+    },
     "tools": {
         "section_diag": "診断",
         "section_tools": "ツール",
@@ -815,7 +822,6 @@
         "update_last": "最終確認：{}",
         "flag_read_only": "閲覧のみ",
         "flag_dev": "開発者",
-        "upload": "レポートをオンラインで送信…",
         "upload_note": "レポートを GitHub アカウントのシークレット gist に送信し（必要ならまずサインイン）、リンクを QR コードで表示します。サポートしてくれる人に渡すか、バグ報告に使ってください。",
         "storage_note_emummc": "現在はemuMMCです。sysMMCには別のみまもり設定があり、PlayGuardはここからは確認できません。そちらでも設定するか、hekateの起動メニューを非表示にしてください。",
         "storage_note_sysmmc": "現在はsysMMCで、このSDカードにはemuMMCも設定されています。emuMMCには別のみまもり設定があり、PlayGuardはここからは確認できません。そちらでも設定するか、hekateの起動メニューを非表示にしてください。",

@@ -320,7 +320,6 @@
             "section_presets": "快速填充",
             "weekdays": "设置星期一至星期五…",
             "weekend": "设置星期六和星期日…",
-            "copy_today": "将{}复制到每天",
             "copy_today_body": "要将{}的限制（{}）用于每天吗？",
             "copy_today_confirm": "复制",
             "revert": "放弃更改",
@@ -701,6 +700,14 @@
         "note_unconfirmed": "没有 PIN 就无法在此更改任何内容，PlayGuard 会照常打开。被锁在外面？请在已安装恢复 sysmodule 的情况下把 RESCUE 文件放回 SD 卡，然后重启主机。",
         "note_old_module": "没有 PIN 无法在此更改任何内容，PlayGuard 会照常打开。请在电脑上更新该模块：将 PlayGuard {} 的 playguard-rescue.zip 解压到 SD 卡根目录，放回 RESCUE 文件，然后重启主机。"
     },
+    "tiles": {
+        "games": "已安装的游戏",
+        "upload": "发送报告…",
+        "weekdays": "星期一至星期五…",
+        "weekend": "周末…",
+        "copy_today": "将{}复制到每天",
+        "text_size_auto": "自动：电视上较大"
+    },
     "tools": {
         "section_diag": "诊断",
         "section_tools": "工具",
@@ -815,7 +822,6 @@
         "update_last": "上次检查：{}",
         "flag_read_only": "只读",
         "flag_dev": "开发者",
-        "upload": "在线发送报告…",
         "upload_note": "将报告发送到你 GitHub 账号中的私密 gist（如需要先登录），并显示其链接和二维码：把它交给帮助你的人，或用它提交错误报告。",
         "storage_note_emummc": "当前为emuMMC：sysMMC有自己的家长控制，PlayGuard在这里无法看到。请在那边也进行设置，或隐藏hekate的启动菜单。",
         "storage_note_sysmmc": "当前为sysMMC，且此SD卡上设置了emuMMC：它有自己的家长控制，PlayGuard在这里无法看到。请在那边也进行设置，或隐藏hekate的启动菜单。",

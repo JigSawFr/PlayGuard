@@ -320,7 +320,6 @@
             "section_presets": "Snel invullen",
             "weekdays": "Maandag t/m vrijdag instellen...",
             "weekend": "Zaterdag en zondag instellen...",
-            "copy_today": "Limiet van {} naar elke dag kopiëren",
             "copy_today_body": "De limiet voor {} ({}) voor elke dag gebruiken?",
             "copy_today_confirm": "Kopiëren",
             "revert": "Wijzigingen negeren",
@@ -701,6 +700,14 @@
         "note_unconfirmed": "Zonder de pincode kan hier niets worden gewijzigd, en PlayGuard opent zoals gewoonlijk. Buitengesloten? Zet het RESCUE-bestand terug op de SD-kaart, met de herstel-sysmodule geïnstalleerd, en start de console opnieuw.",
         "note_old_module": "Zonder de pincode kan hier niets worden gewijzigd, en PlayGuard opent zoals gewoonlijk. Werk de module bij vanaf een computer: pak playguard-rescue.zip van PlayGuard {} uit in de hoofdmap van de SD-kaart, zet het RESCUE-bestand terug en start de console opnieuw."
     },
+    "tiles": {
+        "games": "Geïnstalleerde games",
+        "upload": "Rapport versturen...",
+        "weekdays": "Maandag t/m vrijdag...",
+        "weekend": "Weekend...",
+        "copy_today": "{} naar elke dag",
+        "text_size_auto": "Auto: groter op de tv"
+    },
     "tools": {
         "section_diag": "Diagnose",
         "section_tools": "Hulpmiddelen",
@@ -815,7 +822,6 @@
         "update_last": "Laatst gecontroleerd op {}",
         "flag_read_only": "alleen-lezen",
         "flag_dev": "ontwikkelaar",
-        "upload": "Rapport online versturen...",
         "upload_note": "Stuurt een rapport naar een geheime gist in je GitHub-account (eerst inloggen indien nodig) en toont de link met een QR-code: geef die aan wie je helpt, of open er een bugmelding mee.",
         "storage_note_emummc": "Dit is de emuMMC: de sysMMC heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate.",
         "storage_note_sysmmc": "Dit is de sysMMC, en op deze SD-kaart is een emuMMC ingesteld: die heeft een eigen ouderlijk toezicht, dat PlayGuard van hieruit niet kan zien. Stel het daar ook in, of verberg het opstartmenu van hekate.",

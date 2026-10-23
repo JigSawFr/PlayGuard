@@ -320,7 +320,6 @@
             "section_presets": "Preenchimento rápido",
             "weekdays": "Definir de segunda a sexta...",
             "weekend": "Definir sábado e domingo...",
-            "copy_today": "Copiar {} para todos os dias",
             "copy_today_body": "Usar o limite de {} ({}) em todos os dias?",
             "copy_today_confirm": "Copiar",
             "revert": "Descartar alterações",
@@ -701,6 +700,14 @@
         "note_unconfirmed": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como habitualmente. Sem acesso? Volte a colocar o ficheiro RESCUE no cartão SD, com o sysmodule de recuperação instalado, e reinicie a consola.",
         "note_old_module": "Sem o PIN não é possível alterar nada aqui, e o PlayGuard abre como habitualmente. Atualize o módulo a partir de um computador: extraia o playguard-rescue.zip do PlayGuard {} na raiz do cartão SD, volte a colocar o ficheiro RESCUE e reinicie a consola."
     },
+    "tiles": {
+        "games": "Jogos instalados",
+        "upload": "Enviar um relatório...",
+        "weekdays": "Segunda a sexta...",
+        "weekend": "Fim de semana...",
+        "copy_today": "Copiar {} para todos",
+        "text_size_auto": "Auto: maior na TV"
+    },
     "tools": {
         "section_diag": "Diagnóstico",
         "section_tools": "Ferramentas",
@@ -815,7 +822,6 @@
         "update_last": "Última verificação: {}",
         "flag_read_only": "só de leitura",
         "flag_dev": "programador",
-        "upload": "Enviar um relatório online...",
         "upload_note": "Envia um relatório para um gist secreto da sua conta GitHub (inicie sessão primeiro, se necessário) e mostra a ligação com um código QR: dê-a a quem o ajuda, ou abra um relatório de erro com ela.",
         "storage_note_emummc": "Está na emuMMC: a sysMMC tem o seu próprio controlo parental, que o PlayGuard não consegue ver daqui. Configure-o lá também, ou oculte o menu de arranque do hekate.",
         "storage_note_sysmmc": "Está na sysMMC e há uma emuMMC configurada neste cartão SD: tem o seu próprio controlo parental, que o PlayGuard não consegue ver daqui. Configure-o lá também, ou oculte o menu de arranque do hekate.",

@@ -36,7 +36,7 @@
                  activity/forwarders_activity.hpp). -->
             <brls:Header title="@i18n/playguard/tools/section_tools" marginBottom="8"/>
             <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
-            <brls:DetailCell id="cn_games" title="@i18n/playguard/games/open"/>
+            <brls:DetailCell id="cn_games" title="@i18n/playguard/tiles/games"/>
             <brls:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
             <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>

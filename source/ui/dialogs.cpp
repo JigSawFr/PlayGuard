@@ -514,8 +514,9 @@ void pick_text_size(std::function<void()> after)
     }, true, {}, icons);
 }
 
-std::string text_size_name()
+std::string text_size_name(bool tile)
 {
+    if (tile && config::get().text_size == std::string("auto")) return "playguard/tiles/text_size_auto"_i18n;
     return brls::getStr("playguard/prefs/text_sizes/" + std::string(config::TEXT_SIZES[index_of(config::TEXT_SIZES, config::get().text_size)]));
 }
 
