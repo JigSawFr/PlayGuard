@@ -13,6 +13,7 @@
 
 #include "ui/format_text.hpp"
 #include "ui/cadran_text.hpp"
+#include "ui/guarded.hpp"
 #include "util/patches.hpp"
 #include "util/prodinfo.hpp"
 #include "util/pctl_ops_c.hpp"

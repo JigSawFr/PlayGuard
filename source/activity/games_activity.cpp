@@ -104,10 +104,7 @@ void GamesActivity::onResume()
 {
     if (!this->stale) return;
     this->stale = false;
-    std::weak_ptr<bool> weak = this->alive;
-    brls::sync([this, weak]() {
-        if (!weak.expired()) this->rebuild();
-    });
+    brls::sync(ui::guarded(this->alive, [this]() { this->rebuild(); }));
 }
 
 const PlayAccount* GamesActivity::account() const
@@ -151,10 +148,7 @@ void GamesActivity::switch_view()
     this->set_hints();
     // Next frame: rebuilding deletes the cell whose action runs now.
     const u64 focus_id = this->selected < this->entries.size() ? this->entries[this->selected].app_id : 0;
-    std::weak_ptr<bool> weak = this->alive;
-    brls::sync([this, weak, focus_id]() {
-        if (!weak.expired()) this->build(focus_id);
-    });
+    brls::sync(ui::guarded(this->alive, [this, focus_id]() { this->build(focus_id); }));
 }
 
 void GamesActivity::pick_period()
@@ -266,13 +260,11 @@ void GamesActivity::build(u64 focus_id)
         // Back on the same game (else the first), next frame, once laid out,
         // so the list scrolls to it.
         if (focus_in_list) {
-            std::weak_ptr<bool> weak = this->alive;
             const u64 id = this->entries[focus].app_id;
-            brls::sync([this, weak, id]() {
-                if (weak.expired()) return;
+            brls::sync(ui::guarded(this->alive, [this, id]() {
                 for (const Entry& e : this->entries)
                     if (e.app_id == id) brls::Application::giveFocus(e.view);
-            });
+            }));
         }
     } else {
         this->show_selected(nullptr);
@@ -321,13 +313,11 @@ void GamesActivity::add_more()
 {
     auto on_click = [this](brls::View*) {
         // Next frame: rebuilding deletes this cell, whose action runs now.
-        std::weak_ptr<bool> weak = this->alive;
         const size_t first_new = this->entries.size();
-        brls::sync([this, weak, first_new]() {
-            if (weak.expired()) return;
+        brls::sync(ui::guarded(this->alive, [this, first_new]() {
             this->show_all = true;
             this->build(first_new < this->rows.size() ? this->rows[first_new]->app_id : 0);
-        });
+        }));
         return true;
     };
     if (this->grid) {
@@ -440,13 +430,11 @@ void GamesActivity::load_icons(size_t i)
     for (size_t k = window.first; k < window.second; k++)
         if (!game_icons::known(this->entries[k].app_id)) ids.push_back(this->entries[k].app_id);
     if (ids.empty()) return;
-    std::weak_ptr<bool> weak = this->alive;
-    game_icons::load(ids, [this, weak]() {
-        if (weak.expired()) return;
+    game_icons::load(ids, ui::guarded(this->alive, [this]() {
         this->apply_icons();
         if (this->selected < this->rows.size()) this->show_selected(this->rows[this->selected]);
         this->load_icons(this->selected);
-    });
+    }));
 }
 
 void GamesActivity::apply_icons()

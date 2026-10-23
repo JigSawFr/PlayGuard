@@ -119,12 +119,12 @@ void GameCheckActivity::run(const GameFacts& g, u32 action, const GameContent& c
 void GameCheckActivity::remove(const GameFacts& g, bool asked)
 {
     const std::string label = history_label(g), name = game_name(g);
-    std::weak_ptr<bool> weak = this->alive;
-    auto now = [this, weak, id = g.app_id, label, name]() {
+    const auto read_again = ui::guarded(this->alive, [this, id = g.app_id]() { this->refresh(false, id); });
+    auto now = [read_again, id = g.app_id, label, name]() {
         const Result rc = gamecheck_remove(id);
         if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
         ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
-        if (R_SUCCEEDED(rc) && !weak.expired()) this->refresh(false, id);
+        if (R_SUCCEEDED(rc)) read_again();
     };
     if (asked) now();
     else ui::confirm_danger(name + "\n\n" + "playguard/games/remove_body"_i18n, "playguard/games/remove"_i18n, now);
@@ -527,12 +527,11 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
             if (R_FAILED(v.rc)) continue;
             u64 now = 0;
             time_local_now(&now, nullptr);
-            brls::sync([this, weak, v, now]() {
-                if (weak.expired()) return;
+            brls::sync(ui::guarded(weak, [this, v, now]() {
                 if (game_cache::set_verified(&this->cache, v.game.app_id, v.corrupt ? GC_VERIFIED_CORRUPT : GC_VERIFIED_INTACT,
                                              (int64_t)now, v.found))
                     this->save();
-            });
+            }));
         }
         brls::sync([this, weak, state, results, total = games.size()]() {
             game_verify_flow::close(state, [this, weak, results, total]() { report_verified(this, weak, *results, total); });

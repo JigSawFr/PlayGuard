@@ -217,10 +217,7 @@ void ActivityTab::refresh()
     if (this->stale) {
         // Back on top: next frame, once borealis has put the focus back.
         this->stale = false;
-        std::weak_ptr<bool> weak = this->alive;
-        brls::sync([this, weak]() {
-            if (!weak.expired()) this->rebuild();
-        });
+        brls::sync(ui::guarded(this->alive, [this]() { this->rebuild(); }));
     }
     if (play_data::fresh(play_data::key_of(chosen_account()), MAX_AGE)) return;
     this->fetch(false);

@@ -112,7 +112,6 @@ class ActivityTab : public TabBase
     PtState pt = {};
     bool pt_read = false;
     std::chrono::steady_clock::time_point pt_at;
-    std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
     BRLS_BIND(PlayDaysView,     days,        "ac_days");
     BRLS_BIND(brls::DetailCell, account_default, "ac_account_default");

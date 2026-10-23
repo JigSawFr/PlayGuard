@@ -36,7 +36,6 @@ class ClockTab : public TabBase
     brls::Label*  user_date = nullptr;
     brls::Label*  network_state = nullptr;
     brls::Rectangle* network_dot = nullptr;
-    std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     bool busy = false;
     bool autosync_off = false;   // "Synchronise Clock via Internet" read as off
     bool offline = false;        // the last measurement: no server answered

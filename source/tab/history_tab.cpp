@@ -42,7 +42,7 @@ HistoryTab::HistoryTab()
     });
     backup_restore->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        backup_flow::choose_and_restore([this]() { this->refresh(); });
+        backup_flow::choose_and_restore(this->refresher());
         return true;
     });
     backup_keep->registerClickAction([this](brls::View*) {

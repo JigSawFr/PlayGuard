@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/footer_hints.hpp"
 
+#include "ui/guarded.hpp"
+
 #include <algorithm>
 #include <cmath>
 
@@ -51,10 +53,7 @@ void FooterHints::fit()
     // A new screen's clock is set when it is first drawn: until then it has
     // no width of its own. Fitted after that frame.
     if (clock->getFullText().empty()) {
-        std::weak_ptr<bool> weak = this->alive;
-        brls::sync([this, weak]() {
-            if (!weak.expired()) this->fit();
-        });
+        brls::sync(ui::guarded(this->alive, [this]() { this->fit(); }));
         return;
     }
 

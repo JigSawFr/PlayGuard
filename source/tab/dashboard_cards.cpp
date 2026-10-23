@@ -116,16 +116,16 @@ void DashboardTab::build_steps_card(brls::Box* column, int at)
         card->addView(s.row);
     }
     steps[0].row->registerClickAction([this](brls::View*) {
-        console_actions::set_pin("first_steps", [this]() { this->refresh(); });
+        console_actions::set_pin("first_steps", this->refresher());
         return true;
     });
     steps[1].row->registerClickAction([this](brls::View*) {
         if (!this->pt.fw_supported) ui::error("", NXM_RC_FW_UNSUPPORTED);
-        else pt_flow::choose_uniform_limit(this->pt, [this]() { this->refresh(); });
+        else pt_flow::choose_uniform_limit(this->pt, this->refresher());
         return true;
     });
     steps[2].row->registerClickAction([this](brls::View*) {
-        if (this->clock_inaccurate) clock_flow::guided([this]() { this->refresh(); });
+        if (this->clock_inaccurate) clock_flow::guided(this->refresher());
         else ui::info("playguard/clock/guided_fine"_i18n);
         return true;
     });

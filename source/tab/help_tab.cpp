@@ -98,7 +98,7 @@ HelpTab::HelpTab()
     // Shown once signed in (Send a report online signs in without developer
     // mode), and to a developer, whose builds need it.
     github->registerClickAction([this](brls::View*) {
-        github_login_flow::open([this]() { this->refresh(); });
+        github_login_flow::open(this->refresher());
         return true;
     });
 
@@ -107,17 +107,17 @@ HelpTab::HelpTab()
     logs_note->setText(brls::getStr("playguard/tools/logs_note", paths::logs_dir()));
     logs_keep->registerClickAction([this](brls::View*) {
         pick_limit("playguard/tools/logs_keep"_i18n, config::LOGS_KEEP, config::get().logs_keep, logs_keep_text,
-                   [this]() { this->refresh(); });
+                   this->refresher());
         return true;
     });
     logs_keep_days->registerClickAction([this](brls::View*) {
         pick_limit("playguard/tools/logs_keep_days"_i18n, config::LOGS_KEEP_DAYS, config::get().logs_keep_days,
-                   logs_days_text, [this]() { this->refresh(); });
+                   logs_days_text, this->refresher());
         return true;
     });
     logs_keep_mb->registerClickAction([this](brls::View*) {
         pick_limit("playguard/tools/logs_keep_mb"_i18n, config::LOGS_KEEP_MB, config::get().logs_keep_mb, logs_mb_text,
-                   [this]() { this->refresh(); });
+                   this->refresher());
         return true;
     });
 
