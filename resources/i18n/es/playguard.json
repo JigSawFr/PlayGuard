@@ -1160,7 +1160,7 @@
         "hours_from_of": "{}: desde",
         "hours_to_of": "{}: hasta",
         "remake": "Rehacer",
-        "remake_confirm": "¿Rehacer estos forwarders protegidos? {}. Sus reglas (las horas, la pausa) pasan al propio forwarder, donde la tarjeta SD no puede cambiarlas, y el archivo de la puerta se comprueba antes de iniciarse.",
+        "remake_confirm": "¿Rehacer estos forwarders protegidos? {}: sus reglas (las horas, la pausa) pasan al propio forwarder, donde la tarjeta SD no puede cambiarlas, y el archivo de la puerta se comprueba antes de iniciarse.",
         "remade_n": "Rehechos: {}",
         "batch_title": "Forwarder {} de {}",
         "batch_made": "Hechos: {}",
