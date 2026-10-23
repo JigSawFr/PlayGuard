@@ -227,10 +227,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 - **Profiles** saved on the SD card: apply (a profile already in force just says so), edit, rename or delete one; save the current limits or make a new one.
 - Any name, in any script (*École*, *周末*, *Выходные* …) — a name without Latin letters gets a file name of its own, and two names that would map to the same file are caught.
-- **Scheduled profile** (*Profiles › Scheduled profile*): a profile for a period — holidays, a trip — its first and last day picked from the next 60 days.
-  - When the period begins, PlayGuard asks to put it in force (the days it changes drawn under the question); once it is over, to put back the limits it replaced, or to keep them.
-  - Asked once a day, on the main screen, when nothing else is in front: PlayGuard acts only when it is opened, so a console it is not opened on keeps the limits it has. A period that went by with the profile never put in force is forgotten.
-  - One at a time; the line changes, removes or ends it.
+- **Scheduled profile** (*Profiles › Scheduled profile*): *Soon*. PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself: switching profiles from a calendar or the school holidays comes with the [MQTT bridge](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). A profile scheduled with an earlier version is still offered when its period begins, and the line still changes, removes or ends it.
 
 ### Block all games
 
