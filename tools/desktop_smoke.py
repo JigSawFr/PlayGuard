@@ -51,7 +51,8 @@ notice must go when dismissed, and the Activity tab flag the new account.
 
 The "alarm" scenario starts with "When the time is up" on a warning only and
 today's limit passed (PLAYGUARD_SIM_ALARM_ONLY, PLAYGUARD_SIM_RESTRICTED):
-Today and the Play timer tab must show the time over the limit. A read of the
+Today and the Play timer tab must show the time over the limit, and the
+child screen that the time is up. A read of the
 play data ends as each tab opens, Today not freed yet (PLAYGUARD_SIM_TAB_RACE):
 the header's pill must still be the Play timer's.
 
@@ -1855,6 +1856,13 @@ if ALARM:
     shot("01_overview_over")   # Today: the time over the limit, not a time left
     key("Down")                # Play timer: the state line and the banner say so; its pill, not Today's
     shot("02_play_timer_over")
+    key("Up")                  # Today again
+    key("Right")               # Extra time, the hero's first action
+    key("Down")                # Stop for today
+    key("Right")               # Show the child
+    key("Return")
+    time.sleep(1)              # the screen's own entrance over
+    shot("03_child_over")      # its ring: time up, not the whole limit left
     finish()
 if SYSNOTES:
     def wait_logged(text, what):

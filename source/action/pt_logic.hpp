@@ -31,6 +31,33 @@ int played_today_min(const PtState& pt, int weekday);
 // only warns (alarm_only) or while parental controls are unlocked.
 int over_limit_min(const PtState& pt, int weekday);
 
+// Where today's limit stands, as Today's ring and headline and the child
+// screen's ring say it (each in its own words). `unlocked`: parental controls
+// known to be unlocked, which puts a limit on hold (the console reports the
+// timer off while unlocked, though the limit still stands).
+struct RingState
+{
+    enum Kind
+    {
+        UNKNOWN,    // the play timer not read (or a firmware too old)
+        NO_PLAY,    // today's limit is 0 (on hold when `unlocked`)
+        ON_HOLD,    // unlocked: the limit stands, nothing stops play
+        FREE,       // no limit today, or the timer off
+        TIME_UP,    // the limit reached: suspended, or played past it (a warning only)
+        COUNTING,   // counting down: `left` minutes left
+        IDLE,       // a limit, no game counted yet today
+    } kind = UNKNOWN;
+    bool     unlocked = false;   // `unlocked`, with a limit today
+    uint16_t limit = 0;          // today's
+    // The share of the limit played: 1 once it is up (or no play), 0 with
+    // nothing counted yet, -1 when there is none to show (on hold, no limit).
+    float fraction = -1.0f;
+    int   left = -1;     // COUNTING: the minutes left, rounded down
+    int   played = -1;   // COUNTING, TIME_UP: the minutes played (played_today_min)
+    int   over = -1;     // TIME_UP: the minutes past the limit, -1 when suspended at it
+};
+RingState ring_state(const PtState& pt, int weekday, bool unlocked);
+
 // The minutes already played when `new_days` puts today's limit below them
 // (the game in progress is then suspended at the lock), else -1; -1 too when
 // the console only warns at the limit (alarm_only).

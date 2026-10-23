@@ -259,6 +259,94 @@ static void test_restore()
     CHECK(pt_logic::restore_action(rec, "2026-10-08", pt, false) == Restore::None);
 }
 
+// Where today's limit stands, for Today's ring and headline and the child
+// screen's ring.
+static void test_ring_state()
+{
+    using R = pt_logic::RingState;
+    PtState pt = counting();
+    R r = pt_logic::ring_state(pt, 3, false);   // 2 h limit, 45 min left
+    CHECK(r.kind == R::COUNTING && r.limit == 120 && r.left == 45 && r.played == 75 && r.over == -1);
+    CHECK(r.fraction > 0.62f && r.fraction < 0.63f && !r.unlocked);
+    pt.remaining_ns = 45 * MIN_NS + MIN_NS - 1;     // the minutes left rounded down
+    CHECK(pt_logic::ring_state(pt, 3, false).left == 45);
+    pt.remaining_ns = 200 * MIN_NS;                 // more left than the limit (extra time)
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::COUNTING && r.left == 200 && r.played == 0 && r.fraction == 0.0f);
+
+    // Nothing counted yet today: the time left reads 0 (or was not read).
+    pt = counting();
+    pt.remaining_ns = 0;
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::IDLE && r.fraction == 0.0f && r.left == -1 && r.played == -1);
+    pt = counting();
+    pt.remaining_valid = false;
+    CHECK(pt_logic::ring_state(pt, 3, false).kind == R::IDLE);
+
+    // Suspended at the limit: the whole limit played, nothing over it.
+    pt = counting();
+    pt.restricted = true;
+    pt.remaining_ns = 0;
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::TIME_UP && r.fraction == 1.0f && r.played == 120 && r.over == -1 && r.left == -1);
+    pt.restricted_valid = false;                    // not read: not known to be suspended
+    CHECK(pt_logic::ring_state(pt, 3, false).kind == R::IDLE);
+
+    // Past the limit with the console only warning (alarm_only): time up all
+    // the same, not a whole limit left (the child screen once said so).
+    pt = counting();
+    pt.alarm_only = true;
+    pt.remaining_ns = -(int64_t)(10 * MIN_NS);
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::TIME_UP && r.fraction == 1.0f && r.played == 130 && r.over == 10 && r.left == -1);
+    pt.restricted = true;                           // past it while suspending (unlocked earlier)
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::TIME_UP && r.over == 10 && r.played == 130);
+
+    // Unlocked: the limit on hold, whatever the timer says (it may read off).
+    pt = counting();
+    r = pt_logic::ring_state(pt, 3, true);
+    CHECK(r.kind == R::ON_HOLD && r.unlocked && r.limit == 120 && r.fraction < 0.0f && r.left == -1);
+    pt.enabled = false;
+    CHECK(pt_logic::ring_state(pt, 3, true).kind == R::ON_HOLD);
+    pt = counting();
+    pt.alarm_only = true;
+    pt.remaining_ns = -(int64_t)(10 * MIN_NS);      // past the limit, unlocked: still on hold
+    CHECK(pt_logic::ring_state(pt, 3, true).kind == R::ON_HOLD);
+
+    // No play today: in words, on hold while unlocked.
+    pt = counting();
+    pt.day_min[3] = 0;
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::NO_PLAY && !r.unlocked && r.fraction == 1.0f);
+    r = pt_logic::ring_state(pt, 3, true);
+    CHECK(r.kind == R::NO_PLAY && r.unlocked && r.fraction < 0.0f);
+    pt.enabled = false;                             // the timer off: still the limit's 0
+    CHECK(pt_logic::ring_state(pt, 3, false).kind == R::NO_PLAY);
+
+    // No limit today, or the timer off: free; unlocked changes nothing then.
+    pt = counting();
+    pt.day_min[3] = PT_DAY_NOLIMIT;
+    r = pt_logic::ring_state(pt, 3, false);
+    CHECK(r.kind == R::FREE && r.fraction < 0.0f && r.left == -1);
+    r = pt_logic::ring_state(pt, 3, true);
+    CHECK(r.kind == R::FREE && !r.unlocked);
+    pt = counting();
+    pt.enabled = false;
+    CHECK(pt_logic::ring_state(pt, 3, false).kind == R::FREE);
+
+    // Not read (or too old a firmware), or no weekday.
+    bool PtState::*const fields[] = { &PtState::fw_supported, &PtState::valid, &PtState::enabled_valid };
+    for (auto f : fields) {
+        pt = counting();
+        pt.*f = false;
+        r = pt_logic::ring_state(pt, 3, false);
+        CHECK(r.kind == R::UNKNOWN && r.fraction < 0.0f);
+    }
+    CHECK(pt_logic::ring_state(counting(), 7, false).kind == R::UNKNOWN);
+    CHECK(pt_logic::ring_state(counting(), -1, false).kind == R::UNKNOWN);
+}
+
 static void test_restore_way()
 {
     using pt_logic::RestoreWay;
@@ -620,6 +708,7 @@ int main()
     test_stop();
     test_restore();
     test_bonus();
+    test_ring_state();
     test_restore_way();
     test_bedtime();
     test_pickers();
@@ -628,5 +717,5 @@ int main()
     test_next_stop();
     test_counts_to_bed();
     test_held_step();
-    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, bedtime, picker, pending-relock, next-stop, child-ring and held-arrow assertions passed");
+    return CHECK_DONE("pt_logic gate, played time, suspend warning, extra time, no-more-play, planned bonus, today's ring, bedtime, picker, pending-relock, next-stop, child-ring and held-arrow assertions passed");
 }
