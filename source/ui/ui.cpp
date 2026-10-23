@@ -147,27 +147,42 @@ void refuse(const std::string& text)
     notify(text, Toast::Refused);
 }
 
+// The texts of a result are read on the UI thread, in the sync: a language
+// loaded while the app runs replaces the translations there, which a worker
+// thread must not read meanwhile.
+
 void refuse(Result rc)
 {
-    refuse(rc_text(rc));
+    brls::sync([rc]() {
+        const std::string text = rc_text(rc);
+        brls::Logger::info("toast: {}", text);
+        brls::Application::notify(text, cadran::toast_icon(false));
+    });
 }
 
-void error(const std::string& text)
+static void show_error(const std::string& text)
 {
     brls::Logger::info("error: {}", text);
     cadran_text::Failure f;
     f.reason = text;
-    brls::sync([f]() { show_failure(f); });
+    show_failure(f);
+}
+
+void error(const std::string& text)
+{
+    brls::sync([text]() { show_error(text); });
 }
 
 void error(const std::string& what, Result rc, const std::string& before)
 {
-    // Logged as the text the dialog says, for the smoke test.
-    brls::Logger::info("error: {}{}", before.empty() ? "" : before + " / ",
-                       what.empty() ? rc_text(rc) : what + " \u2014 " + rc_text(rc));
-    cadran_text::Failure f = cadran_text::failure(what, hint_for(rc), (uint32_t)rc, NXM_IS_APP_RESULT(rc));
-    if (!before.empty()) f.reason = f.reason.empty() ? before : before + "\n\n" + f.reason;
-    brls::sync([f]() { show_failure(f); });
+    brls::sync([what, rc, before]() {
+        // Logged as the text the dialog says, for the smoke test.
+        brls::Logger::info("error: {}{}", before.empty() ? "" : before + " / ",
+                           what.empty() ? rc_text(rc) : what + " \u2014 " + rc_text(rc));
+        cadran_text::Failure f = cadran_text::failure(what, hint_for(rc), (uint32_t)rc, NXM_IS_APP_RESULT(rc));
+        if (!before.empty()) f.reason = f.reason.empty() ? before : before + "\n\n" + f.reason;
+        show_failure(f);
+    });
 }
 
 void error(const std::string& what, const std::string& why)
@@ -226,7 +241,7 @@ bool save_config_now()
 void notify_result(Result rc, const std::string& ok_text, const std::string& error_prefix)
 {
     if (R_SUCCEEDED(rc)) notify(ok_text, Toast::Done);
-    else error(error_prefix + " — " + rc_text(rc));
+    else brls::sync([rc, error_prefix]() { show_error(error_prefix + " — " + rc_text(rc)); });
 }
 
 static bool s_unlocked = false;
