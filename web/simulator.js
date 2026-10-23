@@ -1048,11 +1048,27 @@ function setUpPanel() {
     if (open) return;
     canvas.focus();
   });
-  for (const tab of document.querySelectorAll('.tab')) {
-    tab.addEventListener('click', () => {
-      for (const other of document.querySelectorAll('.tab')) other.setAttribute('aria-selected', String(other === tab));
-      for (const body of document.querySelectorAll('.tab-body')) body.hidden = body.dataset.body !== tab.dataset.tab;
-      if (tab.dataset.tab === 'log') renderLog();
+  // The panel's tabs (WAI-ARIA's tabs pattern): the one selected takes the
+  // Tab key's stop, ← / → (Home / End) move to the others and show them.
+  const tabs = [...document.querySelectorAll('.tab')];
+  const select = (tab) => {
+    for (const other of tabs) {
+      other.setAttribute('aria-selected', String(other === tab));
+      other.tabIndex = other === tab ? 0 : -1;
+    }
+    for (const body of document.querySelectorAll('.tab-body')) body.hidden = body.dataset.body !== tab.dataset.tab;
+    if (tab.dataset.tab === 'log') renderLog();
+  };
+  for (const tab of tabs) {
+    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('keydown', (e) => {
+      const at = tabs.indexOf(tab);
+      const to = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (to === undefined) return;
+      e.preventDefault();
+      const next = tabs[(to + tabs.length) % tabs.length];
+      select(next);
+      next.focus();
     });
   }
   $('form').addEventListener('input', markChanges);
