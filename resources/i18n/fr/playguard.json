@@ -650,7 +650,7 @@
         "no_pin": "Définissez d'abord un code PIN (Définir ou changer le code PIN).",
         "set": "Protéger PlayGuard par le code PIN : {}",
         "ask_again": "Redemander le code PIN après 5 minutes",
-        "pauses": "Mettre le contrôle parental en pause pendant que je suis dans PlayGuard",
+        "pauses": "Contrôle parental en pause dans PlayGuard",
         "again_on": {
             "changes": "Redemandé après 5 minutes.",
             "open": "Il revient après 5 minutes hors de PlayGuard."
