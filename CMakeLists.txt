@@ -247,9 +247,35 @@ message(STATUS "PlayGuard release build: ${APP_RELEASE}")
 include(${CMAKE_CURRENT_SOURCE_DIR}/tools/rescue_rev.cmake)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${RESCUE_REV_SOURCES})
 message(STATUS "PlayGuard recovery sysmodule revision: ${RESCUE_REV}")
-target_compile_definitions(${PROJECT_NAME} PRIVATE APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}"
-                           APP_PR=${APP_PR} APP_RELEASE=${APP_RELEASE} APP_RESCUE_REV="${RESCUE_REV}")
+# On the two files that read them only: on every other file's command line
+# the commit (and the pull request) would change it at each build, and ccache
+# would have to preprocess each file again before finding it already compiled
+# (the desktop's precompiled header, below, would be built anew every time).
+set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/app.cpp APPEND PROPERTY COMPILE_DEFINITIONS
+             APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}" APP_PR=${APP_PR} APP_RELEASE=${APP_RELEASE})
+set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/action/rescue.cpp APPEND PROPERTY COMPILE_DEFINITIONS
+             APP_RESCUE_REV="${RESCUE_REV}")
 target_link_libraries(${PROJECT_NAME} PRIVATE borealis ${APP_PLATFORM_LIB})
+# On the desktop: borealis, fmt and the standard headers most files include,
+# parsed once (a precompiled header) instead of in each of the 200-odd C++
+# files: a change to a header many include (ui/ui.hpp, app.hpp) rebuilds in
+# about half the time. The Switch and the web keep compiling as before (their
+# toolchains, and the release's reproducibility check, are left alone); a
+# file that forgets an #include the header gives the desktop fails there.
+# qrcodegen is not ours (-w).
+if (PLATFORM_DESKTOP AND NOT PLAYGUARD_WEB AND NOT CMAKE_VERSION VERSION_LESS 3.16)
+    target_precompile_headers(${PROJECT_NAME} PRIVATE
+        "$<$<COMPILE_LANGUAGE:CXX>:<borealis.hpp$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<fmt/format.h$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<algorithm$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<chrono$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<functional$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<memory$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<string$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<vector$<ANGLE-R>>")
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp
+                                PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+endif ()
 # borealis' headers as system headers: their warnings are not PlayGuard's.
 get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${BOREALIS_INCLUDES})
