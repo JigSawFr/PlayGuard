@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 40e1bd0a81b3 -->
+<!-- translated from docs/features.md, sha256 22cf7958b87f -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Novo no PlayGuard? Comece por [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -173,7 +173,7 @@ A consola mostra "Tempo esgotado" e depois suspende o jogo (sem "continuar") ou 
 - **Tempo extra hoje**: +15 min, +30 min, +1 h por predefinição.
 - **Terminar o jogo por hoje**: limite 0 só para hoje, *Agora* ou *Daqui a 5 minutos* quando o tempo jogado é conhecido (o limite passa então a ser o tempo jogado + 5 min, o tempo de guardar). No bloqueio aparece o "Tempo esgotado" da consola, e o progresso não guardado pode perder-se — a confirmação avisa.
 - **No dia seguinte** — ao arrancar, ou à meia-noite se a aplicação estiver aberta — o PlayGuard repõe o limite habitual:
-  - depois de tempo extra, sozinho, sem perguntar e sem PIN (só baixa o limite, como reativar o controlo parental), desbloqueando por um instante se o temporizador estiver a contar e voltando logo a bloquear. Espera enquanto não puder escrever (modo só de leitura, um firmware que não suporta, o bloqueio da consola ativo) e, uma semana depois no mesmo dia, enquanto o limite mais baixo pararia o jogo em curso (então no dia seguinte). Para manter mais tempo num dia, altere o limite desse dia;
+  - depois de tempo extra, sozinho, sem perguntar e sem PIN (só baixa o limite, como reativar o controlo parental), desbloqueando por um instante se o temporizador estiver a contar e voltando logo a bloquear. Espera enquanto não puder escrever (modo só de leitura, um firmware que não suporta, *Bloquear todos os jogos* ativo) e, uma semana depois no mesmo dia, enquanto o limite mais baixo pararia o jogo em curso (então no dia seguinte). Para manter mais tempo num dia, altere o limite desse dia;
   - depois de *Terminar o jogo por hoje*, pergunta se deve manter 0 ou repor o limite (com o PIN, como qualquer alteração que sobe um limite), ou repõe-no como qualquer alteração (*Tempo de jogo › Repor o limite após "Terminar o jogo por hoje"*); repor "sem limite" é sempre perguntado.
 - **Tempo extra noutro dia** (*Tempo extra › Outro dia…*, no fim da sua lista): amanhã ou um dos cinco dias seguintes, cada um listado com o seu limite, e depois a quantidade. O limite desse dia é aumentado já, só para essa data, e reposto sozinho (só baixa o limite) da próxima vez que o PlayGuard for aberto depois de o dia terminar — não numa consola onde o PlayGuard não é aberto, onde o mesmo dia da semana seguinte também o mantém. Um de cada vez: a lista propõe então retirá-lo (com o limite reposto de imediato). Uma alteração do limite desse dia entretanto (a semana, um perfil…) prevalece: nada é reposto.
 

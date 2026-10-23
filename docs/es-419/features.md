@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 40e1bd0a81b3 -->
+<!-- translated from docs/features.md, sha256 22cf7958b87f -->
 # Funciones
 
 Qué hace cada pestaña, cómo escribe PlayGuard sin riesgos y qué cuenta la consola como tiempo de juego. ¿Es nuevo en PlayGuard? Empiece por [primeros pasos](getting-started.md). Volver al [README](../../README.md).
@@ -173,7 +173,7 @@ La consola muestra “Se acabó el tiempo” y luego suspende el juego (sin “c
 - **Tiempo extra hoy**: +15 min, +30 min, +1 h de forma predeterminada.
 - **No jugar más hoy**: límite 0 solo por hoy, *ahora* o *en 5 minutos* cuando se conoce el tiempo jugado (el límite pasa a ser el tiempo jugado + 5 min, tiempo para guardar). Al bloquearse, aparece el “Se acabó el tiempo” de la consola, y el progreso no guardado puede perderse: la confirmación lo indica.
 - **Al día siguiente** —al iniciar, o a la medianoche si la aplicación está abierta— PlayGuard restablece el límite habitual:
-  - después de tiempo extra, solo, sin preguntar ni pedir el PIN (solo baja el límite, como al reactivar el control parental), desbloqueando un momento si el temporizador está contando y volviendo a bloquear de inmediato. Espera mientras no puede escribir (modo de solo lectura, un firmware no compatible, el bloqueo de la consola activado) y, una semana después el mismo día, mientras el límite más bajo detendría el juego en curso (entonces, al día siguiente). Para conservar más tiempo un día, cambie el límite de ese día;
+  - después de tiempo extra, solo, sin preguntar ni pedir el PIN (solo baja el límite, como al reactivar el control parental), desbloqueando un momento si el temporizador está contando y volviendo a bloquear de inmediato. Espera mientras no puede escribir (modo de solo lectura, un firmware no compatible, *Bloquear todos los juegos* activado) y, una semana después el mismo día, mientras el límite más bajo detendría el juego en curso (entonces, al día siguiente). Para conservar más tiempo un día, cambie el límite de ese día;
   - después de *No jugar más hoy*, pregunta si mantener 0 o restablecer el límite (con el PIN, como cualquier cambio que sube un límite), o lo restablece como cualquier cambio (*Tiempo de juego › Tras “No jugar más hoy”, restablecer el límite*); restablecer “sin límite” siempre se pregunta.
 - **Tiempo extra otro día** (*Tiempo extra › Otro día…*, al final de su lista): mañana o uno de los cinco días siguientes, cada uno con su límite, y luego la cantidad. El límite de ese día se sube de inmediato, solo para esa fecha, y se restablece solo (solo baja el límite) la próxima vez que se abre PlayGuard una vez terminado el día; no en una consola en la que no se abre PlayGuard, donde el mismo día de la semana siguiente también lo conserva. Uno a la vez: la lista ofrece entonces quitarlo (su límite se restablece de inmediato). Si mientras tanto cambia el límite de ese día (la semana, un perfil…), ese cambio prevalece: no se restablece nada.
 

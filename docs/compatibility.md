@@ -15,7 +15,7 @@ Supported firmware, Atmosphère and launchers, emuMMC and sysMMC, and how PlayGu
 - **Firmware 23.0.0** — Atmosphère 1.12.0. Same commands as 23.0.1 in the [switchbrew](https://switchbrew.org/wiki/Parental_Control_services) table.
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Every feature.
 
-**Before 21.0.0, everything but the play timer** — restrictions, PIN, temporary unlock, activity, network clock, companion app and history work. The play timer's settings block (0x44 bytes) only has this layout since 21.0.0, so PlayGuard turns off what lives in it: the daily limits, the bedtime alarm, extra time and the console lock.
+**Before 21.0.0, everything but the play timer** — restrictions, PIN, temporary unlock, activity, network clock, companion app and history work. The play timer's settings block (0x44 bytes) only has this layout since 21.0.0, so PlayGuard turns off what lives in it: the daily limits, the bedtime alarm, extra time and *Block all games*.
 
 - **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
 - **Firmware 19.0.x** — Atmosphère 1.8.0

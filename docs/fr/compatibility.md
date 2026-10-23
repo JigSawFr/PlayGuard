@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 33251c660faf -->
+<!-- translated from docs/compatibility.md, sha256 2e539d2ecda1 -->
 # Compatibilité
 
 Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la comparaison avec un sysmodule de remplacement. Retour au [README](../../README.md).
@@ -16,7 +16,7 @@ Firmwares, Atmosphère et lanceurs pris en charge, emuMMC et sysMMC, et la compa
 - **Firmware 23.0.0** — Atmosphère 1.12.0. Mêmes commandes que 23.0.1 dans la table de [switchbrew](https://switchbrew.org/wiki/Parental_Control_services).
 - **Firmware 21.0.0 → 21.2.0** — Atmosphère 1.10.x. Toutes les fonctions.
 
-**Avant 21.0.0, tout sauf le temps de jeu** — restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile et historique fonctionnent. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et le verrou de console.
+**Avant 21.0.0, tout sauf le temps de jeu** — restrictions, code PIN, déverrouillage temporaire, activité, horloge réseau, application mobile et historique fonctionnent. Le bloc de réglages du minuteur (0x44 octets) n'a cette structure que depuis 21.0.0, donc PlayGuard désactive ce qui en dépend : les limites quotidiennes, l'alarme du coucher, le temps en plus et *Bloquer tous les jeux*.
 
 - **Firmware 20.0.0 → 20.5.0** — Atmosphère 1.9.x
 - **Firmware 19.0.x** — Atmosphère 1.8.0

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 40e1bd0a81b3 -->
+<!-- translated from docs/features.md, sha256 22cf7958b87f -->
 # Recursos
 
 O que cada aba faz, como o PlayGuard grava as configurações com segurança e o que o console conta como tempo de jogo. Novo no PlayGuard? Comece pelos [primeiros passos](getting-started.md). Volte ao [README](../../README.md).
@@ -173,7 +173,7 @@ O console mostra "Tempo esgotado" e depois suspende o jogo (sem "continuar") ou 
 - **Tempo extra hoje**: +15 min, +30 min, +1 h por padrão.
 - **Encerrar o jogo por hoje**: limite 0 só para hoje, *agora* ou *daqui a 5 minutos* quando o tempo jogado é conhecido (o limite passa a ser o tempo jogado + 5 min, tempo para salvar). No bloqueio, o "Tempo esgotado" do console aparece, e o progresso não salvo pode ser perdido — a confirmação avisa.
 - **No dia seguinte** — na abertura, ou à meia-noite se o app estiver aberto — o PlayGuard volta ao limite de sempre:
-  - depois de tempo extra, sozinho, sem perguntar e sem PIN (ele só reduz o limite, como reativar o controle parental), desbloqueando por um instante se o temporizador estiver contando e bloqueando de novo na hora. Ele espera enquanto não pode gravar (modo somente leitura, um firmware sem suporte, o bloqueio do console ativado) e, uma semana depois no mesmo dia, enquanto o limite menor pararia o jogo em andamento (aí, no dia seguinte). Para ter mais tempo em um dia, mude o limite desse dia;
+  - depois de tempo extra, sozinho, sem perguntar e sem PIN (ele só reduz o limite, como reativar o controle parental), desbloqueando por um instante se o temporizador estiver contando e bloqueando de novo na hora. Ele espera enquanto não pode gravar (modo somente leitura, um firmware sem suporte, *Bloquear todos os jogos* ativado) e, uma semana depois no mesmo dia, enquanto o limite menor pararia o jogo em andamento (aí, no dia seguinte). Para ter mais tempo em um dia, mude o limite desse dia;
   - depois de *Encerrar o jogo por hoje*, ele pergunta se mantém 0 ou volta ao limite (com o PIN, como qualquer mudança que aumenta um limite), ou volta ao limite como qualquer mudança (*Tempo de jogo › Voltar ao limite após "Encerrar o jogo por hoje"*); voltar para "sem limite" sempre é perguntado.
 - **Tempo extra em outro dia** (*Tempo extra › Outro dia…*, no fim da lista): amanhã ou um dos cinco dias seguintes, cada um listado com seu limite, e depois o valor. O limite desse dia é aumentado na hora, só para essa data, e restaurado sozinho (ele só reduz o limite) na próxima vez que o PlayGuard for aberto depois que o dia terminar — não em um console em que o PlayGuard não é aberto, onde o mesmo dia da semana seguinte também fica com ele. Um de cada vez: a lista então oferece removê-lo (com o limite restaurado na hora). Uma mudança no limite desse dia nesse meio-tempo (a semana, um perfil…) prevalece: nada é restaurado.
 

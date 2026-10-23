@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 40e1bd0a81b3 -->
+<!-- translated from docs/features.md, sha256 22cf7958b87f -->
 # Funzioni
 
 Cosa fa ogni scheda, come PlayGuard scrive senza rischi, e cosa la console conta come tempo di gioco. Nuovo su PlayGuard? Comincia da [Per iniziare](getting-started.md). Torna al [README](../../README.md).
@@ -173,7 +173,7 @@ La console mostra "Tempo scaduto", poi sospende il gioco (senza "continua") o si
 - **Tempo extra oggi**: +15 min, +30 min, +1 h per impostazione predefinita.
 - **Basta giocare per oggi**: limite 0 solo per oggi, *Adesso* o *Tra 5 minuti* quando il tempo giocato è noto (il limite diventa allora il tempo giocato + 5 min, il tempo di salvare). Al blocco compare il "Tempo scaduto" della console, e i progressi non salvati possono andare persi — la conferma lo dice.
 - **Il giorno dopo** — all'avvio, o a mezzanotte se l'app è aperta — PlayGuard rimette il limite abituale:
-  - dopo il tempo extra, da solo, senza domande né PIN (abbassa solo il limite, come fa la riattivazione del filtro famiglia), sbloccando per un attimo se il timer sta contando e bloccando di nuovo subito. Aspetta finché non può scrivere (modalità sola lettura, un firmware che non supporta, il blocco della console attivo) e, una settimana dopo nello stesso giorno, finché il limite più basso fermerebbe il gioco in corso (allora il giorno dopo). Per tenere più tempo in un giorno, cambia il limite di quel giorno;
+  - dopo il tempo extra, da solo, senza domande né PIN (abbassa solo il limite, come fa la riattivazione del filtro famiglia), sbloccando per un attimo se il timer sta contando e bloccando di nuovo subito. Aspetta finché non può scrivere (modalità sola lettura, un firmware che non supporta, *Blocca tutti i giochi* attivo) e, una settimana dopo nello stesso giorno, finché il limite più basso fermerebbe il gioco in corso (allora il giorno dopo). Per tenere più tempo in un giorno, cambia il limite di quel giorno;
   - dopo *Basta giocare per oggi*, chiede se tenere 0 o rimettere il limite (con il PIN, come ogni modifica che alza un limite), oppure lo rimette come ogni modifica (*Tempo di gioco › Dopo "Basta giocare per oggi", ripristina il limite*); rimettere "nessun limite" viene sempre chiesto.
 - **Tempo extra in un altro giorno** (*Tempo extra › Un altro giorno…*, alla fine del suo elenco): domani o uno dei cinque giorni successivi, ognuno elencato con il suo limite, poi la quantità. Il limite di quel giorno viene alzato subito, solo per quella data, e rimesso da solo (abbassa solo il limite) la prossima volta che PlayGuard viene aperto dopo la fine di quel giorno — non su una console su cui PlayGuard non viene aperto, dove lo mantiene anche lo stesso giorno della settimana successiva. Uno alla volta: l'elenco propone allora di toglierlo (il suo limite torna subito com'era). Una modifica del limite di quel giorno nel frattempo (la settimana, un profilo…) prevale: non viene rimesso nulla.
 
