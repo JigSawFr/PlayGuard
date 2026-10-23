@@ -458,18 +458,18 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
     brls::Application::giveFocus(keep ? keep : (brls::View*)self_cell.getView());
     this->cells.clear();
     this->list_rows = forwarder_flow::rows();
-    // By group: PlayGuard's own, protected, not protected, another app's,
-    // no longer on the HOME menu; by name in each (forwarders_logic::merge).
+    // By group: PlayGuard's own, the others made here (protected or not:
+    // their icon's badge says it), another app's, no longer on the HOME
+    // menu; by name in each (forwarders_logic::merge).
     const auto group_of = [](const Row& r) {
-        if (r.state == State::NotInstalled) return 4;
-        if (r.state == State::Elsewhere) return 3;
-        if (r.self) return 0;
-        return r.pin ? 1 : 2;
+        if (r.state == State::NotInstalled) return 3;
+        if (r.state == State::Elsewhere) return 2;
+        return r.self ? 0 : 1;
     };
-    static const char* const LABELS[] = { nullptr, "playguard/forwarders/group_protected", "playguard/forwarders/group_open",
-                                          "playguard/forwarders/group_elsewhere", "playguard/forwarders/group_gone" };
+    static const char* const LABELS[] = { nullptr, nullptr, "playguard/forwarders/group_elsewhere",
+                                          "playguard/forwarders/group_gone" };
     int groups = 0;
-    for (int g = 0; g < 5; g++)
+    for (int g = 0; g < 4; g++)
         for (const Row& r : this->list_rows)
             if (group_of(r) == g) {
                 groups++;
@@ -482,7 +482,7 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
         auto* groups_box = new Nearest<brls::Box>(brls::Axis::COLUMN);
         groups_box->setAlignItems(brls::AlignItems::STRETCH);
         list->addView(groups_box);
-        for (int g = 0; g < 5; g++) {
+        for (int g = 0; g < 4; g++) {
             cadran::Card* card = nullptr;
             for (const Row& r : this->list_rows) {
                 if (group_of(r) != g) continue;

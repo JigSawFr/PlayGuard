@@ -1087,8 +1087,6 @@
         "help_body": "이 화면의 기능(가이드):",
         "fix_delete": "{} 삭제",
         "fix_protect": "{}을(를) PIN으로 보호",
-        "group_protected": "PIN으로 보호됨",
-        "group_open": "PIN 없음",
         "group_elsewhere": "다른 앱이 만듦",
         "group_gone": "HOME 메뉴에 없음",
         "state_verified": "확인됨",

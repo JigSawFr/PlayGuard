@@ -1087,8 +1087,6 @@
         "help_body": "Cosa fa questa schermata, nella guida:",
         "fix_delete": "Elimina {}",
         "fix_protect": "Proteggi {} con il PIN",
-        "group_protected": "Protetti con il PIN",
-        "group_open": "Senza PIN",
         "group_elsewhere": "Creati da un'altra app",
         "group_gone": "Non più nel menu HOME",
         "state_verified": "verificato",
