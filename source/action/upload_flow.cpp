@@ -71,7 +71,9 @@ void show_link(const log_upload::Result& r, bool report)
     fields.firmware = fw;
     if (si.ams_valid) fields.atmosphere = fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro);
     // The menu it was started from is not known: the reporter adds it.
-    fields.launcher = si.applet_mode ? "from the Album (applet)" : "over a game (title override)";
+    fields.launcher = si.applet_mode ? "from the Album (applet)"
+                    : si.forwarder ? "from its HOME menu icon (forwarder)"
+                                   : "over a game (title override)";
     const SysStorage storage = sysinfo_storage(&si);
     if (const char* name = diagnostic::storage_name(storage)) fields.storage = name;
     const std::string issue = log_upload::issue_url(app::repo_url(), r.url, fields);

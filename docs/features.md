@@ -139,8 +139,8 @@ Under it, what stops play first:
 - The **bedtime alarm** (when games are allowed again, or in how long it rings when the console does not say; off, *Off* in large and Ⓐ *Set it*), **parental controls** and the **network clock**, as cards.
 - The console's state as **pills**:
   - one says whether Atmosphère's DNS redirection blocks Nintendo's servers, and Ⓐ on it which ones and what that changes: no sync for the companion app, no network clock setting itself;
-  - another, opened over a game, that the time spent in PlayGuard counts, Ⓐ saying how;
-  - a game left open on the HOME menu shows as an amber pill (*still counts*, Ⓐ saying why), when the pill about PlayGuard opened over a game does not say it already.
+  - another, opened as an application, that the time spent in PlayGuard counts: as that game when opened over a game (*Opened from a game*), under its icon's name when started from a forwarder on the HOME menu (*Opened from its HOME icon*), Ⓐ saying how;
+  - a game left open on the HOME menu shows as an amber pill (*still counts*, Ⓐ saying why), when the pill about PlayGuard's own time does not say it already.
 - The pills put what needs the parent first (amber, with a triangle), then what is on (teal, with a check), then the rest (grey, with a dot): the shape says it as well as the colour.
 - What is fine and what is only said fold into one pill after those that need the parent (*✓ 3 checks fine*); Ⓐ on it shows them, for as long as the tab is open.
 - Under the pills, the extra time still to put back (Ⓐ puts it back) and the "time's up" alarm while it is off (Ⓐ turns it back on).
@@ -516,6 +516,7 @@ The play timer is the console's: PlayGuard reads it, it does not count anything 
 | **A game left open on the HOME menu** (suspended in the background) | **Yes**: close it, or put the console in sleep mode | Reported by parents ([Arqade](https://gaming.stackexchange.com/questions/398954/)); fits the measurements (the console counts while an application is open) |
 | Sleep mode | No | Reported ([Arqade](https://gaming.stackexchange.com/questions/398954/)); not measured by PlayGuard |
 | **PlayGuard opened over a game** (as an application) | **Yes**, as that game | Measured (22.0.0): open it with a parent's user, or from the album for a quick look |
+| **PlayGuard started from a forwarder** (its HOME menu icon, an application too) | **Yes**, under the icon's name | Inferred: an application like any other; not measured by PlayGuard |
 | PlayGuard opened from the album (applet mode) | No | Inferred: it is not an application, and time outside applications did not seem to count |
 | While parental controls are temporarily unlocked | Maybe not | Not measured: still open |
 | After the clock was changed | The day starts over; after a jump back the count stops until the clock passes the old time | Observed (22.0.0); *Today* says when the console is not counting |
