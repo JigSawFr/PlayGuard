@@ -78,7 +78,10 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* playguard_web_console()
                   "\"alarm_only\":%s,\"unlocked\":%s,\"living\":%s}",
                   game ? game->name : "", static_cast<unsigned long long>(sim_played_today_s()),
                   limited ? static_cast<int>(pt.day_min[wd]) : -1,
-                  static_cast<long long>(pt.remaining_ns / 1000000000LL), pt.restricted ? "true" : "false",
+                  static_cast<long long>(pt.remaining_ns / 1000000000LL),
+                  // Suspended: 1455 reads true past the limit even while
+                  // temporarily unlocked, when nothing is suspended.
+                  pt.restricted && !pt.temporary_unlocked ? "true" : "false",
                   pt.alarm_only ? "true" : "false", pt.temporary_unlocked ? "true" : "false",
                   sim_keeping() ? "true" : "false");
     return out;
