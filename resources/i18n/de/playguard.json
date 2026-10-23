@@ -708,7 +708,12 @@
         "copy_today": "{} auf alle kopieren",
         "text_size_auto": "Auto: größer am TV",
         "text_size": "Textgröße",
-        "start_tab": "Start-Tab"
+        "start_tab": "Start-Tab",
+        "themes": {
+            "system": "System",
+            "light": "Hell",
+            "dark": "Dunkel"
+        }
     },
     "tools": {
         "section_diag": "Diagnose",

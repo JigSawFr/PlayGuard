@@ -708,7 +708,12 @@
         "copy_today": "将{}复制到每天",
         "text_size_auto": "自动：电视上较大",
         "text_size": "文字大小",
-        "start_tab": "启动时显示"
+        "start_tab": "启动时显示",
+        "themes": {
+            "system": "跟随系统",
+            "light": "浅色",
+            "dark": "深色"
+        }
     },
     "tools": {
         "section_diag": "诊断",

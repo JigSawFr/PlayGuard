@@ -706,9 +706,14 @@
         "weekdays": "De lunes a viernes...",
         "weekend": "Fin de semana...",
         "copy_today": "Copiar el {} a todos",
-        "text_size_auto": "Auto: más grande en la TV",
+        "text_size_auto": "Auto: mayor en la TV",
         "text_size": "Texto",
-        "start_tab": "Abrir en"
+        "start_tab": "Abrir en",
+        "themes": {
+            "system": "Consola",
+            "light": "Claro",
+            "dark": "Oscuro"
+        }
     },
     "tools": {
         "section_diag": "Diagnóstico",

@@ -708,7 +708,12 @@
         "copy_today": "{} naar elke dag",
         "text_size_auto": "Auto: groter op de tv",
         "text_size": "Tekstgrootte",
-        "start_tab": "Starttabblad"
+        "start_tab": "Starttabblad",
+        "themes": {
+            "system": "Systeem",
+            "light": "Licht",
+            "dark": "Donker"
+        }
     },
     "tools": {
         "section_diag": "Diagnose",
