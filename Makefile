@@ -2,11 +2,15 @@
 #
 #   make              -> ./playguard.nro            (needs devkitPro, DEVKITPRO set)
 #   make dist         -> ./playguard.zip            (unzip onto the SD card root)
+#   make rescue       -> sysmodule/out/playguard-rescue.nsp (the recovery sysmodule; needs devkitPro)
+#   make dist-rescue  -> ./playguard-rescue.zip     (the recovery sysmodule, SD card layout)
 #   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
 #   make web          -> ./build-web/simulator/          (the same in a browser; needs Emscripten's emcmake)
 #   make web-serve    -> serves it at http://localhost:8000 (with the headers its threads need)
 #   make test         -> host unit tests (plain gcc/g++, ASan + UBSan; parallel, all suites)
+#   make check        -> make test, then the resource checks and compat.json
 #   make fuzz         -> libFuzzer runs of the parsers (clang; FUZZ_SECONDS=30 each, parallel)
+#   make gate-preview -> build/gate-preview/*.png    (the PIN gate's screen, one per state; GATE_LANG=n)
 #   make nxlink       -> push to a Switch running hbmenu (press Y there first)
 #
 # GL=1 builds the Switch .nro with OpenGL (mesa) instead of deko3d.
