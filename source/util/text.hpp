@@ -126,4 +126,56 @@ inline std::string join(const std::vector<std::string>& parts, const std::string
     return out;
 }
 
+// The HTML comments of a Markdown text, invisible on GitHub, read line by
+// line (each trimmed of white space, as trim_space): skipped, except the
+// console's own (the changelog and PlayGuard's release notes)
+//   <!-- console: a line -->              that line, read here only;
+//   <!-- console:only  …  -->             the lines between, here only;
+//   <!-- console:hide --> … <!-- /console -->   the lines between, not here.
+class ConsoleComments
+{
+public:
+    enum Step
+    {
+        Show,        // an ordinary line (one inside console:only too)
+        Skip,        // inside a comment or a console:hide block
+        Break,       // a comment or a block starts or a console:only ends: no line
+        Directive,   // <!-- console: … -->: `inner` is its line
+    };
+
+    Step next(const std::string& t, std::string& inner)
+    {
+        if (block_ == Comment) {
+            if (t.find("-->") != std::string::npos) block_ = Plain;
+            return Skip;
+        }
+        if (block_ == Hide) {
+            if (t == "<!-- /console -->") block_ = Plain;
+            return Skip;
+        }
+        if (block_ == Only && t == "-->") {
+            block_ = Plain;
+            return Break;
+        }
+        if (block_ == Plain && starts_with(t, "<!--")) {
+            const bool closed = t.size() >= 7 && t.compare(t.size() - 3, 3, "-->") == 0;
+            if (t == "<!-- console:hide -->") {
+                block_ = Hide;
+            } else if (t == "<!-- console:only") {
+                block_ = Only;
+            } else if (closed && starts_with(t, "<!-- console:")) {
+                inner = trim_space(t.substr(13, t.size() - 16));
+                return Directive;
+            } else if (!closed) {
+                block_ = Comment;
+            }
+            return Break;
+        }
+        return Show;
+    }
+
+private:
+    enum { Plain, Comment, Hide, Only } block_ = Plain;
+};
+
 }   // namespace text

@@ -102,6 +102,46 @@ static void test_text()
     CHECK(text::join({}, "\n").empty() && text::join({ "", "b", "" }, ",") == ",b,");   // empty parts kept
 }
 
+// Each line through text::ConsoleComments: "S" shown, "-" skipped, "|" a
+// break, "=x" the directive's line x.
+static std::string comment_steps(const std::vector<std::string>& lines)
+{
+    text::ConsoleComments c;
+    std::string out;
+    for (const std::string& l : lines) {
+        std::string inner = "untouched";
+        const auto step = c.next(l, inner);
+        switch (step) {
+            case text::ConsoleComments::Show:      out += "S"; break;
+            case text::ConsoleComments::Skip:      out += "-"; break;
+            case text::ConsoleComments::Break:     out += "|"; break;
+            case text::ConsoleComments::Directive: out += "=" + inner; break;
+        }
+        if (step != text::ConsoleComments::Directive && inner != "untouched") out += "!";   // set for a directive only
+    }
+    return out;
+}
+
+static void test_console_comments()
+{
+    // Plain lines; a one-line comment, a comment over several lines.
+    CHECK(comment_steps({ "a", "", "<!-- note -->", "b" }) == "SS|S");
+    CHECK(comment_steps({ "<!-- open", "inside", "<!-- still -->", "after" }) == "|--S");
+    CHECK(comment_steps({ "<!--", "x -->", "y" }) == "|-S");
+    // The console's line, trimmed; an empty one.
+    CHECK(comment_steps({ "<!-- console:  here only  -->", "a" }) == "=here onlyS");
+    CHECK(comment_steps({ "<!-- console:-->" }) == "=");
+    // console:only: the lines between shown, a comment inside them too, up to "-->".
+    CHECK(comment_steps({ "<!-- console:only", "a", "<!-- x -->", "-->", "b" }) == "|SS|S");
+    // console:hide up to <!-- /console --> only (a "-->" inside does not end it).
+    CHECK(comment_steps({ "<!-- console:hide -->", "a", "-->", "<!-- /console -->", "b" }) == "|---S");
+    // Not the console's: an unclosed "<!-- console: x" is a comment, a stray
+    // "-->" or "<!-- /console -->" outside a block an ordinary line or a comment.
+    CHECK(comment_steps({ "<!-- console: x", "y -->", "z" }) == "|-S");
+    CHECK(comment_steps({ "-->", "<!-- /console -->" }) == "S|");
+    CHECK(comment_steps({ "<!-- console:hide", "a -->", "b" }) == "|-S");   // not the exact marker: a comment
+}
+
 static void test_json()
 {
     nlohmann::json j;
@@ -140,6 +180,7 @@ int main()
     test_utf8();
     test_emoji();
     test_text();
+    test_console_comments();
     test_json();
     CHECK_DONE("utf8, emoji, text and json_util assertions passed");
 }
