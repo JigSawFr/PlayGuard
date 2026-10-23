@@ -5,7 +5,10 @@
 #include <cstdint>
 #include <yoga/Yoga.h>
 
+#include "core/sim_env.h"
 #include "ui/cadran_kit.hpp"
+#include "ui/effects.hpp"
+#include "util/config.hpp"
 #include "view/cadran_icon.hpp"
 
 namespace kit = cadran::kit;
@@ -96,6 +99,57 @@ CadranIcon* make_icon(const char* name, float size, NVGcolor color)
     icon->setColor(color);
     return icon;
 }
+
+// Behind an action tile's icon and title: two soft lights in its card, as if
+// blurred, its own ink near the icon and the next tile's in the far corner,
+// brighter while it has the focus. Gradients, not a blur: a few fills, no
+// texture. Off with the screens' background glow (lighter effects on the
+// battery, Developer › glow, PLAYGUARD_SIM_CADRAN_NOGLOW).
+class TileGlow : public brls::View
+{
+  public:
+    TileGlow(brls::View* tile, NVGcolor ink, NVGcolor far)
+        : tile(tile), ink(ink), far(far)
+    {
+        this->setFocusable(false);
+        this->setPositionType(brls::PositionType::ABSOLUTE);
+        this->setPositionTop(0);
+        this->setPositionLeft(0);
+    }
+    void draw(NVGcontext* vg, float x, float y, float, float, brls::Style, brls::FrameContext*) override
+    {
+        // At the tile's corner (top and left 0), as large as the tile: a
+        // percentage of it does not follow its height.
+        const float width = this->tile->getWidth(), height = this->tile->getHeight();
+        static const bool off = sim_env_flag("PLAYGUARD_SIM_CADRAN_NOGLOW");
+        if (off || !config::get().cadran_glow || effects::light() || width <= 0 || height <= 0) return;
+        // Fainter on the light theme's white, where a tint shows more.
+        const bool light = brls::Application::getThemeVariant() == brls::ThemeVariant::LIGHT;
+        const float lift = this->tile->isFocused() ? 1.5f : 1.0f;
+        light_at(vg, x, y, width, height, x + width * 0.12f, y + height * 0.1f, width * 0.9f, this->ink, (light ? 0.14f : 0.28f) * lift);
+        light_at(vg, x, y, width, height, x + width, y + height, width * 0.75f, this->far, (light ? 0.10f : 0.18f) * lift);
+    }
+
+  private:
+    // One light, clipped by the card's own rounded shape.
+    static void light_at(NVGcontext* vg, float x, float y, float width, float height, float cx, float cy, float radius, NVGcolor color, float alpha)
+    {
+        NVGcolor inner = color, outer = color;
+        inner.a = std::min(alpha, 1.0f);
+        outer.a = 0;
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, x, y, width, height, kit::RADIUS_CARD);
+        nvgFillPaint(vg, nvgRadialGradient(vg, cx, cy, 0.0f, radius, inner, outer));
+        nvgFill(vg);
+    }
+
+    brls::View* tile;
+    NVGcolor ink, far;
+};
+
+// The action tiles' inks, one per tile in turn, never the warnings' (amber,
+// coral).
+constexpr const char* TILE_INKS[] = { "cadran/teal", "cadran/blue", "cadran/violet", "cadran/pink" };
 
 // The icon before a row's title, in a soft rounded square.
 brls::Box* row_icon(const char* name)
@@ -283,9 +337,8 @@ void cadran::List::tag(const char* id, const std::string& text, bool warn, const
 
 brls::Box* cadran::List::head(const char* id) const
 {
-    for (brls::DetailCell* cell : this->readings)
-        if (cell == this->tab->getView(id) && !cell->getChildren().empty())
-            return dynamic_cast<brls::Box*>(cell->getChildren()[0]);
+    for (const auto& [cell, head] : this->heads)
+        if (cell == this->tab->getView(id)) return head;
     return nullptr;
 }
 
@@ -331,10 +384,15 @@ brls::Box* cadran::List::tiles(const std::vector<std::pair<const char*, const ch
         auto* head = new brls::Box(brls::Axis::ROW);
         head->setAlignItems(brls::AlignItems::CENTER);
         head->setMarginBottom(status ? 10 : 0);
-        brls::View* icon = make_icon(cells[i].second, status ? 22 : 24, theme["cadran/teal"]);
+        // An action tile's ink: its icon, its light (TileGlow).
+        const size_t inks = sizeof(TILE_INKS) / sizeof(TILE_INKS[0]);
+        const char* ink = status ? "cadran/teal" : TILE_INKS[i % inks];
+        brls::View* icon = make_icon(cells[i].second, status ? 22 : 24, theme[ink]);
         head->addView(icon);
         cell->addView(head, 0);
+        this->heads.push_back({ cell, head });
         if (!status) {
+            cell->addView(new TileGlow(cell, theme[ink], theme[TILE_INKS[(i + 1) % inks]]), 0);
             icon->setMarginRight(14);
             cell->removeView(cell->title, false);
             head->addView(cell->title);

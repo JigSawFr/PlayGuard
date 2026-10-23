@@ -6,7 +6,8 @@
 // card (surf, 1 px border, kit::RADIUS_CARD, a line between rows); a cell
 // gets an icon in a soft square before its title, a chevron when it opens
 // something, a switch for a BooleanCell; the notes go to kit::TEXT_NOTE. tiles() turns a few cells into
-// the boards' tiles instead (a row of cards; the icon on top, or before an action's title).
+// the boards' tiles instead (a row of cards; the icon on top, or before an action's title
+// over two soft lights in its own ink).
 //
 // The tab keeps every view it binds (they move, they are not rebuilt), and
 // its own show / hide logic: a card or a tile row with all its lines hidden
@@ -91,8 +92,9 @@ class List
     // `note` under it, smaller ("2 versions behind"; empty: none).
     void tag(const char* id, const std::string& text, bool warn, const std::string& note = "");
 
-    // A status tile's head (its icon's row), for a sign at its far end
-    // (RowIcon): the tile's corner, not under its value.
+    // A tile's head (its icon's row, an action tile's title in it too), for a
+    // sign at its far end (RowIcon, TabBadge): the tile's corner, not under
+    // its value.
     brls::Box* head(const char* id) const;
 
     // Puts this line (not a cell: a box of text) in a card of its own.
@@ -131,6 +133,7 @@ class List
     brls::Box*  box = nullptr;
     std::vector<brls::Header*> headers;
     std::vector<brls::DetailCell*> readings;   // the status tiles
+    std::vector<std::pair<brls::DetailCell*, brls::Box*>>  heads;   // every tile's head (head())
     std::vector<std::pair<brls::DetailCell*, brls::View*>> marks;   // each one's state (a kit::Mark)
     std::vector<std::pair<brls::DetailCell*, brls::Box*>>  tags;    // each one's pill (tag())
 };

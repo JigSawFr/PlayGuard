@@ -93,6 +93,9 @@ void cadran::install_theme()
         // light theme as the other inks (4.5:1 on white).
         t->addColor("cadran/blue", c(p->blue));
         t->addColor("cadran/violet", c(p->violet));
+        // The action tiles' fourth ink (cadran::List::tiles()), after teal,
+        // blue and violet: the third avatar's pink, darker on white.
+        t->addColor("cadran/pink", p == dark ? nvgRGB(0xE9, 0x6A, 0xA8) : nvgRGB(0xC2, 0x45, 0x7F));
         // The accounts' avatars, in turn: fills under a navy initial, alike
         // on both themes.
         t->addColor("cadran/avatar0", nvgRGB(0x7C, 0x6C, 0xF2));
