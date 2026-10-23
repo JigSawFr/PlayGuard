@@ -44,13 +44,19 @@ console's state agrees with the report and, after an unlock, when the report
 carries the module's **proof**: PlayGuard keeps a random challenge in
 `config/playguard/rescue_nonce` (a new one at every start, so a report is
 believed only at the first start after the boot that wrote it), and the
-module adds to its report that challenge and an HMAC-SHA256 of the report
-keyed with the PIN the console stores, which PlayGuard computes again. A
-report written by hand, copied from an earlier recovery, or left by a module
-older than this check is shown without the actions, and *Open PlayGuard*
-goes through the lock screen as on any start. The PIN itself is never
-written; the proof is made from it, so like the report it is removed at the
-next start of PlayGuard.
+module adds to its report that challenge and an HMAC-SHA256 of the report,
+which PlayGuard computes again. Its key is made of the PIN the console
+stores **and** a secret of the console that is not on the SD card (its Mii
+author ID, from the system settings: random, made when the console was set
+up, and not in the PRODINFO backup Atmosphère leaves on the card), so a copy
+of the report cannot be used to find the PIN on a computer by trying every
+one. A report written by hand, copied from an earlier recovery, or left by a
+module older than this check (or than its secret: one that keyed it with the
+PIN alone) is shown without the actions, and *Open PlayGuard* goes through
+the lock screen as on any start; with a module out of date, the recovery
+screen says to update it.
+The PIN itself is never written, and like the report the proof is removed at
+the next start of PlayGuard.
 
 ## The homebrew menu's lock
 

@@ -249,7 +249,7 @@ crash_dump_FLAGS := -std=c11 -Isource/util
 # parts of the service layer they share with the console.
 sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
 sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
-                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c) source/util/playlog.c \
+                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c rescue.c) source/util/playlog.c \
                       tests/forwarders/stb.c extern/stb/stb_image_write.c
 # Atomic coverage counters: the suite runs the same code from several threads
 # at once, and gcov's plain counters then come out wrong (negative ones, that

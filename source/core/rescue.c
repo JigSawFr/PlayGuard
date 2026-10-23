@@ -223,7 +223,7 @@ size_t rescue_mac_message(const RescueReport *r, const uint8_t nonce[RESCUE_NONC
     if (!r || !nonce) return 0;
     char hex[2 * RESCUE_NONCE_SIZE + 1];
     to_hex(nonce, RESCUE_NONCE_SIZE, hex);
-    const int head = snprintf(buf, size, "playguard-rescue/1\nnonce=%s\n", hex);
+    const int head = snprintf(buf, size, "playguard-rescue/2\nnonce=%s\n", hex);
     if (head < 0 || (size_t)head >= size) {
         buf[0] = '\0';
         return 0;
@@ -234,6 +234,34 @@ size_t rescue_mac_message(const RescueReport *r, const uint8_t nonce[RESCUE_NONC
         return 0;
     }
     return (size_t)head + body;
+}
+
+// Not optimised away, though the buffer is not read again.
+static void wipe(void *p, size_t n)
+{
+    volatile uint8_t *b = (volatile uint8_t *)p;
+    while (n--) *b++ = 0;
+}
+
+bool rescue_proof_mac(RescueHmac hmac, const uint8_t secret[RESCUE_SECRET_SIZE], const char *pin, size_t pin_len,
+                      const void *msg, size_t msg_len, uint8_t mac[RESCUE_MAC_SIZE])
+{
+    if (!mac) return false;
+    memset(mac, 0, RESCUE_MAC_SIZE);
+    if (!hmac || !secret || !pin || !msg || pin_len == 0 || pin_len > 8) return false;
+    uint8_t any = 0;
+    for (size_t i = 0; i < RESCUE_SECRET_SIZE; i++) any |= secret[i];
+    if (!any) return false;
+    static const char label[] = "playguard-rescue-key/2\n";
+    char text[sizeof(label) - 1 + 8];
+    memcpy(text, label, sizeof(label) - 1);
+    memcpy(text + sizeof(label) - 1, pin, pin_len);
+    uint8_t key[RESCUE_MAC_SIZE];
+    hmac(key, secret, RESCUE_SECRET_SIZE, text, sizeof(label) - 1 + pin_len);
+    hmac(mac, key, sizeof(key), msg, msg_len);
+    wipe(text, sizeof(text));
+    wipe(key, sizeof(key));
+    return true;
 }
 
 size_t rescue_proof_format(const RescueProof *p, char *buf, size_t size)
