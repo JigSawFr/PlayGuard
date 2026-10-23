@@ -1087,8 +1087,6 @@
         "help_body": "此畫面的用途（指南）：",
         "fix_delete": "刪除{}",
         "fix_protect": "以PIN碼保護{}",
-        "group_protected": "已以PIN碼保護",
-        "group_open": "無需PIN碼",
         "group_elsewhere": "由其他應用程式建立",
         "group_gone": "已不在HOME選單",
         "state_verified": "已驗證",

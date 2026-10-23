@@ -1087,8 +1087,6 @@
         "help_body": "Was dieser Bildschirm macht, in der Anleitung:",
         "fix_delete": "{} löschen",
         "fix_protect": "{} mit der Geheimzahl schützen",
-        "group_protected": "Mit der Geheimzahl geschützt",
-        "group_open": "Ohne Geheimzahl",
         "group_elsewhere": "Von einer anderen App erstellt",
         "group_gone": "Nicht mehr im HOME-Menü",
         "state_verified": "geprüft",

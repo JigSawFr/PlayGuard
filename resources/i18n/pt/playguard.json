@@ -1087,8 +1087,6 @@
         "help_body": "O que este ecrã faz, no guia:",
         "fix_delete": "Eliminar {}",
         "fix_protect": "Proteger {} com o PIN",
-        "group_protected": "Protegidos com o PIN",
-        "group_open": "Sem o PIN",
         "group_elsewhere": "Criados por outra aplicação",
         "group_gone": "Já não estão no menu HOME",
         "state_verified": "verificado",

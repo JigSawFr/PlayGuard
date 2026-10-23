@@ -1087,8 +1087,6 @@
         "help_body": "Что делает этот экран, в руководстве:",
         "fix_delete": "Удалить {}",
         "fix_protect": "Защитить {} PIN-кодом",
-        "group_protected": "Защищены PIN-кодом",
-        "group_open": "Без PIN-кода",
         "group_elsewhere": "Созданы другим приложением",
         "group_gone": "Больше нет в меню HOME",
         "state_verified": "проверено",

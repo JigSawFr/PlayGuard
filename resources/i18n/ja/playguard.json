@@ -1087,8 +1087,6 @@
         "help_body": "この画面の説明（ガイド）：",
         "fix_delete": "{}を削除",
         "fix_protect": "{}を暗証番号で保護",
-        "group_protected": "暗証番号で保護",
-        "group_open": "暗証番号なし",
         "group_elsewhere": "ほかのアプリで作成",
         "group_gone": "HOMEメニューにない",
         "state_verified": "確認済み",
