@@ -36,13 +36,13 @@ SecurityTab::SecurityTab()
     // Deleting everything is the one irreversible action here: its line is
     // drawn in the danger colour, not only its section title (refresh()).
     pin_lock_cell->registerClickAction([this](brls::View*) {
-        pin_lock::choose([this]() { this->refresh(); });
+        pin_lock::choose(this->refresher());
         return true;
     });
     // Off by default: once entered, the PIN holds until PlayGuard closes.
     pin_ask_again->init("playguard/pin_lock/ask_again"_i18n, config::get().pin_ask_again, [](bool) {});
     pin_ask_again->registerClickAction([this](brls::View*) {
-        pin_lock::set_ask_again(!config::get().pin_ask_again, [this]() { this->refresh(); });
+        pin_lock::set_ask_again(!config::get().pin_ask_again, this->refresher());
         return true;
     });
     // While linked, anyone can save the block before and after a change made
@@ -53,7 +53,7 @@ SecurityTab::SecurityTab()
         return true;
     });
     pr_unlink->registerClickAction([this](brls::View*) {
-        console_actions::unlink("", [this]() { this->refresh(); });
+        console_actions::unlink("", this->refresher());
         return true;
     });
     set_pin->registerClickAction([this](brls::View*) {
@@ -62,22 +62,21 @@ SecurityTab::SecurityTab()
     });
     show_pin->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        ui::confirm("playguard/security/show_pin_body"_i18n, "playguard/security/show_pin_confirm"_i18n, [this]() {
-            brls::sync([this]() {
-                // The PIN every time (pin_lock.hpp); then, as it may have been
-                // seen over a shoulder, a new one is offered.
-                if (!pin_lock::before_show_pin()) return;
-                const bool shown = ui::show_pin_dialog([this]() {
-                    brls::sync([this]() {
-                        ui::confirm("playguard/security/show_pin_change_body"_i18n,
-                                    "playguard/security/show_pin_change_confirm"_i18n, [this]() {
-                                        brls::sync([this]() { this->change_pin(); });
-                                    });
-                    });
-                });
-                if (shown) history_flow::record_event("pin_shown");
-            });
+        // Each step a frame later, after a dialog: nothing once the tab is gone.
+        const auto change = ui::guarded(this->alive, [this]() { this->change_pin(); });
+        const auto offer_change = ui::guarded(this->alive, [change]() {
+            ui::confirm("playguard/security/show_pin_change_body"_i18n,
+                        "playguard/security/show_pin_change_confirm"_i18n, [change]() { brls::sync(change); });
         });
+        const auto show = ui::guarded(this->alive, [offer_change]() {
+            // The PIN every time (pin_lock.hpp); then, as it may have been
+            // seen over a shoulder, a new one is offered.
+            if (!pin_lock::before_show_pin()) return;
+            const bool shown = ui::show_pin_dialog([offer_change]() { brls::sync(offer_change); });
+            if (shown) history_flow::record_event("pin_shown");
+        });
+        ui::confirm("playguard/security/show_pin_body"_i18n, "playguard/security/show_pin_confirm"_i18n,
+                    [show]() { brls::sync(show); });
         return true;
     });
     unlock->registerClickAction([this](brls::View*) {
@@ -98,7 +97,7 @@ SecurityTab::SecurityTab()
         ui::save_config();
     });
     del->registerClickAction([this](brls::View*) {
-        console_actions::delete_all("", [this]() { this->refresh(); });
+        console_actions::delete_all("", this->refresher());
         return true;
     });
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" }, { "sc_hbmenu", "home" } }, true);
@@ -118,7 +117,7 @@ void SecurityTab::willAppear(bool resetState)
 
 void SecurityTab::change_pin()
 {
-    console_actions::set_pin("", [this]() { this->refresh(); });
+    console_actions::set_pin("", this->refresher());
 }
 
 void SecurityTab::refresh()

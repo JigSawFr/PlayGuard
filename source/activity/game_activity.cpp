@@ -66,9 +66,7 @@ void GameActivity::onContentAvailable()
         Result rc = 0;
         found->resize(playstats_by_account(app_id, found->data(), found->size(), &rc));
         if (ui::quitting()) return;
-        brls::sync([this, weak, found, rc]() {
-            if (!weak.expired()) this->show_accounts(*found, rc);
-        });
+        brls::sync(ui::guarded(weak, [this, found, rc]() { this->show_accounts(*found, rc); }));
     });
 }
 

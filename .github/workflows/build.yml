@@ -212,6 +212,7 @@ jobs:
             echo "$mark **$label**${last:+ — $last}" >> "$GITHUB_STEP_SUMMARY"
           }
           check "Resources (i18n keys, translations, XML layouts)" python3 tools/check_resources.py .
+          check "Sources (include layers, the desktop's and the host tests' core files)" python3 tools/check_sources.py .
           check "Web simulator's settings (every PLAYGUARD_SIM_* variable)" python3 tools/check_web_params.py .
           check "Web simulator's page logic (web/sim_logic.js)" node --test tests/web_page/*.test.js
           check "compat.json generator" python3 tools/gen_compat.py . build/compat.json

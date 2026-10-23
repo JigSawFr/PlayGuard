@@ -197,6 +197,7 @@ write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue
 write_queue_logic_LIBS  := -pthread
 worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
 worker_threads_LIBS  := -pthread
+guarded_SRC          := tests/guarded/test.cpp
 data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
 outside_change_logic_SRC   := source/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
@@ -378,6 +379,7 @@ fuzz:
 
 check: test
 	python3 tools/check_resources.py .
+	python3 tools/check_sources.py .
 	python3 tools/gen_compat.py . $(BUILD)/compat.json
 
 clean:

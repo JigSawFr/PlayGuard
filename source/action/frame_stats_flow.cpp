@@ -18,7 +18,7 @@
 #include "app.hpp"
 #include "ui/effects.hpp"
 #include "ui/ui.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "util/config.hpp"
 #include "util/frame_stats.hpp"
 #include "util/paths.hpp"

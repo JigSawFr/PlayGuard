@@ -33,16 +33,16 @@ PreferencesTab::PreferencesTab()
     : TabBase("xml/tab/preferences.xml", false), list(this)
 {
     language->registerClickAction([this](brls::View*) {
-        ui::pick_language([this]() { this->refresh(); });
+        ui::pick_language(this->refresher());
         return true;
     });
 
     theme->registerClickAction([this](brls::View*) {
-        ui::pick_theme([this]() { this->refresh(); });
+        ui::pick_theme(this->refresher());
         return true;
     });
     text_size->registerClickAction([this](brls::View*) {
-        ui::pick_text_size([this]() { this->refresh(); });
+        ui::pick_text_size(this->refresher());
         return true;
     });
     effects->registerClickAction([this](brls::View*) {
@@ -109,7 +109,7 @@ PreferencesTab::PreferencesTab()
         ui::save_config();
     });
     update_via->registerClickAction([this](brls::View*) {
-        update_flow::choose_method([this]() { this->refresh(); });
+        update_flow::choose_method(this->refresher());
         return true;
     });
     // The guide again (also at the top of About › Help & diagnostics).

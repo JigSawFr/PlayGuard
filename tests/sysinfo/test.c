@@ -79,6 +79,8 @@ int main(void)
     sysinfo_get(&si);
     CHECK(m.spl_inits == 1); /* cached */
     CHECK(si.hos_version >= MAKEHOSVERSION(21, 0, 0));
+    CHECK(sysinfo_hos_version() == MAKEHOSVERSION(23, 0, 1));
+    CHECK(m.spl_inits == 1); /* the version alone: from the cache too */
 
     // emuMMC, PRODINFO blanked.
     reset();

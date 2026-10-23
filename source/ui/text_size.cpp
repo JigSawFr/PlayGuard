@@ -9,8 +9,8 @@
 
 #include "core/sim_env.h"
 #include "view/cadran_digits.hpp"
-#include "tab/cadran_list.hpp"
-#include "tab/tab_base.hpp"
+#include "ui/cadran_list.hpp"
+#include "ui/ui.hpp"
 #include "util/config.hpp"
 
 #ifdef __SWITCH__
@@ -73,7 +73,7 @@ void apply()
         for (brls::View* detached : roots) detached->invalidate();
     }
     // The tab on screen, for what it lays out by the size (Today's room).
-    TabBase::refresh_shown();
+    ui::refresh_shown_tab();
 }
 
 void install()

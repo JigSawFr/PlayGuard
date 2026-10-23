@@ -146,6 +146,17 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
         std::vector<ntp::Reply> replies(hosts.size());
         // Each stops waiting when the app quits: it waits for this thread.
         std::vector<std::thread> workers;
+        // Joined however this ends: an exception (from a query made here, or
+        // the vector growing) with a thread still joinable would end the app.
+        struct JoinAll
+        {
+            std::vector<std::thread>& threads;
+            ~JoinAll()
+            {
+                for (auto& t : threads)
+                    if (t.joinable()) t.join();
+            }
+        } join_all{ workers };
         for (size_t i = 0; i < hosts.size(); i++) {
             if (in_series) {
                 if (ui::quitting()) break;

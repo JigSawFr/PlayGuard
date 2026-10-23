@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/cadran_kit.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -112,7 +112,6 @@ class ActivityTab : public TabBase
     PtState pt = {};
     bool pt_read = false;
     std::chrono::steady_clock::time_point pt_at;
-    std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
     BRLS_BIND(PlayDaysView,     days,        "ac_days");
     BRLS_BIND(brls::DetailCell, account_default, "ac_account_default");

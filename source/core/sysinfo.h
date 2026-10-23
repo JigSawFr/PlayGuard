@@ -55,6 +55,15 @@ typedef enum {
 void      sysinfo_get(SysInfo *out);           // cached after the first call
 SysCompat sysinfo_compat(const SysInfo *info);
 
+// The firmware's version alone: sysinfo_get's, so cached as it is (the
+// simulator's reads its console each time).
+static inline u32 sysinfo_hos_version(void)
+{
+    SysInfo info;
+    sysinfo_get(&info);
+    return info.hos_version;
+}
+
 static inline SysStorage sysinfo_storage(const SysInfo *info)
 {
     if (!info->is_atmosphere || !info->emummc_valid) return SysStorage_Unknown;

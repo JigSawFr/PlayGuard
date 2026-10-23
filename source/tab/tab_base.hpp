@@ -6,8 +6,11 @@
 #pragma once
 
 #include <borealis.hpp>
+#include <functional>
 #include <string>
 #include <vector>
+
+#include "ui/guarded.hpp"
 
 class TabBadge;
 
@@ -39,6 +42,13 @@ class TabBase : public brls::Box
 
   protected:
     virtual void refresh() = 0;
+
+    // Goes with the tab: what finishes later (a flow's callback after the
+    // network or a dialog, a background task's brls::sync) checks it, by
+    // ui::guarded, as a tab replaced by another is freed meanwhile.
+    ui::Alive alive = ui::make_alive();
+    // refresh(), once a flow is over: nothing if the tab is gone by then.
+    std::function<void()> refresher() { return ui::guarded(this->alive, [this]() { this->refresh(); }); }
 
     // This tab is the one on screen. A tab replaced by another is freed a
     // little later (borealis' free queue): until then, its timer and its

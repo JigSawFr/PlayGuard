@@ -13,7 +13,6 @@
 #include "action/outside_watch.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
-#include "activity/main_activity.hpp"
 #include "app.hpp"
 #include "ui/cadran_text.hpp"
 #include "ui/cadran_modal.hpp"
@@ -443,7 +442,7 @@ void withdraw_undo()
 void offer_undo(std::function<void()> refresh)
 {
     constexpr long OFFER_MS = 8000;
-    MainActivity* main = ui::main_activity();
+    brls::Activity* main = ui::main_screen();
     if (!main || brls::Application::getActivitiesStack().back() != main) return;
     withdraw_undo();
     // The change just recorded (a write records it before it ends), when it

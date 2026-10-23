@@ -5,8 +5,7 @@
 #include <cmath>
 #include <string>
 
-#include "tab/cadran_list.hpp"
-#include "tab/tab_base.hpp"
+#include "ui/cadran_list.hpp"
 #include "ui/cadran_kit.hpp"
 #include "ui/live_prefs.hpp"
 #include "ui/text_size.hpp"
@@ -45,9 +44,9 @@ HeaderSetting::HeaderSetting(Kind kind)
     // A tap opens its list (hitTest finds it, focusable or not); the tab on
     // screen shows the new choice (Preferences says it too).
     this->addGestureRecognizer(new brls::TapGestureRecognizer(this, [kind]() {
-        if (kind == Kind::LANGUAGE) ui::pick_language(TabBase::refresh_shown);
-        else if (kind == Kind::THEME) ui::pick_theme(TabBase::refresh_shown);
-        else ui::pick_text_size(TabBase::refresh_shown);
+        if (kind == Kind::LANGUAGE) ui::pick_language(ui::refresh_shown_tab);
+        else if (kind == Kind::THEME) ui::pick_theme(ui::refresh_shown_tab);
+        else ui::pick_text_size(ui::refresh_shown_tab);
     }));
 }
 

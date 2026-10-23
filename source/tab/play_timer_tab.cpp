@@ -140,15 +140,15 @@ PlayTimerTab::PlayTimerTab()
     });
     uniform_chip->registerClickAction([this](brls::View*) {
         if (ui::refuse_read_only()) return true;
-        pt_flow::choose_uniform_limit(this->pt, [this]() { this->refresh(); });
+        pt_flow::choose_uniform_limit(this->pt, this->refresher());
         return true;
     });
     bed_chip->registerClickAction([this](brls::View*) {
-        pt_flow::choose_bedtime(this->pt, [this]() { this->refresh(); });
+        pt_flow::choose_bedtime(this->pt, this->refresher());
         return true;
     });
     time_up_chip->registerClickAction([this](brls::View*) {
-        pt_flow::choose_time_up(this->pt, [this]() { this->refresh(); });
+        pt_flow::choose_time_up(this->pt, this->refresher());
         return true;
     });
     remove_chip->registerClickAction([this](brls::View*) {
@@ -187,7 +187,7 @@ PlayTimerTab::PlayTimerTab()
             ui::info("playguard/console_lock/needs_pin"_i18n);
             return true;
         }
-        console_lock::set(!console_lock::active(), pt, [this]() { this->refresh(); });
+        console_lock::set(!console_lock::active(), pt, this->refresher());
         return true;
     });
     ui::set_detail(split, ui::opens());
@@ -197,7 +197,7 @@ PlayTimerTab::PlayTimerTab()
         return true;
     });
     bedtime_reset->registerClickAction([this](brls::View*) {
-        pt_flow::choose_bedtime_end(this->pt, [this]() { this->refresh(); });
+        pt_flow::choose_bedtime_end(this->pt, this->refresher());
         return true;
     });
 
@@ -324,7 +324,7 @@ void PlayTimerTab::save()
     pt_flow::confirm_write("", "playguard/play_timer/confirm_set"_i18n, [this, snapshot](bool did_unlock) {
         Result rc = pt_flow::write_days(snapshot.data(), "per_day");
         pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
-                              "playguard/play_timer/write_err"_i18n, [this]() { this->refresh(); });
+                              "playguard/play_timer/write_err"_i18n, this->refresher());
     }, snapshot.data(), false, "playguard/cadran/week/save_title"_i18n);
 }
 
@@ -487,7 +487,7 @@ void PlayTimerTab::remove_limit()
                                Result rc = pt_flow::clear_days("remove");
                                pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/removed"_i18n,
                                                      "playguard/play_timer/remove_err"_i18n,
-                                                     [this]() { this->refresh(); });
+                                                     this->refresher());
                            }, nullptr, true);
 }
 

@@ -20,7 +20,7 @@
 #include "action/games_logic.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
-#include "tab/cadran_list.hpp"
+#include "ui/cadran_list.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
@@ -194,8 +194,8 @@ void GameCheckActivity::refresh(bool all, u64 also)
         const Result rc = gamecheck_records(records->data(), GAMECHECK_MAX, &count, &truncated);
         records->resize(count);
         if (ui::quitting()) return;
-        brls::sync([this, weak, all, also, records, rc, truncated]() {
-            if (weak.expired()) return;   // the screen was closed meanwhile
+        brls::sync(ui::guarded(weak, [this, all, also, records, rc, truncated]() {
+            // the screen was closed meanwhile
             if (R_FAILED(rc)) {
                 this->checking = false;
                 this->list_rc = rc;
@@ -204,12 +204,11 @@ void GameCheckActivity::refresh(bool all, u64 also)
             }
             this->list_rc = 0;
             this->cache.truncated = truncated;
-            SysInfo si;
-            sysinfo_get(&si);
+            const u32 hos = sysinfo_hos_version();
             u64 now = 0;
             time_local_now(&now, nullptr);
-            const bool full = all || game_cache::expired(this->cache, (int64_t)now, si.hos_version);
-            std::vector<GameRecord> check = game_cache::to_check(&this->cache, *records, (int64_t)now, si.hos_version);
+            const bool full = all || game_cache::expired(this->cache, (int64_t)now, hos);
+            std::vector<GameRecord> check = game_cache::to_check(&this->cache, *records, (int64_t)now, hos);
             if (all) check = *records;
             // Asked for besides (a game just repaired: its entry may not say so).
             std::vector<u64> extra = this->waiting;
@@ -230,7 +229,7 @@ void GameCheckActivity::refresh(bool all, u64 also)
                 return;
             }
             this->check(std::move(check), full);
-        });
+        }));
     };
     // After the start-up check when it is still under way (game_scan): what
     // it checked first.
@@ -298,18 +297,15 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         brls::Logger::info("games check: {}", timing);
         perf::record("Installed games check", (double)t.total_ns / 1e6);
         if (ui::quitting()) return;
-        brls::sync([this, weak, complete, full, timing]() {
-            if (weak.expired()) return;
+        brls::sync(ui::guarded(weak, [this, complete, full, timing]() {
             this->checking = false;
             this->timing = timing;
             this->check_total = 0;
             if (complete && full) {
-                SysInfo si;
-                sysinfo_get(&si);
                 u64 now = 0;
                 time_local_now(&now, nullptr);
                 this->cache.checked_at = (int64_t)now;
-                this->cache.hos = si.hos_version;
+                this->cache.hos = sysinfo_hos_version();
             }
             this->save();
             // A game asked for meanwhile (a repair during the check): checked
@@ -319,7 +315,7 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
                 return;
             }
             this->show();
-        });
+        }));
     });
 }
 
@@ -565,9 +561,8 @@ void GameCheckActivity::show_view_action(bool shown)
     if (shown == (this->view_action != 0)) return;
     // Not while borealis goes through the actions (one of them may have
     // led here): next frame.
-    std::weak_ptr<bool> weak = this->alive;
-    brls::sync([this, weak, shown]() {
-        if (weak.expired() || shown == (this->view_action != 0)) return;
+    brls::sync(ui::guarded(this->alive, [this, shown]() {
+        if (shown == (this->view_action != 0)) return;
         if (shown) {
             this->view_action = this->getContentView()->registerAction(view_label(!this->grid), brls::BUTTON_RB,
                                                                        [this](brls::View*) {
@@ -579,7 +574,7 @@ void GameCheckActivity::show_view_action(bool shown)
             this->view_action = 0;
         }
         brls::Application::getGlobalHintsUpdateEvent()->fire();
-    });
+    }));
 }
 
 void GameCheckActivity::set_view_hint()
@@ -597,9 +592,7 @@ void GameCheckActivity::switch_view()
     ui::save_config();
     this->set_view_hint();
     // Next frame, out of the action under way: every game rebuilt.
-    std::weak_ptr<bool> weak = this->alive;
-    brls::sync([this, weak, id]() {
-        if (weak.expired()) return;
+    brls::sync(ui::guarded(this->alive, [this, id]() {
         if (id) this->park_focus();
         this->auto_focus = nullptr;
         for (Group& group : this->groups) {
@@ -615,7 +608,7 @@ void GameCheckActivity::switch_view()
             brls::Application::giveFocus(to);
             this->auto_focus = nullptr;
         }
-    });
+    }));
 }
 
 void GameCheckActivity::park_focus()
@@ -667,10 +660,7 @@ void GameCheckActivity::load_icons()
             else if (!game_icons::known(tile->app_id)) ids.push_back(tile->app_id);
         }
     if (ids.empty()) return;
-    std::weak_ptr<bool> weak = this->alive;
-    game_icons::load(ids, [this, weak]() {
-        if (!weak.expired()) this->load_icons();
-    });
+    game_icons::load(ids, ui::guarded(this->alive, [this]() { this->load_icons(); }));
 }
 
 // The first game of the list, in the first section shown.
@@ -701,12 +691,11 @@ void GameCheckActivity::onResume()
 
 bool GameCheckActivity::changes_list(const GameFacts& game) const
 {
-    SysInfo si;
-    sysinfo_get(&si);
-    const GameIssue now = gamecheck_classify(&game, si.hos_version);
+    const u32 hos = sysinfo_hos_version();
+    const GameIssue now = gamecheck_classify(&game, hos);
     for (const GameFacts& g : this->cache.games) {
         if (g.app_id != game.app_id) continue;
-        const GameIssue was = gamecheck_classify(&g, si.hos_version);
+        const GameIssue was = gamecheck_classify(&g, hos);
         if (was != now) return true;
         // Listed: its line and its dialog are made from what was found.
         return now != GC_OK && std::memcmp(&g, &game, sizeof g) != 0;
