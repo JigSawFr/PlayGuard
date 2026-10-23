@@ -260,14 +260,14 @@ void MainActivity::open_tab(int position, const std::string& row)
 
 void MainActivity::update_title()
 {
-    // "PlayGuard", then what the user must know whatever the tab, as icons
-    // a tap undoes: temporarily unlocked (the play timer is not counting),
-    // read-only.
+    // "PlayGuard"; what the user must know whatever the tab (temporarily
+    // unlocked: the play timer is not counting; read-only) is the header's
+    // pill, which a tap undoes (view/title_state).
     auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
     if (!frame) return;
     frame->setTitle("playguard/title"_i18n);
-    // The header's pill says when parental controls are unlocked, on every screen.
-    TitleState::show(frame, app::read_only());
+    // The header's pill says when parental controls are unlocked or the app
+    // read-only, on every screen.
     cadran::refresh_pill();
 }
 

@@ -27,7 +27,7 @@ The module must follow PlayGuard's version: with each PlayGuard update, extract 
 *Console › Forwarders › Lock the homebrew menu* keeps the album and a game started with R from opening the homebrew menu. If PlayGuard's forwarder and the protected menu are both gone (deleted in System Settings, or on the other system: the lock is on the SD card, read by sysMMC and emuMMC both):
 
 - **From a computer:** delete `atmosphere/config/override_config.ini` on the SD card (or put back `config/playguard/override_config.ini.backup`, the file as it was), then restart the console.
-- **With the rescue module installed** (optional): drop an empty `config/playguard/RESCUE` file on the SD card and restart; the module lifts the lock at boot, and PlayGuard says so at its next start. An update of Atmosphère since it was locked lifts it the same way.
+- **With the recovery sysmodule installed** (optional): drop an empty `config/playguard/RESCUE` file on the SD card and restart; the sysmodule lifts the lock at boot, and PlayGuard says so at its next start. An update of Atmosphère since it was locked lifts it the same way.
 
 ### Console not modded
 
@@ -42,7 +42,7 @@ PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key proce
 - **The network clock was never set.** *Console › Network clock › Measure the time difference*, then set it ([network clock](features.md#network-clock)).
 - **The clock was set back.** After a jump back, the count stops until the clock passes the old time; nothing to do.
 - **A limit was just written.** Start a game for a minute, then check again.
-- **Parental controls are temporarily unlocked.** Play time may not be counted then: *Security › Turn parental controls back on*.
+- **Parental controls are temporarily unlocked.** Play time may not be counted then: *Today › Turn back on* (or a tap on the header's pill).
 
 ### My limits changed by themselves
 
@@ -53,7 +53,7 @@ PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key proce
 ### The child played past the limit
 
 - **The console only warns.** *Play timer › When the time is up*: pick *Suspend the software*.
-- **Parental controls were left unlocked.** While they are, today's limit is on hold: the header's pill says so on every tab; *Security › Turn parental controls back on*. A restart of the console locks them too.
+- **Parental controls were left unlocked.** While they are, today's limit is on hold: the header's pill says so on every tab, and a tap on it leads to *Today › Turn back on*. A restart of the console locks them too.
 - **The clock was set back.** The count stops until the clock passes the old time ([what counts](features.md#what-counts-as-play-time)).
 - **The other system.** emuMMC and sysMMC each have their own parental controls: set them on both, or hide the hekate boot menu ([compatibility](compatibility.md#emummc-and-sysmmc)).
 
@@ -140,7 +140,7 @@ Press Ⓨ seven times on *About › Version*; the developer tools appear at the 
 
 - a **read-only** switch — with it on, the app cannot change anything: the safe way to investigate a new firmware (the firmware screen offers it directly);
 - the diagnostic report on screen (Ⓨ saves it, Ⓧ sends it online), and a shortcut to export it from the Play timer tab;
-- **Console self-test**: what PlayGuard checks on this console by itself before [the console checklist](hardware-test.md) is gone through by hand — the PIN, the signature patches, the data folder, each forwarder PlayGuard made (on the HOME menu, protected, seen working through its gate), the gate on the SD card, what Atmosphère reads of the homebrew menu's lock, the ways back, the rescue module. It changes nothing, and writes its result as Markdown to `config/playguard/self-test.md`, to paste in the pull request;
+- **Console self-test**: what PlayGuard checks on this console by itself before [the console checklist](hardware-test.md) is gone through by hand — the PIN, the signature patches, the data folder, each forwarder PlayGuard made (on the HOME menu, protected, seen working through its gate), the gate on the SD card, what Atmosphère reads of the homebrew menu's lock, the ways back, the recovery sysmodule. It changes nothing, and writes its result as Markdown to `config/playguard/self-test.md`, to paste in the pull request;
 - **Install another build** in place, to test a fix before it is released ([below](#installing-another-build));
 - **Compare the play-timer block** (only while the phone app is linked and can sync — not with a hosts file blocking Nintendo; also in *Security*), to decode settings PlayGuard does not show yet: save the raw block as a reference, change one setting in the phone app, come back — PlayGuard lists the values that changed (saved in `logs/reports/` on request). Different bedtimes per day, set from the phone app, could be confirmed this way. Attach that file to an issue, or send it with the report (*Send a report online*).
 - **Record the play timer**: every 30 s while PlayGuard is open, one line of what the play timer reports (time left, time spent, the raw settings block…) in `logs/play_timer/log.csv`, a spreadsheet-ready file, plus a line right after each change PlayGuard makes, saying which (its last column, `event`), and a note when the clock moved more than the time that went by. Left open over midnight, or until the time is up, it shows what one report cannot: when the time spent resets, what the console says near the end. The switch is remembered; it only records in developer mode. What is known so far is in [parental-controls.md](parental-controls.md).

@@ -34,7 +34,7 @@ The screenshots show the dark theme, PlayGuard's default.
 The app is organised in tabs, like System Settings; each has its section below.
 
 - **What failed is said in a dialog, what worked in a toast.** A dialog only says what applies to this console now: that the game in progress would be suspended, only while a game is open; that the companion app could overwrite a change, only while it is linked and can sync.
-- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and shows a crossed-out pencil right of the title when the app is read-only; a tap on either goes where it is undone (*Today › Turn back on*, the firmware screen).
+- **The header** says, on every tab, while parental controls are temporarily unlocked (its pill), and while the app is read-only (its pill then says *Read-only*, the actions that would write greyed and refused with where to turn it off); a tap on it goes where it is undone (*Today › Turn back on*, the firmware screen or *Help & diagnostics*). A small ⊖ before the language and Ⓨ before the bell say the keys that open them from any tab.
 - **In read-only mode**, actions stay in place, greyed, and say why when pressed.
 
 ## The look: Cadran
@@ -109,7 +109,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 - **Ⓐ** on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
 - **Ⓧ** marks an entry for information as read; **Ⓨ** marks them all. An entry marked as read stays read at the next start, until its text changes.
 - **Ignoring:** a few entries to do can be ignored with Ⓧ, after a confirmation and the PIN: a PIN anyone would try first, PlayGuard opening without the PIN, the "time's up" alarm off, the SD card almost full (never no PIN, unlocked controls, the clock, the play timer not counting or PlayGuard's own files). An ignored entry is no longer counted, and is listed last under *Ignored*, where Ⓐ counts it again. It comes back by itself 30 days later (unless *Count ignored warnings again after 30 days* is off), once what it says is fixed and then happens again, or, for the PIN, for a new PIN of another length.
-- *Preferences › Notifications* turns off three kinds: Atmosphère, hekate and firmware releases; the week's play time; reminders (backups, the other system, all games blocked).
+- *Preferences › Notifications* turns off three kinds: Atmosphère, hekate and firmware releases; the week's play time; reminders (backups, the console's second system, blocked games).
 - The state behind it is read when PlayGuard starts, every minute on the main screen, and every 5 s while *Today* is shown.
 
 ## Today — the day at a glance
@@ -128,7 +128,7 @@ Under it, what stops play first:
 ### The actions
 
 - **Extra time**, its amounts in one row (+15 min, +30 min, +1 h), each one press away, then **…** for any other (a duration, another day): an amount focused moves the time up on the line (*with 15 min more*), or says on the bedtime alarm's mark that it still comes first; the first one stands out in teal once 15 min or less are left, or none.
-- **Stop for today**, **Show the child**.
+- **Stop for today**, **Child view**.
 - **Today's limit…**: today's limit picked there and then, written after one confirmation.
 - **The profile in force**, by its name, once a profile is saved (*Profiles…* when none matches): Ⓐ lists them, the one in force ticked, to put another in force after one confirmation (the days that change), or *Manage the profiles…*.
 - While parental controls are unlocked, **Turn back on** comes first, the row's whole width, and *Extra time* steps aside.
@@ -178,7 +178,7 @@ The console shows "Time's up", then suspends the game (no "continue") or only wa
 
 ### The child screen
 
-*Show the child* on *Today*, to hand the console over:
+*Child view* on *Today*, to hand the console over:
 
 - only the time left (while parental controls are unlocked, today's limit, on hold), when play ends (*Ends around 16:40*; when the bedtime alarm comes first, the ring counts down to it instead, *45 min until bedtime*, as it does in the last hour of a day without a limit), the bedtime and what happens when time is up;
 - sized to be read from across the room, on the TV; its text keeps its size whatever the text size;
@@ -215,7 +215,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 ### Chips and quick settings
 
-**Chips** above and below the week open their choices at once: the profiles (how many are saved), the same limit every day, the bedtime alarm, *When the time is up* and the removal.
+**Chips** above and below the week open their choices at once: the profiles (how many are saved), the same limit every day, the bedtime alarm and *When the time is up*. *Remove the limit* is the tab's last line, apart (History undoes it).
 
 - **Same limit every day:** a quick list or an exact duration (*Enter a duration…*: ↑/↓ by 15 min, by the hour once held, Ⓛ/Ⓡ by 5 min).
 - **Weekdays and weekend ›:** the editor, asking for Monday–Friday then for the weekend.
@@ -254,7 +254,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=activity)*
 
-Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account by default* (every account, or one; at the bottom of the tab, with *All games*).
+Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account shown first* (every account, or one; at the bottom of the tab, with *All games*).
 
 ### At the top
 

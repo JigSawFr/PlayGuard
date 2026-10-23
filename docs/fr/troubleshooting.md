@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 1041ec86905b -->
+<!-- translated from docs/troubleshooting.md, sha256 45158eaaf5a4 -->
 # Dépannage
 
 Reprendre la main sur une console bloquée, les problèmes courants, signaler un bug, et le mode développeur. Retour au [README](../../README.md).
@@ -28,7 +28,7 @@ Le module doit suivre la version de PlayGuard : à chaque mise à jour de PlayGu
 *Console › Forwarders › Verrouiller le menu homebrew* empêche l'album et un jeu lancé avec R d'ouvrir le menu homebrew. Si le forwarder de PlayGuard et le menu protégé ont tous deux disparu (supprimés dans les Paramètres, ou sur l'autre système : le verrou est sur la carte SD, lu par sysMMC comme par emuMMC) :
 
 - **Depuis un ordinateur :** supprimez `atmosphere/config/override_config.ini` sur la carte SD (ou remettez `config/playguard/override_config.ini.backup`, le fichier d'origine), puis redémarrez la console.
-- **Avec le module rescue installé** (facultatif) : déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et redémarrez ; le module lève le verrou au démarrage, et PlayGuard le signale à l'ouverture suivante. Une mise à jour d'Atmosphère depuis le verrouillage le lève de la même façon.
+- **Avec le sysmodule de récupération installé** (facultatif) : déposez un fichier vide `config/playguard/RESCUE` sur la carte SD et redémarrez ; le sysmodule lève le verrou au démarrage, et PlayGuard le signale à l'ouverture suivante. Une mise à jour d'Atmosphère depuis le verrouillage le lève de la même façon.
 
 ### Console non modifiée
 
@@ -43,7 +43,7 @@ PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officiel
 - **L'horloge réseau n'a jamais été réglée.** *Console › Horloge réseau › Mesurer l'écart*, puis réglez-la ([horloge réseau](features.md#horloge-réseau)).
 - **L'horloge a été reculée.** Après un retour en arrière, le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure ; rien à faire.
 - **Une limite vient d'être écrite.** Lancez un jeu une minute, puis vérifiez de nouveau.
-- **Le contrôle parental est déverrouillé temporairement.** Le temps de jeu n'est peut-être pas décompté pendant ce temps : *Sécurité › Réactiver le contrôle parental*.
+- **Le contrôle parental est déverrouillé temporairement.** Le temps de jeu n'est peut-être pas décompté pendant ce temps : *Aujourd'hui › Réactiver* (ou un appui sur la pastille de l'en-tête).
 
 ### Mes limites ont changé toutes seules
 
@@ -54,7 +54,7 @@ PlayGuard ne peut rien faire : il nécessite Atmosphère. La procédure officiel
 ### L'enfant a joué au-delà de la limite
 
 - **La console se contente de prévenir.** *Temps de jeu › Quand le temps est écoulé* : choisissez *Suspendre le logiciel*.
-- **Le contrôle parental est resté déverrouillé.** Tant qu'il l'est, la limite du jour est en pause : la pastille de l'en-tête le dit sur chaque onglet ; *Sécurité › Réactiver le contrôle parental*. Un redémarrage de la console le reverrouille aussi.
+- **Le contrôle parental est resté déverrouillé.** Tant qu'il l'est, la limite du jour est en pause : la pastille de l'en-tête le dit sur chaque onglet, et un appui dessus mène à *Aujourd'hui › Réactiver*. Un redémarrage de la console le reverrouille aussi.
 - **L'horloge a été reculée.** Le décompte s'arrête jusqu'à ce que l'horloge dépasse l'ancienne heure ([ce qui compte](features.md#ce-qui-compte-comme-temps-de-jeu)).
 - **L'autre système.** L'emuMMC et la sysMMC ont chacune leur propre contrôle parental : réglez-le sur les deux, ou masquez le menu de démarrage d'hekate ([compatibilité](compatibility.md#emummc-et-sysmmc)).
 
@@ -141,7 +141,7 @@ Appuyez sept fois sur Ⓨ sur *À propos › Version* ; les outils développeur 
 
 - un interrupteur **lecture seule** — activé, l'application ne peut rien modifier : c'est la façon sûre d'examiner un nouveau firmware (l'écran firmware le propose directement) ;
 - le rapport de diagnostic à l'écran (Ⓨ l'enregistre, Ⓧ l'envoie en ligne), et un raccourci pour l'exporter depuis l'onglet Temps de jeu ;
-- **Auto-test de la console** : ce que PlayGuard vérifie seul sur cette console avant de dérouler [la liste de vérification sur console](hardware-test.md) à la main — le code PIN, les patchs de signature, le dossier de données, chaque forwarder fait par PlayGuard (sur le menu HOME, protégé, vu fonctionner à travers sa porte), la porte sur la carte SD, ce qu'Atmosphère lit du verrou du menu homebrew, les chemins de retour, le module rescue. Il ne change rien, et écrit son résultat en Markdown dans `config/playguard/self-test.md`, à coller dans la pull request ;
+- **Auto-test de la console** : ce que PlayGuard vérifie seul sur cette console avant de dérouler [la liste de vérification sur console](hardware-test.md) à la main — le code PIN, les patchs de signature, le dossier de données, chaque forwarder fait par PlayGuard (sur le menu HOME, protégé, vu fonctionner à travers sa porte), la porte sur la carte SD, ce qu'Atmosphère lit du verrou du menu homebrew, les chemins de retour, le sysmodule de récupération. Il ne change rien, et écrit son résultat en Markdown dans `config/playguard/self-test.md`, à coller dans la pull request ;
 - **Installer un autre build** sur place, pour tester un correctif avant sa publication ([ci-dessous](#installer-un-autre-build)) ;
 - **Comparer le bloc du temps de jeu** (seulement tant que l'application mobile est associée et peut se synchroniser — pas avec un fichier hosts qui bloque Nintendo ; aussi dans *Sécurité*), pour décoder les réglages que PlayGuard n'affiche pas encore : enregistrez le bloc brut comme référence, changez un réglage dans l'application mobile, revenez — PlayGuard liste les valeurs qui ont changé (enregistrées dans `logs/reports/` sur demande). Des heures du coucher différentes selon les jours, réglées depuis l'application mobile, pourraient être confirmées ainsi. Joignez ce fichier à un ticket, ou envoyez-le avec le rapport (*Envoyer un rapport en ligne*).
 - **Enregistrer le temps de jeu** : toutes les 30 s tant que PlayGuard est ouvert, une ligne de ce que rapporte le minuteur (temps restant, temps écoulé, bloc brut des réglages…) dans `logs/play_timer/log.csv`, un fichier qui s'ouvre dans un tableur, plus une ligne juste après chaque modification faite par PlayGuard, qui dit laquelle (la dernière colonne, `event`), et une note quand l'horloge a bougé plus que le temps écoulé. Laissé ouvert après minuit, ou jusqu'à la fin du temps, il montre ce qu'un seul rapport ne peut pas montrer : quand le temps écoulé repart à zéro, ce que dit la console vers la fin. L'interrupteur est mémorisé ; il n'enregistre qu'en mode développeur. Ce qu'on sait déjà est dans [parental-controls.md](../parental-controls.md) (en anglais).

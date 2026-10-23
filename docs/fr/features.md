@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 02e95b37e53f -->
+<!-- translated from docs/features.md, sha256 7e41c41641bb -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -35,7 +35,7 @@ Les captures montrent le thème sombre, celui par défaut (en anglais).
 L'application est organisée en onglets, comme les paramètres de la console ; chacun a sa section ci-dessous.
 
 - **Ce qui a échoué est dit dans une boîte de dialogue, ce qui a réussi dans une notification.** Un dialogue ne dit que ce qui s'applique à cette console maintenant : que le jeu en cours serait suspendu, seulement quand un jeu est ouvert ; que l'application compagnon pourrait écraser une modification, seulement quand elle est associée et peut se synchroniser.
-- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et affiche un crayon barré à droite du titre quand l'application est en lecture seule ; toucher l'un ou l'autre mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware).
+- **L'en-tête** indique, sur chaque onglet, que le contrôle parental est déverrouillé temporairement (sa pastille), et que l'application est en lecture seule (sa pastille dit alors *Lecture seule*, les actions qui écriraient sont grisées et refusées en disant où la désactiver) ; la toucher mène là où on l'annule (*Aujourd'hui › Réactiver*, l'écran du firmware ou *Aide et diagnostic*). Un petit ⊖ avant la langue et un Ⓨ avant la cloche indiquent les touches qui les ouvrent depuis n'importe quel onglet.
 - **En lecture seule**, les actions restent à leur place, grisées, et disent pourquoi quand on les choisit.
 
 ## L'apparence : Cadran
@@ -110,7 +110,7 @@ Celles pour information : un retour à la version précédente, un firmware non 
 - **Ⓐ** sur une entrée fait la correction (*L'activer*, *La régler*, *Mettre à jour*…) ou ouvre l'onglet où elle se fait. Une entrée disparaît d'elle-même une fois réglé ce qu'elle signale.
 - **Ⓧ** marque une entrée pour information comme lue ; **Ⓨ** les marque toutes. Une entrée marquée comme lue le reste au lancement suivant, jusqu'à ce que son texte change.
 - **Ignorer :** quelques entrées à faire peuvent être ignorées avec Ⓧ, après une confirmation et le code PIN : un code PIN que tout le monde essaierait en premier, PlayGuard qui s'ouvre sans le code PIN, l'alarme « temps écoulé » désactivée, la carte SD presque pleine (jamais l'absence de PIN, le contrôle parental déverrouillé, l'horloge, le minuteur qui ne compte pas ni les fichiers de PlayGuard). Une entrée ignorée n'est plus comptée et s'affiche en dernier sous *Ignorés*, où Ⓐ la fait compter de nouveau. Elle revient d'elle-même 30 jours plus tard (sauf si *Rappeler les avertissements ignorés après 30 jours* est désactivé), dès que le problème a été corrigé puis se reproduit, ou, pour le code PIN, avec un nouveau code d'une autre longueur.
-- *Préférences › Notifications* désactive trois types : versions d'Atmosphère, de hekate et du firmware ; temps de jeu de la semaine ; rappels (sauvegardes, autre système, jeux bloqués).
+- *Préférences › Notifications* désactive trois types : versions d'Atmosphère, de hekate et du firmware ; temps de jeu de la semaine ; rappels (sauvegardes, second système de la console, jeux bloqués).
 - L'état derrière est relu au lancement de PlayGuard, toutes les minutes sur l'écran principal, et toutes les 5 s tant qu'*Aujourd'hui* est affiché.
 
 ## Aujourd'hui — la journée en un coup d'œil
@@ -216,7 +216,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 ### Puces et réglages rapides
 
-**Des puces** au-dessus et en dessous de la semaine ouvrent directement leurs choix : les profils (combien sont enregistrés), la même limite tous les jours, l'alarme du coucher, *Quand le temps est écoulé* et la suppression.
+**Des puces** au-dessus et en dessous de la semaine ouvrent directement leurs choix : les profils (combien sont enregistrés), la même limite tous les jours, l'alarme du coucher et *Quand le temps est écoulé*. *Supprimer la limite* est la dernière ligne de l'onglet, à part (l'historique l'annule).
 
 - **Même limite tous les jours :** liste rapide ou durée exacte (*Saisir une durée…* : ↑/↓ par 15 min, par heure une fois maintenus, Ⓛ/Ⓡ par 5 min).
 - **Semaine et week-end › :** l'éditeur, qui demande la limite du lundi au vendredi puis celle du week-end.
@@ -255,7 +255,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=activity)*
 
-Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **depuis toujours**, lu dans le journal d'activité de la console — pour tous les comptes ou **un seul compte utilisateur** (les comptes en puces en haut, quand la console en a plusieurs). PlayGuard s'ouvre sur le dernier compte affiché, ou sur celui choisi dans *Compte par défaut* (tous les comptes, ou un seul ; en bas de l'onglet, avec *Tous les jeux*).
+Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **depuis toujours**, lu dans le journal d'activité de la console — pour tous les comptes ou **un seul compte utilisateur** (les comptes en puces en haut, quand la console en a plusieurs). PlayGuard s'ouvre sur le dernier compte affiché, ou sur celui choisi dans *Compte affiché en premier* (tous les comptes, ou un seul ; en bas de l'onglet, avec *Tous les jeux*).
 
 ### En haut
 

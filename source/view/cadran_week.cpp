@@ -88,10 +88,21 @@ CadranWeekView::CadranWeekView()
         c.up->setColor(theme["cadran/teal"]);
         c.up->setMarginBottom(4);
         c.box->addView(c.up);
+        auto* value_row = new brls::Box(brls::Axis::ROW);
+        value_row->setAlignItems(brls::AlignItems::CENTER);
+        value_row->setMarginBottom(8);
+        c.over = new CadranIcon();
+        c.over->setIcon("alert");
+        c.over->setWidth(16);
+        c.over->setHeight(16);
+        c.over->setColor(theme["cadran/coral"]);
+        c.over->setMarginRight(5);
+        c.over->setVisibility(brls::Visibility::GONE);
+        value_row->addView(c.over);
         c.value = new CadranDigits();
         c.value->setFontSize(20);
-        c.value->setMarginBottom(8);
-        c.box->addView(c.value);
+        value_row->addView(c.value);
+        c.box->addView(value_row);
         c.bar = new brls::Box();
         c.bar->setWidth(56);
         c.bar->setHeight(BAR_MIN);
@@ -314,9 +325,12 @@ void CadranWeekView::render()
         const bool changed = this->valid && m != this->live[d];
         const bool over = this->valid && this->played_ok && m != PT_DAY_NOLIMIT && m > 0 && this->played[d] >= m;
         c.value->setText(!this->valid ? "—" : m == PT_DAY_NOLIMIT ? "—" : ui::fmt_played(m));
-        // A limit gone past in coral, as its bar (the key says so); one not
+        // A limit gone past in coral, as its bar (the key says so), after a
+        // triangle; one not
         // saved in amber, its bar ringed in amber too.
         c.value->setTextColor(focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : over ? theme["cadran/coral"] : theme["cadran/text"]);
+        // Not the colour alone: a triangle before it too (the key shows one).
+        c.over->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         const float bar = !this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top);
         c.bar->setHeight(bar);
         c.bar->setBackgroundColor(focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);

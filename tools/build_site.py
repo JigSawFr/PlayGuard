@@ -384,7 +384,8 @@ def gallery_image(t, lang, to_root, name):
     """A screenshot of the gallery, in the page's theme: its dark one under
     the dark theme (site.css), when there is one."""
     light, dark = screenshot(lang, name), screenshot(lang, name, dark=True)
-    alt = t(f"shot_{name}")
+    # A sentence saying what the screen shows (its name is the caption).
+    alt = t(f"shot_{name}_alt")
     img = f'<img src="{to_root}assets/{light}" alt="{alt}" width="1280" height="720" loading="lazy"'
     if not dark:
         return img + ">"
@@ -653,7 +654,7 @@ def home_body(t, lang, to_root):
       <div class="hero-video">
         <video src="{to_root}assets/{tour_video(lang)}" muted loop playsinline preload="none"
                poster="{to_root}assets/{screenshot(lang, 'dashboard')}" aria-label="{t('tour_title')}"></video>
-        <button class="video-toggle" type="button" hidden data-play="{t('video_play')}" data-pause="{t('video_pause')}"></button>
+        <button class="video-toggle" type="button" hidden aria-label="{t('video_play')}" data-play="{t('video_play')}" data-pause="{t('video_pause')}"></button>
       </div>
     </section>
 

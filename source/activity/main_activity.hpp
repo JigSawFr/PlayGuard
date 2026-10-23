@@ -16,8 +16,8 @@ class MainActivity : public brls::Activity
 
     ~MainActivity() override;
 
-    // "PlayGuard", then an icon each for temporarily unlocked and read-only
-    // (view/title_state).
+    // "PlayGuard", and the header's pill again (temporarily unlocked and
+    // read-only say so on every tab: view/title_state).
     void update_title();
 
     // Shows tab `position` (ui::tab) and focuses its content: the view

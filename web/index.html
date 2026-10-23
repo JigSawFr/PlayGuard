@@ -171,11 +171,11 @@
 
     <aside class="panel" id="panel">
       <div class="tabs" role="tablist">
-        <button type="button" role="tab" class="tab" aria-selected="true" data-tab="settings" data-i18n="settings">Settings</button>
-        <button type="button" role="tab" class="tab" aria-selected="false" data-tab="log" data-i18n="log">Log</button>
+        <button type="button" role="tab" class="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="true" data-tab="settings" data-i18n="settings">Settings</button>
+        <button type="button" role="tab" class="tab" id="tab-log" aria-controls="panel-log" aria-selected="false" tabindex="-1" data-tab="log" data-i18n="log">Log</button>
       </div>
 
-      <div class="tab-body" data-body="settings">
+      <div class="tab-body" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" data-body="settings">
         <!-- Main's or a release's simulator (simulator/<tag>/, pages.yml's
              releases.json): shown when there is a release's. -->
         <label class="field version" id="version-field" hidden>
@@ -199,7 +199,7 @@
         </details>
       </div>
 
-      <div class="tab-body" data-body="log" hidden>
+      <div class="tab-body" id="panel-log" role="tabpanel" aria-labelledby="tab-log" data-body="log" hidden>
         <pre class="log" id="log"></pre>
       </div>
 
