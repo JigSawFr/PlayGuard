@@ -27,7 +27,7 @@ The screenshots show the dark theme, PlayGuard's default.
 | Ⓑ | Back or cancel (twice on the sidebar to exit) |
 | Ⓧ | Refresh (on the tabs that read the console) |
 | Ⓨ | Notifications, from any tab |
-| **−** | Language and theme, from any tab (the footer leaves them out; the header's bell, language and theme show them) |
+| **−** | Language and theme, from any tab (in the footer, left out first when a screen's own keys need the room) |
 | **+** | Saves per-day limits (and the week edited on *Play timer*) |
 | **ZR** | *Undo*, for a few seconds after a change is saved |
 
@@ -47,7 +47,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
   - A long dialog fades at its foot while more follows, and its warning (a game about to be suspended) comes first, in an amber card.
   - A failure names what failed as its title, the error code small under the reason, and offers *Send a report* when one helps.
   - Messages appear as cards under the header, with a teal check for what was done and an amber mark for what was refused.
-- **The other screens** take the same look: a profile's per-day editor shows the week as on *Play timer* (edited the same way, the quick fills as tiles); *Check the installed games* and *All games* put their lines in cards; *Profiles* and *Help & diagnostics* give each line its icon.
+- **The other screens** take the same look: a profile's per-day editor shows the week as on *Play timer* (edited the same way, the quick fills as tiles); *Installed games* and *All games* put their lines in cards; *Profiles* and *Help & diagnostics* give each line its icon.
 - **Text size** (*Preferences*, or **AA** in the header):
   - *Automatic*, the default, makes every text 25 % bigger while the console is docked, on the TV, and puts it back in handheld mode; *Larger* keeps it bigger, *Normal* never.
   - The sidebar's tab names grow too, by 25 % as well; the header's title, pill and date and the footer's button hints and clock grow a little less (15 to 20 %), their rows being full already. A name too long for its room in a language is drawn a little smaller, never smaller than in normal size, rather than cut. The Restrictions levels' names keep their size, large already.
@@ -105,7 +105,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 
 - Each section lists its entries in a fixed order, whichever check finished first.
 - **In the sidebar**, an amber badge by a tab's name counts its entries to do, where they are fixed: the Security tab (no PIN, a weak PIN, PlayGuard without its PIN, temporarily unlocked), the Play timer (the alarm off, the console not counting), Today (changes made outside PlayGuard, extra time to put back), the Console (its entries above, and the network clock). Ignored entries and those for information are not counted.
-- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Check the installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them. A row with no value of its own says what the badge is for, in amber, before it (*Easy to guess*, *Not accurate*).
+- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them. A row with no value of its own says what the badge is for, in amber, before it (*Easy to guess*, *Not accurate*).
 - **Ⓐ** on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
 - **Ⓧ** marks an entry for information as read; **Ⓨ** marks them all. An entry marked as read stays read at the next start, until its text changes.
 - **Ignoring:** a few entries to do can be ignored with Ⓧ, after a confirmation and the PIN: a PIN anyone would try first, PlayGuard opening without the PIN, the "time's up" alarm off, the SD card almost full (never no PIN, unlocked controls, the clock, the play timer not counting or PlayGuard's own files). An ignored entry is no longer counted, and is listed last under *Ignored*, where Ⓐ counts it again. It comes back by itself 30 days later (unless *Count ignored warnings again after 30 days* is off), once what it says is fixed and then happens again, or, for the PIN, for a new PIN of another length.
@@ -227,10 +227,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 - **Profiles** saved on the SD card: apply (a profile already in force just says so), edit, rename or delete one; save the current limits or make a new one.
 - Any name, in any script (*École*, *周末*, *Выходные* …) — a name without Latin letters gets a file name of its own, and two names that would map to the same file are caught.
-- **Scheduled profile** (*Profiles › Scheduled profile*): a profile for a period — holidays, a trip — its first and last day picked from the next 60 days.
-  - When the period begins, PlayGuard asks to put it in force (the days it changes drawn under the question); once it is over, to put back the limits it replaced, or to keep them.
-  - Asked once a day, on the main screen, when nothing else is in front: PlayGuard acts only when it is opened, so a console it is not opened on keeps the limits it has. A period that went by with the profile never put in force is forgotten.
-  - One at a time; the line changes, removes or ends it.
+- **Scheduled profile** (*Profiles › Scheduled profile*): *Soon*. PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself: switching profiles from a calendar or the school holidays comes with the [MQTT bridge](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). A profile scheduled with an earlier version is still offered when its period begins, and the line still changes, removes or ends it.
 
 ### Block all games
 
@@ -297,7 +294,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 - **The level's settings:** age rating, social-media posting, communication with others. Under a preset, they are its own: changing one makes the level *Custom*, from the preset's settings with that change, asked first (the settings listed).
 - **Under *Age rating*,** the **rating organisation** (PEGI, ESRB, USK, CERO …): the list says the countries each one rates for (PEGI: most of Europe, ESRB: the United States, Canada and Latin America, USK: Germany, PEGI BBFC: the United Kingdom…).
 - **Installed games it blocks** (under *Age rating* too): how many of the installed games the level in force blocks by their age rating (*3 of 15*), Ⓐ listing them with their rating (*PEGI 16*); each level's tile says it too (*Games blocked · 3*).
-  - The ratings are each game's own (its control data, read by the check of the installed games at start-up or from *Console › Check the installed games*), by the organisation the console uses.
+  - The ratings are each game's own (its control data, read by the check of the installed games at start-up or from *Console › Installed games*), by the organisation the console uses.
   - A game that organisation does not rate is not counted, nor the exceptions set in the companion app.
   - A game's screen in Activity shows its rating, and *blocked at the current level* when it is.
 - **Under *Other*,** VR mode. The games allowed to communicate are in the diagnostic report, raw, until their list is understood.
@@ -367,7 +364,7 @@ Two confirmations, irreversible; a backup of the settings is saved first.
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**At the top**, the tools as tiles (*Network clock*, *Check the installed games*, *Forwarders*, each with what needs a look in its corner), then what the console runs as tiles (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
+**At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles, under *Tools* (*Network clock*, *Installed games* and *Forwarders*; the first two show what needs a look in their corner), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
 ### Network clock
 
@@ -389,7 +386,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### Installed games
 
-*Check the installed games* finds the games the HOME menu cannot start or draw — an icon that keeps loading, a "!", a dotted frame — with what is wrong and what to do, under the game's icon, and how many installed games have a problem.
+*Installed games* (a tile under *Console › Tools*) finds the games the HOME menu cannot start or draw — an icon that keeps loading, a "!", a dotted frame — with what is wrong and what to do, under the game's icon, and how many installed games have a problem.
 
 **What it finds:** name and icon unreadable, the game itself missing behind its update, nothing installed any more, files missing, corrupt data the console found, a newer firmware needed by the game or only by its update, keys too new for the firmware, a missing license (ticket), the console asking for an update that was removed, the SD card unreadable, a launch the console refuses.
 
@@ -402,12 +399,13 @@ On a console without Internet, *Use the console clock* is offered in the result'
 | **Reinstall** | Files gone or unusable, or data found corrupt: remove, then install again |
 | **Firmware or SD card** | The game is fine, the console is not |
 
-- **Checking data:** what the data check found is kept with the game until another version is installed: corrupt, it moves to *Reinstall* as *Corrupt (checked)*, with the date and the console's code; intact, it leaves the list. *Check these games* checks the whole of *To check* one game after the other in one dialog (*game 2 of 5*), then says how many are corrupt, intact or could not be checked, with removing the corrupt ones at hand.
+- **Checking data:** what the data check found is kept with the game until another version is installed: corrupt, it moves to *Reinstall* as *Corrupt (checked)*, with the date and the console's code; intact, it leaves the list. *Check these games* checks the whole of *To check* one game after the other in one dialog, their covers above it (*game 2 of 5*), then says how many are corrupt, intact or could not be checked, with removing the corrupt ones at hand.
 - **Several games at once:** Ⓨ picks games (a check mark in front); from the first one picked, a line above the sections says how many, and A on it picks a whole section too, then one action for all of them: check their data, or remove them (their list saved first, one question, one PIN).
+- **Removing several:** the covers float away as each game goes (a coral "!" on one that stays), the bar a segment a game (up to 20); at the end, how many were removed and what that freed, and the dialog closes by itself. Some left: their covers ringed in coral, and *Try again* for them.
 - **Under *Reinstall*,** their list can be saved (JSON and text, in the exports folder: name, title ID, version, problem), and all of them removed at once after one question and one PIN: the list is saved first, then the games are removed so an installer no longer counts them as installed.
 - **The actions:** when one action is the fix, it is the dialog's first button; the others follow: accept the installed version again (when the console asks for a removed update), remove only the update or an add-on, check the data for corruption (the console's own check, with its progress and Cancel), or remove the game.
 - Versions are shown as the game shows them (*version 1.4.0*, *update #4*); after a repair, a toast says whether the game works again. Save data always stays; every change is in the change history.
-- **When it checks:** the last check shows at once; then only the games whose entry changed are checked again (every game once a day, after a firmware update, or with Ⓧ *Check again*), each shown as soon as it is checked.
+- **When it checks:** the last check shows at once; then only the games whose entry changed are checked again (every game once a day, after a firmware update, or with Ⓧ *Check again*), each shown as soon as it is checked. Ⓧ *Check again* opens a dialog: the games' covers leafed through, a bar and the count; *Cancel* stops after the game under way, what was checked stays. With no game listed yet, the covers go by in the card while it checks.
 - Several broken games at once points to the SD card or to a game installed from the other storage (sysMMC / emuMMC).
 - Ⓡ shows the games as a **list** or as **covers** (icon, name and problem; the choice is kept), as *All games* does.
 
@@ -459,7 +457,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 ### The console's lines
 
 - **Firmware, Atmosphère, hekate** (when its `bootloader/update.bin` is on the SD card) **and sys-patch** (when it is installed; its version from its `config/sys-patch/log.ini`), each a tile with the installed version, then the newer release the last update check found in an amber pill (*23.0.1 available*, the tile outlined in amber, and how many versions behind under it when more than one), or *Up to date*; a warning in the firmware tile's corner when the newest firmware needs a newer Atmosphère or hekate first, or is not supported by them yet (the firmware's release notes say why: their release notes say which firmware they support).
-- **Release notes:** Ⓐ on each opens them: a tab for the installed version, one for each newer one (at most five) and older ones in the tabs left (six in all; Ⓛ / Ⓡ move between them), opening on the next one, with tags (installed or newer, the newest firmware it supports, security fixes, parental controls changed), the notes as published (in English), *See online* (a QR code) and when they were fetched. Atmosphère's, hekate's and sys-patch's come from their GitHub releases (sys-patch's from `impeeza/sys-patch`), the firmware's from switchbrew; they are kept on the SD card for offline reading, fetched again once a day (Ⓧ now).
+- **Release notes:** Ⓐ on each opens them: a tab for the installed version, one for each newer one (at most five) and older ones in the tabs left (six in all; Ⓛ / Ⓡ move between them), opening on the next one, with tags (a check for the installed version, a sparkle for a newer one, the newest firmware it supports, security fixes, parental controls changed), the notes as published (in English), *See online* (a QR code) and when they were fetched. Atmosphère's, hekate's and sys-patch's come from their GitHub releases (sys-patch's from `impeeza/sys-patch`), the firmware's from switchbrew; they are kept on the SD card for offline reading, fetched again once a day (Ⓧ now).
 - **Compatibility**, then **storage** (emuMMC or sysMMC, with an info icon when the other system has its own parental controls: Ⓐ explains).
 - Whether Atmosphère **blanks the serial number** (*Yes (XAW00000000000)*, the number the system then sees; on emuMMC, when it is not, a warning icon, which Ⓐ explains), then the console's **real serial number**, its middle masked: when blanked, read from the PRODINFO backup Atmosphère keeps in `atmosphere/automatic_backups/` (the one of this console, by its device ID, when the SD card holds several). Ⓐ on its info icon shows it whole and where it comes from.
 - **Game patches** (sys-patch or sigpatch files, recommending sys-patch when only files are used: an info icon, or a warning one when something needs a look, which Ⓐ explains).
@@ -496,9 +494,10 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 *Help & diagnostics ›*, a screen of its own, below *Check for updates*:
 
+- **At the top**, under *Getting started*, two tiles: *First steps* and *Send a report…*; then *Diagnostics*.
 - **First steps** opens the guide again (with an *Unlink the companion app* step while linked, a *Turn the "Time's up" alarm back on* step while it is off, a *Protect PlayGuard* step once a PIN is set — the *Protect PlayGuard with the PIN* choice —, and a switch to stop it coming up at start-up). Below *Close*, *Support PlayGuard* shows the funding QR codes.
-- How PlayGuard was launched (application or applet) and its data folder.
-- **Export a diagnostic report**, or **send one online** (see [Reporting a bug](troubleshooting.md#reporting-a-bug)); how many saved reports, crash files, session logs and links of reports sent online are kept, by number, age or size.
+- How PlayGuard was launched (an application over a game or from its HOME icon, or an applet) and its data folder.
+- **Export a diagnostic report**, or **send one online** (*Send a report…*; see [Reporting a bug](troubleshooting.md#reporting-a-bug)); how many saved reports, crash files, session logs and links of reports sent online are kept, by number, age or size.
 
 ### Credits
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 69c84ebb19c6 -->
 # Prise en main
 
 De la carte SD à une console réglée pour votre enfant, en une dizaine de minutes, puis les tâches du quotidien. Retour au [README](../../README.md).
@@ -23,7 +23,8 @@ Extrayez `playguard.zip` de la [dernière version](https://github.com/JigSawFr/P
 Ouvrez PlayGuard **par-dessus un jeu** (maintenez R en lançant un jeu, avec hbmenu, sphaira ou le Homebrew App Store), avec **le compte d'un parent** :
 
 - par-dessus un jeu, PlayGuard tourne en application, avec toute sa mémoire ; depuis l'album, il tourne en applet, avec moins ;
-- la console compte le temps passé dans PlayGuard comme celui de ce jeu, et l'attribue au compte choisi au lancement : celui d'un parent, pas d'un enfant.
+- la console compte le temps passé dans PlayGuard comme celui de ce jeu, et l'attribue au compte choisi au lancement : celui d'un parent, pas d'un enfant ;
+- une fois le code PIN saisi, PlayGuard met le contrôle parental en pause tant que vous y êtes, pour que ce temps ne soit pas pris sur celui de l'enfant ; il revient dès que vous en sortez.
 
 ## 3. Suivre *Premiers pas*
 
@@ -70,7 +71,7 @@ Une console sans Internet : quand aucun serveur ne répond, PlayGuard propose de
 | Donner plus de temps un autre jour | *Aujourd'hui › Temps en plus › Un autre jour…* |
 | Fini pour aujourd'hui | *Aujourd'hui › Fini pour aujourd'hui* : maintenant, ou dans 5 minutes pour sauvegarder. |
 | Changer la limite d'un jour | *Temps de jeu* : Ⓐ sur le jour, ↑/↓, puis **+** pour enregistrer. |
-| Passer de la période scolaire aux vacances | *Temps de jeu › Profils* ; *Profil programmé* pour une période choisie à l'avance. |
+| Passer de la période scolaire aux vacances | *Temps de jeu › Profils*. |
 | Voir qui a joué à quoi | *Activité* : par jeu, par compte, aujourd'hui, 7 jours, depuis toujours ; export ou QR code. |
 | Bloquer tous les jeux pour l'instant | *Temps de jeu › Bloquer tous les jeux*. Une fois désactivé, les limites précédentes reviennent. |
 | Annuler une modification | **ZR** *Annuler* juste après, ou *Historique › Historique des modifications* à tout moment. |

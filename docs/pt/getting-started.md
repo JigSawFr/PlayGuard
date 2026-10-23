@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 d7c8cb8b1c87 -->
+<!-- translated from docs/getting-started.md, sha256 150621760428 -->
 # Como começar
 
 Do cartão SD a uma consola configurada para o seu filho, em cerca de dez minutos, e depois as tarefas do dia a dia. Voltar ao [README](../../README.md).
@@ -23,7 +23,8 @@ Extraia o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/
 Abra o PlayGuard **sobre um jogo** (mantenha R premido ao iniciar um jogo, com o hbmenu, o sphaira ou a Homebrew App Store), com **o utilizador de um adulto**:
 
 - sobre um jogo, o PlayGuard corre como aplicação, com toda a sua memória; a partir do álbum, corre como applet, com menos;
-- a consola conta o tempo passado no PlayGuard como tempo desse jogo, e atribui-o ao utilizador escolhido ao iniciar: o de um adulto, não o de uma criança.
+- a consola conta o tempo passado no PlayGuard como tempo desse jogo, e atribui-o ao utilizador escolhido ao iniciar: o de um adulto, não o de uma criança;
+- depois de introduzido o PIN, o PlayGuard põe o controlo parental em pausa enquanto está nele, para que esse tempo não seja descontado do da criança; volta a ativar-se quando sai.
 
 ## 3. Siga os *Primeiros passos*
 

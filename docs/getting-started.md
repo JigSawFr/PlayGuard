@@ -22,7 +22,8 @@ Extract `playguard.zip` from the [latest release](https://github.com/JigSawFr/Pl
 Open PlayGuard **over a game** (hold R while starting a game, with hbmenu, sphaira or the Homebrew App Store), with **a parent's user**:
 
 - over a game, PlayGuard runs as an application, with all its memory; from the album it runs as an applet, with less;
-- the console counts the time spent in PlayGuard as that game's, and gives it to the user picked at launch: a parent's, not a child's.
+- the console counts the time spent in PlayGuard as that game's, and gives it to the user picked at launch: a parent's, not a child's;
+- once the PIN is entered, PlayGuard pauses parental controls while you are in it, so that time does not take from the child's; they come back on as you leave.
 
 ## 3. Follow *First steps*
 
@@ -69,7 +70,7 @@ A console without Internet: when no server answers, PlayGuard offers to set the 
 | Give more time on another day | *Today › Extra time › Another day…* |
 | Stop for today | *Today › Stop for today*: now, or in 5 minutes to save. |
 | Change one day's limit | *Play timer*: Ⓐ on the day, ↑/↓, then **+** to save. |
-| Switch between term time and holidays | *Play timer › Profiles*; *Scheduled profile* for a period picked ahead. |
+| Switch between term time and holidays | *Play timer › Profiles*. |
 | See who played what | *Activity*: per game, per account, today, 7 days, all time; export or a QR code. |
 | Block every game for now | *Play timer › Block all games*. Turned off, the previous limits come back. |
 | Undo a change | **ZR** *Undo* right after it, or *History › Changes made with PlayGuard* any time. |

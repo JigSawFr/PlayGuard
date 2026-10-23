@@ -376,6 +376,10 @@ jobs:
       # headless shell alone.
       # Playwright and its system packages first, apart: a slow Ubuntu mirror
       # can take minutes over the fonts alone, which is not the check's time.
+      # The venv can be there without a browser (the system packages' step
+      # makes it for install-deps alone, the simulator not built): the headless
+      # shell is installed whatever, a no-op when the smoke test's Chromium
+      # brought it.
       - name: Playwright for the website's layout
         if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
         timeout-minutes: 20
@@ -384,8 +388,8 @@ jobs:
           if [ ! -x "$py" ]; then
             python3 -m venv "$RUNNER_TEMP/playwright"
             "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
-            "$py" -m playwright install --only-shell chromium
           fi
+          "$py" -m playwright install --only-shell chromium
       - name: The website on a phone, a tablet and a desktop
         if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
         timeout-minutes: 5

@@ -19,6 +19,10 @@ class CadranDigits : public brls::View
     void setTextColor(NVGcolor color);
     // At most that wide: a longer text is drawn smaller to fit (0: never).
     void setFitWidth(float width);
+    // At most as wide as its parent is laid out: a longer text is drawn
+    // smaller to fit, the room beside it whatever the language (fitWidth
+    // then follows the parent).
+    void setFitParent(bool fit);
     // The figures at the font size, the words between them (min, h, a unit in
     // any language) at half of it, on the same baseline: "40 min", "1 h 20"
     // as a dial writes them. A text with no figure keeps one size.
@@ -43,6 +47,7 @@ class CadranDigits : public brls::View
     float fontSize = 32.0f;
     float drawSize = 32.0f;   // fontSize, or less to fit fitWidth
     float fitWidth = 0.0f;
+    bool fitParent = false;
     bool smallUnits = false;
     bool followsTextSize = false;
     bool rolls = false;

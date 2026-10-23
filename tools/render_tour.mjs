@@ -63,10 +63,10 @@ if (shots) {
   // The scenes of tour.html, each a screen (its dark theme, PlayGuard's default), its tab's name
   // (k, the app's own word) and the site's texts for it; the bullets stay English-only.
   const SCENES = [
-    { img: 'dashboard', k: 'app:tabs/dashboard', h: 'shot_dashboard', p: 'shot_dashboard_alt', ox: '58%', oy: '30%', hl: [540, 228, 700, 126] },
+    { img: 'dashboard', k: 'app:tabs/dashboard', h: 'shot_dashboard', p: 'shot_dashboard_alt', ox: '58%', oy: '30%', hl: [528, 226, 714, 126] },
     { img: 'play_timer', k: 'app:tabs/play_timer', h: 'f_timer_title', p: 'shot_play_timer_alt', ox: '55%', oy: '40%', hl: [256, 180, 980, 344] },
     { img: 'activity', k: 'app:tabs/activity', h: 'f_activity_title', p: 'f_activity_text', ox: '55%', oy: '25%', hl: [256, 150, 980, 158] },
-    { img: 'restrictions', k: 'app:tabs/restrictions', h: 'f_restrictions_title', p: 'f_restrictions_text', ox: '55%', oy: '30%', hl: [256, 118, 980, 292] },
+    { img: 'restrictions', k: 'app:tabs/restrictions', h: 'f_restrictions_title', p: 'f_restrictions_text', ox: '55%', oy: '30%', hl: [256, 118, 980, 266] },
     { img: 'clock', k: 'app:tabs/console', h: 'shot_clock', p: 'f_console_text', ox: '50%', oy: '28%', hl: [66, 122, 1148, 160] },
   ];
   // The "And there's more" cards: an icon of tour.html's, a title and a line from the site's catalog

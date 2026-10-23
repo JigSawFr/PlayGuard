@@ -4,7 +4,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md). The host tests themsel
 
 - `make test` — host unit tests (`tests/`, see [`tests/README.md`](../../tests/README.md)), including the recovery sysmodule logic (`tests/rescue/`); every suite runs, in parallel, and leaves its output in `build/host-tests/<suite>.log`.
 - `tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|loading|devbuild|update|library|rollback|outside|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders|hbmenu|homebrew]` — clicks through every screen of the desktop build headlessly (needs `DISPLAY`, `xdotool`, ImageMagick) and saves screenshots. Each scenario starts the program anew; with no scenario it opens every tab, the Play timer's editors, the settings backup and the change history. The others:
-  - `games` — the rest of that tour, run on its own so CI can run both side by side: a report sent online, *Console › Check the installed games* with every fix, check and removal, then *Activity › All games* and the PDF export.
+  - `games` — the rest of that tour, run on its own so CI can run both side by side: a report sent online, *Console › Installed games* with every fix, check and removal, then *Activity › All games* and the PDF export.
   - `gate` — the firmware screen and developer mode on a simulated 24.0.0.
   - `errors` — a failed unlock and an unsettable clock.
   - `rescue` — the recovery screen, then quitting while still unlocked.
