@@ -655,6 +655,7 @@ def home_body(t, lang, to_root):
         <video src="{to_root}assets/{tour_video(lang)}" muted loop playsinline preload="none"
                poster="{to_root}assets/{screenshot(lang, 'dashboard')}" aria-label="{t('tour_title')}"></video>
         <button class="video-toggle" type="button" hidden aria-label="{t('video_play')}" data-play="{t('video_play')}" data-pause="{t('video_pause')}"></button>
+        <button class="video-sound" type="button" hidden aria-pressed="false" aria-label="{t('video_sound_on')}" data-on="{t('video_sound_on')}" data-off="{t('video_sound_off')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="m16 9 6 6M22 9l-6 6"/></svg></button>
       </div>
     </section>
 

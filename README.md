@@ -16,7 +16,7 @@
 [**Documentation**](https://playguard.link/) ·
 [**Locked&nbsp;out?**](https://playguard.link/docs/troubleshooting/#locked-out)
 
-<img src="images/video/playguard-tour.gif" alt="PlayGuard in 30 seconds" width="100%">
+<img src="images/video/playguard-tour.gif" alt="PlayGuard in 90 seconds" width="100%">
 
 </div>
 
