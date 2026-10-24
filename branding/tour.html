@@ -144,7 +144,7 @@ let SCENES = [
     ox:'30%', oy:'45%', hl:[276, 190, 146, 272] },
   { img:'activity.png', k:'Activity', h:'Who played <em>what</em>, and how long',
     p:'Per game and per account, this week against the last.',
-    b:['Every game with its own page', 'Export to CSV, JSON, XLSX or PDF', 'The week’s summary as a QR code'],
+    b:['Every game with its own page', 'Each account apart, or all together', 'Exported to the SD card: CSV, JSON, XLSX or PDF'],
     ox:'55%', oy:'25%', hl:[256, 150, 980, 158] },
   { img:'restrictions.png', k:'Restrictions', h:'Right for their <em>age</em>',
     p:'One press picks a level; every setting follows.',
@@ -207,14 +207,14 @@ const ICON = {
   unlink:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M3 3l18 18"/>',
   globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20"/>',
   play:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M10 7.5l4.5 2.5L10 12.5z"/>',
-  qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h7M17.5 17.5V21"/>',
+  check:'<circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.7 2.7L16 9.5"/>',
   text:'<path d="M3 20l5-14 5 14M4.8 15h6.4"/><path d="M14 20l3.5-9 3.5 9M15.2 17h4.6"/>',
   shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
 };
 let BONUS = [
   { i:'undo', t:'History & undo', p:'Every change logged and undoable, backups included.' },
   { i:'unlink', t:'Companion app', p:'Unlink Nintendo’s app, even on a second-hand console.' },
-  { i:'qr', t:'The week on your phone', p:'Its summary as a QR code, scanned off the screen. Nothing goes online.' },
+  { i:'check', t:'Safe on a new firmware', p:'Newer than any tested: PlayGuard opens read-only and looks for a version that supports it.' },
   { i:'text', t:'Larger text on the TV', p:'Automatic: bigger when docked, back to normal in handheld.' },
   { i:'shield', t:'Nothing in the background', p:'The console’s own parental controls do the work, PlayGuard closed.' },
   { i:'play', t:'Try it first', p:'The real PlayGuard runs in your browser.' },
@@ -334,7 +334,7 @@ window.render = function (t) {
     const step = Math.min(n - 1, Math.floor(clamp((t - a - .2) / (b - a - .5)) * n));
     alts.forEach((img, j) => {
       const at = a + .2 + (j + 1) * (b - a - .5) / n;
-      img.style.opacity = ramp(t, at - .25, at + .15);
+      img.style.opacity = ramp(t, at - .1, at + .1);
     });
     el.querySelectorAll('.steps span').forEach((sp, j) => sp.classList.toggle('on', j === step));
     const hl = el.querySelector('.hl');
