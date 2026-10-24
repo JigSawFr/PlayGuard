@@ -103,7 +103,7 @@ which PlayGuard the outdated rescue module came with.
 The "homebrew" scenario starts with Console › Forwarders in use
 (PLAYGUARD_SIM_FORWARDERS) and sphaira paused by its gate: the pause lifted,
 hours sphaira never opens, the pause's rule, Star Atlas's icon from the
-album, the rescue sheet's page to print; the gate's files, forwarders.json
+album and from PlayGuard's library, the rescue sheet's page to print; the gate's files, forwarders.json
 and the change history must follow.
 
 The "loading" scenario stops the start-up on the loading screen
@@ -1583,8 +1583,9 @@ if HOMEBREW:
     go_to("Change the icon")
     key("Return")
     time.sleep(2)              # the screenshots read and drawn
-    shot("04_icon")            # a grid: its .nro's own (checked, in focus), the album's screenshots newest first; now and after
-    key("Right", 2)            # today 09:12:00, Star Kart Racers (another the same minute: its seconds)
+    shot("04_icon")            # a grid: its .nro's own (checked, in focus), PlayGuard's icons, then the album's screenshots newest first; now and after
+    key("x")                   # the keyboard's X: to the album's newest screenshot
+    key("Right")               # today 09:12:00, Star Kart Racers (another the same minute: its seconds)
     time.sleep(1)
     key("e")                   # the keyboard's R: its square a quarter to the right
     time.sleep(1)
@@ -1606,6 +1607,25 @@ if HOMEBREW:
     made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
     if [e.get("icon") for e in made] != [None]:
         fail("Star Atlas's own icon was not put back: " + repr(made))
+    key("Return")              # Star Atlas's sheet again
+    go_to("Change the icon")
+    key("Return")
+    time.sleep(2)
+    key("Right")               # PlayGuard's first icon (its name suggests none: Emulators)
+    key("Return")
+    time.sleep(3)
+    made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
+    if [(e.get("icon"), e.get("icon_x")) for e in made] != [("lib:emulation", None)]:
+        fail("Star Atlas's icon from PlayGuard's library was not kept: " + repr(made))
+    key("Return")              # Star Atlas's sheet again
+    go_to("Change the icon")
+    key("Return")
+    time.sleep(2)
+    key("y")                   # its .nro's own again, for the rest
+    time.sleep(3)
+    made = [e for e in json.load(open(made_file)).get("forwarders", []) if e.get("name") == "Star Atlas"]
+    if [e.get("icon") for e in made] != [None]:
+        fail("Star Atlas's own icon was not put back after PlayGuard's: " + repr(made))
     key("Down", 10)            # Save Keeper, PlayGuard's line, Another homebrew, Install them all again, Lock, Protect every forwarder, Pause after refused PINs, Opening screen, Tries this week, Check
     key("Return")
     key("Left")                # Rescue sheet
