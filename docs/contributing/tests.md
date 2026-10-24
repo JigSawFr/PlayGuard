@@ -2,7 +2,8 @@
 
 Part of the [contributor's guide](../../CONTRIBUTING.md). The host tests themselves: [`tests/README.md`](../../tests/README.md).
 
-- `make test` — host unit tests (`tests/`, see [`tests/README.md`](../../tests/README.md)), including the recovery sysmodule logic (`tests/rescue/`); every suite runs, in parallel, and leaves its output in `build/host-tests/<suite>.log`.
+- `make test` — host unit tests (`tests/`, see [`tests/README.md`](../../tests/README.md)), including the recovery sysmodule logic (`tests/rescue/`), the remote link (`tests/sync_*`) and the agent (`tests/agent/`); every suite runs, in parallel, and leaves its output in `build/host-tests/<suite>.log`.
+- `make check` — `make test`, then the resource and source checks (`tools/check_resources.py`, `tools/check_sources.py`), the remote link's JSON documents (`tools/check_sync_json.py`) and `compat.json`.
 - `tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|loading|devbuild|update|library|rollback|outside|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders|hbmenu|homebrew]` — clicks through every screen of the desktop build headlessly (needs `DISPLAY`, `xdotool`, ImageMagick) and saves screenshots. Each scenario starts the program anew; with no scenario it opens every tab, the Play timer's editors, the settings backup and the change history. The others:
   - `games` — the rest of that tour, run on its own so CI can run both side by side: a report sent online, *Console › Installed games* with every fix, check and removal, then *Activity › All games* and the PDF export.
   - `gate` — the firmware screen and developer mode on a simulated 24.0.0.

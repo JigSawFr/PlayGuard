@@ -158,6 +158,7 @@ else ()
     # (tools/check_sources.py fails on one left out).
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
+                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/console_info_pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gate.c
