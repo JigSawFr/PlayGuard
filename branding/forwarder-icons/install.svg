@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon, an arrow into a tray: installers (Goldleaf…). -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M82 128 H104 L113 144 H143 L152 128 H174 V164 Q174 174 164 174 H92 Q82 174 82 164 Z" fill="#E8EEF7"/>
+  <line x1="128" y1="78" x2="128" y2="116" stroke="#2EC4A6" stroke-width="14" stroke-linecap="round"/>
+  <path d="M108 108 L128 132 L148 108 Z" fill="#2EC4A6" stroke="#2EC4A6" stroke-width="6" stroke-linejoin="round"/>
+</svg>

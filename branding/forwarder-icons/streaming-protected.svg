@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon, a screen with a signal: game streaming (Moonlight…); protected. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <rect x="78" y="84" width="100" height="70" rx="10" fill="#E8EEF7"/>
+  <rect x="87" y="93" width="82" height="52" rx="4" fill="#0B1424"/>
+  <rect x="117" y="154" width="22" height="10" fill="#E8EEF7"/>
+  <rect x="102" y="162" width="52" height="9" rx="4.5" fill="#E8EEF7"/>
+  <circle cx="102" cy="132" r="5" fill="#2EC4A6"/>
+  <path d="M102 116 A16 16 0 0 1 118 132" fill="none" stroke="#2EC4A6" stroke-width="7" stroke-linecap="round"/>
+  <path d="M102 102 A30 30 0 0 1 132 132" fill="none" stroke="#2EC4A6" stroke-width="7" stroke-linecap="round"/>
+  <!-- Protected by PlayGuard: a shield with a padlock at the corner. -->
+  <g transform="translate(198 196) scale(1.15) translate(-198 -200)">
+  <path d="M198 158 L228 169 V193 C228 212 215 225 198 234 C181 225 168 212 168 193 V169 Z" fill="#2EC4A6" stroke="#0B1424" stroke-width="7" stroke-linejoin="round"/>
+  <rect x="186" y="192" width="24" height="20" rx="3.5" fill="#0B1424"/>
+  <path d="M191 192 V185 A7 7 0 0 1 205 185 V192" fill="none" stroke="#0B1424" stroke-width="5"/>
+  </g>
+</svg>

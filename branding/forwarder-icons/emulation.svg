@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon, a retro gamepad: emulators (RetroArch…). -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <rect x="74" y="100" width="108" height="60" rx="30" fill="#E8EEF7"/>
+  <rect x="88" y="125" width="28" height="10" rx="2" fill="#0B1424"/>
+  <rect x="97" y="116" width="10" height="28" rx="2" fill="#0B1424"/>
+  <circle cx="150" cy="122" r="8" fill="#2EC4A6"/>
+  <circle cx="164" cy="138" r="8" fill="#E5484D"/>
+</svg>

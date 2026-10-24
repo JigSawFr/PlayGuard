@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon, a palette: theme tools (NXThemes…); protected. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M128 78 C166 78 182 104 182 126 C182 146 166 150 152 147 C140 145 134 154 139 164 C144 174 138 180 124 180 C94 180 74 156 74 128 C74 98 96 78 128 78 Z" fill="#E8EEF7"/>
+  <circle cx="104" cy="110" r="10" fill="#2EC4A6"/>
+  <circle cx="134" cy="99" r="10" fill="#FFB547"/>
+  <circle cx="160" cy="116" r="10" fill="#E5484D"/>
+  <circle cx="100" cy="144" r="10" fill="#0B1424"/>
+  <!-- Protected by PlayGuard: a shield with a padlock at the corner. -->
+  <g transform="translate(198 196) scale(1.15) translate(-198 -200)">
+  <path d="M198 158 L228 169 V193 C228 212 215 225 198 234 C181 225 168 212 168 193 V169 Z" fill="#2EC4A6" stroke="#0B1424" stroke-width="7" stroke-linejoin="round"/>
+  <rect x="186" y="192" width="24" height="20" rx="3.5" fill="#0B1424"/>
+  <path d="M191 192 V185 A7 7 0 0 1 205 185 V192" fill="none" stroke="#0B1424" stroke-width="5"/>
+  </g>
+</svg>
