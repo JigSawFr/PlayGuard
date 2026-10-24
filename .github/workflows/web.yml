@@ -53,8 +53,9 @@ jobs:
   build:
     runs-on: ubuntu-26.04
     # Taking every screenshot in both themes and rendering the tours (a
-    # release, or by hand): up to an hour and a half.
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 30 || 120 }}
+    # release, or by hand): about three hours, four languages at a time,
+    # 38 minutes each four (2026-10-24: 120 minutes stopped it at 8 of 15).
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 30 || 300 }}
     permissions:
       contents: read
       pages: read     # the site's address (its custom domain)
@@ -76,8 +77,8 @@ jobs:
       #   main's last site was built from: the app, its resources, the
       #   simulator, this workflow.
       #   Otherwise main's, its smoke test's screens with it.
-      # - The website's screenshots (both themes, every language, about an
-      #   hour) and the tours and preview images made from them: taken on main
+      # - The website's screenshots (both themes, every language, about three
+      #   hours) and the tours and preview images made from them: taken on main
       #   for a release (its version changed: the header's badge) and by hand
       #   (`all`); otherwise main's published ones, in seconds.
       # The website itself is built every time (seconds); its layout on a

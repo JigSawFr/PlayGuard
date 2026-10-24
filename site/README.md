@@ -137,7 +137,7 @@ pages; no framework, nothing to install but that.
   `<out-dir>/<language>/<screen>.webp`, on the desktop smoke test's console
   (8 October 2026, 16:00 UTC; the focus without its glow). `SITE_SCREENSHOTS=<out-dir>`
   tells `build_site.py` to use them, on the home page and in the
-  documentation. Taking them takes about an hour on a CI runner (both
+  documentation. Taking them takes about three hours on a CI runner (both
   themes), so CI takes them for a release (main, its version changed: the
   header's badge) and by hand (*Actions › web › Run workflow*, `all`); any
   other build takes main's (its `site` artifact). A change to the screenshots'
