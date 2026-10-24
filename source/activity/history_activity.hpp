@@ -33,6 +33,9 @@ class HistoryActivity : public brls::Activity
     uint64_t                    read_at = 0;   // history_flow::changes() when read
     std::vector<history::Entry> shown;   // what rebuild() listed, for the export
     cadran::kit::Empty          empty_card;   // Cadran: in hi_empty's place
+    // The lines of hi_list, kept here: the list's children are not only them
+    // (a screen rising into place puts a mover first among them, ui/motion.cpp).
+    std::vector<brls::Box*>     slots;
 
     BRLS_BIND(brls::Label,      note,   "hi_note");
     BRLS_BIND(brls::DetailCell, filter_cell, "hi_filter");

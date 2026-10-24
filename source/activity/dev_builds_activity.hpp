@@ -27,6 +27,8 @@
 #include "util/dev_builds.hpp"
 #include "view/loading_bar.hpp"
 
+class BuildCell;
+
 class DevBuildsActivity : public brls::Activity
 {
   public:
@@ -66,6 +68,9 @@ class DevBuildsActivity : public brls::Activity
 
     dev_builds::Cache    cache;
     dev_builds::Kind     tab = dev_builds::Kind::Release;
+    // The cells of db_list, kept here: the list's children are not only them
+    // (the screen rising into place puts a mover first among them, ui/motion.cpp).
+    std::vector<BuildCell*> cells;
     brls::RepeatingTimer refresh_timer;
 
     BRLS_BIND(brls::Label,      note,           "db_note");
