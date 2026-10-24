@@ -73,6 +73,8 @@ INSTALL = """## 📦 Install
 
 3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({site}docs/troubleshooting/#locked-out).
 
+4. **Home Assistant?** [`playguard-agent.zip`]({dl}/playguard-agent.zip){size_agent} is the optional remote link's sysmodule, which keeps the [link to MQTT and Home Assistant]({repo}/blob/main/docs/home-assistant.md) going while PlayGuard is closed. PlayGuard also installs it from *Console › Optional modules*.
+
 > [!NOTE]
 > Requires custom firmware (**Atmosphère**).{firmware} [Compatibility]({site}docs/compatibility/)"""
 
@@ -290,8 +292,9 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
     if section:
         out.append(section)
 
-    out.append(INSTALL.format(dl=dl, site=SITE_URL, firmware=firmware, size_zip=size("playguard.zip"),
-                              size_nro=size("playguard.nro"), size_rescue=size("playguard-rescue.zip")))
+    out.append(INSTALL.format(dl=dl, site=SITE_URL, repo=repo, firmware=firmware, size_zip=size("playguard.zip"),
+                              size_nro=size("playguard.nro"), size_rescue=size("playguard-rescue.zip"),
+                              size_agent=size("playguard-agent.zip")))
 
     build = []
     if run_url:
