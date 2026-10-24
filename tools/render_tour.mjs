@@ -101,8 +101,9 @@ if (shots) {
         const file = join(shots, lang, `${s}-dark.webp`);
         if (existsSync(file)) src[s] = data(file, 'webp');
       }
-      // The gate's screens in that language: its own preview, drawn here.
-      if (gates) {
+      // The gate's screens in that language: its own preview, drawn here; not in Japanese, Korean or
+      // Chinese, which the preview draws in PlayGuard's Latin font (the console's own font has them).
+      if (gates && !['ja', 'ko', 'zh-Hans', 'zh-Hant'].includes(lang)) {
         const dir = mkdtempSync(join(tmpdir(), 'gate-'));
         if (spawnSync(preview, [dir, String(SET_LANGUAGE[lang]), 'dark'], { stdio: 'ignore' }).status === 0) {
           for (const f of readdirSync(dir)) src[`gate_${f.replace(/\.png$/, '')}`] = data(join(dir, f), 'png');
