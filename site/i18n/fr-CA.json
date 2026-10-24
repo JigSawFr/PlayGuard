@@ -196,7 +196,6 @@
  "install_3": "Lancez-le par-dessus un jeu, avec le compte d'un parent.",
  "tab_store": "Magasin d'applications",
  "tab_manual": "À la main (.zip)",
- "store_pending": "Pas encore disponible : la fiche de PlayGuard attend toujours d'être validée. Installez-le à la main pour le moment.",
  "start_title": "Premiers pas",
  "start_1": "Ouvrez PlayGuard : le guide « {{app:onboarding/title}} » règle le NIP et la limite quotidienne.",
  "start_2": "Encore associé à l'application mobile ? « {{app:tabs/security}} › {{app:pairing/unlink}} », sinon sa prochaine synchronisation écrase vos réglages.",

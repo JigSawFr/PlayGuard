@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # Installation
 
 Comment installer, mettre à jour et supprimer PlayGuard, et ce qu'il écrit sur la carte SD. Une fois installé : [prise en main](getting-started.md). Retour au [README](../../README.md).
 
 ## Où le trouver
 
-> [!WARNING]
-> PlayGuard n'est **pas encore dans le Homebrew App Store (ni celui de sphaira)** : sa fiche attend toujours d'être validée. Installez-le à la main pour le moment.
-
 Au choix :
 
-- **Manuellement** (recommandé pour le moment) — Téléchargez `playguard.zip` dans la [dernière version](https://github.com/JigSawFr/PlayGuard/releases/latest) et extrayez-le à la **racine** de la carte SD. L'application arrive dans `sd:/switch/playguard/`, ses fichiers dans `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store de sphaira** (même catalogue) — Cherchez *PlayGuard* et installez-le. Les nouvelles versions sont reprises automatiquement, après une vérification : souvent quelques jours après GitHub. PlayGuard sait qu'il a été installé par là et recommande de se mettre à jour par le store.
+- **Manuellement** — Téléchargez `playguard.zip` dans la [dernière version](https://github.com/JigSawFr/PlayGuard/releases/latest) et extrayez-le à la **racine** de la carte SD. L'application arrive dans `sd:/switch/playguard/`, ses fichiers dans `sd:/config/playguard/`.
 - **sphaira › GitHub** — Le zip de la version contient déjà l'entrée (`/config/sphaira/github/playguard.json`) : après une première installation, mettez à jour depuis *GitHub* dans sphaira.
-- **Homebrew App Store** / **App Store de sphaira** (même catalogue) — **Pas encore référencé.** Une fois la fiche validée, cherchez *PlayGuard*. Les nouvelles versions sont alors reprises automatiquement, après une vérification : souvent quelques jours après GitHub. PlayGuard sait qu'il a été installé par là et recommande de se mettre à jour par le store.
 
 Le **sysmodule de récupération** optionnel (`playguard-rescue.zip`) se télécharge à part : extrayez-le lui aussi à la racine de la carte SD, puis redémarrez la console. Il arrive dans `atmosphere/contents/4200000000505247/` et n'agit que quand un fichier `RESCUE` le demande — voir [Console bloquée ?](troubleshooting.md#console-bloquée-).
 

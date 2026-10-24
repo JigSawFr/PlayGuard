@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
+<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
 # Начало работы
 
 От SD-карты до консоли, настроенной для вашего ребёнка, примерно за десять минут, а затем — повседневные задачи. Назад к [README](../../README.md).
@@ -13,7 +13,7 @@
 
 ## 1. Установите его
 
-Распакуйте `playguard.zip` из [последнего выпуска](https://github.com/JigSawFr/PlayGuard/releases/latest) в корень SD-карты ([установка](install.md)). PlayGuard пока нет в Homebrew App Store и sphaira: его страница ещё ожидает одобрения.
+Найдите *PlayGuard* в Homebrew App Store или в App Store в sphaira и установите его. Или вручную: распакуйте `playguard.zip` из [последнего выпуска](https://github.com/JigSawFr/PlayGuard/releases/latest) в корень SD-карты ([установка](install.md)).
 
 > [!TIP]
 > Распакуйте также `playguard-rescue.zip` — необязательный модуль восстановления. Он ничего не делает, пока не понадобится, и это единственный способ вернуть доступ, если лимит 0 минут блокирует всё, а PIN-код забыт ([Нет доступа?](troubleshooting.md#нет-доступа)).

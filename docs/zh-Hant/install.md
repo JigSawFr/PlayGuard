@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # 安裝
 
 如何安裝、更新和移除 PlayGuard，以及它會在 SD 卡上寫入哪些檔案。安裝之後：[開始使用](getting-started.md)。返回 [README](../../README.md)。
 
 ## 取得方式
 
-> [!WARNING]
-> PlayGuard **還沒有上架 Homebrew App Store（也還沒有上架 sphaira 的商店）**：它的商店頁面仍在等待審核。目前請手動安裝。
-
 任選一種：
 
-- **手動**（目前建議使用）——從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的**根目錄**。應用程式會放在 `sd:/switch/playguard/`，它的檔案則在 `sd:/config/playguard/`。
+- **Homebrew App Store** / **sphaira 的 App Store**（同一個目錄）——搜尋 *PlayGuard* 並安裝即可。新版本會在審核後自動提供：通常比 GitHub 晚幾天。PlayGuard 知道自己是從那裡安裝的，會建議透過商店更新。
+- **手動**——從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的**根目錄**。應用程式會放在 `sd:/switch/playguard/`，它的檔案則在 `sd:/config/playguard/`。
 - **sphaira › GitHub**——版本的 zip 檔已包含對應的項目（`/config/sphaira/github/playguard.json`）：第一次安裝之後，在 sphaira 中從 *GitHub* 更新即可。
-- **Homebrew App Store** / **sphaira 的 App Store**（同一個目錄）——**尚未上架。** 商店頁面通過審核後，搜尋 *PlayGuard* 即可。之後新版本會在審核後自動提供：通常比 GitHub 晚幾天。PlayGuard 知道自己是從那裡安裝的，會建議透過商店更新。
 
 選用的**復原 sysmodule**（`playguard-rescue.zip`）需要另外下載：同樣解壓縮到 SD 卡的根目錄，然後重新啟動主機。它會放在 `atmosphere/contents/4200000000505247/`，只有在 `RESCUE` 檔案要求時才會動作——請見[被鎖在外面？](troubleshooting.md#被鎖在外面)。
 

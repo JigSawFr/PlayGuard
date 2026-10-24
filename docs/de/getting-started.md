@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
+<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
 # Einstieg
 
 Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa zehn Minuten, dann die alltäglichen Aufgaben. Zurück zum [README](../../README.md).
@@ -13,7 +13,7 @@ Willst du dich erst einmal umsehen? [Probiere PlayGuard im Browser aus](https://
 
 ## 1. Installieren
 
-Entpacke `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/PlayGuard/releases/latest) ins Hauptverzeichnis der SD-Karte ([Installation](install.md)). PlayGuard ist noch nicht im Homebrew App Store oder in sphaira: Sein Eintrag wartet noch auf die Freigabe.
+Suche im Homebrew App Store oder im App Store von sphaira nach *PlayGuard* und installiere es. Oder von Hand: Entpacke `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/PlayGuard/releases/latest) ins Hauptverzeichnis der SD-Karte ([Installation](install.md)).
 
 > [!TIP]
 > Entpacke auch `playguard-rescue.zip`, das optionale Wiederherstellungs-Sysmodul. Es tut nichts, bis du es brauchst, und es ist der einzige Weg zurück, wenn ein Limit von 0 Minuten alles sperrt und die Geheimzahl vergessen ist ([Ausgesperrt?](troubleshooting.md#ausgesperrt)).

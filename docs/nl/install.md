@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # Installatie
 
 Hoe je PlayGuard installeert, bijwerkt en verwijdert, en wat het op de SD-kaart schrijft. Eenmaal geïnstalleerd: [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
 
 ## Waar je het vindt
 
-> [!WARNING]
-> PlayGuard staat **nog niet in de Homebrew App Store (en ook niet in die van sphaira)**: de vermelding wacht nog op goedkeuring. Installeer het voorlopig met de hand.
-
 Kies er één:
 
-- **Handmatig** (voorlopig aanbevolen) — Download `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) en pak het uit in de **hoofdmap** van de SD-kaart. De app komt in `sd:/switch/playguard/`, zijn bestanden in `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store van sphaira** (dezelfde catalogus) — Zoek naar *PlayGuard* en installeer het. Nieuwe versies worden automatisch opgepikt, na een controle: vaak een paar dagen na GitHub. PlayGuard weet dat het daarvandaan is geïnstalleerd en raadt aan om via de store bij te werken.
+- **Handmatig** — Download `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) en pak het uit in de **hoofdmap** van de SD-kaart. De app komt in `sd:/switch/playguard/`, zijn bestanden in `sd:/config/playguard/`.
 - **sphaira › GitHub** — De zip van de release bevat de vermelding al (`/config/sphaira/github/playguard.json`): werk na een eerste installatie bij via *GitHub* in sphaira.
-- **Homebrew App Store** / **App Store van sphaira** (dezelfde catalogus) — **Nog niet vermeld.** Zoek naar *PlayGuard* zodra de vermelding is goedgekeurd. Nieuwe versies worden dan automatisch opgepikt, na een controle: vaak een paar dagen na GitHub. PlayGuard weet dat het daarvandaan is geïnstalleerd en raadt aan om via de store bij te werken.
 
 De optionele **herstel-sysmodule** (`playguard-rescue.zip`) is een aparte download: pak die ook uit in de hoofdmap van de SD-kaart en start de console daarna opnieuw op. Hij komt in `atmosphere/contents/4200000000505247/` en doet alleen iets als een `RESCUE`-bestand daarom vraagt — zie [Buitengesloten?](troubleshooting.md#buitengesloten).
 

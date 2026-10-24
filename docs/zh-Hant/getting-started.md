@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
+<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
 # 開始使用
 
 從 SD 卡到一台為孩子設定好的主機，大約十分鐘，接著是日常的操作。返回 [README](../../README.md)。
@@ -13,7 +13,7 @@
 
 ## 1. 安裝
 
-從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的根目錄（[安裝](install.md)）。PlayGuard 還沒有上架 Homebrew App Store 或 sphaira：它的商店頁面仍在等待審核。
+在 Homebrew App Store 或 sphaira 的 App Store 中搜尋 *PlayGuard* 並安裝。也可以手動安裝：從[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下載 `playguard.zip`，解壓縮到 SD 卡的根目錄（[安裝](install.md)）。
 
 > [!TIP]
 > 也請解壓縮 `playguard-rescue.zip`，也就是選用的復原 sysmodule。在你需要它之前，它什麼都不做；而當 0 分鐘的上限封鎖了一切、又忘了PIN碼時，它是唯一能重新進入的方法（[被鎖在外面？](troubleshooting.md#被鎖在外面)）。

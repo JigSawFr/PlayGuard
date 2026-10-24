@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
+<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
 # 시작하기
 
 SD 카드에서 시작해 아이에게 맞게 설정된 본체까지 약 10분, 그다음 매일 하는 일을 설명합니다. 처음으로 돌아가기: [README](../../README.md).
@@ -13,7 +13,7 @@ SD 카드에서 시작해 아이에게 맞게 설정된 본체까지 약 10분, 
 
 ## 1. 설치하기
 
-[최신 버전](https://github.com/JigSawFr/PlayGuard/releases/latest)의 `playguard.zip`을 SD 카드의 루트에 압축을 푸세요([설치](install.md)). PlayGuard는 아직 Homebrew App Store나 sphaira에 없습니다. 등록이 아직 승인을 기다리고 있습니다.
+Homebrew App Store나 sphaira의 App Store에서 *PlayGuard*를 검색해 설치하세요. 직접 설치하려면 [최신 버전](https://github.com/JigSawFr/PlayGuard/releases/latest)의 `playguard.zip`을 SD 카드의 루트에 압축을 푸세요([설치](install.md)).
 
 > [!TIP]
 > 선택 사항인 복구 sysmodule `playguard-rescue.zip`도 압축을 풀어 두세요. 필요할 때까지 아무것도 하지 않으며, 0분 제한이 모든 것을 막고 PIN도 잊어버렸을 때 다시 들어갈 수 있는 유일한 방법입니다([본체가 잠겼나요?](troubleshooting.md#본체가-잠겼나요)).

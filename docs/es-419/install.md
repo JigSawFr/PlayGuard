@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # Instalación
 
 Cómo instalar, actualizar y quitar PlayGuard, y qué escribe en la tarjeta SD. Una vez instalado: [primeros pasos](getting-started.md). Volver al [README](../../README.md).
 
 ## Dónde conseguirlo
 
-> [!WARNING]
-> PlayGuard **todavía no está en el Homebrew App Store (ni en el de sphaira)**: su ficha sigue pendiente de aprobación. Por ahora, instálelo a mano.
-
 Elija una opción:
 
-- **Manual** (recomendado por ahora) — Descargue `playguard.zip` de la [última versión](https://github.com/JigSawFr/PlayGuard/releases/latest) y extráigalo en la **raíz** de la tarjeta SD. La aplicación queda en `sd:/switch/playguard/` y sus archivos en `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store de sphaira** (el mismo catálogo) — Busque *PlayGuard* e instálelo. Las nuevas versiones se detectan automáticamente, después de una revisión: a menudo unos días después que en GitHub. PlayGuard sabe que se instaló desde ahí y recomienda actualizar desde la tienda.
+- **Manual** — Descargue `playguard.zip` de la [última versión](https://github.com/JigSawFr/PlayGuard/releases/latest) y extráigalo en la **raíz** de la tarjeta SD. La aplicación queda en `sd:/switch/playguard/` y sus archivos en `sd:/config/playguard/`.
 - **sphaira › GitHub** — El zip de la versión ya contiene la entrada (`/config/sphaira/github/playguard.json`): después de una primera instalación, actualice desde *GitHub* en sphaira.
-- **Homebrew App Store** / **App Store de sphaira** (el mismo catálogo) — **Todavía no está disponible.** Una vez que la ficha esté aprobada, busque *PlayGuard*. A partir de entonces, las nuevas versiones se detectan automáticamente, después de una revisión: a menudo unos días después que en GitHub. PlayGuard sabe que se instaló desde ahí y recomienda actualizar desde la tienda.
 
 El **sysmodule de recuperación** opcional (`playguard-rescue.zip`) se descarga por separado: extráigalo también en la raíz de la tarjeta SD y luego reinicie la consola. Queda en `atmosphere/contents/4200000000505247/` y solo actúa cuando un archivo `RESCUE` se lo pide: consulte [¿Consola bloqueada?](troubleshooting.md#consola-bloqueada).
 

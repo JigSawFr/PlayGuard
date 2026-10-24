@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # Установка
 
 Как установить, обновить и удалить PlayGuard и что он записывает на SD-карту. После установки: [начало работы](getting-started.md). Назад к [README](../../README.md).
 
 ## Где скачать
 
-> [!WARNING]
-> PlayGuard **пока нет ни в Homebrew App Store, ни в App Store в sphaira**: его страница ещё ожидает одобрения. Пока устанавливайте его вручную.
-
 На выбор:
 
-- **Вручную** (рекомендуется пока что) — Скачайте `playguard.zip` из [последнего выпуска](https://github.com/JigSawFr/PlayGuard/releases/latest) и распакуйте его в **корень** SD-карты. Приложение окажется в `sd:/switch/playguard/`, его файлы — в `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store в sphaira** (тот же каталог) — Найдите *PlayGuard* и установите его. Новые версии подхватываются автоматически, после проверки: часто через несколько дней после GitHub. PlayGuard знает, что был установлен оттуда, и рекомендует обновляться через магазин.
+- **Вручную** — Скачайте `playguard.zip` из [последнего выпуска](https://github.com/JigSawFr/PlayGuard/releases/latest) и распакуйте его в **корень** SD-карты. Приложение окажется в `sd:/switch/playguard/`, его файлы — в `sd:/config/playguard/`.
 - **sphaira › GitHub** — Zip-архив выпуска уже содержит запись (`/config/sphaira/github/playguard.json`): после первой установки обновляйте через *GitHub* в sphaira.
-- **Homebrew App Store** / **App Store в sphaira** (тот же каталог) — **Пока не опубликован.** Когда страница приложения будет одобрена, найдите *PlayGuard*. Новые версии тогда подхватываются автоматически, после проверки: часто через несколько дней после GitHub. PlayGuard знает, что был установлен оттуда, и рекомендует обновляться через магазин.
 
 Необязательный **модуль восстановления** (sysmodule, `playguard-rescue.zip`) скачивается отдельно: его тоже распакуйте в корень SD-карты, затем перезапустите консоль. Он окажется в `atmosphere/contents/4200000000505247/` и срабатывает, только когда его просит об этом файл `RESCUE`, — см. [Нет доступа?](troubleshooting.md#нет-доступа).
 
