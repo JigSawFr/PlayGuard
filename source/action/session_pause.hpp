@@ -43,6 +43,12 @@ bool active();
 // PIN is entered again.
 void stop();
 
+// A remote order (Console › Remote access) asked for a temporary unlock
+// while the pause is on: the pause's unlock is the parent's from now on. It
+// stays as it is once PlayGuard is left, no longer recorded as one to undo
+// at the next start (session_pause_logic::on_remote).
+void adopt();
+
 // While active(): what the screens show, as the console reads once locked
 // again: not temporarily unlocked, the play timer on (1453 reads true
 // whenever locked). The day as it is for the child, not "on hold". The

@@ -313,6 +313,11 @@ DYNAMIC_KEYS = {
     "notices/short/": [i for f in glob.glob(f"{ROOT}/source/tab/*.cpp")
                        for ids in re.findall(r'\bmark\([^,;]+,\s*\{([^}]*)\}\)', read(f))
                        for i in re.findall(r'"(\w+)"', ids)],
+    # The remote link (sync_activity.cpp, sync_orders.cpp).
+    "sync/mqtt_versions/": array_of("source/activity/sync_activity.cpp", "KEYS"),
+    "sync/policies/": returned_by("source/sync/sync_conf.c", "sync_policy_name"),
+    # "unknown": an enumerator out of range, never in an outcome.
+    "sync/reasons/": [r for r in returned_by("source/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
     values = [v for v in values if v]

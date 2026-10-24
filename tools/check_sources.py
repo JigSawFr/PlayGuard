@@ -35,6 +35,7 @@ ACTION_SCREENS = {
                                          "activity/dev_builds_activity.hpp"},
     "source/action/fw_gate.cpp": {"activity/firmware_gate_activity.hpp"},       # the firmware screen
     "source/action/game_notice.cpp": {"activity/game_check_activity.hpp"},      # the installed games check
+    "source/action/ha_update_flow.cpp": {"activity/ha_update_activity.hpp"},    # the integration's What's new
     "source/action/notices.cpp": {"activity/onboarding_activity.hpp",           # what the bell's entries open:
                                   "tab/clock_tab.hpp"},                         # First steps, the network clock
     "source/action/profile_flow.cpp": {"activity/profiles_activity.hpp"},       # the profiles' screen
@@ -76,6 +77,7 @@ CONSOLE_ONLY = {
     "forwarder.c": "sim_forwarder.cpp",
     "gamecheck.c": "sim_gamecheck.c",
     "gate_nx.c": "the PIN gate's .nro",
+    "modules_nx.c": "sim_modules.c",
     "nacp_read.c": "sim_games.c",
     "pctl_dump.c": "sim_pctl.c",
     "pctl_ops.c": "sim_pctl.c",

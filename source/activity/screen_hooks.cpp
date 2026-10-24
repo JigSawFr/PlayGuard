@@ -14,17 +14,21 @@
 #include "action/frame_stats_flow.hpp"
 #include "action/notices.hpp"
 #include "action/pt_log_flow.hpp"
+#include "action/sync_flow.hpp"
 #include "action/upload_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
+#include "activity/lock_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "activity/notices_activity.hpp"
 #include "tab/help_tab.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
+#include "core/sysinfo.h"
 #include "tab/tab_base.hpp"
 #include "ui/app_hooks.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/sync_files.hpp"
 #include "view/title_state.hpp"
 
 using namespace brls::literals;
@@ -191,8 +195,20 @@ void install_screen_hooks()
     a.open_firmware_screen = []() { brls::Application::pushActivity(new FirmwareGateActivity()); };
     a.make_help_tab = []() -> brls::View* { return new HelpTab(); };
     a.note_write = [](const char* what, bool ok) { notices::note_write(what, ok); };
+    a.lock_screen_up = []() {
+        for (brls::Activity* act : brls::Application::getActivitiesStack())
+            if (dynamic_cast<LockActivity*>(act)) return true;
+        return false;
+    };
     a.mode_changed = []() {
         pt_log_flow::apply();
         frame_stats_flow::apply();
+        sync_flow::changed();   // read-only mode is in the remote link's state
+        SysInfo si;             // and in what the agent may do
+        sysinfo_get(&si);
+        char fw[16];
+        sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+        sync_files::set_console(fw, app::read_only());
+        sync_files::export_nro_state();
     };
 }

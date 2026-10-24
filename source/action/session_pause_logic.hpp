@@ -21,4 +21,13 @@ struct Inputs
 // The pause is wanted: the parent is in PlayGuard, PIN entered.
 bool wanted(const Inputs& in);
 
+// A remote order (Console › Remote access: Home Assistant) PlayGuard carries
+// out while its pause is on. The temporary unlock it asks for makes the
+// pause's unlock the parent's own (Adopt: it stays as it is once PlayGuard
+// is left, as Security › Unlock temporarily does); turning parental controls
+// back on ends the pause as the parent's own does (End); any other order
+// leaves it as it is (Keep).
+enum class Remote { Keep, Adopt, End };
+Remote on_remote(bool paused, bool unlock_order, bool relock_order);
+
 }   // namespace session_pause_logic

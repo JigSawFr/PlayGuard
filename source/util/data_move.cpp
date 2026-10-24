@@ -52,10 +52,10 @@ std::string old_dir()
 size_t run(const std::string& from, const std::string& to)
 {
     static const char* const FILES[] = { "config.json", "history.json", "watch.json", "github_token",
-                                         "rescue_report.txt" };
+                                         "rescue_report.txt", "sync.conf" };
     static const char* const SUFFIXES[] = { "", ".tmp", ".bad", ".bad.1" };
     static const char* const OTHERS[] = { "RESCUE", "RESCUE.txt", "RESCUE.done",
-                                          "profiles", "backups", "exports", "cache", "logs" };
+                                          "profiles", "backups", "exports", "cache", "logs", "sync" };
     if (from == to) return 0;
     struct stat st;
     if (!stat_of(from, &st) || !S_ISDIR(st.st_mode)) return 0;
@@ -85,6 +85,11 @@ size_t to_nand(const std::string& data_dir, const std::string& nand_dir)
         for (const char* s : SUFFIXES)
             if (has(std::string(f) + s)) moves.push_back({ std::string(f) + s, std::string(f) + s });
     if (has("backups")) moves.push_back({ "backups", "backups" });
+    // The remote link's records and what the agent sysmodule wrote for this
+    // system (util/sync_files.hpp); profiles.txt stays shared.
+    if (has("sync"))
+        for (const char* f : { "nro_state.txt", "agent_state.txt", "agent_events.log", "agent_events.log.read", "names.txt" })
+            moves.push_back({ std::string("sync/") + f, std::string("sync/") + f });
     if (has("cache"))
         for (const std::string& n : paths::list_files(data_dir + "/cache", ".bin"))
             if (n.compare(0, 9, "activity_") == 0) moves.push_back({ "cache/" + n, "cache/" + n });

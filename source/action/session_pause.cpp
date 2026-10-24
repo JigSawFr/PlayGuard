@@ -138,6 +138,13 @@ void stop()
     ui::note_paused(false);
 }
 
+void adopt()
+{
+    stop();
+    pt_flow::set_relock_pending(false);
+    brls::Logger::info("session pause: the unlock kept, as a remote order asked");
+}
+
 void end()
 {
     s_quitting = true;

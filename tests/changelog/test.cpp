@@ -71,6 +71,14 @@ int main()
     CHECK(changelog::release_notes(MD, "1.1", nullptr).empty());
     CHECK(changelog::release_notes(MD, "", nullptr).empty());
 
+    // What changed since a version: the newer releases, headings included.
+    const auto since = changelog::newer_than(MD, "1.0.0");
+    CHECK(since.size() == 7 && since[0].kind == Line::Release && since[0].text == "1.1.0 · 2026-10-10" &&
+          since.back().text == "uses romfs and borealis");
+    const auto older = changelog::newer_than(MD, "0.9.0");
+    CHECK(older.size() == 9 && older[7].text == "1.0.0 · 2026-09-01" && older[8].text == "First release.");
+    CHECK(changelog::newer_than(MD, "1.1.0").empty() && changelog::newer_than(MD, "2.0.0").empty());
+
     // A release's hand-written summary (.github/release-notes/<version>.md):
     // the highlights About shows, without a "## " heading of its own.
     const auto summary = changelog::parse("### \xF0\x9F\x8C\x9F Highlights\n"   // 🌟

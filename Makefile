@@ -200,7 +200,7 @@ date_SRC    := source/util/date.cpp tests/date/test.cpp
 text_util_SRC   := tests/text_util/test.cpp
 patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
 prodinfo_SRC   := source/util/paths.cpp source/util/prodinfo.cpp tests/prodinfo/test.cpp
-changelog_SRC   := source/util/changelog.cpp tests/changelog/test.cpp
+changelog_SRC   := source/util/date.cpp source/util/changelog.cpp source/util/update.cpp tests/changelog/test.cpp
 support_SRC   := source/util/date.cpp source/util/support.cpp tests/support/test.cpp
 pt_logic_SRC   := source/action/pt_logic.cpp source/util/date.cpp tests/pt_logic/test.cpp
 pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
@@ -212,14 +212,25 @@ gate_tally_SRC   := source/util/date.cpp source/util/gate_tally.cpp tests/gate_t
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
 notice_logic_SRC   := source/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
+sys_updates_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_updates_CSRC  := source/core/console_info_pure.c
+sys_updates_CFLAGS := -std=gnu11 -Isource/core
 # The network half twice from one test: -D__SWITCH__ for the console's path
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
-sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
+sys_updates_net_FLAGS := -std=c++17 -Isource -Isource/core -Itests/sysinfo -D__SWITCH__
+sys_updates_net_CSRC  := source/core/console_info_pure.c
+sys_updates_net_CFLAGS := -std=gnu11 -Isource/core
 sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
+sys_updates_sim_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_updates_sim_CSRC  := source/core/console_info_pure.c
+sys_updates_sim_CFLAGS := -std=gnu11 -Isource/core
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 dns_hosts_SRC   := source/util/dns_hosts.cpp tests/dns_hosts/test.cpp
 sys_notes_SRC   := source/util/date.cpp $(C)/util/safe_text.cpp $(C)/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
+sys_notes_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_notes_CSRC  := $(CALENDAR_C) source/core/console_info_pure.c
+sys_notes_CFLAGS := $(CALENDAR_CFLAGS)
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 clock_logic_SRC   := source/action/clock_logic.cpp tests/clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
@@ -332,6 +343,11 @@ sim_backend_LIBS   := -pthread -lm
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/update.cpp source/util/migrations.cpp tests/migrations/test.cpp
+# The remote link's files on the SD card, with its C parts (built by $(CC):
+# g++ would build a .c as C++).
+sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
+sync_files_CSRC  := $(CALENDAR_C) source/sync/sync_conf.c source/sync/sync_records.c
+sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/core
 
 # C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
 # writes the documents it builds (_ARGS: where) for tools/check_sync_json.py.
@@ -350,7 +366,7 @@ TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
 TEST_OKS := $(addsuffix .ok,$(TEST_PROGRAMS))
 # Every header: a suite is rebuilt when one changes (coarse, but a suite
 # compiles in seconds and CI always starts cold).
-TEST_HEADERS := $(wildcard tests/*.h tests/*.hpp tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp)
+TEST_HEADERS := $(wildcard tests/*.h tests/*.hpp tests/*/*.h source/*.hpp source/*/*.h source/*/*.hpp sysmodule/*/source/*.h)
 
 $(TESTOUT):
 	@mkdir -p $@
@@ -413,6 +429,7 @@ zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
 markdown_FUZZ      := $(filter-out tests/%,$(markdown_SRC)) tests/fuzz/markdown/fuzz.cpp
 changelog_FUZZ     := $(filter-out tests/%,$(changelog_SRC)) tests/fuzz/changelog/fuzz.cpp
+changelog_FUZZ_CSRC := $(CALENDAR_C)
 rescue_FUZZ        := $(filter-out tests/%,$(rescue_SRC)) tests/fuzz/rescue/fuzz.c
 config_FUZZ        := $(filter-out tests/%,$(config_SRC)) tests/fuzz/config/fuzz.cpp
 config_FUZZ_CSRC   := $(CALENDAR_C)

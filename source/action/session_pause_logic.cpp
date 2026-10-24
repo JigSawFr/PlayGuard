@@ -12,4 +12,11 @@ bool wanted(const Inputs& in)
     return in.pin_holds && in.in_focus && in.holds == 0;
 }
 
+Remote on_remote(bool paused, bool unlock_order, bool relock_order)
+{
+    if (!paused) return Remote::Keep;
+    if (unlock_order) return Remote::Adopt;
+    return relock_order ? Remote::End : Remote::Keep;
+}
+
 }   // namespace session_pause_logic

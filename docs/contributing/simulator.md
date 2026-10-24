@@ -26,12 +26,15 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Console › Installed games*) |
 | `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Console › Installed games*; by default one of each problem) |
 | `PLAYGUARD_SIM_SD_FREE_MB=300` | The SD card's free space, in MB (unset: unknown, as the desktop's own disk says nothing of a console; under 500 MB, *The SD card is almost full* on the Console tab) |
+| `PLAYGUARD_SIM_MODEL=1` | The console's model, as `setsysGetProductModel` gives it (6, a Switch OLED, by default; the remote link's `system` document) |
+| `PLAYGUARD_SIM_BATTERY_PCT=15` | The battery's charge, in percent (87 by default, `none`: unknown; the remote link's `system` document, which says the console charges unless `PLAYGUARD_SIM_BATTERY` is set) |
+| `PLAYGUARD_SIM_NETWORK=ethernet` | The connection: `wifi` (the default), `ethernet` or `none` |
 | `PLAYGUARD_SIM_EMUMMC=1` | Running on emuMMC |
 | `PLAYGUARD_SIM_BLANK=1` | Atmosphère blanking the serial number |
 | `PLAYGUARD_SIM_APPLET=1` | Applet (album) mode |
 | `PLAYGUARD_SIM_FROM_FORWARDER=1` | Started from a forwarder's HOME menu icon, not over a game (Today's pill and Help say so) |
 | `PLAYGUARD_SIM_NO_GAME=1` | No game open (applet mode with nothing behind it): no "game left open keeps counting" line, no "the game in progress is suspended" warning |
-| `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text |
+| `PLAYGUARD_SIM_DOCKED=1` | The console on its dock: *Text size › Automatic* draws the larger text (and the remote link's `system` document says docked) |
 | `PLAYGUARD_SIM_BATTERY=1` | The console in hand, off its dock (unset: the simulator draws the effects as on the dock, whatever `PLAYGUARD_SIM_DOCKED` says): *Visual effects › Automatic*, the default, leaves out the glow and every movement of the look (`ui/effects`, `ui/motion`) |
 | `PLAYGUARD_SIM_LEFT_MIN=4` | That many minutes left today while the timer counts (the child screen's last minutes) |
 | `PLAYGUARD_SIM_NO_PDM=1` | No activity log |
@@ -46,6 +49,8 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_LATEST=1.1.0:24.0.0` | The latest release and the newest firmware it supports, for the update check (`offline` for no network) |
 | `PLAYGUARD_SIM_STORE=1.1.0` | The version of PlayGuard the Homebrew App Store's catalogue has (`none`: not listed, `offline` for no network): with its record on the simulated SD card (`playguard_data/sd/switch/appstore/.get/packages/PlayGuard/manifest.install`), an update through a store first checks the catalogue has the new version |
 | `PLAYGUARD_SIM_SYS_LATEST=1.12.1:6.5.4:23.0.1:1.6.3.0` | The latest Atmosphère, hekate, firmware and sys-patch the daily update check finds (Atmosphère : hekate : firmware : sys-patch, the last optional; `offline` for no network) |
+| `PLAYGUARD_SIM_HA_LATEST=v0.2.0` | The Home Assistant integration's latest release the update check finds, once the integration said its version (`offline` or unset: no network) |
+| `PLAYGUARD_SIM_HA_CHANGELOG=<file>` | Its `CHANGELOG.md`, read from that file (*What's new* lists what changed since the installed version) |
 | `PLAYGUARD_SIM_SYS_NOTES=<folder>` | What GitHub and switchbrew return for the release notes in *Console*: `atmosphere.json` and `hekate.json` (GitHub's release lists), `System_Versions.wiki` and `<version>.wiki` (switchbrew's pages, as wikitext); `offline` for no network |
 | `PLAYGUARD_SIM_PASTE=https://gist.github.com/u/ab12` | What GitHub answers to *Send a report…* (`offline` for no network) |
 | `PLAYGUARD_SIM_DEV_BUILDS=<folder>` | What the GitHub API returns for *Install another build*: `releases.json` (the releases tab), `latest.json` (the latest release, for *Update in place*), `artifacts.json`, `pulls.json`; `runs.json`, and for *Find a build* `pull_<n>.json`, `commit.json`, `run_artifacts.json`; `https://<local path>` download URLs are copied from disk (`offline` for no network); `PLAYGUARD_SIM_DEV_BUILDS_DELAY=<ms>` slows each answer |
@@ -61,6 +66,9 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_CUT_TEXT=1` | Not the console: once a second, every label the screen on top cuts short ("…") goes to `cut_text.txt` in the working directory with the screen's name (`dashboard › dialog`, `… › picker` for one opened over it), once each (`tools/cut_text_check.py`) |
 | `PLAYGUARD_SIM_FOCUS_LOG=1` | Not the console: each line or button that takes the focus logs its words (`focus: Hours without the PIN`), so `tools/desktop_smoke.py` reaches a line by its words (`go_to()`), not by counting presses |
 | `PLAYGUARD_SIM_STATS=<file>` | Not the console: one line per frame (frame time with the FPS limiter off; nanovg's draw calls and triangles with `tools/perf_nanovg_stats.patch`), see `tools/perf_frames.sh`. On the console (and the desktop), *About › Help & diagnostics › Developer › Frame statistics* writes one line per second to `logs/frame_stats.txt` instead: the mode (docked, handheld), the UI thread's own time per frame and the late frames (`source/action/frame_stats_flow.cpp`) |
+| `PLAYGUARD_SIM_MODULES=agent:running` | Optional modules running at start (`name:running`, comma-separated); a module starts only when its `exefs.nsp` is on the simulated SD card |
+| `PLAYGUARD_SIM_AGENT=running` | The agent sysmodule runs while its simulated module does (`PLAYGUARD_SIM_MODULES=agent:running`): an agent simulated in the process, with its own command dispatch (`sysmodule/agent/source/agent_core.c`), to which PlayGuard hands the link; what it pushes and answers is logged as `sim agent: …`. An installed `exefs.nsp` holding `old agent` speaks another protocol, one holding `broken agent` never answers |
+| `PLAYGUARD_SIM_AGENT_ORDER=limit_uniform=90` | An order the simulated agent hands PlayGuard once, after `Hello` |
 
 Game patches are read from `./playguard_data/sd/`, the simulated SD card root; *Console › Forwarders* writes a few made-up homebrew there (`switch/*.nro`, `source/sim/sim_forwarder.cpp`) to make forwarders for.
 

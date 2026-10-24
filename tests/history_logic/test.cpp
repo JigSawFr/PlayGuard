@@ -158,6 +158,9 @@ static void test_known()
         CHECK(history_logic::known_source(s));
     // No longer written, still in older histories: still named.
     CHECK(history_logic::known_source("day"));
+    // The remote link's (sync_orders): named as the console's own.
+    for (const char* s : { "remote", "remote_extra", "remote_stop", "remote_console_lock", "remote_restore_extra" })
+        CHECK(history_logic::known_source(s));
     // "profile" is named apart (with the profile's name), others not at all.
     CHECK(!history_logic::known_source("profile") && !history_logic::known_source("") &&
           !history_logic::known_source("telepathy"));
