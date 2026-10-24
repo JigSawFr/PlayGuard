@@ -140,9 +140,11 @@ pages; no framework, nothing to install but that.
   documentation. Taking them takes about three hours on a CI runner (both
   themes), so CI takes them by hand (*Actions › web › Run workflow*, `all`)
   and for a release (main, its version changed: the header's badge), in a run
-  of their own: the release's site goes out first with main's screenshots, in
-  minutes, then its `release-screens` job starts that `all` run, published
-  once it ends; any other build takes main's (its `site` artifact). A change to the screenshots'
+  of their own: the release's site goes out first, in minutes, with the
+  repository's English screenshots (`images/screenshots/`, taken for the
+  release) and main's in the other languages, then its `release-screens` job
+  starts that `all` run, published once it ends; any other build takes main's
+  (its `site` artifact). A change to the screenshots'
   script, or to a screen between releases, shows once taken by hand. A new screen in the gallery is a name in both files: its
   tab, and the keys that lead to it from there.
 - **The preview images**: `tools/site_social.mjs <out-dir>` (Node and
