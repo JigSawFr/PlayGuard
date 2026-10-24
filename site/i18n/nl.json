@@ -196,7 +196,6 @@
  "install_3": "Start het boven een game, met de gebruiker van een ouder.",
  "tab_store": "App-winkel",
  "tab_manual": "Met de hand (.zip)",
- "store_pending": "Nog niet beschikbaar: de vermelding van PlayGuard wacht nog op goedkeuring. Installeer het voorlopig met de hand.",
  "start_title": "Snel aan de slag",
  "start_1": "Open PlayGuard: de gids '{{app:onboarding/title}}' stelt de pincode en de dagelijkse limiet in.",
  "start_2": "Nog gekoppeld aan de app? '{{app:tabs/security}} › {{app:pairing/unlink}}', anders overschrijft de volgende synchronisatie je instellingen.",

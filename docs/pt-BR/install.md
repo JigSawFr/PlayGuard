@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # Instalação
 
 Como instalar, atualizar e remover o PlayGuard, e o que ele grava no cartão SD. Depois de instalado: [primeiros passos](getting-started.md). Volte ao [README](../../README.md).
 
 ## Onde obter
 
-> [!WARNING]
-> O PlayGuard **ainda não está na Homebrew App Store (nem na do sphaira)**: a ficha dele ainda aguarda aprovação. Por enquanto, instale-o manualmente.
-
 Escolha uma opção:
 
-- **Manual** (recomendado por enquanto) — Baixe o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) e extraia-o na **raiz** do cartão SD. O app fica em `sd:/switch/playguard/`, e os arquivos dele em `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store do sphaira** (mesmo catálogo) — Procure *PlayGuard* e instale-o. As novas versões são baixadas automaticamente, depois de uma revisão: muitas vezes alguns dias depois do GitHub. O PlayGuard sabe que foi instalado por ali e recomenda atualizar pela loja.
+- **Manual** — Baixe o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) e extraia-o na **raiz** do cartão SD. O app fica em `sd:/switch/playguard/`, e os arquivos dele em `sd:/config/playguard/`.
 - **sphaira › GitHub** — O zip da versão já contém a entrada (`/config/sphaira/github/playguard.json`): depois de uma primeira instalação, atualize pelo *GitHub* no sphaira.
-- **Homebrew App Store** / **App Store do sphaira** (mesmo catálogo) — **Ainda não disponível.** Depois que a ficha for aprovada, procure *PlayGuard*. As novas versões passam então a ser baixadas automaticamente, depois de uma revisão: muitas vezes alguns dias depois do GitHub. O PlayGuard sabe que foi instalado por ali e recomenda atualizar pela loja.
 
 O **sysmodule de recuperação** opcional (`playguard-rescue.zip`) é baixado à parte: extraia-o também na raiz do cartão SD e depois reinicie o console. Ele fica em `atmosphere/contents/4200000000505247/` e só age quando um arquivo `RESCUE` pede — veja [Console bloqueado?](troubleshooting.md#console-bloqueado).
 

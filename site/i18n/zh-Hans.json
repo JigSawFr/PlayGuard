@@ -196,7 +196,6 @@
  "install_3": "以家长的用户在游戏之上启动它。",
  "tab_store": "应用商店",
  "tab_manual": "手动 (.zip)",
- "store_pending": "暂不可用：PlayGuard 的上架仍在等待审核。目前请手动安装。",
  "start_title": "快速入门",
  "start_1": "打开 PlayGuard：“{{app:onboarding/title}}”向导会设置 PIN 和每日限制。",
  "start_2": "还关联着手机应用？“{{app:tabs/security}} › {{app:pairing/unlink}}”，否则它下次同步会覆盖你的设置。",

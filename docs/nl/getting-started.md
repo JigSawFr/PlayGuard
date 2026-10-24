@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
+<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
 # Aan de slag
 
 Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien minuten, en daarna de dagelijkse taken. Terug naar de [README](../../README.md).
@@ -13,7 +13,7 @@ Wil je eerst rondkijken? [Probeer PlayGuard in je browser](https://playguard.lin
 
 ## 1. Installeer het
 
-Pak `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) uit in de hoofdmap van de SD-kaart ([installatie](install.md)). PlayGuard staat nog niet in de Homebrew App Store of sphaira: de vermelding wacht nog op goedkeuring.
+Zoek naar *PlayGuard* in de Homebrew App Store of de App Store van sphaira en installeer het. Of met de hand: pak `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGuard/releases/latest) uit in de hoofdmap van de SD-kaart ([installatie](install.md)).
 
 > [!TIP]
 > Pak ook `playguard-rescue.zip` uit, de optionele herstel-sysmodule. Die doet niets tot je hem nodig hebt, en is de enige weg terug als een limiet van 0 minuten alles blokkeert en de pincode vergeten is ([Buitengesloten?](troubleshooting.md#buitengesloten)).

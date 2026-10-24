@@ -704,18 +704,17 @@ def home_body(t, lang, to_root):
         <h2>{t('install_title')}</h2>
         <!-- One way or the other: tabs (site.js), else both under their names. -->
         <div class="tabs">
+          <div class="tab-panel" id="install-store">
+            <h3 class="tab-title">{t('tab_store')}</h3>
+            <ol class="steps">
+              <li>{t('install_1')}</li>
+              <li>{t('install_3')}</li>
+            </ol>
+          </div>
           <div class="tab-panel" id="install-manual">
             <h3 class="tab-title">{t('tab_manual')}</h3>
             <ol class="steps">
               <li>{t('install_2')} <a href="{REPO_URL}/releases/latest">{t('download')}</a></li>
-              <li>{t('install_3')}</li>
-            </ol>
-          </div>
-          <div class="tab-panel" id="install-store">
-            <h3 class="tab-title">{t('tab_store')}</h3>
-            <p class="callout warning">{t('store_pending')}</p>
-            <ol class="steps">
-              <li>{t('install_1')}</li>
               <li>{t('install_3')}</li>
             </ol>
           </div>

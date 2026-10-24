@@ -57,7 +57,6 @@ No unknown left; only code.
 
 - **Translations by native speakers** of the 15 catalogues (see
   [Translating PlayGuard](docs/contributing/translating.md)).
-- **The Homebrew App Store listing**, once approved.
 - **New firmware**: PlayGuard opens read-only on an unknown firmware until a
   release supports it; each new firmware needs a check of the command table.
 

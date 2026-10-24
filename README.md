@@ -70,12 +70,9 @@ The real app, against a simulated console, in your browser:
 
 ## 📦 Install
 
-> [!IMPORTANT]
-> PlayGuard is **not in the Homebrew App Store (nor sphaira's) yet**: its listing is still awaiting approval. Install it by hand for now.
-
-1. Download `playguard.zip` from the [**latest release**](https://github.com/JigSawFr/PlayGuard/releases/latest).
-2. Extract it to the **root of the SD card**.
-3. Launch PlayGuard **over a game**, with a **parent's user**, and follow *First steps*.
+1. On the console, open the **Homebrew App Store** or **sphaira**'s App Store, search for *PlayGuard* and install it.
+   By hand instead: download `playguard.zip` from the [**latest release**](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root of the SD card**.
+2. Launch PlayGuard **over a game**, with a **parent's user**, and follow *First steps*.
 
 > [!TIP]
 > Still linked to the companion app? Use *Security › Unlink the companion app*, or its next sync overwrites what you set.

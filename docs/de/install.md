@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # Installation
 
 Wie du PlayGuard installierst, aktualisierst und entfernst, und was es auf die SD-Karte schreibt. Nach der Installation: [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
 
 ## Wo du es bekommst
 
-> [!WARNING]
-> PlayGuard ist **noch nicht im Homebrew App Store (und nicht in dem von sphaira)**: Sein Eintrag wartet noch auf die Freigabe. Installiere es vorerst von Hand.
-
 Wähle eine Möglichkeit:
 
-- **Manuell** (vorerst empfohlen) — Lade `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/PlayGuard/releases/latest) herunter und entpacke es ins **Hauptverzeichnis** der SD-Karte. Die App landet in `sd:/switch/playguard/`, ihre Dateien in `sd:/config/playguard/`.
+- **Homebrew App Store** / **App Store von sphaira** (derselbe Katalog) — Suche nach *PlayGuard* und installiere es. Neue Versionen werden automatisch übernommen, nach einer Prüfung: oft ein paar Tage nach GitHub. PlayGuard weiß, dass es von dort installiert wurde, und empfiehlt, über den Store zu aktualisieren.
+- **Manuell** — Lade `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/PlayGuard/releases/latest) herunter und entpacke es ins **Hauptverzeichnis** der SD-Karte. Die App landet in `sd:/switch/playguard/`, ihre Dateien in `sd:/config/playguard/`.
 - **sphaira › GitHub** — Das Zip der Version enthält den Eintrag bereits (`/config/sphaira/github/playguard.json`): Nach einer ersten Installation aktualisierst du in sphaira über *GitHub*.
-- **Homebrew App Store** / **App Store von sphaira** (derselbe Katalog) — **Noch nicht aufgeführt.** Sobald der Eintrag freigegeben ist, suche nach *PlayGuard*. Neue Versionen werden dann automatisch übernommen, nach einer Prüfung: oft ein paar Tage nach GitHub. PlayGuard weiß, dass es von dort installiert wurde, und empfiehlt, über den Store zu aktualisieren.
 
 Das optionale **Wiederherstellungs-Sysmodul** (`playguard-rescue.zip`) wird separat heruntergeladen: Entpacke es ebenfalls ins Hauptverzeichnis der SD-Karte und starte dann die Konsole neu. Es landet in `atmosphere/contents/4200000000505247/` und wirkt nur, wenn eine Datei `RESCUE` es verlangt — siehe [Ausgesperrt?](troubleshooting.md#ausgesperrt).
 

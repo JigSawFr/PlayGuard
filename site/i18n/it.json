@@ -196,7 +196,6 @@
  "install_3": "Avvialo sopra un gioco, con l'utente di un genitore.",
  "tab_store": "Negozio di app",
  "tab_manual": "A mano (.zip)",
- "store_pending": "Non ancora disponibile: la scheda di PlayGuard è ancora in attesa di approvazione. Per ora installalo a mano.",
  "start_title": "Primi passi",
  "start_1": "Apri PlayGuard: la guida «{{app:onboarding/title}}» imposta il PIN e il limite giornaliero.",
  "start_2": "Ancora collegato all'app? «{{app:tabs/security}} › {{app:pairing/unlink}}», altrimenti la sua prossima sincronizzazione sovrascrive le tue impostazioni.",

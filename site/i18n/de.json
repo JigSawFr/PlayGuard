@@ -196,7 +196,6 @@
  "install_3": "Starte es über ein Spiel, mit dem Benutzer eines Elternteils.",
  "tab_store": "App-Store",
  "tab_manual": "Von Hand (.zip)",
- "store_pending": "Noch nicht verfügbar: Der Eintrag von PlayGuard wartet noch auf die Freigabe. Installiere es vorerst von Hand.",
  "start_title": "Schnellstart",
  "start_1": "Öffne PlayGuard: Die Anleitung „{{app:onboarding/title}}“ legt die Geheimzahl und das tägliche Limit fest.",
  "start_2": "Noch mit der App verknüpft? „{{app:tabs/security}} › {{app:pairing/unlink}}“, sonst überschreibt ihre nächste Synchronisierung deine Einstellungen.",

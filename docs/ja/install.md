@@ -1,18 +1,15 @@
-<!-- translated from docs/install.md, sha256 e4ba1fa1809a -->
+<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
 # インストール
 
 PlayGuard のインストール、アップデート、削除の方法と、PlayGuard が SD カードに書き込むファイルについて説明します。インストールしたら、[はじめに](getting-started.md)へ。トップページは [README](../../README.md)。
 
 ## 入手方法
 
-> [!WARNING]
-> PlayGuard は**まだ Homebrew App Store（sphaira の App Store も）にはありません**。掲載はまだ承認待ちです。今は手動でインストールしてください。
-
 次のどれかを選んでください。
 
-- **手動**（今はこれがおすすめ） — [最新リリース](https://github.com/JigSawFr/PlayGuard/releases/latest)から `playguard.zip` をダウンロードし、SD カードの**ルート**に展開します。アプリは `sd:/switch/playguard/` に、アプリのファイルは `sd:/config/playguard/` に入ります。
+- **Homebrew App Store** / **sphaira の App Store**（同じカタログ） — *PlayGuard* を検索してインストールしてください。新しいリリースは審査のあとに自動で取り込まれます（多くは GitHub の数日後です）。PlayGuard はそこからインストールされたことを認識し、ストアでのアップデートをおすすめします。
+- **手動** — [最新リリース](https://github.com/JigSawFr/PlayGuard/releases/latest)から `playguard.zip` をダウンロードし、SD カードの**ルート**に展開します。アプリは `sd:/switch/playguard/` に、アプリのファイルは `sd:/config/playguard/` に入ります。
 - **sphaira › GitHub** — リリースの zip にはエントリー（`/config/sphaira/github/playguard.json`）が入っています。一度インストールしたあとは、sphaira の *GitHub* からアップデートできます。
-- **Homebrew App Store** / **sphaira の App Store**（同じカタログ） — **まだ掲載されていません。** 掲載が承認されたら、*PlayGuard* を検索してください。そのあと新しいリリースは審査のあとに自動で取り込まれます（多くは GitHub の数日後です）。PlayGuard はそこからインストールされたことを認識し、ストアでのアップデートをおすすめします。
 
 オプションの**リカバリー sysmodule**（`playguard-rescue.zip`）は別にダウンロードします。これも SD カードのルートに展開し、本体を再起動してください。`atmosphere/contents/4200000000505247/` に入り、`RESCUE` ファイルで求められたときにだけ動きます。[ロックされて入れない？](troubleshooting.md#ロックされて入れない)を参照してください。
 
