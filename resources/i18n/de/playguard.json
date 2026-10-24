@@ -1619,6 +1619,7 @@
             "rescue": "Wiederherstellung verwendet",
             "console_lock": "Alle Spiele sperren",
             "bedtime": "Gute-Nacht-Alarm",
+            "module": "Optionales Modul",
             "pin_shown": "Geheimzahl angezeigt",
             "config_reset": "Optionen zurückgesetzt (Datei unlesbar)",
             "outside_reset": "Spielzeit neu begonnen (von PlayGuard bemerkt)",
@@ -1861,6 +1862,89 @@
             "pctl_error": "die Konsole hat abgelehnt",
             "waiting_for_confirmation": "wartet auf eine Bestätigung",
             "busy": "PlayGuard konnte es gerade nicht tun"
+        }
+    },
+    "modules": {
+        "title": "Optionale Module",
+        "open": "Optionale Module",
+        "section": "Optionale Module",
+        "overview": "Übersicht",
+        "count": "{} installiert",
+        "count_one": "1 installiert",
+        "intro": "Zwei kleine Hintergrundprogramme (Sysmodule), die PlayGuard auf die SD-Karte legen kann. Keines ist nötig, und jedes erledigt nur eine Aufgabe. PlayGuard bringt die mit ihm erstellte Version mit und installiert oder aktualisiert sie von hier aus, ohne Computer. Jede Änderung fragt nach der Geheimzahl, wenn Sicherheit › PlayGuard mit der Geheimzahl schützen sie vor einer Änderung verlangt.",
+        "status": "Zustand",
+        "install": "Installieren",
+        "update": "Aktualisieren",
+        "at_boot": "Beim Systemstart starten",
+        "start": "Jetzt starten",
+        "stop": "Jetzt beenden",
+        "remove": "Entfernen",
+        "removed": "Modul entfernt.",
+        "started": "Modul gestartet.",
+        "stopped": "Modul beendet.",
+        "error": "Das Modul konnte nicht geändert werden",
+        "start_failed": "Die neue Version ist nicht gestartet ({}): Die vorherige wurde wiederhergestellt.",
+        "locked_out": "Ausgesperrt?",
+        "state": {
+            "not_installed": "Nicht installiert",
+            "not_bundled": "Nicht in diesem Build",
+            "installed": "Installiert, aktuell",
+            "update": "Installiert, ein Update ist verfügbar",
+            "running": "läuft",
+            "stopped": "beendet",
+            "none": "Keines installiert"
+        },
+        "short": {
+            "installed": "Installiert",
+            "update": "Update verfügbar"
+        },
+        "details": {
+            "where": "Ordner: {}",
+            "installed": "Installiert: Version {} ({})",
+            "by_hand": "von Hand installiert",
+            "bundled": "In PlayGuard enthalten: Version {} ({})",
+            "not_bundled": "Dieser Build von PlayGuard enthält keine Kopie dieses Moduls (ein Desktop-Build oder ein ohne devkitPro erstellter)."
+        },
+        "done": {
+            "installed": "{}: installiert",
+            "updated": "{}: aktualisiert",
+            "removed": "{}: entfernt",
+            "boot_on": "{}: startet beim Systemstart",
+            "boot_off": "{}: startet nicht beim Systemstart",
+            "started": "{}: gestartet",
+            "stopped": "{}: beendet",
+            "rolled_back": "{}: Update rückgängig gemacht, die vorherige Version ist zurück",
+            "failed": "{}: Update fehlgeschlagen"
+        },
+        "rescue": {
+            "title": "Wiederherstellungsmodul (vergessene Geheimzahl)",
+            "tab": "Wiederherstellungsmodul",
+            "about": "Wenn ein Limit von 0 Minuten verhindert, dass irgendetwas startet, und die Geheimzahl vergessen ist, lässt eine leere Datei namens RESCUE in config/playguard auf der SD-Karte dieses Modul die Sperre der Konsole beim nächsten Systemstart aufheben. Es tut nichts anderes und beendet sich sofort.",
+            "install_body": "Das Wiederherstellungsmodul (Version {}) installieren? Es läuft bei jedem Systemstart und greift nur ein, wenn eine RESCUE-Datei auf der SD-Karte liegt.",
+            "update_body": "Das Wiederherstellungsmodul auf Version {} aktualisieren?",
+            "installed": "Wiederherstellungsmodul installiert. Es greift beim nächsten Systemstart ein, wenn eine RESCUE-Datei vorhanden ist.",
+            "updated": "Wiederherstellungsmodul aktualisiert.",
+            "remove_body": "Das Wiederherstellungsmodul entfernen? Ohne es lässt sich eine vergessene Geheimzahl bei einem Limit von 0 Minuten nur mit einem Computer beheben.",
+            "short_title": "Wiederherstellungsmodul"
+        },
+        "agent": {
+            "title": "Agent der Fernverbindung",
+            "tab": "Verbindungsagent",
+            "about": "Hält die Verbindung zu Home Assistant (Konsole › Fernzugriff) aufrecht, während PlayGuard geschlossen ist: Befehle werden ausgeführt, und der Status bleibt aktuell.",
+            "install_body": "Den Agenten (Version {}) installieren und starten? Er startet bei jedem Systemstart und verwendet die Einstellungen unter Fernzugriff.",
+            "update_body": "Den Agenten auf Version {} aktualisieren? Er hält kurz an und startet dann neu.",
+            "installed": "Agent installiert und gestartet.",
+            "updated": "Agent aktualisiert.",
+            "remove_body": "Den Agenten anhalten und entfernen? Die Fernverbindung läuft dann nur, während PlayGuard geöffnet ist.",
+            "installing": "Agent wird installiert...",
+            "updating": "Agent wird aktualisiert...",
+            "busy": "Der Agent wird gerade aktualisiert.",
+            "no_answer": "keine Antwort innerhalb von 10 s",
+            "other_protocol": "er spricht Protokoll {}",
+            "install_undone": "Der Agent hat nicht geantwortet ({}): Er wurde entfernt.",
+            "update_failed": "Der Agent konnte nicht aktualisiert werden ({}). Konsole › Optionale Module zeigt, was jetzt auf der SD-Karte ist.",
+            "offer_body": "Der Agent der Fernverbindung auf der SD-Karte ist nicht der, den dieses PlayGuard mitbringt (Version {}). Jetzt aktualisieren? Er hält kurz an, und der vorherige wird wiederhergestellt, wenn der neue nicht antwortet.",
+            "offer_refused": "Er spricht ein älteres Protokoll: Die Fernverbindung funktioniert erst, wenn er aktualisiert ist."
         }
     },
     "chart": {

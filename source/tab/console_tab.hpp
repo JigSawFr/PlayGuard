@@ -35,6 +35,7 @@ class ConsoleTab : public TabBase
     BRLS_BIND(brls::DetailCell,  games,        "cn_games");
     BRLS_BIND(brls::DetailCell,  forwarders,   "cn_forwarders");
     BRLS_BIND(brls::DetailCell,  remote,       "cn_remote");
+    BRLS_BIND(brls::DetailCell,  modules_cell, "cn_modules");
     BRLS_BIND(brls::DetailCell,  fw,           "cn_fw");
     BRLS_BIND(brls::DetailCell,  ams,          "cn_ams");
     BRLS_BIND(brls::DetailCell,  hekate,       "cn_hekate");

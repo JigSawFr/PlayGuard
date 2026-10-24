@@ -313,11 +313,19 @@ DYNAMIC_KEYS = {
     "notices/short/": [i for f in glob.glob(f"{ROOT}/source/tab/*.cpp")
                        for ids in re.findall(r'\bmark\([^,;]+,\s*\{([^}]*)\}\)', read(f))
                        for i in re.findall(r'"(\w+)"', ids)],
-    # The remote link (sync_activity.cpp, sync_orders.cpp).
+    # The remote link (sync_activity.cpp, sync_orders.cpp) and the optional
+    # modules (modules_activity.cpp, agent_update.cpp).
     "sync/mqtt_versions/": array_of("source/activity/sync_activity.cpp", "KEYS"),
     "sync/policies/": returned_by("source/sync/sync_conf.c", "sync_policy_name"),
     # "unknown": an enumerator out of range, never in an outcome.
     "sync/reasons/": [r for r in returned_by("source/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
+    "modules/": [f"{name}/{what}"
+                 for name in re.findall(r'\{\s*Id::\w+,\s*"(\w+)"', read(f"{ROOT}/source/util/modules.cpp"))
+                 for call in re.findall(r"\bkey\(\w+,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
+                 for what in strings_of(call)],
+    "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp")
+                      for call in re.findall(r"\brecord\(([^;{]*?)\);", read(f"{ROOT}/{path}"))
+                      for v in strings_of(call)],
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
     values = [v for v in values if v]

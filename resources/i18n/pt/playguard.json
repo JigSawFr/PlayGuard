@@ -1619,6 +1619,7 @@
             "rescue": "Recuperação usada",
             "console_lock": "Bloquear todos os jogos",
             "bedtime": "Alarme de hora de dormir",
+            "module": "Módulo opcional",
             "pin_shown": "PIN mostrado",
             "config_reset": "Preferências repostas (ficheiro ilegível)",
             "outside_reset": "Tempo de jogo recomeçado (visto pelo PlayGuard)",
@@ -1861,6 +1862,89 @@
             "pctl_error": "a consola recusou",
             "waiting_for_confirmation": "à espera de uma confirmação",
             "busy": "o PlayGuard não conseguiu fazê-lo agora"
+        }
+    },
+    "modules": {
+        "title": "Módulos opcionais",
+        "open": "Módulos opcionais",
+        "section": "Módulos opcionais",
+        "overview": "Visão geral",
+        "count": "{} instalados",
+        "count_one": "1 instalado",
+        "intro": "Dois pequenos programas em segundo plano (sysmodules) que o PlayGuard pode colocar no cartão SD. Nenhum é necessário, e cada um faz uma só coisa. O PlayGuard traz a versão feita com ele e instala-a ou atualiza-a a partir daqui, sem computador. Cada alteração pede o PIN quando Segurança › Proteger o PlayGuard com o PIN o pede antes de uma alteração.",
+        "status": "Estado",
+        "install": "Instalar",
+        "update": "Atualizar",
+        "at_boot": "Iniciar com a consola",
+        "start": "Iniciar agora",
+        "stop": "Parar agora",
+        "remove": "Remover",
+        "removed": "Módulo removido.",
+        "started": "Módulo iniciado.",
+        "stopped": "Módulo parado.",
+        "error": "Não foi possível alterar o módulo",
+        "start_failed": "A nova versão não iniciou ({}): a anterior foi reposta.",
+        "locked_out": "Sem acesso?",
+        "state": {
+            "not_installed": "Não instalado",
+            "not_bundled": "Não incluído nesta compilação",
+            "installed": "Instalado, atualizado",
+            "update": "Instalado, há uma atualização disponível",
+            "running": "em execução",
+            "stopped": "parado",
+            "none": "Nenhum instalado"
+        },
+        "short": {
+            "installed": "Instalado",
+            "update": "Atualização disponível"
+        },
+        "details": {
+            "where": "Pasta: {}",
+            "installed": "Instalado: versão {} ({})",
+            "by_hand": "instalado à mão",
+            "bundled": "Incluído no PlayGuard: versão {} ({})",
+            "not_bundled": "Esta compilação do PlayGuard não inclui nenhuma cópia deste módulo (uma compilação para computador, ou feita sem devkitPro)."
+        },
+        "done": {
+            "installed": "{}: instalado",
+            "updated": "{}: atualizado",
+            "removed": "{}: removido",
+            "boot_on": "{}: inicia com a consola",
+            "boot_off": "{}: não inicia com a consola",
+            "started": "{}: iniciado",
+            "stopped": "{}: parado",
+            "rolled_back": "{}: atualização anulada, a versão anterior voltou",
+            "failed": "{}: a atualização falhou"
+        },
+        "rescue": {
+            "title": "Módulo de recuperação (PIN esquecido)",
+            "tab": "Módulo de recuperação",
+            "about": "Se um limite de 0 minutos impedir que tudo inicie e o PIN tiver sido esquecido, um ficheiro vazio chamado RESCUE em config/playguard no cartão SD faz com que este módulo desbloqueie a consola no arranque seguinte. Não faz mais nada, e para logo a seguir.",
+            "install_body": "Instalar o módulo de recuperação (versão {})? É executado em cada arranque e só atua quando há um ficheiro RESCUE no cartão SD.",
+            "update_body": "Atualizar o módulo de recuperação para a versão {}?",
+            "installed": "Módulo de recuperação instalado. Atua no próximo arranque se houver um ficheiro RESCUE.",
+            "updated": "Módulo de recuperação atualizado.",
+            "remove_body": "Remover o módulo de recuperação? Sem ele, um PIN esquecido com um limite de 0 minutos precisa de um computador para ser resolvido.",
+            "short_title": "Módulo de recuperação"
+        },
+        "agent": {
+            "title": "Agente da ligação remota",
+            "tab": "Agente da ligação",
+            "about": "Mantém ativa a ligação ao Home Assistant (Consola › Acesso remoto) enquanto o PlayGuard está fechado: as ordens são executadas e o estado mantém-se atualizado.",
+            "install_body": "Instalar e iniciar o agente (versão {})? É iniciado com a consola e usa as definições do Acesso remoto.",
+            "update_body": "Atualizar o agente para a versão {}? Para durante um instante e volta a iniciar.",
+            "installed": "Agente instalado e iniciado.",
+            "updated": "Agente atualizado.",
+            "remove_body": "Parar e remover o agente? A ligação remota passa a funcionar só enquanto o PlayGuard estiver aberto.",
+            "installing": "A instalar o agente...",
+            "updating": "A atualizar o agente...",
+            "busy": "O agente está a ser atualizado.",
+            "no_answer": "sem resposta em 10 s",
+            "other_protocol": "usa o protocolo {}",
+            "install_undone": "O agente não respondeu ({}): foi removido.",
+            "update_failed": "Não foi possível atualizar o agente ({}). Consola › Módulos opcionais mostra o que está agora no cartão SD.",
+            "offer_body": "O agente da ligação remota no cartão SD não é o que este PlayGuard traz (versão {}). Atualizá-lo agora? Para durante um instante, e o anterior é reposto se o novo não responder.",
+            "offer_refused": "Usa um protocolo mais antigo: a ligação remota não funciona enquanto não for atualizado."
         }
     },
     "chart": {

@@ -763,7 +763,9 @@ jobs:
           # PlayGuard's warnings as errors, as on the desktop: the libnx code
           # (source/core/*.c, the __SWITCH__ paths) is only built here.
           make dist CMAKE_ARGS=-DPLAYGUARD_WERROR=ON
-          # The optional recovery sysmodule, as its own asset (sysmodule/).
+          # make dist builds the optional sysmodules first and bundles them in
+          # the romfs (Console › Optional modules); each is also its own asset
+          # (sysmodule/rescue/, sysmodule/agent/).
           make dist-rescue dist-agent
           # This build's hit rate, for the summary (the second build below takes nothing from it).
           ccache --print-stats > ccache-stats.txt
@@ -798,7 +800,7 @@ jobs:
             fi
           fi
           # The raw sysmodules next to their zips, for their artifacts.
-          cp sysmodule/out/playguard-rescue.nsp playguard-rescue.nsp
+          cp sysmodule/rescue/out/playguard-rescue.nsp playguard-rescue.nsp
           cp sysmodule/agent/out/playguard-agent.nsp playguard-agent.nsp
           # Only what these builds used goes back to the cache (a hit refreshes
           # an object's date), not 350 MB of builds gone by.
@@ -831,7 +833,7 @@ jobs:
           # libnx's 21.0.0 marker (LNY2 after MOD0), which hbmenu checks; the
           # .nro files after --romfs with their RomFS in their assets (the PIN
           # gate's font, and something after its code for the forwarders' loader).
-          python3 tools/check_nro.py sysmodule/out/playguard-rescue.elf sysmodule/agent/out/playguard-agent.elf --romfs playguard.nro gate/out/gate.nro
+          python3 tools/check_nro.py sysmodule/rescue/out/playguard-rescue.elf sysmodule/agent/out/playguard-agent.elf --romfs playguard.nro gate/out/gate.nro
       - name: compat.json
         run: python3 tools/gen_compat.py . compat.json
       - name: Build identity

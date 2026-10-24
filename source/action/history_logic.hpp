@@ -42,7 +42,7 @@ enum class Category
 {
     PlayTime,       // the limits, the alarms, the bedtime, the countdown, the console lock
     Restrictions,   // the level, the rating organisation, custom settings, VR
-    Security,       // the PIN, unlocks, the companion app, deleting, recovery
+    Security,       // the PIN, unlocks, the companion app, deleting, recovery, the optional modules
     Outside,        // what PlayGuard saw changed outside it, a new account
     Homebrew,       // the forwarders, their PIN gate's tries, the homebrew menu's lock
     Other,          // the network clock, a backup restored, settings reset, a kind unknown

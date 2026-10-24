@@ -320,7 +320,11 @@ set(ASSEMBLE_RESOURCES
     # (view/release_notes.cpp), the full list a press away.
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/.github/release-notes ${MERGED_RESOURCES}/release-notes
     COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/release-notes/README.md ${MERGED_RESOURCES}/img/emoji/README.md
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg)
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg
+    # The optional sysmodules, when built (make rescue / make agent).
+    COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DDEST=${MERGED_RESOURCES}/sysmodules
+            -DAPP_VERSION=${APP_VERSION} -DAPP_COMMIT=${APP_COMMIT}
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bundle_sysmodules.cmake)
 
 set(PLAYGUARD_COPY_SHADERS)
 # The web simulator: Japanese, Korean and Chinese drawn with the characters
@@ -359,19 +363,10 @@ if (PLATFORM_SWITCH AND USE_DEKO3D)
 endif ()
 
 if (PLATFORM_SWITCH)
-    # The recovery sysmodule rides in the .nro (romfs:/rescue/exefs.nsp), so
-    # PlayGuard can update an installed one that is out of date
-    # (action/rescue.hpp). Its own Makefile (sysmodule/) builds it; it is
-    # only copied to the SD card when a parent asks.
-    find_program(PLAYGUARD_MAKE NAMES make gmake)
-    set(RESCUE_NSP ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/out/playguard-rescue.nsp)
-    add_custom_target(playguard_rescue
-        COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule
-        BYPRODUCTS ${RESCUE_NSP}
-        COMMENT "Building the recovery sysmodule")
     # The program of the NRO forwarders PlayGuard installs (core/forwarder.h)
-    # rides in it too (romfs:/forwarder/main and main.npdm), built by
+    # rides in the .nro (romfs:/forwarder/main and main.npdm), built by
     # forwarder/'s Makefile.
+    find_program(PLAYGUARD_MAKE NAMES make gmake)
     set(FORWARDER_OUT ${CMAKE_CURRENT_SOURCE_DIR}/forwarder/out)
     add_custom_target(playguard_forwarder
         COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/forwarder
@@ -384,13 +379,11 @@ if (PLATFORM_SWITCH)
         COMMAND ${PLAYGUARD_MAKE} --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}/gate
         BYPRODUCTS ${GATE_NRO}
         COMMENT "Building the forwarders' PIN gate")
-    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_rescue playguard_forwarder playguard_gate
+    add_custom_target(${PROJECT_NAME}.nro ALL DEPENDS ${PROJECT_NAME} playguard_forwarder playguard_gate
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
         ${PLAYGUARD_COPY_SHADERS}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/rescue
-        COMMAND ${CMAKE_COMMAND} -E copy ${RESCUE_NSP} ${MERGED_RESOURCES}/rescue/exefs.nsp
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/forwarder
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.nso ${MERGED_RESOURCES}/forwarder/main
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.npdm ${MERGED_RESOURCES}/forwarder/main.npdm

@@ -1619,6 +1619,7 @@
             "rescue": "已使用恢复",
             "console_lock": "阻止所有游戏",
             "bedtime": "就寝提醒",
+            "module": "可选模块",
             "pin_shown": "已显示PIN",
             "config_reset": "偏好设置已重置（文件无法读取）",
             "outside_reset": "游戏时间重新开始计算（PlayGuard发现）",
@@ -1861,6 +1862,89 @@
             "pctl_error": "主机拒绝了",
             "waiting_for_confirmation": "等待确认",
             "busy": "PlayGuard 现在无法执行"
+        }
+    },
+    "modules": {
+        "title": "可选模块",
+        "open": "可选模块",
+        "section": "可选模块",
+        "overview": "概览",
+        "count": "已安装 {} 个",
+        "count_one": "已安装 1 个",
+        "intro": "PlayGuard 可以放到 SD 卡上的两个小型后台程序（sysmodule）。两者都不是必需的，各自只做一件事。PlayGuard 附带与它一起制作的版本，可在这里安装或更新，无需电脑。当“安全 › 用PIN保护PlayGuard”设为更改前要求输入 PIN 时，每项更改都需要输入 PIN。",
+        "status": "状态",
+        "install": "安装",
+        "update": "更新",
+        "at_boot": "开机时启动",
+        "start": "立即启动",
+        "stop": "立即停止",
+        "remove": "移除",
+        "removed": "模块已移除。",
+        "started": "模块已启动。",
+        "stopped": "模块已停止。",
+        "error": "无法更改模块",
+        "start_failed": "新版本未能启动（{}）：已恢复之前的版本。",
+        "locked_out": "被锁在外面？",
+        "state": {
+            "not_installed": "未安装",
+            "not_bundled": "此构建中没有",
+            "installed": "已安装，已是最新",
+            "update": "已安装，有可用更新",
+            "running": "运行中",
+            "stopped": "已停止",
+            "none": "未安装任何模块"
+        },
+        "short": {
+            "installed": "已安装",
+            "update": "有可用更新"
+        },
+        "details": {
+            "where": "文件夹：{}",
+            "installed": "已安装：版本 {}（{}）",
+            "by_hand": "手动安装",
+            "bundled": "PlayGuard 附带：版本 {}（{}）",
+            "not_bundled": "这个 PlayGuard 构建没有附带此模块（电脑版构建，或未使用 devkitPro 制作的构建）。"
+        },
+        "done": {
+            "installed": "{}：已安装",
+            "updated": "{}：已更新",
+            "removed": "{}：已移除",
+            "boot_on": "{}：开机时启动",
+            "boot_off": "{}：开机时不启动",
+            "started": "{}：已启动",
+            "stopped": "{}：已停止",
+            "rolled_back": "{}：更新已撤销，已恢复之前的版本",
+            "failed": "{}：更新失败"
+        },
+        "rescue": {
+            "title": "恢复模块（忘记PIN）",
+            "tab": "恢复模块",
+            "about": "如果 0 分钟的限制让一切都无法启动，而且忘记了 PIN，只要在 SD 卡的 config/playguard 中放一个名为 RESCUE 的空文件，这个模块就会在下次开机时解除主机的锁定。它不做别的事，并会立即停止。",
+            "install_body": "要安装恢复模块（版本 {}）吗？它在每次开机时运行，只有 SD 卡上有 RESCUE 文件时才会起作用。",
+            "update_body": "要将恢复模块更新到版本 {} 吗？",
+            "installed": "恢复模块已安装。下次开机时，如果有 RESCUE 文件，它就会起作用。",
+            "updated": "恢复模块已更新。",
+            "remove_body": "要移除恢复模块吗？没有它，在限制为 0 分钟时忘记 PIN，就需要用电脑来解决。",
+            "short_title": "恢复模块"
+        },
+        "agent": {
+            "title": "远程连接代理程序",
+            "tab": "连接代理程序",
+            "about": "在 PlayGuard 关闭期间保持与 Home Assistant 的连接（主机 › 远程访问）：指令照常执行，状态保持最新。",
+            "install_body": "要安装并启动代理程序（版本 {}）吗？它会在每次开机时启动，并使用“远程访问”的设置。",
+            "update_body": "要将代理程序更新到版本 {} 吗？它会短暂停止，然后重新启动。",
+            "installed": "代理程序已安装并启动。",
+            "updated": "代理程序已更新。",
+            "remove_body": "要停止并移除代理程序吗？之后远程连接只在 PlayGuard 打开期间运行。",
+            "installing": "正在安装代理程序…",
+            "updating": "正在更新代理程序…",
+            "busy": "代理程序正在更新。",
+            "no_answer": "10 秒内没有响应",
+            "other_protocol": "它使用协议 {}",
+            "install_undone": "代理程序没有响应（{}）：已将其移除。",
+            "update_failed": "无法更新代理程序（{}）。“主机 › 可选模块”会显示 SD 卡上现在的内容。",
+            "offer_body": "SD 卡上的远程连接代理程序不是这个 PlayGuard 附带的那个（版本 {}）。要现在更新吗？它会短暂停止；如果新版本没有响应，会恢复之前的版本。",
+            "offer_refused": "它使用较旧的协议：更新之前，远程连接无法使用。"
         }
     },
     "chart": {

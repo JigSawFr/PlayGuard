@@ -44,6 +44,9 @@ void check_once(std::function<void(const Offer&)> done);
 // day) or when the last check found a newer version; the update screen comes
 // up on `main` once nothing else is in front of it, unless postponed.
 void at_start(brls::Activity* main);
+// A newer release is known (the last check's) and not postponed: its screen
+// comes at start-up (agent_update leaves its own offer for later then).
+bool pending_at_start();
 
 // Installs the newer version the way About › Update with says, asking for
 // that way first when none is chosen.

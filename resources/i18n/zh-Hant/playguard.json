@@ -1619,6 +1619,7 @@
             "rescue": "已使用復原",
             "console_lock": "封鎖所有遊戲",
             "bedtime": "就寢鬧鐘",
+            "module": "選用模組",
             "pin_shown": "已顯示PIN碼",
             "config_reset": "偏好設定已重設（檔案無法讀取）",
             "outside_reset": "遊玩時間重新開始計算（PlayGuard發現）",
@@ -1861,6 +1862,89 @@
             "pctl_error": "主機拒絕了",
             "waiting_for_confirmation": "等待確認",
             "busy": "PlayGuard 目前無法執行"
+        }
+    },
+    "modules": {
+        "title": "選用模組",
+        "open": "選用模組",
+        "section": "選用模組",
+        "overview": "總覽",
+        "count": "已安裝 {} 個",
+        "count_one": "已安裝 1 個",
+        "intro": "PlayGuard 可以放到 SD 卡上的兩個小型背景程式（sysmodule）。兩者都不是必要的，各自只做一件事。PlayGuard 附帶與它一起製作的版本，可在此安裝或更新，不需要電腦。當「安全 › 用PIN碼保護PlayGuard」設為變更前詢問PIN碼時，每項變更都會要求輸入PIN碼。",
+        "status": "狀態",
+        "install": "安裝",
+        "update": "更新",
+        "at_boot": "開機時啟動",
+        "start": "立即啟動",
+        "stop": "立即停止",
+        "remove": "移除",
+        "removed": "模組已移除。",
+        "started": "模組已啟動。",
+        "stopped": "模組已停止。",
+        "error": "無法變更模組",
+        "start_failed": "新版本未能啟動（{}）：已改回先前的版本。",
+        "locked_out": "被鎖在外面？",
+        "state": {
+            "not_installed": "未安裝",
+            "not_bundled": "此建置未附帶",
+            "installed": "已安裝，已是最新",
+            "update": "已安裝，有可用的更新",
+            "running": "執行中",
+            "stopped": "已停止",
+            "none": "未安裝任何模組"
+        },
+        "short": {
+            "installed": "已安裝",
+            "update": "有可用更新"
+        },
+        "details": {
+            "where": "資料夾：{}",
+            "installed": "已安裝：版本 {}（{}）",
+            "by_hand": "手動安裝",
+            "bundled": "PlayGuard 附帶：版本 {}（{}）",
+            "not_bundled": "這個 PlayGuard 建置沒有附帶此模組（電腦版建置，或未使用 devkitPro 製作的建置）。"
+        },
+        "done": {
+            "installed": "{}：已安裝",
+            "updated": "{}：已更新",
+            "removed": "{}：已移除",
+            "boot_on": "{}：開機時啟動",
+            "boot_off": "{}：開機時不啟動",
+            "started": "{}：已啟動",
+            "stopped": "{}：已停止",
+            "rolled_back": "{}：已撤回更新，先前的版本已恢復",
+            "failed": "{}：更新失敗"
+        },
+        "rescue": {
+            "title": "復原模組（忘記PIN碼）",
+            "tab": "復原模組",
+            "about": "如果 0 分鐘的上限讓一切都無法啟動，而且忘記了 PIN碼，只要在 SD 卡的 config/playguard 中放一個名為 RESCUE 的空檔案，此模組就會在下次開機時解除主機的鎖定。它不做其他事，並會立即停止。",
+            "install_body": "要安裝復原模組（版本 {}）嗎？它會在每次開機時執行，只有 SD 卡上有 RESCUE 檔案時才會動作。",
+            "update_body": "要將復原模組更新至版本 {} 嗎？",
+            "installed": "復原模組已安裝。下次開機時，若有 RESCUE 檔案，它就會動作。",
+            "updated": "復原模組已更新。",
+            "remove_body": "要移除復原模組嗎？沒有它，在上限為 0 分鐘時忘記 PIN碼，就需要用電腦來解決。",
+            "short_title": "復原模組"
+        },
+        "agent": {
+            "title": "遠端連線代理程式",
+            "tab": "連線代理程式",
+            "about": "在 PlayGuard 關閉期間維持與 Home Assistant 的連線（主機 › 遠端存取）：指令照常執行，狀態保持最新。",
+            "install_body": "要安裝並啟動代理程式（版本 {}）嗎？它會在每次開機時啟動，並使用「遠端存取」的設定。",
+            "update_body": "要將代理程式更新至版本 {} 嗎？它會短暫停止，然後重新啟動。",
+            "installed": "代理程式已安裝並啟動。",
+            "updated": "代理程式已更新。",
+            "remove_body": "要停止並移除代理程式嗎？之後遠端連線只會在 PlayGuard 開啟期間運作。",
+            "installing": "正在安裝代理程式…",
+            "updating": "正在更新代理程式…",
+            "busy": "代理程式正在更新。",
+            "no_answer": "10 秒內沒有回應",
+            "other_protocol": "它使用通訊協定 {}",
+            "install_undone": "代理程式沒有回應（{}）：已將其移除。",
+            "update_failed": "無法更新代理程式（{}）。「主機 › 選用模組」會顯示 SD 卡上目前的內容。",
+            "offer_body": "SD 卡上的遠端連線代理程式不是這個 PlayGuard 附帶的版本（版本 {}）。要現在更新嗎？它會短暫停止；如果新版本沒有回應，會改回先前的版本。",
+            "offer_refused": "它使用較舊的通訊協定：更新之前，遠端連線無法運作。"
         }
     },
     "chart": {

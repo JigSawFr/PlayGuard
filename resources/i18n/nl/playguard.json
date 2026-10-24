@@ -1619,6 +1619,7 @@
             "rescue": "Herstel gebruikt",
             "console_lock": "Alle games blokkeren",
             "bedtime": "Bedtijdalarm",
+            "module": "Optionele module",
             "pin_shown": "Pincode getoond",
             "config_reset": "Voorkeuren teruggezet (bestand onleesbaar)",
             "outside_reset": "Speeltijd opnieuw begonnen (gezien door PlayGuard)",
@@ -1861,6 +1862,89 @@
             "pctl_error": "de console weigerde",
             "waiting_for_confirmation": "wacht op een bevestiging",
             "busy": "PlayGuard kon het nu niet doen"
+        }
+    },
+    "modules": {
+        "title": "Optionele modules",
+        "open": "Optionele modules",
+        "section": "Optionele modules",
+        "overview": "Overzicht",
+        "count": "{} geïnstalleerd",
+        "count_one": "1 geïnstalleerd",
+        "intro": "Twee kleine achtergrondprogramma's (sysmodules) die PlayGuard op de SD-kaart kan zetten. Geen van beide is nodig, en elk doet één ding. PlayGuard bevat de versie die ermee is gemaakt en installeert of werkt die van hieruit bij, zonder computer. Elke wijziging vraagt om de pincode als Beveiliging › PlayGuard beveiligen met de pincode daarom vraagt vóór een wijziging.",
+        "status": "Toestand",
+        "install": "Installeren",
+        "update": "Bijwerken",
+        "at_boot": "Starten bij het opstarten",
+        "start": "Nu starten",
+        "stop": "Nu stoppen",
+        "remove": "Verwijderen",
+        "removed": "Module verwijderd.",
+        "started": "Module gestart.",
+        "stopped": "Module gestopt.",
+        "error": "De module kon niet worden gewijzigd",
+        "start_failed": "De nieuwe versie startte niet ({}): de vorige is teruggezet.",
+        "locked_out": "Buitengesloten?",
+        "state": {
+            "not_installed": "Niet geïnstalleerd",
+            "not_bundled": "Niet in deze build",
+            "installed": "Geïnstalleerd, up-to-date",
+            "update": "Geïnstalleerd, er is een update beschikbaar",
+            "running": "actief",
+            "stopped": "gestopt",
+            "none": "Geen geïnstalleerd"
+        },
+        "short": {
+            "installed": "Geïnstalleerd",
+            "update": "Update beschikbaar"
+        },
+        "details": {
+            "where": "Map: {}",
+            "installed": "Geïnstalleerd: versie {} ({})",
+            "by_hand": "handmatig geïnstalleerd",
+            "bundled": "Meegeleverd met PlayGuard: versie {} ({})",
+            "not_bundled": "Deze build van PlayGuard bevat geen kopie van deze module (een desktopbuild, of een build gemaakt zonder devkitPro)."
+        },
+        "done": {
+            "installed": "{}: geïnstalleerd",
+            "updated": "{}: bijgewerkt",
+            "removed": "{}: verwijderd",
+            "boot_on": "{}: start bij het opstarten",
+            "boot_off": "{}: start niet bij het opstarten",
+            "started": "{}: gestart",
+            "stopped": "{}: gestopt",
+            "rolled_back": "{}: update ongedaan gemaakt, de vorige versie is terug",
+            "failed": "{}: de update is mislukt"
+        },
+        "rescue": {
+            "title": "Herstelmodule (vergeten pincode)",
+            "tab": "Herstelmodule",
+            "about": "Als een limiet van 0 minuten alles tegenhoudt en de pincode vergeten is, laat een leeg bestand met de naam RESCUE in config/playguard op de SD-kaart deze module de console ontgrendelen bij de volgende keer opstarten. Verder doet hij niets, en hij stopt meteen.",
+            "install_body": "De herstelmodule (versie {}) installeren? Hij draait bij elke keer opstarten en doet alleen iets als er een RESCUE-bestand op de SD-kaart staat.",
+            "update_body": "De herstelmodule bijwerken naar versie {}?",
+            "installed": "Herstelmodule geïnstalleerd. Hij doet iets bij de volgende keer opstarten als er een RESCUE-bestand staat.",
+            "updated": "Herstelmodule bijgewerkt.",
+            "remove_body": "De herstelmodule verwijderen? Zonder deze module is bij een vergeten pincode met een limiet van 0 minuten een computer nodig.",
+            "short_title": "Herstelmodule"
+        },
+        "agent": {
+            "title": "Agent voor verbinding op afstand",
+            "tab": "Verbindingsagent",
+            "about": "Houdt de verbinding met Home Assistant (Console › Toegang op afstand) actief terwijl PlayGuard gesloten is: opdrachten worden uitgevoerd en de status blijft actueel.",
+            "install_body": "De agent (versie {}) installeren en starten? Hij start bij elke keer opstarten en gebruikt de instellingen van Toegang op afstand.",
+            "update_body": "De agent bijwerken naar versie {}? Hij stopt even en start daarna opnieuw.",
+            "installed": "Agent geïnstalleerd en gestart.",
+            "updated": "Agent bijgewerkt.",
+            "remove_body": "De agent stoppen en verwijderen? De verbinding op afstand werkt dan alleen terwijl PlayGuard open is.",
+            "installing": "Agent wordt geïnstalleerd...",
+            "updating": "Agent wordt bijgewerkt...",
+            "busy": "De agent wordt bijgewerkt.",
+            "no_answer": "geen antwoord binnen 10 s",
+            "other_protocol": "hij spreekt protocol {}",
+            "install_undone": "De agent antwoordde niet ({}): hij is verwijderd.",
+            "update_failed": "De agent kon niet worden bijgewerkt ({}). Console › Optionele modules toont wat er nu op de SD-kaart staat.",
+            "offer_body": "De agent voor de verbinding op afstand op de SD-kaart is niet die van deze PlayGuard (versie {}). Nu bijwerken? Hij stopt even, en de vorige wordt teruggezet als de nieuwe niet antwoordt.",
+            "offer_refused": "Hij spreekt een ouder protocol: de verbinding op afstand werkt pas als hij is bijgewerkt."
         }
     },
     "chart": {

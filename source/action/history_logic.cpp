@@ -45,7 +45,7 @@ Category category(const history::Entry& e)
         return Category::PlayTime;
     if (k == "level" || k == "org" || k == "custom" || k == "vr") return Category::Restrictions;
     if (k == "pin" || k == "pin_shown" || k == "unlock" || k == "relock" || k == "unlink" || k == "delete" ||
-        k == "rescue")
+        k == "rescue" || k == "module")
         return Category::Security;
     if (text::starts_with(k, "outside_") || k == "new_account") return Category::Outside;
     if (text::ends_with(k, "_forwarder") || k == "forwarder_gone" || text::starts_with(k, "gate_") ||
@@ -98,7 +98,7 @@ const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm",
                               "forwarder_gone", "lock_hbmenu", "unlock_hbmenu", "hbmenu_restored",
                               "hbmenu_lock_removed", "gate_open", "gate_free", "gate_refused", "gate_hours", "gate_paused", "gate_closed",
                               "gate_closed_hours", "gate_pause", "gate_pause_lifted", "gate_limit", "gate_limit_set",
-                              "forwarder_options" };
+                              "forwarder_options", "module" };
 const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra", "bonus", "restore_bonus", "schedule_end",
                                 "remove", "backup", "undo", "first_steps", "overview", "console_lock", "notices",
                                 "rescue", "remote", "remote_extra", "remote_stop", "remote_console_lock",

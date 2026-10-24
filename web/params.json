@@ -37,6 +37,7 @@
   {"name": "modules", "group": "console", "type": "text", "panel": false},
   {"name": "agent", "group": "console", "type": "select", "options": ["", "running"], "panel": false},
   {"name": "agent_order", "group": "console", "type": "text", "panel": false},
+  {"name": "bundled", "group": "console", "type": "text", "panel": false},
   {"name": "accurate", "live": true, "group": "clock", "type": "bool"},
   {"name": "autosync_off", "group": "clock", "type": "bool"},
   {"name": "network_offset", "group": "clock", "type": "number"},

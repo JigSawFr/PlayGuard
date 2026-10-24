@@ -69,6 +69,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_MODULES=agent:running` | Optional modules running at start (`name:running`, comma-separated); a module starts only when its `exefs.nsp` is on the simulated SD card |
 | `PLAYGUARD_SIM_AGENT=running` | The agent sysmodule runs while its simulated module does (`PLAYGUARD_SIM_MODULES=agent:running`): an agent simulated in the process, with its own command dispatch (`sysmodule/agent/source/agent_core.c`), to which PlayGuard hands the link; what it pushes and answers is logged as `sim agent: …`. An installed `exefs.nsp` holding `old agent` speaks another protocol, one holding `broken agent` never answers |
 | `PLAYGUARD_SIM_AGENT_ORDER=limit_uniform=90` | An order the simulated agent hands PlayGuard once, after `Hello` |
+| `PLAYGUARD_SIM_BUNDLED=<folder>` | The optional modules PlayGuard carries (`<name>/exefs.nsp` and `version.txt`, as `cmake/bundle_sysmodules.cmake` writes them in the romfs) |
 
 Game patches are read from `./playguard_data/sd/`, the simulated SD card root; *Console › Forwarders* writes a few made-up homebrew there (`switch/*.nro`, `source/sim/sim_forwarder.cpp`) to make forwarders for.
 

@@ -1619,6 +1619,7 @@
             "rescue": "복구 사용",
             "console_lock": "모든 소프트웨어 차단",
             "bedtime": "취침 알람",
+            "module": "추가 모듈",
             "pin_shown": "PIN 표시",
             "config_reset": "환경 설정 초기화(파일을 읽을 수 없음)",
             "outside_reset": "플레이 시간 초기화(PlayGuard가 감지)",
@@ -1861,6 +1862,89 @@
             "pctl_error": "본체가 거부함",
             "waiting_for_confirmation": "확인 대기 중",
             "busy": "PlayGuard가 지금은 처리할 수 없었음"
+        }
+    },
+    "modules": {
+        "title": "추가 모듈",
+        "open": "추가 모듈",
+        "section": "추가 모듈",
+        "overview": "개요",
+        "count": "{}개 설치됨",
+        "count_one": "1개 설치됨",
+        "intro": "PlayGuard가 SD 카드에 설치할 수 있는 작은 백그라운드 프로그램(sysmodule) 두 개입니다. 둘 다 꼭 필요하지는 않으며, 각각 한 가지 일만 합니다. PlayGuard에는 함께 만든 버전이 들어 있어 컴퓨터 없이 여기에서 설치하거나 업데이트할 수 있습니다. 보안 › PIN으로 PlayGuard 보호가 변경 전에 PIN을 묻도록 설정되어 있으면 모든 변경에 PIN이 필요합니다.",
+        "status": "상태",
+        "install": "설치",
+        "update": "업데이트",
+        "at_boot": "부팅 시 시작",
+        "start": "지금 시작",
+        "stop": "지금 중지",
+        "remove": "제거",
+        "removed": "모듈을 제거했습니다.",
+        "started": "모듈을 시작했습니다.",
+        "stopped": "모듈을 중지했습니다.",
+        "error": "모듈을 변경할 수 없습니다",
+        "start_failed": "새 버전이 시작되지 않아({}) 이전 버전으로 되돌렸습니다.",
+        "locked_out": "본체가 잠겼나요?",
+        "state": {
+            "not_installed": "설치 안 됨",
+            "not_bundled": "이 빌드에 없음",
+            "installed": "설치됨, 최신 상태",
+            "update": "설치됨, 업데이트 있음",
+            "running": "실행 중",
+            "stopped": "중지됨",
+            "none": "설치된 모듈 없음"
+        },
+        "short": {
+            "installed": "설치됨",
+            "update": "업데이트 가능"
+        },
+        "details": {
+            "where": "폴더: {}",
+            "installed": "설치됨: 버전 {} ({})",
+            "by_hand": "직접 설치함",
+            "bundled": "PlayGuard에 포함: 버전 {} ({})",
+            "not_bundled": "이 PlayGuard 빌드에는 이 모듈이 들어 있지 않습니다(PC용 빌드이거나 devkitPro 없이 만든 빌드)."
+        },
+        "done": {
+            "installed": "{}: 설치됨",
+            "updated": "{}: 업데이트됨",
+            "removed": "{}: 제거됨",
+            "boot_on": "{}: 부팅 시 시작",
+            "boot_off": "{}: 부팅 시 시작 안 함",
+            "started": "{}: 시작됨",
+            "stopped": "{}: 중지됨",
+            "rolled_back": "{}: 업데이트 취소, 이전 버전으로 복원",
+            "failed": "{}: 업데이트 실패"
+        },
+        "rescue": {
+            "title": "복구 모듈 (PIN을 잊었을 때)",
+            "tab": "복구 모듈",
+            "about": "0분 제한 때문에 아무것도 시작할 수 없고 PIN도 잊어버렸다면, SD 카드의 config/playguard에 RESCUE라는 빈 파일을 넣으세요. 다음 부팅 때 이 모듈이 본체의 잠금을 해제합니다. 그 밖에는 아무것도 하지 않으며 바로 종료됩니다.",
+            "install_body": "복구 모듈(버전 {})을 설치할까요? 부팅할 때마다 실행되지만 SD 카드에 RESCUE 파일이 있을 때만 작동합니다.",
+            "update_body": "복구 모듈을 버전 {}(으)로 업데이트할까요?",
+            "installed": "복구 모듈을 설치했습니다. RESCUE 파일이 있으면 다음 부팅 때 작동합니다.",
+            "updated": "복구 모듈을 업데이트했습니다.",
+            "remove_body": "복구 모듈을 제거할까요? 모듈이 없으면 0분 제한에서 PIN을 잊어버렸을 때 컴퓨터가 있어야 해결할 수 있습니다.",
+            "short_title": "복구 모듈"
+        },
+        "agent": {
+            "title": "원격 연결 에이전트",
+            "tab": "연결 에이전트",
+            "about": "PlayGuard가 닫혀 있는 동안에도 Home Assistant와의 연결(본체 › 원격 접속)을 유지합니다. 명령이 실행되고 상태도 최신으로 유지됩니다.",
+            "install_body": "에이전트(버전 {})를 설치하고 시작할까요? 부팅할 때마다 시작되며 원격 접속 설정을 사용합니다.",
+            "update_body": "에이전트를 버전 {}(으)로 업데이트할까요? 잠시 멈췄다가 다시 시작됩니다.",
+            "installed": "에이전트를 설치하고 시작했습니다.",
+            "updated": "에이전트를 업데이트했습니다.",
+            "remove_body": "에이전트를 중지하고 제거할까요? 그러면 원격 연결은 PlayGuard가 열려 있는 동안에만 작동합니다.",
+            "installing": "에이전트 설치 중...",
+            "updating": "에이전트 업데이트 중...",
+            "busy": "에이전트를 업데이트하는 중입니다.",
+            "no_answer": "10초 안에 응답 없음",
+            "other_protocol": "프로토콜 {} 사용",
+            "install_undone": "에이전트가 응답하지 않아({}) 제거했습니다.",
+            "update_failed": "에이전트를 업데이트하지 못했습니다({}). 지금 SD 카드에 있는 것은 본체 › 추가 모듈에서 확인할 수 있습니다.",
+            "offer_body": "SD 카드의 원격 연결 에이전트가 이 PlayGuard에 들어 있는 것(버전 {})과 다릅니다. 지금 업데이트할까요? 잠시 멈추며, 새 에이전트가 응답하지 않으면 이전 것으로 되돌립니다.",
+            "offer_refused": "이전 프로토콜을 사용하므로 업데이트할 때까지 원격 연결이 작동하지 않습니다."
         }
     },
     "chart": {

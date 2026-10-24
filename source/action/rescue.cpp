@@ -10,9 +10,11 @@
 #include "action/data_notice.hpp"
 #include "action/history_flow.hpp"
 #include "action/notices.hpp"
+#include "action/bundled_modules.hpp"
 #include "app.hpp"
 #include "core/platform.h"
 #include "ui/ui.hpp"
+#include "util/modules.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/paths.hpp"
 
@@ -183,14 +185,15 @@ void update_now(std::function<void(bool)> done)
 
 bool bundled()
 {
-    struct stat st;
-    return stat(BRLS_ASSET("rescue/exefs.nsp"), &st) == 0;
+    return modules::bundled(bundled_modules::dir(), modules::get(modules::Id::Rescue)).present;
 }
 
 bool update(std::string* error)
 {
+    // The one Console › Optional modules installs (romfs:/sysmodules/rescue/).
+    const modules::Bundle b = modules::bundled(bundled_modules::dir(), modules::get(modules::Id::Rescue));
     std::string nsp;
-    if (!paths::read_file(BRLS_ASSET("rescue/exefs.nsp"), nsp) || nsp.empty()) {
+    if (!b.present || !paths::read_file(b.nsp, nsp) || nsp.empty()) {
         if (error) *error = "This build does not carry the module";
         return false;
     }
@@ -205,7 +208,7 @@ bool update(std::string* error)
         brls::Logger::error("rescue: playguard-rescue.txt could not be written: {}", error ? *error : "");
         return false;
     }
-    // Until the module removes it at the next boot (sysmodule/source/main.c).
+    // Until the module removes it at the next boot (sysmodule/rescue/source/main.c).
     std::string ignore;
     if (!paths::atomic_write(restart_path(), "", &ignore))
         brls::Logger::warning("rescue: {} could not be written: {}", RESCUE_RESTART_PATH, ignore);
