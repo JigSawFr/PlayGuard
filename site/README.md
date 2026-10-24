@@ -149,7 +149,9 @@ pages; no framework, nothing to install but that.
   language's `og:image`, else the repository's `images/social-preview.png`.
 - **The tour in each language**: `tools/render_tour.mjs <out-dir>` (Node,
   Playwright and ffmpeg) renders `branding/tour.html` with the language's
-  texts (its catalog) over its screenshots, `<out-dir>/<language>/tour.mp4`
+  texts (its catalog's `tour_*` keys) over its screenshots and the gate's in
+  that language (`make gate-preview`), the scenes the language has a
+  screenshot for, with the music, `<out-dir>/<language>/tour.mp4`
   (1280×720), the home page's video in that language; English keeps
   `images/video/playguard-tour.mp4`. A few minutes each: rendered with the
   screenshots (a release, or by hand), else main's.
@@ -163,7 +165,8 @@ pages; no framework, nothing to install but that.
   needing something else (a script inline, a file from another site) is
   blocked: put it in `site/assets/`. The pages also use
   `branding/` (the mark, the icon), `images/screenshots/` and the 90-second
-  tour (`images/video/playguard-tour.mp4`).
+  tour (`images/video/playguard-tour.mp4`), muted until its sound button
+  (site.js) turns its music on.
 
 To look at it locally: `python3 tools/build_site.py /tmp/site` then
 `python3 web/serve.py /tmp/site`, with `make web` and `cp -r build-web/simulator /tmp/site/simulator`

@@ -179,6 +179,25 @@ pre code { background: none; padding: 0; }
 .video-toggle:not(.playing) { right: calc(50% - 32px); bottom: calc(50% - 32px); width: 64px; height: 64px; }
 .video-toggle:not(.playing)::before { border-width: 12px 0 12px 19px; transform: translateX(3px); }
 .video-toggle.playing::before { width: 12px; height: 16px; border: solid currentColor; border-width: 0 4px; transform: none; }
+/* Its sound (site.js): off at first, as a video that plays by itself must
+   be; a speaker in the other corner while it plays, struck through while muted. */
+.video-sound {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #2a3854;
+  background: rgb(8 16 29 / 0.8);
+  color: #e8eef7;
+  cursor: pointer;
+  padding: 0;
+}
+.video-sound svg { display: block; margin: auto; width: 22px; height: 22px; }
+.video-sound .on { display: none; }
+.video-sound[aria-pressed="true"] .on { display: inline; }
+.video-sound[aria-pressed="true"] .off { display: none; }
 
 .section { max-width: 1180px; margin: 0 auto; padding: 56px var(--gutter-r) 0 var(--gutter-l); }
 .section > h2 { font-size: clamp(24px, 3vw, 32px); margin: 0 0 22px; }
@@ -516,7 +535,7 @@ pre.has-copy { position: relative; padding-right: 76px; }
 /* Printed (the troubleshooting's steps, a page to keep): the text alone,
    every folded part open, the links' addresses after them. */
 @media print {
-  .top, .footer, .doc-nav, .toc, .toc-mobile, .pager, .edit, .to-top, .lightbox, .copy, .anchor, .video-toggle,
+  .top, .footer, .doc-nav, .toc, .toc-mobile, .pager, .edit, .to-top, .lightbox, .copy, .anchor, .video-toggle, .video-sound,
   .gallery-dots, .doc-search, .skip, .compat-check { display: none !important; }
   :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #333; }
   body { background: #fff; color: #000; font-size: 12pt; }

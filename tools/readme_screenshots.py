@@ -11,7 +11,7 @@ listing (packaging/hb-appstore/pkgbuild.json) show them.
 One start of PlayGuard per screen, on the tab it opens on (config.json's
 start_tab), then the keys to it from there. Needs `make desktop`, Xvfb,
 xdotool, ImageMagick, dbus and faketime.
-  xvfb-run -s "-screen 0 1280x720x24" python3 tools/readme_screenshots.py [screen... | gate]
+  xvfb-run -s "-screen 0 1280x720x24" python3 tools/readme_screenshots.py [screen... | gate | clips | clip:<name>]
 """
 import json
 import os
@@ -89,7 +89,7 @@ def behind(data, config):
         "[stats]\nversion=v1.6.2.3\nfw_version=22.5.0\nis_emummc=1\n")
 
 
-def take(name, lang, tab, keys, sim=None, setup=None):
+def take(name, lang, tab, keys, sim=None, setup=None, clip=None):
     run = tempfile.mkdtemp(prefix="readme-shot-")
     data = os.path.join(run, "playguard_data")
     os.makedirs(data)
@@ -99,10 +99,11 @@ def take(name, lang, tab, keys, sim=None, setup=None):
     if setup:
         setup(data, config)
     json.dump(config, open(os.path.join(data, "config.json"), "w"))
-    env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1", TZ="UTC",
-               PLAYGUARD_SIM_NOW="1791475200", PLAYGUARD_SIM_STILL_FOCUS="1",
+    env = dict(os.environ, LIBGL_ALWAYS_SOFTWARE="1", TZ="UTC", PLAYGUARD_SIM_NOW="1791475200",
                PLAYGUARD_SIM_VERSION=f"{VERSION}:", PLAYGUARD_SIM_FOCUS_LOG="1",
                FAKETIME_DONT_FAKE_MONOTONIC="1")
+    if not clip:
+        env["PLAYGUARD_SIM_STILL_FOCUS"] = "1"   # a clip keeps the look's movements
     # The screen's own console (PLAYGUARD_SIM_*, docs/contributing/simulator.md).
     env.update({f"PLAYGUARD_SIM_{k}": v.replace("{root}", ROOT) for k, v in (sim or {}).items()})
     log_path = os.path.join(run, "app.log")
@@ -114,7 +115,8 @@ def take(name, lang, tab, keys, sim=None, setup=None):
             log.flush()
             return any(text in l for l in open(log_path, errors="replace"))
 
-        for wanted in ("start-up: first screen ready", "games: start-up check done"):
+        entrance = clip and clip.get("entrance")
+        for wanted in ("start-up: first screen ready",) + (() if entrance else ("games: start-up check done",)):
             for _ in range(240):
                 if logged(wanted):
                     break
@@ -123,10 +125,34 @@ def take(name, lang, tab, keys, sim=None, setup=None):
                 time.sleep(0.25)
             else:
                 sys.exit(f"{name}: no {wanted!r} in 60 s ({log_path})")
-        time.sleep(2)
-        for k in keys:
+        def press(k, pause=1.2):
             subprocess.run(["xdotool", "keydown", k, "sleep", "0.02", "keyup", k])
-            time.sleep(1.2)
+            time.sleep(pause)
+
+        if not entrance:
+            time.sleep(2)
+        for k in keys:
+            press(k)
+        if clip:
+            # The screen as it moves (x11grab), its keys pressed meanwhile.
+            # Recorded fast (the screen is drawn on the CPU too), then made a WebM: the
+            # Chromium tools/render_tour.mjs draws with plays VP9, not H.264.
+            raw = os.path.join(run, "clip.mp4")
+            path = os.path.join(OUT, "clips", name + ".webm")
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            rec = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "x11grab", "-draw_mouse", "0", "-framerate", "30",
+                                    "-video_size", "1280x720", "-i", os.environ["DISPLAY"], "-an", "-c:v", "libx264",
+                                    "-preset", "ultrafast", "-crf", "12", "-pix_fmt", "yuv420p", raw],
+                                   stdin=subprocess.PIPE)
+            time.sleep(clip.get("lead", 0.6))
+            for k in clip.get("keys", []):
+                press(k, clip.get("pause", 1.0))
+            time.sleep(clip.get("tail", 1.5))
+            rec.communicate(b"q")
+            subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", raw, "-an", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "30",
+                            "-row-mt", "1", "-deadline", "good", path], check=True)
+            print(name, path)
+            return
         time.sleep(1.5)   # every animation over, no label scrolling yet
         path = os.path.join(OUT, name + ".png")
         subprocess.run(IM + ["import", "-window", "root", "-crop", "1280x720+0+0", "+repage", path], check=True)
@@ -151,11 +177,27 @@ def gate():
 
 CONSOLES = {"updates": (UPDATES, behind), "forwarders": ({"FORWARDERS": "1"}, None)}
 
+# The tour's clips (images/screenshots/clips/<name>.webm, branding/tour.html):
+# the screen as it moves, recorded while its keys are pressed. name: (language,
+# tab, keys before, the clip: its keys and timing, its console).
+CLIPS = {
+    # Today opening: the ring drawing itself, then each extra time moving the line.
+    "today": ("en-US", "", [], {"entrance": True, "lead": 1.4, "keys": ["Right", "Right", "Right"], "pause": 1.1, "tail": 0.8}),
+    # The child view in its last minutes: the end in amber, the ring beating.
+    "child": ("en-US", "", ["Right", "Down", "Right", "Return"], {"tail": 4.0}, {"LEFT_MIN": "4"}),
+    # A day raised with the stick, 15 minutes a press.
+    "day": ("en-US", "play_timer", ["Right", "Down", "Return"], {"keys": ["Up", "Up", "Up"], "pause": 0.8, "tail": 1.0}),
+}
+
 # A screen not in SCREENS: <name>=<language>:<tab>:<key>,<key>…[:<SIM>=<value>;…]
 # (to try keys out; SIM a PLAYGUARD_SIM_ variable without its prefix).
 for name in sys.argv[1:] or [*SCREENS, "gate"]:
     if name == "gate":
         gate()
+    elif name == "clips" or name.startswith("clip:"):
+        for clip in CLIPS if name == "clips" else [name[5:]]:
+            lang, tab, keys, spec, *sim = CLIPS[clip]
+            take(clip, lang, tab, keys, sim[0] if sim else None, clip=spec)
     elif "=" in name:
         name, spec = name.split("=", 1)
         lang, tab, keys, *sim = spec.split(":", 3)

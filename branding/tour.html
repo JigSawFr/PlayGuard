@@ -1,6 +1,9 @@
 <!doctype html>
-<!-- PlayGuard's tour, a minute and a half: window.render(t) draws the frame at t seconds; tools/render_tour.mjs turns it into images/video/playguard-tour.mp4.
-     window.TOUR, set before the page's script (tools/render_tour.mjs), is the website's tour in another language: its texts and its screenshots. -->
+<!-- PlayGuard's tour, a minute and a half (?short: the teaser, under half a minute): once window.READY resolves,
+     window.render(t) draws the frame at t seconds (a promise, its clips seeked); tools/render_tour.mjs turns it into
+     images/video/playguard-tour.mp4 and playguard-teaser.mp4. window.TOUR, set before the page's script
+     (tools/render_tour.mjs), holds its texts (the site's catalog, site/i18n/<language>.json's tour_* keys) and, in
+     another language than English, its screenshots. -->
 <html><head><meta charset="utf-8">
 <style>
   /* Sora, the site's own copy (site/assets/fonts/, SIL Open Font License): nothing asked of Google Fonts. */
@@ -40,10 +43,23 @@
   .copy ul { margin:34px 0 0; padding:0; list-style:none; }
   .copy li { display:flex; gap:16px; align-items:flex-start; margin:0 0 18px; font-size:26px; line-height:1.35; }
   .copy li svg { flex:none; width:34px; height:34px; margin-top:1px; }
+  .stage { position:absolute; inset:0; }
   .shot { position:absolute; left:676px; top:206px; width:1152px; height:648px; border-radius:28px; overflow:hidden; background:#0b1424;
           box-shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06), 0 0 0 12px #121e33, 0 0 0 13px #2a3854; }
   .zoom { position:absolute; inset:0; transform-origin:var(--ox,50%) var(--oy,50%); }
-  .zoom img { width:100%; height:100%; display:block; }
+  .zoom img, .zoom video { width:100%; height:100%; display:block; }
+  .zoom video { position:absolute; inset:0; }
+  /* A console around the screen (device: a scene's), drawn, not any maker's: a body and two controllers. */
+  .device .shot { left:826px; top:262px; width:852px; height:480px; border-radius:10px; box-shadow:0 0 0 14px #0a0f18; }
+  .body { position:absolute; left:812px; top:236px; width:880px; height:532px; border-radius:28px; background:linear-gradient(180deg, #1a2435, #121a28);
+          box-shadow:0 40px 100px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06); }
+  .pad { position:absolute; top:236px; width:136px; height:532px; background:linear-gradient(180deg, #26344d, #1b2638); box-shadow:inset 0 0 0 1px rgba(255,255,255,.07); }
+  .pad.l { left:676px; border-radius:68px 14px 14px 68px; }
+  .pad.r { left:1692px; border-radius:14px 68px 68px 14px; }
+  .pad i { position:absolute; border-radius:50%; background:#0e1522; box-shadow:inset 0 0 0 2px #33445f; }
+  .pad i.stick { width:62px; height:62px; left:37px; }
+  .pad i.btn { width:30px; height:30px; background:#18233a; box-shadow:inset 0 0 0 2px rgba(46,196,166,.55); }
+  .device .steps { top:800px; }
     /* The part that matters: the rest of the screen dimmed, a soft edge, no outline (the screen's own focus stays the only one). */
   .hl { position:absolute; border-radius:24px; box-shadow:0 0 0 9999px rgba(4,9,18,.5); filter:blur(10px); opacity:0; }
   .zoom img.alt { position:absolute; inset:0; opacity:0; }
@@ -75,6 +91,7 @@
   #ogit { padding:20px 40px; border-radius:999px; border:2px solid var(--line); color:var(--ink); font-size:34px; font-weight:600; display:flex; align-items:center; }
   #onote { top:830px; font-size:28px; color:var(--mute); }
   #onote b { color:var(--amber); font-weight:600; }
+  #omusic { top:1010px; font-size:20px; color:var(--dim); }
 </style></head>
 <body>
 <div id="bg"></div>
@@ -113,166 +130,134 @@
     <path d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round"/>
   </svg>
   <div class="center" id="oword">Play<span>Guard</span></div>
-  <div class="center" id="oline1">Free &amp; open source · GPLv3</div>
+  <div class="center" id="oline1"></div>
   <div id="octa"><div id="ourl">playguard.link</div><div id="ogit">github.com/JigSawFr/PlayGuard</div></div>
   <div class="center" id="onote">Homebrew App Store · sphaira · <b>Requires Atmosphère CFW</b></div>
+  <!-- The music's credit (branding/tour-music.txt: CC BY 4.0), where the music is: not in the silent GIF. -->
+  <div class="center" id="omusic">Music: “Getting it Done” Kevin MacLeod (incompetech.com) · CC BY 4.0</div>
 </div>
 
 <script>
-// Each scene: its screen, its words, where the camera leans (ox, oy) and the part of the screen lit up
-// (hl: x, y, width, height in the screenshot's 1280x720 pixels).
-let SCENES = [
-  { img:'dashboard.png', k:'Today', h:'The whole day <em>at a glance</em>',
-    p:'Time left on a ring, when play ends, the bedtime coming.',
-    b:['Extra time, stop for today, child view', 'Bedtime, parental controls and clock as cards', 'What needs you comes first, in amber'],
-    ox:'58%', oy:'30%', hl:[528, 226, 714, 126] },
-  { img:'extra_time.png', k:'Extra time', h:'More time? <em>One press.</em>',
-    p:'A well-earned bonus, given in a second, taken back by itself.',
-    b:['+15 min, +30 min, +1 h or any amount', 'Today, or a day still to come', 'The usual limit back the next day'],
-    ox:'50%', oy:'60%', hl:[196, 296, 888, 334] },
-  { img:'child_view.png', k:'Child view', h:'Hand it over, <em>worry-free</em>',
-    p:'Just the time left, big enough to read from the couch.',
-    b:['When play ends, when it’s bedtime', 'The ring pulses in the last 5 minutes', 'Back to your screens with the PIN'],
-    ox:'50%', oy:'60%', hl:[326, 508, 640, 68] },
-  { img:'play_timer.png', k:'Play timer', h:'A limit for <em>every day</em>',
-    p:'The whole week on one screen, with the time played each day.',
-    b:['Weekdays and weekends, each their own', 'Profiles for school weeks and holidays', 'Bedtime alarm · suspend or just warn'],
-    ox:'55%', oy:'40%', hl:[256, 180, 980, 344] },
-  { img:'per_day.png', k:'Play timer', h:'Change a day <em>with the stick</em>',
-    p:'±15 min a press, then the week saved in one go.',
-    b:['Copy to Mon → Fri, or to the weekend', 'Days over the limit marked in coral', 'Discard or save, nothing written before'],
-    ox:'30%', oy:'45%', hl:[276, 190, 146, 272] },
-  { img:'activity.png', k:'Activity', h:'Who played <em>what</em>, and how long',
-    p:'Per game and per account, this week against the last.',
-    b:['Every game with its own page', 'Each account apart, or all together', 'Exported to the SD card: CSV, JSON, XLSX or PDF'],
-    ox:'55%', oy:'25%', hl:[256, 150, 980, 158] },
-  { img:'restrictions.png', k:'Restrictions', h:'Right for their <em>age</em>',
-    p:'One press picks a level; every setting follows.',
-    b:['Young child, child, teen or your own', 'Age rating, social posting, communication', 'Games blocked one by one'],
-    ox:'55%', oy:'30%', hl:[256, 118, 980, 266] },
-  { img:'security.png', k:'Security', h:'A <em>PIN</em> that really protects',
-    p:'Easy-to-guess PINs flagged, never shown.',
-    b:['PlayGuard itself behind the PIN', 'Temporary unlock that turns itself back on', 'Lock the homebrew menu'],
-    ox:'55%', oy:'25%', hl:[256, 118, 980, 142] },
-  { img:'notifications.png', k:'Notifications', h:'What needs you, <em>in one place</em>',
-    p:'A bell gathers it all, Ⓨ from any tab, the fix one press away.',
-    b:['A weak PIN, a drifting clock, an alarm off', 'Changes made outside PlayGuard', 'The week’s play time, every 7 days'],
-    ox:'50%', oy:'25%', hl:[64, 94, 1150, 236] },
-  { img:'clock.png', k:'Network clock', h:'A clock that’s <em>never wrong</em>',
-    p:'Set from public time servers, so the timer counts true on a console that never reaches Nintendo.',
-    b:[],
-    ox:'50%', oy:'32%', hl:[66, 122, 1148, 232] },
-  { img:'console.png', k:'Console', h:'The console, <em>checked</em>',
-    p:'What it runs and what needs a look, before it bites.',
-    b:['Firmware, Atmosphère, hekate, sys-patch', 'The network clock, the installed games', 'Forwarders and the homebrew menu'],
-    ox:'55%', oy:'48%', hl:[256, 292, 980, 92] },
-  { img:'notes_firmware.png', imgs:['notes_atmosphere.png', 'notes_hekate.png', 'notes_syspatch.png'], d:6.4,
-    k:'Updates', h:'Every update, <em>with its notes</em>',
-    p:'Firmware, Atmosphère, hekate and sys-patch checked once a day: what changed, a press away.',
-    b:['What’s newer than what the console runs', 'A firmware that needs a newer hekate, said first', 'Each version in its tab, L and R'],
-    steps:['Firmware', 'Atmosphère', 'hekate', 'sys-patch'], ox:'30%', oy:'25%' },
-  { img:'installed_games.png', k:'Installed games', h:'Games that won’t start, <em>found</em>',
-    p:'Every installed game checked: a firmware it needs, a removed update, corrupt data.',
-    b:['Repaired here when PlayGuard can', 'A full check of the suspect ones', 'The list to reinstall, saved first'],
-    ox:'50%', oy:'30%', hl:[64, 148, 1152, 176] },
-  { img:'forwarders.png', k:'Forwarders', h:'Homebrew on the <em>HOME menu</em>',
-    p:'Any .nro as an icon of its own, started like a game, counted by the play timer.',
-    b:['PlayGuard’s own icon in one press', 'An icon taken from the album', 'Which ones are protected, at a glance'],
-    ox:'50%', oy:'65%', hl:[64, 370, 1152, 210] },
-  { img:'forwarder_protection.png', k:'Forwarders', h:'Each icon, <em>behind the PIN</em>',
-    p:'Its rules live inside the forwarder: no file to edit them away.',
-    b:['Hours without the PIN, hours it never opens', 'Closed once today’s play time is used up', 'A pause after refused PINs'],
-    ox:'45%', oy:'55%', hl:[216, 286, 848, 272] },
-  { img:'gate_asking.png', imgs:['gate_opening.png'], d:5.4, k:'From its HOME icon', h:'Started from its icon: <em>PIN first</em>',
-    p:'PlayGuard’s gate opens, then the console’s PIN screen. The right PIN, and off it goes.',
-    b:['In its free hours, no PIN asked', 'Every try in the change history'],
-    steps:['The PIN asked', 'PIN entered: starting'], ox:'35%', oy:'45%' },
-  { img:'gate_refused.png', imgs:['gate_closed.png', 'gate_limit.png'], d:5.8, k:'From its HOME icon', h:'No PIN, <em>no play</em>',
-    p:'Refused, outside its hours or out of play time: back to the HOME menu.',
-    b:[],
-    steps:['PIN refused', 'Not at this time', 'Play time used up'], ox:'35%', oy:'50%' },
-  { img:'homebrew_menu.png', k:'Homebrew menu', h:'The album and R, <em>locked too</em>',
-    p:'Neither the album nor a game started holding R opens the homebrew menu without the PIN.',
-    b:['Step by step, each check a press away', 'A rescue sheet to undo it from a computer'],
-    ox:'50%', oy:'35%', hl:[312, 146, 656, 276] },
-  { img:'dashboard_fr_dark.png', k:'Every language', h:'In <em>their</em> language',
-    p:'The console’s 15 languages, a light and a dark theme, larger text on the TV.',
-    b:[],
-    ox:'50%', oy:'50%' },
+// Each scene: its id (its texts: tour_<id>_k, _h, _p, _b1…, _s1… in the site's catalog), its screen
+// (img, imgs: several in turn; clip: the screen moving, images/screenshots/clips/, English only), shot:
+// the website's screenshot it is in another language (tools/site_screenshots.mjs), d: its own length,
+// device: drawn in a console, where the camera leans (ox, oy) and the part of the screen lit up (hl:
+// x, y, width, height in the screenshot's 1280x720 pixels).
+const ALL = [
+  { id:'gate', img:'gate_asking.png', imgs:['gate_opening.png'], d:5.4, device:true, ox:'50%', oy:'45%' },
+  { id:'gaterules', img:'gate_refused.png', imgs:['gate_closed.png', 'gate_limit.png'], d:5.8, device:true, ox:'50%', oy:'50%' },
+  { id:'today', img:'dashboard.png', clip:'today.webm', shot:'dashboard', ox:'58%', oy:'30%', hl:[528, 226, 714, 126] },
+  { id:'extra', img:'extra_time.png', ox:'50%', oy:'60%', hl:[196, 296, 888, 334] },
+  { id:'child', img:'child_view.png', clip:'child.webm', device:true, ox:'50%', oy:'60%' },
+  { id:'week', img:'play_timer.png', shot:'play_timer', ox:'55%', oy:'40%', hl:[256, 180, 980, 344] },
+  { id:'day', img:'per_day.png', clip:'day.webm', shot:'per_day', ox:'30%', oy:'45%', hl:[276, 190, 146, 272] },
+  { id:'activity', img:'activity.png', shot:'activity', ox:'55%', oy:'25%', hl:[256, 150, 980, 158] },
+  { id:'restrictions', img:'restrictions.png', shot:'restrictions', ox:'55%', oy:'30%', hl:[256, 118, 980, 266] },
+  { id:'security', img:'security.png', shot:'security', ox:'55%', oy:'25%', hl:[256, 118, 980, 142] },
+  { id:'notices', img:'notifications.png', ox:'50%', oy:'25%', hl:[64, 94, 1150, 236] },
+  { id:'clock', img:'clock.png', shot:'clock', ox:'50%', oy:'32%', hl:[66, 122, 1148, 232] },
+  { id:'console', img:'console.png', shot:'console', ox:'55%', oy:'48%', hl:[256, 292, 980, 92] },
+  { id:'updates', img:'notes_firmware.png', imgs:['notes_atmosphere.png', 'notes_hekate.png', 'notes_syspatch.png'], d:6.4, ox:'30%', oy:'25%' },
+  { id:'games', img:'installed_games.png', ox:'50%', oy:'30%', hl:[64, 148, 1152, 176] },
+  { id:'fwd', img:'forwarders.png', ox:'50%', oy:'65%', hl:[64, 370, 1152, 210] },
+  { id:'fwdpin', img:'forwarder_protection.png', ox:'45%', oy:'55%', hl:[216, 286, 848, 272] },
+  { id:'hbmenu', img:'homebrew_menu.png', ox:'50%', oy:'35%', hl:[312, 146, 656, 276] },
+  { id:'langs', img:'dashboard_fr_dark.png', ox:'50%', oy:'50%' },
 ];
+// The teaser: the gate, Today and the child view, then the end.
+const SHORT = ['gate', 'today', 'child'];
 const ICON = {
-  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
-  eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   undo:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
   unlink:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M3 3l18 18"/>',
-  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20"/>',
-  play:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M10 7.5l4.5 2.5L10 12.5z"/>',
   check:'<circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.7 2.7L16 9.5"/>',
   text:'<path d="M3 20l5-14 5 14M4.8 15h6.4"/><path d="M14 20l3.5-9 3.5 9M15.2 17h4.6"/>',
   shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+  play:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M10 7.5l4.5 2.5L10 12.5z"/>',
 };
-let BONUS = [
-  { i:'undo', t:'History & undo', p:'Every change logged and undoable, backups included.' },
-  { i:'unlink', t:'Companion app', p:'Unlink Nintendo’s app, even on a second-hand console.' },
-  { i:'check', t:'Safe on a new firmware', p:'Newer than any tested: PlayGuard opens read-only and looks for a version that supports it.' },
-  { i:'text', t:'Larger text on the TV', p:'Automatic: bigger when docked, back to normal in handheld.' },
-  { i:'shield', t:'Nothing in the background', p:'The console’s own parental controls do the work, PlayGuard closed.' },
-  { i:'play', t:'Try it first', p:'The real PlayGuard runs in your browser.' },
-];
-// Another language's tour: its texts (plain text, no markup) and its screenshots.
-const TOUR = window.TOUR;
+const BONUS = [['undo', 'undo'], ['app', 'unlink'], ['firmware', 'check'], ['text', 'text'], ['background', 'shield'], ['try', 'play']];
+
+const TOUR = window.TOUR || { lang: 'en-US', t: {} };
+const text = (key) => TOUR.t[key] || '';
 const escape = (s) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-if (TOUR) {
-  document.documentElement.lang = TOUR.lang;
-  const text = (id, value) => { document.getElementById(id).textContent = value; };
-  text('tag', TOUR.tag);
-  ['h1', 'h2', 'h3'].forEach((id, i) => text(id, TOUR.hooks[i] || ''));
-  text('hooksub', TOUR.hooksub);
-  text('btitle', TOUR.more);
-  text('bsub', '');
-  text('oline1', TOUR.line1);
+// A catalog's text as HTML: **its words** in `tag`.
+const marked = (key, tag = 'em') => escape(text(key)).replace(/\*\*(.+?)\*\*/g, `<${tag}>$1</${tag}>`);
+const english = TOUR.lang === 'en-US';
+const SHORTCUT = new URLSearchParams(location.search).has('short') || TOUR.short;
+// Another language's tour: its screens only where the website has them in that language (TOUR.src).
+let SCENES = ALL.filter((s) => !SHORTCUT || SHORT.includes(s.id));
+if (!english) SCENES = SCENES.filter((s) => [s.img, ...(s.imgs || [])].every((m) => TOUR.src && TOUR.src[s.shot || m.replace(/\.png$/, '')]));
+const src = (m, s) => english ? `../images/screenshots/${m}` : TOUR.src[(m === s.img && s.shot) || m.replace(/\.png$/, '')];
+
+document.documentElement.lang = TOUR.lang;
+if (!english) {
+  const set = (id, value) => { document.getElementById(id).textContent = value; };
+  set('tag', TOUR.tag);
+  ['h1', 'h2', 'h3'].forEach((id, i) => set(id, TOUR.hooks[i] || ''));
   document.getElementById('onote').replaceChildren(`${TOUR.stores} · `, Object.assign(document.createElement('b'), { textContent: TOUR.cfw }));
-  SCENES = TOUR.scenes.map((s) => ({ ...s, k: escape(s.k), h: escape(s.h), p: escape(s.p), b: [] }));
-  BONUS = TOUR.bonus.map((c) => ({ ...c, t: escape(c.t), p: escape(c.p || '') }));
 }
+if (text('tour_hook_sub')) document.getElementById('hooksub').innerHTML = marked('tour_hook_sub', 'b');
+document.getElementById('btitle').innerHTML = marked('tour_more', 'span');
+document.getElementById('bsub').textContent = text('tour_more_sub');
+document.getElementById('oline1').textContent = text('tour_free');
+
 // ?still: no drifting light and no camera move on the screenshots, so a GIF only redraws what changes.
 const STILL = new URLSearchParams(location.search).has('still');
-const T_INTRO = 3.4, T_HOOK = 3.6, T_SCENE = 3.8, T_BONUS = 5.6, T_OUTRO = 4.8;
+if (STILL) document.getElementById('omusic').remove();
+const T_INTRO = SHORTCUT ? 2.6 : 3.4, T_HOOK = SHORTCUT ? 3.0 : 3.6, T_SCENE = 3.8, T_BONUS = SHORTCUT ? 0 : 5.6, T_OUTRO = 4.8;
 const T_SCENES0 = T_INTRO + T_HOOK;
-// A scene lasts T_SCENE, or its own d (one with several screens, longer).
-const T_AT = SCENES.reduce((at, s) => [...at, at[at.length - 1] + (s.d || T_SCENE)], [T_SCENES0]);
-const T_BONUS0 = T_AT[SCENES.length];
-const T_OUTRO0 = T_BONUS0 + T_BONUS;
-window.DURATION = T_OUTRO0 + T_OUTRO;
+let T_AT = [], T_BONUS0 = 0, T_OUTRO0 = 0;
 
 const MARK = '<svg viewBox="0 0 256 256"><circle cx="128" cy="128" r="62" fill="none" stroke="#1F3355" stroke-width="18"/><circle cx="128" cy="128" r="62" fill="none" stroke="#2EC4A6" stroke-width="18" stroke-linecap="round" stroke-dasharray="292 390" transform="rotate(-90 128 128)"/><path d="M112 100 L160 128 L112 156 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="8" stroke-linejoin="round"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="rgba(46,196,166,.16)"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#2EC4A6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const PADS = `<div class="pad l"><i class="stick" style="top:70px"></i><i class="btn" style="left:21px;top:290px"></i><i class="btn" style="left:53px;top:258px"></i><i class="btn" style="left:85px;top:290px"></i><i class="btn" style="left:53px;top:322px"></i></div>
+  <div class="pad r"><i class="btn" style="left:21px;top:120px"></i><i class="btn" style="left:53px;top:88px"></i><i class="btn" style="left:85px;top:120px"></i><i class="btn" style="left:53px;top:152px"></i><i class="stick" style="top:270px"></i></div>`;
 const box = document.getElementById('scenes');
 const els = SCENES.map((s, i) => {
   const d = document.createElement('div');
   d.className = 'layer';
   const [x, y, w, h] = s.hl || [0, 0, 0, 0];
   const pct = (v, of) => `${(100 * v / of).toFixed(3)}%`;
+  const k = text(`tour_${s.id}_k`), head = text(`tour_${s.id}_h`).replace(/\*\*/g, '');
+  const bullets = [1, 2, 3].map((n) => `tour_${s.id}_b${n}`).filter(text);
+  const steps = [1, 2, 3, 4].map((n) => `tour_${s.id}_s${n}`).filter(text);
+  const clip = english && s.clip;
   d.innerHTML = `<div class="brand">${MARK}PlayGuard</div>
-    <div class="copy">${s.k && s.k !== s.h ? `<span class="kicker">${s.k}</span>` : ''}<h2>${s.h}</h2><p>${s.p}</p>
-      <ul>${s.b.map((b) => `<li>${CHECK}<span>${b}</span></li>`).join('')}</ul></div>
-    <div class="shot"><div class="zoom" style="--ox:${s.ox};--oy:${s.oy}"><img src="${s.src || `../images/screenshots/${s.img}`}">
-      ${(s.imgs || []).map((m) => `<img class="alt" src="../images/screenshots/${m}">`).join('')}
-      ${s.hl ? `<div class="hl" style="left:${pct(x, 1280)};top:${pct(y, 720)};width:${pct(w, 1280)};height:${pct(h, 720)}"></div>` : ''}</div></div>
-    ${s.steps ? `<div class="steps">${s.steps.map((c) => `<span>${c}</span>`).join('')}</div>` : ''}
+    <div class="copy">${k && k !== head ? `<span class="kicker">${escape(k)}</span>` : ''}<h2>${marked(`tour_${s.id}_h`)}</h2><p>${marked(`tour_${s.id}_p`)}</p>
+      <ul>${bullets.map((b) => `<li>${CHECK}<span>${marked(b)}</span></li>`).join('')}</ul></div>
+    <div class="stage${s.device ? ' device' : ''}">${s.device ? `<div class="body"></div>${PADS}` : ''}
+      <div class="shot"><div class="zoom" style="--ox:${s.ox};--oy:${s.oy}"><img src="${src(s.img, s)}">
+        ${(s.imgs || []).map((m) => `<img class="alt" src="${src(m, s)}">`).join('')}
+        ${clip ? `<video muted playsinline preload="auto" src="../images/screenshots/clips/${s.clip}"></video>` : ''}
+        ${s.hl ? `<div class="hl" style="left:${pct(x, 1280)};top:${pct(y, 720)};width:${pct(w, 1280)};height:${pct(h, 720)}"></div>` : ''}</div></div>
+      ${steps.length ? `<div class="steps">${steps.map((c) => `<span>${escape(text(c))}</span>`).join('')}</div>` : ''}</div>
     <div class="dots">${SCENES.map((_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</div>`;
   box.appendChild(d);
   return d;
 });
 const grid = document.getElementById('grid');
-const cards = BONUS.map((c) => {
+const cards = SHORTCUT ? [] : BONUS.map(([key, icon]) => {
   const d = document.createElement('div');
   d.className = 'card';
-  d.innerHTML = `<div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2EC4A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[c.i]}</svg></div>
-    <h3>${c.t}</h3>${c.p ? `<p>${c.p}</p>` : ''}`;
+  d.innerHTML = `<div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2EC4A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[icon]}</svg></div>
+    <h3>${marked(`tour_x_${key}_t`)}</h3>${text(`tour_x_${key}_p`) ? `<p>${marked(`tour_x_${key}_p`)}</p>` : ''}`;
   grid.appendChild(d);
   return d;
 });
+
+// The timeline, once the clips say how long they are: a clip's scene lasts the clip, a little more.
+window.READY = Promise.all([...document.querySelectorAll('video')].map((v) => v.readyState >= 1 ? null
+  : new Promise((r) => { v.addEventListener('loadedmetadata', r, { once: true }); v.addEventListener('error', r, { once: true }); })))
+  .then(() => {
+    T_AT = SCENES.reduce((at, s, i) => {
+      const v = els[i].querySelector('video');
+      const d = v && v.duration ? Math.max(T_SCENE, v.duration + .4) : (s.d || T_SCENE);
+      return [...at, at[at.length - 1] + d];
+    }, [T_SCENES0]);
+    T_BONUS0 = T_AT[SCENES.length];
+    T_OUTRO0 = T_BONUS0 + T_BONUS;
+    window.DURATION = T_OUTRO0 + T_OUTRO;
+    window.render(0);
+  });
 
 const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
 const ease = x => { x = clamp(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2; };
@@ -282,9 +267,13 @@ const ramp = (t, a, b) => clamp((t - a) / (b - a));
 // fade in over [a, a+fi], hold, fade out over [b-fo, b]
 const win = (t, a, b, fi=.35, fo=.35) => Math.min(ramp(t, a, a+fi), 1 - ramp(t, b-fo, b));
 const rise = (el, k, dy=30, base='') => { el.style.opacity = k; el.style.transform = `${base}translateY(${dy*(1-k)}px)`; };
+// A clip at `time`: resolves once that frame is the one shown.
+const seek = (v, time) => Math.abs(v.currentTime - time) < 1e-3 ? Promise.resolve()
+  : new Promise((r) => { v.addEventListener('seeked', r, { once: true }); v.currentTime = time; });
 
 const $ = id => document.getElementById(id);
 window.render = function (t) {
+  const seeking = [];
   // the light behind, drifting slowly
   const drift = STILL ? 0 : t;
   $('orb1').style.left = (900 + 260*Math.sin(drift*0.22)) + 'px';
@@ -293,11 +282,12 @@ window.render = function (t) {
   $('orb2').style.top = (420 + 120*Math.sin(drift*0.2)) + 'px';
 
   // intro
+  const s = T_INTRO / 3.4;
   $('intro').style.opacity = 1 - ramp(t, T_INTRO - .4, T_INTRO);
-  $('ring').setAttribute('stroke-dasharray', `${292*ease(ramp(t, .1, 1.4))} 390`);
-  $('play').style.transform = `scale(${back(ramp(t, .4, 1.0))})`;
-  rise($('word'), out(ramp(t, .8, 1.4)), 40);
-  rise($('tag'), out(ramp(t, 1.3, 1.9)));
+  $('ring').setAttribute('stroke-dasharray', `${292*ease(ramp(t, .1*s, 1.4*s))} 390`);
+  $('play').style.transform = `scale(${back(ramp(t, .4*s, 1.0*s))})`;
+  rise($('word'), out(ramp(t, .8*s, 1.4*s)), 40);
+  rise($('tag'), out(ramp(t, 1.3*s, 1.9*s)));
 
   // hook: each line in, then its words struck through
   const h0 = T_INTRO;
@@ -306,8 +296,8 @@ window.render = function (t) {
     const k = out(ramp(t, h0 + .1 + i*.45, h0 + .55 + i*.45));
     $(id).style.opacity = k;
     $(id).style.transform = `translateY(${40*(1-k)}px)`;
-    const s = $(id).querySelector('s');
-    if (s) s.style.setProperty('--k', ease(ramp(t, h0 + .5 + i*.45, h0 + .85 + i*.45)));
+    const st = $(id).querySelector('s');
+    if (st) st.style.setProperty('--k', ease(ramp(t, h0 + .5 + i*.45, h0 + .85 + i*.45)));
   });
   rise($('hooksub'), out(ramp(t, h0 + 1.7, h0 + 2.2)));
 
@@ -327,8 +317,12 @@ window.render = function (t) {
       li.style.opacity = kj;
       li.style.transform = `translateX(${-30*(1-kj)}px)`;
     });
-    el.querySelector('.shot').style.transform = `translateX(${80*(1-k)}px) scale(${.95 + .05*k})`;
-    el.querySelector('.zoom').style.transform = STILL ? 'none' : `scale(${1 + .05*ease(ramp(t, a + .5, b))})`;
+    el.querySelector('.stage').style.transform = `translateX(${80*(1-k)}px) scale(${.95 + .05*k})`;
+    el.querySelector('.stage').style.transformOrigin = '1250px 540px';
+    const v = el.querySelector('video');
+    // A clip moves by itself: the camera stays still on it.
+    el.querySelector('.zoom').style.transform = STILL || v ? 'none' : `scale(${1 + .05*ease(ramp(t, a + .5, b))})`;
+    if (v) seeking.push(seek(v, clamp(t - a - .2, 0, Math.max(0, v.duration - .05))));
     // Several screens: each in turn, crossfading, its step lit under the frame.
     const alts = el.querySelectorAll('img.alt'), n = alts.length + 1;
     const step = Math.min(n - 1, Math.floor(clamp((t - a - .2) / (b - a - .5)) * n));
@@ -343,7 +337,7 @@ window.render = function (t) {
 
   // bonus: the cards one after another
   const b0 = T_BONUS0;
-  $('bonus').style.opacity = win(t, b0, b0 + T_BONUS, .3, .35);
+  $('bonus').style.opacity = T_BONUS ? win(t, b0, b0 + T_BONUS, .3, .35) : 0;
   rise($('btitle'), out(ramp(t, b0, b0 + .5)));
   rise($('bsub'), out(ramp(t, b0 + .2, b0 + .7)), 20);
   cards.forEach((c, i) => {
@@ -355,10 +349,10 @@ window.render = function (t) {
   // outro
   const o0 = T_OUTRO0;
   $('outro').style.opacity = ramp(t, o0, o0 + .4);
-  [['omark',0],['oword',.2],['oline1',.5],['octa',.8],['onote',1.2]].forEach(([id, d]) => {
-    rise($(id), out(ramp(t, o0 + d, o0 + d + .5)), 30, id === 'octa' ? 'translateX(-50%) ' : '');
+  [['omark',0],['oword',.2],['oline1',.5],['octa',.8],['onote',1.2],['omusic',1.4]].forEach(([id, d]) => {
+    if ($(id)) rise($(id), out(ramp(t, o0 + d, o0 + d + .5)), 30, id === 'octa' ? 'translateX(-50%) ' : '');
   });
+  return Promise.all(seeking);
 };
-window.render(0);
 </script>
 </body></html>

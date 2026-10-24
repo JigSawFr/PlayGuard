@@ -37,6 +37,18 @@
     toggle.addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); });
     toggle.hidden = false;
     label();
+    // Its music: muted until asked for, the button there only while it plays.
+    const sound = document.querySelector('.video-sound');
+    if (sound) {
+      const shown = () => {
+        sound.hidden = video.paused;
+        sound.setAttribute('aria-pressed', String(!video.muted));
+        sound.setAttribute('aria-label', video.muted ? sound.dataset.on : sound.dataset.off);
+      };
+      ['play', 'pause', 'volumechange'].forEach((e) => video.addEventListener(e, shown));
+      sound.addEventListener('click', () => { video.muted = !video.muted; if (!video.muted && video.paused) video.play().catch(() => {}); });
+      shown();
+    }
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData
       || matchMedia('(max-width: 860px)').matches;
     if (!still) video.play().catch(() => {});
