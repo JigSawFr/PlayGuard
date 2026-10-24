@@ -117,10 +117,10 @@ class Sheet : public brls::Box
         std::vector<std::string> library = forwarder_library::ids();
         const auto first = std::find(library.begin(), library.end(), this->suggested);
         if (first != library.end()) std::rotate(library.begin(), first, first + 1);
-        for (const std::string& id : library) {
+        for (const std::string& lib_id : library) {
             Choice c;
-            c.lib = id;
-            c.shot = forwarder_library::ref_of(id);
+            c.lib = lib_id;
+            c.shot = forwarder_library::ref_of(lib_id);
             if (forwarder.custom_icon && c.shot == forwarder.icon) this->focus = this->choices.size();
             this->choices.push_back(std::move(c));
         }
@@ -232,7 +232,7 @@ class Sheet : public brls::Box
     size_t focus = 0, in_use = 0;
     size_t album_from = 1;        // the first screenshot's place (after the library)
     std::string suggested;        // the library icon its name suggests ("" none)
-    Pixels badge;                 // drawn over the "after" of a protected one
+    Pixels shield;                // the badge drawn over the "after" of a protected one
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
     // The one in focus, in full once read: a sharper "after" than its thumbnail.
@@ -276,9 +276,9 @@ class Sheet : public brls::Box
         // Two parts, each its title then its lines of cells: its .nro's own
         // and the library, then the album (or what to do when it is empty).
         std::vector<std::vector<size_t>> lines;
-        auto part = [this, column, &lines](const std::string& title, size_t from, size_t to) {
+        auto part = [this, column, &lines](const std::string& heading, size_t from, size_t to) {
             auto* kicker = new brls::Label();
-            kit::set_kicker(kicker, title);
+            kit::set_kicker(kicker, heading);
             kicker->setSingleLine(true);
             kicker->setMargins(lines.empty() ? 0 : 22, 0, 10, CELL_PAD);
             column->addView(kicker);
@@ -509,8 +509,8 @@ class Sheet : public brls::Box
             return;
         }
         std::vector<uint8_t> rgba = forwarder_icon::square_rgba(p.rgba.data(), p.w, p.h, c.x, 256);
-        if (this->row.pin && !this->badge.rgba.empty())
-            forwarder_icon::draw_over(rgba, 256, this->badge.rgba.data(), this->badge.w, this->badge.h);
+        if (this->row.pin && !this->shield.rgba.empty())
+            forwarder_icon::draw_over(rgba, 256, this->shield.rgba.data(), this->shield.w, this->shield.h);
         set_texture(this->after, texture_of(rgba, 256));
     }
 
@@ -573,13 +573,13 @@ class Sheet : public brls::Box
             Pixels own;
             own.rgba = forwarder_icon::rgba_of(forwarder_flow::own_icon(r), own.w, own.h);
             auto icons = std::make_shared<std::vector<Pixels>>();
-            for (const std::string& id : library) {
+            for (const std::string& lib_id : library) {
                 Pixels p;
-                p.rgba = forwarder_icon::rgba_of(asset_bytes(forwarder_library::asset_of(id)), p.w, p.h);
+                p.rgba = forwarder_icon::rgba_of(asset_bytes(forwarder_library::asset_of(lib_id)), p.w, p.h);
                 icons->push_back(std::move(p));
             }
-            Pixels badge;
-            badge.rgba = forwarder_icon::rgba_of(asset_bytes(forwarder_library::BADGE), badge.w, badge.h);
+            Pixels mark;
+            mark.rgba = forwarder_icon::rgba_of(asset_bytes(forwarder_library::BADGE), mark.w, mark.h);
             // The games, from caps:a; their names from ns, once each.
             std::vector<AlbumShot> found(512);
             found.resize(album_shots_of_games(found.data(), found.size()));
@@ -603,9 +603,9 @@ class Sheet : public brls::Box
                 }
                 games->push_back({ names[it->second], false });
             }
-            brls::sync([this, weak, own, icons, badge, games]() {
+            brls::sync([this, weak, own, icons, mark, games]() {
                 if (weak.expired()) return;
-                this->badge = badge;
+                this->shield = mark;
                 this->choices[0].small = own;
                 this->draw_cell(0);
                 for (size_t i = 0; i < icons->size() && i + 1 < this->choices.size(); i++) {
