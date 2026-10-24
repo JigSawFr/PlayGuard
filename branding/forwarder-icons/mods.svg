@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: a puzzle piece: mod managers. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M88 108 H114 A14 14 0 1 1 142 108 H166 V132 A14 14 0 1 1 166 160 V176 H88 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="114" cy="146" r="9" fill="#2EC4A6"/>
+</svg>

@@ -17,6 +17,8 @@
 #include "ui/format_text.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarder_icon.hpp"
+#include "util/forwarder_library.hpp"
+#include "util/paths.hpp"
 #include "view/cadran_icon.hpp"
 
 using namespace brls::literals;
@@ -47,10 +49,12 @@ struct Pixels
     int w = 0, h = 0;
 };
 
-// One choice: the .nro's own icon (`shot` empty), or a screenshot.
+// One choice: the .nro's own icon (`shot` empty), one of PlayGuard's
+// library, or a screenshot.
 struct Choice
 {
-    std::string shot;          // "sdmc:/Nintendo/Album/…"
+    std::string shot;          // "sdmc:/Nintendo/Album/…", or "lib:<id>"
+    std::string lib;           // that library icon's id ("" for the others)
     int         x = forwarders::ICON_X_MIDDLE;
     bool        seconds = false;   // another taken the same minute: its time to the second
     std::string game;          // the game it was taken in ("" unknown)
@@ -73,6 +77,14 @@ void set_texture(brls::Image* image, int texture)
     image->setScalingType(brls::ImageScalingType::FIT);
     image->innerSetImage(texture);
     image->setFreeTexture(true);
+}
+
+// An image of the app's resources ("img/…"), as its bytes.
+std::vector<uint8_t> asset_bytes(const std::string& path)
+{
+    std::string bytes;
+    if (!paths::read_file(std::string(BRLS_ASSET("")) + path, bytes)) return {};
+    return std::vector<uint8_t>(bytes.begin(), bytes.end());
 }
 
 // "Today", "Yesterday", the day's name in the last week, else its date.
@@ -98,8 +110,21 @@ class Sheet : public brls::Box
           std::function<void(const std::string&, int)> on_done)
         : brls::Box(brls::Axis::COLUMN), row(forwarder), done(std::move(on_done))
     {
-        // Its .nro's own first, then the screenshots; the one in use focused.
+        // Its .nro's own first, then PlayGuard's library (the one its name
+        // suggests first), then the screenshots; the one in use focused.
         this->choices.push_back(Choice{});
+        this->suggested = forwarder_library::suggest(forwarder.name, forwarder.nro);
+        std::vector<std::string> library = forwarder_library::ids();
+        const auto first = std::find(library.begin(), library.end(), this->suggested);
+        if (first != library.end()) std::rotate(library.begin(), first, first + 1);
+        for (const std::string& lib_id : library) {
+            Choice c;
+            c.lib = lib_id;
+            c.shot = forwarder_library::ref_of(lib_id);
+            if (forwarder.custom_icon && c.shot == forwarder.icon) this->focus = this->choices.size();
+            this->choices.push_back(std::move(c));
+        }
+        this->album_from = this->choices.size();
         const std::vector<bool> same = forwarders_logic::same_minute(shots);
         for (size_t i = 0; i < shots.size(); i++) {
             Choice c;
@@ -111,8 +136,8 @@ class Sheet : public brls::Box
             }
             this->choices.push_back(std::move(c));
         }
-        // In use: its .nro's own, or a screenshot (none of these when it is
-        // older than the newest thirty).
+        // In use: its .nro's own, a library icon or a screenshot (none of
+        // these when it is older than the newest thirty).
         this->in_use = !forwarder.custom_icon ? 0 : this->focus ? this->focus : this->choices.size();
 
         brls::Theme theme = brls::Application::getTheme();
@@ -156,6 +181,10 @@ class Sheet : public brls::Box
             this->choose(0);
             return true;
         });
+        this->registerAction("playguard/forwarders/icon_jump"_i18n, brls::BUTTON_X, [this](brls::View*) {
+            this->jump();
+            return true;
+        });
         this->registerAction("playguard/forwarders/icon_move"_i18n, brls::BUTTON_RB, [this](brls::View*) {
             this->move(1);
             return true;
@@ -165,7 +194,12 @@ class Sheet : public brls::Box
             return true;
         }, true, true);
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
-        // The desktop build: the keyboard has no Y, L or R; its y, q and e.
+        // The desktop build: the keyboard has no X, Y, L or R; its x, y, q
+        // and e.
+        this->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_X), [this](brls::View*) {
+            this->jump();
+            return true;
+        });
         this->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [this](brls::View*) {
             this->choose(0);
             return true;
@@ -196,6 +230,9 @@ class Sheet : public brls::Box
     std::function<void(const std::string&, int)> done;
     std::vector<Choice> choices;
     size_t focus = 0, in_use = 0;
+    size_t album_from = 1;        // the first screenshot's place (after the library)
+    std::string suggested;        // the library icon its name suggests ("" none)
+    Pixels shield;                // the badge drawn over the "after" of a protected one
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
     // The one in focus, in full once read: a sharper "after" than its thumbnail.
@@ -236,28 +273,59 @@ class Sheet : public brls::Box
         frame->setScrollingBehavior(brls::ScrollingBehavior::CENTERED);
         auto* column = new brls::Box(brls::Axis::COLUMN);
         column->setPadding(GRID_PAD, GRID_PAD, GRID_PAD, GRID_PAD);
-        brls::Box* line = nullptr;
-        for (size_t i = 0; i < this->choices.size(); i++) {
-            if (i % COLUMNS == 0) {
-                line = new brls::Box(brls::Axis::ROW);
-                if (i) line->setMarginTop(CELL_GAP);
-                column->addView(line);
+        // Two parts, each its title then its lines of cells: its .nro's own
+        // and the library, then the album (or what to do when it is empty).
+        std::vector<std::vector<size_t>> lines;
+        auto part = [this, column, &lines](const std::string& heading, size_t from, size_t to) {
+            auto* kicker = new brls::Label();
+            kit::set_kicker(kicker, heading);
+            kicker->setSingleLine(true);
+            kicker->setMargins(lines.empty() ? 0 : 22, 0, 10, CELL_PAD);
+            column->addView(kicker);
+            brls::Box* line = nullptr;
+            for (size_t i = from; i < to; i++) {
+                if ((i - from) % COLUMNS == 0) {
+                    line = new brls::Box(brls::Axis::ROW);
+                    if (i > from) line->setMarginTop(CELL_GAP);
+                    column->addView(line);
+                    lines.emplace_back();
+                }
+                brls::Box* cell = this->cell(i);
+                if ((i - from) % COLUMNS) cell->setMarginLeft(CELL_GAP);
+                line->addView(cell);
+                lines.back().push_back(i);
             }
-            brls::Box* cell = this->cell(i);
-            if (i % COLUMNS) cell->setMarginLeft(CELL_GAP);
-            line->addView(cell);
+        };
+        part("playguard/forwarders/icon_library"_i18n, 0, this->album_from);
+        part("playguard/forwarders/icon_album"_i18n, this->album_from, this->choices.size());
+        if (this->album_from == this->choices.size()) {
+            brls::Label* none = kit::label("playguard/forwarders/icon_none"_i18n, kit::TEXT_META, "cadran/text3");
+            none->setMarginLeft(CELL_PAD);
+            none->setMaxWidth(COLUMNS * (TILE + 2 * CELL_PAD));
+            column->addView(none);
         }
-        // Up and down stay in their column.
-        for (size_t i = 0; i < this->choices.size(); i++) {
-            if (i >= COLUMNS)
-                this->choices[i].cell->setCustomNavigationRoute(brls::FocusDirection::UP, this->choices[i - COLUMNS].cell);
-            if (i + COLUMNS < this->choices.size())
-                this->choices[i].cell->setCustomNavigationRoute(brls::FocusDirection::DOWN, this->choices[i + COLUMNS].cell);
-            else if (i / COLUMNS + 1 < (this->choices.size() + COLUMNS - 1) / COLUMNS)
-                this->choices[i].cell->setCustomNavigationRoute(brls::FocusDirection::DOWN, this->choices.back().cell);
+        // Up and down: the same column of the line above or below, else its
+        // last cell.
+        for (size_t l = 0; l < lines.size(); l++) {
+            for (size_t c = 0; c < lines[l].size(); c++) {
+                brls::Box* cell = this->choices[lines[l][c]].cell;
+                if (l > 0)
+                    cell->setCustomNavigationRoute(brls::FocusDirection::UP,
+                                                   this->choices[lines[l - 1][std::min(c, lines[l - 1].size() - 1)]].cell);
+                if (l + 1 < lines.size())
+                    cell->setCustomNavigationRoute(brls::FocusDirection::DOWN,
+                                                   this->choices[lines[l + 1][std::min(c, lines[l + 1].size() - 1)]].cell);
+            }
         }
         frame->setContentView(column);
         return frame;
+    }
+
+    // X: from the library to the album's first screenshot, and back.
+    void jump()
+    {
+        const size_t to = this->focus < this->album_from && this->album_from < this->choices.size() ? this->album_from : 0;
+        if (to != this->focus && this->choices[to].cell) brls::Application::giveFocus(this->choices[to].cell);
     }
 
     brls::Box* cell(size_t index)
@@ -314,6 +382,7 @@ class Sheet : public brls::Box
     std::string caption(const Choice& c) const
     {
         if (c.shot.empty()) return "playguard/forwarders/icon_own"_i18n;
+        if (!c.lib.empty()) return brls::getStr("playguard/forwarders/icon_lib/" + c.lib);
         forwarders_logic::ShotTime t;
         if (!forwarders_logic::shot_time(c.shot, t)) return forwarders_logic::file_title(c.shot);
         return day_word(t, true);
@@ -405,6 +474,10 @@ class Sheet : public brls::Box
         if (c.shot.empty()) {
             this->title->setText("playguard/forwarders/icon_own"_i18n);
             this->when->setText("playguard/forwarders/icon_own_note"_i18n);
+        } else if (!c.lib.empty()) {
+            this->title->setText(brls::getStr("playguard/forwarders/icon_lib/" + c.lib));
+            this->when->setText(c.lib == this->suggested ? "playguard/forwarders/icon_suggested"_i18n
+                                                         : "playguard/forwarders/icon_lib_note"_i18n);
         } else {
             this->title->setText(!c.game.empty() ? c.game
                                  : c.no_game     ? "playguard/forwarders/icon_no_game"_i18n
@@ -418,14 +491,15 @@ class Sheet : public brls::Box
                 this->when->setText(forwarders_logic::file_title(c.shot));
             }
         }
-        this->frame_row->setVisibility(c.shot.empty() ? brls::Visibility::INVISIBLE : brls::Visibility::VISIBLE);
+        this->frame_row->setVisibility(c.shot.empty() || !c.lib.empty() ? brls::Visibility::INVISIBLE : brls::Visibility::VISIBLE);
         for (size_t i = 0; i < this->frame_dots.size(); i++)
             this->frame_dots[i]->setBackgroundColor(kit::color((int)i == (c.x + 12) / 25 ? "cadran/teal" : "cadran/line"));
         this->draw_after();
-        if (!c.shot.empty() && c.shot != this->full_shot) this->read_full(c.shot);
+        if (!c.shot.empty() && c.lib.empty() && c.shot != this->full_shot) this->read_full(c.shot);
     }
 
-    // The "after" of the one in focus: in full once read, else its thumbnail.
+    // The "after" of the one in focus: in full once read, else its
+    // thumbnail; protected, with the badge the HOME menu will show on it.
     void draw_after()
     {
         const Choice& c = this->choices[this->focus];
@@ -434,7 +508,10 @@ class Sheet : public brls::Box
             this->after->clear();
             return;
         }
-        set_texture(this->after, texture_of(forwarder_icon::square_rgba(p.rgba.data(), p.w, p.h, c.x, 256), 256));
+        std::vector<uint8_t> rgba = forwarder_icon::square_rgba(p.rgba.data(), p.w, p.h, c.x, 256);
+        if (this->row.pin && !this->shield.rgba.empty())
+            forwarder_icon::draw_over(rgba, 256, this->shield.rgba.data(), this->shield.w, this->shield.h);
+        set_texture(this->after, texture_of(rgba, 256));
     }
 
     void draw_cell(size_t index)
@@ -445,7 +522,7 @@ class Sheet : public brls::Box
                                         TILE_PX));
         // What the HOME menu shows now: the one in use, its square where it was.
         if (index == this->in_use) {
-            const int x = c.shot.empty() ? forwarders::ICON_X_MIDDLE : this->row.icon_x;
+            const int x = c.shot.empty() || !c.lib.empty() ? forwarders::ICON_X_MIDDLE : this->row.icon_x;
             set_texture(this->now, texture_of(forwarder_icon::square_rgba(c.small.rgba.data(), c.small.w, c.small.h, x, TILE_PX),
                                               TILE_PX));
         }
@@ -455,7 +532,7 @@ class Sheet : public brls::Box
     {
         if (this->focus >= this->choices.size()) return;
         Choice& c = this->choices[this->focus];
-        if (c.shot.empty()) return;
+        if (c.shot.empty() || !c.lib.empty()) return;
         const int x = forwarders_logic::icon_x_step(c.x, step);
         if (x == c.x) return;
         c.x = x;
@@ -481,17 +558,28 @@ class Sheet : public brls::Box
         ui::close_sheet(then);
     }
 
-    // Off the UI thread: the .nro's own icon, the games, then each
-    // screenshot's thumbnail, each shown as it comes.
+    // Off the UI thread: the .nro's own icon, the library's and the badge,
+    // the games, then each screenshot's thumbnail, each shown as it comes.
     void load()
     {
         std::weak_ptr<bool> weak = this->alive;
         std::vector<std::string> shots;
-        for (const Choice& c : this->choices) shots.push_back(c.shot);
+        for (const Choice& c : this->choices) shots.push_back(c.lib.empty() ? c.shot : "");
         const forwarders_logic::Row r = this->row;
-        brls::async([this, weak, shots, r]() {
+        const size_t album = this->album_from;
+        std::vector<std::string> library;
+        for (size_t i = 1; i < album; i++) library.push_back(this->choices[i].lib);
+        brls::async([this, weak, shots, r, album, library]() {
             Pixels own;
             own.rgba = forwarder_icon::rgba_of(forwarder_flow::own_icon(r), own.w, own.h);
+            auto icons = std::make_shared<std::vector<Pixels>>();
+            for (const std::string& lib_id : library) {
+                Pixels p;
+                p.rgba = forwarder_icon::rgba_of(asset_bytes(forwarder_library::asset_of(lib_id)), p.w, p.h);
+                icons->push_back(std::move(p));
+            }
+            Pixels mark;
+            mark.rgba = forwarder_icon::rgba_of(asset_bytes(forwarder_library::BADGE), mark.w, mark.h);
             // The games, from caps:a; their names from ns, once each.
             std::vector<AlbumShot> found(512);
             found.resize(album_shots_of_games(found.data(), found.size()));
@@ -515,17 +603,22 @@ class Sheet : public brls::Box
                 }
                 games->push_back({ names[it->second], false });
             }
-            brls::sync([this, weak, own, games]() {
+            brls::sync([this, weak, own, icons, mark, games]() {
                 if (weak.expired()) return;
+                this->shield = mark;
                 this->choices[0].small = own;
                 this->draw_cell(0);
+                for (size_t i = 0; i < icons->size() && i + 1 < this->choices.size(); i++) {
+                    this->choices[i + 1].small = (*icons)[i];
+                    this->draw_cell(i + 1);
+                }
                 for (size_t i = 0; i < games->size() && i < this->choices.size(); i++) {
                     this->choices[i].game = (*games)[i].first;
                     this->choices[i].no_game = (*games)[i].second;
                 }
                 this->select(this->focus);
             });
-            for (size_t i = 1; i < shots.size(); i++) {
+            for (size_t i = album; i < shots.size(); i++) {
                 if (weak.expired()) return;
                 Pixels p = small_of(shots[i]);
                 brls::sync([this, weak, i, p]() {

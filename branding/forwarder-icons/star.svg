@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: a star: favorites and anything else. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M128.0 82.0 L140.3 115.0 L175.6 116.5 L148.0 138.5 L157.4 172.5 L128.0 153.0 L98.6 172.5 L108.0 138.5 L80.4 116.5 L115.7 115.0 Z" fill="#2EC4A6" stroke="#2EC4A6" stroke-width="6" stroke-linejoin="round"/>
+</svg>

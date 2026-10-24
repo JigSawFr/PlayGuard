@@ -49,8 +49,8 @@ struct Row
     bool        limit = false;     // protected: closed once the day's play time is used up
     bool        carried = false;   // protected: its rules in it (forwarders::Made::carried)
     uint64_t    paused_until = 0;   // paused after refusals until then (POSIX; 0: not paused), read by forwarder_flow
-    bool        custom_icon = false;   // its icon from the album (forwarders::Made::icon)
-    std::string icon;                  // that screenshot, "sdmc:/Nintendo/Album/…"
+    bool        custom_icon = false;   // its icon from the album or the library (forwarders::Made::icon)
+    std::string icon;                  // that screenshot, "sdmc:/Nintendo/Album/…", or "lib:<id>"
     int         icon_x = forwarders::ICON_X_MIDDLE;   // where its square sits (forwarders::Made::icon_x)
     // How the HOME menu starts it (forwarders::Made::ask_user, …).
     bool        ask_user = false, screenshots = true, video = true;

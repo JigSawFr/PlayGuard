@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: a game card and an arrow: dump tools (nxdumptool…). -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M80 82 H132 L148 98 V174 H80 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="92" y="96" width="42" height="32" rx="4" fill="#0B1424"/>
+  <line x1="118" y1="152" x2="162" y2="152" stroke="#0B1424" stroke-width="24" stroke-linecap="round"/>
+  <line x1="118" y1="152" x2="162" y2="152" stroke="#2EC4A6" stroke-width="12" stroke-linecap="round"/>
+  <path d="M158 134 L182 152 L158 170 Z" fill="#2EC4A6" stroke="#2EC4A6" stroke-width="5" stroke-linejoin="round"/>
+</svg>

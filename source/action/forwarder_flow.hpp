@@ -141,8 +141,9 @@ void set_launch_wait(unsigned ms, std::function<void(bool)> done);
 std::string wait_label(unsigned ms);
 
 // Its HOME menu icon from a screenshot (`shot`, "sdmc:/Nintendo/Album/…"),
-// its square at `x` (0 the left edge, 100 the right one), or its .nro's
-// again (""): made again, the same program ID.
+// its square at `x` (0 the left edge, 100 the right one), from PlayGuard's
+// library ("lib:<id>", forwarder_library), or its .nro's again (""): made
+// again, the same program ID.
 void set_icon(const forwarders_logic::Row& row, const std::string& shot, int x, std::function<void(bool)> done);
 // Of `made` (a settings backup's), those not on the HOME menu now; and
 // those installed again, as they were (protected, their hours, their icon).

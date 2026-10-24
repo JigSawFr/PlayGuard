@@ -749,12 +749,9 @@ void ForwardersActivity::pick_wait()
 void ForwardersActivity::pick_icon(const Row& row)
 {
     const Row r = row;
-    // Its .nro's own first, then the album's screenshots, the newest first.
+    // Its .nro's own first, then PlayGuard's library, then the album's
+    // screenshots, the newest first (none: the sheet says how to take one).
     std::vector<std::string> shots = forwarder_flow::album_shots();
-    if (shots.empty()) {
-        ui::notice("eye", ui::Check::Info, "playguard/forwarders/action_icon"_i18n, "playguard/forwarders/icon_none"_i18n);
-        return;
-    }
     std::weak_ptr<bool> weak = this->alive;
     icon_sheet::open(r, std::move(shots), [this, weak, r](const std::string& shot, int x) {
         if (weak.expired()) return;

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: a magic wand: cheat tools (EdiZon, Breeze…). -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <line x1="88" y1="170" x2="146" y2="112" stroke="#E8EEF7" stroke-width="13" stroke-linecap="round"/>
+  <path d="M160 72 L167 92 L187 99 L167 106 L160 126 L153 106 L133 99 L153 92 Z" fill="#2EC4A6"/>
+  <path d="M106 80 L110 92 L122 96 L110 100 L106 112 L102 100 L90 96 L102 92 Z" fill="#FFB547"/>
+</svg>

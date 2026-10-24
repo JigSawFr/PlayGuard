@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: radio waves: local wireless and LAN play (ldn_mitm…). -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <circle cx="128" cy="164" r="9" fill="#2EC4A6"/>
+  <path d="M109.6 145.6 A26 26 0 0 1 146.4 145.6" fill="none" stroke="#E8EEF7" stroke-width="11" stroke-linecap="round"/>
+  <path d="M94.1 130.1 A48 48 0 0 1 161.9 130.1" fill="none" stroke="#E8EEF7" stroke-width="11" stroke-linecap="round"/>
+  <path d="M78.5 114.5 A70 70 0 0 1 177.5 114.5" fill="none" stroke="#E8EEF7" stroke-width="11" stroke-linecap="round"/>
+</svg>

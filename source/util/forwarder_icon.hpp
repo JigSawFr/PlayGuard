@@ -48,6 +48,16 @@ std::vector<uint8_t> exif_thumbnail(const std::vector<uint8_t>& jpeg);
 // the host tests.
 std::vector<uint8_t> with_thumbnail(const std::vector<uint8_t>& jpeg, const std::vector<uint8_t>& thumbnail);
 
+// `over` (RGBA, `w` x `h`, scaled to `px`) drawn over `rgba` (RGBA, `px` x
+// `px`) as its transparency says: the badge of a protected forwarder over
+// the icon the icon sheet shows. Nothing for a bad size.
+void draw_over(std::vector<uint8_t>& rgba, int px, const uint8_t* over, int w, int h);
+
+// `icon` (an image, as the HOME menu's 256 x 256 JPEG) with `badge` (a PNG,
+// transparent but for itself: forwarder_library::BADGE) drawn over it, as a
+// JPEG; `icon` as it is when either cannot be decoded.
+std::vector<uint8_t> with_badge(const std::vector<uint8_t>& icon, const std::vector<uint8_t>& badge);
+
 // The icon of a homebrew that has none: `png` (an emoji of img/emoji/)
 // drawn large in the middle of a pale square. Empty when `png` cannot be
 // decoded.

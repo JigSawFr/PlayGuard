@@ -9,7 +9,10 @@
 #include "check.h"
 #include "fs.hpp"
 #include "temp_dir.hpp"
+#include <algorithm>
 #include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -17,6 +20,7 @@
 #include "action/forwarders_logic.hpp"
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
+#include "util/forwarder_library.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 
@@ -801,11 +805,80 @@ static void test_icon()
     CHECK(nro::icon_usable(stand_in));
     CHECK(colour_near(stand_in, 4, 4, 0xE8, 0xEC, 0xF1) && colour_near(stand_in, 60, 128, 220, 30, 30));
     CHECK(forwarder_icon::placeholder({ 9, 9 }).empty());
+
+    // The badge of a protected one: a PNG transparent but for its bottom
+    // right quarter (green), over the blue icon: blue where it is clear,
+    // green under it.
+    std::vector<uint8_t> mark(64 * 64 * 4, 0);
+    for (int y = 32; y < 64; y++)
+        for (int x = 32; x < 64; x++) {
+            uint8_t* p = &mark[((size_t)y * 64 + x) * 4];
+            p[0] = 30, p[1] = 200, p[2] = 160, p[3] = 255;
+        }
+    std::vector<uint8_t> badge;
+    REQUIRE(stbi_write_png_to_func(append, &badge, 64, 64, 4, mark.data(), 64 * 4));
+    const std::vector<uint8_t> badged = forwarder_icon::with_badge(shrunk, badge);
+    CHECK(nro::icon_usable(badged) && badged != shrunk);
+    CHECK(colour_near(badged, 40, 40, 20, 60, 200) && colour_near(badged, 220, 220, 30, 200, 160));
+    const std::vector<uint8_t> junk = { 1, 2 };
+    CHECK(forwarder_icon::with_badge(shrunk, junk) == shrunk && forwarder_icon::with_badge(junk, badge) == junk);
+    // As pixels, for the icon sheet: half covered where the badge is half
+    // transparent; a bad size left as it is.
+    std::vector<uint8_t> grey(8 * 8 * 4, 100), half(8 * 8 * 4, 0);
+    for (size_t i = 0; i < half.size(); i += 4) half[i] = 200, half[i + 3] = 128;
+    forwarder_icon::draw_over(grey, 8, half.data(), 8, 8);
+    CHECK(std::abs(grey[0] - 150) <= 1 && std::abs(grey[1] - 50) <= 1 && grey[3] > 100);
+    std::vector<uint8_t> small(4, 7);
+    forwarder_icon::draw_over(small, 8, half.data(), 8, 8);
+    CHECK(small == std::vector<uint8_t>(4, 7));
+}
+
+static void test_library()
+{
+    namespace lib = forwarder_library;
+    // Every icon once, its image among the resources (read from the
+    // repository root, as `make test` runs), the badge's too.
+    const std::vector<std::string>& ids = lib::ids();
+    CHECK(ids.size() >= 30);
+    for (size_t i = 0; i < ids.size(); i++) {
+        CHECK(std::count(ids.begin(), ids.end(), ids[i]) == 1);
+        int w = 0, h = 0, comp = 0;
+        const std::string png = "resources/" + lib::asset_of(ids[i]);
+        if (!CHECK(stbi_info(png.c_str(), &w, &h, &comp))) std::printf("  %s\n", png.c_str());
+        CHECK(w == 256 && h == 256);
+    }
+    int w = 0, h = 0, comp = 0;
+    CHECK(stbi_info((std::string("resources/") + lib::BADGE).c_str(), &w, &h, &comp) && comp == 4);
+
+    // Named in forwarders.json: "lib:<id>", an id no longer there none.
+    CHECK(lib::ref_of("files") == "lib:files" && lib::asset_of("files") == "img/forwarder/files.png");
+    CHECK(lib::is_ref("lib:files") && lib::id_of("lib:files") == "files");
+    CHECK(lib::is_ref("lib:gone") && lib::id_of("lib:gone").empty());
+    CHECK(!lib::is_ref("sdmc:/Nintendo/Album/2026/01/01/x.jpg") && lib::id_of("sdmc:/x.jpg").empty() && !lib::is_ref(""));
+
+    // Suggested from its name or its file's, case aside; the first kind
+    // that matches; none for a name that says nothing.
+    CHECK(lib::suggest("JKSV", "sdmc:/switch/JKSV.nro") == "saves");
+    CHECK(lib::suggest("RetroArch", "/switch/retroarch_switch.nro") == "emulation");
+    CHECK(lib::suggest("My homebrew", "sdmc:/switch/retroarch/retroarch_switch.nro") == "emulation");
+    CHECK(lib::suggest("Goldleaf", "") == "install" && lib::suggest("ftpd", "") == "network");
+    CHECK(lib::suggest("NX-Shell", "") == "files" && lib::suggest("Moonlight", "") == "streaming");
+    CHECK(lib::suggest("Hekate Toolbox", "") == "reboot" && lib::suggest("Tesla Menu", "") == "overlays");
+    CHECK(lib::suggest("hbmenu", "sdmc:/hbmenu.nro") == "launcher" && lib::suggest("sphaira", "") == "launcher");
+    CHECK(lib::suggest("Backup and restore", "") == "" && lib::suggest("", "") == "");
+    CHECK(lib::suggest("Something", "sdmc:/switch/folder.with.dots/thing.nro") == "");
+    // Every suggestion is an icon of the library.
+    for (const char* name : { "jksv", "edizon", "tesla", "mods", "goldleaf", "appstore", "nxdumptool", "lockpick",
+                              "updater", "moonlight", "nxmp", "music", "ebook", "nxthemes", "nx-shell", "ftpd", "ldn",
+                              "missioncontrol", "sys-clk", "hekate", "hbmenu", "retroarch", "album", "chat", "browser",
+                              "download", "nxlink", "paint", "clock", "calc", "learn", "toolbox", "tool", "game" })
+        CHECK(std::count(ids.begin(), ids.end(), lib::suggest(name, "")) == 1);
 }
 
 int main()
 {
     test_icon();
+    test_library();
     test_jpeg();
     test_parse();
     test_files();

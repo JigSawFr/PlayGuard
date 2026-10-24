@@ -45,7 +45,8 @@ It also warns, without failing:
   Brazil says "tela", "arquivo";
 - about an XML layout of resources/xml no class inflates, and an image of
   resources/img nothing names (the emoji of img/emoji/ aside: a palette for
-  the release notes, kept whole on purpose);
+  the release notes, kept whole on purpose; and the forwarder icons of
+  img/forwarder/, named by forwarder_library's ids);
 - about an emoji a heading or a bullet of CHANGELOG.md or
   .github/release-notes/ opens on that has no img/emoji/<hex>.png (it shows
   no icon on the console);
@@ -311,6 +312,7 @@ DYNAMIC_KEYS = {
     "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
+    "forwarders/icon_lib/": array_of("source/util/forwarder_library.cpp", "IDS"),   # icon_sheet.cpp: the library's icons
     # notices::reason_of: what a row's badge is for, the ids its tab marks
     # (TabBase::mark(row, { "id", ... })).
     "notices/short/": [i for f in glob.glob(f"{ROOT}/source/tab/*.cpp")
@@ -472,6 +474,9 @@ named = "\n".join(read(p) for p in code_files + glob.glob(f"{xml_dir}/**/*.xml",
 for path in sorted(glob.glob(f"{ROOT}/resources/img/**/*", recursive=True)):
     rel = path[len(f"{ROOT}/resources/"):]
     if os.path.isdir(path) or rel.startswith("img/emoji/"):
+        continue
+    # The forwarder icons: named by their id (forwarder_library's IDS).
+    if rel.startswith("img/forwarder/") and rel[len("img/forwarder/"):-len(".png")] in DYNAMIC_KEYS["forwarders/icon_lib/"]:
         continue
     if rel not in named:
         warnings.append(f"resources/{rel} is never used (no \"{rel}\" in the code or a layout)")

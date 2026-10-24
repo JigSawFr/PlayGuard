@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: stacked layers: overlays (Tesla, Ultrahand…). -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M80 142 L128 166 L176 142" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M80 122 L128 146 L176 122" fill="none" stroke="#E8EEF7" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 78 L176 102 L128 126 L80 102 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="6" stroke-linejoin="round"/>
+</svg>

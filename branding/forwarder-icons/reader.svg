@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: an open book: e-book and comic readers. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M128 94 C112 84 94 84 78 88 V166 C94 162 112 162 128 172 Z" fill="#E8EEF7"/>
+  <path d="M128 94 C144 84 162 84 178 88 V166 C162 162 144 162 128 172 Z" fill="#2EC4A6"/>
+  <path d="M92 106 C102 104 108 104 116 108 M92 124 C102 122 108 122 116 126 M92 142 C102 140 108 140 116 144" fill="none" stroke="#0B1424" stroke-width="5" stroke-linecap="round"/>
+</svg>

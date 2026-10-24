@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: a pencil: drawing apps. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <g transform="rotate(45 128 128)">
+    <rect x="114" y="62" width="28" height="16" rx="5" fill="#2EC4A6"/>
+    <rect x="114" y="82" width="28" height="70" fill="#E8EEF7"/>
+    <path d="M114 152 H142 L128 186 Z" fill="#FFB547"/>
+    <path d="M123 174 H133 L128 186 Z" fill="#0B1424"/>
+  </g>
+</svg>

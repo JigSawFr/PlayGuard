@@ -18,6 +18,7 @@
 #include "ui/ui.hpp"
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
+#include "util/forwarder_library.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/sha256.hpp"
@@ -166,15 +167,31 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         ui::error("playguard/forwarders/add_err"_i18n, error);
         return false;
     }
-    // Its icon from the album, when it has one still there.
+    // Its icon from PlayGuard's library, or from the album when it has one
+    // still there.
     if (!m.icon.empty()) {
-        std::string shot;
-        const std::string p = nro::sd_path(m.icon);
+        std::string bytes;
         std::vector<uint8_t> icon;
-        if (!p.empty() && paths::read_file(on_sd(p), shot))
-            icon = forwarder_icon::from_screenshot(std::vector<uint8_t>(shot.begin(), shot.end()), m.icon_x);
+        if (forwarder_library::is_ref(m.icon)) {
+            const std::string id = forwarder_library::id_of(m.icon);
+            if (!id.empty() && paths::read_file(std::string(BRLS_ASSET("")) + forwarder_library::asset_of(id), bytes))
+                icon = forwarder_icon::normalize(std::vector<uint8_t>(bytes.begin(), bytes.end()));
+        } else {
+            const std::string p = nro::sd_path(m.icon);
+            if (!p.empty() && paths::read_file(on_sd(p), bytes))
+                icon = forwarder_icon::from_screenshot(std::vector<uint8_t>(bytes.begin(), bytes.end()), m.icon_x);
+        }
         if (nro::icon_usable(icon)) info.icon = icon;
         else brls::Logger::warning("forwarders: {} unreadable, the .nro's icon instead", m.icon);
+    }
+    // Protected: the badge over it, on the HOME menu as in the list.
+    if (m.pin) {
+        std::string badge;
+        if (paths::read_file(std::string(BRLS_ASSET("")) + forwarder_library::BADGE, badge)) {
+            const std::vector<uint8_t> icon =
+                forwarder_icon::with_badge(info.icon, std::vector<uint8_t>(badge.begin(), badge.end()));
+            if (nro::icon_usable(icon)) info.icon = icon;
+        }
     }
     forwarders::Made made = m;
     made.loader = loader_id();   // the loader it is built with now

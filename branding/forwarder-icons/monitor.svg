@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: a rising chart: monitors and statistics (sys-clk…). -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M84 80 V172 H176" fill="none" stroke="#E8EEF7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M100 150 L120 122 L140 138 L164 98" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="164" cy="98" r="8" fill="#FFB547"/>
+</svg>
