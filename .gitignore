@@ -86,6 +86,8 @@ toolchain.txt
 /out-agent
 /smoke-rescue
 /smoke-devbuild
+/smoke-sync
+/smoke-modules
 /sysmodule/*/build
 /sysmodule/*/out
 *.nsp

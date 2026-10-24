@@ -476,6 +476,11 @@ jobs:
             scenarios: devbuild forwarders
           - shard: system
             scenarios: update errors sysnotes rollback
+          # The remote link against a real broker (Mosquitto, MQTT 5.0 and
+          # 3.1.1), a simulated agent sysmodule, and the optional modules.
+          - shard: link
+            scenarios: sync sync-311 agent agent-update agent-rollback modules
+            packages: mosquitto mosquitto-clients
           # Every Cadran tab, a few common dialogs and the child screen in
           # the 15 languages, normal and larger text: no text cut short
           # (tools/cut_text_check.py, tests/cut_text/): about 59 s a language
@@ -539,7 +544,8 @@ jobs:
           sudo apt-get install $archives -y --no-install-recommends libgl1-mesa-dri libgl1 libglx-mesa0 \
             libegl1 libegl-mesa0 libx11-6 libx11-xcb1 libxcursor1 libxext6 libxi6 libxinerama1 libxrandr2 \
             libxrender1 libxkbcommon0 libwayland-client0 libwayland-cursor0 libwayland-egl1 libdbus-1-3 \
-            libcurl4t64 zlib1g xvfb xauth xdotool imagemagick dbus
+            libcurl4t64 zlib1g xvfb xauth xdotool imagemagick dbus \
+            ${{ matrix.packages }}
           # The screens are drawn by this mesa (llvmpipe), not pinned: an
           # Ubuntu update of it can move every screen, so the run says which.
           echo "mesa: $(dpkg-query -W -f='${Version}' libgl1-mesa-dri)" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -657,6 +663,8 @@ jobs:
           path: |
             smoke*/*.png
             smoke*/app.log
+            smoke*/*.txt
+            smoke*/mosquitto.log
             smoke*/visual_diff/*.png
           retention-days: 14
       - name: Shard summary

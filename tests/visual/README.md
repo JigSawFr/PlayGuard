@@ -2,7 +2,7 @@
 
 What `tools/desktop_smoke.py` shows on screens that come out the same in every
 run (console time fixed, footer clock redrawn at the console's time, 16:00), one folder per scenario:
-`smoke/`, `games/`, `errors/`, `gate/`, `rescue/`, `forged/`, `lock/`, `outside/`, `library/`, `devbuild/`, `alarm/`, `cadran/`, `cadranstates/`, `cadranunlocked/`, `cadranlarge/`, `bedtime/`, `forwarders/`, `hbmenu/`.
+`smoke/`, `games/`, `errors/`, `gate/`, `rescue/`, `forged/`, `lock/`, `outside/`, `library/`, `devbuild/`, `alarm/`, `cadran/`, `cadranstates/`, `cadranunlocked/`, `cadranlarge/`, `bedtime/`, `forwarders/`, `hbmenu/`, and the remote link's: `sync/`, `sync-311/`, `agent/`, `agent-update/`, `agent-rollback/`, `modules/`.
 
 Each folder's `SCREENS` names the stable screens compared, one a line: that
 list is all git keeps. The references are **main's own screens**, never

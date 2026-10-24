@@ -557,11 +557,14 @@ for v in sorted(sim_read - sim_documented):
     warnings.append(f"the code reads {v}, which {SIMULATOR_PAGE} does not document (the simulator's table)")
 for v in sorted(sim_documented - sim_read):
     warnings.append(f"{SIMULATOR_PAGE} documents {v}, which the code does not read")
-scenarios = set(re.findall(r'SCENARIO\s*==\s*"(\w+)"', read(f"{ROOT}/tools/desktop_smoke.py")))
-m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|]+)\]", tests_page)
+smoke_text = read(f"{ROOT}/tools/desktop_smoke.py")
+scenarios = set(re.findall(r'SCENARIO\s*==\s*"([\w-]+)"', smoke_text))
+for group in re.findall(r"SCENARIO\s+in\s+\(([^)]*)\)", smoke_text):   # a flag for two scenarios
+    scenarios |= set(strings_of(group))
+m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|-]+)\]", tests_page)
 listed_scenarios = set(m.group(1).split("|")) if m else set()
 # Each scenario of that synopsis has its line in the list under it.
-described = set(re.findall(r"^  - `(\w+)` —", tests_page, re.M))
+described = set(re.findall(r"^  - `([\w-]+)` —", tests_page, re.M))
 if not scenarios or not listed_scenarios:
     errors.append(f"no smoke scenario found in tools/desktop_smoke.py, or no list of them in {TESTS_PAGE}")
 for v in sorted(scenarios - listed_scenarios):
