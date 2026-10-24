@@ -902,9 +902,13 @@ def doc_body(t, lang, to_root, page_name, assets):
                 f'<a href="{main_page}">{t("doc_release_see_dev")}</a></p>\n') + note
     elif RELEASE_DOCS and page_name in CHANGED:
         new_page = page_name not in dict(RELEASE_DOCS.pages)
-        other = "" if new_page else f'<a href="{release_page}">{release_text(t, "doc_dev_see_release")}</a> · '
+        links = [] if new_page else [f'<a href="{release_page}">{release_text(t, "doc_dev_see_release")}</a>']
+        # What's coming: the changelog's section, there only when main has a
+        # change its notes will list (not when it has only hidden ones: ci, chore).
+        if UNRELEASED:
+            links.append(f'<a href="{to_root}{lang_dir(lang)}changelog/#dev">{t("doc_dev_whats_new")}</a>')
         note = (f'      <p class="callout note">{release_text(t, "doc_dev_new_page" if new_page else "doc_dev_note")} '
-                f'{other}<a href="{to_root}{lang_dir(lang)}changelog/#dev">{t("doc_dev_whats_new")}</a></p>\n') + note
+                f'{" · ".join(links)}</p>\n') + note
     # The page's sections (its h2: toc_depth leaves the h1 out).
     toc_items = "".join(f'<li><a href="#{h["id"]}">{h["name"]}</a></li>' for h in toc)
     # The same under the page's first paragraph where there is no room for
