@@ -286,6 +286,8 @@ jobs:
           TOUR_JOBS="$(nproc)" node tools/render_tour.mjs shots
       - name: Main's screenshots, preview images and tours
         if: env.TAKE_SCREENS != '1'
+        env:
+          RELEASE: ${{ steps.what.outputs.release }}
         run: |
           mkdir -p shots
           if [ -d main-site/assets/images/screenshots ]; then
@@ -303,6 +305,11 @@ jobs:
               done
             done
           fi
+          # A release: its English pages show the repository's screenshots
+          # (images/screenshots/, taken for the release, the README's) rather
+          # than main's of the previous release, until the release-screens
+          # run takes them all; the other languages keep main's meanwhile.
+          if [ "$RELEASE" = 1 ]; then rm -rf shots/en-US; echo "A release: the repository's English screenshots."; fi
           echo "$(find shots -type f | wc -l) files from main's site"
       # The screens against main's, published with its site: which ones this
       # pull request changes (tools/visual_check.py, the footer clock masked;
