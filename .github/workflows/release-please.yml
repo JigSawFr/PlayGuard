@@ -58,11 +58,11 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-      # A pre-release until its assets are attached and its page laid out
-      # (the build's release job publishes it then): releases/latest, which
-      # the app's update check and the site's download links read, stays on
-      # the previous release meanwhile, and on it should the assets job fail
-      # (Actions › build › Run workflow, its tag, then).
+      # A pre-release until its assets are attached, its page laid out and
+      # the site built with it (pages.yml publishes it then): releases/latest,
+      # which the app's update check and the site's download links read,
+      # stays on the previous release meanwhile, and on it should the assets
+      # job fail (Actions › build › Run workflow, its tag, then).
       - name: The release a pre-release until its assets are there
         if: ${{ (steps.release.outputs.release_created || steps.retry.outputs.release_created) == 'true' }}
         env:
@@ -83,6 +83,7 @@ jobs:
       attestations: write
       discussions: write
       pull-requests: read
+      actions: write
     uses: ./.github/workflows/build.yml
     # Only the secrets the build asks for (its workflow_call secrets), not
     # every secret of the repository: the Docker Hub login for the switch

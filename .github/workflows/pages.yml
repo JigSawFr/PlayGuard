@@ -82,6 +82,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       actions: read          # the artifacts of web.yml's runs
+      contents: write        # a release published once its site is out (last step)
       pages: write
       id-token: write
       pull-requests: write   # the link on the pull request
@@ -167,11 +168,42 @@ jobs:
           done
           touch site/.nojekyll
           echo "previews=$previews" >> "$GITHUB_OUTPUT"
+          echo "main=$main" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
       - id: deploy
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+      # A release stays a pre-release (release-please.yml) until the build's
+      # release job laid out its page (its title "PlayGuard X.Y.Z", the job's
+      # last change to it, after the assets) and the site just published was
+      # built from its commit or a later one; then it is published as the
+      # latest. Whichever of the two ends last does it: the release job
+      # starts this workflow, the site's web run does too.
+      - name: A release published once its assets, page and site are out
+        if: steps.gather.outputs.main != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          MAIN_RUN: ${{ steps.gather.outputs.main }}
+        run: |
+          set -euo pipefail
+          site=$(gh api "repos/$REPO/actions/runs/$MAIN_RUN" --jq .head_sha)
+          gh release list -R "$REPO" --limit 5 --exclude-drafts --json tagName,isPrerelease \
+              --jq '.[] | select(.isPrerelease) | .tagName' | while read -r tag; do
+            title=$(gh release view "$tag" -R "$REPO" --json name --jq .name)
+            if [[ "$title" != "PlayGuard "* ]]; then echo "$tag: its page is not laid out yet"; continue; fi
+            if ! gh release view "$tag" -R "$REPO" --json assets --jq '.assets[].name' | grep -qx playguard.zip; then
+              echo "$tag: no playguard.zip yet"; continue
+            fi
+            sha=$(gh api "repos/$REPO/commits/$tag" --jq .sha)
+            status=$(gh api "repos/$REPO/compare/$sha...$site" --jq .status 2>/dev/null || true)
+            if [ "$status" != identical ] && [ "$status" != ahead ]; then
+              echo "$tag: the site (${site::7}) is not built from it yet"; continue
+            fi
+            gh release edit "$tag" -R "$REPO" --prerelease=false --latest
+            echo "$tag: published (assets, page and site out)" >> "$GITHUB_STEP_SUMMARY"
+          done
       # The pull request whose build started this run: its comment points to
       # its preview (one comment, edited at each push).
       - name: Link on the pull request
