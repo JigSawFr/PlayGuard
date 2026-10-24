@@ -1,12 +1,13 @@
 // Renders branding/tour.html, frame by frame, to images/video/playguard-tour.mp4
-// (1920x1080, 30 fps) and images/video/playguard-tour.gif (720 px, 10 fps): the
+// (1920x1080, 30 fps) and images/video/playguard-tour.gif (640 px, 10 fps: under
+// the 10 MB GitHub shows inline): the
 // README shows the GIF, which GitHub plays inline (its mobile app too), and
 // links it to itself at full size: GitHub never plays an MP4 from the
 // repository (its file view says it is too big, its raw link downloads it).
 // The GIF is rendered with tour.html?still (no drifting glow, no zoom on the
 // screenshots), so most of each frame repeats the last one and it stays small.
 // Needs Node + Playwright (Chromium) and ffmpeg; the Sora font is the site's own (site/assets/fonts/).
-//   node tools/render_tour.mjs
+//   node tools/render_tour.mjs [--gif]
 // The website's tour in the console's other languages: their texts (the
 // site's catalogs, site/i18n/) over their screenshots (tools/site_screenshots.mjs),
 // <shots-dir>/<language>/tour.mp4 (1280x720) for tools/build_site.py
@@ -24,7 +25,8 @@ const mp4 = join(root, 'images/video/playguard-tour.mp4');
 const gif = join(root, 'images/video/playguard-tour.gif');
 const tour = pathToFileURL(join(root, 'branding/tour.html')).href;
 
-const [shots, ...only] = process.argv.slice(2);
+const [arg, ...only] = process.argv.slice(2);
+const shots = arg === '--gif' ? undefined : arg;
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 // The site's tours at 1280x720: the page drawn at two thirds.
 const newPage = () => browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: shots ? 2 / 3 : 1 });
@@ -116,8 +118,9 @@ if (shots) {
 }
 
 const page = await newPage();
-await render(page, tour, 30, ['-preset', 'veryslow', ...H264], mp4);
+// --gif: the GIF alone, the MP4 left as it is.
+if (arg !== '--gif') await render(page, tour, 30, ['-preset', 'veryslow', ...H264], mp4);
 // One palette for the whole GIF and no dithering: flat colours stay flat.
 await render(page, `${tour}?still`, 10, ['-vf',
-  'scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=full[p];[b][p]paletteuse=dither=none:diff_mode=rectangle'], gif);
+  'scale=640:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=full[p];[b][p]paletteuse=dither=none:diff_mode=rectangle'], gif);
 await browser.close();

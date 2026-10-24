@@ -162,7 +162,7 @@ pages; no framework, nothing to install but that.
   JSON-LD blocks are data, not scripts: the policy does not apply to them. A page
   needing something else (a script inline, a file from another site) is
   blocked: put it in `site/assets/`. The pages also use
-  `branding/` (the mark, the icon), `images/screenshots/` and the one-minute
+  `branding/` (the mark, the icon), `images/screenshots/` and the 90-second
   tour (`images/video/playguard-tour.mp4`).
 
 To look at it locally: `python3 tools/build_site.py /tmp/site` then
