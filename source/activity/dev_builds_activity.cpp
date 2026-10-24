@@ -194,8 +194,7 @@ void DevBuildsActivity::onContentAvailable()
     this->refresh_timer.start();
     this->fill();
     // The screen opens on the first build, not on the tabs above it.
-    if (!list->getChildren().empty() && list->getChildren()[0]->getVisibility() == brls::Visibility::VISIBLE)
-        brls::Application::giveFocus(list->getChildren()[0]);
+    if (!cells.empty() && cells[0]->getVisibility() == brls::Visibility::VISIBLE) brls::Application::giveFocus(cells[0]);
 }
 
 void DevBuildsActivity::update(const dev_builds::Cache& fresh)
@@ -212,16 +211,15 @@ void DevBuildsActivity::update(const dev_builds::Cache& fresh)
     this->fill();
     // Never under a dialog (Back to the previous build, the sign-in code).
     if (!ui::has_focus(this)) return;
-    if (focus_moves && !list->getChildren().empty() &&
-        list->getChildren()[0]->getVisibility() == brls::Visibility::VISIBLE)
-        brls::Application::giveFocus(list->getChildren()[0]);
+    if (focus_moves && !cells.empty() && cells[0]->getVisibility() == brls::Visibility::VISIBLE)
+        brls::Application::giveFocus(cells[0]);
 }
 
 // Back from a build's screen or a dialog: the list fetched meanwhile may
 // have hidden the build it was opened from (fewer builds) or a tab.
 void DevBuildsActivity::onResume()
 {
-    brls::View* first = list->getChildren().empty() ? nullptr : list->getChildren()[0];
+    brls::View* first = cells.empty() ? nullptr : cells[0];
     ui::keep_focus(this, first && first->getVisibility() == brls::Visibility::VISIBLE ? first : nullptr);
 }
 
@@ -284,15 +282,12 @@ void DevBuildsActivity::fill()
     brls::Application::getGlobalHintsUpdateEvent()->fire();
 
     const std::vector<dev_builds::Build> shown = this->builds(this->tab);
-    auto& cells = list->getChildren();
     for (size_t i = 0; i < shown.size(); i++) {
-        BuildCell* cell;
-        if (i < cells.size()) {
-            cell = (BuildCell*)cells[i];
-        } else {
-            cell = new BuildCell();
-            list->addView(cell);
+        if (i >= cells.size()) {
+            cells.push_back(new BuildCell());
+            list->addView(cells.back());
         }
+        BuildCell* cell = cells[i];
         const dev_builds::Build b = shown[i];
         // Two lines: its title, then its tags (kind of change, checks,
         // installed or new); how old it is and its commit at the right.
@@ -325,7 +320,7 @@ void DevBuildsActivity::show_tab(dev_builds::Kind kind, bool focus_list)
     s_tab = kind;
     s_tab_chosen = true;
     this->fill();
-    if (focus_list) brls::Application::giveFocus(list->getChildren()[0]);
+    if (focus_list) brls::Application::giveFocus(cells[0]);
 }
 
 void DevBuildsActivity::next_tab(int step)
@@ -350,7 +345,6 @@ void DevBuildsActivity::sort()
 {
     // The pull requests' tab, the focused one keeping the focus wherever it moves.
     int focused_pr = 0;
-    auto& cells = list->getChildren();
     if (this->tab == dev_builds::Kind::PullRequest) {
         const std::vector<dev_builds::Build> before = this->builds(dev_builds::Kind::PullRequest);
         for (size_t i = 0; i < cells.size() && i < before.size(); i++)
