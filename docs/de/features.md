@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 a913a7c19f05 -->
+<!-- translated from docs/features.md, sha256 06fe889ee4f2 -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -100,7 +100,7 @@ Die Einträge, die die Konsole statt des Jugendschutzes betreffen, kommen zuletz
 - das veraltete Wiederherstellungs-Sysmodul (nicht das, das mit dieser Version kommt, oder installiert, bevor es seine Version angab; *Aktualisieren* installiert das, das diese Version mitbringt), dann die Konsole, die dafür neu zu starten ist, bis sie es wurde;
 - ein Build, der nicht fertig gestartet ist und von dem zurückgekehrt wurde (*Bericht senden*).
 
-Die zur Information: ein Build, von dem zurückgekehrt wurde, eine mit dieser Version nicht getestete Firmware, ein neueres Atmosphère, hekate oder eine neuere Firmware (geprüft mit *Täglich nach Updates suchen*; der Eintrag der Firmware rät, zu warten, bis Atmosphère sie unterstützt), die nicht anonymisierte Seriennummer auf emuMMC, der eigene Jugendschutz des anderen Systems, eine von PlayGuards eigenen Dateien, die beschädigt gefunden und beiseitegelegt wurde (eine Meldung beim Start verweist darauf).
+Die zur Information: ein Build, von dem zurückgekehrt wurde, eine mit dieser Version nicht getestete Firmware, ein neueres Atmosphère, hekate oder eine neuere Firmware (geprüft mit *Täglich nach Updates suchen*; der Eintrag der Firmware rät, zu warten, bis Atmosphère sie unterstützt), eine neuere Version der Home-Assistant-Integration (sobald sie gemeldet hat, welche Version Home Assistant nutzt: *Neuigkeiten* zeigt, was sich seitdem geändert hat, und den QR-Code, der sie in HACS öffnet), die nicht anonymisierte Seriennummer auf emuMMC, der eigene Jugendschutz des anderen Systems, eine von PlayGuards eigenen Dateien, die beschädigt gefunden und beiseitegelegt wurde (eine Meldung beim Start verweist darauf).
 
 ### Wie sich Einträge verhalten
 
@@ -228,7 +228,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 - **Profile**, auf der SD-Karte gespeichert: eines anwenden (ein bereits geltendes Profil sagt das einfach), bearbeiten, umbenennen oder löschen; die aktuellen Limits speichern oder ein neues anlegen.
 - Jeder Name, in jeder Schrift (*École*, *周末*, *Выходные* …) — ein Name ohne lateinische Buchstaben bekommt einen eigenen Dateinamen, und zwei Namen, die auf dieselbe Datei hinauslaufen würden, werden erkannt.
-- **Geplantes Profil** (*Profile › Geplantes Profil*): *Bald*. PlayGuard läuft nur, während es geöffnet ist, und kann daher nicht von selbst am richtigen Tag das Profil wechseln: Profile nach einem Kalender oder den Schulferien zu wechseln, kommt mit der [MQTT-Brücke](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). Ein mit einer früheren Version geplantes Profil wird weiterhin angeboten, wenn sein Zeitraum beginnt, und die Zeile ändert, entfernt oder beendet es weiterhin.
+- **Geplantes Profil** (*Profile › Geplantes Profil*): *Mit Home Assistant*. PlayGuard läuft nur, während es geöffnet ist, und kann daher nicht von selbst am richtigen Tag das Profil wechseln: Home Assistant übernimmt das, nach einem Kalender oder den Schulferien, sobald *Konsole › Fernzugriff* die Konsole damit verbindet (eine Automatisierung, die seine Auswahl *Profil* setzt; [die Home-Assistant-Anleitung](../home-assistant.md), auf Englisch). Ein mit einer früheren Version geplantes Profil wird weiterhin angeboten, wenn sein Zeitraum beginnt, und die Zeile ändert, entfernt oder beendet es weiterhin.
 
 ### Alle Spiele sperren
 
@@ -341,6 +341,10 @@ Die Geheimzahl in PlayGuard selbst:
 
 Zwei Bestätigungen, unumkehrbar; vorher wird eine Sicherung der Einstellungen gespeichert.
 
+### Ausgesperrt?
+
+Als Letztes im Tab: das optionale Wiederherstellungsmodul, für eine vergessene Geheimzahl bei einem Limit von 0 Minuten. Ⓐ öffnet es in *Konsole › Optionale Module*, wo es installiert wird.
+
 ## Verlauf — was PlayGuard geändert hat, und die Sicherungen
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=history)*
@@ -365,7 +369,7 @@ Zwei Bestätigungen, unumkehrbar; vorher wird eine Sicherung der Einstellungen g
 
 *[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=console)*
 
-**Oben**, was auf der Konsole läuft, als Kacheln, unter *System* (die Firmware, Atmosphère, hekate, wenn es auf der SD-Karte liegt, und sys-patch, wenn es installiert ist; Ⓐ öffnet seine Versionshinweise), dann die Werkzeuge als Kacheln, unter *Werkzeuge* (*Netzwerkuhr*, *Installierte Spiele* und *Forwarder*; die ersten beiden zeigen in ihrer Ecke, was einen Blick braucht), dann die Zeilen der Konsole, die Kompatibilität zuerst (nur ein Häkchen in Petrol, wenn PlayGuard auf dieser Firmware geprüft wurde, sonst eine Warnung und was nicht stimmt).
+**Oben**, was auf der Konsole läuft, als Kacheln, unter *System* (die Firmware, Atmosphère, hekate, wenn es auf der SD-Karte liegt, und sys-patch, wenn es installiert ist; Ⓐ öffnet seine Versionshinweise), dann die Werkzeuge als Kacheln, unter *Werkzeuge* (*Netzwerkuhr*, *Installierte Spiele* und *Forwarder*; die ersten beiden zeigen in ihrer Ecke, was einen Blick braucht; dann *Fernzugriff* und *Optionale Module*), dann die Zeilen der Konsole, die Kompatibilität zuerst (nur ein Häkchen in Petrol, wenn PlayGuard auf dieser Firmware geprüft wurde, sonst eine Warnung und was nicht stimmt).
 
 ### Netzwerkuhr
 
@@ -455,6 +459,14 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 - **In den Sicherungen der Einstellungen** (*Verlauf › Sicherungen*): was PlayGuard erstellt hat und ob das Homebrew-Menü gesperrt war. Eine Sicherung wiederherzustellen bietet nach dem Rest an, die Forwarder zurückzulegen, die nicht mehr im HOME-Menü sind (geschützt wie zuvor, mit ihren Zeiten und ihrem Symbol); eine Sperre wird nur gemeldet und ist von hier aus erneut zu setzen.
 - Jede Änderung fragt nach der Geheimzahl, wenn *PlayGuard mit der Geheimzahl schützen* das vorsieht, wird im schreibgeschützten Modus abgelehnt und steht im Änderungsverlauf. Was PlayGuard erstellt hat, wird pro System (sysMMC / emuMMC) in `forwarders.json` gespeichert.
 
+### Fernzugriff
+
+*Fernzugriff ›*, eine Kachel unter *Werkzeuge*: eine optionale Verbindung zu einem MQTT-Broker und Home Assistant in deinem lokalen Netzwerk, standardmäßig aus ([die Home-Assistant-Anleitung](../home-assistant.md), auf Englisch). Der Broker und seine MQTT-Version, der Name der Konsole, was mit Befehlen geschieht (auf der Konsole fragen, sie ausführen, sie ablehnen), ob sie die Spielzeit ändern dürfen (standardmäßig aus), die Discovery von Home Assistant, die eigenen Informationen der Konsole (Modell, Versionen, Speicher, Akku, Netzwerk, Spiele; die Seriennummer nur mit *Die Seriennummer veröffentlichen*), QR-Codes, die die PlayGuard-Integration aus HACS installieren und die Konsole hinzufügen (sobald sie installiert ist, ihre Version und ihre neuere Version), der Live-Status, *Jetzt synchronisieren* und das Protokoll.
+
+### Optionale Module
+
+*Optionale Module ›*, eine Kachel unter *Werkzeuge*: das Wiederherstellungsmodul und den Agenten der Fernverbindung installieren, aktualisieren, beim Systemstart starten oder entfernen, jedes in seinem eigenen Tab, aus den Kopien, die PlayGuard mitbringt (kein Computer nötig). Jede Änderung fragt nach der Geheimzahl, wenn *PlayGuard mit der Geheimzahl schützen* das vorsieht.
+
 ### Die Zeilen der Konsole
 
 - **Firmware, Atmosphère, hekate** (wenn seine `bootloader/update.bin` auf der SD-Karte liegt) **und sys-patch** (wenn es installiert ist; seine Version aus seiner `config/sys-patch/log.ini`), jedes eine Kachel mit der installierten Version, dann der neueren Version, die die letzte Update-Suche gefunden hat, in einer bernsteinfarbenen Kapsel (*23.0.1 verfügbar*, die Kachel bernsteinfarben umrandet, und wie viele Versionen zurück darunter, wenn es mehr als eine ist), oder *Aktuell*; ein Warnzeichen in der Ecke der Firmware-Kachel, wenn die neueste Firmware zuerst ein neueres Atmosphère oder hekate braucht oder von ihnen noch nicht unterstützt wird (die Versionshinweise der Firmware sagen, warum: Deren Versionshinweise sagen, welche Firmware sie unterstützen).
@@ -513,7 +525,7 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 
 **Keine Abstürze mehr mit 22.5.** `pctl:a`, der privilegierte Jugendschutzdienst, nimmt **nur eine einzige Sitzung** an. Ältere Builds der ursprünglichen App hielten sie offen, sodass die Geheimzahl-Abfrage des HOME-Menüs (oder das Geheimzahl-Applet) sie nicht bekam und Atmosphère abstürzen konnte. PlayGuard öffnet die Sitzung für jede Aktion und gibt sie sofort wieder frei; regelmäßige Aktualisierungen pausieren, während die App im Hintergrund ist. *(Diagnose durch [den Fork von anbingxi](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Nichts läuft im Hintergrund.** Das Limit, die Geheimzahl, die Warnungen und die Unterbrechung sind die der Konsole; PlayGuard ändert nur ihre Einstellungen.
+**Nichts läuft im Hintergrund.** Das Limit, die Geheimzahl, die Warnungen und die Unterbrechung sind die der Konsole; PlayGuard ändert nur ihre Einstellungen. Die optionale Fernverbindung läuft, solange PlayGuard geöffnet ist, oder ständig, sobald ihr optionaler Agent installiert ist, und führt einen Befehl genau wie eine auf der Konsole vorgenommene Änderung aus (dasselbe Aufheben und Wiederaktivieren, derselbe schreibgeschützte Modus und Verlauf); sie kann nie den Jugendschutz löschen, die Smart-Geräte-App trennen oder die Geheimzahl antasten.
 
 ## Was als Spielzeit zählt
 

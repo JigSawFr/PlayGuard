@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 a913a7c19f05 -->
+<!-- translated from docs/features.md, sha256 06fe889ee4f2 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -100,7 +100,7 @@ De meldingen over de console in plaats van over het ouderlijk toezicht komen als
 - een verouderde herstel-sysmodule (niet de module die met deze versie meekomt, of geïnstalleerd voordat hij zijn versie vermeldde; *Bijwerken* plaatst de module die deze versie meebrengt), daarna de console die daarvoor opnieuw moet opstarten, tot dat is gebeurd;
 - een build die niet helemaal opstartte en waarvan is teruggegaan (*Rapport versturen*).
 
-Ter informatie: een build waarvan is teruggegaan, een firmware die niet met deze versie is getest, een nieuwere versie van Atmosphère, hekate of de firmware (gecontroleerd met *Elke dag op updates controleren*; de melding over de firmware zegt dat je moet wachten tot Atmosphère hem ondersteunt), het serienummer dat op emuMMC niet is afgeschermd, het eigen ouderlijk toezicht van het andere systeem, een bestand van PlayGuard zelf dat beschadigd werd gevonden en opzij is gezet (een korte melding bij het opstarten verwijst ernaar).
+Ter informatie: een build waarvan is teruggegaan, een firmware die niet met deze versie is getest, een nieuwere versie van Atmosphère, hekate of de firmware (gecontroleerd met *Elke dag op updates controleren*; de melding over de firmware zegt dat je moet wachten tot Atmosphère hem ondersteunt), een nieuwere release van de Home Assistant-integratie (zodra die heeft gemeld welke versie Home Assistant draait: *Wat is er nieuw* toont wat er sindsdien is veranderd en de QR-code die haar in HACS opent), het serienummer dat op emuMMC niet is afgeschermd, het eigen ouderlijk toezicht van het andere systeem, een bestand van PlayGuard zelf dat beschadigd werd gevonden en opzij is gezet (een korte melding bij het opstarten verwijst ernaar).
 
 ### Hoe meldingen zich gedragen
 
@@ -228,7 +228,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 - **Profielen** opgeslagen op de SD-kaart: een profiel toepassen (een profiel dat al geldt, zegt dat gewoon), bewerken, hernoemen of verwijderen; de huidige limieten opslaan of een nieuw profiel maken.
 - Elke naam, in elk schrift (*École*, *周末*, *Выходные* …) — een naam zonder Latijnse letters krijgt een eigen bestandsnaam, en twee namen die hetzelfde bestand zouden opleveren, worden opgemerkt.
-- **Gepland profiel** (*Profielen › Gepland profiel*): *Binnenkort*. PlayGuard draait alleen terwijl het open is, dus kan het niet zelf op de juiste dag van profiel wisselen: van profiel wisselen vanuit een agenda of de schoolvakanties komt met de [MQTT-brug](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). Een profiel dat met een eerdere versie is gepland, wordt nog steeds aangeboden als zijn periode begint, en de regel wijzigt, verwijdert of beëindigt het nog steeds.
+- **Gepland profiel** (*Profielen › Gepland profiel*): *Met Home Assistant*. PlayGuard draait alleen terwijl het open is, dus kan het niet zelf op de juiste dag van profiel wisselen: Home Assistant doet dat wel, vanuit een agenda of de schoolvakanties, zodra *Console › Toegang op afstand* de console ermee verbindt (een automatisering die zijn keuzelijst *Profiel* instelt; [de Home Assistant-handleiding](../home-assistant.md), in het Engels). Een profiel dat met een eerdere versie is gepland, wordt nog steeds aangeboden als zijn periode begint, en de regel wijzigt, verwijdert of beëindigt het nog steeds.
 
 ### Alle games blokkeren
 
@@ -341,6 +341,10 @@ De pincode in PlayGuard zelf:
 
 Twee bevestigingen, onomkeerbaar; eerst wordt een back-up van de instellingen opgeslagen.
 
+### Buitengesloten?
+
+Als laatste op het tabblad: de optionele herstelmodule, voor een vergeten pincode met een limiet van 0 minuten. Ⓐ opent hem in *Console › Optionele modules*, dat hem installeert.
+
 ## Geschiedenis — wat PlayGuard veranderde, en de back-ups
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=history)*
@@ -365,7 +369,7 @@ Twee bevestigingen, onomkeerbaar; eerst wordt een back-up van de instellingen op
 
 *[Probeer het in de simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**Bovenaan** wat de console draait, als tegels, onder *Systeem* (de firmware, Atmosphère, hekate als het op de SD-kaart staat en sys-patch als het is geïnstalleerd; Ⓐ opent de release-opmerkingen), dan de hulpmiddelen als tegels, onder *Hulpmiddelen* (*Netwerkklok*, *Games* en *Forwarders*; de eerste twee tonen in hun hoek wat aandacht nodig heeft), dan de regels van de console, compatibiliteit eerst (alleen een blauwgroen vinkje als PlayGuard op deze firmware is gecontroleerd, anders een waarschuwing en wat er mis is).
+**Bovenaan** wat de console draait, als tegels, onder *Systeem* (de firmware, Atmosphère, hekate als het op de SD-kaart staat en sys-patch als het is geïnstalleerd; Ⓐ opent de release-opmerkingen), dan de hulpmiddelen als tegels, onder *Hulpmiddelen* (*Netwerkklok*, *Games* en *Forwarders*; de eerste twee tonen in hun hoek wat aandacht nodig heeft; dan *Toegang op afstand* en *Optionele modules*), dan de regels van de console, compatibiliteit eerst (alleen een blauwgroen vinkje als PlayGuard op deze firmware is gecontroleerd, anders een waarschuwing en wat er mis is).
 
 ### Netwerkklok
 
@@ -455,6 +459,14 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 - **In de back-ups van de instellingen** (*Geschiedenis › Back-ups*): wat PlayGuard heeft gemaakt en of het homebrew-menu vergrendeld was. Een back-up terugzetten biedt, na de rest, aan om de forwarders terug te zetten die niet meer in het HOME-menu staan (beveiligd zoals ze waren, met hun uren en icoon); een vergrendeling wordt alleen gemeld, en moet hier opnieuw worden ingesteld.
 - Elke wijziging vraagt om de pincode als *PlayGuard beveiligen met de pincode* dat doet, wordt in de alleen-lezenmodus geweigerd en staat in de wijzigingsgeschiedenis. Wat PlayGuard heeft gemaakt, wordt per systeem (sysMMC / emuMMC) bewaard, in `forwarders.json`.
 
+### Toegang op afstand
+
+*Toegang op afstand ›*, een tegel onder *Hulpmiddelen*: een optionele verbinding met een MQTT-broker en Home Assistant op je lokale netwerk, standaard uit ([de Home Assistant-handleiding](../home-assistant.md), in het Engels). De broker en zijn MQTT-versie, de naam van de console, wat er met opdrachten gebeurt (vragen op de console, ze uitvoeren, ze weigeren), of ze de speeltijdtimer mogen wijzigen (standaard uit), de discovery van Home Assistant, de eigen gegevens van de console (model, versies, opslag, batterij, netwerk, games; het serienummer alleen met *Het serienummer publiceren*), QR-codes die de PlayGuard-integratie vanuit HACS installeren en de console toevoegen (eenmaal geïnstalleerd: de versie ervan, en de nieuwere release), de live status, *Nu synchroniseren* en het logboek.
+
+### Optionele modules
+
+*Optionele modules ›*, een tegel onder *Hulpmiddelen*: de herstelmodule en de agent voor de verbinding op afstand installeren, bijwerken, starten bij het opstarten of verwijderen, elk op een eigen tabblad, vanuit de kopieën die PlayGuard meebrengt (geen computer nodig). Elke wijziging vraagt om de pincode als *PlayGuard beveiligen met de pincode* dat doet.
+
 ### De regels van de console
 
 - **Firmware, Atmosphère, hekate** (als zijn `bootloader/update.bin` op de SD-kaart staat) **en sys-patch** (als het is geïnstalleerd; zijn versie uit zijn `config/sys-patch/log.ini`), elk een tegel met de geïnstalleerde versie, dan de nieuwere versie die de laatste updatecontrole vond in een oranje pil (*23.0.1 beschikbaar*, de tegel oranje omrand, en hoeveel versies achter eronder als het er meer dan één zijn), of *Up-to-date*; een waarschuwing in de hoek van de firmwaretegel als de nieuwste firmware eerst een nieuwere Atmosphère of hekate nodig heeft, of door die nog niet wordt ondersteund (de release-opmerkingen van de firmware zeggen waarom: hun release-opmerkingen zeggen welke firmware ze ondersteunen).
@@ -513,7 +525,7 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 
 **Geen crashes meer op 22.5.** `pctl:a`, de bevoorrechte dienst voor ouderlijk toezicht, accepteert **één enkele sessie**. Oudere builds van de oorspronkelijke app hielden die open, waardoor de pincodevraag van het HOME-menu (of de pincode-applet) haar niet kon krijgen en Atmosphère kon crashen. PlayGuard opent de sessie voor elke actie en geeft haar meteen vrij; periodieke vernieuwingen pauzeren zolang de app op de achtergrond staat. *(Diagnose door [de fork van anbingxi](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Niets draait op de achtergrond.** De limiet, de pincode, de waarschuwingen en de onderbreking zijn die van de console zelf; PlayGuard wijzigt alleen hun instellingen.
+**Niets draait op de achtergrond.** De limiet, de pincode, de waarschuwingen en de onderbreking zijn die van de console zelf; PlayGuard wijzigt alleen hun instellingen. De optionele verbinding op afstand werkt terwijl PlayGuard open is, of altijd zodra de optionele agent ervan is geïnstalleerd, en voert een opdracht precies zo uit als een wijziging op de console (hetzelfde ontgrendelen en opnieuw vergrendelen, dezelfde alleen-lezenmodus en geschiedenis); ze kan nooit het ouderlijk toezicht wissen, de smartphone-app ontkoppelen of aan de pincode komen.
 
 ## Wat telt als speeltijd
 

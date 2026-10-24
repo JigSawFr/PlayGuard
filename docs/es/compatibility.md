@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
+<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
 # Compatibilidad
 
 Firmware, Atmosphère y lanzadores compatibles, emuMMC y sysMMC, y cómo se compara PlayGuard con un sysmodule de sustitución. Volver al [README](../../README.md).
@@ -66,7 +66,7 @@ A los niños les encantan los videojuegos, y los videojuegos son pantallas: pone
 
 Las pocas herramientas que existían no servían: informes de actividad poco mantenidos y poco detallados, un control parental tosco y sin terminar. Tampoco quería un sustituto hecho a medida, ni un sysmodule siempre en marcha en segundo plano. La idea era **aprovechar al máximo el control parental de la propia consola**, con todo lo que ya hace —el límite, el PIN, los avisos, la suspensión— y volver a llevar sus ajustes a la consola. Eso es PlayGuard.
 
-Manejar el control parental de la propia consola abre además la puerta a mucho más: enviar el tiempo de juego a un servidor en casa, recibir órdenes de él, Home Assistant, automatizaciones. Hacia dónde podría ir está en el [horizonte de la hoja de ruta](../../ROADMAP.md#horizon) (en inglés).
+Manejar el control parental de la propia consola abre además la puerta a mucho más: enviar el tiempo de juego a un servidor en casa, recibir órdenes de él, Home Assistant, automatizaciones. El primer paso ya está aquí, un enlace opcional con Home Assistant por MQTT ([guía](../home-assistant.md), en inglés); hacia dónde podría ir después está en el [horizonte de la hoja de ruta](../../ROADMAP.md#horizon) (en inglés).
 
 ## ¿PlayGuard o un sysmodule de sustitución?
 
@@ -76,7 +76,7 @@ PlayGuard maneja el control parental integrado en la consola (el servicio `pctl`
 |---|---|---|
 | **Límite de tiempo de juego** | Uno para la consola (el temporizador de la propia consola) | Uno por cuenta de usuario |
 | **PIN, avisos, suspensión** | Los de la consola | Los suyos |
-| **En segundo plano** | Nada (el sysmodule de recuperación opcional solo actúa al arrancar, cuando un archivo `RESCUE` se lo pide) | Un sysmodule, desde el arranque |
+| **En segundo plano** | Nada (el sysmodule de recuperación opcional solo actúa al arrancar, cuando un archivo `RESCUE` se lo pide; el agente del enlace con Home Assistant, también opcional, solo funciona una vez instalado) | Un sysmodule, desde el arranque |
 | **Tras una actualización del firmware** | El control parental de la consola sigue funcionando; PlayGuard se abre en solo lectura hasta que una versión admita el firmware | El control depende de que el sysmodule siga funcionando |
 | **Eliminado de la tarjeta SD** | Los límites se quedan en la consola | El control desaparece con él |
 

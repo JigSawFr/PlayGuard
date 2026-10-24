@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # Solución de problemas
 
 Recuperar el acceso a una consola bloqueada, los problemas habituales, informar de un error y el modo desarrollador. Volver al [README](../../README.md).
@@ -19,7 +19,7 @@ Conoces el PIN, pero la aplicación móvil del anterior propietario sigue vincul
 
 ### El temporizador lo bloquea todo (límite de 0 minutos) y has olvidado el PIN
 
-En ese caso, PlayGuard ni siquiera puede iniciarse. Instala **de antemano** el sysmodule de recuperación opcional (`playguard-rescue.zip`); si te quedas bloqueado, coloca un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y arranca: desbloquea la consola para que PlayGuard pueda abrirse. Consulta [`sysmodule/README.md`](../../sysmodule/README.md) (en inglés).
+En ese caso, PlayGuard ni siquiera puede iniciarse. Instala **de antemano** el sysmodule de recuperación opcional (*Consola › Módulos opcionales*, o `playguard-rescue.zip` a mano); si te quedas bloqueado, coloca un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y arranca: desbloquea la consola para que PlayGuard pueda abrirse. Consulta [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (en inglés).
 
 El módulo debe seguir la versión de PlayGuard: con cada actualización de PlayGuard, vuelve a extraer el `playguard-rescue.zip` de esa versión (o *Actualizar* en *El sysmodule de recuperación no está actualizado*, en la campana de notificaciones) y reinicia la consola. Un módulo más antiguo deja un informe que PlayGuard no puede verificar: la pantalla de recuperación no ofrece entonces nada, indica que el módulo es más antiguo, y volver a usar `RESCUE` da el mismo resultado hasta que se actualice.
 

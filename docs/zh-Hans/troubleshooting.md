@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # 故障排除
 
 重新进入被锁定的主机、常见问题、报告问题，以及开发者模式。返回 [README](../../README.md)。
@@ -19,7 +19,7 @@ PlayGuard 只能看到它所运行的系统的家长控制：**emuMMC 和 sysMMC
 
 ### 游戏时间阻止了一切（限制为 0 分钟），而且忘记了 PIN
 
-这时 PlayGuard 本身无法启动。请**事先**安装可选的恢复 sysmodule（`playguard-rescue.zip`）；被锁在外面时，在 SD 卡上放一个空的 `config/playguard/RESCUE` 文件并启动主机——它会解除主机的锁定，让 PlayGuard 能够打开。见 [`sysmodule/README.md`](../../sysmodule/README.md)（英文）。
+这时 PlayGuard 本身无法启动。请**事先**安装可选的恢复 sysmodule（*主机 › 可选模块*，或手动安装 `playguard-rescue.zip`）；被锁在外面时，在 SD 卡上放一个空的 `config/playguard/RESCUE` 文件并启动主机——它会解除主机的锁定，让 PlayGuard 能够打开。见 [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)（英文）。
 
 这个模块必须与 PlayGuard 的版本一致：每次更新 PlayGuard 后，重新解压该版本的 `playguard-rescue.zip`（或者在通知铃铛的 *恢复 sysmodule 不是最新版本* 上选择 *更新*），然后重启主机。较旧的模块留下的报告 PlayGuard 无法核验：这时恢复画面不提供任何操作，会说明模块较旧，再次使用 `RESCUE` 也是同样的结果，直到它被更新。
 

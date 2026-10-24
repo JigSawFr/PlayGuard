@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # Risoluzione dei problemi
 
 Riprendere il controllo di una console bloccata, i problemi comuni, segnalare un bug, e la modalità sviluppatore. Torna al [README](../../README.md).
@@ -19,7 +19,7 @@ Conosci il PIN, ma l'app Filtro famiglia del proprietario precedente è ancora c
 
 ### Il tempo di gioco blocca tutto (limite di 0 minuti) e il PIN è dimenticato
 
-In questo caso PlayGuard stesso non può avviarsi. Installa il sysmodule di ripristino facoltativo (`playguard-rescue.zip`) **in anticipo**; una volta bloccato, metti un file vuoto `config/playguard/RESCUE` sulla scheda SD e avvia la console — sblocca la console perché PlayGuard possa aprirsi. Vedi [`sysmodule/README.md`](../../sysmodule/README.md) (in inglese).
+In questo caso PlayGuard stesso non può avviarsi. Installa il sysmodule di ripristino facoltativo **in anticipo** (*Console › Moduli facoltativi*, o `playguard-rescue.zip` a mano); una volta bloccato, metti un file vuoto `config/playguard/RESCUE` sulla scheda SD e avvia la console — sblocca la console perché PlayGuard possa aprirsi. Vedi [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (in inglese).
 
 Il modulo deve seguire la versione di PlayGuard: a ogni aggiornamento di PlayGuard, estrai di nuovo il `playguard-rescue.zip` di quella versione (oppure *Aggiorna* sulla voce *Il sysmodule di ripristino non è aggiornato* della campanella delle notifiche), poi riavvia la console. Un modulo più vecchio lascia un rapporto che PlayGuard non può verificare: la schermata di recupero allora non propone nulla, dice che il modulo è più vecchio, e rifare `RESCUE` dà lo stesso risultato finché non viene aggiornato.
 

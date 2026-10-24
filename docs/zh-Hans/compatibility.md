@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
+<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
 # 兼容性
 
 支持的系统版本、Atmosphère 和启动器，emuMMC 和 sysMMC，以及 PlayGuard 与替代型 sysmodule 的比较。返回 [README](../../README.md)。
@@ -66,7 +66,7 @@ PlayGuard 正是为此而做的，而游戏时间计时器仍然需要一个设�
 
 已有的少数工具都做不好：游玩报告几乎没人维护，也不够详细；家长控制功能粗糙，没有完成。我也不想要一个自己写的替代品，或一个一直在后台运行的 sysmodule。思路是**尽可能沿用主机自身的家长控制**，以及它已经做到的一切——时间限制、PIN、提醒、中断——再把它们的设置带回主机上。这就是 PlayGuard。
 
-操作主机自身的家长控制还打开了更多可能：把游戏时间报告给家庭服务器、接受它的指令、Home Assistant、自动化。这些可能的发展方向写在[路线图的远景](../../ROADMAP.md#horizon)（英文）中。
+操作主机自身的家长控制还打开了更多可能：把游戏时间报告给家庭服务器、接受它的指令、Home Assistant、自动化。第一步已经实现：通过 MQTT 与 Home Assistant 建立的可选连接（[指南](../home-assistant.md)，英文）；接下来可能的发展方向写在[路线图的远景](../../ROADMAP.md#horizon)（英文）中。
 
 ## PlayGuard 还是替代型 sysmodule？
 
@@ -76,7 +76,7 @@ PlayGuard 离线操作主机内置的家长控制（`pctl` 服务）。另一种
 |---|---|---|
 | **游戏时间限制** | 整台主机一个（主机自身的计时器） | 每个用户一个 |
 | **PIN、提醒、中断** | 主机的 | 它自己的 |
-| **在后台** | 没有任何东西（可选的恢复 sysmodule 只在启动时、有 `RESCUE` 文件要求时才起作用） | 一个 sysmodule，从开机起运行 |
+| **在后台** | 没有任何东西（可选的恢复 sysmodule 只在启动时、有 `RESCUE` 文件要求时才起作用；Home Assistant 连接的代理程序同样是可选的，只有安装后才会运行） | 一个 sysmodule，从开机起运行 |
 | **系统版本更新之后** | 主机的家长控制继续有效；PlayGuard 以只读方式打开，直到有版本支持该系统版本 | 家长控制取决于 sysmodule 是否仍然能用 |
 | **从 SD 卡删除后** | 限制仍然留在主机上 | 家长控制随之消失 |
 

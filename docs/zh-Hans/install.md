@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
+<!-- translated from docs/install.md, sha256 900d9a183a17 -->
 # 安装
 
 如何安装、更新和删除 PlayGuard，以及它会在 SD 卡上写入哪些文件。安装之后：[快速上手](getting-started.md)。返回 [README](../../README.md)。
@@ -11,19 +11,20 @@
 - **手动**— 从[最新版本](https://github.com/JigSawFr/PlayGuard/releases/latest)下载 `playguard.zip`，解压到 SD 卡的**根目录**。应用位于 `sd:/switch/playguard/`，它的文件位于 `sd:/config/playguard/`。
 - **sphaira › GitHub** — 发布的 zip 已包含这个条目（`/config/sphaira/github/playguard.json`）：首次安装后，在 sphaira 的 *GitHub* 中更新。
 
-可选的**恢复 sysmodule**（`playguard-rescue.zip`）需要单独下载：同样把它解压到 SD 卡的根目录，然后重启主机。它位于 `atmosphere/contents/4200000000505247/`，只有在 `RESCUE` 文件要求时才会起作用——见[被锁在外面？](troubleshooting.md#被锁在外面)。
+可选的**恢复 sysmodule** 可以从 PlayGuard 安装（*主机 › 可选模块*，或 *安全 › 被锁在外面？*），也可以从它单独的下载（`playguard-rescue.zip`）手动安装：同样把它解压到 SD 卡的根目录，然后重启主机。它位于 `atmosphere/contents/4200000000505247/`，只有在 `RESCUE` 文件要求时才会起作用——见[被锁在外面？](troubleshooting.md#被锁在外面)。
 
 然后**在游戏之上**、用家长的用户打开 PlayGuard（[原因](compatibility.md#启动器)）。
 
 ## 更新
 
 - **在 PlayGuard 中：** *偏好设置 › 更新方式* 选择更新的方式——在 PlayGuard 内（它会下载发布版本、校验、替换自身并重新启动）、sphaira、Homebrew App Store 或手动。开启 *每天检查更新* 后，有新版本时 PlayGuard 打开时会显示它。
-- **恢复 sysmodule** 与 PlayGuard 的版本保持一致：每次更新后，重新解压该版本的 `playguard-rescue.zip`（或者在铃铛的 *恢复 sysmodule 不是最新版本* 上选择 *更新*），然后重启主机。
+- **恢复 sysmodule** 与 PlayGuard 的版本保持一致：每次更新后，重新解压该版本的 `playguard-rescue.zip`（或者在铃铛的 *恢复 sysmodule 不是最新版本* 上选择 *更新*，或者在 *主机 › 可选模块* 中更新），然后重启主机。
+- **远程连接的代理程序**（如果已安装）：当 PlayGuard 附带了更新的版本时，会在下次启动时提议更新（[Home Assistant](../home-assistant.md#keep-the-link-up-when-playguard-is-closed)，英文）。
 - 设置、历史记录、配置和备份都会保留：它们位于 `sd:/config/playguard/`，而不是应用旁边。
 
 ## 删除
 
-删除 `sd:/switch/playguard/`（应用本身）；如果要连它的文件一起删除，再删除 `sd:/config/playguard/`；装了恢复 sysmodule 的话，还要删除 `sd:/atmosphere/contents/4200000000505247/`。时间限制、PIN 和各项限制都是主机自身的：它们**会留在主机上**。如果也要删除它们，请先使用 *安全 › 删除所有家长控制*。
+删除 `sd:/switch/playguard/`（应用本身）；如果要连它的文件一起删除，再删除 `sd:/config/playguard/`；装了可选的 sysmodule 的话，还要删除 `sd:/atmosphere/contents/4200000000505247/`（恢复）和 `sd:/atmosphere/contents/4200000000504741/`（代理程序），或者先在 *主机 › 可选模块* 中移除它们。时间限制、PIN 和各项限制都是主机自身的：它们**会留在主机上**。如果也要删除它们，请先使用 *安全 › 删除所有家长控制*。
 
 ## SD 卡上的文件
 
@@ -38,7 +39,9 @@
 - **`gate.nro`**、**`gate-<hash>.nro`**、**`gate_*.txt`** — 受保护转发器的门禁（*主机 › 转发器*）：它的程序、免 PIN 时段、禁止使用的时段和被拒后的暂停、在 PlayGuard 读取之前记下的尝试，以及启动画面持续多久（`gate_wait.txt`，每次启动时读取）
 - **`previous_build.json`**、**`boot_check.json`** — 原地安装构建之后：被替换的构建名称（它本身作为 `playguard.nro.previous` 保留在 `.nro` 旁边），以及下次启动时的检查（第一个画面出现后删除）
 - **`rescue_report.txt`** — 恢复 sysmodule 执行操作后留下，直到 PlayGuard 在启动时显示它（无法读取的会被删除，PlayGuard 会提示）
-- **`rescue_nonce`** — 一个随机挑战值，恢复 sysmodule 会在报告中回应它，这样 PlayGuard 能区分它写的报告和手写的报告（[sysmodule/README.md](../../sysmodule/README.md)，英文）；每次启动都会生成新的
+- **`rescue_nonce`** — 一个随机挑战值，恢复 sysmodule 会在报告中回应它，这样 PlayGuard 能区分它写的报告和手写的报告（[sysmodule/rescue/README.md](../../sysmodule/rescue/README.md)，英文）；每次启动都会生成新的
+- **`sync.conf`** — 只有在设置过 *远程访问* 之后才有：连接的设置，包括 broker 的密码（从不出现在报告或上传内容中）
+- **`sync/`** — 只在使用 *远程访问* 时才有：已保存的配置，供可选的代理程序使用（`profiles.txt`）；它为某一个系统读取和写入的内容位于该系统的 `nand/<system>/sync/` 中（记录、游戏名称、它所做的更改、它的事件）。sysMMC 和 emuMMC 共用 `sync.conf`，但在 Home Assistant 中是两个设备
 - **`logs/`** — `reports/` 是已保存的诊断报告（从不包含 PIN 或序列号）；`crashes/` 每次崩溃一个文件（是什么让 PlayGuard 停止）；`uploads/` 每份在线发送的报告一个网络快捷方式（`.url`）；`play_timer/` 是开发者工具的游戏时间记录文件。保留多少份报告、崩溃文件和链接：*关于 › 帮助与诊断*（按数量、时间或大小；最新的一份始终保留）
 
 更多内容见 [packaging/README.md](../../packaging/README.md)（英文）。

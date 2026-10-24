@@ -28,6 +28,14 @@ The latest release. Fixes are not backported.
   unless *every feature at your own risk* was chosen on the firmware screen.
 - **The recovery sysmodule** — acting without a `RESCUE` request file, acting twice on one
   request, or doing more than the request asks.
+- **The agent sysmodule** — carrying out an order under a policy other than *auto*, a
+  write while `nro_state.txt` says read-only or on a firmware PlayGuard has not run on, an
+  order PlayGuard declined being applied anyway, or the `pg:agent` service letting a
+  process other than PlayGuard change what the agent publishes or does beyond what an
+  order on the broker could.
+- **Optional modules** — PlayGuard installing, updating, starting or removing a sysmodule
+  without the PIN while *Protect PlayGuard with the PIN* is set to *Before a change*, or installing
+  anything but the copy it carries (checked against its SHA-256).
 - **The update check and releases** — anything that makes PlayGuard trust a `compat.json`
   or a download that did not come from this repository's releases, or, in developer mode
   (*Install another build*), from this repository's own CI builds of `main` and of pull
@@ -37,7 +45,7 @@ The latest release. Fixes are not backported.
   `rescue_report.txt` the console's state does not confirm, or, after an unlock, from one
   without the recovery sysmodule's proof for the current challenge (`rescue_nonce`, an
   HMAC keyed with the stored PIN and a secret of the console: see
-  [`sysmodule/README.md`](sysmodule/README.md)), or without the recovery sysmodule
+  [`sysmodule/rescue/README.md`](sysmodule/rescue/README.md)), or without the recovery sysmodule
   installed; or the PIN found back from a copy of PlayGuard's files on the card (a report's
   proof included) without the console.
 - **The forwarder gate** — a forwarder protected with the PIN starting its homebrew from the
@@ -54,6 +62,13 @@ The latest release. Fixes are not backported.
   console itself (the album, a game started with R held) without going through a forwarder
   protected with the PIN, or the lock lifted at boot by anything but a `RESCUE` request or
   an Atmosphère update.
+- **The remote link (MQTT, Home Assistant)** — an order doing more than its entity allows
+  (any order that deletes parental controls, unlinks the companion app or reads or changes
+  the PIN, a play-timer write while *Orders may change the play timer* is off, a write in
+  read-only mode, the play timer written while it counts down); an order carried out
+  without the console's confirmation under the *ask* policy; the broker's password, user
+  name or address reaching a log, the diagnostic report or an upload; a malformed message
+  from the broker crashing PlayGuard.
 
 ## What is not
 
@@ -66,8 +81,12 @@ The latest release. Fixes are not backported.
   files a forwarder made by an earlier PlayGuard reads its hours from, or replace the
   homebrew a forwarder starts. On a console running custom firmware, any homebrew can also
   read the stored PIN from the system (`pctl:a` command 1208): PlayGuard keeps a child out
-  of PlayGuard, not out of every homebrew. See [`sysmodule/README.md`](sysmodule/README.md).
+  of PlayGuard, not out of every homebrew. See [`sysmodule/rescue/README.md`](sysmodule/rescue/README.md).
 - **Custom firmware itself.** PlayGuard needs Atmosphère; a modded console can run any
   homebrew, including ones that change parental controls.
+- **Whoever can publish to the broker.** With the remote link on, the broker's users are
+  trusted to send orders (that is what the link is for): securing the broker and the local
+  network, and keeping *Orders may change the play timer* off when it is not needed, is the
+  owner's part. See [`docs/home-assistant.md`](docs/home-assistant.md).
 - **Nintendo's parental controls.** Behaviour of the system `pctl` service or the phone app
   belongs with Nintendo. PlayGuard is not affiliated with Nintendo.

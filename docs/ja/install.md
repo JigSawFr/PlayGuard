@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
+<!-- translated from docs/install.md, sha256 900d9a183a17 -->
 # インストール
 
 PlayGuard のインストール、アップデート、削除の方法と、PlayGuard が SD カードに書き込むファイルについて説明します。インストールしたら、[はじめに](getting-started.md)へ。トップページは [README](../../README.md)。
@@ -11,19 +11,20 @@ PlayGuard のインストール、アップデート、削除の方法と、Play
 - **手動** — [最新リリース](https://github.com/JigSawFr/PlayGuard/releases/latest)から `playguard.zip` をダウンロードし、SD カードの**ルート**に展開します。アプリは `sd:/switch/playguard/` に、アプリのファイルは `sd:/config/playguard/` に入ります。
 - **sphaira › GitHub** — リリースの zip にはエントリー（`/config/sphaira/github/playguard.json`）が入っています。一度インストールしたあとは、sphaira の *GitHub* からアップデートできます。
 
-オプションの**リカバリー sysmodule**（`playguard-rescue.zip`）は別にダウンロードします。これも SD カードのルートに展開し、本体を再起動してください。`atmosphere/contents/4200000000505247/` に入り、`RESCUE` ファイルで求められたときにだけ動きます。[ロックされて入れない？](troubleshooting.md#ロックされて入れない)を参照してください。
+オプションの**リカバリー sysmodule** は、PlayGuard からインストールするか（*本体 › 追加モジュール*、または *セキュリティ › ロックされて入れない？*）、専用のダウンロード（`playguard-rescue.zip`）から手動でインストールします。手動の場合は、これも SD カードのルートに展開し、本体を再起動してください。`atmosphere/contents/4200000000505247/` に入り、`RESCUE` ファイルで求められたときにだけ動きます。[ロックされて入れない？](troubleshooting.md#ロックされて入れない)を参照してください。
 
 そのあと、PlayGuard を**ゲームの上から**、保護者のユーザーで開きます（[理由](compatibility.md#ランチャー)）。
 
 ## アップデート
 
 - **PlayGuard で：** *オプション › アップデート方法* で方法を選びます。PlayGuard 内で（リリースをダウンロードして確認し、自分を置き換えて再起動します）、sphaira、Homebrew App Store、手動のどれかです。*毎日アップデートを確認* がオンなら、新しいリリースがあるとき、PlayGuard はそのリリースの画面で開きます。
-- **リカバリー sysmodule** は PlayGuard のバージョンに合わせます。アップデートのたびに、そのリリースの `playguard-rescue.zip` を展開し直し（またはベルの *リカバリー sysmodule が最新ではありません* で *更新*）、本体を再起動してください。
+- **リカバリー sysmodule** は PlayGuard のバージョンに合わせます。アップデートのたびに、そのリリースの `playguard-rescue.zip` を展開し直し（またはベルの *リカバリー sysmodule が最新ではありません* で *更新*、または *本体 › 追加モジュール* で）、本体を再起動してください。
+- **リモート接続のエージェント** は、インストールしてあれば、PlayGuard がより新しいものを含むとき、次の起動時に提案されます（[Home Assistant](../home-assistant.md#keep-the-link-up-when-playguard-is-closed)、英語）。
 - 設定、履歴、プリセット、バックアップはそのまま残ります。アプリの隣ではなく、`sd:/config/playguard/` にあるからです。
 
 ## 削除
 
-`sd:/switch/playguard/`（アプリ）を削除します。アプリのファイルも消すなら `sd:/config/playguard/` も、リカバリー sysmodule を入れていれば `sd:/atmosphere/contents/4200000000505247/` も削除します。上限、暗証番号、制限は本体自身のものなので、**本体に残ります**。それらも消すには、先に *セキュリティ › みまもり設定をすべて削除* を使ってください。
+`sd:/switch/playguard/`（アプリ）を削除します。アプリのファイルも消すなら `sd:/config/playguard/` も、オプションの sysmodule を入れていれば `sd:/atmosphere/contents/4200000000505247/`（リカバリー）と `sd:/atmosphere/contents/4200000000504741/`（エージェント）も削除します。先に *本体 › 追加モジュール* で削除することもできます。上限、暗証番号、制限は本体自身のものなので、**本体に残ります**。それらも消すには、先に *セキュリティ › みまもり設定をすべて削除* を使ってください。
 
 ## SD カード上のファイル
 
@@ -38,7 +39,9 @@ PlayGuard のインストール、アップデート、削除の方法と、Play
 - **`gate.nro`**、**`gate-<hash>.nro`**、**`gate_*.txt`** — 保護されたフォワーダーのゲート（*本体 › フォワーダー*）です。そのプログラム、暗証番号なしの時間帯、利用不可の時間、拒否後の一時停止、PlayGuard が読み込むまでの試行の記録、起動画面の表示時間（`gate_wait.txt`。起動のたびに読み込まれます）
 - **`previous_build.json`**、**`boot_check.json`** — ビルドをその場でインストールしたあとに使います。置き換えたビルドの名前（そのビルドは `.nro` の隣に `playguard.nro.previous` として残ります）と、次回の起動のチェック（最初の画面が表示されると削除されます）
 - **`rescue_report.txt`** — リカバリー sysmodule が動作したあとに残すファイルです。PlayGuard が起動時に表示するまで残ります（PlayGuard が読み込めない場合は削除され、そのことを知らせます）
-- **`rescue_nonce`** — リカバリー sysmodule がレポートの中で答えるランダムなチャレンジです。これで PlayGuard は、sysmodule が書いたレポートと手で書かれたレポートを見分けられます（[sysmodule/README.md](../../sysmodule/README.md)、英語）。起動のたびに新しくなります
+- **`rescue_nonce`** — リカバリー sysmodule がレポートの中で答えるランダムなチャレンジです。これで PlayGuard は、sysmodule が書いたレポートと手で書かれたレポートを見分けられます（[sysmodule/rescue/README.md](../../sysmodule/rescue/README.md)、英語）。起動のたびに新しくなります
+- **`sync.conf`** — *リモートアクセス* を設定したあとにだけ作られます。接続の設定で、ブローカーのパスワードも含みます（レポートやアップロードには決して含まれません）
+- **`sync/`** — *リモートアクセス* を使うときだけ作られます。オプションのエージェント用に保存したプリセット（`profiles.txt`）。エージェントが 1 つのシステムについて読み書きするものは、そのシステムの `nand/<system>/sync/` にあります（記録、ゲーム名、変更した内容、イベント）。sysMMC と emuMMC は `sync.conf` を共有しますが、Home Assistant では 2 つのデバイスになります
 - **`logs/`** — `reports/`：保存した診断レポート（暗証番号やシリアル番号は含みません）。`crashes/`：クラッシュごとに 1 ファイル（PlayGuard が止まった原因）。`uploads/`：オンラインで送信したレポートごとのインターネットショートカット（`.url`）。`play_timer/`：開発者ツールのプレイ時間記録ファイル。レポート、クラッシュファイル、リンクをいくつ残すかは *情報 › ヘルプと診断* で設定します（件数、日数、容量で指定。最新のものは必ず残ります）
 
 詳しくは [packaging/README.md](../../packaging/README.md)（英語）をご覧ください。

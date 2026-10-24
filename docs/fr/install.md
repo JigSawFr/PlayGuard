@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
+<!-- translated from docs/install.md, sha256 900d9a183a17 -->
 # Installation
 
 Comment installer, mettre à jour et supprimer PlayGuard, et ce qu'il écrit sur la carte SD. Une fois installé : [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -11,19 +11,20 @@ Au choix :
 - **Manuellement** — Téléchargez `playguard.zip` dans la [dernière version](https://github.com/JigSawFr/PlayGuard/releases/latest) et extrayez-le à la **racine** de la carte SD. L'application arrive dans `sd:/switch/playguard/`, ses fichiers dans `sd:/config/playguard/`.
 - **sphaira › GitHub** — Le zip de la version contient déjà l'entrée (`/config/sphaira/github/playguard.json`) : après une première installation, mettez à jour depuis *GitHub* dans sphaira.
 
-Le **sysmodule de récupération** optionnel (`playguard-rescue.zip`) se télécharge à part : extrayez-le lui aussi à la racine de la carte SD, puis redémarrez la console. Il arrive dans `atmosphere/contents/4200000000505247/` et n'agit que quand un fichier `RESCUE` le demande — voir [Console bloquée ?](troubleshooting.md#console-bloquée-).
+Le **sysmodule de récupération** optionnel s'installe depuis PlayGuard (*Console › Modules facultatifs*, ou *Sécurité › Bloqué ?*), ou à la main depuis son propre téléchargement (`playguard-rescue.zip`) : extrayez-le lui aussi à la racine de la carte SD, puis redémarrez la console. Il arrive dans `atmosphere/contents/4200000000505247/` et n'agit que quand un fichier `RESCUE` le demande — voir [Console bloquée ?](troubleshooting.md#console-bloquée-).
 
 Ouvrez ensuite PlayGuard **par-dessus un jeu**, avec le compte d'un parent ([pourquoi](compatibility.md#lanceurs)).
 
 ## Mettre à jour
 
 - **Dans PlayGuard :** *Préférences › Mettre à jour avec* choisit comment — dans PlayGuard même (il télécharge la version, la vérifie, se remplace et redémarre), sphaira, le Homebrew App Store ou à la main. Avec *Rechercher les mises à jour chaque jour* activé, PlayGuard s'ouvre sur la nouvelle version quand il y en a une.
-- **Le sysmodule de récupération** suit la version de PlayGuard : après chaque mise à jour, extrayez à nouveau le `playguard-rescue.zip` de cette version (ou *Mettre à jour* sur l'entrée *Le sysmodule de récupération n'est pas à jour* de la cloche), puis redémarrez la console.
+- **Le sysmodule de récupération** suit la version de PlayGuard : après chaque mise à jour, extrayez à nouveau le `playguard-rescue.zip` de cette version (ou *Mettre à jour* sur l'entrée *Le sysmodule de récupération n'est pas à jour* de la cloche, ou dans *Console › Modules facultatifs*), puis redémarrez la console.
+- **L'agent du lien à distance**, s'il est installé, est proposé au démarrage suivant quand PlayGuard en contient un plus récent ([Home Assistant](../home-assistant.fr.md#garder-le-lien-quand-playguard-est-fermé)).
 - Les réglages, l'historique, les profils et les sauvegardes restent : ils sont dans `sd:/config/playguard/`, pas à côté de l'application.
 
 ## Le supprimer
 
-Supprimez `sd:/switch/playguard/` (l'application) et, pour retirer aussi ses fichiers, `sd:/config/playguard/` ; avec le sysmodule de récupération, aussi `sd:/atmosphere/contents/4200000000505247/`. Les limites, le code PIN et les restrictions sont ceux de la console : ils **restent sur la console**. Pour les retirer aussi, passez d'abord par *Sécurité › Supprimer tout le contrôle parental*.
+Supprimez `sd:/switch/playguard/` (l'application) et, pour retirer aussi ses fichiers, `sd:/config/playguard/` ; avec les sysmodules facultatifs, aussi `sd:/atmosphere/contents/4200000000505247/` (récupération) et `sd:/atmosphere/contents/4200000000504741/` (l'agent), ou retirez-les d'abord dans *Console › Modules facultatifs*. Les limites, le code PIN et les restrictions sont ceux de la console : ils **restent sur la console**. Pour les retirer aussi, passez d'abord par *Sécurité › Supprimer tout le contrôle parental*.
 
 ## Fichiers sur la carte SD
 
@@ -38,7 +39,9 @@ Tous dans `sd:/config/playguard/` (l'application elle-même reste dans `sd:/swit
 - **`gate.nro`**, **`gate-<hash>.nro`**, **`gate_*.txt`** — La porte des forwarders protégés (*Console › Forwarders*) : son programme, ses heures libres, ses heures fermées et sa pause après des refus, ses tentatives jusqu'à ce que PlayGuard les lise, et la durée de son écran d'ouverture (`gate_wait.txt`, lu à chaque lancement)
 - **`previous_build.json`**, **`boot_check.json`** — Après l'installation d'un build sur place : le nom du build remplacé (gardé à côté du `.nro` sous `playguard.nro.previous`), et le contrôle du lancement suivant (supprimé dès que son premier écran s'affiche)
 - **`rescue_report.txt`** — Laissé par le sysmodule de récupération après son intervention, jusqu'à ce que PlayGuard l'affiche au démarrage (illisible, il est supprimé et PlayGuard le signale)
-- **`rescue_nonce`** — Un défi aléatoire auquel le sysmodule de récupération répond dans son rapport, pour que PlayGuard distingue un rapport qu'il a écrit d'un rapport écrit à la main ([sysmodule/README.md](../../sysmodule/README.md)) ; un nouveau à chaque lancement
+- **`rescue_nonce`** — Un défi aléatoire auquel le sysmodule de récupération répond dans son rapport, pour que PlayGuard distingue un rapport qu'il a écrit d'un rapport écrit à la main ([sysmodule/rescue/README.md](../../sysmodule/rescue/README.md)) ; un nouveau à chaque lancement
+- **`sync.conf`** — Seulement une fois l'*Accès à distance* configuré : les réglages du lien, mot de passe du broker compris (jamais dans un rapport ni un envoi)
+- **`sync/`** — Seulement avec l'*Accès à distance* : les profils enregistrés, pour l'agent facultatif (`profiles.txt`) ; ce qu'il lit et écrit pour un système est dans le `nand/<système>/sync/` de ce système (enregistrements, noms des jeux, ce qu'il a changé, ses événements). Un sysMMC et un emuMMC partagent `sync.conf` mais sont deux appareils dans Home Assistant
 - **`logs/`** — `reports/` les rapports de diagnostic enregistrés (jamais le code PIN ni le numéro de série) ; `crashes/` un fichier par plantage (ce qui a arrêté PlayGuard) ; `uploads/` un raccourci Internet (`.url`) par rapport envoyé en ligne ; `play_timer/` les fichiers du minuteur des outils développeur. Combien de rapports, de fichiers de plantage et de liens sont gardés : *À propos › Aide et diagnostic* (par nombre, âge ou taille ; le plus récent reste toujours)
 
 Plus de détails dans [packaging/README.md](../../packaging/README.md) (en anglais).

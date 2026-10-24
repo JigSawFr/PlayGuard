@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # 문제 해결
 
 잠긴 본체를 다시 쓰는 방법, 자주 있는 문제, 버그 신고, 개발자 모드를 설명합니다. 처음으로 돌아가기: [README](../../README.md).
@@ -19,7 +19,7 @@ PIN은 알지만 이전 소유자의 스마트폰 앱이 아직 연동되어 있
 
 ### 플레이 타이머가 모든 것을 막고(0분 제한) PIN도 잊어버렸을 때
 
-이때는 PlayGuard 자체가 시작되지 않습니다. 선택 사항인 복구 sysmodule(`playguard-rescue.zip`)을 **미리** 설치해 두세요. 잠겼을 때 SD 카드에 빈 `config/playguard/RESCUE` 파일을 넣고 부팅하면 본체의 잠금이 풀려 PlayGuard를 열 수 있습니다. [`sysmodule/README.md`](../../sysmodule/README.md)(영어)를 참고하세요.
+이때는 PlayGuard 자체가 시작되지 않습니다. 선택 사항인 복구 sysmodule을 **미리** 설치해 두세요(*본체 › 추가 모듈* 또는 `playguard-rescue.zip`으로 직접). 잠겼을 때 SD 카드에 빈 `config/playguard/RESCUE` 파일을 넣고 부팅하면 본체의 잠금이 풀려 PlayGuard를 열 수 있습니다. [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)(영어)를 참고하세요.
 
 이 모듈은 PlayGuard 버전에 맞춰야 합니다. PlayGuard를 업데이트할 때마다 그 버전의 `playguard-rescue.zip`을 다시 압축 해제하고(또는 알림 벨의 *복구 sysmodule이 최신이 아닙니다*에서 *업데이트*), 본체를 다시 시작하세요. 오래된 모듈이 남긴 보고서는 PlayGuard가 확인할 수 없습니다. 이때 복구 화면은 아무것도 제안하지 않고 모듈이 오래되었다고 알려 주며, 모듈을 업데이트할 때까지는 `RESCUE`를 다시 해도 결과가 같습니다.
 
