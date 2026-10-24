@@ -138,9 +138,11 @@ pages; no framework, nothing to install but that.
   (8 October 2026, 16:00 UTC; the focus without its glow). `SITE_SCREENSHOTS=<out-dir>`
   tells `build_site.py` to use them, on the home page and in the
   documentation. Taking them takes about three hours on a CI runner (both
-  themes), so CI takes them for a release (main, its version changed: the
-  header's badge) and by hand (*Actions › web › Run workflow*, `all`); any
-  other build takes main's (its `site` artifact). A change to the screenshots'
+  themes), so CI takes them by hand (*Actions › web › Run workflow*, `all`)
+  and for a release (main, its version changed: the header's badge), in a run
+  of their own: the release's site goes out first with main's screenshots, in
+  minutes, then its `release-screens` job starts that `all` run, published
+  once it ends; any other build takes main's (its `site` artifact). A change to the screenshots'
   script, or to a screen between releases, shows once taken by hand. A new screen in the gallery is a name in both files: its
   tab, and the keys that lead to it from there.
 - **The preview images**: `tools/site_social.mjs <out-dir>` (Node and
@@ -181,7 +183,7 @@ and for each pull request (the `site` artifact, kept 30 days), which checks
 that it builds. It starts from main's last site and makes only what changed
 since the commit that one was built from: the simulator (and its smoke test,
 about ten minutes) when the app, its resources, the simulator or the workflow
-changed; the screenshots and tours for a release or by hand (above); the
+changed; the screenshots and tours by hand, or for a release in a run after its site (above); the
 website itself, every time, in seconds. A change to the docs or the site
 takes a few minutes. A pull request that changes the site, its documentation or its texts
 also has its layout checked (`tools/site_layout.py`, under a minute): no
