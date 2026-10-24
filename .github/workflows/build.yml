@@ -978,6 +978,8 @@ jobs:
       discussions: write
       # The descriptions of the release's pull requests, for its summary.
       pull-requests: read
+      # pages.yml started once the page is laid out (below).
+      actions: write
     env:
       LABEL: ${{ needs.meta.outputs.label }}
     steps:
@@ -1087,3 +1089,12 @@ jobs:
           TAG: ${{ inputs.tag }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: python3 tools/ci_summary.py release --tag "$TAG" --repo-url "$REPO_URL" --dir dist >> "$GITHUB_STEP_SUMMARY"
+      # Its assets and page in place: pages.yml publishes the pre-release
+      # release-please.yml made once the site has this release too (its
+      # last step), whichever of the two ends last; started here for the
+      # case where the site was out first.
+      - name: The release published once its site is out
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run pages.yml --ref main
