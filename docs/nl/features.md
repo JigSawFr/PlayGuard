@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 194c5e251f6e -->
+<!-- translated from docs/features.md, sha256 a913a7c19f05 -->
 # Functies
 
 Wat elk tabblad doet, hoe PlayGuard veilig schrijft, en wat de console als speeltijd telt. Nieuw met PlayGuard? Begin met [aan de slag](getting-started.md). Terug naar de [README](../../README.md).
@@ -228,10 +228,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 - **Profielen** opgeslagen op de SD-kaart: een profiel toepassen (een profiel dat al geldt, zegt dat gewoon), bewerken, hernoemen of verwijderen; de huidige limieten opslaan of een nieuw profiel maken.
 - Elke naam, in elk schrift (*École*, *周末*, *Выходные* …) — een naam zonder Latijnse letters krijgt een eigen bestandsnaam, en twee namen die hetzelfde bestand zouden opleveren, worden opgemerkt.
-- **Gepland profiel** (*Profielen › Gepland profiel*): een profiel voor een periode — vakantie, een reis —, waarvan de eerste en de laatste dag worden gekozen uit de komende 60 dagen.
-  - Als de periode begint, vraagt PlayGuard of het profiel moet worden toegepast (de dagen die het verandert, getekend onder de vraag); als ze voorbij is, of de limieten die het verving moeten worden teruggezet of behouden.
-  - Eén keer per dag gevraagd, op het hoofdscherm, als er niets anders voor staat: PlayGuard handelt alleen als het wordt geopend, dus een console waarop het niet wordt geopend, houdt de limieten die hij heeft. Een periode die voorbijging zonder dat het profiel ooit is toegepast, wordt vergeten.
-  - Eén tegelijk; de regel wijzigt, verwijdert of beëindigt het.
+- **Gepland profiel** (*Profielen › Gepland profiel*): *Binnenkort*. PlayGuard draait alleen terwijl het open is, dus kan het niet zelf op de juiste dag van profiel wisselen: van profiel wisselen vanuit een agenda of de schoolvakanties komt met de [MQTT-brug](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). Een profiel dat met een eerdere versie is gepland, wordt nog steeds aangeboden als zijn periode begint, en de regel wijzigt, verwijdert of beëindigt het nog steeds.
 
 ### Alle games blokkeren
 
@@ -325,6 +322,7 @@ De pincode in PlayGuard zelf:
 - Gecontroleerd in de servicelaag, dus geen enkele wijziging slaat het over; opnieuw vergrendelen vraagt er nooit om. *Pincode tonen* vraagt er elke keer om, in elke modus en zelfs vlak nadat hij is ingevoerd, en een ontbrekend of beschadigd `config.json` geldt als *Vóór een wijziging*.
 #### De pincode pauzeert ouderlijk toezicht zolang je in PlayGuard bent
 
+- Alleen met *Beveiliging › Ouderlijk toezicht pauzeren zolang ik in PlayGuard ben* aan (standaard uit: dan laat het invoeren van de pincode ouderlijk toezicht zoals het is, en telt de tijd in PlayGuard als speeltijd). Aanzetten vraagt om de pincode.
 - Zodra de pincode is ingevoerd (het vergrendelscherm van *Om PlayGuard te openen*, de eerste wijziging met *Vóór een wijziging*, de weg terug vanaf het kinderscherm…), ontgrendelt PlayGuard ouderlijk toezicht tijdelijk, zodat de tijd die je erin doorbrengt niet van de speeltijd van het kind afgaat; *Vanuit een game geopend* verdwijnt uit Vandaag.
 - De pil in de kopregel zegt *Ouderlijk toezicht gepauzeerd*, in blauwgroen; erop tikken legt uit wat dat is, met *Nu weer aanzetten* (daarna niet opnieuw gepauzeerd tot de pincode weer wordt ingevoerd). Vandaag toont de dag zoals die voor het kind is, en de tegel Beveiliging zegt *Ouderlijk toezicht gepauzeerd*, zonder waarschuwing.
 - Het gaat vanzelf weer aan zodra PlayGuard wordt verlaten (HOME-menu, slaapstand) of gesloten, ook via het HOME-menu (het afsluiten wacht erop), en zolang het kinderscherm of het vergrendelscherm wordt getoond. Terug in PlayGuard, terwijl de pincode nog geldt, pauzeert het weer.

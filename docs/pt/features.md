@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 194c5e251f6e -->
+<!-- translated from docs/features.md, sha256 a913a7c19f05 -->
 # Funcionalidades
 
 O que faz cada separador, como o PlayGuard escreve em segurança e o que a consola conta como tempo de jogo. Novo no PlayGuard? Comece por [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -228,10 +228,7 @@ Com o texto maior, *Hoje* continua a caber num só ecrã: a linha por cima do t�
 
 - **Perfis** guardados no cartão SD: aplicar (um perfil já em vigor limita-se a dizê-lo), editar, mudar o nome ou eliminar um; guardar os limites atuais ou criar um novo.
 - Qualquer nome, em qualquer escrita (*École*, *周末*, *Выходные* …) — um nome sem letras latinas recebe um nome de ficheiro próprio, e dois nomes que dariam o mesmo ficheiro são detetados.
-- **Perfil agendado** (*Perfis › Perfil agendado*): um perfil para um período — férias, uma viagem — com o primeiro e o último dia escolhidos entre os próximos 60 dias.
-  - Quando o período começa, o PlayGuard pergunta se deve aplicá-lo (com os dias que muda desenhados por baixo da pergunta); quando termina, se deve repor os limites que ele substituiu, ou mantê-los.
-  - A pergunta é feita uma vez por dia, no ecrã principal, quando não há mais nada à frente: o PlayGuard só age quando é aberto, por isso uma consola onde não é aberto mantém os limites que tem. Um período que passou sem que o perfil tenha sido aplicado é esquecido.
-  - Um de cada vez; a linha altera-o, remove-o ou termina-o.
+- **Perfil agendado** (*Perfis › Perfil agendado*): *Em breve*. O PlayGuard só funciona enquanto está aberto, por isso não consegue mudar de perfil sozinho no dia certo: mudar de perfil a partir de um calendário ou das férias escolares chega com a [ponte MQTT](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). Um perfil agendado com uma versão anterior continua a ser proposto quando o seu período começa, e a linha continua a alterá-lo, removê-lo ou terminá-lo.
 
 ### Bloquear todos os jogos
 
@@ -325,6 +322,7 @@ O PIN no próprio PlayGuard:
 - É verificado na camada de serviço, por isso nenhuma alteração lhe escapa; voltar a bloquear nunca o pede. *Mostrar o PIN* pede-o sempre, em todos os modos e mesmo logo depois de ter sido introduzido, e um `config.json` em falta ou danificado conta como *Antes de uma alteração*.
 #### O PIN põe o controlo parental em pausa enquanto está no PlayGuard
 
+- Só com *Segurança › Pausar o controlo parental enquanto estou no PlayGuard* ativado (desativado por predefinição: então introduzir o PIN deixa o controlo parental como está, e o tempo passado no PlayGuard conta como tempo de jogo). Ativá-lo pede o PIN.
 - Depois de introduzido o PIN (o ecrã de bloqueio de *Para abrir o PlayGuard*, a primeira alteração com *Antes de uma alteração*, o regresso a partir do ecrã da criança…), o PlayGuard desbloqueia temporariamente o controlo parental, para que o tempo passado nele não seja descontado do tempo de jogo da criança; *Aberto a partir de um jogo* sai de Hoje.
 - A etiqueta do cabeçalho diz *Controlo parental em pausa*, a verde-azulado; tocar-lhe explica o que isso é, com *Reativar agora* (depois disso, sem nova pausa até o PIN ser introduzido de novo). Hoje mostra o dia tal como é para a criança, e o mosaico de Segurança diz *Controlo parental em pausa*, sem aviso.
 - Volta a ativar-se sozinho assim que se sai do PlayGuard (menu HOME, suspensão) ou ele é fechado, também a partir do menu HOME (a saída espera por isso), e enquanto o ecrã da criança ou o ecrã de bloqueio está visível. De volta ao PlayGuard com o PIN ainda válido, entra de novo em pausa.
