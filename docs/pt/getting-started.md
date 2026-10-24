@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 150621760428 -->
+<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
 # Como começar
 
 Do cartão SD a uma consola configurada para o seu filho, em cerca de dez minutos, e depois as tarefas do dia a dia. Voltar ao [README](../../README.md).
@@ -23,7 +23,7 @@ Extraia o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/
 Abra o PlayGuard **sobre um jogo** (mantenha R premido ao iniciar um jogo, com o hbmenu, o sphaira ou a Homebrew App Store), com **o utilizador de um adulto**:
 
 - sobre um jogo, o PlayGuard corre como aplicação, com toda a sua memória; a partir do álbum, corre como applet, com menos;
-- a consola conta o tempo passado no PlayGuard como tempo desse jogo, e atribui-o ao utilizador escolhido ao iniciar: o de um adulto, não o de uma criança;
+- esse tempo conta como tempo de jogo da criança, a menos que *Segurança › Pausar o controlo parental enquanto estou no PlayGuard* esteja ativado (desativado por predefinição): então, depois de introduzido o PIN, o PlayGuard põe o controlo parental em pausa enquanto está nele, e volta a ativar-se quando sai.
 - depois de introduzido o PIN, o PlayGuard põe o controlo parental em pausa enquanto está nele, para que esse tempo não seja descontado do da criança; volta a ativar-se quando sai.
 
 ## 3. Siga os *Primeiros passos*
@@ -71,7 +71,7 @@ Uma consola sem Internet: quando nenhum servidor responde, o PlayGuard propõe a
 | Dar mais tempo noutro dia | *Hoje › Tempo extra › Outro dia…* |
 | Terminar por hoje | *Hoje › Terminar por hoje*: agora, ou daqui a 5 minutos para guardar. |
 | Alterar o limite de um dia | *Tempo de jogo*: Ⓐ no dia, ↑/↓, depois **+** para guardar. |
-| Alternar entre o tempo de aulas e as férias | *Tempo de jogo › Perfis*; *Perfil agendado* para um período escolhido com antecedência. |
+| Alternar entre o tempo de aulas e as férias | *Tempo de jogo › Perfis*. |
 | Ver quem jogou a quê | *Atividade*: por jogo, por conta, hoje, 7 dias, desde sempre; uma exportação. |
 | Bloquear todos os jogos por agora | *Tempo de jogo › Bloquear todos os jogos*. Quando é desativado, os limites anteriores voltam. |
 | Anular uma alteração | **ZR** *Anular* logo a seguir, ou *Histórico › Alterações do PlayGuard* a qualquer momento. |

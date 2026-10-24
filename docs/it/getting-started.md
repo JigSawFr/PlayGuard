@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 150621760428 -->
+<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
 # Per iniziare
 
 Dalla scheda SD a una console configurata per tuo figlio, in una decina di minuti, poi le attività di tutti i giorni. Torna al [README](../../README.md).
@@ -23,7 +23,7 @@ Estrai `playguard.zip` dall'[ultima versione](https://github.com/JigSawFr/PlayGu
 Apri PlayGuard **sopra un gioco** (tieni premuto R mentre avvii un gioco, con hbmenu, sphaira o l'Homebrew App Store), con **l'utente di un genitore**:
 
 - sopra un gioco, PlayGuard gira come applicazione, con tutta la sua memoria; dall'album gira come applet, con meno memoria;
-- la console conta il tempo passato in PlayGuard come tempo di quel gioco, e lo attribuisce all'utente scelto all'avvio: quello di un genitore, non di un bambino;
+- quel tempo conta come tempo di gioco del bambino, a meno che *Sicurezza › Metti in pausa il filtro famiglia mentre sono in PlayGuard* sia attivato (disattivato di predefinito): allora, una volta inserito il PIN, PlayGuard mette in pausa il filtro famiglia mentre ci sei, e si riattiva quando esci.
 - una volta inserito il PIN, PlayGuard mette in pausa il filtro famiglia mentre ci sei, così quel tempo non viene tolto a quello del bambino; si riattiva quando esci.
 
 ## 3. Segui *Primi passi*
@@ -71,7 +71,7 @@ Una console senza Internet: quando nessun server risponde, PlayGuard propone inv
 | Dare più tempo in un altro giorno | *Oggi › Tempo extra › Un altro giorno…* |
 | Fermare il gioco per oggi | *Oggi › Basta per oggi*: adesso, o tra 5 minuti per salvare. |
 | Cambiare il limite di un giorno | *Tempo di gioco*: Ⓐ sul giorno, ↑/↓, poi **+** per salvare. |
-| Passare dal periodo scolastico alle vacanze | *Tempo di gioco › Profili*; *Profilo programmato* per un periodo scelto in anticipo. |
+| Passare dal periodo scolastico alle vacanze | *Tempo di gioco › Profili*. |
 | Vedere chi ha giocato a cosa | *Attività*: per gioco, per utente, oggi, 7 giorni, da sempre; esportazione. |
 | Bloccare tutti i giochi per ora | *Tempo di gioco › Blocca tutti i giochi*. Una volta disattivato, i limiti precedenti tornano. |
 | Annullare una modifica | **ZR** *Annulla* subito dopo, o *Cronologia › Modifiche fatte da PlayGuard* in qualsiasi momento. |

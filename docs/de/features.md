@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 194c5e251f6e -->
+<!-- translated from docs/features.md, sha256 a913a7c19f05 -->
 # Funktionen
 
 Was jeder Tab macht, wie PlayGuard sicher schreibt, und was die Konsole als Spielzeit zählt. Neu bei PlayGuard? Beginne mit dem [Einstieg](getting-started.md). Zurück zum [README](../../README.md).
@@ -228,10 +228,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 - **Profile**, auf der SD-Karte gespeichert: eines anwenden (ein bereits geltendes Profil sagt das einfach), bearbeiten, umbenennen oder löschen; die aktuellen Limits speichern oder ein neues anlegen.
 - Jeder Name, in jeder Schrift (*École*, *周末*, *Выходные* …) — ein Name ohne lateinische Buchstaben bekommt einen eigenen Dateinamen, und zwei Namen, die auf dieselbe Datei hinauslaufen würden, werden erkannt.
-- **Geplantes Profil** (*Profile › Geplantes Profil*): ein Profil für einen Zeitraum — Ferien, eine Reise —, dessen erster und letzter Tag aus den nächsten 60 Tagen gewählt werden.
-  - Wenn der Zeitraum beginnt, fragt PlayGuard, ob es angewendet werden soll (die Tage, die es ändert, unter der Frage dargestellt); wenn er vorbei ist, ob die Limits, die es ersetzt hat, wiederhergestellt oder behalten werden sollen.
-  - Einmal am Tag gefragt, auf dem Hauptbildschirm, wenn nichts anderes im Vordergrund ist: PlayGuard handelt nur, wenn es geöffnet wird, also behält eine Konsole, auf der es nicht geöffnet wird, ihre Limits. Ein Zeitraum, der verstrichen ist, ohne dass das Profil je angewendet wurde, wird vergessen.
-  - Immer nur eines; die Zeile ändert, entfernt oder beendet es.
+- **Geplantes Profil** (*Profile › Geplantes Profil*): *Bald*. PlayGuard läuft nur, während es geöffnet ist, und kann daher nicht von selbst am richtigen Tag das Profil wechseln: Profile nach einem Kalender oder den Schulferien zu wechseln, kommt mit der [MQTT-Brücke](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). Ein mit einer früheren Version geplantes Profil wird weiterhin angeboten, wenn sein Zeitraum beginnt, und die Zeile ändert, entfernt oder beendet es weiterhin.
 
 ### Alle Spiele sperren
 
@@ -325,6 +322,7 @@ Die Geheimzahl in PlayGuard selbst:
 - Wird in der Dienstschicht geprüft, sodass keine Änderung sie umgeht; das Wiederaktivieren fragt nie danach. *Geheimzahl anzeigen* fragt jedes Mal danach, in jedem Modus und sogar direkt nach der Eingabe, und eine fehlende oder beschädigte `config.json` zählt als *Vor einer Änderung*.
 #### Die Geheimzahl pausiert den Jugendschutz, solange du in PlayGuard bist
 
+- Nur wenn *Sicherheit › Jugendschutz pausieren, solange ich in PlayGuard bin* eingeschaltet ist (standardmäßig aus: dann lässt die Eingabe der Geheimzahl den Jugendschutz, wie er ist, und die Zeit in PlayGuard zählt als Spielzeit). Das Einschalten fragt nach der Geheimzahl.
 - Sobald die Geheimzahl eingegeben ist (der Sperrbildschirm von *Beim Öffnen von PlayGuard*, die erste Änderung mit *Vor einer Änderung*, der Weg zurück vom Kinderbildschirm…), hebt PlayGuard den Jugendschutz vorübergehend auf, sodass die Zeit darin nicht von der Spielzeit des Kindes abgeht; *Über ein Spiel geöffnet* verschwindet aus Heute.
 - Die Kapsel in der Kopfzeile sagt *Jugendschutz pausiert*, in Petrol; ein Tippen erklärt, was das ist, mit *Jetzt wieder aktivieren* (dann nicht wieder pausiert, bis die Geheimzahl erneut eingegeben wird). Heute zeigt den Tag so, wie er für das Kind ist, und die Kachel in Sicherheit sagt *Jugendschutz pausiert*, ohne Warnung.
 - Er wird von selbst wieder aktiv, sobald PlayGuard verlassen (HOME-Menü, Standby) oder geschlossen wird, auch über das HOME-Menü (das Beenden wartet darauf), und solange der Kinderbildschirm oder der Sperrbildschirm angezeigt wird. Zurück in PlayGuard, während die Geheimzahl noch gilt, pausiert er wieder.

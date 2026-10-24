@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 150621760428 -->
+<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
 # Einstieg
 
 Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa zehn Minuten, dann die alltäglichen Aufgaben. Zurück zum [README](../../README.md).
@@ -23,7 +23,7 @@ Entpacke `playguard.zip` aus der [neuesten Version](https://github.com/JigSawFr/
 Öffne PlayGuard **über ein Spiel** (halte R gedrückt, während du ein Spiel startest, mit hbmenu, sphaira oder dem Homebrew App Store), mit **dem Benutzer eines Elternteils**:
 
 - über einem Spiel läuft PlayGuard als Anwendung, mit seinem ganzen Arbeitsspeicher; aus dem Album läuft es als Applet, mit weniger;
-- die Konsole zählt die Zeit in PlayGuard als die dieses Spiels und schreibt sie dem Benutzer zu, der beim Start gewählt wurde: dem eines Elternteils, nicht dem eines Kindes;
+- diese Zeit zählt als Spielzeit des Kindes, es sei denn, *Sicherheit › Jugendschutz pausieren, solange ich in PlayGuard bin* ist eingeschaltet (standardmäßig aus): dann pausiert PlayGuard, sobald die Geheimzahl eingegeben ist, den Jugendschutz, solange du darin bist, und er wird wieder aktiv, sobald du es verlässt.
 - sobald die Geheimzahl eingegeben ist, pausiert PlayGuard den Jugendschutz, solange du darin bist, sodass diese Zeit nicht von der des Kindes abgeht; er wird wieder aktiv, sobald du es verlässt.
 
 ## 3. *Erste Schritte* folgen
@@ -71,7 +71,7 @@ Eine Konsole ohne Internet: Wenn kein Server antwortet, bietet PlayGuard an, die
 | An einem anderen Tag mehr Zeit zu geben | *Heute › Zusatzzeit › Ein anderer Tag…* |
 | Für heute aufzuhören | *Heute › Für heute beenden*: jetzt, oder in 5 Minuten, um zu speichern. |
 | Das Limit eines Tages zu ändern | *Spielzeit*: Ⓐ auf dem Tag, ↑/↓, dann **+** zum Speichern. |
-| Zwischen Schulzeit und Ferien zu wechseln | *Spielzeit › Profile*; *Geplantes Profil* für einen im Voraus gewählten Zeitraum. |
+| Zwischen Schulzeit und Ferien zu wechseln | *Spielzeit › Profile*. |
 | Zu sehen, wer was gespielt hat | *Aktivität*: pro Spiel, pro Benutzerkonto, heute, 7 Tage, insgesamt; Export. |
 | Vorerst alle Spiele zu sperren | *Spielzeit › Alle Spiele sperren*. Ausgeschaltet kommen die vorherigen Limits zurück. |
 | Eine Änderung rückgängig zu machen | **ZR** *Rückgängig* direkt danach, oder jederzeit *Verlauf › Änderungen durch PlayGuard*. |

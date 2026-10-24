@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 150621760428 -->
+<!-- translated from docs/getting-started.md, sha256 a23901ed837a -->
 # Aan de slag
 
 Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien minuten, en daarna de dagelijkse taken. Terug naar de [README](../../README.md).
@@ -23,7 +23,7 @@ Pak `playguard.zip` van de [nieuwste release](https://github.com/JigSawFr/PlayGu
 Open PlayGuard **boven een game** (houd R ingedrukt terwijl je een game start, met hbmenu, sphaira of de Homebrew App Store), met **de gebruiker van een ouder**:
 
 - boven een game draait PlayGuard als applicatie, met al zijn geheugen; vanuit het album draait het als applet, met minder;
-- de console telt de tijd in PlayGuard als tijd van die game, en geeft die aan de gebruiker die bij het starten is gekozen: die van een ouder, niet van een kind;
+- die tijd telt als speeltijd van het kind, tenzij *Beveiliging › Ouderlijk toezicht pauzeren zolang ik in PlayGuard ben* aan staat (standaard uit): dan pauzeert PlayGuard, zodra de pincode is ingevoerd, ouderlijk toezicht zolang je erin bent, en het gaat weer aan zodra je het verlaat.
 - zodra de pincode is ingevoerd, pauzeert PlayGuard ouderlijk toezicht zolang je erin bent, zodat die tijd niet van die van het kind afgaat; het gaat weer aan zodra je het verlaat.
 
 ## 3. Volg *Eerste stappen*
@@ -71,7 +71,7 @@ Een console zonder internet: als geen enkele server antwoordt, biedt PlayGuard a
 | Op een andere dag meer tijd te geven | *Vandaag › Extra tijd › Een andere dag…* |
 | Te stoppen voor vandaag | *Vandaag › Stoppen voor vandaag*: nu, of over 5 minuten om op te slaan. |
 | De limiet van één dag te wijzigen | *Speeltijdtimer*: Ⓐ op de dag, ↑/↓, dan **+** om op te slaan. |
-| Te wisselen tussen schooltijd en vakantie | *Speeltijdtimer › Profielen*; *Gepland profiel* voor een vooraf gekozen periode. |
+| Te wisselen tussen schooltijd en vakantie | *Speeltijdtimer › Profielen*. |
 | Te zien wie wat speelde | *Activiteit*: per game, per account, vandaag, 7 dagen, altijd; exporteren. |
 | Voorlopig alle games te blokkeren | *Speeltijdtimer › Alle games blokkeren*. Zet je het uit, dan komen de vorige limieten terug. |
 | Een wijziging ongedaan te maken | **ZR** *Ongedaan maken* er direct na, of *Geschiedenis › Wijzigingen via PlayGuard* op elk moment. |
