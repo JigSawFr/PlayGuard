@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <!-- Forwarder icon, a music note: media players; protected. -->
+  <!-- Forwarder icon: a music note: music and audio players. -->
   <rect width="256" height="256" fill="#FFB547"/>
   <circle cx="128" cy="128" r="100" fill="#0B1424"/>
   <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
@@ -9,10 +9,4 @@
   <line x1="168" y1="88" x2="168" y2="148" stroke="#E8EEF7" stroke-width="9"/>
   <ellipse cx="102" cy="162" rx="18" ry="14" fill="#E8EEF7"/>
   <ellipse cx="154" cy="150" rx="18" ry="14" fill="#E8EEF7"/>
-  <!-- Protected by PlayGuard: a shield with a padlock at the corner. -->
-  <g transform="translate(198 196) scale(1.15) translate(-198 -200)">
-  <path d="M198 158 L228 169 V193 C228 212 215 225 198 234 C181 225 168 212 168 193 V169 Z" fill="#2EC4A6" stroke="#0B1424" stroke-width="7" stroke-linejoin="round"/>
-  <rect x="186" y="192" width="24" height="20" rx="3.5" fill="#0B1424"/>
-  <path d="M191 192 V185 A7 7 0 0 1 205 185 V192" fill="none" stroke="#0B1424" stroke-width="5"/>
-  </g>
 </svg>

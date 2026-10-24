@@ -251,6 +251,32 @@ std::vector<uint8_t> with_thumbnail(const std::vector<uint8_t>& jpeg, const std:
     return out;
 }
 
+void draw_over(std::vector<uint8_t>& rgba, int px, const uint8_t* over, int w, int h)
+{
+    if (!over || w <= 0 || h <= 0 || px <= 0 || rgba.size() != (size_t)px * px * 4) return;
+    for (int y = 0; y < px; y++) {
+        for (int x = 0; x < px; x++) {
+            float o[4];
+            sample(over, w, h, px, x, y, o);
+            const float a = o[3] / 255.0f;
+            uint8_t* d = &rgba[((size_t)y * px + x) * 4];
+            for (int c = 0; c < 3; c++) d[c] = byte(o[c] * a + d[c] * (1 - a));
+            d[3] = byte(o[3] + d[3] * (1 - a));
+        }
+    }
+}
+
+std::vector<uint8_t> with_badge(const std::vector<uint8_t>& icon, const std::vector<uint8_t>& badge)
+{
+    std::vector<uint8_t> base = square_of(icon, 50, PX);
+    int w = 0, h = 0;
+    const std::vector<uint8_t> over = rgba_of(badge, w, h);
+    if (base.empty() || over.empty()) return icon;
+    draw_over(base, PX, over.data(), w, h);
+    std::vector<uint8_t> out = jpeg_from_rgba(base.data(), PX, PX);
+    return out.empty() ? icon : out;
+}
+
 std::vector<uint8_t> placeholder(const std::vector<uint8_t>& png)
 {
     int w = 0, h = 0, comp = 0;

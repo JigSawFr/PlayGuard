@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: angle brackets: development tools and terminals. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <path d="M104 98 L78 128 L104 158" fill="none" stroke="#E8EEF7" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M152 98 L178 128 L152 158" fill="none" stroke="#E8EEF7" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="140" y1="90" x2="116" y2="166" stroke="#2EC4A6" stroke-width="11" stroke-linecap="round"/>
+</svg>

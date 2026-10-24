@@ -56,7 +56,9 @@ struct Made
     // from the SD card, and is made again (forwarder_flow::at_start).
     bool        carried = false;
     // Its HOME menu icon from a screenshot of the album ("sdmc:/Nintendo/
-    // Album/…jpg"), else the .nro's own.
+    // Album/…jpg"), or from PlayGuard's library ("lib:<id>",
+    // forwarder_library), else the .nro's own. Protected, with a badge over
+    // it (forwarder_icon::with_badge).
     std::string icon;
     // The loader it was built with (forwarder_flow::loader_id: 16 hex
     // digits of its SHA-256); empty for one made before it was kept. One

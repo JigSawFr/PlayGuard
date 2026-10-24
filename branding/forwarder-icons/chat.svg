@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Forwarder icon: speech bubbles: chat and social apps. -->
+  <rect width="256" height="256" fill="#FFB547"/>
+  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
+  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <rect x="116" y="78" width="62" height="46" rx="14" fill="#2EC4A6"/>
+  <path d="M100 156 L92 182 L124 158 Z" fill="#E8EEF7" stroke="#E8EEF7" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="78" y="102" width="88" height="60" rx="16" fill="#E8EEF7" stroke="#0B1424" stroke-width="6"/>
+  <path d="M98 160 L124 160" stroke="#E8EEF7" stroke-width="7"/>
+  <circle cx="102" cy="132" r="6" fill="#0B1424"/>
+  <circle cx="122" cy="132" r="6" fill="#0B1424"/>
+  <circle cx="142" cy="132" r="6" fill="#0B1424"/>
+</svg>

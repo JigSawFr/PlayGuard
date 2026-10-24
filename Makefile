@@ -214,7 +214,7 @@ table_export_LIBS  := -lz
 update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
 config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
-forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
+forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_library.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
 forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
 forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb

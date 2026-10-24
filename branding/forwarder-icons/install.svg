@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <!-- Forwarder icon, an arrow into a tray: installers (Goldleaf…). -->
+  <!-- Forwarder icon: an arrow into a tray: installers (Goldleaf…). -->
   <rect width="256" height="256" fill="#FFB547"/>
   <circle cx="128" cy="128" r="100" fill="#0B1424"/>
   <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
