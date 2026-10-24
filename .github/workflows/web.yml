@@ -56,6 +56,8 @@ jobs:
     # release, or by hand): about three hours, four languages at a time,
     # 38 minutes each four (2026-10-24: 120 minutes stopped it at 8 of 15).
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 30 || 300 }}
+    outputs:
+      release: ${{ steps.what.outputs.release }}
     permissions:
       contents: read
       pages: read     # the site's address (its custom domain)
@@ -78,13 +80,16 @@ jobs:
       #   simulator, this workflow.
       #   Otherwise main's, its smoke test's screens with it.
       # - The website's screenshots (both themes, every language, about three
-      #   hours) and the tours and preview images made from them: taken on main
-      #   for a release (its version changed: the header's badge) and by hand
-      #   (`all`); otherwise main's published ones, in seconds.
+      #   hours) and the tours and preview images made from them: taken by
+      #   hand (`all`); otherwise main's published ones, in seconds. A release
+      #   (main, its version changed: the header's badge) is published first
+      #   with main's, in minutes, then this workflow runs again with `all`
+      #   (the release-screens job below) and publishes its own.
       # The website itself is built every time (seconds); its layout on a
       # phone, a tablet and a desktop is checked for a pull request that
       # changes what it is made of (about half a minute, below).
       - name: What to build
+        id: what
         env:
           FORCE: ${{ inputs.screens == 'all' }}
           # The merge queue as a pull request: a release pull request in it
@@ -113,11 +118,15 @@ jobs:
           [ "$FORCE" = true ] && changed=all
           simulator='^(source|resources|web|extern|patches)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|\.github/workflows/web\.yml)$|^tools/web_'
           site='^(site|docs|images|branding)/|^resources/i18n/|^tools/(build_site|site_layout|check_site_links)\.py$|^CHANGELOG\.md$|^\.github/workflows/web\.yml$'
-          build=0; screens=0; layout=0
+          build=0; screens=0; layout=0; release=0
           if [[ "$changed" == all* ]] || grep -qE "$simulator" <<< "$changed"; then build=1; fi
           if [[ "$changed" == all* ]] || grep -qE "$site" <<< "$changed"; then layout=1; fi
-          # A release: its version (the header's badge) changed, on main.
-          if [ "$changed" = all ] || { [ "$IS_PR" != true ] && grep -qx '\.release-please-manifest\.json' <<< "$changed"; }; then screens=1; fi
+          if [ "$changed" = all ]; then screens=1; fi
+          # A release: its version (the header's badge) changed, on main. Its
+          # site goes out now with main's screenshots; its own are taken by
+          # the run the release-screens job starts.
+          if [ "$changed" != all ] && [ "$IS_PR" != true ] && grep -qx '\.release-please-manifest\.json' <<< "$changed"; then release=1; fi
+          echo "release=$release" >> "$GITHUB_OUTPUT"
           {
             echo "BUILD_SIMULATOR=$build"
             echo "TAKE_SCREENS=$screens"
@@ -411,3 +420,26 @@ jobs:
           path: out
           include-hidden-files: true   # .nojekyll
           retention-days: 30
+
+  # A release's screenshots, tours and preview images, once its site is out
+  # (pages.yml publishes this run's as soon as it ends): this workflow again,
+  # by hand's way (`all`, about three hours), which pages.yml publishes in
+  # turn. GITHUB_TOKEN may start a workflow_dispatch run. It waits behind
+  # this one (main's builds run one at a time) and a push meanwhile does not
+  # replace it once it runs; should it fail, *Actions › web › Run workflow*,
+  # `all`, takes them.
+  release-screens:
+    needs: build
+    if: needs.build.outputs.release == '1' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions:
+      actions: write   # the workflow_dispatch run
+    steps:
+      - name: Every screenshot of the release, in a run of its own
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh workflow run web.yml -R "$REPO" --ref main -f screens=all
+          echo "The release's screenshots: a web run with \`all\` started, published once it ends." >> "$GITHUB_STEP_SUMMARY"

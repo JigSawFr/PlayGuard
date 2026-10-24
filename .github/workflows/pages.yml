@@ -103,7 +103,10 @@ jobs:
           # open pull request's) and its pull request's web run would come up
           # too. Only runs of this repository are taken.
           ours=".workflow_runs | map(select(.head_repository.full_name == \"$REPO\")) | .[0].id // empty"
-          main=$(gh api -X GET "$runs" -f branch=main -f event=push -f status=success -f per_page=20 --jq "$ours")
+          # main's newest site: a push's, or a run by hand's (a release's
+          # screenshots, web.yml's release-screens), never a pull request's.
+          mains=".workflow_runs | map(select(.head_repository.full_name == \"$REPO\" and (.event == \"push\" or .event == \"workflow_dispatch\"))) | .[0].id // empty"
+          main=$(gh api -X GET "$runs" -f branch=main -f status=success -f per_page=20 --jq "$mains")
           if [ -n "$main" ]; then
             gh run download "$main" -R "$REPO" -n site -D site
             echo "main: run $main" >> "$GITHUB_STEP_SUMMARY"
