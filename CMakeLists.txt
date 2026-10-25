@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Borealis lives in extern/ as a git submodule (xfangfang/borealis, wiliwili branch).
+# Borealis lives in extern/ as a git submodule: JigSawFr/borealis, wiliwili
+# branch (xfangfang/borealis with PlayGuard's fixes and some from its forks).
 set(BOREALIS_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/extern/borealis/library)
 
 # On the Switch, draw with deko3d (devkitPro's own GPU API) rather than mesa's
@@ -113,65 +114,6 @@ if (PLAYGUARD_WEB)
     set(BRLS_RESOURCES_DIR /app)
 elseif (PLATFORM_DESKTOP)
     set(BRLS_RESOURCES_DIR ${CMAKE_BINARY_DIR})
-endif ()
-
-# PlayGuard's fixes to borealis, until upstream has them (patches/borealis/,
-# its README says why each one): applied to the submodule's files at
-# configure time, in order. Once the whole series is in place, a stamp in the
-# submodule's git directory says so (the patches and the change they made):
-# configuring again (or a second build, as CI's reproducibility check does)
-# then changes nothing, even where a later patch changed the lines of an
-# earlier one so that the earlier one no longer reverses alone. Without the
-# stamp, one already in place is left as it is; one that no longer applies
-# (after a borealis bump) stops the configure. safe.directory: CI's container
-# checks out as another user.
-file(GLOB PLAYGUARD_BOREALIS_PATCHES ${CMAKE_CURRENT_SOURCE_DIR}/patches/borealis/*.patch)
-list(SORT PLAYGUARD_BOREALIS_PATCHES)
-find_package(Git REQUIRED)
-set(PLAYGUARD_BOREALIS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/borealis)
-set(PLAYGUARD_PATCHES_SUM "")
-foreach (patch ${PLAYGUARD_BOREALIS_PATCHES})
-    file(SHA256 ${patch} patch_sum)
-    string(APPEND PLAYGUARD_PATCHES_SUM ${patch_sum})
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${patch})
-endforeach ()
-string(SHA256 PLAYGUARD_PATCHES_SUM "${PLAYGUARD_PATCHES_SUM}")
-# What the submodule's files hold against its commit, as a sum.
-function(playguard_borealis_change out)
-    execute_process(COMMAND ${GIT_EXECUTABLE} -c safe.directory=* diff HEAD
-                    WORKING_DIRECTORY ${PLAYGUARD_BOREALIS_DIR}
-                    OUTPUT_VARIABLE change)
-    string(SHA256 change_sum "${change}")
-    set(${out} ${change_sum} PARENT_SCOPE)
-endfunction()
-execute_process(COMMAND ${GIT_EXECUTABLE} -c safe.directory=* rev-parse --absolute-git-dir
-                WORKING_DIRECTORY ${PLAYGUARD_BOREALIS_DIR}
-                OUTPUT_VARIABLE borealis_git_dir OUTPUT_STRIP_TRAILING_WHITESPACE)
-set(PLAYGUARD_PATCHES_STAMP ${borealis_git_dir}/playguard-patches)
-playguard_borealis_change(borealis_change)
-set(stamped "")
-if (EXISTS ${PLAYGUARD_PATCHES_STAMP})
-    file(READ ${PLAYGUARD_PATCHES_STAMP} stamped)
-endif ()
-if (NOT stamped STREQUAL "${PLAYGUARD_PATCHES_SUM} ${borealis_change}")
-    foreach (patch ${PLAYGUARD_BOREALIS_PATCHES})
-        get_filename_component(patch_name ${patch} NAME)
-        execute_process(COMMAND ${GIT_EXECUTABLE} -c safe.directory=* apply --reverse --check ${patch}
-                        WORKING_DIRECTORY ${PLAYGUARD_BOREALIS_DIR}
-                        RESULT_VARIABLE patch_missing OUTPUT_QUIET ERROR_QUIET)
-        if (patch_missing)
-            execute_process(COMMAND ${GIT_EXECUTABLE} -c safe.directory=* apply ${patch}
-                            WORKING_DIRECTORY ${PLAYGUARD_BOREALIS_DIR}
-                            RESULT_VARIABLE patch_failed)
-            if (patch_failed)
-                message(FATAL_ERROR "patches/borealis/${patch_name} does not apply to extern/borealis: "
-                                    "update it for the new borealis, or drop it if upstream has the fix")
-            endif ()
-            message(STATUS "borealis: ${patch_name} applied")
-        endif ()
-    endforeach ()
-    playguard_borealis_change(borealis_change)
-    file(WRITE ${PLAYGUARD_PATCHES_STAMP} "${PLAYGUARD_PATCHES_SUM} ${borealis_change}")
 endif ()
 
 # borealis links stdc++fs under clang, which Emscripten's libc++ has no
