@@ -4,7 +4,8 @@
 // is over its commit. The tags (build_tags, also on the build's page): a
 // pull request's number, the kind of change and its scope ("Feature",
 // "ui"), breaking, the pull request a commit came from, how its checks
-// ended, pre-release, installed (a check) or new (a sparkle). Focusable like a list cell; reused
+// ended, pre-release; installed (a check) or new (a sparkle) sit beside the
+// title. Focusable like a list cell; reused
 // when the list changes (set()).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -37,6 +38,7 @@ class BuildCell : public brls::RecyclerCell
 
   private:
     brls::Label* title;
+    brls::Box*   marks;   // the icon-only tags, beside the title
     brls::Box*   tags;
     brls::Label* age;
     brls::Label* commit;

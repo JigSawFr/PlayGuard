@@ -116,10 +116,19 @@ BuildCell::BuildCell()
     left->setGrow(1.0f);
     left->setShrink(1.0f);
     left->setMarginRight(indent);
+    // The title, then its marks (installed, new) right after it.
+    auto* head = new brls::Box(brls::Axis::ROW);
+    head->setAlignItems(brls::AlignItems::CENTER);
     this->title = new brls::Label();
     this->title->setSingleLine(true);
     this->title->setFontSize(21);
-    left->addView(this->title);
+    this->title->setShrink(1.0f);
+    this->title->setMarginRight(10);
+    head->addView(this->title);
+    this->marks = new brls::Box(brls::Axis::ROW);
+    this->marks->setShrink(0.0f);
+    head->addView(this->marks);
+    left->addView(head);
     this->tags = new brls::Box(brls::Axis::ROW);
     this->tags->setMarginTop(6);
     left->addView(this->tags);
@@ -147,8 +156,12 @@ BuildCell::BuildCell()
 void BuildCell::set(const dev_builds::Build& b, bool newer)
 {
     this->title->setText(build_title(b));
+    this->marks->clearViews();
     this->tags->clearViews();
-    for (const BuildTag& t : build_tags(b, newer)) this->tags->addView(tag_view(t));
+    // An icon alone (installed, new) marks the title; the words go below it,
+    // and a release with none leaves no empty line.
+    for (const BuildTag& t : build_tags(b, newer)) (t.text.empty() ? this->marks : this->tags)->addView(tag_view(t));
+    this->tags->setVisibility(this->tags->getChildren().empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
     this->age->setText(dev_build_flow::age_text(b.date));
     // A release: its date; anything else: its commit.
     this->commit->setText(b.kind == dev_builds::Kind::Release ? b.date.substr(0, 10) : b.commit);
