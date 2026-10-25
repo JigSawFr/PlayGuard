@@ -398,6 +398,7 @@ static struct {
     size_t integration_len;
     unsigned refused_logs;    // "the broker refused <base>/integration" lines
     unsigned systems;         // system() calls
+    uint64_t posix;           // the wall clock (0: 1791000000)
 } host;
 
 static size_t h_state(void *ctx, char *out, size_t cap)
@@ -465,7 +466,7 @@ static bool h_read_only(void *ctx)
 static uint64_t h_now_posix(void *ctx)
 {
     (void)ctx;
-    return 1791000000;
+    return host.posix ? host.posix : 1791000000;
 }
 
 static void h_log(void *ctx, const char *line)
@@ -904,6 +905,57 @@ static void test_keepalive(void)
         sync_engine_step(&engine, 0);
     }
     CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "stopped answering"));
+
+    // The broker says nothing while this client keeps publishing (a
+    // connection dropped while the console slept takes what is written): a
+    // PINGREQ all the same, and the connection closed when it goes unanswered.
+    setup(false, SyncPolicy_Auto);
+    turns(3);
+    const unsigned before = broker.pings;
+    for (int i = 0; i < 30 && broker.pings == before; i++) {
+        now += 1000;
+        if (i % 5 == 0) CHECK(sync_engine_publish(&engine, "names", "{}", 2, true) == 0);
+        sync_engine_step(&engine, 0);
+    }
+    CHECK(broker.pings == before + 1 && sync_engine_online(&engine));
+    broker.answer_pings = false;
+    for (int i = 0; i < 90 && sync_engine_online(&engine); i++) {
+        now += 1000;
+        if (i % 5 == 0) sync_engine_publish(&engine, "names", "{}", 2, true);
+        sync_engine_step(&engine, 0);
+    }
+    CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "stopped answering"));
+}
+
+// The console slept: its clock moved on by more than the broker keeps a
+// silent connection. The connection is closed without a word before anything
+// is written to it, and the next step connects again.
+static void test_woke(void)
+{
+    setup(false, SyncPolicy_Auto);
+    host.posix = 1791000000;
+    turns(3);
+    CHECK(sync_engine_online(&engine) && sync_engine_publish(&engine, "names", "{}", 2, true) == 0);
+    const unsigned connects = broker.connects, disconnects = broker.disconnects;
+    const size_t sent = broker.n_log;
+    // A clock that moved on within the keep-alive: nothing to do.
+    host.posix += 40;
+    CHECK(sync_engine_publish(&engine, "names", "{}", 2, true) == 0 && sync_engine_online(&engine));
+    // Ten minutes asleep (the tick barely moved).
+    host.posix += 600;
+    now += 100;
+    CHECK(sync_engine_publish(&engine, "names", "{}", 2, true) < 0);
+    CHECK(!sync_engine_online(&engine) && strstr(engine.status.error, "slept"));
+    CHECK(broker.n_log == sent + 1 && broker.disconnects == disconnects);   // not written, no DISCONNECT
+    turns(2);
+    CHECK(sync_engine_online(&engine) && broker.connects == connects + 1);
+    const Message *avail = find_retained("playguard/a1b2c3d4/availability");
+    CHECK(avail && !strcmp(avail->payload, "online"));
+    // Asleep while offline: nothing to close, the step connects as before.
+    sync_engine_stop(&engine);
+    host.posix += 3600;
+    turns(2);
+    CHECK(sync_engine_online(&engine) && broker.connects == connects + 2);
 }
 
 static void test_oversized_and_reconfigure(void)
@@ -1083,6 +1135,7 @@ int main(void)
     test_integration_version();
     test_connection_failures();
     test_keepalive();
+    test_woke();
     test_oversized_and_reconfigure();
     test_mqtt_versions();
     test_mqtt5_properties();

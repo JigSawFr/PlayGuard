@@ -111,6 +111,7 @@ typedef struct {
     bool        want_state, want_activity, want_discovery, want_names, want_online;
     uint64_t    next_state_ms, next_activity_ms;
     bool        discovery_published;
+    uint64_t    seen_posix;      // the wall clock at the last call (0: not read yet)
 
     SyncQueued  queue[SYNC_QUEUE_MAX];
     uint32_t    next_id;

@@ -106,13 +106,19 @@ static int tcp_open(void *ctx, const char *host, uint16_t port, int timeout_ms, 
     return 0;
 }
 
+// All of it within `timeout_ms`, however the socket answers: one that says
+// it can take more and then takes nothing (a connection lost while the
+// console slept) gives up at the deadline rather than trying forever.
 static int tcp_write(void *ctx, const void *buf, size_t len, int timeout_ms)
 {
     SyncTcp *t = (SyncTcp *)ctx;
     const uint8_t *p = (const uint8_t *)buf;
+    const uint64_t deadline = sync_now_ms() + (uint64_t)(timeout_ms > 0 ? timeout_ms : 0);
     while (len > 0) {
+        const uint64_t now = sync_now_ms();
+        if (now >= deadline) return -1;
         struct pollfd pf = { .fd = t->fd, .events = POLLOUT, .revents = 0 };
-        const int r = poll(&pf, 1, timeout_ms);
+        const int r = poll(&pf, 1, (int)(deadline - now));
         if (r <= 0 || (pf.revents & (POLLERR | POLLHUP | POLLNVAL))) return -1;
         const ssize_t n = send(t->fd, p, len, MSG_NOSIGNAL);
         if (n < 0) {

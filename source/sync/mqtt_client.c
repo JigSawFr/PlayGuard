@@ -106,6 +106,7 @@ static int pump(MqttClient *c, int timeout_ms, uint8_t want, uint16_t want_id, b
     if (c->rx_len == c->rx_cap && c->skip == 0) return fail(c, "receive buffer full");
     const long n = c->io.read(c->io.ctx, c->rx + c->rx_len, c->rx_cap - c->rx_len, timeout_ms);
     if (n < 0) return fail(c, "the broker closed the connection");
+    if (n > 0) c->last_in_ms = c->now_ms();
     c->rx_len += (size_t)n;
 
     // Drop the rest of a message too large to hold.
@@ -233,6 +234,7 @@ int mqtt_client_connect(MqttClient *c, const char *host, uint16_t port, const Mq
     c->keepalive_s = ack.has_server_keepalive ? ack.server_keepalive : opts->keepalive_s;
     c->max_out = ack.max_packet;
     c->connected = true;
+    c->last_in_ms = c->now_ms();
     return 0;
 }
 
@@ -297,8 +299,12 @@ int mqtt_client_poll(MqttClient *c, int timeout_ms)
         const uint64_t period = (uint64_t)c->keepalive_s * 1000u;
         if (c->ping_sent_ms && now - c->ping_sent_ms > period) return fail(c, "the broker stopped answering");
         // A PINGREQ well before the keep-alive runs out, so a slow answer
-        // still arrives in time.
-        if (!c->ping_sent_ms && now - c->last_out_ms >= period * 3 / 4) {
+        // still arrives in time. Also when the broker has said nothing for
+        // as long, though this client keeps publishing: a connection the
+        // broker dropped (the console slept) can still take what is sent,
+        // and only an answer shows it is there.
+        const uint64_t quiet = period * 3 / 4;
+        if (!c->ping_sent_ms && (now - c->last_out_ms >= quiet || now - c->last_in_ms >= quiet)) {
             const size_t n = mqtt_encode_empty(c->tx, sizeof(c->tx), MQTT_PINGREQ);
             if (send_bytes(c, c->tx, n) < 0) return -1;
             c->ping_sent_ms = c->now_ms();

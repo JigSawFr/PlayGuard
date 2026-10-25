@@ -59,7 +59,8 @@ the subscription to `playguard/<id>/+/set` uses QoS 1, the one to
 prefix) QoS 0, the one to `playguard/<id>/integration` QoS 1. That last one
 is optional: a broker whose access list refuses it keeps the link up (the
 integration's version stays unknown, and the log says so). Keep-alive is 30 s, so a console that falls asleep is marked offline
-within 45 s.
+within 45 s. The console sends a PINGREQ whenever the broker has said nothing
+for 22 s, and connects again at once after a sleep longer than 45 s.
 
 ## `state`
 

@@ -55,6 +55,9 @@ constexpr auto FETCH_EVERY = std::chrono::minutes(5);
 constexpr auto ACCOUNTS_FRESH = std::chrono::minutes(15);
 constexpr auto EXIT_WAIT = std::chrono::seconds(4);
 constexpr int AGENT_POLL_MS = 100;
+// The agent's link turns about every second; a connection's timeouts can
+// hold one turn some twenty seconds. A minute without one: it is stuck.
+constexpr uint64_t AGENT_QUIET_MS = 60000;
 constexpr auto PROBE_EVERY = std::chrono::seconds(5);
 constexpr auto INTEGRATION_EVERY = std::chrono::seconds(30);
 constexpr auto SPACE_EVERY = std::chrono::minutes(5);
@@ -1282,6 +1285,10 @@ Status status()
         st.link = s_agent_status.link;
         st.pending = s_agent_status.pending + s_queue.size();
         st.agent_read_only = s_agent_status.read_only;
+        // Its turns stamp the status with the system tick, which PlayGuard
+        // reads too.
+        const uint64_t now = sync_now_ms();
+        if (s_agent_status.uptime_ms && now > s_agent_status.uptime_ms) st.agent_quiet_ms = now - s_agent_status.uptime_ms;
     } else if (s_shared) {
         std::lock_guard<std::mutex> lk(s_shared->m);
         st.link = s_shared->status;
@@ -1330,6 +1337,11 @@ std::string report_section()
         out += fmt::format("agent       : {} {}\n", st.agent_version,
                            st.agent ? (st.agent_read_only ? "(holds the link, read-only)" : "(holds the link)")
                                     : "(another protocol: not used)");
+    // A link that stopped turning keeps its last status: say so, the
+    // session line below is then that old view.
+    if (st.agent && st.agent_quiet_ms >= AGENT_QUIET_MS)
+        out += fmt::format("agent loop  : last turn {} s ago (stuck: its status below is that old)\n",
+                           st.agent_quiet_ms / 1000);
     if (!st.running) return out + "session     : not running\n";
     const SyncStatus& l = st.link;
     out += fmt::format("session     : {} mqtt={} connects={} publishes={} orders={} rejected={} dropped={} pending={}\n",

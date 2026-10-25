@@ -67,6 +67,7 @@ struct Status
     bool        agent_refused = false;   // it runs, but speaks another protocol (an update is due)
     bool        agent_read_only = false; // it refuses changes (sync/nro_state.txt)
     std::string agent_version;
+    uint64_t    agent_quiet_ms = 0;      // since the agent's link last ran a turn (its status says)
 };
 Status status();
 

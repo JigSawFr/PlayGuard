@@ -42,6 +42,7 @@ typedef struct {
     bool          connected;        // CONNACK accepted
     uint16_t      keepalive_s;
     uint64_t      last_out_ms;      // last packet sent
+    uint64_t      last_in_ms;       // last bytes received
     uint64_t      ping_sent_ms;     // PINGREQ waiting for its PINGRESP (0: none)
     uint16_t      next_id;
     MqttOnMessage on_message;

@@ -251,9 +251,16 @@ into long-term statistics.
   "no more play today" and a "no limit" base wait for PlayGuard's question).
 - Two threads: the MQTT loop in 500 ms slices, and the IPC server blocked on
   `svcReplyAndReceive`, joined by a mailbox under a mutex.
-- Sleep: the last will marks the console offline within 45 s; the socket error
-  or the `nifm` status at wake triggers a reconnection with back-off. No
-  `psc:m` registration (not confirmed safe for a third-party module).
+- Sleep: the last will marks the console offline within 45 s. At wake the
+  connection is gone, though its socket may still take what is written (seen
+  on a console: the agent stayed "online" for hours, the broker heard
+  nothing). So the engine closes it at once when the wall clock moved on by
+  more than one keep-alive and a half since its last call, before writing
+  anything, and connects again; a PINGREQ goes out whenever the broker has
+  been silent for 3/4 of the keep-alive, not only the client; a write gives
+  up at its deadline. The report says when the agent's loop has not turned
+  for a minute. No `psc:m` registration (not confirmed safe for a
+  third-party module).
 - `pctl:a` contention: none between the two processes (one reader at a time);
   with the HOME menu's PIN prompt, a few milliseconds every 30 s, cycles
   skipped while the PIN applet runs, and libnx's fallback to `pctl:s` turns a

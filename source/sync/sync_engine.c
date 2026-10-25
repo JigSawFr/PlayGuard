@@ -29,6 +29,29 @@ static uint64_t now_posix(SyncEngine *e)
     return e->host.now_posix ? e->host.now_posix(e->host.ctx) : 0;
 }
 
+static void lost(SyncEngine *e);
+
+// The console slept: the wall clock moved on further than the broker keeps a
+// silent connection (one keep-alive and a half), so the broker has dropped
+// this one and said "offline" for it, while the socket may still look open
+// and take what is written, for nowhere. Closed without a word, at once:
+// the next step connects again. Every call that writes asks first (a clock
+// set forward by as much costs one connection more, nothing else).
+static bool woke(SyncEngine *e)
+{
+    const uint64_t t = now_posix(e);
+    const uint64_t last = e->seen_posix;
+    if (t) e->seen_posix = t;
+    if (!t || !last || t <= last || !e->mqtt.connected) return false;
+    const uint64_t keepalive = e->mqtt.keepalive_s ? e->mqtt.keepalive_s : SYNC_KEEPALIVE_S;
+    if (t - last <= keepalive * 3 / 2) return false;
+    mqtt_client_close(&e->mqtt, false);
+    snprintf(e->mqtt.error, sizeof(e->mqtt.error), "the console slept, connecting again");
+    e->backoff_ms = 0;
+    lost(e);
+    return true;
+}
+
 static bool read_only(SyncEngine *e)
 {
     return e->host.read_only && e->host.read_only(e->host.ctx);
@@ -100,6 +123,7 @@ void sync_engine_discovery_changed(SyncEngine *e)
 
 int sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, size_t len, bool retained)
 {
+    woke(e);
     if (!e->mqtt.connected) return -1;
     char topic[160];
     snprintf(topic, sizeof(topic), "%s/%s", e->base, sub);
@@ -123,6 +147,7 @@ static void lost(SyncEngine *e)
 
 void sync_engine_stop(SyncEngine *e)
 {
+    woke(e);
     if (e->mqtt.connected) {
         char topic[160];
         snprintf(topic, sizeof(topic), "%s/availability", e->base);
@@ -143,6 +168,7 @@ void sync_engine_reconfigure(SyncEngine *e, const SyncConf *conf)
                            conf->allow_anonymous != e->conf.allow_anonymous || conf->enabled != e->conf.enabled ||
                            conf->mqtt_version != e->conf.mqtt_version;
     const bool discovery_off = e->conf.ha_discovery && !conf->ha_discovery;
+    woke(e);
     if (reconnect || discovery_off) {
         // Clear the old discovery while still connected under the old identity.
         if (e->mqtt.connected && e->conf.ha_discovery && (discovery_off || !conf->enabled ||
@@ -546,6 +572,7 @@ static int subscribe(SyncEngine *e)
 
 void sync_engine_replay_orders(SyncEngine *e)
 {
+    woke(e);
     if (!e->mqtt.connected) return;
     if (subscribe(e) < 0) lost(e);
 }
@@ -594,6 +621,7 @@ static int connect_now(SyncEngine *e)
 
 int sync_engine_step(SyncEngine *e, int max_wait_ms)
 {
+    woke(e);
     const uint64_t now = e->now_ms();
     if (!e->conf.enabled || sync_conf_problem(&e->conf)) {
         if (e->mqtt.open) sync_engine_stop(e);
