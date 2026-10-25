@@ -59,6 +59,7 @@ constexpr int AGENT_POLL_MS = 100;
 // hold one turn some twenty seconds. A minute without one: it is stuck.
 constexpr uint64_t AGENT_QUIET_MS = 60000;
 constexpr size_t AGENT_REPORT_LINES = 20;   // the agent's last lines in a report
+constexpr size_t WATCHDOG_REPORT_LINES = 6;  // its watchdog's, from the SD card
 constexpr auto PROBE_EVERY = std::chrono::seconds(5);
 constexpr auto INTEGRATION_EVERY = std::chrono::seconds(30);
 constexpr auto SPACE_EVERY = std::chrono::minutes(5);
@@ -1351,6 +1352,22 @@ std::string report_section()
         for (size_t i = lines.size() > AGENT_REPORT_LINES ? lines.size() - AGENT_REPORT_LINES : 0; i < lines.size(); i++)
             tail += "  " + without_broker(lines[i], c.host) + "\n";
         if (!tail.empty()) tail = "agent's log : its last lines, oldest first\n" + tail;
+    }
+    // The agent's watchdog keeps its lines on the SD card too: a console
+    // restarted to free the link has lost the log above.
+    std::string kept;
+    if (paths::read_file(sync_files::system_dir() + "/agent_watchdog.log", kept)) {
+        std::vector<std::string> stops;
+        for (size_t at = 0; at < kept.size();) {
+            size_t end = kept.find('\n', at);
+            if (end == std::string::npos) end = kept.size();
+            if (end > at) stops.push_back(kept.substr(at, end - at));
+            at = end + 1;
+        }
+        if (!stops.empty()) tail += "agent stops : its watchdog's last lines (SD card), oldest first\n";
+        for (size_t i = stops.size() > WATCHDOG_REPORT_LINES ? stops.size() - WATCHDOG_REPORT_LINES : 0;
+             i < stops.size(); i++)
+            tail += "  " + stops[i] + "\n";
     }
     if (!st.running) return out + "session     : not running\n" + tail;
     const SyncStatus& l = st.link;

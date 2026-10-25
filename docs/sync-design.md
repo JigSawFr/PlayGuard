@@ -259,7 +259,14 @@ into long-term statistics.
   from its own `bsd` session (the agent opens two), the call returns and
   the link connects again; a service call that never returns cannot be freed
   from outside. The agent's log lines start with the local time, read once a
-  turn, and a report carries the last 20 of them.
+  turn, and a report carries the last 20 of them. The watchdog's own lines
+  also go to `nand/<system>/sync/agent_watchdog.log` (a restart loses the
+  log), and a report carries its last 6.
+- The network service's room for the agent's socket buffers is four times
+  their sizes (256 KiB of the heap), and a write goes in 8 KiB pieces. With
+  room of their own size, the games document (64 KiB) could fill it, and then
+  the ACKs that would empty it have none: seen on a console, the loop stopped
+  twice right after the week, the document before the games.
 - Sleep: the last will marks the console offline within 45 s. At wake the
   connection is gone, though its socket may still take what is written (seen
   on a console: the agent stayed "online" for hours, the broker heard

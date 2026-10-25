@@ -64,8 +64,10 @@ In `sd:/config/playguard/`, as PlayGuard's: it reads `sync.conf` and
 folder, `nand/<system>/sync/` (`sysmmc`, `emummc` or `unknown`, as PlayGuard
 names it), it reads `nro_state.txt` and `names.txt` and writes
 `agent_state.txt` (what it changed: extra time, console lock, a relock
-pending) and `agent_events.log` (the orders it carried out, imported into
-PlayGuard's history); a report asked for from Home Assistant goes to
+pending), `agent_events.log` (the orders it carried out, imported into
+PlayGuard's history) and `agent_watchdog.log` (where its loop stopped, when
+it stopped; PlayGuard's report shows the last lines); a report asked for from
+Home Assistant goes to
 `logs/reports/` with PlayGuard's. At boot it waits up to 10 s for the SD card,
 then tries again every 30 s.
 Details: [`docs/sync-protocol.md`](../../docs/sync-protocol.md).
@@ -84,9 +86,9 @@ It links PlayGuard's C service layer and the remote link's core unchanged
 `tests/agent/`) and `source/agent_ipc.c` (the HIPC server).
 
 Program ID `0x4200000000504741`, in the private range homebrew sysmodules use.
-Static heap 1.5 MiB; one TCP socket, on two `bsd` sessions (the watchdog
-shuts it down when a call on it hangs); TLS through the console's `ssl`
-service.
+Static heap 1.5 MiB, 256 KiB of it the network service's room for the socket
+buffers; one TCP socket, on two `bsd` sessions (the watchdog shuts it down
+when a call on it hangs); TLS through the console's `ssl` service.
 
 ## Not tested on a console yet
 

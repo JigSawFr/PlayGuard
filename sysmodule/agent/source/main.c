@@ -54,7 +54,7 @@
 
 // This system's (nand/<key>/sync/), once the system is known (system_paths()).
 static char g_system_dir[64];
-static char NRO_STATE[96], AGENT_STATE[96], AGENT_EVENTS[96], NAMES[96], INTEGRATION[96];
+static char NRO_STATE[96], AGENT_STATE[96], AGENT_EVENTS[96], NAMES[96], INTEGRATION[96], AGENT_WATCHDOG[96];
 static bool g_emummc;
 
 #define ACTIVITY_EVERY_MS (5 * 60 * 1000ULL)
@@ -90,6 +90,22 @@ static void wall_read(uint64_t now_ms)
     g_wall_offset = (s32)((s64)t.hour * 3600 + t.minute * 60 + t.second - (s64)(posix % 86400));
     g_wall_ms = now_ms;
     g_wall_posix = posix;
+}
+
+// The local date and time from it, "YYYY-MM-DD HH:MM:SS"; false while unknown.
+static bool wall_stamp(char out[32])
+{
+    const u64 wall = g_wall_posix;
+    if (!wall) return false;
+    const uint64_t now = sync_now_ms(), read = g_wall_ms;
+    const s64 local = (s64)(wall + (now > read ? (now - read) / 1000 : 0)) + g_wall_offset;
+    const s64 days = local >= 0 ? local / 86400 : (local - 86399) / 86400;
+    const unsigned s = (unsigned)(local - days * 86400);
+    int y = 0;
+    unsigned m = 0, d = 0;
+    calendar_civil_from_days(days, &y, &m, &d);
+    snprintf(out, 32, "%04d-%02u-%02u %02u:%02u:%02u", y, m, d, s / 3600, s / 60 % 60, s % 60);
+    return true;
 }
 
 // A sysmodule: no applet, one fs session, a heap of its own.
@@ -150,15 +166,9 @@ void        agent_ipc_start(void);
 
 static void slog(const char *fmt, const char *a, const char *b)
 {
-    char line[AGENT_LOG_LINE];
+    char line[AGENT_LOG_LINE], stamp[32];
     int at = 0;
-    const u64 wall = g_wall_posix;
-    if (wall) {
-        const uint64_t now = sync_now_ms(), read = g_wall_ms;
-        const s64 day = (s64)((wall + (now > read ? (now - read) / 1000 : 0)) % 86400) + g_wall_offset;
-        const unsigned s = (unsigned)((day % 86400 + 86400) % 86400);
-        at = snprintf(line, sizeof(line), "%02u:%02u:%02u ", s / 3600, s / 60 % 60, s % 60);
-    }
+    if (wall_stamp(stamp)) at = snprintf(line, sizeof(line), "%s ", stamp + 11);   // the time of day
     snprintf(line + at, sizeof(line) - (size_t)at, fmt, a ? a : "", b ? b : "");
     mutexLock(&g_lock);
     agent_log(&g_shared, line);
@@ -270,6 +280,7 @@ static void system_paths(void)
     snprintf(AGENT_EVENTS, sizeof(AGENT_EVENTS), "%s/sync/agent_events.log", g_system_dir);
     snprintf(NAMES, sizeof(NAMES), "%s/sync/names.txt", g_system_dir);
     snprintf(INTEGRATION, sizeof(INTEGRATION), "%s/sync/integration.json", g_system_dir);
+    snprintf(AGENT_WATCHDOG, sizeof(AGENT_WATCHDOG), "%s/sync/agent_watchdog.log", g_system_dir);
 }
 
 // ---- the agent's state ----
@@ -802,7 +813,13 @@ static bool sockets_up(void)
         .tcp_rx_buf_max_size = 0x8000,
         .udp_tx_buf_size = 0,
         .udp_rx_buf_size = 0,
-        .sb_efficiency = 1,
+        // The network service's room for this process's socket buffers, taken
+        // from the heap: four times their sizes, libnx's own default. Seen
+        // on a console: the loop stopped twice right after the week, the
+        // next document being the games (64 KiB). Room of the buffers' own
+        // size (one time) can be filled by it, and then the ACKs that would
+        // empty it have none.
+        .sb_efficiency = 4,
         .num_bsd_sessions = 2,   // the watchdog's shutdown() does not wait behind a call that hangs
         .bsd_service_type = BsdServiceType_Auto,
     };
@@ -838,6 +855,21 @@ static void engine_stop(void)
 #define WATCHDOG_MS 60000ULL
 static Thread g_watchdog;
 
+// The watchdog's lines, kept on the SD card too: a console restarted to free
+// the link loses the log above (PlayGuard's report shows both). Started again
+// past 16 KiB. When the card is what hangs, this waits, after the log above.
+static void watchdog_keep(const char *line)
+{
+    char stamp[32];
+    if (!wall_stamp(stamp)) snprintf(stamp, sizeof(stamp), "(time unknown)");
+    struct stat st;
+    const bool full = stat(AGENT_WATCHDOG, &st) == 0 && st.st_size > 16 * 1024;
+    FILE *f = open_write(AGENT_WATCHDOG, !full);
+    if (!f) return;
+    fprintf(f, "%s %s\n", stamp, line);
+    fclose(f);
+}
+
 static void watchdog(void *arg)
 {
     (void)arg;
@@ -852,6 +884,7 @@ static void watchdog(void *arg)
         if (told && turn != told) {
             told = 0;
             slog("the loop turns again%s%s", NULL, NULL);
+            watchdog_keep("the loop turns again");
         }
         if (!awake || !turn || now < turn || now - turn < WATCHDOG_MS || told == turn) continue;
         told = turn;
@@ -865,6 +898,7 @@ static void watchdog(void *arg)
         snprintf(line, sizeof(line), "the loop has not turned for %llu s, stopped in %s%s",
                  (unsigned long long)((now - turn) / 1000), where, freed ? ": its socket shut down to free it" : "");
         slog("%s%s", line, NULL);
+        watchdog_keep(line);
     }
 }
 

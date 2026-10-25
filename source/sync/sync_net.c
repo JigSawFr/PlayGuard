@@ -106,6 +106,11 @@ static int tcp_open(void *ctx, const char *host, uint16_t port, int timeout_ms, 
     return 0;
 }
 
+// At most this much per send(): a large document (the games, 64 KiB) goes in
+// pieces, so the network service never needs room for all of it at once (the
+// agent's buffers are small).
+#define SEND_CHUNK 0x2000
+
 // All of it within `timeout_ms`, however the socket answers: one that says
 // it can take more and then takes nothing (a connection lost while the
 // console slept) gives up at the deadline rather than trying forever.
@@ -120,7 +125,7 @@ static int tcp_write(void *ctx, const void *buf, size_t len, int timeout_ms)
         struct pollfd pf = { .fd = t->fd, .events = POLLOUT, .revents = 0 };
         const int r = poll(&pf, 1, (int)(deadline - now));
         if (r <= 0 || (pf.revents & (POLLERR | POLLHUP | POLLNVAL))) return -1;
-        const ssize_t n = send(t->fd, p, len, MSG_NOSIGNAL);
+        const ssize_t n = send(t->fd, p, len > SEND_CHUNK ? SEND_CHUNK : len, MSG_NOSIGNAL);
         if (n < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) continue;
             return -1;
