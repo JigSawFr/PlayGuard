@@ -239,7 +239,10 @@ payload (text, no JSON). The console applies it through the same guarded path
 as a press on the console, publishes an `event`, **clears the retained
 message** (an empty retained publish on the same topic) and republishes
 `state`. An order the broker replays at reconnection (delivered with the RETAIN
-flag) is applied only if it differs from the current state. Orders received
+flag) is applied only if it differs from the current state. The broker also
+sends an order again while it is carried out (it stays retained until then)
+at each new subscription: that copy, RETAIN set and the same payload, is not
+taken a second time; a press that comes live meanwhile is. Orders received
 while PlayGuard is open are applied by PlayGuard, with its policy (*ask* shows
 the usual confirmation on the console).
 

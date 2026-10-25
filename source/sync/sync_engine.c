@@ -254,6 +254,17 @@ static void on_message(void *user, const MqttPublish *msg)
         return;
     }
 
+    // An order stays retained until it is done: a new subscription (a
+    // replay, a new connection) hands it over again, RETAIN 1, while it is
+    // carried out. Already taken. A press while it runs comes live, RETAIN 0.
+    if (msg->retain)
+        for (size_t i = 0; i < SYNC_QUEUE_MAX; i++) {
+            const SyncQueued *q = &e->queue[i];
+            if (q->id && q->in_flight && !strcmp(q->entity, entity) && strlen(q->payload) == msg->payload_len &&
+                !memcmp(q->payload, msg->payload, msg->payload_len))
+                return;
+        }
+
     // The newest order for an entity replaces one still waiting in the queue.
     SyncQueued *slot = NULL;
     for (size_t i = 0; i < SYNC_QUEUE_MAX && !slot; i++)

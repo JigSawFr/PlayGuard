@@ -742,6 +742,47 @@ static void test_async_and_waiting(void)
     CHECK(!retained_order("stop_today") && strstr(last_event(), "command_applied"));
 }
 
+// An order stays retained until it is done, so the broker sends it again
+// while it is carried out: at a replay (PlayGuard opens or closes beside the
+// agent) and at a new connection. Seen on a console: +15 min given twice.
+static void test_replay_in_flight(void)
+{
+    setup(true, SyncPolicy_Auto);
+    turns(3);
+    host.async = true;
+    ha_order("console_lock", "ON");
+    turns(2);
+    CHECK(host.orders == 1 && sync_engine_pending(&engine) == 1);
+    const uint32_t first = host.taken_id;
+    sync_engine_replay_orders(&engine);
+    turns(3);
+    CHECK(host.orders == 1 && sync_engine_pending(&engine) == 1);
+    broker_drop(false);
+    turns(1);
+    now += 6000;
+    turns(3);
+    CHECK(sync_engine_online(&engine) && host.orders == 1 && sync_engine_pending(&engine) == 1);
+
+    // Another value while it runs is another order, and so is a press that
+    // comes live (RETAIN 0) while one with the same payload runs.
+    ha_order("console_lock", "OFF");
+    turns(2);
+    CHECK(host.orders == 2 && !strcmp(host.last_entity, "console_lock") && !host.last_intent.on);
+    const uint32_t second = host.taken_id;
+    broker_publish("playguard/a1b2c3d4/console_lock/set", "OFF", 3, false);
+    turns(2);
+    CHECK(host.orders == 3);
+    const uint32_t third = host.taken_id;
+
+    SyncOutcome out;
+    sync_outcome_init(&out);
+    out.applied = true;
+    sync_engine_order_done(&engine, first, &out);
+    sync_engine_order_done(&engine, second, &out);
+    sync_engine_order_done(&engine, third, &out);
+    CHECK(sync_engine_pending(&engine) == 0 && !retained_order("console_lock"));
+}
+
 static void test_home_assistant_restart_and_discovery_switch(void)
 {
     setup(false, SyncPolicy_Auto);
@@ -1130,6 +1171,7 @@ int main(void)
     test_policy_off();
     test_limits_merged();
     test_async_and_waiting();
+    test_replay_in_flight();
     test_home_assistant_restart_and_discovery_switch();
     test_custom_discovery_prefix();
     test_integration_version();

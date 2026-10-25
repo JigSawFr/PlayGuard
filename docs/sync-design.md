@@ -219,7 +219,9 @@ applies it through the ordinary guarded path (`sync_exec` mirrors
 `/event` says applied or rejected and why → the retained order is **cleared**
 (empty retained publish) so it is used once → the state is republished. An
 order replayed by the broker at reconnection (RETAIN flag set) is applied only
-if it differs from the current state. HA's writable entities are
+if it differs from the current state, and its copy sent again while it is
+carried out (a replay when PlayGuard opens or closes beside the agent, a new
+connection) is not taken twice. HA's writable entities are
 `optimistic`, so a slider moved while the console sleeps keeps its value; the
 `pending_orders` sensor and the events say what is still waiting.
 
