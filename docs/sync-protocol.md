@@ -198,7 +198,8 @@ first, as many as fit in 64 KiB (`complete` says whether all did).
 `total_min` is a game's play time since it was first played, every account
 (the play log's statistics); `version` the installed one, `null` for a game
 no longer installed. Home Assistant's native discovery has the totals; the
-integration adds one sensor per game.
+integration lists every game on *Games installed* (an attribute) and keeps
+each game's history in a long-term statistic, with no sensor per game.
 
 ## `activity`, `activity/<date>`, `names`, `week`
 

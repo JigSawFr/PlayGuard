@@ -87,7 +87,7 @@ handle the topics yourself).
 | Buttons | Sync now, Turn parental controls back on, Extra time +15 / +30 min / +1 h, No more play today, Remove the limit, Export a diagnostic report |
 | Event | Events: every order applied, refused (with the reason) or kept waiting for the console |
 | The console | Model, Console nickname, Region, hekate, System (sysMMC / emuMMC), PRODINFO blanked, Serial number (off, see below), SD card free space and size, Internal storage free space and size, Battery, Charging, Docked, Temperature, Connection, IP address, Wi-Fi signal, Wi-Fi network (off), Last started |
-| Games | Games installed, Play time (all time), User accounts; the integration below adds one sensor per game |
+| Games | Games installed, Play time (all time), User accounts; the integration below lists every game on *Games installed*, with its play time, and keeps each game's history in a long-term statistic |
 
 What a dashboard needs is on; the rest is off in Home Assistant until you turn
 it on, on the device's page (*entities not shown*): Used screen time (play

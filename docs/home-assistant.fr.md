@@ -95,7 +95,7 @@ Assistant* pour gérer les topics vous-même).
 | Boutons | Synchroniser maintenant, Réactiver le contrôle parental, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
 | Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console |
 | La console | Modèle, Surnom de la console, Région, hekate, Système (sysMMC / emuMMC), PRODINFO masqué, Numéro de série (désactivé, voir plus bas), Espace libre et taille de la carte SD, Espace libre et taille du stockage interne, Batterie, En charge, Sur le dock, Température, Connexion, Adresse IP, Signal Wi-Fi, Réseau Wi-Fi (désactivé), Dernier démarrage |
-| Jeux | Jeux installés, Temps de jeu (depuis toujours), Comptes utilisateurs ; l'intégration ci-dessous ajoute un capteur par jeu |
+| Jeux | Jeux installés, Temps de jeu (depuis toujours), Comptes utilisateurs ; l'intégration ci-dessous liste chaque jeu sur *Jeux installés*, avec son temps de jeu, et garde l'historique de chacun dans une statistique à long terme |
 
 Ce qu'un tableau de bord utilise est activé ; le reste est désactivé dans Home
 Assistant jusqu'à ce que vous l'activiez, sur la page de l'appareil (*entités
