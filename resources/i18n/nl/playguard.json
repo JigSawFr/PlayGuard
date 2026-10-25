@@ -805,7 +805,6 @@
         "available": "{} · {} beschikbaar",
         "tile_newer": "{} beschikbaar",
         "tile_behind": "{} versies achter",
-        "tile_current": "Up-to-date",
         "compat": "Compatibiliteit",
         "compat_ok_info": "Deze firmware is gecontroleerd met PlayGuard: alle functies zijn beschikbaar.",
         "mode": "Startmodus",

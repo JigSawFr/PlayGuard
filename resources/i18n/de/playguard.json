@@ -805,7 +805,6 @@
         "available": "{} · {} verfügbar",
         "tile_newer": "{} verfügbar",
         "tile_behind": "{} Versionen zurück",
-        "tile_current": "Aktuell",
         "compat": "Kompatibilität",
         "compat_ok_info": "Diese Firmware wurde mit PlayGuard geprüft: Alle Funktionen sind verfügbar.",
         "mode": "Startmodus",

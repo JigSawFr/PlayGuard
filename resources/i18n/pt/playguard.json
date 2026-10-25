@@ -805,7 +805,6 @@
         "available": "{} · {} disponível",
         "tile_newer": "{} disponível",
         "tile_behind": "{} versões atrasado",
-        "tile_current": "Atualizado",
         "compat": "Compatibilidade",
         "compat_ok_info": "Este firmware foi verificado com o PlayGuard: todas as funções estão disponíveis.",
         "mode": "Modo de execução",
