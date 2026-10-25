@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <switch.h>
@@ -58,6 +59,38 @@ static bool g_emummc;
 
 #define ACTIVITY_EVERY_MS (5 * 60 * 1000ULL)
 #define CONF_CHECK_MS     (30 * 1000ULL)
+
+// Where the loop is, and when it last turned (the system tick): what the
+// watchdog says when a call never returns (seen on a console, the link then
+// showed its last status for hours). Each part that calls a service names
+// itself, and puts back the part it was called from.
+static const char PHASE_LINK[] = "the link (network)";
+static const char PHASE_HANDOVER[] = "the hand-over (network)";
+static const char *volatile g_phase = "start-up";
+static volatile uint64_t g_turn_ms;
+
+static const char *phase(const char *p)
+{
+    const char *was = g_phase;
+    g_phase = p;
+    return was;
+}
+
+// The wall clock read once a turn: a line logged, the watchdog's too, starts
+// with its local time without calling the time service (it may be the call
+// that hangs).
+static volatile u64 g_wall_posix, g_wall_ms;
+static volatile s32 g_wall_offset;   // local time minus UTC, in seconds
+
+static void wall_read(uint64_t now_ms)
+{
+    u64 posix = 0;
+    LocalTime t;
+    if (!time_local_now(&posix, &t)) return;
+    g_wall_offset = (s32)((s64)t.hour * 3600 + t.minute * 60 + t.second - (s64)(posix % 86400));
+    g_wall_ms = now_ms;
+    g_wall_posix = posix;
+}
 
 // A sysmodule: no applet, one fs session, a heap of its own.
 u32 __nx_applet_type = AppletType_None;
@@ -118,7 +151,15 @@ void        agent_ipc_start(void);
 static void slog(const char *fmt, const char *a, const char *b)
 {
     char line[AGENT_LOG_LINE];
-    snprintf(line, sizeof(line), fmt, a ? a : "", b ? b : "");
+    int at = 0;
+    const u64 wall = g_wall_posix;
+    if (wall) {
+        const uint64_t now = sync_now_ms(), read = g_wall_ms;
+        const s64 day = (s64)((wall + (now > read ? (now - read) / 1000 : 0)) % 86400) + g_wall_offset;
+        const unsigned s = (unsigned)((day % 86400 + 86400) % 86400);
+        at = snprintf(line, sizeof(line), "%02u:%02u:%02u ", s / 3600, s / 60 % 60, s % 60);
+    }
+    snprintf(line + at, sizeof(line) - (size_t)at, fmt, a ? a : "", b ? b : "");
     mutexLock(&g_lock);
     agent_log(&g_shared, line);
     mutexUnlock(&g_lock);
@@ -334,7 +375,9 @@ static void read_activity(uint64_t now_ms, bool force)
     g_activity_at = now_ms;
     u64 now = 0;
     Result rc = 0;
+    const char *was = phase("the play log (pdm)");
     g_n_totals = playstats_days(g_totals, PLAYSTATS_MAX, &now, g_day_wday, &g_playing, &g_playing_since, &rc);
+    phase(was);
     g_activity_ok = R_SUCCEEDED(rc);
     g_activity_s = 0;
     for (size_t i = 0; i < g_n_totals; i++) g_activity_s += g_totals[i].today_s;
@@ -412,9 +455,11 @@ static size_t own_state(char *out, size_t cap)
     static PtState pt;
     static PtSample sample;
     static SysInfo si;
+    const char *was = phase("the console's state (pctl)");
     pctl_status_fetch(&st);
     pctl_play_timer_query(&pt);
     pctl_play_timer_sample(&sample);
+    phase(was);
     sysinfo_get(&si);
     bool accurate = false;
     const bool accurate_ok = R_SUCCEEDED(time_network_accuracy(&accurate));
@@ -564,7 +609,9 @@ static void exec_order(const SyncIntent *in, const char *entity, const char *pay
     ctx.profile_days = profile_days;
     ctx.save_records = save_records_first;
     core_set_read_only(!may_write());
+    const char *was = phase("an order (pctl)");
     sync_exec(in, &ctx, out);
+    phase(was);
     if (out->records_changed) save_records();
     if (out->applied && out->changed) append_event(entity, payload, out);
 }
@@ -609,9 +656,11 @@ static size_t host_report(void *ctx, char *out, size_t cap)
     int at = snprintf(out, cap, "=== PlayGuard agent report ===\nagent version: %s\nfirmware: %s\n\n", AGENT_VERSION,
                       g_firmware);
     if (at < 0 || (size_t)at >= cap) return 0;
+    const char *was = phase("a report (time, pctl)");
     time_clock_dump(out + at, cap - (size_t)at);
     at += (int)strlen(out + at);
     if ((size_t)at < cap - 1) pctl_dump(out + at, cap - (size_t)at);
+    phase(was);
     const size_t n = strlen(out);
     // Kept on the SD card as PlayGuard's reports are, named as they are
     // (util/log_files.hpp: report_YYYYMMDD_HHMMSS[_n].txt, local time), so
@@ -699,13 +748,16 @@ static size_t host_system(void *ctx, char *out, size_t cap)
     static char hekate[16];
     static uint64_t space_at;
     sysinfo_get(&si);
+    const char *was = phase("the console's readings (psm, ts, apm, nifm)");
     console_live_read(&live);
     const uint64_t now_ms = sync_now_ms();
     if (!space_at || now_ms - space_at >= SPACE_EVERY_MS) {
         space_at = now_ms ? now_ms : 1;
+        phase("the storage (fs)");
         console_space_read(&sd, &nand);
         if (!console_hekate("sdmc:/", hekate)) hekate[0] = '\0';
     }
+    phase(was);
     mutexLock(&g_lock);
     if (g_shared.app_session && g_shared.app_version[0])
         snprintf(g_app_version, sizeof(g_app_version), "%s", g_shared.app_version);
@@ -751,7 +803,7 @@ static bool sockets_up(void)
         .udp_tx_buf_size = 0,
         .udp_rx_buf_size = 0,
         .sb_efficiency = 1,
-        .num_bsd_sessions = 1,
+        .num_bsd_sessions = 2,   // the watchdog's shutdown() does not wait behind a call that hangs
         .bsd_service_type = BsdServiceType_Auto,
     };
     g_sockets = R_SUCCEEDED(socketInitialize(&cfg));
@@ -777,6 +829,43 @@ static void engine_stop(void)
     if (!g_engine_on) return;
     sync_engine_stop(&g_engine);
     g_engine_on = false;
+}
+
+// The loop not turned for a minute: said once in the log, with where it
+// stopped, and again when it turns. Stopped in the network, the socket is
+// shut down from here (the call then returns, and the link connects again);
+// in a service, nothing can free it from outside, and the log says which.
+#define WATCHDOG_MS 60000ULL
+static Thread g_watchdog;
+
+static void watchdog(void *arg)
+{
+    (void)arg;
+    uint64_t told = 0, prev = 0;
+    for (;;) {
+        svcSleepThread(5000000000ULL);
+        const uint64_t turn = g_turn_ms, now = sync_now_ms();
+        // A round long after the last one (the console slept, and the tick
+        // may have run on): the loop has not had its chance to turn yet.
+        const bool awake = prev && now - prev < 15000;
+        prev = now;
+        if (told && turn != told) {
+            told = 0;
+            slog("the loop turns again%s%s", NULL, NULL);
+        }
+        if (!awake || !turn || now < turn || now - turn < WATCHDOG_MS || told == turn) continue;
+        told = turn;
+        const char *where = g_phase;
+        bool freed = false;
+        if (where == PHASE_LINK || where == PHASE_HANDOVER) {
+            const int fd = g_conf.tls ? g_tls.tcp.fd : g_tcp.fd;
+            freed = fd >= 0 && shutdown(fd, SHUT_RDWR) == 0;
+        }
+        char line[AGENT_LOG_LINE];
+        snprintf(line, sizeof(line), "the loop has not turned for %llu s, stopped in %s%s",
+                 (unsigned long long)((now - turn) / 1000), where, freed ? ": its socket shut down to free it" : "");
+        slog("%s%s", line, NULL);
+    }
 }
 
 static void reload(bool force)
@@ -846,7 +935,10 @@ static void new_day(bool app_session)
         ctx.rec = &g_records;
         core_set_read_only(false);
         SyncOutcome out;
-        if (sync_exec_restore_extra(&ctx, &out) || out.records_changed) {
+        const char *was = phase("the usual limit put back (pctl)");
+        const bool restored = sync_exec_restore_extra(&ctx, &out);
+        phase(was);
+        if (restored || out.records_changed) {
             if (out.records_changed) save_records();
             if (out.applied && out.changed) append_event("restore_extra", "", &out);
             slog("usual limit put back: %s%s", out.applied ? "done" : sync_reason_name(out.reason), NULL);
@@ -973,12 +1065,19 @@ int main(int argc, char **argv)
     load_conf();
     load_records();
     agent_ipc_start();
+    wall_read(sync_now_ms());
+    if (R_SUCCEEDED(threadCreate(&g_watchdog, watchdog, NULL, NULL, 0x2000, 0x2D, -2))) threadStart(&g_watchdog);
     slog("agent %s started, firmware %s", AGENT_VERSION, g_firmware);
 
     for (;;) {
         const uint64_t now = sync_now_ms();
+        g_turn_ms = now;
+        phase("the clock (time)");
+        wall_read(now);
+        phase("the loop");
         if (now - g_conf_checked >= CONF_CHECK_MS) {
             g_conf_checked = now;
+            phase("sync.conf (SD card)");
             reload(false);
         }
         mutexLock(&g_lock);
@@ -995,8 +1094,10 @@ int main(int argc, char **argv)
             slog("resumed for PlayGuard%s%s", NULL, NULL);
         }
         if (g_stopped || !g_conf_ok || !g_conf.enabled || sync_conf_problem(&g_conf)) {
+            phase(PHASE_LINK);
             if (!g_stopped) engine_stop();
             publish_status();
+            phase("waiting (link off)");
             svcSleepThread(1000000000ULL);
             // Requests still come (reload, a new session); results have
             // nowhere to go and wait.
@@ -1010,15 +1111,20 @@ int main(int argc, char **argv)
             }
             continue;
         }
+        phase("the network's start (bsd)");
         if (!sockets_up()) {
             svcSleepThread(5000000000ULL);
             continue;
         }
         if (!g_engine_on) engine_start();
+        phase("the new day");
         new_day(session);
+        phase(PHASE_HANDOVER);
         hand_over();
+        phase(PHASE_LINK);
         const int sleep_ms = sync_engine_step(&g_engine, 500);
         publish_status();
+        phase("waiting");
         if (sleep_ms > 0) svcSleepThread((u64)(sleep_ms > 1000 ? 1000 : sleep_ms) * 1000000ULL);
     }
     return 0;

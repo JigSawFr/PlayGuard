@@ -58,6 +58,7 @@ constexpr int AGENT_POLL_MS = 100;
 // The agent's link turns about every second; a connection's timeouts can
 // hold one turn some twenty seconds. A minute without one: it is stuck.
 constexpr uint64_t AGENT_QUIET_MS = 60000;
+constexpr size_t AGENT_REPORT_LINES = 20;   // the agent's last lines in a report
 constexpr auto PROBE_EVERY = std::chrono::seconds(5);
 constexpr auto INTEGRATION_EVERY = std::chrono::seconds(30);
 constexpr auto SPACE_EVERY = std::chrono::minutes(5);
@@ -1342,7 +1343,16 @@ std::string report_section()
     if (st.agent && st.agent_quiet_ms >= AGENT_QUIET_MS)
         out += fmt::format("agent loop  : last turn {} s ago (stuck: its status below is that old)\n",
                            st.agent_quiet_ms / 1000);
-    if (!st.running) return out + "session     : not running\n";
+    // The agent's last lines, its watchdog's among them: what it did while
+    // PlayGuard was not there to log it.
+    std::string tail;
+    if (st.agent) {
+        const std::vector<std::string> lines = log_lines();
+        for (size_t i = lines.size() > AGENT_REPORT_LINES ? lines.size() - AGENT_REPORT_LINES : 0; i < lines.size(); i++)
+            tail += "  " + without_broker(lines[i], c.host) + "\n";
+        if (!tail.empty()) tail = "agent's log : its last lines, oldest first\n" + tail;
+    }
+    if (!st.running) return out + "session     : not running\n" + tail;
     const SyncStatus& l = st.link;
     out += fmt::format("session     : {} mqtt={} connects={} publishes={} orders={} rejected={} dropped={} pending={}\n",
                        STATES[l.state <= SyncLink_Online ? l.state : 0],
@@ -1351,7 +1361,7 @@ std::string report_section()
     // "cannot find <host>": reports are public, the broker's name is not.
     if (l.error[0]) out += fmt::format("last error  : {}\n", without_broker(l.error, c.host));
     if (l.last_result[0]) out += fmt::format("last order  : {}\n", l.last_result);
-    return out;
+    return out + tail;
 }
 
 }   // namespace sync_flow

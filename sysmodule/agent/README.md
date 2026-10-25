@@ -84,7 +84,9 @@ It links PlayGuard's C service layer and the remote link's core unchanged
 `tests/agent/`) and `source/agent_ipc.c` (the HIPC server).
 
 Program ID `0x4200000000504741`, in the private range homebrew sysmodules use.
-Static heap 1.5 MiB; one TCP socket; TLS through the console's `ssl` service.
+Static heap 1.5 MiB; one TCP socket, on two `bsd` sessions (the watchdog
+shuts it down when a call on it hangs); TLS through the console's `ssl`
+service.
 
 ## Not tested on a console yet
 

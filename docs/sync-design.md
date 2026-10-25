@@ -249,8 +249,15 @@ into long-term statistics.
   handle inbound orders, and at midnight publish yesterday and put back the
   limit extra time raised, if its record still matches (as PlayGuard does:
   "no more play today" and a "no limit" base wait for PlayGuard's question).
-- Two threads: the MQTT loop in 500 ms slices, and the IPC server blocked on
-  `svcReplyAndReceive`, joined by a mailbox under a mutex.
+- Three threads: the MQTT loop in 500 ms slices, and the IPC server blocked on
+  `svcReplyAndReceive`, joined by a mailbox under a mutex; and a watchdog.
+  Each part of the loop that calls a service names itself. When the loop has
+  not turned for a minute, the watchdog logs where it stopped (once, and
+  again when it turns). Stopped in the network, it shuts the socket down
+  from its own `bsd` session (the agent opens two), the call returns and
+  the link connects again; a service call that never returns cannot be freed
+  from outside. The agent's log lines start with the local time, read once a
+  turn, and a report carries the last 20 of them.
 - Sleep: the last will marks the console offline within 45 s. At wake the
   connection is gone, though its socket may still take what is written (seen
   on a console: the agent stayed "online" for hours, the broker heard
