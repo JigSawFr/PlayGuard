@@ -116,7 +116,7 @@ jobs:
             changed=all-but-screens
           fi
           [ "$FORCE" = true ] && changed=all
-          simulator='^(source|resources|web|extern|patches)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|\.github/workflows/web\.yml)$|^tools/web_'
+          simulator='^(source|resources|web|extern)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|\.github/workflows/web\.yml)$|^tools/web_'
           site='^(site|docs|images|branding)/|^resources/i18n/|^tools/(build_site|site_layout|check_site_links)\.py$|^CHANGELOG\.md$|^\.github/workflows/web\.yml$'
           build=0; screens=0; layout=0; release=0
           if [[ "$changed" == all* ]] || grep -qE "$simulator" <<< "$changed"; then build=1; fi
