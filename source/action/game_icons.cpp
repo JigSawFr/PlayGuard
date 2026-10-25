@@ -190,6 +190,14 @@ bool known(u64 app_id)
     return s.textures.count(app_id) || s.icons.contains(app_id) || s.no_icon.count(app_id);
 }
 
+void forget(u64 app_id)
+{
+    s.textures.erase(app_id);
+    s.pixels.erase(app_id);
+    s.no_icon.erase(app_id);
+    s.icons.erase(app_id);
+}
+
 void load(const std::vector<u64>& ids, std::function<void()> done)
 {
     if (!wanted()) return;

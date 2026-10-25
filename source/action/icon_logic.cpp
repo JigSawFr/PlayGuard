@@ -28,6 +28,14 @@ void Lru::put(uint64_t id, std::vector<unsigned char> bytes)
     }
 }
 
+void Lru::erase(uint64_t id)
+{
+    const auto it = this->index.find(id);
+    if (it == this->index.end()) return;
+    this->order.erase(it->second);
+    this->index.erase(it);
+}
+
 std::pair<int, int> fit(int w, int h, int max_side)
 {
     if (w <= 0 || h <= 0 || max_side <= 0 || (w <= max_side && h <= max_side)) return { w, h };

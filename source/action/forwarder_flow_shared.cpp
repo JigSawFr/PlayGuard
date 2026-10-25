@@ -7,6 +7,7 @@
 #include <borealis.hpp>
 
 #include "action/forwarder_flow.hpp"
+#include "action/game_icons.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -230,6 +231,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
     if (R_SUCCEEDED(rc)) {
         made.id = id;
         made.gone = false;   // on the HOME menu again
+        game_icons::forget(id);   // its icon as built now in the lists, not the one read before
         std::string werr;
         if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
         if (kind) history_flow::record_event(kind, "", history_label(made.name, id));

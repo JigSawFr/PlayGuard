@@ -39,6 +39,13 @@ static void test_lru()
     lru.put(6, bytes(6));
     lru.put(7, bytes(7));
     CHECK(lru.contains(4) && !lru.contains(1) && !lru.contains(5));
+    // Erased: gone, room for another; one not kept, nothing.
+    lru.erase(6);
+    CHECK(!lru.contains(6) && lru.get(6) == nullptr && lru.size() == 2);
+    lru.erase(42);
+    CHECK(lru.size() == 2);
+    lru.put(8, bytes(8));
+    CHECK(lru.size() == 3 && lru.contains(4) && lru.contains(7) && lru.contains(8));
 
     // Many more than it keeps: never more than its capacity.
     Lru big(64);
