@@ -76,6 +76,11 @@ void SysNotesActivity::onContentAvailable()
         loading_box->setMarginRight(16);
         top->addView(loading_box.getView(), 1);
     }
+    // Installed (a check) or new (a sparkle) marks the version, right after it.
+    this->mark = new brls::Box(brls::Axis::ROW);
+    this->mark->setAlignSelf(brls::AlignSelf::CENTER);
+    this->mark->setMarginLeft(12);
+    header->addView(this->mark, 2);
     loading_text->setSingleLine(false);
     advice->setSingleLine(false);
     language->setSingleLine(false);
@@ -193,6 +198,7 @@ void SysNotesActivity::fill()
     advice->setText(need);
     ui::set_visible(advice.getView(), !need.empty());
 
+    mark->clearViews();
     tags->clearViews();
     notes->clearViews();
     const bool fetching = sys_notes_flow::fetching(this->which);
@@ -209,7 +215,7 @@ void SysNotesActivity::fill()
         const auto lines = own ? release_notes::bundled() : std::vector<changelog::Line>{};
         if (!lines.empty()) {
             release_notes::current(&date);
-            tags->addView(tag_view({ "", accent, "check" }, 18));
+            mark->addView(tag_view({ "", accent, "check" }, 18));
             header->setTitle(title_of(this->which) + " " + mine);
             header->setSubtitle(date);
             release_notes::fill_release(notes, lines);
@@ -217,18 +223,19 @@ void SysNotesActivity::fill()
         const bool english = text::starts_with(live_prefs::locale(), "en");
         ui::set_visible_all({ { header.getView(), !lines.empty() },
                               { language.getView(), !lines.empty() && !english },
-                              { tags.getView(), !lines.empty() } });
+                              { tags.getView(), false } });
         empty->setText(fetching ? "playguard/sys_notes/fetching"_i18n : "playguard/sys_notes/none"_i18n);
         ui::set_visible(empty.getView(), !fetching && lines.empty());
     } else {
         const sys_notes::Release& r = list.releases[this->shown[this->tab]];
         this->page = r.page;
-        // Tags: installed (a check) or newer (a sparkle); what it supports; for the firmware, security
-        // fixes and a change to the parental-control service.
+        // Installed (a check) or newer (a sparkle), beside the version; tags:
+        // what it supports; for the firmware, security fixes and a change to
+        // the parental-control service.
         if ((int)this->shown[this->tab] == installed_at)
-            tags->addView(tag_view({ "", accent, "check" }, 18));
+            mark->addView(tag_view({ "", accent, "check" }, 18));
         else if (!mine.empty() && this->tab >= newer_from)
-            tags->addView(tag_view({ "", cadran::kit::color("cadran/amber"), "sparkle" }, 18));
+            mark->addView(tag_view({ "", cadran::kit::color("cadran/amber"), "sparkle" }, 18));
         if (!r.supports.empty())
             tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), cadran::kit::color("cadran/text2") }, 18));
         if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, cadran::kit::color("cadran/amber") }, 18));
