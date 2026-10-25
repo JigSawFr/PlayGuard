@@ -39,6 +39,11 @@ int placeholder();
 // The game has no icon to read, or it is read already.
 bool known(u64 app_id);
 
+// Its icon read again next time: a forwarder made again (another icon, the
+// protected one's badge) has a new one under the same ID. Its old texture is
+// not freed (a cell of another screen may still draw it): a few in a run.
+void forget(u64 app_id);
+
 // Reads the icons of `ids` not read yet, off the main thread (one read at a
 // time: asked meanwhile, the next read takes them). `done` runs on the UI
 // thread once icons arrive; only the last caller's is kept (it checks that

@@ -29,6 +29,8 @@ class Lru
     bool contains(uint64_t id) const { return this->index.count(id) != 0; }
     // Kept as the most recently used (replacing what `id` had).
     void put(uint64_t id, std::vector<unsigned char> bytes);
+    // No longer kept (nothing when it was not).
+    void erase(uint64_t id);
     size_t size() const { return this->index.size(); }
 
   private:
