@@ -3,6 +3,8 @@
 
 #include <borealis.hpp>
 
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_logic.hpp"
 #include "action/hbmenu_lock.hpp"
@@ -12,7 +14,6 @@
 #include "core/hbl_lock.h"
 #include "core/pctl_ops.h"
 #include "core/sysinfo.h"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"

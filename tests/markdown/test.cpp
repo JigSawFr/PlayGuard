@@ -4,11 +4,12 @@
 // GitHub-flavoured Markdown as blocks
 // (headings, paragraphs and their line breaks, lists, tasks, code, quotes and
 // alerts, rules, tables, HTML, inline marks, entities, emoji) with its bounds.
-#include "check.h"
 #include <string>
 
-#include "util/markdown.hpp"
-#include "util/safe_text.hpp"
+#include <borealis/cadran/util/markdown.hpp>
+#include <borealis/cadran/util/safe_text.hpp>
+
+#include "check.h"
 
 using markdown::Block;
 

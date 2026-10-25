@@ -4,13 +4,14 @@
 #include <cctype>
 #include <cstdlib>
 
+#include <borealis/cadran/ui/live_prefs.hpp>
+#include <borealis/cadran/util/text.hpp>
+
 #include "core/platform.h"
 #include "core/sim_env.h"
-#include "ui/live_prefs.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
-#include "util/text.hpp"
 
 #ifndef APP_VERSION
 #define APP_VERSION "0.0.0-dev"

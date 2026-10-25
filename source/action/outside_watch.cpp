@@ -101,7 +101,7 @@ void observe(const PtState& pt)
     if (f.reset) history_flow::record_event("outside_reset", "", ob.hm);
     if (f.clock) {
         const int64_t m = f.clock_moved_s < 0 ? -f.clock_moved_s : f.clock_moved_s;
-        history_flow::record_event("outside_clock", "", (f.clock_moved_s < 0 ? "−" : "+") + ui::fmt_play_time((uint64_t)m));
+        history_flow::record_event("outside_clock", "", (f.clock_moved_s < 0 ? "−" : "+") + ui::fmt_duration((uint64_t)m));
     }
     if (f.limits)
         history_flow::record_values("outside_limits", history_flow::days_values(f.limits_before),

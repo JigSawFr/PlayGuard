@@ -10,10 +10,11 @@
 
 #include <borealis.hpp>
 
+#include <borealis/cadran/view/cadran_digits.hpp>
+#include <borealis/cadran/view/cadran_icon.hpp>
+
 #include "action/session_pause.hpp"
 #include "util/pctl_ops_c.hpp"
-#include "view/cadran_digits.hpp"
-#include "view/cadran_icon.hpp"
 #include "view/pt_ring.hpp"
 
 class CadranChildActivity : public brls::Activity

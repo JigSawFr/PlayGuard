@@ -6,12 +6,13 @@
 #include <limits>
 #include <string>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+
 #include "action/game_icons.hpp"
 #include "action/games_logic.hpp"
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
-#include "ui/cadran_list.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/config.hpp"
@@ -339,7 +340,7 @@ void GamesActivity::add_more()
 
 void GamesActivity::fill(Entry& e, const GameStat& g) const
 {
-    const std::string time = ui::fmt_play_time(activity_summary::value(g, this->period));
+    const std::string time = ui::fmt_duration(activity_summary::value(g, this->period));
     if (e.tile) {
         e.tile->set_name(play_data::game_name(g));
         e.tile->set_detail(time);
@@ -369,7 +370,7 @@ void GamesActivity::select(size_t i)
 
 void GamesActivity::show_selected(const GameStat* g)
 {
-    const std::string na = "playguard/common/unavailable"_i18n;
+    const std::string na = "cadran/common/unavailable"_i18n;
     icon->clear();
     if (!g) {
         name->setText(" ");
@@ -382,8 +383,8 @@ void GamesActivity::show_selected(const GameStat* g)
     name->setText(play_data::game_name(*g));
     const bool known = this->period == activity_summary::AllTime ? g->totals_ok
                                                                   : this->data && activity_summary::period_read(*this->data, this->period);
-    period_value->setText(known ? ui::fmt_play_time(activity_summary::value(*g, this->period)) : na);
-    total->setText(g->totals_ok ? ui::fmt_play_time(g->total_s) : na);
+    period_value->setText(known ? ui::fmt_duration(activity_summary::value(*g, this->period)) : na);
+    total->setText(g->totals_ok ? ui::fmt_duration(g->total_s) : na);
     launches->setText(g->totals_ok ? std::to_string(g->launches) : na);
     last->setText(g->totals_ok && g->last_played ? ui::time_text(g->last_played) : "—");
     bool owned = false;

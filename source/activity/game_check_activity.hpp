@@ -29,10 +29,11 @@
 #include <string>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/view/loading_bar.hpp>
+
 #include "action/game_verify_flow.hpp"
-#include "ui/cadran_kit.hpp"
 #include "view/cover_strip.hpp"
-#include "view/loading_bar.hpp"
 #include "util/game_cache.hpp"
 
 #include "util/pctl_ops_c.hpp"

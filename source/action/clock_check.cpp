@@ -44,7 +44,7 @@ void at_start()
                 notices::clear("clock_off");
                 return;
             }
-            const std::string text = brls::getStr("playguard/clock/start_off", ui::fmt_play_time((uint64_t)off), server);
+            const std::string text = brls::getStr("playguard/clock/start_off", ui::fmt_duration((uint64_t)off), server);
             ui::notify(text);
             // Kept in the bell after the toast, until put away.
             notices::set("clock_off", notices::Level::Info, "playguard/notices/clock"_i18n, text,

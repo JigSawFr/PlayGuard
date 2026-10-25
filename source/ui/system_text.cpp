@@ -2,7 +2,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include "ui/cadran_kit.hpp"
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "util/diagnostics.hpp"
 #include "util/paths.hpp"
 #include "util/prodinfo.hpp"
@@ -89,13 +90,13 @@ std::string blank_text(const SysInfo& info, NVGcolor* color)
 {
     if (!info.blank_valid) {
         if (color) *color = cadran::kit::color("cadran/text2");
-        return "playguard/common/unavailable"_i18n;
+        return "cadran/common/unavailable"_i18n;
     }
     if (color) *color = info.blank ? cadran::kit::color("cadran/teal") : (serial_warning(info) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    if (!info.blank) return "playguard/common/no"_i18n;
+    if (!info.blank) return "cadran/common/no"_i18n;
     // With what the system sees instead.
     return info.serial_valid && info.serial[0] ? brls::getStr("playguard/tools/blank_yes", std::string(info.serial))
-                                               : "playguard/common/yes"_i18n;
+                                               : "cadran/common/yes"_i18n;
 }
 
 const RealSerial& real_serial(const SysInfo& info)
@@ -135,7 +136,7 @@ const RealSerial& real_serial(const SysInfo& info)
 std::string serial_text(const SysInfo& info)
 {
     const std::string& s = real_serial(info).serial;
-    if (s.empty()) return "playguard/common/unavailable"_i18n;
+    if (s.empty()) return "cadran/common/unavailable"_i18n;
     if (s.size() < 8) return s;
     // Keep the prefix (model / region) and the last two digits; the whole
     // number is in the note (Ⓐ).

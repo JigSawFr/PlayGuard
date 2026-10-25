@@ -21,8 +21,9 @@
 #include <borealis.hpp>
 #include <vector>
 
+#include <borealis/cadran/view/loading_bar.hpp>
+
 #include "util/sys_notes.hpp"
-#include "view/loading_bar.hpp"
 
 class SysNotesActivity : public brls::Activity
 {

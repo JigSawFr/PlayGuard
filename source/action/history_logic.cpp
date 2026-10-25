@@ -4,8 +4,9 @@
 #include <algorithm>
 #include <string>
 
+#include <borealis/cadran/util/text.hpp>
+
 #include "util/date.hpp"
-#include "util/text.hpp"
 
 namespace history_logic
 {

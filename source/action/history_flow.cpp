@@ -7,6 +7,11 @@
 #include <borealis.hpp>
 #include <fmt/format.h>
 
+#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <borealis/cadran/ui/cadran_text.hpp>
+#include <borealis/cadran/util/text.hpp>
+#include <borealis/cadran/view/footer_hints.hpp>
+
 #include "action/data_notice.hpp"
 #include "action/history_logic.hpp"
 #include "action/notices.hpp"
@@ -14,13 +19,9 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "app.hpp"
-#include "ui/cadran_text.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
-#include "util/text.hpp"
-#include "view/footer_hints.hpp"
 
 using namespace brls::literals;
 
@@ -254,7 +255,7 @@ static std::string plain_title(const history::Entry& e)
     if (days.size() == 1) {
         const int d = days[0];
         return brls::getStr("playguard/history/title_day_change", kind_label(e.kind), ui::day_name_in_text(d),
-                            ui::fmt_minutes((uint16_t)e.before[d]), ui::fmt_minutes((uint16_t)e.after[d]));
+                            ui::fmt_limit((uint16_t)e.before[d]), ui::fmt_limit((uint16_t)e.after[d]));
     }
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty() && !after.empty())
@@ -291,8 +292,8 @@ std::string details(const history::Entry& e)
     if (!days.empty()) {
         out += "\n\n" + "playguard/history/days_changed"_i18n;
         for (int d : days)
-            out += "\n" + brls::getStr("playguard/history/day_change", ui::day_name(d), ui::fmt_minutes((uint16_t)e.before[d]),
-                                        ui::fmt_minutes((uint16_t)e.after[d]));
+            out += "\n" + brls::getStr("playguard/history/day_change", ui::day_name(d), ui::fmt_limit((uint16_t)e.before[d]),
+                                        ui::fmt_limit((uint16_t)e.after[d]));
     }
     if (!e.result.empty())
         out += "\n\n" + brls::getStr("playguard/history/failed_note", ui::rc_text(result_of(e), false));

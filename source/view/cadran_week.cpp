@@ -5,9 +5,10 @@
 #include <cstdlib>
 #include <fmt/format.h>
 
+#include <borealis/cadran/ui/effects.hpp>
+#include <borealis/cadran/ui/motion.hpp>
+
 #include "action/pt_logic.hpp"
-#include "ui/effects.hpp"
-#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -246,7 +247,7 @@ void CadranWeekView::set_edit(bool on)
     // changes are saved with + or Save, not by it.
     for (int d = 0; d < 7; d++)
         this->cols[d].box->updateActionHint(
-            brls::BUTTON_A, on ? brls::getStr("playguard/cadran/week/done_day", brls::getStr(fmt::format("playguard/days_lower/{}", d)))
+            brls::BUTTON_A, on ? brls::getStr("playguard/cadran/week/done_day", brls::getStr(fmt::format("cadran/days_lower/{}", d)))
                                : "playguard/cadran/week/edit"_i18n);
     brls::Application::getGlobalHintsUpdateEvent()->fire();
     this->render();

@@ -21,11 +21,12 @@
 #include <memory>
 #include <vector>
 
-#include "ui/cadran_list.hpp"
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+#include <borealis/cadran/view/cadran_digits.hpp>
+
 #include "tab/tab_base.hpp"
-#include "ui/cadran_kit.hpp"
 #include "util/pctl_ops_c.hpp"
-#include "view/cadran_digits.hpp"
 #include "view/play_days.hpp"
 #include "view/play_hours.hpp"
 

@@ -7,10 +7,12 @@
 #include <memory>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/util/text.hpp>
+
 #include "action/github_login_flow.hpp"
 #include "action/notices.hpp"
 #include "app.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -20,7 +22,6 @@
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
-#include "util/text.hpp"
 
 using namespace brls::literals;
 

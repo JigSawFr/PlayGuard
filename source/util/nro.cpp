@@ -8,8 +8,8 @@
 #include <cstdio>
 #include <cstring>
 
-#include "util/text.hpp"
-#include "util/utf8.hpp"
+#include <borealis/cadran/util/text.hpp>
+#include <borealis/cadran/util/utf8.hpp>
 
 namespace nro
 {

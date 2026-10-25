@@ -3,11 +3,12 @@
 
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/onboarding_activity.hpp"
-#include "ui/cadran_frame.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -51,8 +52,8 @@ PreferencesTab::PreferencesTab()
         // Automatic as Text size's (full on the TV), full, and still.
         const std::vector<std::string> icons = { "tv", "sparkle", "pause" };
         static_assert(sizeof(config::EFFECTS) / sizeof(config::EFFECTS[0]) == 3, "an icon for each choice");
-        ui::pick("playguard/prefs/effects"_i18n, labels, index_of(config::EFFECTS, config::get().effects), [this](int i) {
-            config::get().effects = config::EFFECTS[i];   // the next frame draws by it
+        ui::pick("playguard/prefs/effects"_i18n, labels, index_of(config::EFFECTS, config::get().look.effects), [this](int i) {
+            config::get().look.effects = config::EFFECTS[i];   // the next frame draws by it
             ui::save_config();
             this->refresh();
         }, true, {}, icons);
@@ -61,16 +62,7 @@ PreferencesTab::PreferencesTab()
 
     // The main screen's sidebar: open, on its icons, or folding by itself.
     rail->registerClickAction([this](brls::View*) {
-        std::vector<std::string> labels;
-        for (const char* r : config::RAILS) labels.push_back(brls::getStr(std::string("playguard/prefs/rail_values/") + r));
-        const std::vector<std::string> icons = { "rail-auto", "rail-open", "rail-icons" };
-        static_assert(sizeof(config::RAILS) / sizeof(config::RAILS[0]) == 3, "an icon for each choice");
-        ui::pick("playguard/prefs/rail"_i18n, labels, index_of(config::RAILS, config::get().rail), [this](int i) {
-            config::get().rail = config::RAILS[i];
-            ui::save_config();
-            cadran::apply_rail();   // at once, this tab wider or narrower
-            this->refresh();
-        }, true, {}, icons);
+        ui::pick_rail(this->refresher());
         return true;
     });
 
@@ -151,8 +143,8 @@ void PreferencesTab::refresh()
     language->setDetailText(ui::language_name(true));
     theme->setDetailText(ui::theme_name(true));
     text_size->setDetailText(ui::text_size_name(true));
-    effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.effects)])));
-    rail->setDetailText(brls::getStr("playguard/prefs/rail_values/" + std::string(config::RAILS[index_of(config::RAILS, cfg.rail)])));
+    effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.look.effects)])));
+    rail->setDetailText(ui::rail_name());
     start_tab->setDetailText(tab_name(config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
     notices_system->setOn(cfg.notices_system, false);

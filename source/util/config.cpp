@@ -124,12 +124,12 @@ bool account_key_ok(const std::string& s)
 void sanitize(Config& c)
 {
     bool language_ok = false;
-    for (const char* l : LANGUAGES) language_ok |= c.language == l;
-    if (!language_ok) c.language = "system";
-    one_of(c.theme, { "system", "light", "dark" }, "dark");
-    one_of(c.text_size, { "auto", "normal", "large" }, "auto");
-    one_of(c.effects, { "auto", "full", "reduced" }, "auto");
-    one_of(c.rail, { "auto", "open", "icons" }, "auto");
+    for (const char* l : LANGUAGES) language_ok |= c.look.language == l;
+    if (!language_ok) c.look.language = "system";
+    one_of(c.look.theme, { "system", "light", "dark" }, "dark");
+    one_of(c.look.text_size, { "auto", "normal", "large" }, "auto");
+    one_of(c.look.effects, { "auto", "full", "reduced" }, "auto");
+    one_of(c.look.rail, { "auto", "open", "icons" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
@@ -306,11 +306,11 @@ static void load_shared()
     s_loaded = Loaded::Read;
 
     Config& c = s_config;
-    read_string(j, "language", c.language);
-    read_string(j, "theme", c.theme);
-    read_string(j, "text_size", c.text_size);
-    read_string(j, "effects", c.effects);
-    read_string(j, "rail", c.rail);
+    read_string(j, "language", c.look.language);
+    read_string(j, "theme", c.look.theme);
+    read_string(j, "text_size", c.look.text_size);
+    read_string(j, "effects", c.look.effects);
+    read_string(j, "rail", c.look.rail);
     read_string(j, "ntp_server", c.ntp_server);
     read_bool(j, "advanced", c.advanced);
     read_bool(j, "auto_relock", c.auto_relock);
@@ -318,7 +318,7 @@ static void load_shared()
     read_bool(j, "dev_mode", c.dev_mode);
     read_bool(j, "pt_log", c.pt_log);
     read_bool(j, "frame_stats", c.frame_stats);
-    read_bool(j, "cadran_glow", c.cadran_glow);
+    read_bool(j, "cadran_glow", c.look.glow);
     read_string(j, "update_via", c.update_via);
     read_bool(j, "update_daily", c.update_daily);
     read_string(j, "update_checked", c.update_checked);
@@ -419,11 +419,11 @@ bool snapshot(Snapshot& snap)
     };
     nlohmann::json j;
     j["schema"]          = SCHEMA;
-    j["language"]        = s_config.language;
-    j["theme"]           = s_config.theme;
-    j["text_size"]       = s_config.text_size;
-    j["effects"]         = s_config.effects;
-    j["rail"]            = s_config.rail;
+    j["language"]        = s_config.look.language;
+    j["theme"]           = s_config.look.theme;
+    j["text_size"]       = s_config.look.text_size;
+    j["effects"]         = s_config.look.effects;
+    j["rail"]            = s_config.look.rail;
     j["ntp_server"]      = s_config.ntp_server;
     j["custom_servers"]  = s_config.custom_servers;
     j["advanced"]        = s_config.advanced;
@@ -432,7 +432,7 @@ bool snapshot(Snapshot& snap)
     j["dev_mode"]        = s_config.dev_mode;
     j["pt_log"]          = s_config.pt_log;
     j["frame_stats"]     = s_config.frame_stats;
-    j["cadran_glow"]     = s_config.cadran_glow;
+    j["cadran_glow"]     = s_config.look.glow;
     j["update_via"]      = s_config.update_via;
     j["update_daily"]    = s_config.update_daily;
     j["update_checked"]  = s_config.update_checked;

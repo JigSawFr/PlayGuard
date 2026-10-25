@@ -3,6 +3,11 @@
 
 #include <algorithm>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+#include <borealis/cadran/ui/cadran_text.hpp>
+#include <borealis/cadran/view/cadran_icon.hpp>
+
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_text.hpp"
 #include "action/game_icons.hpp"
@@ -10,15 +15,11 @@
 #include "activity/forwarders_pickers.hpp"
 #include "activity/icon_sheet.hpp"
 #include "app.hpp"
-#include "ui/cadran_list.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_text.hpp"
 #include "ui/format_text.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 #include "util/paths.hpp"
-#include "view/cadran_icon.hpp"
 #include "view/game_cell.hpp"
 
 #include <yoga/Yoga.h>

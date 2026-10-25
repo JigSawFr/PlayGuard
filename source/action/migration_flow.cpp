@@ -6,8 +6,9 @@
 #include <string>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_text.hpp>
+
 #include "app.hpp"
-#include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"

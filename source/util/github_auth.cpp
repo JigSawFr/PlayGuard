@@ -7,9 +7,10 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include <borealis/cadran/util/text.hpp>
+
 #include "util/json_util.hpp"
 #include "util/paths.hpp"
-#include "util/text.hpp"
 
 namespace github_auth
 {

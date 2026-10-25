@@ -6,9 +6,10 @@
 #include <borealis.hpp>
 #include <fmt/format.h>
 
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/history_flow.hpp"
 #include "action/pt_logic.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -123,7 +124,7 @@ static std::vector<DaySet> day_sets()
                                  { pt_logic::WEEKEND, "playguard/play_timer/bedtime_weekend"_i18n } };
     for (int i = 0; i < 7; i++) {
         const int d = (i + 1) % 7;   // Monday first
-        sets.push_back({ (uint8_t)(1u << d), brls::getStr(fmt::format("playguard/days/{}", d)) });
+        sets.push_back({ (uint8_t)(1u << d), brls::getStr(fmt::format("cadran/days/{}", d)) });
     }
     return sets;
 }

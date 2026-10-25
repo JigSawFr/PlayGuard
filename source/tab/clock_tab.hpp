@@ -12,11 +12,12 @@
 #include <memory>
 #include <string>
 
+#include <borealis/cadran/ui/cadran_list.hpp>
+#include <borealis/cadran/view/cadran_digits.hpp>
+
 #include "action/clock_flow.hpp"
-#include "ui/cadran_list.hpp"
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
-#include "view/cadran_digits.hpp"
 
 class ClockTab : public TabBase
 {

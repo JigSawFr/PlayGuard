@@ -1,15 +1,16 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/about_tab.hpp"
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/view/cadran_digits.hpp>
+
 #include "action/sys_notes_flow.hpp"
 #include "action/update_flow.hpp"
 #include "app.hpp"
 #include "tab/help_tab.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
-#include "view/cadran_digits.hpp"
 #include "view/funding.hpp"
 
 using namespace brls::literals;

@@ -8,6 +8,8 @@
 #include <map>
 #include <sys/statvfs.h>
 
+#include <borealis/cadran/util/text.hpp>
+
 #include "action/backup_flow.hpp"
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
@@ -29,7 +31,6 @@
 #include "util/config.hpp"
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
-#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -478,18 +479,18 @@ void note_play_data(const PtState& pt)
     const auto& cfg = config::get();
     const activity_summary::Summary week = activity_summary::summarize(*stats, activity_summary::Week);
     if (notice_logic::week_due(week.known, week.total_s, cfg.summary_seen, ui::today_date())) {
-        std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_play_time(week.per_day_s));
+        std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_duration(week.per_day_s));
         // Against the 7 days before, as on Activity.
         using activity_summary::Trend;
         const auto trend = activity_summary::week_trend(*stats);
         if (trend.known)
-            detail += " " + (trend.trend == Trend::More   ? brls::getStr("playguard/notices/week_more", ui::fmt_minutes(trend.amount_min))
-                             : trend.trend == Trend::Less ? brls::getStr("playguard/notices/week_less", ui::fmt_minutes(trend.amount_min))
+            detail += " " + (trend.trend == Trend::More   ? brls::getStr("playguard/notices/week_more", ui::fmt_limit(trend.amount_min))
+                             : trend.trend == Trend::Less ? brls::getStr("playguard/notices/week_less", ui::fmt_limit(trend.amount_min))
                                                           : "playguard/notices/week_same"_i18n);
         if (week.top >= 0 && stats->games[week.top].name[0])
             detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
-                                          ui::fmt_play_time(week.top_s));
-        set("week", Level::Info, brls::getStr("playguard/notices/week", ui::fmt_play_time(week.total_s)), detail,
+                                          ui::fmt_duration(week.top_s));
+        set("week", Level::Info, brls::getStr("playguard/notices/week", ui::fmt_duration(week.total_s)), detail,
             open_label("activity"), []() {
                 config::get().summary_seen = ui::today_date();
                 ui::save_config();
@@ -563,7 +564,7 @@ void note_crash()
     // The file's line: when, the version, what was thrown.
     std::string text;
     if (paths::read_file(paths::crashes_dir() + "/" + newest, text)) text = text.substr(0, text.find('\n'));
-    set("crash", Level::Info, "playguard/notices/crash"_i18n, text, "playguard/notices/send_report"_i18n, []() {
+    set("crash", Level::Info, "playguard/notices/crash"_i18n, text, "cadran/notices/send_report"_i18n, []() {
         dismiss("crash");
         upload_flow::choose();
     });

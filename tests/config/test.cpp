@@ -38,7 +38,7 @@ static void test_defaults()
     std::remove(paths::config_file().c_str());
     config::load();
     const auto& c = config::get();
-    CHECK(c.language == "system" && c.theme == "dark" && c.auto_relock && !c.dev_mode && !c.pt_log);
+    CHECK(c.look.language == "system" && c.look.theme == "dark" && c.auto_relock && !c.dev_mode && !c.pt_log);
     CHECK(!c.extra_auto_restore);
     CHECK(c.extra_weekday == -1 && !c.relock_pending && c.fw_gate_choice.empty());
     CHECK(c.update_via.empty() && c.update_latest.empty());   // the update method: asked the first time
@@ -48,7 +48,7 @@ static void test_defaults()
         write_config(bad);
         config::get().dev_mode = true;
         config::load();
-        CHECK(!config::get().dev_mode && config::get().language == "system");
+        CHECK(!config::get().dev_mode && config::get().look.language == "system");
         CHECK(config::loaded() == config::Loaded::PutAside);
     }
     std::remove(paths::config_file().c_str());
@@ -125,7 +125,7 @@ static void test_fields()
                     "custom_servers": ["a.example", 7, "b.example"]})");
     config::load();
     auto c = config::get();
-    CHECK(c.language == "system" && c.theme == "dark" && !c.dev_mode && !c.auto_relock && !c.pt_log);
+    CHECK(c.look.language == "system" && c.look.theme == "dark" && !c.dev_mode && !c.auto_relock && !c.pt_log);
     CHECK(c.fw_gate_fw == "24.0.0" && c.fw_gate_app == "1.0.0" && c.fw_gate_choice == "risk");
     CHECK(c.extra_weekday == 3 && c.extra_date == "2026-10-06" && c.extra_base == 60 && c.extra_value == 90);
     CHECK(c.bonus_weekday == 6 && c.bonus_date == "2026-10-10" && c.bonus_base == 180 && c.bonus_value == 240);
@@ -139,7 +139,7 @@ static void test_fields()
                     "fw_gate_app": "1.0.0", "fw_gate_choice": "maybe"})");
     config::load();
     c = config::get();
-    CHECK(c.language == "system" && c.theme == "dark" && c.update_via.empty());
+    CHECK(c.look.language == "system" && c.look.theme == "dark" && c.update_via.empty());
     CHECK(c.fw_gate_choice.empty() && c.fw_gate_fw.empty() && c.fw_gate_app.empty());
 
     // The extra-time record is all or nothing: a base of -1 would otherwise
@@ -215,8 +215,8 @@ static void test_round_trip()
 {
     config::Config& c = config::get();
     c = config::Config{};
-    c.language = "fr";
-    c.theme = "light";
+    c.look.language = "fr";
+    c.look.theme = "light";
     c.ntp_server = "fr.pool.ntp.org";
     c.custom_servers = { "time.example" };
     c.dev_mode = true;
@@ -234,7 +234,7 @@ static void test_round_trip()
     CHECK(paths::read_file(paths::config_file(), text) && text.find("\"schema\": 1") != std::string::npos);
     c = config::Config{};
     config::load();
-    CHECK(c.language == "fr" && c.theme == "light" && c.ntp_server == "fr.pool.ntp.org");
+    CHECK(c.look.language == "fr" && c.look.theme == "light" && c.ntp_server == "fr.pool.ntp.org");
     CHECK(c.custom_servers.size() == 1 && c.dev_mode && c.pt_log && c.relock_pending);
     CHECK(c.extra_weekday == 0 && c.extra_base == 120 && c.extra_value == 150 && c.extra_auto_restore);
     CHECK(!c.intro);
@@ -285,7 +285,7 @@ static void test_preferences()
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again && !d.pin_pauses);
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
-    CHECK(d.effects == "auto");
+    CHECK(d.look.effects == "auto");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
@@ -330,15 +330,15 @@ static void test_preferences()
     CHECK(c.logs_keep == 0 && c.logs_keep_days == 30 && c.logs_keep_mb == 5);
     CHECK(c.start_tab == "activity" && c.extra_amounts == std::vector<int>({ 30, 60, 90 }));
     CHECK(c.activity_period == 3 && !c.games_grid && c.check_grid && c.export_format == 3 && c.backup_keep == 10);
-    CHECK(c.effects == "full" && c.rail == "icons");
+    CHECK(c.look.effects == "full" && c.look.rail == "icons");
     CHECK(c.activity_account == "0123456789ABCDEF0123456789ABCDEF" && c.activity_account_last.empty());
     write_config(R"({"effects": "reduced"})");
     config::load();
-    CHECK(config::get().effects == "reduced");
-    CHECK(config::get().rail == "auto");   // missing: the default
+    CHECK(config::get().look.effects == "reduced");
+    CHECK(config::get().look.rail == "auto");   // missing: the default
     write_config(R"({"rail": "open"})");
     config::load();
-    CHECK(config::get().rail == "open");
+    CHECK(config::get().look.rail == "open");
     CHECK(c.update_daily && c.update_checked == "2026-10-07" && c.clock_check_at_start);
 
     // Anything else goes back to the default: no 7-minute keep, no 999-minute
@@ -355,7 +355,7 @@ static void test_preferences()
     CHECK(c.logs_keep == 20 && c.logs_keep_days == 0 && c.logs_keep_mb == 0);
     CHECK(c.start_tab == "dashboard" && c.extra_amounts == std::vector<int>({ 15, 30, 60 }));
     CHECK(c.activity_period == 1 && c.export_format == 0 && c.backup_keep == 0 && c.update_checked.empty());
-    CHECK(c.effects == "auto" && c.rail == "auto");
+    CHECK(c.look.effects == "auto" && c.look.rail == "auto");
     CHECK(c.activity_account == "last" && c.activity_account_last.empty());
     // The tabs that became Console: the network clock and the console part of Tools.
     for (const char* old_tab : { "clock", "tools" }) {
@@ -423,13 +423,13 @@ static void test_tmp_recovery()
 {
     // Stopped after removing config.json, before renaming config.json.tmp.
     config::get() = config::Config{};
-    config::get().theme = "dark";
+    config::get().look.theme = "dark";
     CHECK(save_config());
     const std::string file = paths::config_file();
     CHECK(std::rename(file.c_str(), (file + ".tmp").c_str()) == 0);
     config::get() = config::Config{};
     config::load();
-    CHECK(config::get().theme == "dark");
+    CHECK(config::get().look.theme == "dark");
 
     // The next save must not truncate that .tmp, the only good copy: it is
     // promoted first, and a save that fails afterwards still leaves it.
@@ -458,7 +458,7 @@ static void test_tmp_recovery()
     write_config(R"({"theme": "light"})");
     CHECK(paths::atomic_write(file + ".tmp", R"({"theme": "dark"})"));
     config::load();
-    CHECK(config::get().theme == "light");
+    CHECK(config::get().look.theme == "light");
 
     // Both missing: nothing to read.
     std::remove(file.c_str());
@@ -472,7 +472,7 @@ static void test_tmp_recovery()
     CHECK(!paths::read_file(file, text) && !paths::exists_or_pending(file) && !paths::file_exists(file));
     config::get() = config::Config{};
     config::load();
-    CHECK(config::loaded() == config::Loaded::Missing && config::get().theme == "dark");
+    CHECK(config::loaded() == config::Loaded::Missing && config::get().look.theme == "dark");
     CHECK(paths::atomic_write(file, R"({"theme": "dark"})"));
     CHECK(paths::read_file(file, text) && text == R"({"theme": "dark"})");
     CHECK(!exists(file + ".part") && !exists(file + ".tmp"));
@@ -501,7 +501,7 @@ static void test_systems()
     write_config(R"({"theme": "dark", "console_lock": true, "relock_pending": true,
                     "console_lock_prev": [60, 60, 60, 60, 60, 60, 60]})");
     config::load();
-    CHECK(config::get().console_lock && config::get().relock_pending && config::get().theme == "dark");
+    CHECK(config::get().console_lock && config::get().relock_pending && config::get().look.theme == "dark");
     CHECK(save_config());
     std::string text;
     CHECK(paths::read_file(paths::config_file(), text));
@@ -513,24 +513,24 @@ static void test_systems()
     // Another system: the shared preferences, none of the first one's state.
     paths::set_nand("emummc");
     config::load();
-    CHECK(config::get().theme == "dark" && !config::get().console_lock && !config::get().relock_pending);
+    CHECK(config::get().look.theme == "dark" && !config::get().console_lock && !config::get().relock_pending);
     CHECK(config::get().console_lock_prev.empty());
     config::get().fw_gate_fw = "24.0.0", config::get().fw_gate_app = "1.0.0", config::get().fw_gate_choice = "probe";
-    config::get().theme = "light";
+    config::get().look.theme = "light";
     CHECK(save_config());
 
     // Back on the first: its own state, the preference changed on the other.
     paths::set_nand("sysmmc");
     config::load();
     CHECK(config::get().console_lock && config::get().relock_pending && config::get().console_lock_prev.size() == 7);
-    CHECK(config::get().fw_gate_choice.empty() && config::get().theme == "light");
+    CHECK(config::get().fw_gate_choice.empty() && config::get().look.theme == "light");
 
     // A damaged state.json: put aside, said like config.json, this system's
     // state from its defaults, the preferences kept.
     CHECK(paths::atomic_write(paths::state_file(), "{ half"));
     config::load();
     CHECK(config::loaded() == config::Loaded::PutAside);
-    CHECK(!config::get().console_lock && config::get().theme == "light");
+    CHECK(!config::get().console_lock && config::get().look.theme == "light");
     CHECK(paths::read_file(paths::state_file() + ".bad", text) && text == "{ half");
     std::remove((paths::state_file() + ".bad").c_str());
     std::system(("rm -rf '" + paths::data_dir() + "/nand'").c_str());

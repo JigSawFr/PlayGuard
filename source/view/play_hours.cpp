@@ -5,8 +5,9 @@
 #include <cmath>
 #include <fmt/format.h>
 
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "ui/ui.hpp"
 
 namespace

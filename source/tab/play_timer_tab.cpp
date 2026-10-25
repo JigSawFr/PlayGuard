@@ -6,6 +6,9 @@
 #include <fmt/format.h>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/console_lock.hpp"
 #include "action/outside_watch.hpp"
 #include "action/play_data.hpp"
@@ -16,8 +19,6 @@
 #include "activity/play_timer_perday_activity.hpp"
 #include "activity/profiles_activity.hpp"
 #include "app.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
@@ -31,7 +32,7 @@ namespace
 std::string amounts_text(const int (&set)[3])
 {
     std::string text;
-    for (int m : set) text += (text.empty() ? "+" : " / +") + ui::fmt_minutes((uint16_t)m);
+    for (int m : set) text += (text.empty() ? "+" : " / +") + ui::fmt_limit((uint16_t)m);
     return text;
 }
 
@@ -56,9 +57,9 @@ std::string range(const uint16_t* v, std::initializer_list<int> days)
         hi = std::max(hi, v[d]);
     }
     if (lo == PT_DAY_NOLIMIT) return "playguard/cadran/week/no_limit"_i18n;
-    if (lo == hi && !none) return ui::fmt_minutes(lo);
-    return brls::getStr("playguard/play_timer/profile_range", ui::fmt_minutes(lo),
-                        none ? "playguard/cadran/week/no_limit"_i18n : ui::fmt_minutes(hi));
+    if (lo == hi && !none) return ui::fmt_limit(lo);
+    return brls::getStr("playguard/play_timer/profile_range", ui::fmt_limit(lo),
+                        none ? "playguard/cadran/week/no_limit"_i18n : ui::fmt_limit(hi));
 }
 
 // The week in a sentence: the same every day, or weekdays and weekend.
@@ -67,13 +68,13 @@ std::string summary_of(const uint16_t* v)
     bool same = true;
     for (int d = 1; d < 7; d++) same = same && v[d] == v[0];
     if (same) return v[0] == PT_DAY_NOLIMIT ? "playguard/play_timer/perday/pick_no_limit"_i18n
-                                            : brls::getStr("playguard/cadran/week/every_day", ui::fmt_minutes(v[0]));
+                                            : brls::getStr("playguard/cadran/week/every_day", ui::fmt_limit(v[0]));
     return brls::getStr("playguard/cadran/week/summary", range(v, { 1, 2, 3, 4, 5 }), range(v, { 6, 0 }));
 }
 
 std::string limit_text(uint16_t minutes)
 {
-    return minutes == PT_DAY_NOLIMIT ? "—" : ui::fmt_minutes(minutes);
+    return minutes == PT_DAY_NOLIMIT ? "—" : ui::fmt_limit(minutes);
 }
 }   // namespace
 
@@ -282,7 +283,7 @@ void PlayTimerTab::refresh()
     // When play is allowed again after bedtime, every day, once the console's
     // answer confirms where the bedtime is (pt_logic::bedtime_layout_ok);
     // else what the console reports for today.
-    const std::string na = "playguard/common/unavailable"_i18n;
+    const std::string na = "cadran/common/unavailable"_i18n;
     PtBedtime same;
     if (pt_logic::bedtime_layout_ok(this->pt, wd)) {
         const bool uniform = pt_logic::bedtime_uniform(this->pt, &same);
@@ -406,7 +407,7 @@ void PlayTimerTab::rerender()
     brls::Theme theme = brls::Application::getTheme();
     const PtState& timer = this->pt;
     cadran::kit::set_kicker(kicker, "playguard/play_timer/week_title"_i18n);
-    summary->setText(timer.valid ? summary_of(this->pending) : "playguard/common/unavailable"_i18n);
+    summary->setText(timer.valid ? summary_of(this->pending) : "cadran/common/unavailable"_i18n);
     if (timer.valid) week_editor->show(this->pending, timer.day_min);
 
     // The profile these limits are, else the one the console's are or how

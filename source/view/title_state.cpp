@@ -5,7 +5,7 @@
 
 #include "action/console_actions.hpp"
 #include "action/fw_gate.hpp"
-#include "ui/hooks.hpp"
+#include "ui/app_hooks.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -30,7 +30,7 @@ static void open_paused()
 static void open_read_only()
 {
     // Untested firmware: the screen that chose read-only, where the choice changes.
-    const ui::hooks::Hooks& hooks = ui::hooks::get();
+    const ui::app_hooks::Hooks& hooks = ui::app_hooks::get();
     if (fw_gate::needed()) {
         if (hooks.open_firmware_screen) hooks.open_firmware_screen();
         return;

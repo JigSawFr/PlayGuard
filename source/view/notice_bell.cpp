@@ -5,13 +5,15 @@
 
 #include <cmath>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/effects.hpp>
+#include <borealis/cadran/ui/motion.hpp>
+#include <borealis/cadran/view/header_settings.hpp>
+#include <borealis/cadran/view/version_badge.hpp>
+
 #include "action/notices.hpp"
-#include "ui/effects.hpp"
-#include "ui/hooks.hpp"
-#include "ui/motion.hpp"
-#include "ui/cadran_kit.hpp"
+#include "ui/app_hooks.hpp"
 #include "ui/ui.hpp"
-#include "view/version_badge.hpp"
 
 static constexpr float SIZE = 40;
 static constexpr const char* BELL_ID = "notice_bell";
@@ -28,7 +30,7 @@ NoticeBell::NoticeBell()
     this->setAlignSelf(brls::AlignSelf::CENTER);
     // A tap opens the list, as Y does (hitTest finds it, focusable or not).
     this->addGestureRecognizer(new brls::TapGestureRecognizer(this, []() {
-        if (ui::hooks::get().open_notices) ui::hooks::get().open_notices();
+        if (ui::app_hooks::get().open_notices) ui::app_hooks::get().open_notices();
     }));
     this->listener = notices::listen([this]() { this->update(); });
     this->update();
@@ -135,7 +137,8 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
 }
 
 // The main screen (its tab frame) holding `focus`: the bell goes in the
-// header's row at the right, unless it has one.
+// header's row at the right, after the language, theme and text size
+// (Aurore's, which may be there first), unless it has one.
 static void bell_screen_of(brls::View* focus)
 {
     if (!focus) return;
@@ -144,7 +147,10 @@ static void bell_screen_of(brls::View* focus)
     if (!frame || !frame->getView("main_tabs")) return;
     auto* tools = VersionBadge::header_tools(frame);
     if (!tools || tools->getView(BELL_ID)) return;
-    tools->addView(new NoticeBell(), 0);
+    size_t at = 0;
+    for (size_t i = 0; i < tools->getChildren().size(); i++)
+        if (dynamic_cast<HeaderSetting*>(tools->getChildren()[i])) at = i + 1;
+    tools->addView(new NoticeBell(), at);
 }
 
 void NoticeBell::install()

@@ -6,6 +6,8 @@
 #include <memory>
 #include <borealis.hpp>
 
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/forwarder_flow.hpp"
 #include "action/game_icons.hpp"
 #include "action/hbmenu_lock.hpp"
@@ -15,7 +17,6 @@
 #include "core/forwarder.h"
 #include "core/forwarder_pack.h"
 #include "core/gate.h"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"

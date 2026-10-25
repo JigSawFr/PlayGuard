@@ -6,6 +6,8 @@
 #include <memory>
 #include <utility>
 
+#include <borealis/cadran/util/text.hpp>
+
 #include "action/sys_update_flow.hpp"
 #include "activity/sys_notes_activity.hpp"
 #include "app.hpp"
@@ -14,7 +16,6 @@
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sys_updates.hpp"
-#include "util/text.hpp"
 #include "util/update.hpp"
 
 using namespace brls::literals;

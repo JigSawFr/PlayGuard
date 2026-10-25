@@ -3,15 +3,16 @@
 
 #include <yoga/Yoga.h>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/motion.hpp>
+#include <borealis/cadran/view/tab_badge.hpp>
+
 #include "action/notices.hpp"
 #include "action/frame_stats_flow.hpp"
 #include "action/play_data.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
-#include "ui/cadran_kit.hpp"
-#include "ui/motion.hpp"
 #include "ui/ui.hpp"
-#include "view/tab_badge.hpp"
 
 using namespace brls::literals;
 

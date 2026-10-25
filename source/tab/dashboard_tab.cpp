@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <yoga/Yoga.h>
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
 #include "action/notices.hpp"
@@ -19,8 +22,6 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "tab/clock_tab.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
@@ -198,7 +199,7 @@ DashboardTab::DashboardTab()
         chips->addView(words);
     }
     for (int minutes : config::get().extra_amounts) {
-        brls::Box* amount = kit::chip("+" + ui::fmt_minutes((uint16_t)minutes));
+        brls::Box* amount = kit::chip("+" + ui::fmt_limit((uint16_t)minutes));
         amount->setMarginRight(10);
         amount->registerClickAction([this, minutes](brls::View*) {
             if (ui::refuse_read_only()) return true;

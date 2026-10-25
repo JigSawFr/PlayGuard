@@ -5,12 +5,13 @@
 #include <string>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+
 #include "action/notices.hpp"
 #include "action/notice_logic.hpp"
 #include "action/pin_lock.hpp"
-#include "ui/cadran_list.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 

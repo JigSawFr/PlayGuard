@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_text.hpp>
+
 #include "action/backup_logic.hpp"
 #include "action/forwarder_flow.hpp"
 #include "action/hbmenu_lock.hpp"
@@ -14,7 +16,6 @@
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
-#include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -34,12 +35,12 @@ std::string days_text(const std::array<uint16_t, 7>& days)
     for (int d = 1; d < 7; d++) uniform &= days[d] == days[0];
     if (uniform)
         return days[0] == PT_DAY_NOLIMIT ? "playguard/common/no_limit"_i18n
-                                         : brls::getStr("playguard/play_timer/state/every_day", ui::fmt_minutes(days[0]));
+                                         : brls::getStr("playguard/play_timer/state/every_day", ui::fmt_limit(days[0]));
     std::string out;
     for (int i = 1; i <= 7; i++) {
         const int d = i % 7;
         if (!out.empty()) out += " · ";
-        out += brls::getStr(fmt::format("playguard/days_short/{}", d)) + " " + ui::fmt_minutes(days[d]);
+        out += brls::getStr(fmt::format("playguard/days_short/{}", d)) + " " + ui::fmt_limit(days[d]);
     }
     return out;
 }

@@ -5,15 +5,16 @@
 #include <string>
 #include <utility>
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/motion.hpp>
+
 #include "action/frame_stats_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "activity/main_activity.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/motion.hpp"
 #include "ui/ui.hpp"
-#include "ui/cadran_kit.hpp"
 
 using namespace brls::literals;
 
@@ -136,7 +137,7 @@ void CadranChildActivity::refresh()
             caption = st.unlocked ? "playguard/cadran/child/on_hold"_i18n : "playguard/cadran/today/today"_i18n;
             break;
         case pt_logic::RingState::ON_HOLD:
-            left = ui::fmt_minutes(st.limit);
+            left = ui::fmt_limit(st.limit);
             caption = "playguard/cadran/child/on_hold"_i18n;
             break;
         case pt_logic::RingState::FREE:
@@ -146,14 +147,14 @@ void CadranChildActivity::refresh()
         case pt_logic::RingState::TIME_UP:
             // Suspended, or past the limit with the console only warning.
             left = ui::fmt_played(0);
-            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_minutes(st.limit)) + " · " + "playguard/cadran/today/time_up"_i18n;
+            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_limit(st.limit)) + " · " + "playguard/cadran/today/time_up"_i18n;
             break;
         case pt_logic::RingState::COUNTING:
-            left = ui::fmt_duration_ns(pt.remaining_ns);
-            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_minutes(st.limit));
+            left = ui::fmt_time_left(pt.remaining_ns);
+            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_limit(st.limit));
             break;
         case pt_logic::RingState::IDLE:
-            left = ui::fmt_minutes(st.limit);
+            left = ui::fmt_limit(st.limit);
             caption = "playguard/cadran/today/today"_i18n;
             break;
         case pt_logic::RingState::UNKNOWN:

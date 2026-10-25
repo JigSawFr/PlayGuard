@@ -21,7 +21,7 @@ GameActivity::GameActivity(GameStat shown, std::shared_ptr<const PlayStats> play
 void GameActivity::onContentAvailable()
 {
     accounts_note->setSingleLine(false);
-    const std::string na = "playguard/common/unavailable"_i18n;
+    const std::string na = "cadran/common/unavailable"_i18n;
     const GameStat& g = this->game;
 
     name->setText(g.name[0] ? std::string(g.name)
@@ -32,9 +32,9 @@ void GameActivity::onContentAvailable()
     const bool windows = this->stats && this->stats->windows_ok;
     ui::set_visible(days.getView(), windows);
     if (windows) days->show(g.day_s, this->stats->day_wday);
-    today->setDetailText(windows ? ui::fmt_play_time(g.today_s) : na);
-    week->setDetailText(windows ? ui::fmt_play_time(g.week_s) : na);
-    total->setDetailText(g.totals_ok ? ui::fmt_play_time(g.total_s) : na);
+    today->setDetailText(windows ? ui::fmt_duration(g.today_s) : na);
+    week->setDetailText(windows ? ui::fmt_duration(g.week_s) : na);
+    total->setDetailText(g.totals_ok ? ui::fmt_duration(g.total_s) : na);
     launches->setDetailText(g.totals_ok ? std::to_string(g.launches) : na);
     first->setDetailText(g.totals_ok && g.first_played ? ui::time_text(g.first_played) : "—");
     last->setDetailText(g.totals_ok && g.last_played ? ui::time_text(g.last_played) : "—");
@@ -77,7 +77,7 @@ void GameActivity::show_accounts(const std::vector<AccountPlay>& by_account, Res
         auto* cell = new brls::DetailCell();
         cell->setFocusable(false);
         cell->setText(a.nickname[0] ? std::string(a.nickname) : "?");
-        cell->setDetailText(brls::getStr("playguard/activity/account_value", ui::fmt_play_time(a.total_s), (int)a.launches));
+        cell->setDetailText(brls::getStr("playguard/activity/account_value", ui::fmt_duration(a.total_s), (int)a.launches));
         accounts->addView(cell);
     }
     // The game's own total less the accounts': time with no account chosen
@@ -90,7 +90,7 @@ void GameActivity::show_accounts(const std::vector<AccountPlay>& by_account, Res
         auto* cell = new brls::DetailCell();
         cell->setFocusable(false);
         cell->setText("playguard/activity/account_nobody"_i18n);
-        cell->setDetailText(ui::fmt_play_time(nobody));
+        cell->setDetailText(ui::fmt_duration(nobody));
         accounts->addView(cell);
     }
     std::string note;

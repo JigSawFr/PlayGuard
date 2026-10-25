@@ -3,10 +3,11 @@
 
 #include <algorithm>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/effects.hpp>
+#include <borealis/cadran/ui/motion.hpp>
+
 #include "action/game_icons.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/effects.hpp"
-#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 
 namespace

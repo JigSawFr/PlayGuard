@@ -4,7 +4,6 @@
 // (in a word in the list, every one in Details; paused first; to make
 // again; a protected menu seen working), the list's text and icons, a
 // rule's days and hours (two spans). Every key asked for exists.
-#include "check.h"
 #include <borealis/extern/nlohmann/json.hpp>
 #include <cstdio>
 #include <fstream>
@@ -12,8 +11,11 @@
 #include <set>
 #include <string>
 
+#include <borealis/cadran/ui/tr.hpp>
+
+#include "check.h"
+
 #include "action/forwarders_text.hpp"
-#include "ui/tr.hpp"
 
 using namespace forwarders_text;
 using forwarders_logic::Row;
@@ -35,9 +37,12 @@ static void flatten(const nlohmann::json& j, const std::string& prefix)
 static bool load(const std::string& lang)
 {
     s_catalog.clear();
+    // PlayGuard's catalog, and Aurore's Cadran's (extern/borealis).
     std::ifstream in("resources/i18n/" + lang + "/playguard.json");
-    if (!in) return false;
+    std::ifstream cadran("extern/borealis/resources/i18n/" + lang + "/cadran.json");
+    if (!in || !cadran) return false;
     flatten(nlohmann::json::parse(in), "playguard/");
+    flatten(nlohmann::json::parse(cadran), "cadran/");
     return !s_catalog.empty();
 }
 

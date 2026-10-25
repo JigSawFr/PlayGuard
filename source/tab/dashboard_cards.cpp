@@ -5,6 +5,9 @@
 
 #include <fmt/format.h>
 
+#include <borealis/cadran/ui/motion.hpp>
+#include <borealis/cadran/util/text.hpp>
+
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
 #include "action/nintendo_dns.hpp"
@@ -12,9 +15,7 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "app.hpp"
-#include "ui/motion.hpp"
 #include "ui/ui.hpp"
-#include "util/text.hpp"
 
 using namespace brls::literals;
 
@@ -252,7 +253,7 @@ void DashboardTab::show_low(bool unlocked)
 void DashboardTab::show_cards(bool unlocked, bool has_pin)
 {
     brls::Theme theme = brls::Application::getTheme();
-    const std::string na = "playguard/common/unavailable"_i18n;
+    const std::string na = "cadran/common/unavailable"_i18n;
     const PtState& timer = this->pt;
     const PctlStatus& s = this->status;
 
@@ -281,7 +282,7 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
             // No morning time from the console: in how long the alarm rings.
             const LocalTime now = ui::local_now();
             const int in = (timer.bedtime_hour * 60 + timer.bedtime_minute) - (now.hour * 60 + now.minute);
-            if (in > 0) sub = brls::getStr("playguard/cadran/today/bed_in", ui::fmt_minutes((uint16_t)in));
+            if (in > 0) sub = brls::getStr("playguard/cadran/today/bed_in", ui::fmt_limit((uint16_t)in));
         }
         bed_sub->setText(sub);
     } else {

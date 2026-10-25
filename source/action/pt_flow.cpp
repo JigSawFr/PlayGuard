@@ -8,14 +8,15 @@
 
 #include <borealis.hpp>
 
+#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <borealis/cadran/ui/cadran_text.hpp>
+
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pairing_state.hpp"
 #include "action/pt_flow_internal.hpp"
 #include "action/pt_logic.hpp"
 #include "core/platform.h"
-#include "ui/cadran_text.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
@@ -58,7 +59,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     std::string body = body_in;
     const int played = pt_logic::suspend_warning_min(pt, ui::today_weekday(), new_days);
     if (played > 0 && platform_game_open(nullptr)) {
-        const std::string warning = brls::getStr("playguard/play_timer/suspend_warning", ui::fmt_minutes((uint16_t)played)) +
+        const std::string warning = brls::getStr("playguard/play_timer/suspend_warning", ui::fmt_limit((uint16_t)played)) +
                                     " " + "playguard/play_timer/unsaved"_i18n;
         body = body.empty() ? warning : body + "\n\n" + warning;
     }
@@ -73,7 +74,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
         for (int i = 1; i <= 7; i++) {
             const int d = i % 7;   // Monday first
             if (new_days[d] == pt.day_min[d]) continue;
-            rows.push_back({ ui::day_name(d), ui::fmt_minutes(pt.day_min[d]) + " → " + ui::fmt_minutes(new_days[d]) });
+            rows.push_back({ ui::day_name(d), ui::fmt_limit(pt.day_min[d]) + " → " + ui::fmt_limit(new_days[d]) });
         }
     const std::string changes = rows.empty() ? "" : cadran_text::table(rows);
     const auto titled = [&title, &changes](const std::string& text) {
@@ -91,9 +92,10 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     }
 
     std::string text = body.empty() ? std::string() : body + "\n\n";
-    text += "playguard/play_timer/gate/body"_i18n + " " +
-            (config::get().auto_relock ? "playguard/play_timer/gate/relock_auto"_i18n
-                                       : "playguard/play_timer/gate/relock_manual"_i18n);
+    // Locked again by itself: the unlock in one line (a note of the dialog's).
+    text += config::get().auto_relock ? "playguard/cadran/dialog/unlock_short"_i18n
+                                      : "playguard/play_timer/gate/body"_i18n + " " +
+                                            "playguard/play_timer/gate/relock_manual"_i18n;
     text = titled(text);
     auto unlock_and_write = [write]() {
         // Should the app stop before finish_write, the next start locks again:
@@ -208,14 +210,14 @@ void finish_write(Result rc, bool did_unlock, const std::string& ok_text,
 static void apply_uniform(uint16_t minutes, std::function<void()> refresh)
 {
     std::string body = minutes == 0 ? "playguard/play_timer/confirm_uniform_zero"_i18n
-                                    : brls::getStr("playguard/play_timer/confirm_uniform", ui::fmt_minutes(minutes));
+                                    : brls::getStr("playguard/play_timer/confirm_uniform", ui::fmt_limit(minutes));
     uint16_t new_days[7];
     for (auto& d : new_days) d = minutes;
     confirm_write(body, "playguard/play_timer/confirm_set"_i18n, [minutes, refresh](bool did_unlock) {
         uint16_t days[7];
         for (auto& d : days) d = minutes;
         Result rc = write_days(days, "uniform");
-        finish_write(rc, did_unlock, brls::getStr("playguard/play_timer/written_uniform", ui::fmt_minutes(minutes)),
+        finish_write(rc, did_unlock, brls::getStr("playguard/play_timer/written_uniform", ui::fmt_limit(minutes)),
                      "playguard/play_timer/write_err"_i18n, refresh);
     }, new_days);
 }
@@ -224,7 +226,7 @@ void choose_uniform_limit(const PtState& pt, std::function<void()> refresh)
 {
     const pt_logic::UniformPick pick = pt_logic::uniform_pick(pt);
     std::vector<std::string> labels;
-    for (uint16_t v : pt_logic::quick_values()) labels.push_back(ui::fmt_minutes(v));
+    for (uint16_t v : pt_logic::quick_values()) labels.push_back(ui::fmt_limit(v));
     labels.push_back("playguard/common/custom"_i18n);
 
     const std::string title = pick.uniform ? "playguard/play_timer/quick_title"_i18n
@@ -247,7 +249,7 @@ void pick_limit(const std::string& title, uint16_t current, std::function<void(u
     // no limit; the current value is pre-selected.
     const pt_logic::LimitPick pick = pt_logic::limit_pick(current);
     std::vector<std::string> options;
-    for (uint16_t v : pt_logic::quick_values()) options.push_back(ui::fmt_minutes(v));
+    for (uint16_t v : pt_logic::quick_values()) options.push_back(ui::fmt_limit(v));
     options.push_back("playguard/play_timer/perday/pick_minutes"_i18n);
     options.push_back("playguard/play_timer/perday/pick_no_limit"_i18n);
 

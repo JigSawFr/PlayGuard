@@ -133,7 +133,7 @@ void note_went_back()
                  "playguard/notices/went_back"_i18n,
                  brls::getStr(back.starts ? "playguard/notices/went_back_crash" : "playguard/notices/went_back_detail",
                               from, running_label()),
-                 back.starts ? "playguard/notices/send_report"_i18n : "", []() {
+                 back.starts ? "cadran/notices/send_report"_i18n : "", []() {
                      notices::clear("went_back");
                      upload_flow::choose();
                  });
