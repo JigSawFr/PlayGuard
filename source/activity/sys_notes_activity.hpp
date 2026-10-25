@@ -6,8 +6,8 @@
 // (their icons on either side of the tabs); the screen opens on the closest
 // newer version, or on the installed one when it is the newest. For the firmware, what updating to the newest needs first
 // (Atmosphère's and hekate's notes: update them, or wait). Each version:
-// tags (installed or new, the newest firmware it supports, security fixes,
-// parental controls changed), its title and date, its notes as Markdown
+// tags (the newest firmware it supports, security fixes, parental controls
+// changed), its title (installed or new marked beside it) and date, its notes as Markdown
 // (view/markdown_view.hpp; in English, as published; PlayGuard's as in
 // "What's new", view/release_notes.hpp: the summary as cards, then the
 // lists, the installed version's from the app when GitHub's are not there),
@@ -57,6 +57,7 @@ class SysNotesActivity : public brls::Activity
     size_t              tab = 0;      // the chosen one, in `shown`
     bool                tab_chosen = false;
     std::string         page;         // the chosen one's page
+    brls::Box*          mark = nullptr;   // installed or new, in the header after the version
 
     BRLS_BIND(brls::Box,    loading_box,  "sn_loading");
     BRLS_BIND(LoadingBar,   loading_bar,  "sn_loading_bar");
