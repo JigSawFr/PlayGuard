@@ -7,10 +7,12 @@
 #include "ui/effects.hpp"
 #include "ui/motion.hpp"
 #include "ui/ui.hpp"
+#include "view/cadran_icon.hpp"
 
 static constexpr float SIZE = 26;
 static constexpr const char* BADGE_ID = "tab_badge";
 static constexpr float POP_US = 380000.0f;
+static constexpr float DOCKED = 18;   // on the icon's corner
 
 TabBadge::TabBadge()
 {
@@ -33,6 +35,14 @@ void TabBadge::set_count(int n)
     this->setVisibility(n > 0 ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
 }
 
+void TabBadge::dock(float t, bool out_of_row)
+{
+    this->open = t;
+    if (out_of_row == this->floating) return;
+    this->floating = out_of_row;
+    this->setPositionType(out_of_row ? brls::PositionType::ABSOLUTE : brls::PositionType::RELATIVE);
+}
+
 void TabBadge::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
                     brls::FrameContext* ctx)
 {
@@ -40,7 +50,19 @@ void TabBadge::draw(NVGcontext* vg, float x, float y, float width, float height,
     (void)ctx;
     if (this->count <= 0) return;
     const std::string n = this->count > 9 ? "9+" : std::to_string(this->count);
-    const float r = height * 0.5f, cx = x + width * 0.5f, cy = y + height * 0.5f;
+    float r = height * 0.5f, cx = x + width * 0.5f, cy = y + height * 0.5f;
+    // Docked on the icon of its sidebar item: its top right corner.
+    CadranIcon* glyph = nullptr;
+    if (this->open < 1.0f && this->hasParent())
+        for (brls::View* v : this->getParent()->getChildren())
+            if ((glyph = dynamic_cast<CadranIcon*>(v))) break;
+    if (glyph) {
+        const brls::Rect at = glyph->getFrame();
+        const float t = this->open;
+        cx = at.getMaxX() - 1 + (cx - at.getMaxX() + 1) * t;
+        cy = at.getMinY() + 1 + (cy - at.getMinY() - 1) * t;
+        r  = DOCKED * 0.5f + (r - DOCKED * 0.5f) * t;
+    }
     nvgSave(vg);
     if (this->pop_since) {
         const float t = motion::progress(this->pop_since, POP_US);
@@ -76,6 +98,11 @@ TabBadge* TabBadge::on_row(brls::Box* row)
     badge->setMarginRight(0);
     row->addView(badge);
     return badge;
+}
+
+TabBadge* TabBadge::find(brls::SidebarItem* item)
+{
+    return item ? dynamic_cast<TabBadge*>(item->getView(BADGE_ID)) : nullptr;
 }
 
 TabBadge* TabBadge::of(brls::SidebarItem* item)

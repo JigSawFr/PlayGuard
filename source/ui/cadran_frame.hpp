@@ -24,8 +24,11 @@ void style_header(brls::AppletFrame* frame, const char* icon, const std::string&
 // first time it takes the focus.
 void install_screens();
 // A TabFrame's sidebar as the boards' rail: an icon before each label, the
-// active tab on a teal pill.
+// active tab on a teal pill; open, on its icons, or folding by itself as
+// Preferences › Sidebar says (config::RAILS).
 void style_rail(brls::View* tab_frame);
+// Preferences › Sidebar changed: the main screen's rail after it, at once.
+void apply_rail();
 // Both, for the main screen.
 void style_frame(brls::AppletFrame* frame, brls::View* tab_frame);
 // The main screen's header pill: its text, or hidden when empty (each

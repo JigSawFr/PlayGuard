@@ -1386,6 +1386,12 @@
             "full": "Always full",
             "auto": "Automatic: full on the TV",
             "reduced": "Reduced motion"
+        },
+        "rail": "Sidebar",
+        "rail_values": {
+            "auto": "Automatic: open to choose a tab",
+            "open": "Always open",
+            "icons": "Icons only"
         }
     },
     "backup": {

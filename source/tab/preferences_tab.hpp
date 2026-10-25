@@ -1,5 +1,5 @@
 // PreferencesTab — PlayGuard itself: language, theme, text size and start
-// tab as tiles, visual effects and the intro; the kinds of notifications and
+// tab as tiles, visual effects, the sidebar and the intro; the kinds of notifications and
 // the monthly "Support PlayGuard" reminder; how PlayGuard updates; the first
 // steps again. A setting that shapes one feature lives in that feature's
 // tab; the change history and backups have their own (History), checking
@@ -26,6 +26,7 @@ class PreferencesTab : public TabBase
     BRLS_BIND(brls::DetailCell,  start_tab,     "pf_start_tab");
     BRLS_BIND(brls::DetailCell,  text_size,     "pf_text_size");
     BRLS_BIND(brls::DetailCell,  effects,       "pf_effects");
+    BRLS_BIND(brls::DetailCell,  rail,          "pf_rail");
     BRLS_BIND(brls::BooleanCell, intro,         "pf_intro");
     BRLS_BIND(brls::BooleanCell, support_reminder, "pf_support_reminder");
     BRLS_BIND(brls::BooleanCell, notices_system, "pf_notices_system");
