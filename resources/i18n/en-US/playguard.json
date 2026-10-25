@@ -27,46 +27,21 @@
         "exit_leave": "Quit, still unlocked"
     },
     "common": {
-        "yes": "Yes",
-        "no": "No",
         "on": "On",
         "off": "Off",
-        "unavailable": "Unavailable",
         "not_set": "Not set",
         "no_limit": "No limit",
         "no_limit_in_text": "no limit",
         "zero_minutes": "0 min (no play)",
         "line": "{}: {}",
-        "minutes": "{} min",
         "min_sec": "{} min {} s",
         "sec": "{} s",
-        "hours": "{} h",
-        "hours_minutes": "{} h {}",
         "custom": "Custom…",
         "later": "Later",
         "quit": "Quit",
         "delete": "Delete",
         "applied": "Saved.",
-        "read_only_note": "Read-only mode: nothing can be changed from this app for now.",
-        "hold_hint": "Hold on “{}” for 2 seconds"
-    },
-    "days": {
-        "0": "Sunday",
-        "1": "Monday",
-        "2": "Tuesday",
-        "3": "Wednesday",
-        "4": "Thursday",
-        "5": "Friday",
-        "6": "Saturday"
-    },
-    "days_lower": {
-        "0": "Sunday",
-        "1": "Monday",
-        "2": "Tuesday",
-        "3": "Wednesday",
-        "4": "Thursday",
-        "5": "Friday",
-        "6": "Saturday"
+        "read_only_note": "Read-only mode: nothing can be changed from this app for now."
     },
     "days_short": {
         "0": "Sun",
@@ -78,7 +53,6 @@
         "6": "Sat"
     },
     "error": {
-        "code": "error {}",
         "code_hint": "error {}: {}",
         "read_only": "read-only mode is on, so nothing was changed: turn it off in About › Help & diagnostics › Developer › Read-only mode",
         "read_only_fw": "read-only mode is on, as this firmware is not checked yet, so nothing was changed: Console › Compatibility opens the firmware screen, where it can be turned off",
@@ -308,7 +282,6 @@
         "gate": {
             "body": "The play timer is counting down, so parental controls are unlocked temporarily first, with the stored PIN (you don't need to remember it).",
             "confirm": "Unlock and apply",
-            "relock_auto": "They are locked again right after the change.",
             "relock_manual": "You can lock them again right after the change.",
             "failed": "Could not unlock parental controls"
         },
@@ -411,7 +384,6 @@
         "account_value": "{} ({} launches)",
         "first": "First played",
         "last": "Last played",
-        "less_than_minute": "< 1 min",
         "note": "Read from the console's activity log, for every account. Times are approximate if the console clock was changed. PlayGuard opened over a game counts as that game for the account picked at launch: open it with a parent's account.",
         "show_all": "Show every game",
         "section_summary": "Summary",
@@ -705,14 +677,8 @@
         "weekdays": "Monday to Friday…",
         "weekend": "Weekend…",
         "copy_today": "Copy {} to all",
-        "text_size_auto": "Auto: larger on TV",
         "text_size": "Text size",
-        "start_tab": "Start on",
-        "themes": {
-            "system": "System",
-            "light": "Light",
-            "dark": "Dark"
-        }
+        "start_tab": "Start on"
     },
     "tools": {
         "section_diag": "Diagnostics",
@@ -739,32 +705,7 @@
         "logs_days_n": "{} days",
         "logs_keep_mb": "Space for reports",
         "logs_note": "Applies to the diagnostic reports, the crash files, the session logs and the links of the reports sent online in {}, each on its own, at start-up and when a limit changes. The newest one always stays.",
-        "language": "Language",
-        "languages": {
-            "system": "System language",
-            "en-US": "English",
-            "fr": "Français (France)",
-            "fr-CA": "Français (Canada)",
-            "de": "Deutsch",
-            "es": "Español (España)",
-            "es-419": "Español (Latinoamérica)",
-            "it": "Italiano",
-            "nl": "Nederlands",
-            "pt": "Português (Portugal)",
-            "pt-BR": "Português (Brasil)",
-            "ru": "Русский",
-            "ja": "日本語",
-            "ko": "한국어",
-            "zh-Hans": "简体中文",
-            "zh-Hant": "繁體中文"
-        },
-        "theme": "Theme",
         "start_tab": "Start on",
-        "themes": {
-            "system": "System",
-            "light": "Light",
-            "dark": "Dark"
-        },
         "advanced": "Show advanced play-timer actions",
         "section_console": "Console",
         "storage": "Storage",
@@ -1374,23 +1315,11 @@
         "notices_reminders": "Reminders: backups, the console's second system, blocked games",
         "notices_ack_remind": "Count ignored warnings again after 30 days",
         "help": "Help & diagnostics",
-        "text_size": "Text size",
-        "text_sizes": {
-            "normal": "Normal",
-            "large": "Larger",
-            "auto": "Automatic: larger on the TV"
-        },
         "effects": "Visual effects",
         "effects_values": {
             "full": "Always full",
             "auto": "Automatic: full on the TV",
             "reduced": "Reduced motion"
-        },
-        "rail": "Sidebar",
-        "rail_values": {
-            "auto": "Automatic: open to choose a tab",
-            "open": "Always open",
-            "icons": "Icons only"
         }
     },
     "backup": {
@@ -1626,13 +1555,6 @@
         "find_hint": "Search",
         "cancelled": "Download cancelled."
     },
-    "markdown": {
-        "note": "Note",
-        "tip": "Tip",
-        "important": "Important",
-        "warning": "Warning",
-        "caution": "Caution"
-    },
     "github": {
         "account": "GitHub account",
         "not_signed_in": "Not signed in",
@@ -1823,8 +1745,7 @@
         "failed": "The notes could not be fetched. Press X to try again."
     },
     "quick": {
-        "hint": "Language & theme",
-        "title_text": "Language, theme and text size"
+        "hint": "Language & theme"
     },
     "notices": {
         "title": "Notifications",
@@ -1876,7 +1797,6 @@
         "went_back": "Back to the previous build",
         "went_back_detail": "Gone back from {} to {}.",
         "went_back_crash": "{} did not finish starting (it may have crashed), so PlayGuard went back to {}. A report helps fix it.",
-        "send_report": "Send a report",
         "upload": "Report sent",
         "upload_show": "Show the link",
         "crash": "PlayGuard closed unexpectedly last time",
@@ -1938,21 +1858,6 @@
         }
     },
     "cadran": {
-        "date": "{0}, {3} {2}",
-        "months": {
-            "1": "January",
-            "2": "February",
-            "3": "March",
-            "4": "April",
-            "5": "May",
-            "6": "June",
-            "7": "July",
-            "8": "August",
-            "9": "September",
-            "10": "October",
-            "11": "November",
-            "12": "December"
-        },
         "today": {
             "kicker": "Today · {}'s limit",
             "kicker_short": "{} · {}",
@@ -2030,7 +1935,6 @@
             "pc_off": "Off",
             "unlocked": "Unlocked",
             "paused": "Parental controls paused",
-            "read_only": "Read-only",
             "timer_on": "Play timer on",
             "timer_off": "Countdown paused",
             "timer_none": "No play-time limit",

@@ -27,46 +27,21 @@
         "exit_leave": "Afsluiten zonder vergrendelen"
     },
     "common": {
-        "yes": "Ja",
-        "no": "Nee",
         "on": "Aan",
         "off": "Uit",
-        "unavailable": "Niet beschikbaar",
         "not_set": "Niet ingesteld",
         "no_limit": "Geen limiet",
         "no_limit_in_text": "geen limiet",
         "zero_minutes": "0 min (niet spelen)",
         "line": "{}: {}",
-        "minutes": "{} min",
         "min_sec": "{} min {} s",
         "sec": "{} s",
-        "hours": "{} u",
-        "hours_minutes": "{} u {}",
         "custom": "Aangepast…",
         "later": "Later",
         "quit": "Afsluiten",
         "delete": "Verwijderen",
         "applied": "Opgeslagen.",
-        "read_only_note": "Alleen-lezenmodus: voorlopig kan er niets worden gewijzigd vanuit deze app.",
-        "hold_hint": "Houd “{}” 2 seconden ingedrukt"
-    },
-    "days": {
-        "0": "Zondag",
-        "1": "Maandag",
-        "2": "Dinsdag",
-        "3": "Woensdag",
-        "4": "Donderdag",
-        "5": "Vrijdag",
-        "6": "Zaterdag"
-    },
-    "days_lower": {
-        "0": "zondag",
-        "1": "maandag",
-        "2": "dinsdag",
-        "3": "woensdag",
-        "4": "donderdag",
-        "5": "vrijdag",
-        "6": "zaterdag"
+        "read_only_note": "Alleen-lezenmodus: voorlopig kan er niets worden gewijzigd vanuit deze app."
     },
     "days_short": {
         "0": "Zo",
@@ -78,7 +53,6 @@
         "6": "Za"
     },
     "error": {
-        "code": "fout {}",
         "code_hint": "fout {}: {}",
         "read_only": "de alleen-lezenmodus staat aan, er is niets gewijzigd: zet hem uit via Info › Hulp en diagnose › Ontwikkelaar › Alleen-lezenmodus",
         "read_only_fw": "de alleen-lezenmodus staat aan omdat deze firmware nog niet gecontroleerd is: er is niets gewijzigd. Console › Compatibiliteit opent het firmwarescherm, waar hij uit kan",
@@ -308,7 +282,6 @@
         "gate": {
             "body": "De speeltijdtimer telt af, dus het ouderlijk toezicht wordt eerst tijdelijk ontgrendeld met de opgeslagen pincode (je hoeft die niet te onthouden).",
             "confirm": "Toepassen",
-            "relock_auto": "Het wordt direct na de wijziging weer vergrendeld.",
             "relock_manual": "Je kunt het direct na de wijziging weer vergrendelen.",
             "failed": "Kan het ouderlijk toezicht niet ontgrendelen"
         },
@@ -411,7 +384,6 @@
         "account_value": "{} ({} keer gestart)",
         "first": "Voor het eerst gespeeld",
         "last": "Laatst gespeeld",
-        "less_than_minute": "< 1 min",
         "note": "Gelezen uit het activiteitenlogboek van de console, voor alle gebruikers. De tijden zijn bij benadering als de klok van de console is gewijzigd. PlayGuard geopend over een spel telt als dat spel voor de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder.",
         "show_all": "Alle games tonen",
         "section_summary": "Samenvatting",
@@ -705,14 +677,8 @@
         "weekdays": "Maandag t/m vrijdag…",
         "weekend": "Weekend…",
         "copy_today": "{} naar elke dag",
-        "text_size_auto": "Auto: groter op de tv",
         "text_size": "Tekstgrootte",
-        "start_tab": "Starttabblad",
-        "themes": {
-            "system": "Systeem",
-            "light": "Licht",
-            "dark": "Donker"
-        }
+        "start_tab": "Starttabblad"
     },
     "tools": {
         "section_diag": "Diagnose",
@@ -739,32 +705,7 @@
         "logs_days_n": "{} dagen",
         "logs_keep_mb": "Ruimte voor rapporten",
         "logs_note": "Geldt voor de diagnoserapporten, de crashbestanden, de sessielogs en de links van de online verstuurde rapporten in {}, elk apart, bij het starten en wanneer een limiet verandert. Het nieuwste blijft altijd staan.",
-        "language": "Taal",
-        "languages": {
-            "system": "Systeemtaal",
-            "en-US": "English",
-            "fr": "Français (France)",
-            "fr-CA": "Français (Canada)",
-            "de": "Deutsch",
-            "es": "Español (España)",
-            "es-419": "Español (Latinoamérica)",
-            "it": "Italiano",
-            "nl": "Nederlands",
-            "pt": "Português (Portugal)",
-            "pt-BR": "Português (Brasil)",
-            "ru": "Русский",
-            "ja": "日本語",
-            "ko": "한국어",
-            "zh-Hans": "简体中文",
-            "zh-Hant": "繁體中文"
-        },
-        "theme": "Thema",
         "start_tab": "Starttabblad",
-        "themes": {
-            "system": "Systeem",
-            "light": "Licht",
-            "dark": "Donker"
-        },
         "advanced": "Geavanceerde speeltijdacties tonen",
         "section_console": "Console",
         "storage": "Opslag",
@@ -1374,23 +1315,11 @@
         "notices_reminders": "Herinneringen: back-ups, tweede systeem, games op slot",
         "notices_ack_remind": "Genegeerde waarschuwingen na 30 dagen weer meetellen",
         "help": "Hulp en diagnose",
-        "text_size": "Tekstgrootte",
-        "text_sizes": {
-            "normal": "Normaal",
-            "large": "Groter",
-            "auto": "Automatisch: groter op de tv"
-        },
         "effects": "Visuele effecten",
         "effects_values": {
             "full": "Altijd volledig",
             "auto": "Automatisch: volledig op de tv",
             "reduced": "Minder beweging"
-        },
-        "rail": "Zijbalk",
-        "rail_values": {
-            "auto": "Automatisch: open om een tabblad te kiezen",
-            "open": "Altijd open",
-            "icons": "Alleen pictogrammen"
         }
     },
     "backup": {
@@ -1626,13 +1555,6 @@
         "find_hint": "Zoeken",
         "cancelled": "Download geannuleerd."
     },
-    "markdown": {
-        "note": "Opmerking",
-        "tip": "Tip",
-        "important": "Belangrijk",
-        "warning": "Waarschuwing",
-        "caution": "Voorzichtig"
-    },
     "github": {
         "account": "GitHub-account",
         "not_signed_in": "Niet aangemeld",
@@ -1823,8 +1745,7 @@
         "failed": "De opmerkingen konden niet worden opgehaald. Druk op X om het opnieuw te proberen."
     },
     "quick": {
-        "hint": "Taal en thema",
-        "title_text": "Taal, thema en tekstgrootte"
+        "hint": "Taal en thema"
     },
     "notices": {
         "title": "Meldingen",
@@ -1876,7 +1797,6 @@
         "went_back": "Terug naar de vorige build",
         "went_back_detail": "Van {} terug naar {}.",
         "went_back_crash": "{} is niet volledig gestart (misschien vastgelopen), dus PlayGuard is teruggegaan naar {}. Een rapport helpt het op te lossen.",
-        "send_report": "Rapport versturen",
         "upload": "Rapport verstuurd",
         "upload_show": "Link tonen",
         "crash": "PlayGuard is de vorige keer onverwacht gesloten",
@@ -1938,21 +1858,6 @@
         }
     },
     "cadran": {
-        "date": "{1} {2} {3}",
-        "months": {
-            "1": "januari",
-            "2": "februari",
-            "3": "maart",
-            "4": "april",
-            "5": "mei",
-            "6": "juni",
-            "7": "juli",
-            "8": "augustus",
-            "9": "september",
-            "10": "oktober",
-            "11": "november",
-            "12": "december"
-        },
         "today": {
             "kicker": "Vandaag · limiet voor {}",
             "kicker_short": "{} · {}",
@@ -2030,7 +1935,6 @@
             "pc_off": "Uitgeschakeld",
             "unlocked": "Ontgrendeld",
             "paused": "Ouderlijk toezicht gepauzeerd",
-            "read_only": "Alleen-lezen",
             "timer_on": "Timer actief",
             "timer_off": "Aftellen gepauzeerd",
             "timer_none": "Geen speeltijdlimiet",

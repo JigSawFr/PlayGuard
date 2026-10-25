@@ -30,12 +30,12 @@
             paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
 
             <brls:Header title="@i18n/playguard/prefs/section_app" marginBottom="8"/>
-            <brls:DetailCell id="pf_language" title="@i18n/playguard/tools/language"/>
-            <brls:DetailCell id="pf_theme" title="@i18n/playguard/tools/theme"/>
+            <brls:DetailCell id="pf_language" title="@i18n/cadran/tools/language"/>
+            <brls:DetailCell id="pf_theme" title="@i18n/cadran/tools/theme"/>
             <brls:DetailCell id="pf_text_size" title="@i18n/playguard/tiles/text_size"/>
             <brls:DetailCell id="pf_start_tab" title="@i18n/playguard/tiles/start_tab"/>
             <brls:DetailCell id="pf_effects" title="@i18n/playguard/prefs/effects"/>
-            <brls:DetailCell id="pf_rail" title="@i18n/playguard/prefs/rail"/>
+            <brls:DetailCell id="pf_rail" title="@i18n/cadran/prefs/rail"/>
             <brls:BooleanCell id="pf_intro"/>
             <brls:Header title="@i18n/playguard/prefs/section_notices" marginTop="24" marginBottom="8"/>
             <brls:BooleanCell id="pf_notices_system"/>

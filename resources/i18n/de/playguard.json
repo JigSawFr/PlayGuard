@@ -27,46 +27,21 @@
         "exit_leave": "Ohne Aktivieren beenden"
     },
     "common": {
-        "yes": "Ja",
-        "no": "Nein",
         "on": "An",
         "off": "Aus",
-        "unavailable": "Nicht verfügbar",
         "not_set": "Nicht festgelegt",
         "no_limit": "Kein Limit",
         "no_limit_in_text": "kein Limit",
         "zero_minutes": "0 min (nicht spielen)",
         "line": "{}: {}",
-        "minutes": "{} min",
         "min_sec": "{} min {} s",
         "sec": "{} s",
-        "hours": "{} h",
-        "hours_minutes": "{} h {}",
         "custom": "Benutzerdefiniert…",
         "later": "Später",
         "quit": "Beenden",
         "delete": "Löschen",
         "applied": "Gespeichert.",
-        "read_only_note": "Schreibschutzmodus: Über diese App kann derzeit nichts geändert werden.",
-        "hold_hint": "Halte „{}“ 2 Sekunden lang gedrückt"
-    },
-    "days": {
-        "0": "Sonntag",
-        "1": "Montag",
-        "2": "Dienstag",
-        "3": "Mittwoch",
-        "4": "Donnerstag",
-        "5": "Freitag",
-        "6": "Samstag"
-    },
-    "days_lower": {
-        "0": "Sonntag",
-        "1": "Montag",
-        "2": "Dienstag",
-        "3": "Mittwoch",
-        "4": "Donnerstag",
-        "5": "Freitag",
-        "6": "Samstag"
+        "read_only_note": "Schreibschutzmodus: Über diese App kann derzeit nichts geändert werden."
     },
     "days_short": {
         "0": "So",
@@ -78,7 +53,6 @@
         "6": "Sa"
     },
     "error": {
-        "code": "Fehler {}",
         "code_hint": "Fehler {}: {}",
         "read_only": "der Schreibschutzmodus ist aktiv, nichts wurde geändert: unter Info › Hilfe & Diagnose › Entwickler › Schreibschutzmodus ausschalten",
         "read_only_fw": "der Schreibschutzmodus ist aktiv, weil diese Firmware noch nicht geprüft ist: Nichts wurde geändert. Konsole › Kompatibilität öffnet den Firmware-Bildschirm, wo er ausgeschaltet werden kann",
@@ -308,7 +282,6 @@
         "gate": {
             "body": "Die Spielzeit wird gerade gezählt, daher werden die Altersbeschränkungen zuerst mit der gespeicherten Geheimzahl vorübergehend aufgehoben (Sie müssen sie nicht kennen).",
             "confirm": "Aufheben und anwenden",
-            "relock_auto": "Direkt nach der Änderung werden sie wieder aktiviert.",
             "relock_manual": "Sie können sie direkt nach der Änderung wieder aktivieren.",
             "failed": "Altersbeschränkungen konnten nicht aufgehoben werden"
         },
@@ -411,7 +384,6 @@
         "account_value": "{} ({} Starts)",
         "first": "Erstmals gespielt",
         "last": "Zuletzt gespielt",
-        "less_than_minute": "< 1 min",
         "note": "Aus dem Aktivitätsprotokoll der Konsole gelesen, für alle Nutzer. Die Zeiten sind ungefähr, wenn die Konsolenuhr geändert wurde. PlayGuard über einem Spiel geöffnet zählt als dieses Spiel für den beim Start gewählten Nutzer: Öffnen Sie es mit dem Nutzer eines Elternteils.",
         "show_all": "Alle Spiele anzeigen",
         "section_summary": "Übersicht",
@@ -705,14 +677,8 @@
         "weekdays": "Montag bis Freitag…",
         "weekend": "Wochenende…",
         "copy_today": "{} auf alle kopieren",
-        "text_size_auto": "Auto: größer am TV",
         "text_size": "Textgröße",
-        "start_tab": "Start-Tab",
-        "themes": {
-            "system": "System",
-            "light": "Hell",
-            "dark": "Dunkel"
-        }
+        "start_tab": "Start-Tab"
     },
     "tools": {
         "section_diag": "Diagnose",
@@ -739,32 +705,7 @@
         "logs_days_n": "{} Tagen",
         "logs_keep_mb": "Speicherplatz für Berichte",
         "logs_note": "Gilt für die Diagnoseberichte, die Absturzdateien, die Sitzungsprotokolle und die Links der online gesendeten Berichte in {}, jeweils für sich, beim Start und wenn sich eine Grenze ändert. Der neueste bleibt immer erhalten.",
-        "language": "Sprache",
-        "languages": {
-            "system": "Systemsprache",
-            "en-US": "English",
-            "fr": "Français (France)",
-            "fr-CA": "Français (Canada)",
-            "de": "Deutsch",
-            "es": "Español (España)",
-            "es-419": "Español (Latinoamérica)",
-            "it": "Italiano",
-            "nl": "Nederlands",
-            "pt": "Português (Portugal)",
-            "pt-BR": "Português (Brasil)",
-            "ru": "Русский",
-            "ja": "日本語",
-            "ko": "한국어",
-            "zh-Hans": "简体中文",
-            "zh-Hant": "繁體中文"
-        },
-        "theme": "Design",
         "start_tab": "Start-Tab",
-        "themes": {
-            "system": "System",
-            "light": "Hell",
-            "dark": "Dunkel"
-        },
         "advanced": "Erweiterte Spielzeit-Aktionen anzeigen",
         "section_console": "Konsole",
         "storage": "Speicher",
@@ -1374,23 +1315,11 @@
         "notices_reminders": "Erinnerungen: Sicherungen, zweites System der Konsole, Spielsperre",
         "notices_ack_remind": "Ignorierte Warnungen nach 30 Tagen wieder zählen",
         "help": "Hilfe & Diagnose",
-        "text_size": "Textgröße",
-        "text_sizes": {
-            "normal": "Normal",
-            "large": "Größer",
-            "auto": "Automatisch: größer am Fernseher"
-        },
         "effects": "Visuelle Effekte",
         "effects_values": {
             "full": "Immer vollständig",
             "auto": "Automatisch: vollständig am Fernseher",
             "reduced": "Weniger Bewegung"
-        },
-        "rail": "Seitenleiste",
-        "rail_values": {
-            "auto": "Automatisch: offen zur Tab-Auswahl",
-            "open": "Immer offen",
-            "icons": "Nur Symbole"
         }
     },
     "backup": {
@@ -1626,13 +1555,6 @@
         "find_hint": "Suchen",
         "cancelled": "Download abgebrochen."
     },
-    "markdown": {
-        "note": "Hinweis",
-        "tip": "Tipp",
-        "important": "Wichtig",
-        "warning": "Warnung",
-        "caution": "Vorsicht"
-    },
     "github": {
         "account": "GitHub-Konto",
         "not_signed_in": "Nicht angemeldet",
@@ -1823,8 +1745,7 @@
         "failed": "Die Hinweise konnten nicht abgerufen werden. Drücken Sie X, um es erneut zu versuchen."
     },
     "quick": {
-        "hint": "Sprache & Design",
-        "title_text": "Sprache, Design und Textgröße"
+        "hint": "Sprache & Design"
     },
     "notices": {
         "title": "Benachrichtigungen",
@@ -1876,7 +1797,6 @@
         "went_back": "Zurück zum vorherigen Build",
         "went_back_detail": "Von {} zurück zu {}.",
         "went_back_crash": "{} ist nicht fertig gestartet (vielleicht abgestürzt), daher ist PlayGuard zu {} zurückgekehrt. Ein Bericht hilft bei der Behebung.",
-        "send_report": "Bericht senden",
         "upload": "Bericht gesendet",
         "upload_show": "Link anzeigen",
         "crash": "PlayGuard wurde beim letzten Mal unerwartet beendet",
@@ -1938,21 +1858,6 @@
         }
     },
     "cadran": {
-        "date": "{0}, {2}. {3}",
-        "months": {
-            "1": "Januar",
-            "2": "Februar",
-            "3": "März",
-            "4": "April",
-            "5": "Mai",
-            "6": "Juni",
-            "7": "Juli",
-            "8": "August",
-            "9": "September",
-            "10": "Oktober",
-            "11": "November",
-            "12": "Dezember"
-        },
         "today": {
             "kicker": "Heute · Limit für {}",
             "kicker_short": "{} · {}",
@@ -2030,7 +1935,6 @@
             "pc_off": "Deaktiviert",
             "unlocked": "Aufgehoben",
             "paused": "Jugendschutz pausiert",
-            "read_only": "Schreibgeschützt",
             "timer_on": "Spielzeit aktiv",
             "timer_off": "Zählung pausiert",
             "timer_none": "Kein Spielzeitlimit",

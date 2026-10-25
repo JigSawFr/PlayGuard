@@ -27,46 +27,21 @@
         "exit_leave": "Sair sem bloquear"
     },
     "common": {
-        "yes": "Sim",
-        "no": "Não",
         "on": "Ativado",
         "off": "Desativado",
-        "unavailable": "Indisponível",
         "not_set": "Não definido",
         "no_limit": "Sem limite",
         "no_limit_in_text": "sem limite",
         "zero_minutes": "0 min (sem jogar)",
         "line": "{}: {}",
-        "minutes": "{} min",
         "min_sec": "{} min {} s",
         "sec": "{} s",
-        "hours": "{} h",
-        "hours_minutes": "{} h {}",
         "custom": "Personalizado…",
         "later": "Mais tarde",
         "quit": "Sair",
         "delete": "Eliminar",
         "applied": "Guardado.",
-        "read_only_note": "Modo só de leitura: por enquanto, nada pode ser alterado a partir desta aplicação.",
-        "hold_hint": "Mantenha «{}» premido durante 2 segundos"
-    },
-    "days": {
-        "0": "Domingo",
-        "1": "Segunda-feira",
-        "2": "Terça-feira",
-        "3": "Quarta-feira",
-        "4": "Quinta-feira",
-        "5": "Sexta-feira",
-        "6": "Sábado"
-    },
-    "days_lower": {
-        "0": "domingo",
-        "1": "segunda-feira",
-        "2": "terça-feira",
-        "3": "quarta-feira",
-        "4": "quinta-feira",
-        "5": "sexta-feira",
-        "6": "sábado"
+        "read_only_note": "Modo só de leitura: por enquanto, nada pode ser alterado a partir desta aplicação."
     },
     "days_short": {
         "0": "Dom",
@@ -78,7 +53,6 @@
         "6": "Sáb"
     },
     "error": {
-        "code": "erro {}",
         "code_hint": "erro {}: {}",
         "read_only": "o modo só de leitura está ativo, nada foi alterado: desative-o em Sobre › Ajuda e diagnóstico › Programador › Modo só de leitura",
         "read_only_fw": "o modo só de leitura está ativo porque este firmware ainda não foi verificado: nada foi alterado. Consola › Compatibilidade abre o ecrã do firmware, onde pode ser desativado",
@@ -308,7 +282,6 @@
         "gate": {
             "body": "O temporizador de jogo está em contagem, por isso o controlo parental é primeiro desbloqueado temporariamente com o PIN guardado (não precisa de o saber).",
             "confirm": "Desbloquear e aplicar",
-            "relock_auto": "Volta a ser bloqueado logo após a alteração.",
             "relock_manual": "Pode voltar a bloqueá-lo logo após a alteração.",
             "failed": "Não foi possível desbloquear o controlo parental"
         },
@@ -411,7 +384,6 @@
         "account_value": "{} ({} execuções)",
         "first": "Primeira vez",
         "last": "Última vez",
-        "less_than_minute": "< 1 min",
         "note": "Lido do registo de atividade da consola, para todos os utilizadores. Os tempos são aproximados se o relógio da consola foi alterado. O PlayGuard aberto sobre um jogo conta como esse jogo para o utilizador escolhido ao iniciar: abra-o com o utilizador de um adulto.",
         "show_all": "Mostrar todos os jogos",
         "section_summary": "Resumo",
@@ -705,14 +677,8 @@
         "weekdays": "Segunda a sexta…",
         "weekend": "Fim de semana…",
         "copy_today": "Copiar {} para todos",
-        "text_size_auto": "Auto: maior na TV",
         "text_size": "Texto",
-        "start_tab": "Abrir em",
-        "themes": {
-            "system": "Sistema",
-            "light": "Claro",
-            "dark": "Escuro"
-        }
+        "start_tab": "Abrir em"
     },
     "tools": {
         "section_diag": "Diagnóstico",
@@ -739,32 +705,7 @@
         "logs_days_n": "{} dias",
         "logs_keep_mb": "Espaço para relatórios",
         "logs_note": "Aplica-se aos relatórios de diagnóstico, aos ficheiros de falha, aos registos de sessão e às ligações dos relatórios enviados online em {}, cada um por si, ao iniciar e quando um limite muda. O mais recente fica sempre.",
-        "language": "Idioma",
-        "languages": {
-            "system": "Idioma do sistema",
-            "en-US": "English",
-            "fr": "Français (France)",
-            "fr-CA": "Français (Canada)",
-            "de": "Deutsch",
-            "es": "Español (España)",
-            "es-419": "Español (Latinoamérica)",
-            "it": "Italiano",
-            "nl": "Nederlands",
-            "pt": "Português (Portugal)",
-            "pt-BR": "Português (Brasil)",
-            "ru": "Русский",
-            "ja": "日本語",
-            "ko": "한국어",
-            "zh-Hans": "简体中文",
-            "zh-Hant": "繁體中文"
-        },
-        "theme": "Tema",
         "start_tab": "Abrir em",
-        "themes": {
-            "system": "Sistema",
-            "light": "Claro",
-            "dark": "Escuro"
-        },
         "advanced": "Mostrar ações avançadas do temporizador",
         "section_console": "Consola",
         "storage": "Armazenamento",
@@ -1374,23 +1315,11 @@
         "notices_reminders": "Avisos: cópias, segundo sistema da consola, jogos bloqueados",
         "notices_ack_remind": "Voltar a contar os avisos ignorados após 30 dias",
         "help": "Ajuda e diagnóstico",
-        "text_size": "Tamanho do texto",
-        "text_sizes": {
-            "normal": "Normal",
-            "large": "Maior",
-            "auto": "Automático: maior na TV"
-        },
         "effects": "Efeitos visuais",
         "effects_values": {
             "full": "Sempre completos",
             "auto": "Automático: completos na TV",
             "reduced": "Menos movimento"
-        },
-        "rail": "Barra lateral",
-        "rail_values": {
-            "auto": "Automático: aberta ao escolher um separador",
-            "open": "Sempre aberta",
-            "icons": "Só ícones"
         }
     },
     "backup": {
@@ -1626,13 +1555,6 @@
         "find_hint": "Procurar",
         "cancelled": "Transferência cancelada."
     },
-    "markdown": {
-        "note": "Nota",
-        "tip": "Dica",
-        "important": "Importante",
-        "warning": "Aviso",
-        "caution": "Cuidado"
-    },
     "github": {
         "account": "Conta GitHub",
         "not_signed_in": "Sem sessão",
@@ -1823,8 +1745,7 @@
         "failed": "Não foi possível obter as notas. Prime X para tentar de novo."
     },
     "quick": {
-        "hint": "Idioma e tema",
-        "title_text": "Idioma, tema e tamanho do texto"
+        "hint": "Idioma e tema"
     },
     "notices": {
         "title": "Notificações",
@@ -1876,7 +1797,6 @@
         "went_back": "Regresso à compilação anterior",
         "went_back_detail": "De {} voltou-se a {}.",
         "went_back_crash": "{} não terminou de arrancar (pode ter falhado), por isso o PlayGuard voltou a {}. Um relatório ajuda a corrigir.",
-        "send_report": "Enviar um relatório",
         "upload": "Relatório enviado",
         "upload_show": "Mostrar a ligação",
         "crash": "Da última vez, o PlayGuard fechou inesperadamente",
@@ -1938,21 +1858,6 @@
         }
     },
     "cadran": {
-        "date": "{1}, {2} de {3}",
-        "months": {
-            "1": "janeiro",
-            "2": "fevereiro",
-            "3": "março",
-            "4": "abril",
-            "5": "maio",
-            "6": "junho",
-            "7": "julho",
-            "8": "agosto",
-            "9": "setembro",
-            "10": "outubro",
-            "11": "novembro",
-            "12": "dezembro"
-        },
         "today": {
             "kicker": "Hoje · limite de {}",
             "kicker_short": "{} · {}",
@@ -2030,7 +1935,6 @@
             "pc_off": "Desativado",
             "unlocked": "Desbloqueado",
             "paused": "Controlo parental em pausa",
-            "read_only": "Só de leitura",
             "timer_on": "Temporizador ativo",
             "timer_off": "Contagem em pausa",
             "timer_none": "Sem limite de tempo de jogo",
