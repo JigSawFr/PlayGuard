@@ -3,9 +3,9 @@
 in web/i18n/ against the desktop simulator and the app (web/README.md).
 
 Errors:
-- a PLAYGUARD_SIM_* variable read anywhere in source/ without its entry in
-  params.json (its name in lower case without the prefix), or an entry no
-  variable matches any more;
+- a PLAYGUARD_SIM_* variable read anywhere in source/ (or by Aurore's Cadran,
+  through ui::env_flag) without its entry in params.json (its name in lower
+  case without the prefix), or an entry no variable matches any more;
 - a variable read in source/ that docs/contributing/simulator.md's table
   does not describe, or one it describes that nothing reads;
 - `live` on a variable PlayGuard reads once only: in the simulated console's
@@ -14,7 +14,7 @@ Errors:
   `values` for an option it does not offer, `live` on an entry that is no
   variable, a preset naming an unknown entry, or giving a datetime entry
   neither POSIX seconds nor `@HH:MM`;
-- a language of the console (config::LANGUAGES, but "system") without its
+- a language of the console (Aurore's ui::LANGUAGES, but "system") without its
   catalog web/i18n/<language>.json, or not in the page's `lang` entry;
 - a text English (web/i18n/en-US.json) lacks: a group, a panel entry's label,
   an option of a select or a list, a preset; or a text in any catalog that
@@ -60,6 +60,15 @@ def main():
                 m = re.search(r"\nstatic void sim_defaults\([^)]*\)\n\{(.*?)\n\}", text, re.S)
                 if m:
                     once |= set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", m.group(1)))
+    # Aurore's Cadran reads its flags through ui::env_flag("NAME"), which
+    # activity/screen_hooks.cpp answers with PLAYGUARD_SIM_NAME.
+    for folder, _, files in os.walk(os.path.join(root, "extern", "borealis", "library", "lib", "cadran")):
+        for name in files:
+            if name.endswith(".cpp"):
+                with open(os.path.join(folder, name), encoding="utf-8", errors="replace") as f:
+                    text = f.read()
+                read |= set(re.findall(r'env_flag\(\s*"([A-Z0-9_]+)"', text))
+                once |= set(re.findall(r'static\s+const\s+[\w:*\s]+=\s*ui::env_flag\(\s*"([A-Z0-9_]+)"', text))
 
     # The simulator's page: its table of the variables.
     simulator = os.path.join("docs", "contributing", "simulator.md")
@@ -123,12 +132,14 @@ def main():
             elif types[name] == "datetime" and not re.fullmatch(r"\d+|@([01]\d|2[0-3]):[0-5]\d", str(value)):
                 errors.append(f"preset {preset.get('id')}: {name} {value!r} is neither POSIX seconds nor @HH:MM")
 
-    # The console's languages: one catalog each, all in the page's `lang` entry.
-    with open(os.path.join(root, "source", "util", "config.hpp"), encoding="utf-8") as f:
+    # The console's languages (Aurore's ui::LANGUAGES, which config::LANGUAGES
+    # names): one catalog each, all in the page's `lang` entry.
+    prefs_hpp = os.path.join("extern", "borealis", "library", "include", "borealis", "cadran", "ui", "prefs.hpp")
+    with open(os.path.join(root, prefs_hpp), encoding="utf-8") as f:
         m = re.search(r"LANGUAGES\[\]\s*=\s*\{([^}]*)\}", f.read())
     languages = [l for l in re.findall(r'"([^"]+)"', m.group(1)) if l != "system"] if m else []
     if not languages:
-        errors.append("source/util/config.hpp: no LANGUAGES[] found")
+        errors.append(f"{prefs_hpp}: no LANGUAGES[] found")
     lang = next((p for p in manifest["params"] if p.get("name") == "lang"), {})
     for l in languages:
         if l not in (lang.get("options") or []):
