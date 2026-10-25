@@ -44,7 +44,7 @@ function browserLanguage() {
   return SimLogic.firstConsoleLanguage(navigator.languages?.length ? navigator.languages : [navigator.language]);
 }
 
-// borealis' ControllerButton values (borealis fork, patch 0090).
+// borealis' ControllerButton values (Aurore, patch 0090).
 const BUTTON = { ZL: 0, L: 1, UP: 3, RIGHT: 4, DOWN: 5, LEFT: 6, MINUS: 7, PLUS: 9, Y: 11, B: 12, A: 13, X: 14, R: 15, ZR: 16 };
 // The keys the page presses buttons for, by what they say (any layout); the
 // arrows, Enter and Escape reach SDL directly.

@@ -162,7 +162,7 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
 - `source/main.cpp`: in a browser a frame must hand the thread back to the
   page, so the main loop is `emscripten_set_main_loop`, one `run_frame()` per
   display refresh.
-- borealis (our fork, patch 0090): no SDL haptic in a browser;
+- Aurore, our borealis fork (patch 0090): no SDL haptic in a browser;
   a window fixed at the console's 1280×720 (the page scales the canvas);
   `brls_web_button()`, which the page calls to press a button; the CJK font
   below as borealis' fallback when it is there at start-up.

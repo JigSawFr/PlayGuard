@@ -272,7 +272,7 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
         std::string sub;
         if (timer.bedtime_reset_valid) {
             // The time kept with the word before it: "again at / 06:00" never
-            // breaks there (borealis fork, patch 0010).
+            // breaks there (Aurore, patch 0010).
             const std::string at = fmt::format("{:02d}:{:02d}", timer.bedtime_reset_hour, timer.bedtime_reset_minute);
             sub = brls::getStr("playguard/cadran/today/bed_sub", at);
             const size_t pos = sub.find(" " + at);

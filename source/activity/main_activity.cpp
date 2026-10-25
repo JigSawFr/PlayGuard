@@ -117,7 +117,7 @@ void MainActivity::onContentAvailable()
     // Y: the notification bell's list, from any tab, its count in the footer.
     // A tab with its own Ⓨ shows that one instead (the focused view's wins).
     // With − below, the footer's optional keys: left out of it, − first, when
-    // a screen's own keys need their room (borealis fork, patch 0020).
+    // a screen's own keys need their room (Aurore, patch 0020).
     brls::setHintsOptionalOwner(this->getContentView());
     this->getContentView()->registerAction("playguard/notices/hint"_i18n, brls::BUTTON_Y, [](brls::View*) {
         NoticesActivity::open();
