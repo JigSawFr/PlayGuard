@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 a913a7c19f05 -->
+<!-- translated from docs/features.md, sha256 27ea66c9bbab -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -55,6 +55,7 @@ L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets
   - Le changement est immédiat, sur tous les écrans, sans relancer.
   - Les 25 % viennent d'une TV 55" en 4K : le plus petit texte (15 px) y fait alors 14,6 mm de haut en capitales, 20′ d'arc à 2,5 m, où la lecture est confortable (16′ en taille normale, le strict minimum).
 - **Effets visuels** (*Préférences*) : *Automatique : complets sur la TV*, par défaut, garde le halo de fond et chaque mouvement de l'interface tant que la console est sur son dock : les écrans et leurs lignes qui prennent place, l'anneau qui se trace et glisse vers une nouvelle valeur, le battement de l'anneau de l'écran enfant dans ses dernières minutes, les petites réponses à une pression. En main (en portable ou sur son pied, chargée ou non), il les retire tous, et remettre la console sur le dock les fait revenir. *Toujours complets* les garde aussi en main. *Mouvements réduits* retire chaque mouvement décoratif, sur le dock aussi, et garde le halo : pour qui le mouvement fatigue.
+- **Barre latérale** (*Préférences*) : *Automatique : ouverte pour choisir un onglet*, par défaut, garde la barre latérale sur ses icônes tant qu'un onglet a le focus, pour lui laisser la place ; revenu sur la barre (Ⓑ ou ← depuis un onglet, ou un toucher sur une icône), elle s'ouvre par-dessus l'onglet avec les noms, et se replie dès qu'on entre dans un onglet (→, Ⓐ ou un toucher sur l'onglet). L'onglet garde sa largeur dans les deux cas : rien ne bouge dessous. *Toujours ouverte* garde les noms à côté des icônes, comme avant ; *Icônes seules* ne garde que les icônes, les onglets plus larges. Repliée, la pastille ambre d'un onglet se place sur le coin de son icône.
 - **Annuler :** après l'enregistrement d'une modification, **ZR** *Annuler* reste quelques secondes dans le pied de page : il ouvre cette modification dans l'historique, pour remettre la valeur précédente. Un historique vide le dit dans une carte.
 
 ## Notifications — ce qui demande votre attention, depuis n'importe quel onglet

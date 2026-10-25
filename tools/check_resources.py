@@ -310,6 +310,7 @@ DYNAMIC_KEYS = {
     "tiles/themes/": array_of("source/util/config.hpp", "THEMES"),
     "prefs/text_sizes/": array_of("source/util/config.hpp", "TEXT_SIZES"),
     "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
+    "prefs/rail_values/": array_of("source/util/config.hpp", "RAILS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
     "forwarders/icon_lib/": array_of("source/util/forwarder_library.cpp", "IDS"),   # icon_sheet.cpp: the library's icons

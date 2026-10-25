@@ -20,6 +20,10 @@ struct Config
     // "auto" (the default: lighter effects off the dock), "full" or
     // "reduced" (no decorative movement) (ui/effects).
     std::string effects = "auto";
+    // The main screen's sidebar: "auto" (the default: on its icons while a
+    // tab has the focus, open over the tab while the focus is on it),
+    // "open" (always) or "icons" (always on its icons) (ui/cadran_frame).
+    std::string rail = "auto";
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
@@ -173,6 +177,8 @@ constexpr const char* THEMES[] = { "system", "light", "dark" };
 constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
 // What effects may be: the default first.
 constexpr const char* EFFECTS[] = { "auto", "full", "reduced" };
+// What rail may be: the default first.
+constexpr const char* RAILS[] = { "auto", "open", "icons" };
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "history", "console", "preferences", "about" };

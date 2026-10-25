@@ -1385,6 +1385,12 @@
             "full": "Sempre completi",
             "auto": "Automatico: completi sulla TV",
             "reduced": "Meno movimento"
+        },
+        "rail": "Barra laterale",
+        "rail_values": {
+            "auto": "Automatico: aperta per scegliere una scheda",
+            "open": "Sempre aperta",
+            "icons": "Solo icone"
         }
     },
     "backup": {

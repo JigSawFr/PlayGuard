@@ -1385,6 +1385,12 @@
             "full": "Altijd volledig",
             "auto": "Automatisch: volledig op de tv",
             "reduced": "Minder beweging"
+        },
+        "rail": "Zijbalk",
+        "rail_values": {
+            "auto": "Automatisch: open om een tabblad te kiezen",
+            "open": "Altijd open",
+            "icons": "Alleen pictogrammen"
         }
     },
     "backup": {

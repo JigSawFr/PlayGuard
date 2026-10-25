@@ -129,6 +129,7 @@ void sanitize(Config& c)
     one_of(c.theme, { "system", "light", "dark" }, "dark");
     one_of(c.text_size, { "auto", "normal", "large" }, "auto");
     one_of(c.effects, { "auto", "full", "reduced" }, "auto");
+    one_of(c.rail, { "auto", "open", "icons" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
@@ -309,6 +310,7 @@ static void load_shared()
     read_string(j, "theme", c.theme);
     read_string(j, "text_size", c.text_size);
     read_string(j, "effects", c.effects);
+    read_string(j, "rail", c.rail);
     read_string(j, "ntp_server", c.ntp_server);
     read_bool(j, "advanced", c.advanced);
     read_bool(j, "auto_relock", c.auto_relock);
@@ -421,6 +423,7 @@ bool snapshot(Snapshot& snap)
     j["theme"]           = s_config.theme;
     j["text_size"]       = s_config.text_size;
     j["effects"]         = s_config.effects;
+    j["rail"]            = s_config.rail;
     j["ntp_server"]      = s_config.ntp_server;
     j["custom_servers"]  = s_config.custom_servers;
     j["advanced"]        = s_config.advanced;
