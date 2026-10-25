@@ -16,6 +16,8 @@
 #define E_LIMIT "\"min\":0,\"max\":1440,\"step\":5,\"mode\":\"box\"," E_MINUTES ",\"ent_cat\":\"config\""
 #define E_DIAG "\"ent_cat\":\"diagnostic\""
 #define E_CONFIG "\"ent_cat\":\"config\""
+// Off until turned on on the device page: what few dashboards need.
+#define E_OFF ",\"en\":false"
 #define E_SPACE "\"unit_of_meas\":\"MiB\",\"dev_cla\":\"data_size\",\"stat_cla\":\"measurement\""
 // The document an entity's template reads (NULL: the state).
 #define T_SYSTEM "system"
@@ -35,12 +37,12 @@ static const SyncEntity ENTITIES[] = {
     { "limit_reached", "binary_sensor", SyncWrite_None, "Time is up", "{{ value_json.timer.limit_reached }}",
       E_BINARY ",\"ic\":\"mdi:timer-alert-outline\"", NULL },
     { "clock_accurate", "binary_sensor", SyncWrite_None, "Network clock accurate",
-      "{{ value_json.clock_accurate }}", E_BINARY "," E_DIAG, NULL },
+      "{{ value_json.clock_accurate }}", E_BINARY "," E_DIAG E_OFF, NULL },
 
     // sensors
     { "used_screen_time", "sensor", SyncWrite_None, "Used screen time", "{{ value_json.timer.used_min }}", E_TOTAL, NULL },
     { "used_screen_time_log", "sensor", SyncWrite_None, "Used screen time (play log)",
-      "{{ value_json.activity_today.used_min }}", E_TOTAL, NULL },
+      "{{ value_json.activity_today.used_min }}", E_TOTAL E_OFF, NULL },
     { "screen_time_remaining", "sensor", SyncWrite_None, "Screen time remaining",
       "{{ value_json.timer.remaining_min }}", E_MEASURE, NULL },
     { "extended_screen_time", "sensor", SyncWrite_None, "Extended screen time",
@@ -48,12 +50,12 @@ static const SyncEntity ENTITIES[] = {
     { "now_playing", "sensor", SyncWrite_None, "Now playing",
       "{{ value_json.activity_today.now_playing.name or value_json.activity_today.now_playing.app_id }}",
       "\"ic\":\"mdi:gamepad-variant\"", NULL },
-    { "rating_age", "sensor", SyncWrite_None, "Age rating", "{{ value_json.controls.rating_age }}", E_DIAG, NULL },
+    { "rating_age", "sensor", SyncWrite_None, "Age rating", "{{ value_json.controls.rating_age }}", E_DIAG E_OFF, NULL },
     { "firmware", "sensor", SyncWrite_None, "Firmware", "{{ value_json.console.firmware }}", E_DIAG, NULL },
     { "atmosphere", "sensor", SyncWrite_None, "Atmosphère", "{{ value_json.console.atmosphere }}", E_DIAG, NULL },
     { "spent_raw", "sensor", SyncWrite_None, "Time spent (1952)", "{{ value_json.timer.spent_raw_min }}",
-      E_MINUTES "," E_DIAG ",\"en\":false", NULL },
-    { "last_order", "sensor", SyncWrite_None, "Last order", "{{ value_json.link.last_result }}", E_DIAG, NULL },
+      E_MINUTES "," E_DIAG E_OFF, NULL },
+    { "last_order", "sensor", SyncWrite_None, "Last order", "{{ value_json.link.last_result }}", E_DIAG E_OFF, NULL },
 
     // limits
     { "limit_sun", "number", SyncWrite_Timer, "Limit Sunday", "{{ value_json.timer.limits.sun }}", E_LIMIT, NULL },
@@ -99,7 +101,7 @@ static const SyncEntity ENTITIES[] = {
     // buttons
     { "sync_now", "button", SyncWrite_Free, "Sync now", NULL, "\"ic\":\"mdi:sync\"," E_DIAG, NULL },
     { "lock_now", "button", SyncWrite_Free, "Turn parental controls back on", NULL, "\"ic\":\"mdi:lock\"", NULL },
-    { "export_report", "button", SyncWrite_Free, "Export a diagnostic report", NULL, E_DIAG, NULL },
+    { "export_report", "button", SyncWrite_Free, "Export a diagnostic report", NULL, E_DIAG E_OFF, NULL },
     { "add_bonus_time_15", "button", SyncWrite_Timer, "Extra time +15 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
     { "add_bonus_time_30", "button", SyncWrite_Timer, "Extra time +30 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
     { "add_bonus_time_60", "button", SyncWrite_Timer, "Extra time +1 h", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
@@ -112,27 +114,27 @@ static const SyncEntity ENTITIES[] = {
     // The console itself (the system document): versions, hardware, storage,
     // power, network. Diagnostic but for what a parent may want on a card.
     { "model", "sensor", SyncWrite_None, "Model", "{{ value_json.hardware.model }}",
-      "\"dev_cla\":\"enum\",\"ops\":[\"erista\",\"mariko\",\"lite\",\"oled\",\"other\"]," E_DIAG, T_SYSTEM },
+      "\"dev_cla\":\"enum\",\"ops\":[\"erista\",\"mariko\",\"lite\",\"oled\",\"other\"]," E_DIAG E_OFF, T_SYSTEM },
     { "nickname", "sensor", SyncWrite_None, "Console nickname", "{{ value_json.hardware.nickname }}",
-      "\"ic\":\"mdi:tag-text-outline\"," E_DIAG, T_SYSTEM },
+      "\"ic\":\"mdi:tag-text-outline\"," E_DIAG E_OFF, T_SYSTEM },
     { "region", "sensor", SyncWrite_None, "Region", "{{ value_json.hardware.region }}",
-      "\"dev_cla\":\"enum\",\"ops\":[\"jpn\",\"usa\",\"eur\",\"aus\",\"htk\",\"chn\"]," E_DIAG, T_SYSTEM },
-    { "hekate", "sensor", SyncWrite_None, "hekate", "{{ value_json.versions.hekate }}", E_DIAG, T_SYSTEM },
+      "\"dev_cla\":\"enum\",\"ops\":[\"jpn\",\"usa\",\"eur\",\"aus\",\"htk\",\"chn\"]," E_DIAG E_OFF, T_SYSTEM },
+    { "hekate", "sensor", SyncWrite_None, "hekate", "{{ value_json.versions.hekate }}", E_DIAG E_OFF, T_SYSTEM },
     { "system_storage", "sensor", SyncWrite_None, "System", "{{ value_json.hardware.system }}",
-      "\"dev_cla\":\"enum\",\"ops\":[\"sysmmc\",\"emummc\"]," E_DIAG, T_SYSTEM },
+      "\"dev_cla\":\"enum\",\"ops\":[\"sysmmc\",\"emummc\"]," E_DIAG E_OFF, T_SYSTEM },
     { "prodinfo_blanked", "binary_sensor", SyncWrite_None, "PRODINFO blanked",
-      "{{ value_json.hardware.prodinfo_blanked }}", E_BINARY "," E_DIAG, T_SYSTEM },
+      "{{ value_json.hardware.prodinfo_blanked }}", E_BINARY "," E_DIAG E_OFF, T_SYSTEM },
     // Only with "Publish the serial number" on the console; off in Home Assistant too.
     { "serial", "sensor", SyncWrite_None, "Serial number", "{{ value_json.hardware.serial }}",
-      E_DIAG ",\"en\":false", T_SYSTEM },
+      E_DIAG E_OFF, T_SYSTEM },
     { "sd_free", "sensor", SyncWrite_None, "SD card free space", "{{ value_json.storage.sd.free_mb }}",
       E_SPACE ",\"ic\":\"mdi:micro-sd\"", T_SYSTEM },
     { "sd_total", "sensor", SyncWrite_None, "SD card size", "{{ value_json.storage.sd.total_mb }}",
-      E_SPACE ",\"ic\":\"mdi:micro-sd\"," E_DIAG, T_SYSTEM },
+      E_SPACE ",\"ic\":\"mdi:micro-sd\"," E_DIAG E_OFF, T_SYSTEM },
     { "nand_free", "sensor", SyncWrite_None, "Internal storage free space", "{{ value_json.storage.nand.free_mb }}",
       E_SPACE ",\"ic\":\"mdi:harddisk\"", T_SYSTEM },
     { "nand_total", "sensor", SyncWrite_None, "Internal storage size", "{{ value_json.storage.nand.total_mb }}",
-      E_SPACE ",\"ic\":\"mdi:harddisk\"," E_DIAG, T_SYSTEM },
+      E_SPACE ",\"ic\":\"mdi:harddisk\"," E_DIAG E_OFF, T_SYSTEM },
     { "battery", "sensor", SyncWrite_None, "Battery", "{{ value_json.power.battery_pct }}",
       "\"unit_of_meas\":\"%\",\"dev_cla\":\"battery\",\"stat_cla\":\"measurement\"", T_SYSTEM },
     { "charging", "binary_sensor", SyncWrite_None, "Charging", "{{ value_json.power.charging }}",
@@ -140,18 +142,18 @@ static const SyncEntity ENTITIES[] = {
     { "docked", "binary_sensor", SyncWrite_None, "Docked", "{{ value_json.power.docked }}",
       E_BINARY ",\"ic\":\"mdi:television\"", T_SYSTEM },
     { "temperature", "sensor", SyncWrite_None, "Temperature", "{{ value_json.power.temperature_c }}",
-      "\"unit_of_meas\":\"\xc2\xb0" "C\",\"dev_cla\":\"temperature\",\"stat_cla\":\"measurement\"," E_DIAG, T_SYSTEM },
+      "\"unit_of_meas\":\"\xc2\xb0" "C\",\"dev_cla\":\"temperature\",\"stat_cla\":\"measurement\"," E_DIAG E_OFF, T_SYSTEM },
     { "network", "sensor", SyncWrite_None, "Connection", "{{ value_json.network.type }}",
-      "\"dev_cla\":\"enum\",\"ops\":[\"none\",\"wifi\",\"ethernet\"]," E_DIAG, T_SYSTEM },
+      "\"dev_cla\":\"enum\",\"ops\":[\"none\",\"wifi\",\"ethernet\"]," E_DIAG E_OFF, T_SYSTEM },
     { "ip_address", "sensor", SyncWrite_None, "IP address", "{{ value_json.network.ip }}",
-      "\"ic\":\"mdi:ip-network\"," E_DIAG, T_SYSTEM },
+      "\"ic\":\"mdi:ip-network\"," E_DIAG E_OFF, T_SYSTEM },
     { "wifi_signal", "sensor", SyncWrite_None, "Wi-Fi signal", "{{ value_json.network.wifi_bars }}",
-      "\"stat_cla\":\"measurement\",\"ic\":\"mdi:wifi\"," E_DIAG, T_SYSTEM },
+      "\"stat_cla\":\"measurement\",\"ic\":\"mdi:wifi\"," E_DIAG E_OFF, T_SYSTEM },
     // The network's name: off in Home Assistant until wanted.
     { "ssid", "sensor", SyncWrite_None, "Wi-Fi network", "{{ value_json.network.ssid }}",
-      "\"ic\":\"mdi:wifi\"," E_DIAG ",\"en\":false", T_SYSTEM },
+      "\"ic\":\"mdi:wifi\"," E_DIAG E_OFF, T_SYSTEM },
     { "last_boot", "sensor", SyncWrite_None, "Last started",
-      "{{ as_datetime(value_json.boot_ts) if value_json.boot_ts else None }}", "\"dev_cla\":\"timestamp\"," E_DIAG,
+      "{{ as_datetime(value_json.boot_ts) if value_json.boot_ts else None }}", "\"dev_cla\":\"timestamp\"," E_DIAG E_OFF,
       T_SYSTEM },
 
     // The games (the games document, PlayGuard's): the per-game sensors are
@@ -161,7 +163,7 @@ static const SyncEntity ENTITIES[] = {
     { "play_time_total", "sensor", SyncWrite_None, "Play time (all time)", "{{ value_json.total_min }}",
       E_MINUTES ",\"stat_cla\":\"total_increasing\",\"ic\":\"mdi:timer-sand-complete\"", T_GAMES },
     { "accounts", "sensor", SyncWrite_None, "User accounts", "{{ value_json.accounts }}",
-      "\"ic\":\"mdi:account-multiple\"," E_DIAG, T_GAMES },
+      "\"ic\":\"mdi:account-multiple\"," E_DIAG E_OFF, T_GAMES },
 };
 
 const SyncEntity *sync_entities(size_t *count)

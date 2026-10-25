@@ -89,6 +89,12 @@ handle the topics yourself).
 | The console | Model, Console nickname, Region, hekate, System (sysMMC / emuMMC), PRODINFO blanked, Serial number (off, see below), SD card free space and size, Internal storage free space and size, Battery, Charging, Docked, Temperature, Connection, IP address, Wi-Fi signal, Wi-Fi network (off), Last started |
 | Games | Games installed, Play time (all time), User accounts; the integration below adds one sensor per game |
 
+What a dashboard needs is on; the rest is off in Home Assistant until you turn
+it on, on the device's page (*entities not shown*): Used screen time (play
+log), Age rating, Last order, Network clock accurate, Export a diagnostic
+report, User accounts, and the console's own but the free space, Battery,
+Charging and Docked.
+
 The console's own entities read `playguard/<id>/system`, which the agent
 keeps fresh while PlayGuard is closed; the games ones read
 `playguard/<id>/games`, which PlayGuard publishes after each read of the play

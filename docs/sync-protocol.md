@@ -319,7 +319,7 @@ the profiles change and when read-only mode changes.
 | Platform | Object ids |
 |---|---|
 | binary_sensor | `parental_controls_enabled`, `temp_unlocked`, `pin_set`, `companion_linked`, `timer_enabled`, `limit_reached`, `clock_accurate` |
-| sensor | `used_screen_time`, `used_screen_time_log`, `screen_time_remaining`, `extended_screen_time`, `now_playing`, `rating_age`, `firmware`, `atmosphere`, `spent_raw` (disabled by default), `last_order` |
+| sensor | `used_screen_time`, `used_screen_time_log`, `screen_time_remaining`, `extended_screen_time`, `now_playing`, `rating_age`, `firmware`, `atmosphere`, `spent_raw`, `last_order` |
 | number | `limit_sun` … `limit_sat`, `limit_uniform`, `max_screentime_today` (0–1440, step 5, minutes) |
 | time | `bedtime_alarm`, `bedtime_end_time` |
 | select | `restriction_level` (`unrestricted`, `young_child`, `child`, `teen`, `custom`), `profile` (the saved profiles; only when there are some) |
@@ -334,6 +334,10 @@ log's; both are `total_increasing` (a day's total, back to 0 at midnight),
 Diagnostic entities (`pin_set`, `clock_accurate`, `rating_age`, `firmware`,
 `atmosphere`, `spent_raw`, `last_order`, `export_report`) carry
 `ent_cat: diagnostic`; the limits, bedtime, alarm and restrictions `config`.
+Those few dashboards need carry `en: false`, off until turned on in Home
+Assistant: `clock_accurate`, `used_screen_time_log`, `rating_age`,
+`spent_raw`, `last_order`, `export_report`, `accounts`, and those of the
+`system` topic but `sd_free`, `nand_free`, `battery`, `charging` and `docked`.
 Ids and names follow HA's `nintendo_parental_controls` integration where the
 meaning matches. The table is `source/sync/sync_entities.c`.
 

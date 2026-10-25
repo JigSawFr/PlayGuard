@@ -651,11 +651,14 @@ static void test_discovery(void)
     CHECK(contains(buf, "\"ops\":[\"School week\",\"Holidays\"]"));
     CHECK(contains(buf, "\"bedtime_alarm\":{\"p\":\"time\""));
     // The console's own entities read the system and games documents; the
-    // serial number and the Wi-Fi network's name are off in Home Assistant.
+    // serial number, the Wi-Fi network's name and what few dashboards need
+    // (the model, the battery's not) are off in Home Assistant.
     CHECK(contains(buf, "\"battery\":{\"p\":\"sensor\",\"name\":\"Battery\",\"uniq_id\":\"playguard_a1b2c3d4_battery\","
                         "\"stat_t\":\"playguard/a1b2c3d4/system\",\"val_tpl\":\"{{ value_json.power.battery_pct }}\""));
     CHECK(contains(buf, "\"stat_t\":\"playguard/a1b2c3d4/games\",\"val_tpl\":\"{{ value_json.installed }}\""));
     CHECK(contains(buf, "\"val_tpl\":\"{{ value_json.hardware.serial }}\",\"ent_cat\":\"diagnostic\",\"en\":false"));
+    CHECK(contains(buf, "\"oled\",\"other\"],\"ent_cat\":\"diagnostic\",\"en\":false"));
+    CHECK(contains(buf, "\"stat_cla\":\"measurement\"},\"charging\""));
     CHECK(contains(buf, "\"unit_of_meas\":\"\xc2\xb0" "C\",\"dev_cla\":\"temperature\""));
     CHECK(n < SYNC_SCRATCH_SIZE * 3 / 4);   // room to grow
     // Every component has a unique id and the device's availability.
