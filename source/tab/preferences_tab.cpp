@@ -60,12 +60,14 @@ PreferencesTab::PreferencesTab()
     rail->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
         for (const char* r : config::RAILS) labels.push_back(brls::getStr(std::string("playguard/prefs/rail_values/") + r));
+        const std::vector<std::string> icons = { "rail-auto", "rail-open", "rail-icons" };
+        static_assert(sizeof(config::RAILS) / sizeof(config::RAILS[0]) == 3, "an icon for each choice");
         ui::pick("playguard/prefs/rail"_i18n, labels, index_of(config::RAILS, config::get().rail), [this](int i) {
             config::get().rail = config::RAILS[i];
             ui::save_config();
             cadran::apply_rail();   // at once, this tab wider or narrower
             this->refresh();
-        });
+        }, true, {}, icons);
         return true;
     });
 
@@ -134,7 +136,7 @@ PreferencesTab::PreferencesTab()
 
     this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
                        { "pf_start_tab", "home" } }, false);
-    this->list.apply({ { "pf_effects", "sparkle" }, { "pf_rail", "lines" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
+    this->list.apply({ { "pf_effects", "sparkle" }, { "pf_rail", "rail-auto" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
                        { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
                        { "pf_support_reminder", "heart" }, { "pf_update_daily", "calendar" }, { "pf_update_via", "server" },
                        { "pf_first_steps", "sparkle" } });
