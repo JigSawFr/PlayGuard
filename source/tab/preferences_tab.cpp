@@ -48,11 +48,14 @@ PreferencesTab::PreferencesTab()
     effects->registerClickAction([this](brls::View*) {
         std::vector<std::string> labels;
         for (const char* e : config::EFFECTS) labels.push_back(brls::getStr(std::string("playguard/prefs/effects_values/") + e));
+        // Automatic as Text size's (full on the TV), full, and still.
+        const std::vector<std::string> icons = { "tv", "sparkle", "pause" };
+        static_assert(sizeof(config::EFFECTS) / sizeof(config::EFFECTS[0]) == 3, "an icon for each choice");
         ui::pick("playguard/prefs/effects"_i18n, labels, index_of(config::EFFECTS, config::get().effects), [this](int i) {
             config::get().effects = config::EFFECTS[i];   // the next frame draws by it
             ui::save_config();
             this->refresh();
-        });
+        }, true, {}, icons);
         return true;
     });
 
