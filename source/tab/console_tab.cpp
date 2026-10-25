@@ -138,21 +138,22 @@ void ConsoleTab::refresh()
 {
     SysInfo si;
     sysinfo_get(&si);
-    // Each tile: the installed version, then a pill with the newer release
-    // the last update check found (sys_update_flow) and how many releases
-    // behind, in amber, or "Up to date" once a check knows the newest.
+    // Each tile: the installed version after a check once a check knows it is
+    // the newest, or a warning when the last update check found a newer one
+    // (sys_update_flow), named under it with how many releases behind, in
+    // amber.
     const auto version_tile = [this](brls::DetailCell* cell, const char* tile_id, sys_notes::Which which) {
         const sys_notes_flow::Status s = sys_notes_flow::status(which);
         cell->setDetailText(s.installed.empty() ? "playguard/common/unavailable"_i18n : s.installed);
         cell->setDetailTextColor(cadran::kit::color(s.installed.empty() ? "cadran/text2" : "cadran/text"));
-        std::string tag, note;
+        std::string note;
         if (s.newer) {
-            tag = brls::getStr("playguard/tools/tile_newer", s.latest);
-            if (s.behind > 1) note = brls::getStr("playguard/tools/tile_behind", (int)s.behind);
-        } else if (!s.installed.empty() && !s.latest.empty()) {
-            tag = "playguard/tools/tile_current"_i18n;
+            note = brls::getStr("playguard/tools/tile_newer", s.latest);
+            if (s.behind > 1) note += " · " + brls::getStr("playguard/tools/tile_behind", (int)s.behind);
         }
-        this->list.tag(tile_id, tag, s.newer, note);
+        const bool current = !s.newer && !s.installed.empty() && !s.latest.empty();
+        this->list.state(tile_id, s.newer ? "cadran/amber_fill" : current ? "cadran/teal_fill" : nullptr);
+        this->list.tag(tile_id, "", s.newer, note);
     };
     version_tile(fw, "cn_fw", sys_notes::Which::Firmware);
     version_tile(ams, "cn_ams", sys_notes::Which::Atmosphere);

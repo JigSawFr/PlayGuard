@@ -805,7 +805,6 @@
         "available": "{} · {} 已發布",
         "tile_newer": "{} 已發布",
         "tile_behind": "落後 {} 個版本",
-        "tile_current": "已是最新",
         "compat": "相容性",
         "compat_ok_info": "此韌體已與PlayGuard確認相容：可使用所有功能。",
         "mode": "啟動模式",
