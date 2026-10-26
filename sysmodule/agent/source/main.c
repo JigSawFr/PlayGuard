@@ -20,6 +20,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -383,6 +384,20 @@ static void today_text(char out[11], int *weekday)
     }
 }
 
+// Each account's time on day k (days back), in `out`: NULL when not known.
+static const SyncAccountTime *accounts_of(int k, SyncAccountTime out[PLAYSTATS_MAX_ACCOUNTS], size_t *n)
+{
+    *n = 0;
+    if (g_n_accounts == SIZE_MAX) return NULL;
+    for (size_t i = 0; i < g_n_accounts; i++) {
+        out[i].uid[0] = g_accounts[i].uid[0];
+        out[i].uid[1] = g_accounts[i].uid[1];
+        out[i].seconds = g_accounts[i].day_s[k];
+    }
+    *n = g_n_accounts;
+    return out;
+}
+
 static void read_activity(uint64_t now_ms, bool force)
 {
     if (!force && g_activity_at && now_ms - g_activity_at < ACTIVITY_EVERY_MS) return;
@@ -419,20 +434,6 @@ static void read_activity(uint64_t now_ms, bool force)
     static SyncAccountTime accounts[PLAYSTATS_MAX_ACCOUNTS];
     a.accounts = accounts_of(0, accounts, &a.n_accounts);
     g_activity_len = sync_activity_build(&a, g_activity, sizeof(g_activity));
-}
-
-// Each account's time on day k (days back), in `out`: NULL when not known.
-static const SyncAccountTime *accounts_of(int k, SyncAccountTime out[PLAYSTATS_MAX_ACCOUNTS], size_t *n)
-{
-    *n = 0;
-    if (g_n_accounts == SIZE_MAX) return NULL;
-    for (size_t i = 0; i < g_n_accounts; i++) {
-        out[i].uid[0] = g_accounts[i].uid[0];
-        out[i].uid[1] = g_accounts[i].uid[1];
-        out[i].seconds = g_accounts[i].day_s[k];
-    }
-    *n = g_n_accounts;
-    return out;
 }
 
 // A finished day (k days back) from the last read.
