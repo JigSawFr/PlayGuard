@@ -58,8 +58,8 @@ typedef struct {
     const char          *button_a;
     const char          *button_b;
     // The opening (GateScreen_Loading, _Opening, _Free), as PlayGuard's
-    // loading screen: its bar filled to `progress` (0..1), the arc of
-    // PlayGuard's mark turned by `spin` (in turns).
+    // loading screen: its bar filled to `progress` (0..1), the glint on
+    // PlayGuard's mark `spin` of the way round it (in turns).
     float                progress;
     float                spin;
     int                  light;        // PlayGuard's light theme (0: its dark one)

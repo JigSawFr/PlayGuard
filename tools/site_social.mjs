@@ -36,15 +36,17 @@ for (const lang of only.length ? only : LANGUAGES) {
   const features = ['f_timer_title', 'f_restrictions_title', 'f_activity_title', 'f_console_title'].map((k) => escape(t[k])).join(' · ');
   await page.setContent(`<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><style>
 @font-face { font-family: Sora; src: url("${sora}") format("woff2"); font-weight: 100 900; }
-html, body { margin: 0; width: 1280px; height: 640px; overflow: hidden; background: #0b1424; color: #e8eef7;
+html, body { margin: 0; width: 1280px; height: 640px; overflow: hidden; color: #e8eef7;
+  background: radial-gradient(110% 90% at 0% 100%, rgb(0 255 204 / 0.14), transparent 60%),
+    radial-gradient(90% 80% at 100% 0%, rgb(138 92 255 / 0.16), transparent 60%), linear-gradient(#0a1020, #141b2e);
   font-family: Sora, "Noto Sans", "Noto Sans CJK JP", sans-serif; }
-body { border-top: 8px solid #ffb547; box-sizing: border-box; position: relative; }
+body { border-top: 8px solid; border-image: linear-gradient(90deg, #00ffcc, #33bbff 55%, #8a5cff) 1; box-sizing: border-box; position: relative; }
 .text { position: absolute; left: 72px; top: 8px; bottom: 0; width: 560px; display: flex; flex-direction: column; justify-content: center; }
 .brand { display: flex; align-items: center; gap: 16px; font-size: 44px; font-weight: 700; letter-spacing: -1px; }
-.brand b { color: #2ec4a6; }
+.brand b { color: inherit; }
 h1 { font-size: 46px; line-height: 1.18; font-weight: 700; margin: 40px 0 20px; letter-spacing: -0.5px; text-wrap: balance; }
 p { font-size: 25px; line-height: 1.4; color: #a9b6cc; margin: 0 0 26px; }
-.features { font-size: 19px; color: #ffb547; }
+.features { font-size: 19px; color: #33bbff; }
 img.shot { position: absolute; left: 676px; top: 140px; width: 680px; border-radius: 14px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, .55); border: 1px solid #1f3355; }
 </style></head><body>

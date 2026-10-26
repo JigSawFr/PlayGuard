@@ -639,7 +639,7 @@ def home_body(t, lang, to_root):
     home = f"{to_root}{lang_dir(lang)}"
     return f"""    <section class="hero">
       <div class="hero-text">
-        <p class="wordmark" aria-hidden="true">Play<span>Guard</span></p>
+        <p class="wordmark" aria-hidden="true">PlayGuard</p>
         <h1>{t('hero_title')}</h1>
         <p class="sub">{t('hero_sub')}</p>
         <p>{t('hero_text')}</p>
