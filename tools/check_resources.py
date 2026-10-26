@@ -3,7 +3,7 @@
 
 - every i18n JSON file parses, and every language (resources/i18n/<code>/
   playguard.json) defines exactly the keys of en-US, with as many "{}";
-- Aurore's ui::LANGUAGES (extern/borealis, the language picker's list that
+- Aurore's ui::LANGUAGES (library/aurore, the language picker's list that
   config::LANGUAGES names) lists exactly those languages;
 - every "playguard/..." key referenced from C++ or XML exists in en-US;
 - a key built at runtime ("playguard/days_short/{}",
@@ -73,7 +73,7 @@ import xml.parsers.expat
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
 # Aurore's Cadran's preferences: the languages, themes, text sizes, effects.
-PREFS_HPP = "extern/borealis/library/include/borealis/cadran/ui/prefs.hpp"
+PREFS_HPP = "library/aurore/library/include/borealis/cadran/ui/prefs.hpp"
 errors = []
 warnings = []
 # Names that read the same in every language.
@@ -548,7 +548,7 @@ for path in glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
     sim_read |= set(re.findall(r'(?:sim_env(?:_flag|_int)?|getenv)\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
 # Aurore's Cadran reads its flags through ui::env_flag("NAME"), which
 # activity/screen_hooks.cpp answers with PLAYGUARD_SIM_NAME.
-for path in glob.glob(f"{ROOT}/extern/borealis/library/lib/cadran/**/*.cpp", recursive=True):
+for path in glob.glob(f"{ROOT}/library/aurore/library/lib/cadran/**/*.cpp", recursive=True):
     sim_read |= {"PLAYGUARD_SIM_" + n for n in re.findall(r'env_flag\(\s*"(\w+)"', read(path))}
 sim_documented = set(re.findall(r"`(PLAYGUARD_SIM_\w+)", simulator_page))
 if not sim_read or not sim_documented:

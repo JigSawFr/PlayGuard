@@ -211,7 +211,7 @@ jobs:
         with:
           submodules: true   # nlohmann/json (bundled with borealis) for the backup and export tests
       # A compiler error or warning becomes an annotation on the file's line
-      # (.github/problem-matchers/gcc.json). Not for extern/: borealis' own
+      # (.github/problem-matchers/gcc.json). Not for extern/ nor library/: borealis' own
       # warnings are not PlayGuard's, and would bury its annotations.
       - name: Compiler messages as annotations
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
@@ -363,7 +363,7 @@ jobs:
           ref: ${{ inputs.tag || github.ref }}
           submodules: true
       - name: Borealis GLFW fork
-        run: git -C extern/borealis submodule update --init --depth 1 library/lib/extern/glfw
+        run: git -C library/aurore submodule update --init --depth 1 library/lib/extern/glfw
       - name: Compiler messages as annotations
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
       # The packages below as downloaded by the last run (29 MB, 6 s to
