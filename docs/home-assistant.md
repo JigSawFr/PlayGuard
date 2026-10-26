@@ -96,7 +96,8 @@ handle the topics yourself). It is the console as Nintendo names it, its model
 
 What a dashboard needs is on; the rest is off in Home Assistant until you turn
 it on, on the device's page (*entities not shown*): Used screen time (the
-play timer's), each day's limit, Age rating, Last order, Network clock accurate, Export a diagnostic
+play timer's), each day's limit, Age rating, Firmware and Atmosphère (the
+device's info shows both), Last order, Network clock accurate, Export a diagnostic
 report, User accounts, and the console's own but the free space, Battery,
 Charging and Docked.
 
