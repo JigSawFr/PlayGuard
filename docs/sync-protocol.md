@@ -236,7 +236,11 @@ each game's history in a long-term statistic, with no sensor per game.
 holds, once per run, and clears the days 15 to 30 days old. `per_account`
 (`[{ "uid": "<32 hex>", "s": …, "min": … }]`) is filled by PlayGuard only when
 it read every account's data in the last 15 minutes (the Activity tab's
-account filter), else `null`; the agent does not open the account service. Application ids are 16 uppercase hex characters, as the
+account filter), else `null`. The agent fills it from the play log: the
+accounts opened in a game over the last 7 days, each with the time a game had
+the focus while it was open (local play: each account the whole time); an
+account that did not play then is left out, and the agent does not open the
+account service. Application ids are 16 uppercase hex characters, as the
 console prints them. PlayGuard's own time over a game is excluded, as in the
 Activity tab.
 

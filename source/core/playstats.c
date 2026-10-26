@@ -3,6 +3,7 @@
 #include "playstats.h"
 
 #include <stdatomic.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -200,8 +201,10 @@ static bool played_totals(void *ctx, u64 app_id, GameStat *g)
 }
 
 size_t playstats_days(PlayLogTotal *out, size_t max, u64 *now, u8 day_wday[7], u64 *playing,
-                      u64 *playing_since, Result *rc_out)
+                      u64 *playing_since, PlayLogAccountDays *accounts, size_t max_accounts, size_t *n_accounts,
+                      Result *rc_out)
 {
+    *n_accounts = SIZE_MAX;
     *now = 0;
     *playing = *playing_since = 0;
     time_local_now(now, NULL);
@@ -222,6 +225,15 @@ size_t playstats_days(PlayLogTotal *out, size_t max, u64 *now, u8 day_wday[7], u
     rc = read_events(day_starts[6] >= DAY_S ? day_starts[6] - DAY_S : 0, &events, &count, &capped);
     if (R_SUCCEEDED(rc)) {
         n = playlog_fold_days(events, count, *now, day_starts, out, max);
+        // Each account's days: the log filtered per account into `scratch`,
+        // folded into `totals` (`out` is the caller's).
+        PlayLogEvent *scratch = count ? malloc(count * sizeof(*scratch)) : NULL;
+        PlayLogTotal *totals = malloc(PLAYSTATS_MAX * sizeof(*totals));
+        if (totals && (scratch || !count))
+            *n_accounts = playlog_account_days(events, count, *now, day_starts, scratch, totals, PLAYSTATS_MAX,
+                                               accounts, max_accounts);
+        free(scratch);
+        free(totals);
         // The newest focus change says which game is in front.
         for (size_t i = count; i-- > 0;) {
             const u8 k = events[i].kind;

@@ -20,6 +20,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -310,6 +311,8 @@ static bool     g_activity_ok;
 static u64      g_playing, g_playing_since;
 static PlayLogTotal g_totals[PLAYSTATS_MAX];
 static size_t   g_n_totals;
+static PlayLogAccountDays g_accounts[PLAYSTATS_MAX_ACCOUNTS];
+static size_t   g_n_accounts;            // SIZE_MAX: not known
 static u8       g_day_wday[7];
 
 static void load_conf(void)
@@ -381,6 +384,20 @@ static void today_text(char out[11], int *weekday)
     }
 }
 
+// Each account's time on day k (days back), in `out`: NULL when not known.
+static const SyncAccountTime *accounts_of(int k, SyncAccountTime out[PLAYSTATS_MAX_ACCOUNTS], size_t *n)
+{
+    *n = 0;
+    if (g_n_accounts == SIZE_MAX) return NULL;
+    for (size_t i = 0; i < g_n_accounts; i++) {
+        out[i].uid[0] = g_accounts[i].uid[0];
+        out[i].uid[1] = g_accounts[i].uid[1];
+        out[i].seconds = g_accounts[i].day_s[k];
+    }
+    *n = g_n_accounts;
+    return out;
+}
+
 static void read_activity(uint64_t now_ms, bool force)
 {
     if (!force && g_activity_at && now_ms - g_activity_at < ACTIVITY_EVERY_MS) return;
@@ -388,7 +405,8 @@ static void read_activity(uint64_t now_ms, bool force)
     u64 now = 0;
     Result rc = 0;
     const char *was = phase("the play log (pdm)");
-    g_n_totals = playstats_days(g_totals, PLAYSTATS_MAX, &now, g_day_wday, &g_playing, &g_playing_since, &rc);
+    g_n_totals = playstats_days(g_totals, PLAYSTATS_MAX, &now, g_day_wday, &g_playing, &g_playing_since, g_accounts,
+                                PLAYSTATS_MAX_ACCOUNTS, &g_n_accounts, &rc);
     phase(was);
     g_activity_ok = R_SUCCEEDED(rc);
     g_activity_s = 0;
@@ -413,6 +431,8 @@ static void read_activity(uint64_t now_ms, bool force)
     a.n_apps = n;
     a.now_playing = g_playing;
     a.now_playing_since = g_playing_since;
+    static SyncAccountTime accounts[PLAYSTATS_MAX_ACCOUNTS];
+    a.accounts = accounts_of(0, accounts, &a.n_accounts);
     g_activity_len = sync_activity_build(&a, g_activity, sizeof(g_activity));
 }
 
@@ -433,6 +453,8 @@ static size_t final_doc(int k, const char *date, char *out, size_t cap)
     a.final = true;
     a.apps = apps;
     a.n_apps = n;
+    static SyncAccountTime accounts[PLAYSTATS_MAX_ACCOUNTS];
+    a.accounts = accounts_of(k, accounts, &a.n_accounts);
     return sync_activity_build(&a, out, cap);
 }
 
