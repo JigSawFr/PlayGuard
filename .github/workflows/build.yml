@@ -935,7 +935,7 @@ jobs:
         id: map
         with:
           name: playguard-${{ env.LABEL }}-linker-map
-          path: build/borealis.map
+          path: build/playguard.map
           retention-days: 14
           if-no-files-found: error
       # The .nro size of main's last build (a small JSON in the Actions cache,
@@ -959,10 +959,10 @@ jobs:
                  --artifact "playguard-$LABEL-agent|$AGENT_URL|playguard-agent.zip (unzip at the SD-card root) · playguard-agent.nsp"
           if [ -n "$SDCARD_URL" ]; then set -- "$@" --artifact "playguard-$LABEL-sdcard|$SDCARD_URL|playguard.zip (the store package: unzip at the SD-card root)"; fi
           set -- "$@" --artifact "playguard-$LABEL-hbas|$HBAS_URL|PlayGuard/ (the Homebrew App Store listing: pkgbuild.json and its images)"
-          set -- "$@" --artifact "playguard-$LABEL-linker-map|$MAP_URL|borealis.map (14 days)"
+          set -- "$@" --artifact "playguard-$LABEL-linker-map|$MAP_URL|playguard.map (14 days)"
           python3 tools/ci_summary.py build --version "${{ needs.meta.outputs.version }}" --ref "${{ needs.meta.outputs.ref }}" \
             --sha "${{ needs.meta.outputs.sha }}" --ccache ccache-stats.txt --gcc "$(/opt/devkitpro/devkitA64/bin/aarch64-none-elf-gcc -dumpfullversion)" \
-            --map build/borealis.map --baseline baseline-nro/size.json --write-baseline baseline-nro/size.json "$@" \
+            --map build/playguard.map --baseline baseline-nro/size.json --write-baseline baseline-nro/size.json "$@" \
             >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && inputs.tag == ''

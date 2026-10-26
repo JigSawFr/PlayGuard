@@ -308,7 +308,7 @@ void ForwardersActivity::show_lock()
     const hbmenu_lock::Summary s = hbmenu_lock::summary();
     const bool on = s.locked;
     lock_cell->setDetailText(on ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n);
-    ui::show_writable(lock_cell, !app::read_only(), cadran::kit::color("cadran/text"), on ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
+    ui::show_writable(lock_cell, !app::read_only(), "cadran/text", on ? "cadran/teal" : "cadran/text2");
     const GatePauseRule rule = forwarder_flow::pause_rule();
     pause_cell->setDetailText(forwarder_flow::pause_label(rule.tries, rule.minutes));
     wait_cell->setDetailText(forwarder_flow::wait_label(forwarder_flow::launch_wait()));
@@ -383,8 +383,8 @@ void ForwardersActivity::show_self()
     const bool on = own && own->state != State::NotInstalled;
     self_cell->setDetailText(on ? state_text(*own) : "playguard/forwarders/add"_i18n);
     // Read-only: greyed when it would add it (its details stay a press away).
-    ui::show_writable(self_cell, on || !app::read_only(), cadran::kit::color("cadran/text"),
-                      on && own->state == State::Ready ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
+    ui::show_writable(self_cell, on || !app::read_only(), "cadran/text",
+                      on && own->state == State::Ready ? "cadran/teal" : "cadran/text2");
 }
 
 std::function<void(bool)> ForwardersActivity::then_rebuild(uint64_t id)

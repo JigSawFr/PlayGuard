@@ -122,7 +122,7 @@ SecurityTab::SecurityTab()
                        { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" },
                        { "sc_rescue", "tools" } });
     if (cadran::Card* danger = this->list.card_of("sc_delete"))
-        danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
+        danger->setAccent("cadran/coral_line");
 }
 
 void SecurityTab::willAppear(bool resetState)
@@ -207,7 +207,7 @@ void SecurityTab::refresh()
                                  (brls::DetailCell*)auto_relock.getView() })
         ui::show_writable(c, writable);
     auto_relock->setOn(config::get().auto_relock, false);
-    ui::show_writable(del, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
+    ui::show_writable(del, writable, "cadran/coral", "cadran/text2");
     this->list.sync();
     if (unlocked) cadran::set_pill("playguard/cadran/pill/unlocked"_i18n, "unlock", cadran::Tone::WARN);
     else if (has_pin) cadran::set_pill("playguard/cadran/pill/pin_set"_i18n, "key");

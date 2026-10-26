@@ -91,7 +91,7 @@ PlayTimerTab::PlayTimerTab()
                        { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" }, { "pt_remove", "trash" } });
     // Removing the limit: last, apart, in coral (as Security's "Delete all").
     if (cadran::Card* danger = this->list.card_of("pt_remove"))
-        danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
+        danger->setAccent("cadran/coral_line");
 
     // The week: edited here, saved together (+ or Save), as in the per-day editor.
     week_editor->set_can_edit([this]() {
@@ -275,7 +275,7 @@ void PlayTimerTab::refresh()
                            (brls::View*)extra_auto.getView(), (brls::View*)advanced.getView(),
                            (brls::View*)remove_cell.getView() })
         ui::set_visible(v, fw_ok);
-    ui::show_writable(remove_cell, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
+    ui::show_writable(remove_cell, writable, "cadran/coral", "cadran/text2");
     const auto& cfg = config::get();
     ui::set_detail(extra_amounts, amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
     extra_auto->setOn(cfg.extra_auto_restore, false);

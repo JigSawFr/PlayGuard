@@ -179,9 +179,9 @@ if (PLATFORM_SWITCH)
 endif ()
 
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
 
-target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen extern/stb ${APP_PLATFORM_INCLUDE})
+target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen extern/stb)
 if (NOT PLATFORM_SWITCH)
     target_include_directories(${PROJECT_NAME} PRIVATE source/sync sysmodule/agent/source)
 endif ()
@@ -197,7 +197,7 @@ set(PLAYGUARD_WARNINGS -Wall -Wextra -Wimplicit-fallthrough -Wshadow $<$<COMPILE
 if (PLAYGUARD_WERROR)
     list(APPEND PLAYGUARD_WARNINGS -Werror)
 endif ()
-target_compile_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_OPTION} ${PLAYGUARD_WARNINGS})
+target_compile_options(${PROJECT_NAME} PRIVATE ${PLAYGUARD_WARNINGS})
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp PROPERTIES COMPILE_OPTIONS "-w")
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/stb_image_write.c PROPERTIES COMPILE_OPTIONS "-w")
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/extern/stb/pg_stb.c PROPERTIES COMPILE_OPTIONS "-w")
@@ -240,7 +240,7 @@ set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/app.cpp APPEND PROPERTY C
              APP_VERSION="${APP_VERSION}" APP_COMMIT="${APP_COMMIT}" APP_PR=${APP_PR} APP_RELEASE=${APP_RELEASE})
 set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/action/rescue.cpp APPEND PROPERTY COMPILE_DEFINITIONS
              APP_RESCUE_REV="${RESCUE_REV}")
-target_link_libraries(${PROJECT_NAME} PRIVATE borealis ${APP_PLATFORM_LIB})
+target_link_libraries(${PROJECT_NAME} PRIVATE Aurore::aurore ${APP_PLATFORM_LIB})
 # On the desktop: borealis, fmt and the standard headers most files include,
 # parsed once (a precompiled header) instead of in each of the 200-odd C++
 # files: a change to a header many include (ui/ui.hpp, app.hpp) rebuilds in
@@ -262,10 +262,12 @@ if (PLATFORM_DESKTOP AND NOT PLAYGUARD_WEB AND NOT CMAKE_VERSION VERSION_LESS 3.
                                 PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 endif ()
 # borealis' headers as system headers: their warnings are not PlayGuard's.
-get_target_property(BOREALIS_INCLUDES borealis INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(BOREALIS_INCLUDES Aurore::aurore INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${BOREALIS_INCLUDES})
-# On the Switch: a linker map (build/borealis.map) to see what makes the .nro big.
-target_link_options(${PROJECT_NAME} PRIVATE ${APP_PLATFORM_LINK_OPTION})
+# On the Switch: a linker map (build/playguard.map) to see what makes the .nro big.
+if (PLATFORM_SWITCH)
+    target_link_options(${PROJECT_NAME} PRIVATE -Wl,-Map,playguard.map)
+endif ()
 # The web simulator: WebGL 2, threads from a pool started with the page (a
 # thread asked for later waits for the browser, which a busy main thread never
 # lets it have), the resources packaged at /app/resources and the answers of a
@@ -309,6 +311,7 @@ set(ASSEMBLE_RESOURCES
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOREALIS_RESOURCES} ${MERGED_RESOURCES}
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/xml
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/themes
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/img/pokemon
     COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/img/tiles.png ${MERGED_RESOURCES}/img/demo_icon.jpg
             ${MERGED_RESOURCES}/img/aurore_96.png ${MERGED_RESOURCES}/img/aurore_256.png

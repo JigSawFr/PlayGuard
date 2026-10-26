@@ -204,10 +204,8 @@ void card_look(brls::Box* list, bool grid)
 {
     auto* card = dynamic_cast<cadran::Card*>(list);
     if (!card) return;
-    brls::Theme theme = brls::Application::getTheme();
-    const NVGcolor none = nvgRGBA(0, 0, 0, 0);
-    card->setFill(grid ? none : theme["cadran/surf"]);
-    card->setAccent(grid ? none : theme["cadran/line"]);
+    card->setFill(grid ? "cadran/none" : "cadran/surf");
+    card->setAccent(grid ? "cadran/none" : "cadran/line");
 }
 
 void round_button(brls::Button* button)

@@ -195,7 +195,7 @@ playstats_LIBS  := -lz
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 # util/date stands on core/calendar.c: a suite that links it builds that C
 # file too (its <name>_CSRC, without having to say so).
-TEST_CXXFLAGS   := -std=c++17 -Isource -isystem library/aurore/library/include
+TEST_CXXFLAGS   := -std=c++20 -Isource -isystem library/aurore/library/include
 CALENDAR_C      := source/core/calendar.c
 # Aurore's Cadran (library/aurore): the look's helpers PlayGuard tests here.
 C := library/aurore/library/lib/cadran
@@ -223,7 +223,7 @@ sys_updates_CFLAGS := -std=gnu11 -Isource/core
 # The network half twice from one test: -D__SWITCH__ for the console's path
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
-sys_updates_net_FLAGS := -std=c++17 -Isource -Isource/core -Itests/sysinfo -D__SWITCH__
+sys_updates_net_FLAGS := -std=c++20 -Isource -Isource/core -Itests/sysinfo -D__SWITCH__
 sys_updates_net_CSRC  := source/core/console_info_pure.c
 sys_updates_net_CFLAGS := -std=gnu11 -Isource/core
 sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
@@ -314,10 +314,10 @@ $(I18N_COPY)/i18n.cpp: $(I18N_STAMP) | $(TESTOUT)
 	@# in this copy only: borealis itself is built as it is.
 	@sed 's/operator"" _i18n/operator""_i18n/' $(I18N_COPY)/library/lib/core/i18n.cpp > $@
 i18n_threads_SRC   := $(I18N_COPY)/i18n.cpp tests/i18n_threads/test.cpp
-i18n_threads_FLAGS := -std=c++17 -isystem $(I18N_COPY)/library/include -isystem library/aurore/library/include \
+i18n_threads_FLAGS := -std=c++20 -isystem $(I18N_COPY)/library/include -isystem library/aurore/library/include \
                       -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
                       $(addprefix -isystem library/aurore/library/,include/borealis/extern include/borealis/extern/nanovg \
-                        include/borealis/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga/src) \
+                        include/borealis/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga) \
                       -DBRLS_RESOURCES='"./"'
 i18n_threads_LIBS  := -pthread
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
@@ -452,7 +452,7 @@ $(FUZZOUT):
 # Rebuilt when the Makefile changes too (the flags above).
 $(FUZZ_PROGRAMS): $(FUZZOUT)/%: $$($$*_FUZZ) $$($$*_FUZZ_CSRC) tests/fuzz/fuzz.h $(TEST_HEADERS) Makefile | $(FUZZOUT)
 	$(if $($*_FUZZ_CSRC),$(FUZZ_CC) -std=gnu11 $(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) -c $($*_FUZZ_CSRC) -o $@.c.o)
-	$(if $(filter %.c,$(lastword $($*_FUZZ))),$(FUZZ_CC) -std=gnu11 -Isource/core,$(FUZZ_CXX) -std=c++17) \
+	$(if $(filter %.c,$(lastword $($*_FUZZ))),$(FUZZ_CC) -std=gnu11 -Isource/core,$(FUZZ_CXX) -std=c++20) \
 		$(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) $($*_FUZZ) $(if $($*_FUZZ_CSRC),$@.c.o) $($*_FUZZ_LIBS) -o $@
 
 # A run: its output in <name>.log, its final figures on the terminal (tagged

@@ -118,7 +118,7 @@ void RescueActivity::refresh()
                           { reset_pin.getView(), actions },
                           { del.getView(), actions && has_pin } });
     ui::show_writable(reset_pin, writable);
-    ui::show_writable(del, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
+    ui::show_writable(del, writable, "cadran/coral", "cadran/text2");
 }
 
 void RescueActivity::proceed()
