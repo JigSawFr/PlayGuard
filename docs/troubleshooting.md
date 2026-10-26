@@ -18,7 +18,7 @@ You know the PIN, but the previous owner's phone app is still linked (unlinking 
 
 ### The play timer blocks everything (0-minute limit) and the PIN is forgotten
 
-PlayGuard itself cannot start then. Install the optional recovery sysmodule (`playguard-rescue.zip`) **beforehand**; when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/README.md`](../sysmodule/README.md).
+PlayGuard itself cannot start then. Install the optional recovery sysmodule **beforehand** (*Console › Optional modules*, or `playguard-rescue.zip` by hand); when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/rescue/README.md`](../sysmodule/rescue/README.md).
 
 The module must follow PlayGuard's version: with each PlayGuard update, extract that release's `playguard-rescue.zip` again (or *Update* on the notification bell's *The recovery sysmodule is out of date*), then restart the console. An older module leaves a report PlayGuard cannot check: the recovery screen then offers nothing, says the module is older, and doing `RESCUE` again gives the same until it is updated.
 

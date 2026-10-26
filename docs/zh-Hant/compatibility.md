@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
+<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
 # 相容性
 
 支援的韌體、Atmosphère 和啟動器，emuMMC 和 sysMMC，以及 PlayGuard 與替代型 sysmodule 的比較。返回 [README](../../README.md)。
@@ -66,7 +66,7 @@ PlayGuard 從不連線任天堂：連網時，它只會存取公用時間伺服�
 
 現有的少數工具都不夠好：活動報告幾乎沒有維護、內容也不詳細；家長監護功能粗糙、尚未完成。我也不想要自製的替代品，或一個一直在背景執行的 sysmodule。想法是**盡可能重用主機本身的家長監護**，連同它已經能做的一切——時間上限、PIN碼、提醒、暫停——再把它的設定帶回主機上。這就是 PlayGuard。
 
-操作主機本身的家長監護，也為更多可能打開了大門：把遊玩時間回報給家中的伺服器、接受它的指令、Home Assistant、自動化。可能的發展方向請見[路線圖的遠景](../../ROADMAP.md#horizon)（英文）。
+操作主機本身的家長監護，也為更多可能打開了大門：把遊玩時間回報給家中的伺服器、接受它的指令、Home Assistant、自動化。第一步已經實現：透過 MQTT 與 Home Assistant 建立的選用連線（[指南](../home-assistant.md)，英文）；接下來可能的發展方向請見[路線圖的遠景](../../ROADMAP.md#horizon)（英文）。
 
 ## PlayGuard 還是替代型 sysmodule？
 
@@ -76,7 +76,7 @@ PlayGuard 操作的是主機內建的家長監護（`pctl` 服務），完全離
 |---|---|---|
 | **遊玩時間上限** | 整台主機一個（主機本身的計時器） | 每個使用者帳號一個 |
 | **PIN碼、提醒、暫停** | 主機本身的 | 它自己的 |
-| **在背景執行** | 沒有（選用的復原 sysmodule 只在開機時、有 `RESCUE` 檔案要求時才會動作） | 一個 sysmodule，從開機起就在執行 |
+| **在背景執行** | 沒有（選用的復原 sysmodule 只在開機時、有 `RESCUE` 檔案要求時才會動作；Home Assistant 連線的代理程式同樣是選用的，只有安裝後才會執行） | 一個 sysmodule，從開機起就在執行 |
 | **韌體更新之後** | 主機的家長監護照常運作；PlayGuard 會以唯讀方式開啟，直到有版本支援該韌體 | 家長監護取決於 sysmodule 是否仍能運作 |
 | **從 SD 卡刪除之後** | 上限仍留在主機上 | 家長監護也跟著消失 |
 

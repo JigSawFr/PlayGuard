@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
+<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
 # Compatibilidade
 
 Firmwares, Atmosphère e launchers compatíveis, emuMMC e sysMMC, e como o PlayGuard se compara a um sysmodule substituto. Volte ao [README](../../README.md).
@@ -66,7 +66,7 @@ As crianças adoram videogame, e videogame significa tela: um limite faz parte d
 
 As poucas ferramentas que existiam não davam conta: relatórios de atividade pouco mantidos e pouco detalhados, controles parentais rudimentares e inacabados. E eu também não queria um substituto caseiro, nem um sysmodule sempre rodando em segundo plano. A ideia era **reaproveitar ao máximo o controle parental do próprio console**, com tudo o que ele já faz — o limite, o PIN, os avisos, a suspensão — e trazer as configurações dele de volta para o console. Isso é o PlayGuard.
 
-Comandar o controle parental do próprio console também abre a porta para muito mais: enviar o tempo de jogo para um servidor em casa, receber ordens dele, Home Assistant, automações. Para onde isso pode ir está no [horizonte do roadmap](../../ROADMAP.md#horizon) (em inglês).
+Comandar o controle parental do próprio console também abre a porta para muito mais: enviar o tempo de jogo para um servidor em casa, receber ordens dele, Home Assistant, automações. O primeiro passo já está aqui, uma conexão opcional com o Home Assistant por MQTT ([guia](../home-assistant.md), em inglês); para onde isso pode ir depois está no [horizonte do roadmap](../../ROADMAP.md#horizon) (em inglês).
 
 ## PlayGuard ou um sysmodule substituto?
 
@@ -76,7 +76,7 @@ O PlayGuard comanda o controle parental embutido no console (o serviço `pctl`),
 |---|---|---|
 | **Limite de tempo de jogo** | Um para o console (o temporizador do próprio console) | Um por conta de usuário |
 | **PIN, avisos, suspensão** | Os do console | Os dele |
-| **Em segundo plano** | Nada (o sysmodule de recuperação opcional só age na inicialização, quando um arquivo `RESCUE` pede) | Um sysmodule, desde a inicialização |
+| **Em segundo plano** | Nada (o sysmodule de recuperação opcional só age na inicialização, quando um arquivo `RESCUE` pede; o agente da conexão com o Home Assistant, também opcional, só roda depois de instalado) | Um sysmodule, desde a inicialização |
 | **Depois de uma atualização do firmware** | O controle do console continua funcionando; o PlayGuard abre somente leitura até uma versão oferecer suporte ao firmware | O controle depende de o sysmodule continuar funcionando |
 | **Apagado do cartão SD** | Os limites continuam no console | O controle vai embora com ele |
 

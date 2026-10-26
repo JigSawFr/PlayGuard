@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # トラブルシューティング
 
 ロックされた本体を取り戻す方法、よくある問題、不具合の報告、開発者モードについて説明します。トップページは [README](../../README.md)。
@@ -19,7 +19,7 @@ PlayGuard は、自分が動いているシステムのみまもり設定しか�
 
 ### タイマーがすべてをブロックし（上限 0 分）、暗証番号も忘れた
 
-この場合、PlayGuard 自体が起動できません。オプションのリカバリー sysmodule（`playguard-rescue.zip`）を**あらかじめ**インストールしておいてください。ロックされたら、SD カードに空の `config/playguard/RESCUE` ファイルを置いて本体を起動します。sysmodule が本体のロックを解除し、PlayGuard を開けるようになります。[`sysmodule/README.md`](../../sysmodule/README.md)（英語）を参照してください。
+この場合、PlayGuard 自体が起動できません。オプションのリカバリー sysmodule を**あらかじめ**インストールしておいてください（*本体 › 追加モジュール*、または手動で `playguard-rescue.zip`）。ロックされたら、SD カードに空の `config/playguard/RESCUE` ファイルを置いて本体を起動します。sysmodule が本体のロックを解除し、PlayGuard を開けるようになります。[`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)（英語）を参照してください。
 
 sysmodule は PlayGuard のバージョンに合わせる必要があります。PlayGuard をアップデートするたびに、そのリリースの `playguard-rescue.zip` を展開し直し（またはお知らせのベルの *リカバリー sysmodule が最新ではありません* で *更新*）、本体を再起動してください。古い sysmodule が残すレポートは、PlayGuard が確認できません。その場合、復旧画面は何も提案せず、sysmodule が古いことを伝えます。アップデートするまでは、もう一度 `RESCUE` を使っても同じ結果になります。
 

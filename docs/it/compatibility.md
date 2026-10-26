@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
+<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
 # Compatibilità
 
 Firmware, Atmosphère e launcher supportati, emuMMC e sysMMC, e come PlayGuard si confronta con un sysmodule sostitutivo. Torna al [README](../../README.md).
@@ -66,7 +66,7 @@ I bambini amano i videogiochi, e i videogiochi vogliono dire schermi: un limite 
 
 I pochi strumenti esistenti non facevano al caso: resoconti di attività poco mantenuti e poco dettagliati, un filtro famiglia rudimentale e incompleto. E non volevo nemmeno un sostituto fatto in casa, né un sysmodule sempre in esecuzione in background. L'idea era **riutilizzare il più possibile il filtro famiglia della console stessa**, con tutto ciò che già fa — il limite, il PIN, gli avvisi, la sospensione — e riportare le sue impostazioni sulla console. Questo è PlayGuard.
 
-Gestire il filtro famiglia della console stessa apre anche la porta a molto di più: inviare il tempo di gioco a un server di casa, riceverne ordini, Home Assistant, automazioni. Dove potrebbe portare è nell'[orizzonte della roadmap](../../ROADMAP.md#horizon) (in inglese).
+Gestire il filtro famiglia della console stessa apre anche la porta a molto di più: inviare il tempo di gioco a un server di casa, riceverne ordini, Home Assistant, automazioni. Il primo passo è qui, un collegamento facoltativo con Home Assistant tramite MQTT ([guida](../home-assistant.md), in inglese); dove potrebbe portare poi è nell'[orizzonte della roadmap](../../ROADMAP.md#horizon) (in inglese).
 
 ## PlayGuard o un sysmodule sostitutivo?
 
@@ -76,7 +76,7 @@ PlayGuard gestisce il filtro famiglia integrato nella console (il servizio `pctl
 |---|---|---|
 | **Limite di tempo di gioco** | Uno per la console (il timer della console stessa) | Uno per utente |
 | **PIN, avvisi, sospensione** | Quelli della console | I propri |
-| **In background** | Niente (il sysmodule di ripristino facoltativo agisce solo all'avvio della console, quando un file `RESCUE` glielo chiede) | Un sysmodule, dall'avvio |
+| **In background** | Niente (il sysmodule di ripristino facoltativo agisce solo all'avvio della console, quando un file `RESCUE` glielo chiede; l'agente del collegamento con Home Assistant, anch'esso facoltativo, funziona solo una volta installato) | Un sysmodule, dall'avvio |
 | **Dopo un aggiornamento del firmware** | Il filtro famiglia della console continua a funzionare; PlayGuard si apre in sola lettura finché una versione non supporta il firmware | Il controllo dipende dal fatto che il sysmodule funzioni ancora |
 | **Eliminato dalla scheda SD** | I limiti restano sulla console | Il controllo sparisce con lui |
 

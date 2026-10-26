@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # Fehlerbehebung
 
 Wieder Zugang zu einer gesperrten Konsole bekommen, die häufigen Probleme, einen Fehler melden, und der Entwicklermodus. Zurück zum [README](../../README.md).
@@ -19,7 +19,7 @@ Du kennst die Geheimzahl, aber die Smart-Geräte-App des Vorbesitzers ist noch v
 
 ### Der Timer sperrt alles (Limit von 0 Minuten) und die Geheimzahl ist vergessen
 
-PlayGuard selbst kann dann nicht starten. Installiere das optionale Wiederherstellungs-Sysmodul (`playguard-rescue.zip`) **vorher**; bist du ausgesperrt, lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte die Konsole — es hebt die Sperre der Konsole auf, damit PlayGuard öffnen kann. Siehe [`sysmodule/README.md`](../../sysmodule/README.md) (auf Englisch).
+PlayGuard selbst kann dann nicht starten. Installiere das optionale Wiederherstellungs-Sysmodul **vorher** (*Konsole › Optionale Module* oder `playguard-rescue.zip` von Hand); bist du ausgesperrt, lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte die Konsole — es hebt die Sperre der Konsole auf, damit PlayGuard öffnen kann. Siehe [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (auf Englisch).
 
 Das Sysmodul muss der Version von PlayGuard folgen: Entpacke bei jedem Update von PlayGuard die `playguard-rescue.zip` dieser Version erneut (oder *Aktualisieren* auf *Das Wiederherstellungs-Sysmodul ist veraltet* in der Benachrichtigungsglocke) und starte die Konsole dann neu. Ein älteres Sysmodul hinterlässt einen Bericht, den PlayGuard nicht prüfen kann: Der Wiederherstellungsbildschirm bietet dann nichts an, sagt, dass das Sysmodul älter ist, und ein erneutes `RESCUE` ergibt dasselbe, bis es aktualisiert ist.
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 27ea66c9bbab -->
+<!-- translated from docs/features.md, sha256 f6399849cfd1 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -101,7 +101,7 @@ Les entrées qui concernent la console plutôt que le contrôle parental viennen
 - le sysmodule de récupération pas à jour (pas celui fourni avec cette version, ou installé avant qu'il n'indique sa version ; *Mettre à jour* installe celui que cette version contient), puis la console à redémarrer pour qu'il serve, jusqu'à ce qu'elle l'ait été ;
 - une version qui n'a pas fini de démarrer et dont PlayGuard est revenu (*Envoyer un rapport*).
 
-Celles pour information : un retour à la version précédente, un firmware non testé avec cette version, une nouvelle version d'Atmosphère, de hekate ou du firmware (vérifiée avec *Rechercher les mises à jour chaque jour* ; l'entrée du firmware conseille d'attendre qu'Atmosphère le prenne en charge), le numéro de série non masqué sur emuMMC, le contrôle parental propre à l'autre système, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
+Celles pour information : un retour à la version précédente, un firmware non testé avec cette version, une nouvelle version d'Atmosphère, de hekate ou du firmware (vérifiée avec *Rechercher les mises à jour chaque jour* ; l'entrée du firmware conseille d'attendre qu'Atmosphère le prenne en charge), une nouvelle version de l'intégration Home Assistant (une fois qu'elle a indiqué la version que Home Assistant utilise : *Nouveautés* montre ce qui a changé depuis et le QR code qui l'ouvre dans HACS), le numéro de série non masqué sur emuMMC, le contrôle parental propre à l'autre système, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
 
 ### Comportement des entrées
 
@@ -229,7 +229,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 - **Profils** enregistrés sur la carte SD : appliquer (un profil déjà en vigueur le dit simplement), modifier, renommer ou supprimer un profil ; enregistrer les limites actuelles ou en créer un nouveau.
 - N'importe quel nom, dans n'importe quelle écriture (*École*, *周末*, *Выходные* …) — un nom sans lettres latines reçoit son propre nom de fichier, et deux noms qui donneraient le même fichier sont repérés.
-- **Profil programmé** (*Profils › Profil programmé*) : *Bientôt*. PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul : changer de profil depuis un agenda ou les vacances scolaires arrive avec le [pont MQTT](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). Un profil programmé avec une version précédente est toujours proposé quand sa période commence, et la ligne le modifie, le retire ou y met fin.
+- **Profil programmé** (*Profils › Profil programmé*) : *Avec Home Assistant*. PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul : Home Assistant le fait, depuis un agenda ou les vacances scolaires, une fois la console reliée par *Console › Accès à distance* (une automatisation qui règle son sélecteur *Profil* ; [le guide Home Assistant](../home-assistant.fr.md)). Un profil programmé avec une version précédente est toujours proposé quand sa période commence, et la ligne le modifie, le retire ou y met fin.
 
 ### Bloquer tous les jeux
 
@@ -342,6 +342,10 @@ Le code PIN dans PlayGuard lui-même :
 
 Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enregistrée.
 
+### Bloqué ?
+
+Le dernier de l'onglet : le sysmodule de récupération facultatif, pour un code PIN oublié avec une limite de 0 minute. Ⓐ l'ouvre dans *Console › Modules facultatifs*, qui l'installe.
+
 ## Historique — ce que PlayGuard a changé, et les sauvegardes
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=history)*
@@ -366,7 +370,7 @@ Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enr
 
 *[L'essayer dans le simulateur ›](https://playguard.link/simulator/?tab=console)*
 
-**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les outils en tuiles, sous *Outils* (*Horloge réseau*, *Jeux installés* et *Forwarders* ; les deux premiers montrent dans leur coin ce qui demande un coup d'œil), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
+**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les outils en tuiles, sous *Outils* (*Horloge réseau*, *Jeux installés* et *Forwarders* ; les deux premiers montrent dans leur coin ce qui demande un coup d'œil ; puis *Accès à distance* et *Modules facultatifs*), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
 
 ### Horloge réseau
 
@@ -456,6 +460,14 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 - **Temps de jeu :** lancé depuis son icône, un homebrew tourne comme un jeu : le temps de jeu le compte et le suspend comme n'importe quel jeu une fois le temps écoulé, et Activité le liste. PlayGuard reste accessible depuis le menu des homebrews.
 - Chaque modification demande le code PIN quand *Protéger PlayGuard par le code PIN* le prévoit, est refusée en lecture seule et figure dans l'historique. Ce que PlayGuard a créé est gardé par système (sysMMC / emuMMC), dans `forwarders.json`.
 
+### Accès à distance
+
+*Accès à distance ›*, une tuile sous *Outils* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal.
+
+### Modules facultatifs
+
+*Modules facultatifs ›*, une tuile sous *Outils* : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération et l'agent du lien à distance, chacun dans son onglet, depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
+
 ### Les lignes de la console
 
 - **Firmware, Atmosphère, hekate** (quand son `bootloader/update.bin` est sur la carte SD) **et sys-patch** (quand il est installé ; sa version d'après son `config/sys-patch/log.ini`), chacun une tuile avec la version installée, précédée d'une coche verte quand c'est la plus récente, ou d'un avertissement orange quand la dernière recherche de mises à jour en a trouvé une plus récente, nommée dessous (*23.0.1 disponible*, avec le nombre de versions de retard quand il y en a plus d'une ; la tuile bordée d'orange) ; un avertissement dans le coin de la tuile du firmware quand le firmware le plus récent demande d'abord un Atmosphère ou un hekate plus récent, ou n'est pas encore pris en charge (les notes de version du firmware disent pourquoi, d'après celles d'Atmosphère et de hekate).
@@ -514,7 +526,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 **Plus de plantage en 22.5.** `pctl:a`, le service privilégié du contrôle parental, n'accepte **qu'une seule session**. Les anciennes versions de l'application d'origine la gardaient ouverte : l'écran PIN du menu HOME (ou l'applet PIN) ne pouvait pas l'obtenir et Atmosphère pouvait planter. PlayGuard ouvre la session pour chaque action et la libère aussitôt ; les rafraîchissements périodiques s'arrêtent quand l'application est en arrière-plan. *(Diagnostic du [fork d'anbingxi](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Rien ne tourne en arrière-plan.** La limite, le code PIN, les avertissements et la suspension sont ceux de la console ; PlayGuard ne change que leurs réglages.
+**Rien ne tourne en arrière-plan.** La limite, le code PIN, les avertissements et la suspension sont ceux de la console ; PlayGuard ne change que leurs réglages. Le lien à distance facultatif fonctionne tant que PlayGuard est ouvert, ou en permanence une fois son agent facultatif installé, et exécute un ordre exactement comme un changement fait sur la console (même déverrouillage, reverrouillage, mode lecture seule et historique) ; il ne peut jamais supprimer le contrôle parental, délier l'appli mobile ni toucher au code PIN.
 
 ## Ce qui compte comme temps de jeu
 

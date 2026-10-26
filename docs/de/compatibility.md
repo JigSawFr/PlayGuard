@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
+<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
 # Kompatibilität
 
 Unterstützte Firmware, Atmosphère und Launcher, emuMMC und sysMMC, und wie PlayGuard sich mit einem Ersatz-Sysmodul vergleicht. Zurück zum [README](../../README.md).
@@ -66,7 +66,7 @@ Kinder lieben Videospiele, und Videospiele bedeuten Bildschirme: Ein Limit gehö
 
 Die wenigen Werkzeuge, die es gab, erfüllten den Zweck nicht: Aktivitätsberichte, die kaum gepflegt und wenig detailliert waren, ein Jugendschutz, der grob und unfertig war. Und ich wollte auch keinen selbstgebauten Ersatz und kein Sysmodul, das ständig im Hintergrund läuft. Die Idee war, **den Jugendschutz der Konsole so weit wie möglich wiederzuverwenden**, mit allem, was er schon kann — das Limit, die Geheimzahl, die Warnungen, die Unterbrechung — und seine Einstellungen zurück auf die Konsole zu bringen. Das ist PlayGuard.
 
-Die Jugendschutzfunktionen der Konsole selbst zu steuern, öffnet auch die Tür zu viel mehr: die Spielzeit an einen Server zu Hause melden, Befehle von ihm annehmen, Home Assistant, Automatisierungen. Wohin das führen könnte, steht im [Horizont der Roadmap](../../ROADMAP.md#horizon) (auf Englisch).
+Die Jugendschutzfunktionen der Konsole selbst zu steuern, öffnet auch die Tür zu viel mehr: die Spielzeit an einen Server zu Hause melden, Befehle von ihm annehmen, Home Assistant, Automatisierungen. Der erste Schritt ist da, eine optionale Verbindung zu Home Assistant über MQTT ([Anleitung](../home-assistant.md), auf Englisch); wohin es als Nächstes gehen könnte, steht im [Horizont der Roadmap](../../ROADMAP.md#horizon) (auf Englisch).
 
 ## PlayGuard oder ein Ersatz-Sysmodul?
 
@@ -76,7 +76,7 @@ PlayGuard steuert den in die Konsole eingebauten Jugendschutz (den Dienst `pctl`
 |---|---|---|
 | **Spielzeitlimit** | Eines für die Konsole (der eigene Timer der Konsole) | Eines pro Benutzerkonto |
 | **Geheimzahl, Warnungen, Unterbrechung** | Die der Konsole | Seine eigenen |
-| **Im Hintergrund** | Nichts (das optionale Wiederherstellungs-Sysmodul wirkt nur beim Start, wenn eine Datei `RESCUE` es verlangt) | Ein Sysmodul, ab dem Start |
+| **Im Hintergrund** | Nichts (das optionale Wiederherstellungs-Sysmodul wirkt nur beim Start, wenn eine Datei `RESCUE` es verlangt; der Agent der Verbindung zu Home Assistant, ebenfalls optional, läuft nur, wenn er installiert ist) | Ein Sysmodul, ab dem Start |
 | **Nach einem Firmware-Update** | Der Jugendschutz der Konsole funktioniert weiter; PlayGuard öffnet schreibgeschützt, bis eine Version die Firmware unterstützt | Der Jugendschutz hängt davon ab, dass das Sysmodul weiter funktioniert |
 | **Von der SD-Karte gelöscht** | Die Limits bleiben auf der Konsole | Der Jugendschutz verschwindet mit ihm |
 

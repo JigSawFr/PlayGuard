@@ -9,7 +9,8 @@ set from the app; the file is only worth editing by hand to get back in (see
 [`pin_lock`](#pin_lock)) or to check what PlayGuard remembered.
 
 The code is the reference: `source/util/config.hpp` (fields and defaults) and
-`source/util/config.cpp` (reading, checks, writing).
+`source/util/config.cpp` (reading, checks, writing). The remote link's
+settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)).
 
 ## How the file is read
 
@@ -114,6 +115,8 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `update_latest` | string | the latest release the last check found; while newer than the running version, start-up checks again and opens the update screen | `""` |
 | `sys_latest` | string | the latest Atmosphère, hekate, firmware and sys-patch the last check found (`"atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1;syspatch=1.6.3.0"`); the notification bell says which of the first three are newer than what the console runs; at most 96 characters | `""` |
 | `sys_checked` | string | `"YYYY-MM-DD"` of that check (once a day, with *Check for updates every day*); anything else is cleared | `""` |
+| `ha_latest` | string | the latest release of PlayGuard's Home Assistant integration the last check found (checked only once the integration said which version Home Assistant runs); the notification bell says when it is newer; at most 32 characters | `""` |
+| `ha_checked` | string | `"YYYY-MM-DD"` of that check (as `sys_checked`); anything else is cleared | `""` |
 | `update_snooze_version` | string | the release whose screen *Later* postponed (cleared with `update_snooze_until` when either is malformed) | `""` |
 | `update_snooze_until` | string | `"YYYY-MM-DD"`: that release is offered again from that day (30 days at most; a farther date is ignored) | `""` |
 
@@ -124,6 +127,7 @@ The code is the reference: `source/util/config.hpp` (fields and defaults) and
 | `support_reminder` | boolean | *Support PlayGuard* once a month at start-up (*Preferences › Notifications*) | `true` |
 | `support_reminded` | string | `"YYYY-MM-DD"` of the last reminder; anything else is cleared | `""` |
 | `seen_version` | string | the version whose *What's new* was shown; at most 32 characters | `""` |
+| `agent_update_skipped` | string | the SHA-256 of the remote link agent PlayGuard carries that the offer to update the installed one was answered *Later* to: not offered again at start-up for that build (*Console › Optional modules* still offers it); at most 64 characters | `""` |
 | `notices_system` | boolean | the notification bell shows newer Atmosphère, hekate and firmware releases (*Preferences › Notifications*) | `true` |
 | `notices_summary` | boolean | the bell shows the week's play time and a limit passed on several days | `true` |
 | `notices_reminders` | boolean | the bell reminds of a settings backup to make, the other system's parental controls and *Block all games* on for a week | `true` |
@@ -201,7 +205,7 @@ over (unless that day's limit was changed since). All four keys go together.
 ### Scheduled profile
 
 *Play timer › Profiles › Scheduled profile*: a profile for a period, set by
-an earlier version (a new one waits for the MQTT bridge). When the period begins, PlayGuard asks to put it in force (once a day, when it is
+an earlier version (a new one is Home Assistant's: *Console › Remote access*). When the period begins, PlayGuard asks to put it in force (once a day, when it is
 opened); once it is over, to put back the limits it replaced. A period that
 went by with the profile never in force is forgotten. The six keys go
 together.
@@ -274,11 +278,14 @@ line; the order does not matter when it reads them:
   "update_latest": "",
   "sys_latest": "",
   "sys_checked": "",
+  "ha_latest": "",
+  "ha_checked": "",
   "update_snooze_version": "",
   "update_snooze_until": "",
   "support_reminder": true,
   "support_reminded": "",
   "seen_version": "",
+  "agent_update_skipped": "",
   "crash_seen": "",
   "notices_system": true,
   "notices_summary": true,

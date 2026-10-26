@@ -2,7 +2,8 @@
 // the temporary unlock, the homebrew menu), then the PIN (set / show),
 // protecting PlayGuard and the homebrew menu (a line to Console ›
 // Forwarders), temporary unlock, the companion phone app link, delete
-// everything. "Block all games" is in Play timer.
+// everything; last, Locked out? (the recovery sysmodule, in Console ›
+// Optional modules). "Block all games" is in Play timer.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -23,7 +24,8 @@ class SecurityTab : public TabBase
   private:
     cadran::List list;
     // The homebrew menu's lock, read from the SD card when the tab appears
-    // (back from Console › Forwarders too), not at each 5 s refresh.
+    // (back from Console › Forwarders too), not at each 5 s refresh; the
+    // recovery module's line (Locked out?) too, after Optional modules.
     bool hbmenu_locked = false;
     // Set or change the PIN (the system PIN screen), recorded in the history.
     void change_pin();
@@ -49,4 +51,6 @@ class SecurityTab : public TabBase
     BRLS_BIND(brls::Label,      pr_note,        "pr_note");
     BRLS_BIND(brls::Header,     danger_header,  "sc_danger_header");
     BRLS_BIND(brls::DetailCell, del,            "sc_delete");
+    BRLS_BIND(brls::DetailCell, rescue,         "sc_rescue");
+    BRLS_BIND(brls::Label,      rescue_about,   "sc_rescue_about");
 };

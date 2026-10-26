@@ -54,5 +54,15 @@ int main()
     in.quitting = true;
     CHECK(!wanted(in));
 
+    // A remote order while the pause is on: an unlock is the parent's from
+    // then on, turning parental controls back on ends it, the rest keeps it.
+    using session_pause_logic::on_remote;
+    using session_pause_logic::Remote;
+    CHECK(on_remote(true, true, false) == Remote::Adopt);
+    CHECK(on_remote(true, false, true) == Remote::End);
+    CHECK(on_remote(true, false, false) == Remote::Keep);
+    CHECK(on_remote(false, true, false) == Remote::Keep);   // no pause: the order as it is
+    CHECK(on_remote(false, false, true) == Remote::Keep);
+
     return CHECK_DONE("session_pause_logic assertions passed");
 }

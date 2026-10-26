@@ -8,6 +8,8 @@
 #include <borealis/cadran/util/emoji.hpp>
 #include <borealis/cadran/util/text.hpp>
 
+#include "util/update.hpp"
+
 namespace changelog
 {
 namespace
@@ -176,6 +178,21 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             continue;
         }
         line(raw, t);
+    }
+    return lines;
+}
+
+std::vector<Line> newer_than(const std::string& md, const std::string& installed)
+{
+    std::vector<Line> lines;
+    bool inside = false;
+    for (Line& l : parse(md, 0)) {
+        if (l.kind == Line::Release) {
+            const std::string v = l.text.substr(0, l.text.find(" · "));
+            int numbers[3];
+            inside = update::parse_version(v, numbers) && update::compare_versions(v, installed) > 0;
+        }
+        if (inside) lines.push_back(std::move(l));
     }
     return lines;
 }

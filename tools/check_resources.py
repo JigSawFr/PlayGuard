@@ -313,6 +313,19 @@ DYNAMIC_KEYS = {
     "notices/short/": [i for f in glob.glob(f"{ROOT}/source/tab/*.cpp")
                        for ids in re.findall(r'\bmark\([^,;]+,\s*\{([^}]*)\}\)', read(f))
                        for i in re.findall(r'"(\w+)"', ids)],
+    # The remote link (sync_activity.cpp, sync_orders.cpp) and the optional
+    # modules (modules_activity.cpp, agent_update.cpp).
+    "sync/mqtt_versions/": array_of("source/activity/sync_activity.cpp", "KEYS"),
+    "sync/policies/": returned_by("source/sync/sync_conf.c", "sync_policy_name"),
+    # "unknown": an enumerator out of range, never in an outcome.
+    "sync/reasons/": [r for r in returned_by("source/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
+    "modules/": [f"{name}/{what}"
+                 for name in re.findall(r'\{\s*Id::\w+,\s*"(\w+)"', read(f"{ROOT}/source/util/modules.cpp"))
+                 for call in re.findall(r"\bkey\(\w+,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
+                 for what in strings_of(call)],
+    "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp")
+                      for call in re.findall(r"\brecord\(([^;{]*?)\);", read(f"{ROOT}/{path}"))
+                      for v in strings_of(call)],
 }
 for prefix, values in sorted(DYNAMIC_KEYS.items()):
     values = [v for v in values if v]
@@ -544,11 +557,14 @@ for v in sorted(sim_read - sim_documented):
     warnings.append(f"the code reads {v}, which {SIMULATOR_PAGE} does not document (the simulator's table)")
 for v in sorted(sim_documented - sim_read):
     warnings.append(f"{SIMULATOR_PAGE} documents {v}, which the code does not read")
-scenarios = set(re.findall(r'SCENARIO\s*==\s*"(\w+)"', read(f"{ROOT}/tools/desktop_smoke.py")))
-m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|]+)\]", tests_page)
+smoke_text = read(f"{ROOT}/tools/desktop_smoke.py")
+scenarios = set(re.findall(r'SCENARIO\s*==\s*"([\w-]+)"', smoke_text))
+for group in re.findall(r"SCENARIO\s+in\s+\(([^)]*)\)", smoke_text):   # a flag for two scenarios
+    scenarios |= set(strings_of(group))
+m = re.search(r"desktop_smoke\.py\s+<out-dir>\s+\[([\w|-]+)\]", tests_page)
 listed_scenarios = set(m.group(1).split("|")) if m else set()
 # Each scenario of that synopsis has its line in the list under it.
-described = set(re.findall(r"^  - `(\w+)` —", tests_page, re.M))
+described = set(re.findall(r"^  - `([\w-]+)` —", tests_page, re.M))
 if not scenarios or not listed_scenarios:
     errors.append(f"no smoke scenario found in tools/desktop_smoke.py, or no list of them in {TESTS_PAGE}")
 for v in sorted(scenarios - listed_scenarios):

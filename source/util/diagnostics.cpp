@@ -6,6 +6,7 @@
 #include <sys/statvfs.h>
 #include <vector>
 
+#include "action/sync_flow.hpp"
 #include "app.hpp"
 #include "util/log_files.hpp"
 #include "util/patches.hpp"
@@ -136,6 +137,7 @@ std::string current_report()
     pctl_dump(buf.data(), buf.size());
     out += buf.data();
     if (std::string(buf.data()).size() >= buf.size() - 1) out += "\n(report truncated)\n";
+    out += sync_flow::report_section();
 
     // Last: what led here, which can be long.
     const std::string recent = session_log::recent();

@@ -38,6 +38,14 @@ std::string doc_url(const std::string& page, const std::string& anchor = "");
 // Funding links (.github/FUNDING.yml), shown in About.
 constexpr const char* SPONSORS_URL = "https://github.com/sponsors/JigSawFr";
 constexpr const char* KOFI_URL     = "https://ko-fi.com/jigsawfr";
+// The Home Assistant integration (JigSawFr/playguard-ha), through My Home
+// Assistant's redirects (it asks once for the user's own instance, then opens
+// the page there): the repository in HACS, and adding the integration.
+constexpr const char* HA_HACS_URL =
+    "https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration";
+constexpr const char* HA_ADD_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard";
+// Its releases, with what changed in each.
+constexpr const char* HA_RELEASES_URL = "https://github.com/JigSawFr/playguard-ha/releases";
 
 // Read-only mode: the service layer refuses every change (core/write_guard.h)
 // and the tabs hide their write controls. On at launch when the firmware is

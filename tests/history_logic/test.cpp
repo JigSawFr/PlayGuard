@@ -101,6 +101,7 @@ static void test_categories()
     CHECK(history_logic::category(entry("vr", {}, {})) == Category::Restrictions);
     CHECK(history_logic::category(entry("unlink", {}, {})) == Category::Security);
     CHECK(history_logic::category(entry("pin_shown", {}, {})) == Category::Security);
+    CHECK(history_logic::category(entry("module", {}, {})) == Category::Security);
     CHECK(history_logic::category(entry("outside_clock", {}, {})) == Category::Outside);
     CHECK(history_logic::category(entry("new_account", {}, {})) == Category::Outside);
     for (const char* k : { "add_forwarder", "protect_forwarder", "forwarder_gone", "gate_refused", "lock_hbmenu",
@@ -151,13 +152,17 @@ static void test_known()
         CHECK(history_logic::known_kind(k));
     // Written by a newer version, or nothing: unknown.
     CHECK(!history_logic::known_kind("") && !history_logic::known_kind("teleport") && !history_logic::known_kind("Limits"));
-    CHECK(history_logic::known_kinds().size() == 49);
+    CHECK(history_logic::known_kinds().size() == 50);
+    CHECK(history_logic::known_kind("module"));   // an optional module installed or removed
     for (const std::string& k : history_logic::known_kinds()) CHECK(history_logic::known_kind(k));
 
     for (const char* s : { "uniform", "per_day", "extra", "stop", "undo", "backup", "overview", "console_lock" })
         CHECK(history_logic::known_source(s));
     // No longer written, still in older histories: still named.
     CHECK(history_logic::known_source("day"));
+    // The remote link's (sync_orders): named as the console's own.
+    for (const char* s : { "remote", "remote_extra", "remote_stop", "remote_console_lock", "remote_restore_extra" })
+        CHECK(history_logic::known_source(s));
     // "profile" is named apart (with the profile's name), others not at all.
     CHECK(!history_logic::known_source("profile") && !history_logic::known_source("") &&
           !history_logic::known_source("telepathy"));

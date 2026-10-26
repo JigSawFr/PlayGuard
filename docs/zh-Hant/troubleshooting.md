@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # 疑難排解
 
 重新取得被鎖住的主機的控制權、常見問題、回報錯誤，以及開發者模式。返回 [README](../../README.md)。
@@ -19,7 +19,7 @@ PlayGuard 只能看到它所執行的那個系統的家長監護：**emuMMC 和 
 
 ### 遊玩時間限制封鎖了一切（0 分鐘上限），又忘了PIN碼
 
-這時 PlayGuard 本身無法啟動。請**事先**安裝選用的復原 sysmodule（`playguard-rescue.zip`）；被鎖住時，在 SD 卡上放一個空的 `config/playguard/RESCUE` 檔案再開機——它會解除主機的鎖定，讓 PlayGuard 可以開啟。請見 [`sysmodule/README.md`](../../sysmodule/README.md)（英文）。
+這時 PlayGuard 本身無法啟動。請**事先**安裝選用的復原 sysmodule（*主機 › 選用模組*，或手動安裝 `playguard-rescue.zip`）；被鎖住時，在 SD 卡上放一個空的 `config/playguard/RESCUE` 檔案再開機——它會解除主機的鎖定，讓 PlayGuard 可以開啟。請見 [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)（英文）。
 
 這個模組必須跟上 PlayGuard 的版本：每次更新 PlayGuard，都要重新解壓縮該版本的 `playguard-rescue.zip`（或在通知鈴鐺的*復原 sysmodule 不是最新版本*上選*更新*），然後重新啟動主機。舊版模組留下的報告 PlayGuard 無法驗證：這時復原畫面不會提供任何操作，只會說明模組版本較舊；在更新模組之前，再次使用 `RESCUE` 也會得到相同的結果。
 

@@ -4,6 +4,7 @@
 #include "action/dev_build_flow.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "action/notices.hpp"
+#include "action/ha_update_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sys_update_flow.hpp"
 #include "activity/update_activity.hpp"
@@ -230,6 +231,7 @@ void check_now()
     ui::notify("playguard/update/checking"_i18n);
     if (busy()) return;
     sys_update_flow::check_now();   // Atmosphère, hekate, firmware: in the notification bell
+    ha_update_flow::check_now();    // the Home Assistant integration, once known: there too
     run_check([](const Offer& o) { show_result(o); });
 }
 
@@ -251,12 +253,18 @@ void at_start(brls::Activity* main)
     const bool due = cfg.update_daily && cfg.update_checked != today;
     note_latest(cfg.update_latest);   // what the last check found, until the next one
     sys_update_flow::at_start();
+    ha_update_flow::at_start();
     if (s_checking || !(pending || due)) return;
     // Quietly: only a newer version, not postponed, is worth a word.
     check_once([main, today](const Offer& o) {
         if (newer(o.result) && update::offer_at_start(o.result.latest.version, app::version(), snooze(), today))
             show_when_free(main, o, WAIT_STEPS);
     });
+}
+
+bool pending_at_start()
+{
+    return update::offer_at_start(config::get().update_latest, app::version(), snooze(), ui::today_date());
 }
 
 void update_now()

@@ -27,8 +27,9 @@ void ProfilesActivity::onContentAvailable()
     });
     // A profile for a period (holidays): offered when it begins, the limits
     // from before once it is over. PlayGuard acts only while it is open, so
-    // a new one waits for the MQTT bridge (Home Assistant) to switch it on
-    // the day; one set by an earlier version can still be changed or ended.
+    // a new one is Home Assistant's (Console › Remote access: its profile
+    // select, from an automation); one set by an earlier version can still
+    // be changed or ended.
     schedule_note->setSingleLine(false);
     schedule->registerClickAction([this](brls::View*) {
         if (schedule_flow::summary().empty()) {
@@ -54,8 +55,9 @@ void ProfilesActivity::show_schedule()
 {
     const std::string s = schedule_flow::summary();
     if (s.empty()) {
+        // A new one: through Home Assistant (Console › Remote access).
         schedule->setDetailText("playguard/schedule/soon"_i18n);
-        schedule->setDetailTextColor(cadran::kit::color("cadran/amber"));
+        schedule->setDetailTextColor(cadran::kit::color("cadran/text2"));
         schedule_note->setText("playguard/schedule/soon_note"_i18n);
         return;
     }
