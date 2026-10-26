@@ -86,7 +86,7 @@ for 22 s, and connects again at once after a sleep longer than 45 s.
     "companion_linked": false
   },
   "timer": {
-    "supported": true, "enabled": true, "limit_reached": false,
+    "supported": true, "enabled": true, "limit_reached": false, "blocked_by": null,
     "limits": { "sun": 180, "mon": 120, "tue": 120, "wed": 120, "thu": 120, "fri": 120, "sat": 1440 },
     "limits_min": [180, 120, 120, 120, 120, 120, 1440],
     "uniform_min": null,
@@ -124,6 +124,11 @@ Every object is always there; a value the console could not read is `null`
   reached. `spent_raw_min` is command 1952, unverified. `activity_today.used_min` comes from the play
   log and exists even with no limit. See `parental-controls.md` for why they
   differ.
+- `limit_reached`: the play timer blocks games (1455), which it also does
+  during the bedtime alarm's hours; `blocked_by` says why: `bedtime` from the
+  bedtime alarm to the time play is allowed again (the console's local time),
+  else `limit` (the day's limit, *No more play today*); `null` while games are
+  not blocked.
 - `alarm_on`: the "time's up" alarm sounds (command 1953 reads it off).
 - `bedtime.start` / `end`: `HH:MM:SS`, as Home Assistant's `time` entity
   takes them. `start` is `null` when bedtime is off; `end` is the console's
@@ -258,8 +263,8 @@ the usual confirmation on the console).
 | `add_bonus_time` | integer | 5–180 | yes | Extra minutes today, 24 h at most; the usual limit comes back the next day, as in PlayGuard. Refused without a limit today or under the console lock. |
 | `add_bonus_time_15`, `_30`, `_60` | `PRESS` | | yes | The same, 15 / 30 / 60 minutes. |
 | `stop_today` | `PRESS` | | yes | 0 minutes today; the next day PlayGuard offers to put the usual limit back (or does it, with *Play timer › Put the limit back by itself after "No more play today"*). |
-| `unlocked` | `ON` / `OFF` | | `ON` only | `ON` unlocks parental controls temporarily with the stored PIN; `OFF` locks again. While PlayGuard's own pause is on (*Pause parental controls while I'm in PlayGuard*), the state shows the console as for the child; `ON` keeps the pause's unlock once PlayGuard is left, `OFF` (and `lock_now`) ends the pause. |
-| `lock_now` | `PRESS` | | no | Locks again (1007), always allowed, never asked. |
+| `parental_controls` | `LOCK` / `UNLOCK` | | `UNLOCK` only | `UNLOCK` unlocks parental controls temporarily with the stored PIN; `LOCK` locks again (1007), always allowed, never asked. While PlayGuard's own pause is on (*Pause parental controls while I'm in PlayGuard*), the state shows the console as for the child; `UNLOCK` keeps the pause's unlock once PlayGuard is left, `LOCK` ends the pause. |
+| `unlocked`, `lock_now` | `ON` / `OFF`, `PRESS` | | `ON` only | What the lock replaced, still taken (an integration that sends them): `ON` is `UNLOCK`, `OFF` and `PRESS` are `LOCK`. |
 | `play_timer_alarm` | `ON` / `OFF` | | yes | `OFF` = the "time's up" alarm disabled (1953). |
 | `bedtime_enabled` | `ON` / `OFF` | | yes | The bedtime alarm on (at the time the days share, else 21:00) or off. |
 | `bedtime_alarm` | `HH:MM` (`HH:MM:SS` accepted) | 16:00–23:59 | yes | The bedtime alarm, every day. |
@@ -327,31 +332,38 @@ the profiles change and when read-only mode changes.
 
 | Platform | Object ids |
 |---|---|
-| binary_sensor | `parental_controls_enabled`, `temp_unlocked`, `pin_set`, `companion_linked`, `timer_enabled`, `limit_reached`, `clock_accurate` |
+| binary_sensor | `parental_controls_enabled`, `pin_set`, `companion_linked`, `timer_enabled`, `limit_reached` (attribute `reason`: `blocked_by`), `clock_accurate` |
+| lock | `parental_controls` (locked while parental controls are set up and not temporarily unlocked) |
 | sensor | `used_screen_time`, `used_screen_time_log`, `screen_time_remaining`, `extended_screen_time`, `now_playing`, `rating_age`, `firmware`, `atmosphere`, `spent_raw`, `last_order` |
 | number | `limit_sun` … `limit_sat`, `limit_uniform`, `max_screentime_today` (0–1440, step 5, minutes) |
 | time | `bedtime_alarm`, `bedtime_end_time` |
 | select | `restriction_level` (`unrestricted`, `young_child`, `child`, `teen`, `custom`), `profile` (the saved profiles; only when there are some) |
-| switch | `bedtime_enabled`, `console_lock`, `play_timer_alarm`, `unlocked`, `vr_restricted`, `sns_post_restricted`, `free_communication_restricted` |
-| button | `sync_now`, `lock_now`, `export_report`, `add_bonus_time_15`, `add_bonus_time_30`, `add_bonus_time_60`, `stop_today`, `remove_limit` |
+| switch | `bedtime_enabled`, `console_lock`, `play_timer_alarm`, `vr_restricted`, `sns_post_restricted`, `free_communication_restricted` |
+| button | `sync_now`, `export_report`, `add_bonus_time_15`, `add_bonus_time_30`, `add_bonus_time_60`, `stop_today`, `remove_limit` |
 | event | `events` (event types `command_applied`, `command_rejected`, `command_waiting`) |
 
-`used_screen_time` is the timer's figure, `used_screen_time_log` the play
-log's; both are `total_increasing` (a day's total, back to 0 at midnight),
+`used_screen_time_log` (*Play time today*) is the play log's figure,
+`used_screen_time` the timer's (off: it only counts while a limit is set);
+both are `total_increasing` (a day's total, back to 0 at midnight),
 `screen_time_remaining` is `measurement`, all in minutes, device class
 `duration`.
 Diagnostic entities (`pin_set`, `clock_accurate`, `rating_age`, `firmware`,
 `atmosphere`, `spent_raw`, `last_order`, `export_report`) carry
 `ent_cat: diagnostic`; the limits, bedtime, alarm and restrictions `config`.
 Those few dashboards need carry `en: false`, off until turned on in Home
-Assistant: `clock_accurate`, `used_screen_time_log`, `rating_age`,
-`spent_raw`, `last_order`, `export_report`, `accounts`, and those of the
+Assistant: `clock_accurate`, `used_screen_time`, `limit_sun` …
+`limit_sat`, `rating_age`, `spent_raw`, `last_order`, `export_report`,
+`accounts`, and those of the
 `system` topic but `sd_free`, `nand_free`, `battery`, `charging` and `docked`.
 Ids and names follow HA's `nintendo_parental_controls` integration where the
 meaning matches. The table is `source/sync/sync_entities.c`.
 
 The HA integration, when installed, publishes `discovery/set = OFF`, and
 creates its own entities with the same object ids.
+
+What an earlier version offered and the lock replaced is sent as its platform alone, which removes it from Home
+Assistant: `temp_unlocked`, `unlocked` and `lock_now` (the lock
+`parental_controls` does all three).
 
 ## `integration`
 

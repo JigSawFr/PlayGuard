@@ -101,6 +101,24 @@ static void controls(SyncJson *j, const SyncSnapshot *s)
     sync_json_obj_end(j);
 }
 
+// Why play is blocked: within the bedtime alarm's hours (from the alarm to
+// the time play is allowed again), else the day's limit (or No more play
+// today). NULL: not blocked, or unknown.
+static const char *blocked_by(const SyncSnapshot *s)
+{
+    const PtState *pt = s->timer;
+    if (!pt || !pt->fw_supported || !pt->restricted_valid || !pt->restricted) return NULL;
+    if (pt->bedtime_valid && pt->bedtime_enabled && s->local_min_ok) {
+        const int start = pt->bedtime_hour * 60 + pt->bedtime_minute;
+        const int wd = s->weekday;
+        int end = -1;
+        if (pt->bedtime_reset_valid) end = pt->bedtime_reset_hour * 60 + pt->bedtime_reset_minute;
+        else if (pt->valid && wd >= 0 && wd <= 6 && pt->bed[wd].on) end = pt->bed[wd].end_hour * 60 + pt->bed[wd].end_minute;
+        if (s->local_min >= start || s->local_min < end) return "bedtime";
+    }
+    return "limit";
+}
+
 static void timer(SyncJson *j, const SyncSnapshot *s)
 {
     const PtState *pt = s->timer;
@@ -115,6 +133,7 @@ static void timer(SyncJson *j, const SyncSnapshot *s)
     sync_json_kbool_or_null(j, "enabled", enabled_ok, enabled_ok && pt->enabled);
     sync_json_kbool_or_null(j, "limit_reached", pt && pt->fw_supported && pt->restricted_valid,
                             pt && pt->restricted);
+    sync_json_kstr_or_null(j, "blocked_by", blocked_by(s));
 
     sync_json_key(j, "limits");
     sync_json_obj(j);

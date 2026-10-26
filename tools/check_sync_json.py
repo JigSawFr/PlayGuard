@@ -80,12 +80,14 @@ def main():
             if path not in topic_keys[topic]:
                 fail(f"discovery: {oid} reads value_json.{path}, which the {topic} document does not have")
     # entities.json (the Home Assistant integration's copy of the table): every
-    # entity, and nothing else, of the discovery with every option.
+    # entity, and nothing else, of the discovery with every option; what it
+    # removes (an earlier version's), each as its platform alone.
     path = folder / "entities.json"
     if not path.exists():
         fail(f"{path} is missing: run make test first")
     try:
-        table = json.loads(path.read_text(encoding="utf-8"))["entities"]
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        table, retired = doc["entities"], doc["retired"]
     except (json.JSONDecodeError, KeyError) as e:
         fail(f"entities.json: {e}")
     ids = [e["id"] for e in table]
@@ -98,7 +100,13 @@ def main():
         for p in re.findall(r"value_json\.([a-z0-9_.]+)", e["value_template"] or ""):
             if p not in topic_keys[e["topic"]]:
                 fail(f"entities.json: {e['id']} reads value_json.{p}, which the {e['topic']} document does not have")
-    missing = set(disc["cmps"]) - set(ids)
+    gone = {r["id"]: r["platform"] for r in retired}
+    for oid, platform in gone.items():
+        if oid in ids:
+            fail(f"entities.json: {oid} is both offered and retired")
+        if disc["cmps"].get(oid) != {"p": platform}:
+            fail(f"discovery: the retired {oid} is not sent as its platform alone")
+    missing = set(disc["cmps"]) - set(ids) - set(gone)
     if missing:
         fail(f"entities.json lacks {sorted(missing)}")
     print(f"check_sync_json: {len(disc['cmps'])} components, {len(state_keys)} state keys, "

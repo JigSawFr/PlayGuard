@@ -89,21 +89,22 @@ l'origine.
 
 | Type | Entités |
 |---|---|
-| Capteurs | Temps d'écran utilisé (le décompte du minuteur), Temps d'écran utilisé (journal de jeu), Temps d'écran restant, Temps d'écran prolongé, En cours de jeu (inconnu tant que PlayGuard est ouvert : personne ne joue alors), Âge de classification, Firmware, Atmosphère, Dernier ordre |
-| Capteurs binaires | Contrôle parental, Déverrouillé temporairement, Code PIN défini, Appli mobile liée, Minuteur, Temps écoulé, Horloge réseau exacte |
-| Nombres | Limite dimanche … samedi, Limite tous les jours, Temps d'écran max aujourd'hui (0 à 1440 minutes ; 1440 = pas de limite) |
+| Capteurs | Temps de jeu aujourd'hui (le journal de jeu : chaque jeu, avec ou sans limite), Temps d'écran utilisé (le décompte du minuteur, désactivé), Temps d'écran restant, Temps d'écran prolongé, En cours de jeu (inconnu tant que PlayGuard est ouvert : personne ne joue alors), Âge de classification, Firmware, Atmosphère, Dernier ordre |
+| Capteurs binaires | Contrôle parental configuré, Code PIN défini, Appli mobile liée, Minuteur, Jeu bloqué (son *reason* : `limit` ou `bedtime`), Horloge réseau exacte |
+| Verrou | Contrôle parental : verrouillé tant qu'il s'applique ; déverrouillez-le pour le suspendre (avec *Les ordres peuvent changer le temps de jeu* activé), verrouillez-le pour le réactiver |
+| Nombres | Limite dimanche … samedi (désactivées), Limite tous les jours, Temps d'écran max aujourd'hui (0 à 1440 minutes ; 1440 = pas de limite) |
 | Heures | Coucher, Lever |
-| Interrupteurs | Bloquer tous les jeux, Alarme « temps écoulé », Déverrouillé, Alarme du coucher, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
+| Interrupteurs | Bloquer tous les jeux, Alarme « temps écoulé », Alarme du coucher, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
 | Sélecteurs | Niveau de restriction (*unrestricted* : sans restriction, young child, child, teen, custom), Profil (vos profils enregistrés) |
-| Boutons | Synchroniser maintenant, Réactiver le contrôle parental, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
+| Boutons | Synchroniser maintenant, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
 | Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console |
 | La console | Modèle, Surnom de la console, Région, hekate, Système (sysMMC / emuMMC), PRODINFO masqué, Numéro de série (désactivé, voir plus bas), Espace libre et taille de la carte SD, Espace libre et taille du stockage interne, Batterie, En charge, Sur le dock, Température, Connexion, Adresse IP, Signal Wi-Fi, Réseau Wi-Fi (désactivé), Dernier démarrage |
 | Jeux | Jeux installés, Temps de jeu (depuis toujours), Comptes utilisateurs ; l'intégration ci-dessous liste chaque jeu sur *Jeux installés*, avec son temps de jeu, et garde l'historique de chacun dans une statistique à long terme |
 
 Ce qu'un tableau de bord utilise est activé ; le reste est désactivé dans Home
 Assistant jusqu'à ce que vous l'activiez, sur la page de l'appareil (*entités
-non affichées*) : Temps d'écran utilisé (journal de jeu), Âge de
-classification, Dernier ordre, Horloge réseau exacte, Exporter un rapport de
+non affichées*) : Temps d'écran utilisé (celui du minuteur), la limite de
+chaque jour, Âge de classification, Dernier ordre, Horloge réseau exacte, Exporter un rapport de
 diagnostic, Comptes utilisateurs, et celles de la console sauf l'espace libre,
 Batterie, En charge et Sur le dock.
 

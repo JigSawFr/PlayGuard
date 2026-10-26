@@ -577,6 +577,7 @@ static void test_entities_match_orders(void)
                            : !strcmp(e->platform, "switch") ? "ON"
                            : !strcmp(e->platform, "button") ? "PRESS"
                            : !strcmp(e->platform, "time") ? (strstr(e->id, "end") ? "06:30:00" : "21:00:00")
+                           : !strcmp(e->platform, "lock") ? "LOCK"
                            : !strcmp(e->id, "restriction_level") ? "child"
                            : !strcmp(e->id, "profile") ? "School week"
                            : "1";
@@ -590,6 +591,19 @@ static void test_entities_match_orders(void)
         CHECK(timer == (e->write == SyncWrite_Timer));
         CHECK(e->value_template || !strcmp(e->platform, "button"));
     }
+    // The lock: locking again is always allowed, unlocking needs
+    // remote_timer_writes; the switch and the button it replaced still parse.
+    SyncIntent in;
+    CHECK(parse("parental_controls", "LOCK", &in) == SyncReason_None && in.kind == SyncIntent_LockNow);
+    CHECK(!sync_intent_needs_timer_writes(in.kind));
+    CHECK(parse("parental_controls", "UNLOCK", &in) == SyncReason_None && in.kind == SyncIntent_Unlock && in.on);
+    CHECK(sync_intent_needs_timer_writes(in.kind));
+    CHECK(parse("parental_controls", "ON", &in) == SyncReason_Invalid);
+    CHECK(parse("unlocked", "OFF", &in) == SyncReason_None && in.kind == SyncIntent_LockNow);
+    CHECK(parse("lock_now", "PRESS", &in) == SyncReason_None && in.kind == SyncIntent_LockNow);
+    size_t gone = 0;
+    const SyncRetired *retired = sync_entities_retired(&gone);
+    for (size_t i = 0; i < gone; i++) CHECK(!sync_entity_find(retired[i].id));
 }
 
 // ---------------------------------------------------------------- discovery
@@ -626,10 +640,20 @@ static void test_discovery(void)
     CHECK(contains(buf, "\"avty_t\":\"playguard/a1b2c3d4/availability\""));
     CHECK(contains(buf, "\"used_screen_time\":{\"p\":\"sensor\""));
     CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/vr_restricted/set\""));
-    CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/lock_now/set\""));
     CHECK(contains(buf, "\"limit_mon\":{\"p\":\"number\"}"));
     CHECK(contains(buf, "\"bedtime_alarm\":{\"p\":\"time\"}"));
-    CHECK(contains(buf, "\"unlocked\":{\"p\":\"switch\"}"));
+    // The lock, offered even so (locking again is always allowed); what it
+    // replaced is removed.
+    CHECK(contains(buf, "\"parental_controls\":{\"p\":\"lock\",\"name\":\"Parental controls\",\"uniq_id\":"
+                        "\"playguard_a1b2c3d4_parental_controls\",\"stat_t\":\"playguard/a1b2c3d4/state\",\"val_tpl\":"
+                        "\"{{ 'LOCKED' if value_json.controls.enabled and not value_json.controls.temp_unlocked else "
+                        "'UNLOCKED' }}\",\"cmd_t\":\"playguard/a1b2c3d4/parental_controls/set\",\"ret\":true,\"opt\":true}"));
+    CHECK(contains(buf, "\"unlocked\":{\"p\":\"switch\"}") && contains(buf, "\"lock_now\":{\"p\":\"button\"}"));
+    CHECK(contains(buf, "\"temp_unlocked\":{\"p\":\"binary_sensor\"}"));
+    // Why play is blocked, as an attribute read from the state.
+    CHECK(contains(buf, "\"name\":\"Playing blocked\""));
+    CHECK(contains(buf, "\"json_attr_t\":\"playguard/a1b2c3d4/state\",\"pl_on\":\"True\",\"pl_off\":\"False\","
+                        "\"ic\":\"mdi:block-helper\",\"json_attr_tpl\":\"{{ {'reason': value_json.timer.blocked_by} | tojson }}\""));
     CHECK(contains(buf, "\"add_bonus_time_15\":{\"p\":\"button\"}"));
     CHECK(contains(buf, "\"profile\":{\"p\":\"select\"}"));
     CHECK(!contains(buf, "limit_mon/set"));
@@ -731,7 +755,7 @@ static void test_discovery(void)
     n = sync_discovery_build(&d, buf, sizeof(buf));
     CHECK(n > 0 && contains(buf, "\"ids\":[\"playguard_21b2c3d4\"]") && !contains(buf, "a1b2c3d4"));
     CHECK(contains(buf, "\"name\":\"Salon \\\"Léa\\\" (emuMMC)\""));
-    CHECK(contains(buf, "\"cmd_t\":\"playguard/21b2c3d4/lock_now/set\""));
+    CHECK(contains(buf, "\"cmd_t\":\"playguard/21b2c3d4/parental_controls/set\""));
     strcpy(c.console_id, "f0000000");   // every digit flips both ways
     sync_conf_device_id(&c, id);
     CHECK(!strcmp(id, "70000000"));
@@ -854,6 +878,26 @@ static void test_state(void)
     pt.restricted = true;
     n = sync_state_build(&s, buf, sizeof(buf));
     CHECK(contains(buf, "\"limit_reached\":true") && contains(buf, "\"remaining_min\":0") && contains(buf, "\"used_min\":120"));
+    // Why: the day's limit, or the bedtime alarm's hours (21:30 to 06:00).
+    CHECK(contains(buf, "\"limit_reached\":true,\"blocked_by\":\"limit\""));   // the time of day unknown
+    s.local_min_ok = true;
+    s.local_min = 15 * 60;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"blocked_by\":\"limit\""));
+    s.local_min = 22 * 60 + 10;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"blocked_by\":\"bedtime\""));
+    s.local_min = 5 * 60 + 30;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"blocked_by\":\"bedtime\""));
+    s.local_min = 6 * 60;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"blocked_by\":\"limit\""));
+    pt.restricted = false;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"limit_reached\":false,\"blocked_by\":null"));
+    pt.restricted = true;
+    s.local_min_ok = false;
 
     // Nothing could be read: every object is there, its leaves null.
     SyncSnapshot empty;
@@ -1029,9 +1073,22 @@ static void test_export_entities(void)
         sync_json_obj_end(&j);
     }
     sync_json_arr_end(&j);
+    // What the discovery removes (an earlier version's).
+    size_t gone = 0;
+    const SyncRetired *r = sync_entities_retired(&gone);
+    sync_json_key(&j, "retired");
+    sync_json_arr(&j);
+    for (size_t i = 0; i < gone; i++) {
+        sync_json_obj(&j);
+        sync_json_kstr(&j, "id", r[i].id);
+        sync_json_kstr(&j, "platform", r[i].platform);
+        sync_json_obj_end(&j);
+    }
+    sync_json_arr_end(&j);
     sync_json_obj_end(&j);
     const size_t n = sync_json_end(&j);
     CHECK(n > 0 && contains(buf, "\"id\":\"limit_mon\",\"platform\":\"number\",\"write\":\"timer\""));
+    CHECK(contains(buf, "\"retired\":[{\"id\":\"temp_unlocked\",\"platform\":\"binary_sensor\"}"));
     save("entities.json", buf);
 }
 

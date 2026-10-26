@@ -34,6 +34,14 @@ typedef struct {
 const SyncEntity *sync_entities(size_t *count);
 const SyncEntity *sync_entity_find(const char *id);
 
+// Entities an earlier version offered: the discovery sends each as its
+// platform alone, which removes it from Home Assistant.
+typedef struct {
+    const char *id, *platform;
+} SyncRetired;
+
+const SyncRetired *sync_entities_retired(size_t *count);
+
 #ifdef __cplusplus
 }
 #endif

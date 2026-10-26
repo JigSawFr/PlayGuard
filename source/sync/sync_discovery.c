@@ -157,7 +157,19 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
             for (size_t p = 0; p < d->n_profiles; p++) sync_json_str(&j, d->profiles[p]);
             sync_json_arr_end(&j);
         }
+        // Attributes from the same document as the state.
+        if (e->extra && strstr(e->extra, "\"json_attr_tpl\"")) {
+            snprintf(topic, sizeof(topic), "%s/%s", base, e->topic ? e->topic : "state");
+            sync_json_kstr(&j, "json_attr_t", topic);
+        }
         if (e->extra && *e->extra) sync_json_members(&j, e->extra);
+        sync_json_obj_end(&j);
+    }
+    const SyncRetired *gone = sync_entities_retired(&n);
+    for (size_t i = 0; i < n; i++) {
+        sync_json_key(&j, gone[i].id);
+        sync_json_obj(&j);
+        sync_json_kstr(&j, "p", gone[i].platform);
         sync_json_obj_end(&j);
     }
     sync_json_obj_end(&j);

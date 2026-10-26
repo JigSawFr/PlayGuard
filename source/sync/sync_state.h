@@ -23,6 +23,8 @@ typedef struct {
     uint64_t           ts;              // user clock, POSIX seconds
     const char        *local_date;      // "YYYY-MM-DD", NULL or "" when unknown
     int                weekday;         // 0 = Sunday, -1 unknown
+    bool               local_min_ok;    // local_min is known
+    int                local_min;       // minutes since local midnight
     bool               clock_accurate_ok, clock_accurate;
 
     const SyncConf    *conf;            // id, name, policy, switches

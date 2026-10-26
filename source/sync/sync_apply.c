@@ -158,8 +158,17 @@ SyncReason sync_apply_parse(const char *entity, const char *payload, size_t len,
         out->kind = SyncIntent_StopToday;
         return press(s) ? SyncReason_None : SyncReason_Invalid;
     }
+    if (!strcmp(entity, "parental_controls")) {
+        // The lock: LOCK is always allowed, as on the console.
+        if (!strcmp(s, "LOCK")) out->kind = SyncIntent_LockNow;
+        else if (!strcmp(s, "UNLOCK")) out->kind = SyncIntent_Unlock;
+        else return SyncReason_Invalid;
+        out->on = out->kind == SyncIntent_Unlock;
+        return SyncReason_None;
+    }
+    // The switch and the button the lock replaced (an integration that
+    // still sends them).
     if (!strcmp(entity, "unlocked")) {
-        // OFF locks again: always allowed, as on the console.
         const SyncReason r = on_off(s, &out->on);
         out->kind = out->on ? SyncIntent_Unlock : SyncIntent_LockNow;
         return r;

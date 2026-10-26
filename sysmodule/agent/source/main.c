@@ -478,7 +478,8 @@ static size_t own_state(char *out, size_t cap)
     int weekday = -1;
     today_text(date, &weekday);
     u64 now = 0;
-    time_local_now(&now, NULL);
+    LocalTime local;
+    const bool local_ok = time_local_now(&now, &local);
     const SyncStatus *ls = sync_engine_status(&g_engine);
 
     SyncSnapshot s;
@@ -487,6 +488,8 @@ static size_t own_state(char *out, size_t cap)
     s.ts = now;
     s.local_date = date;
     s.weekday = weekday;
+    s.local_min_ok = local_ok;
+    s.local_min = local_ok ? local.hour * 60 + local.minute : 0;
     s.clock_accurate_ok = accurate_ok;
     s.clock_accurate = accurate;
     s.conf = &g_conf;

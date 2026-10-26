@@ -25,25 +25,28 @@
 
 static const SyncEntity ENTITIES[] = {
     // binary sensors
-    { "parental_controls_enabled", "binary_sensor", SyncWrite_None, "Parental controls",
+    { "parental_controls_enabled", "binary_sensor", SyncWrite_None, "Parental controls set up",
       "{{ value_json.controls.enabled }}", E_BINARY ",\"ic\":\"mdi:shield-account\"", NULL },
-    { "temp_unlocked", "binary_sensor", SyncWrite_None, "Temporarily unlocked",
-      "{{ value_json.controls.temp_unlocked }}", E_BINARY ",\"dev_cla\":\"lock\"", NULL },
     { "pin_set", "binary_sensor", SyncWrite_None, "PIN set", "{{ value_json.controls.pin_set }}",
       E_BINARY ",\"ic\":\"mdi:form-textbox-password\"," E_DIAG, NULL },
     { "companion_linked", "binary_sensor", SyncWrite_None, "Companion app linked",
       "{{ value_json.controls.companion_linked }}", E_BINARY ",\"ic\":\"mdi:cellphone-link\"", NULL },
     { "timer_enabled", "binary_sensor", SyncWrite_None, "Play timer", "{{ value_json.timer.enabled }}",
       E_BINARY ",\"ic\":\"mdi:timer-outline\"", NULL },
-    { "limit_reached", "binary_sensor", SyncWrite_None, "Time is up", "{{ value_json.timer.limit_reached }}",
-      E_BINARY ",\"ic\":\"mdi:timer-alert-outline\"", NULL },
+    // Why: its `reason` attribute (the bedtime alarm's hours, or the day's limit).
+    { "limit_reached", "binary_sensor", SyncWrite_None, "Playing blocked", "{{ value_json.timer.limit_reached }}",
+      E_BINARY ",\"ic\":\"mdi:block-helper\",\"json_attr_tpl\":\"{{ {'reason': value_json.timer.blocked_by} | tojson }}\"",
+      NULL },
     { "clock_accurate", "binary_sensor", SyncWrite_None, "Network clock accurate",
       "{{ value_json.clock_accurate }}", E_BINARY ",\"ic\":\"mdi:clock-check-outline\"," E_DIAG E_OFF, NULL },
 
     // sensors
-    { "used_screen_time", "sensor", SyncWrite_None, "Used screen time", "{{ value_json.timer.used_min }}", E_TOTAL, NULL },
-    { "used_screen_time_log", "sensor", SyncWrite_None, "Used screen time (play log)",
-      "{{ value_json.activity_today.used_min }}", E_TOTAL E_OFF, NULL },
+    // Today's play time is the play log's (every game, whoever played it);
+    // the play timer's own count, which only counts while a limit is set, is off.
+    { "used_screen_time", "sensor", SyncWrite_None, "Used screen time", "{{ value_json.timer.used_min }}", E_TOTAL E_OFF,
+      NULL },
+    { "used_screen_time_log", "sensor", SyncWrite_None, "Play time today", "{{ value_json.activity_today.used_min }}",
+      E_TOTAL, NULL },
     { "screen_time_remaining", "sensor", SyncWrite_None, "Screen time remaining",
       "{{ value_json.timer.remaining_min }}", E_MEASURE, NULL },
     { "extended_screen_time", "sensor", SyncWrite_None, "Extended screen time",
@@ -58,14 +61,14 @@ static const SyncEntity ENTITIES[] = {
       E_MINUTES "," E_DIAG E_OFF, NULL },
     { "last_order", "sensor", SyncWrite_None, "Last order", "{{ value_json.link.last_result }}", E_DIAG E_OFF, NULL },
 
-    // limits
-    { "limit_sun", "number", SyncWrite_Timer, "Limit Sunday", "{{ value_json.timer.limits.sun }}", E_LIMIT, NULL },
-    { "limit_mon", "number", SyncWrite_Timer, "Limit Monday", "{{ value_json.timer.limits.mon }}", E_LIMIT, NULL },
-    { "limit_tue", "number", SyncWrite_Timer, "Limit Tuesday", "{{ value_json.timer.limits.tue }}", E_LIMIT, NULL },
-    { "limit_wed", "number", SyncWrite_Timer, "Limit Wednesday", "{{ value_json.timer.limits.wed }}", E_LIMIT, NULL },
-    { "limit_thu", "number", SyncWrite_Timer, "Limit Thursday", "{{ value_json.timer.limits.thu }}", E_LIMIT, NULL },
-    { "limit_fri", "number", SyncWrite_Timer, "Limit Friday", "{{ value_json.timer.limits.fri }}", E_LIMIT, NULL },
-    { "limit_sat", "number", SyncWrite_Timer, "Limit Saturday", "{{ value_json.timer.limits.sat }}", E_LIMIT, NULL },
+    // limits: the day's and every day's on, each day's off until wanted
+    { "limit_sun", "number", SyncWrite_Timer, "Limit Sunday", "{{ value_json.timer.limits.sun }}", E_LIMIT E_OFF, NULL },
+    { "limit_mon", "number", SyncWrite_Timer, "Limit Monday", "{{ value_json.timer.limits.mon }}", E_LIMIT E_OFF, NULL },
+    { "limit_tue", "number", SyncWrite_Timer, "Limit Tuesday", "{{ value_json.timer.limits.tue }}", E_LIMIT E_OFF, NULL },
+    { "limit_wed", "number", SyncWrite_Timer, "Limit Wednesday", "{{ value_json.timer.limits.wed }}", E_LIMIT E_OFF, NULL },
+    { "limit_thu", "number", SyncWrite_Timer, "Limit Thursday", "{{ value_json.timer.limits.thu }}", E_LIMIT E_OFF, NULL },
+    { "limit_fri", "number", SyncWrite_Timer, "Limit Friday", "{{ value_json.timer.limits.fri }}", E_LIMIT E_OFF, NULL },
+    { "limit_sat", "number", SyncWrite_Timer, "Limit Saturday", "{{ value_json.timer.limits.sat }}", E_LIMIT E_OFF, NULL },
     { "limit_uniform", "number", SyncWrite_Timer, "Limit every day", "{{ value_json.timer.uniform_min }}", E_LIMIT, NULL },
     { "max_screentime_today", "number", SyncWrite_Timer, "Max screentime today",
       "{{ value_json.timer.limit_today_min }}", E_LIMIT, NULL },
@@ -83,14 +86,19 @@ static const SyncEntity ENTITIES[] = {
       E_SWITCH ",\"ic\":\"mdi:lock\"", NULL },
     { "play_timer_alarm", "switch", SyncWrite_Timer, "Time's up alarm", "{{ value_json.timer.alarm_on }}",
       E_SWITCH ",\"ic\":\"mdi:alarm\"," E_CONFIG, NULL },
-    { "unlocked", "switch", SyncWrite_Timer, "Unlocked", "{{ value_json.controls.temp_unlocked }}",
-      E_SWITCH ",\"ic\":\"mdi:lock-open-variant\"", NULL },
     { "vr_restricted", "switch", SyncWrite_Free, "VR mode restricted", "{{ value_json.controls.vr_restricted }}",
       E_SWITCH ",\"ic\":\"mdi:virtual-reality\"," E_CONFIG, NULL },
     { "sns_post_restricted", "switch", SyncWrite_Free, "Posting to social media restricted",
       "{{ value_json.controls.sns_post_restricted }}", E_SWITCH ",\"ic\":\"mdi:share-off\"," E_CONFIG, NULL },
     { "free_communication_restricted", "switch", SyncWrite_Free, "Communication restricted",
       "{{ value_json.controls.free_communication_restricted }}", E_SWITCH ",\"ic\":\"mdi:message-lock\"," E_CONFIG,
+      NULL },
+
+    // The lock: locked while parental controls are in effect. Unlocking
+    // (temporarily, with the stored PIN) needs remote_timer_writes; locking
+    // again is always allowed, as on the console.
+    { "parental_controls", "lock", SyncWrite_Free, "Parental controls",
+      "{{ 'LOCKED' if value_json.controls.enabled and not value_json.controls.temp_unlocked else 'UNLOCKED' }}", "",
       NULL },
 
     // selects (the profile's options are added when the discovery is built).
@@ -105,7 +113,6 @@ static const SyncEntity ENTITIES[] = {
 
     // buttons
     { "sync_now", "button", SyncWrite_Free, "Sync now", NULL, "\"ic\":\"mdi:sync\"," E_DIAG, NULL },
-    { "lock_now", "button", SyncWrite_Free, "Turn parental controls back on", NULL, "\"ic\":\"mdi:lock\"", NULL },
     { "export_report", "button", SyncWrite_Free, "Export a diagnostic report", NULL,
       "\"ic\":\"mdi:file-document-outline\"," E_DIAG E_OFF, NULL },
     { "add_bonus_time_15", "button", SyncWrite_Timer, "Extra time +15 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
@@ -176,6 +183,20 @@ const SyncEntity *sync_entities(size_t *count)
 {
     *count = sizeof(ENTITIES) / sizeof(ENTITIES[0]);
     return ENTITIES;
+}
+
+// Replaced by the parental controls lock. Their orders still parse,
+// for an integration that sends them.
+static const SyncRetired RETIRED[] = {
+    { "temp_unlocked", "binary_sensor" },
+    { "unlocked", "switch" },
+    { "lock_now", "button" },
+};
+
+const SyncRetired *sync_entities_retired(size_t *count)
+{
+    *count = sizeof(RETIRED) / sizeof(RETIRED[0]);
+    return RETIRED;
 }
 
 const SyncEntity *sync_entity_find(const char *id)

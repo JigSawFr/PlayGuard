@@ -724,6 +724,8 @@ void build_state()
     s.ts = posix;
     s.local_date = date.c_str();
     s.weekday = dated ? today.wday : -1;
+    s.local_min_ok = dated;
+    s.local_min = dated ? today.hour * 60 + today.minute : 0;
     s.clock_accurate_ok = accurate_ok;
     s.clock_accurate = accurate;
     s.conf = &s_conf;
