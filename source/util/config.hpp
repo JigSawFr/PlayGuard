@@ -7,23 +7,19 @@
 #include <string>
 #include <vector>
 
+#include <borealis/cadran/ui/prefs.hpp>
+
 namespace config
 {
 
 struct Config
 {
-    std::string language = "system";   // "system" or one of LANGUAGES
-    std::string theme    = "dark";     // "dark" (the default), "system", "light"
-    // The text: "auto" (larger while docked), "normal" or "large"
-    // (ui/text_size).
-    std::string text_size = "auto";
-    // "auto" (the default: lighter effects off the dock), "full" or
-    // "reduced" (no decorative movement) (ui/effects).
-    std::string effects = "auto";
-    // The main screen's sidebar: "auto" (the default: on its icons while a
-    // tab has the focus, open over the tab while the focus is on it),
-    // "open" (always) or "icons" (always on its icons) (ui/cadran_frame).
-    std::string rail = "auto";
+    // The look Aurore's Cadran draws (ui::use_prefs): the language, the
+    // theme, the text size ("auto": larger while docked), the effects ("auto":
+    // lighter off the dock), the main screen's sidebar ("auto": on its icons
+    // while a tab has the focus) and the screens' background glow
+    // (Developer › glow).
+    ui::Prefs look;
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
@@ -31,7 +27,6 @@ struct Config
     bool dev_mode = false;             // developer tools (7 presses on About > Version)
     bool pt_log = false;               // Developer › record the play timer (action/pt_log_flow)
     bool frame_stats = false;          // Developer › frame statistics (action/frame_stats_flow)
-    bool cadran_glow = true;           // Developer › the Cadran screens' background glow
     // How an update is installed: "" (not chosen yet: asked on the first
     // update), "inplace" (PlayGuard downloads it and replaces itself),
     // "auto", "sphaira", "appstore", "manual".
@@ -166,19 +161,17 @@ struct Config
 
 constexpr int    SCHEMA             = 1;    // "schema" in config.json
 // The languages PlayGuard is translated into, after "system" (the console's
-// own): each has resources/i18n/<code>/playguard.json and a name under
-// playguard/tools/languages/. tools/check_resources.py checks both; README
-// "Translating PlayGuard" lists the steps to add one.
-constexpr const char* LANGUAGES[] = { "system", "en-US", "fr", "fr-CA", "de", "es", "es-419", "it", "nl", "pt", "pt-BR", "ru", "ja", "ko", "zh-Hans", "zh-Hant" };
+// own): Aurore's Cadran's (ui::LANGUAGES), each with
+// resources/i18n/<code>/playguard.json here. tools/check_resources.py checks
+// it; README "Translating PlayGuard" lists the steps to add one.
+inline constexpr const auto& LANGUAGES = ui::LANGUAGES;
 // What theme may be, in the pickers' order: the console's own, then the two
-// forced ones. Dark unless the parent chooses otherwise (Config::theme).
-constexpr const char* THEMES[] = { "system", "light", "dark" };
+// forced ones. Dark unless the parent chooses otherwise (ui::Prefs::theme).
+inline constexpr const auto& THEMES = ui::THEMES;
 // What text_size may be: the default first.
-constexpr const char* TEXT_SIZES[] = { "auto", "normal", "large" };
+inline constexpr const auto& TEXT_SIZES = ui::TEXT_SIZES;
 // What effects may be: the default first.
-constexpr const char* EFFECTS[] = { "auto", "full", "reduced" };
-// What rail may be: the default first.
-constexpr const char* RAILS[] = { "auto", "open", "icons" };
+inline constexpr const auto& EFFECTS = ui::EFFECTS;
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
                                        "security", "history", "console", "preferences", "about" };

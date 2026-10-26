@@ -1,8 +1,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/game_cell.hpp"
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/game_icons.hpp"
-#include "ui/cadran_kit.hpp"
 
 GameCell::GameCell(bool with_icon)
 {

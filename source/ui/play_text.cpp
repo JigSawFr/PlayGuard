@@ -1,11 +1,12 @@
-// ui — time limits, play time, day, level and age names as text.
+// ui — time limits, play time, level and age names as text.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
-#include "ui/format_text.hpp"
+#include "ui/play_text.hpp"
 
 #include <algorithm>
 #include <fmt/format.h>
 
-#include "ui/tr.hpp"
+#include <borealis/cadran/ui/tr.hpp>
+
 #include "util/pctl_ops_c.hpp"
 
 using namespace brls::literals;
@@ -24,13 +25,13 @@ std::string glued(std::string text)
 namespace ui
 {
 
-std::string fmt_minutes(uint16_t m)
+std::string fmt_limit(uint16_t m)
 {
     if (m == PT_DAY_NOLIMIT) return "playguard/common/no_limit"_i18n;
     if (m == 0) return "playguard/common/zero_minutes"_i18n;
-    if (m < 60) return glued(brls::getStr("playguard/common/minutes", (int)m));
-    if (m % 60 == 0) return glued(brls::getStr("playguard/common/hours", (int)(m / 60)));
-    return glued(brls::getStr("playguard/common/hours_minutes", (int)(m / 60), fmt::format("{:02d}", (int)(m % 60))));
+    if (m < 60) return glued(brls::getStr("cadran/common/minutes", (int)m));
+    if (m % 60 == 0) return glued(brls::getStr("cadran/common/hours", (int)(m / 60)));
+    return glued(brls::getStr("cadran/common/hours_minutes", (int)(m / 60), fmt::format("{:02d}", (int)(m % 60))));
 }
 
 std::string days_summary(const uint16_t days[7])
@@ -48,76 +49,38 @@ std::string days_summary(const uint16_t days[7])
     }
     if (uniform)
         return days[0] == PT_DAY_NOLIMIT ? "playguard/common/no_limit"_i18n
-                                         : brls::getStr("playguard/play_timer/state/every_day", fmt_minutes(days[0]));
+                                         : brls::getStr("playguard/play_timer/state/every_day", fmt_limit(days[0]));
     if (lo < 0) return "playguard/common/no_limit"_i18n;
     // Inside the sentence: "1 h to no limit", not "1 h to No limit".
-    const std::string top = any_nolimit ? "playguard/common/no_limit_in_text"_i18n : fmt_minutes((uint16_t)hi);
-    return brls::getStr("playguard/play_timer/profile_range", fmt_minutes((uint16_t)lo), top);
+    const std::string top = any_nolimit ? "playguard/common/no_limit_in_text"_i18n : fmt_limit((uint16_t)hi);
+    return brls::getStr("playguard/play_timer/profile_range", fmt_limit((uint16_t)lo), top);
 }
 
 std::string fmt_played(uint16_t m)
 {
-    if (m == 0) return glued(brls::getStr("playguard/common/minutes", 0));
-    return fmt_minutes(m);
+    if (m == 0) return glued(brls::getStr("cadran/common/minutes", 0));
+    return fmt_limit(m);
 }
 
-std::string fmt_duration_ns(uint64_t ns)
+std::string fmt_time_left(uint64_t ns)
 {
     uint64_t minutes = (ns + 30000000000ULL) / 60000000000ULL;
     if (minutes > 1440) minutes = 1440;
     return fmt_played((uint16_t)minutes);   // a time left: "0 min", not "0 min (no play)"
 }
 
-std::string fmt_play_time(uint64_t seconds)
-{
-    if (seconds > 0 && seconds < 60) return "playguard/activity/less_than_minute"_i18n;
-    const uint64_t m = (seconds + 30) / 60;
-    if (m < 60) return glued(brls::getStr("playguard/common/minutes", (int)m));
-    // From 100 h, the minutes are noise: whole hours, rounded.
-    if (m % 60 == 0 || m >= 100 * 60) return glued(brls::getStr("playguard/common/hours", (unsigned long long)((m + 30) / 60)));
-    return glued(brls::getStr("playguard/common/hours_minutes", (unsigned long long)(m / 60), fmt::format("{:02d}", (int)(m % 60))));
-}
-
 std::string fmt_per_day_over(uint64_t per_day_s, int days)
 {
-    const std::string avg = fmt_play_time(per_day_s);
+    const std::string avg = fmt_duration(per_day_s);
     if (days < 60) return brls::getStr("playguard/activity/summary/per_day_over", avg, days);
     // Rounded to the nearest month (30.44 days) or year (365.25 days).
     if (days < 730) return brls::getStr("playguard/activity/summary/per_day_over_months", avg, (days * 100 + 1522) / 3044);
     return brls::getStr("playguard/activity/summary/per_day_over_years", avg, (days * 100 + 18262) / 36525);
 }
 
-std::string day_name(int day)
-{
-    if (day < 0 || day > 6) return "?";
-    return brls::getStr(fmt::format("playguard/days/{}", day));
-}
-
-std::string day_name_in_text(int day)
-{
-    if (day < 0 || day > 6) return "?";
-    return brls::getStr(fmt::format("playguard/days_lower/{}", day));
-}
-
-std::string bool_text(bool ok, bool value, const std::string& yes, const std::string& no)
-{
-    if (!ok) return "playguard/common/unavailable"_i18n;
-    return value ? yes : no;
-}
-
-std::string yes_no(bool value)
-{
-    return value ? "playguard/common/yes"_i18n : "playguard/common/no"_i18n;
-}
-
 std::string age_text(int age)
 {
     return age == 0 ? "playguard/restrictions/age_none"_i18n : brls::getStr("playguard/restrictions/age_value", age);
-}
-
-std::string opens(const std::string& value)
-{
-    return value.empty() ? "›" : value + "  ›";
 }
 
 std::string level_name(uint32_t level)

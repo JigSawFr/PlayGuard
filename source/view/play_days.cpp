@@ -4,7 +4,8 @@
 #include <algorithm>
 #include <fmt/format.h>
 
-#include "ui/cadran_kit.hpp"
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -128,7 +129,7 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
         }
         any_over = any_over || over;
         // Over the limit is marked by "!", not by the colour alone.
-        const std::string played = day_s[k] ? ui::fmt_play_time(day_s[k]) : "—";
+        const std::string played = day_s[k] ? ui::fmt_duration(day_s[k]) : "—";
         c.value->setText(over ? "! " + played : played);
         c.value->setTextColor(over ? cadran::kit::color("cadran/amber") : today ? cadran::kit::color("cadran/text") : cadran::kit::color("cadran/text3"));
         c.day->setText(brls::getStr(fmt::format("playguard/days_short/{}", (int)day_wday[k])));

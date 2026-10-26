@@ -13,7 +13,8 @@
 #include <map>
 #include <vector>
 
-#include "ui/cadran_modal.hpp"
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "util/pctl_ops_c.hpp"
 
 class CoverStrip : public brls::View

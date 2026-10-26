@@ -680,7 +680,7 @@ def key(name, n=1, hold=0.02):
 
 def focused():
     """The words of the line that has the focus now (PLAYGUARD_SIM_FOCUS_LOG:
-    source/ui/focus_log.cpp), or None."""
+    Aurore's cadran/ui/focus_log.cpp), or None."""
     log.flush()
     last = None
     for l in open(os.path.join(OUT, "app.log"), errors="replace"):

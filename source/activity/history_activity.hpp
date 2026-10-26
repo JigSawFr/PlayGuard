@@ -9,8 +9,9 @@
 
 #include <borealis.hpp>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/history_logic.hpp"
-#include "ui/cadran_kit.hpp"
 #include "util/history.hpp"
 
 class HistoryActivity : public brls::Activity

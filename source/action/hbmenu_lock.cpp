@@ -9,6 +9,10 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <borealis/cadran/view/qr_view.hpp>
+
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_logic.hpp"
 #include "action/history_flow.hpp"
@@ -19,14 +23,11 @@
 #include "core/gate.h"
 #include "core/hbl_lock.h"
 #include "core/rescue.h"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/diagnostics.hpp"
 #include "util/forwarders.hpp"
 #include "util/paths.hpp"
 #include "util/rescue_page.hpp"
-#include "view/qr_view.hpp"
 #include "util/pctl_ops_c.hpp"
 
 #include "action/hbmenu_lock_shared.hpp"

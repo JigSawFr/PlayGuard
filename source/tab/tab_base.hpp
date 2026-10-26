@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "ui/guarded.hpp"
+#include <borealis/cadran/ui/guarded.hpp>
 
 class TabBadge;
 

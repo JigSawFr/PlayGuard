@@ -16,9 +16,10 @@
 #include <functional>
 #include <string>
 
+#include <borealis/cadran/view/cadran_digits.hpp>
+#include <borealis/cadran/view/cadran_icon.hpp>
+
 #include "action/pt_logic.hpp"
-#include "view/cadran_digits.hpp"
-#include "view/cadran_icon.hpp"
 
 class CadranWeekView : public brls::Box
 {

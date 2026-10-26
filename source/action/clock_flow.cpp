@@ -10,10 +10,11 @@
 #include <thread>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/clock_logic.hpp"
 #include "action/history_flow.hpp"
 #include "action/offline_clock_logic.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -228,7 +229,7 @@ std::string offset_text(int64_t offset)
     const uint64_t a = offset < 0 ? (uint64_t)(-(offset + 1)) + 1 : (uint64_t)offset;
     std::string span;
     if (a >= 86400) span = brls::getStr("playguard/clock/days", (unsigned long long)(a / 86400));
-    else if (a >= 3600) span = brls::getStr("playguard/common/hours_minutes", (int)(a / 3600), fmt::format("{:02}", (int)(a % 3600 / 60)));
+    else if (a >= 3600) span = brls::getStr("cadran/common/hours_minutes", (int)(a / 3600), fmt::format("{:02}", (int)(a % 3600 / 60)));
     else if (a >= 60) span = brls::getStr("playguard/common/min_sec", (int)(a / 60), (int)(a % 60));
     else span = brls::getStr("playguard/common/sec", (int)a);
     // The servers ahead of the network clock: it is behind.

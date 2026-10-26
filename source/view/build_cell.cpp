@@ -1,8 +1,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/build_cell.hpp"
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/dev_build_flow.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;

@@ -14,6 +14,10 @@
 #include <string>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/game_check_text.hpp"
 #include "action/game_icons.hpp"
 #include "action/game_notice.hpp"
@@ -23,13 +27,10 @@
 #include "action/games_logic.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
-#include "ui/cadran_list.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "view/game_tile.hpp"
 #include "view/segment_bar.hpp"

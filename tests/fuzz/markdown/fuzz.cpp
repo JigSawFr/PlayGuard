@@ -1,4 +1,4 @@
-// libFuzzer target: source/util/markdown.cpp and safe_text.cpp, on any
+// libFuzzer target: Aurore's cadran/util/markdown.cpp and safe_text.cpp, on any
 // bytes (a pull request's description, a release's notes, as GitHub sends
 // them). Beyond the sanitizers: the bounds markdown.hpp promises (blocks,
 // code lines, table rows and columns, nesting), every string of a block valid
@@ -6,9 +6,10 @@
 // run again.
 #include <string>
 
+#include <borealis/cadran/util/markdown.hpp>
+#include <borealis/cadran/util/safe_text.hpp>
+
 #include "fuzz.h"
-#include "util/markdown.hpp"
-#include "util/safe_text.hpp"
 
 static bool ok(const std::string& s) { return fuzz_utf8_ok(s.data(), s.size()); }
 

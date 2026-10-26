@@ -19,6 +19,12 @@
 #include <emscripten.h>
 #endif
 
+#include <borealis/cadran/ui/cut_text.hpp>
+#include <borealis/cadran/view/cadran_digits.hpp>
+#include <borealis/cadran/view/cadran_icon.hpp>
+#include <borealis/cadran/view/loading_bar.hpp>
+#include <borealis/cadran/view/scroll_view.hpp>
+
 #include "action/frame_stats_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
@@ -48,11 +54,6 @@
 #include "tab/preferences_tab.hpp"
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cut_text.hpp"
-#include "ui/focus_log.hpp"
-#include "ui/live_prefs.hpp"
-#include "ui/text_size.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
@@ -64,12 +65,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
 #include "util/startup.h"
-#include "view/cadran_digits.hpp"
-#include "view/cadran_icon.hpp"
 #include "view/cadran_week.hpp"
-#include "view/footer_hints.hpp"
-#include "view/header_settings.hpp"
-#include "view/loading_bar.hpp"
 #include "view/loading_dial.hpp"
 #include "view/loading_mark.hpp"
 #include "view/made_in_france.hpp"
@@ -78,8 +74,6 @@
 #include "view/play_hours.hpp"
 #include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
-#include "view/scroll_view.hpp"
-#include "view/version_badge.hpp"
 
 // nanovg's per-frame counters, through the getter
 // tools/perf_nanovg_stats.patch adds to the borealis tree. Weak: without the
@@ -311,7 +305,9 @@ void select_nand_and_log_system()
     crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
 }
 
-// The views the XML layouts name, and what goes in every screen's header.
+// The views the XML layouts name, and the bell in the main screen's header
+// (Cadran's own look, the footer's hints and the header's badge and
+// settings come with Aurore).
 void register_views()
 {
     brls::Application::registerXMLView("ScrollView",      ScrollView::create);
@@ -337,16 +333,7 @@ void register_views()
     brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
     brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
 
-    // In place of borealis' brls:Hints: the footer's clock on one line.
-    FooterHints::install();
-
-    // The version (and, for a development build, its commit) next to every
-    // screen's title.
-    VersionBadge::install();
     NoticeBell::install();   // the bell goes in the header's row at the right
-    focus_log::install();   // the smoke test's lines by their words (PLAYGUARD_SIM_FOCUS_LOG)
-    HeaderSetting::install();   // after the bell: the language and theme go left of it
-    cadran::install_screens();   // the other screens after the boards
 }
 
 // After the main loop: the play timer locked again if asked, the tasks and
@@ -443,7 +430,7 @@ int main(int argc, char* argv[])
     install_screen_hooks();
 
     // Preferences first: their language replaces the console's once borealis
-    // has read it (live_prefs::start).
+    // has read it (Aurore's Cadran, in Application::init()).
     config::load();
     startup_mark(StartupStep_Preferences);
 
@@ -453,15 +440,13 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     startup_mark(StartupStep_Borealis);
-    live_prefs::start();
 
+    // Aurore starts Cadran itself: the preferences' language (in init()), then
+    // their font and theme, the palettes after the design boards, the text
+    // size, the footer's hints, the header's version badge and settings, and
+    // every screen's look (in createWindow()).
     brls::Application::createWindow("playguard/title"_i18n);
-    ui::use_font_for(live_prefs::locale());
     startup_mark(StartupStep_Window);
-
-    // The preferences' theme: dark by default, light when chosen, or the
-    // console's.
-    live_prefs::apply_theme();
 
     // No cross-fade when a screen opens or closes: on the console's LCD the
     // two screens blended for 200 ms read as ghosting. 2 ms, not 0: borealis
@@ -469,11 +454,6 @@ int main(int argc, char* argv[])
     // picker's takes half of it.
     brls::getStyle().addMetric("brls/animations/show", 2.0f);
 
-    // The palettes after the design boards (navy on dark, cool white on light).
-    cadran::install_theme();
-    // Preferences › Text size (larger on a TV by default), before the
-    // first label exists; then on and off the dock.
-    text_size::install();
     // The console clears the screen with a colour deko3d records once
     // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
     // change), so before this palette: the space behind the tabs stayed

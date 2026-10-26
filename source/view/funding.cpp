@@ -1,10 +1,11 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/funding.hpp"
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/util/text.hpp>
+
 #include "app.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
-#include "util/text.hpp"
 
 using namespace brls::literals;
 

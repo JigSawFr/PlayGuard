@@ -3,8 +3,9 @@
 
 #include <fmt/format.h>
 
+#include <borealis/cadran/ui/cadran_list.hpp>
+
 #include "app.hpp"
-#include "ui/cadran_list.hpp"
 
 using namespace brls::literals;
 

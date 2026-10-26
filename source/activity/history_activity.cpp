@@ -1,11 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/history_activity.hpp"
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+
 #include "action/export_flow.hpp"
 #include "action/forwarder_flow.hpp"
 #include "action/history_flow.hpp"
-#include "ui/cadran_list.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"

@@ -8,13 +8,14 @@
 
 #include <borealis/extern/nlohmann/json.hpp>
 
+#include <borealis/cadran/util/text.hpp>
+#include <borealis/cadran/util/utf8.hpp>
+
 #include "util/json_util.hpp"
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
 #include "util/pt_block.hpp"
 #include "util/pt_log.hpp"
-#include "util/text.hpp"
-#include "util/utf8.hpp"
 
 namespace log_upload
 {

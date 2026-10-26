@@ -1,5 +1,5 @@
 // ui — the console's local date and time, and a moment, as text (limits,
-// play time and names: format_text.cpp).
+// play time and names: play_text.cpp, and Aurore's format_text.cpp).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 

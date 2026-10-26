@@ -1,6 +1,10 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/console_tab.hpp"
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/view/tab_badge.hpp>
+
 #include "action/fw_gate.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sigpatch_flow.hpp"
@@ -10,12 +14,9 @@
 #include "activity/game_check_activity.hpp"
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/patches.hpp"
 #include "view/row_icon.hpp"
-#include "view/tab_badge.hpp"
 
 using namespace brls::literals;
 
@@ -144,7 +145,7 @@ void ConsoleTab::refresh()
     // amber.
     const auto version_tile = [this](brls::DetailCell* cell, const char* tile_id, sys_notes::Which which) {
         const sys_notes_flow::Status s = sys_notes_flow::status(which);
-        cell->setDetailText(s.installed.empty() ? "playguard/common/unavailable"_i18n : s.installed);
+        cell->setDetailText(s.installed.empty() ? "cadran/common/unavailable"_i18n : s.installed);
         cell->setDetailTextColor(cadran::kit::color(s.installed.empty() ? "cadran/text2" : "cadran/text"));
         std::string note;
         if (s.newer) {

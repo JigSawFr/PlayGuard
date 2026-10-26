@@ -3,6 +3,10 @@
 
 #include <cstdlib>
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <borealis/cadran/view/tab_badge.hpp>
+
 #include "action/clock_check.hpp"
 #include "action/data_notice.hpp"
 #include "action/fw_gate.hpp"
@@ -23,12 +27,9 @@
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "tab/tab_base.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
-#include "view/tab_badge.hpp"
 #include "view/title_state.hpp"
 
 using namespace brls::literals;

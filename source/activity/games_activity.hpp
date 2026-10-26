@@ -14,10 +14,11 @@
 #include <memory>
 #include <vector>
 
+#include <borealis/cadran/view/scroll_view.hpp>
+
 #include "util/pctl_ops_c.hpp"
 #include "view/game_cell.hpp"
 #include "view/game_tile.hpp"
-#include "view/scroll_view.hpp"
 
 class GamesActivity : public brls::Activity
 {

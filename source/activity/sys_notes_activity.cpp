@@ -1,16 +1,17 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/sys_notes_activity.hpp"
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <borealis/cadran/ui/live_prefs.hpp>
+#include <borealis/cadran/util/markdown.hpp>
+#include <borealis/cadran/util/text.hpp>
+#include <borealis/cadran/view/cadran_icon.hpp>
+#include <borealis/cadran/view/markdown_view.hpp>
+
 #include "action/sys_notes_flow.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_modal.hpp"
-#include "ui/live_prefs.hpp"
 #include "ui/ui.hpp"
-#include "util/markdown.hpp"
-#include "util/text.hpp"
 #include "view/build_cell.hpp"
-#include "view/cadran_icon.hpp"
-#include "view/markdown_view.hpp"
 #include "view/release_notes.hpp"
 
 using namespace brls::literals;

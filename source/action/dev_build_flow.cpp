@@ -13,6 +13,10 @@
 
 #include <fmt/format.h>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <borealis/cadran/util/text.hpp>
+
 #include "action/github_login_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/rollback_flow.hpp"
@@ -21,8 +25,6 @@
 #include "app.hpp"
 #include "core/platform.h"
 #include "core/sim_env.h"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
@@ -30,7 +32,6 @@
 #include "util/migrations.hpp"
 #include "util/paths.hpp"
 #include "util/rollback.hpp"
-#include "util/text.hpp"
 
 using namespace brls::literals;
 

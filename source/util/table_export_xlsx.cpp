@@ -3,7 +3,8 @@
 
 #include <cstdint>
 
-#include "util/utf8.hpp"
+#include <borealis/cadran/util/utf8.hpp>
+
 #include "util/zip_write.hpp"
 
 namespace table_export

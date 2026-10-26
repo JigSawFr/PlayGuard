@@ -6,7 +6,8 @@
 
 #include <string>
 
-#include "util/markdown.hpp"
+#include <borealis/cadran/util/markdown.hpp>
+
 #include "util/sys_notes.hpp"
 
 using namespace sys_notes;

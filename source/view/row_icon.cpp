@@ -1,7 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/row_icon.hpp"
 
-#include "ui/cadran_kit.hpp"
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "ui/ui.hpp"
 
 static constexpr float SIZE = 26;

@@ -1,5 +1,5 @@
-// Host tests for source/util/safe_text.cpp and markdown.cpp: what text from
-// GitHub keeps (valid UTF-8, no control, bidi or zero-width character, cut
+// Host tests for Aurore's cadran/util/safe_text.cpp and markdown.cpp: what
+// text from GitHub keeps (valid UTF-8, no control, bidi or zero-width character, cut
 // between two characters; notes cut after a whole line), versions, and
 // GitHub-flavoured Markdown as blocks
 // (headings, paragraphs and their line breaks, lists, tasks, code, quotes and
@@ -7,8 +7,8 @@
 #include "check.h"
 #include <string>
 
-#include "util/markdown.hpp"
-#include "util/safe_text.hpp"
+#include <borealis/cadran/util/markdown.hpp>
+#include <borealis/cadran/util/safe_text.hpp>
 
 using markdown::Block;
 

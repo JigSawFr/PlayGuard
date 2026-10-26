@@ -1,6 +1,9 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/security_tab.hpp"
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/console_actions.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
@@ -11,8 +14,6 @@
 #include "action/session_pause.hpp"
 #include "activity/forwarders_activity.hpp"
 #include "app.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
@@ -134,14 +135,14 @@ void SecurityTab::refresh()
     PctlStatus s;
     pctl_status_fetch(&s);
     ui::note_unlocked(s.temp_unlocked_ok, s.temp_unlocked);
-    const std::string na = "playguard/common/unavailable"_i18n;
+    const std::string na = "cadran/common/unavailable"_i18n;
 
     if (!s.pin_length_ok) ui::set_detail(pin, na);
     else if (s.pin_length == 0) ui::set_detail(pin, "playguard/common/not_set"_i18n);
     else ui::set_detail(pin, "playguard/dashboard/pin_set"_i18n);   // not its length: it narrows a guess
 
     ui::set_detail(restrictions, ui::bool_text(s.restriction_enabled_ok, s.restriction_enabled,
-                                               "playguard/common/yes"_i18n, "playguard/common/no"_i18n));
+                                               "cadran/common/yes"_i18n, "cadran/common/no"_i18n));
     // Said as a state, not as "unlocked: no" under a check. PlayGuard's own
     // pause while the parent is here is no warning: it ends as it is left.
     const bool paused = session_pause::active() && s.temp_unlocked_ok && s.temp_unlocked;
@@ -168,11 +169,11 @@ void SecurityTab::refresh()
     // unless Atmosphère's DNS blocks its server (then the note says so).
     const bool paired = s.pairing_active_ok && s.pairing_active;
     const bool syncs = pairing_state::syncs(s);
-    std::string active = ui::bool_text(s.pairing_active_ok, s.pairing_active, "playguard/common/yes"_i18n, "playguard/common/no"_i18n);
+    std::string active = ui::bool_text(s.pairing_active_ok, s.pairing_active, "cadran/common/yes"_i18n, "cadran/common/no"_i18n);
     if (paired && !syncs) active += " · " + "playguard/pairing/dns_blocked"_i18n;
     ui::set_detail(pr_active, active);
     pr_active->setDetailTextColor(syncs ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
-    ui::set_detail(pr_updated, s.last_updated_ok ? ui::time_text(s.last_updated) : "playguard/common/unavailable"_i18n);
+    ui::set_detail(pr_updated, s.last_updated_ok ? ui::time_text(s.last_updated) : "cadran/common/unavailable"_i18n);
     ui::set_text(pr_note, paired && !syncs ? "playguard/pairing/dns_note"_i18n : "playguard/pairing/note"_i18n);
     pr_note->setTextColor(syncs ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text3"));
 

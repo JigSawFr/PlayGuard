@@ -8,12 +8,13 @@
 #include <fmt/format.h>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/profile_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/schedule_logic.hpp"
 #include "app.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/profiles.hpp"
@@ -61,7 +62,7 @@ std::string day_text(const std::string& ymd)
     if (ymd.size() != 10) return ymd;
     const int month = std::atoi(ymd.substr(5, 2).c_str()), day = std::atoi(ymd.substr(8, 2).c_str());
     if (month < 1 || month > 12 || day < 1) return ymd;
-    return brls::getStr("playguard/schedule/date", day, brls::getStr(fmt::format("playguard/cadran/months/{}", month)));
+    return brls::getStr("playguard/schedule/date", day, brls::getStr(fmt::format("cadran/months/{}", month)));
 }
 
 bool find_profile(const std::string& file, profiles::Profile* out)

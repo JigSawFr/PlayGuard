@@ -1,12 +1,13 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/rescue_activity.hpp"
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/console_actions.hpp"
 #include "action/pin_lock.hpp"
 #include "activity/lock_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "app.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/forwarders_text.hpp"
 
-#include "ui/tr.hpp"
+#include <borealis/cadran/ui/tr.hpp>
 
 using namespace brls::literals;
 using forwarders_logic::Row;

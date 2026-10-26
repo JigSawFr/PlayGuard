@@ -15,9 +15,10 @@
 #include <string>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/game_check_text.hpp"
 #include "core/gamecheck.h"
-#include "ui/cadran_modal.hpp"
 #include "view/cover_strip.hpp"
 
 namespace game_verify_flow

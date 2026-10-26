@@ -3,8 +3,8 @@
 
 Errors:
 - an include going up the layers: source/ui, source/view and source/util
-  never include activity/ or tab/ (they ask the screens through ui::hooks,
-  ui/hooks.hpp); source/action includes only the screens a flow opens
+  never include activity/ or tab/ (they ask the screens through ui::app_hooks,
+  ui/app_hooks.hpp, or Aurore's ui::hooks); source/action includes only the screens a flow opens
   itself, listed below with why;
 - a C file of source/core that needs no console service (every one but the
   CONSOLE_ONLY ones below) missing from the desktop build's list
@@ -53,7 +53,7 @@ def sources(folder):
 for folder in LOWER:
     for rel, text in sources(folder):
         for inc in UPWARD.findall(text):
-            errors.append(f'{rel} includes "{inc}": {folder}/ is below the screens (ask them through ui/hooks.hpp)')
+            errors.append(f'{rel} includes "{inc}": {folder}/ is below the screens (ask them through ui/app_hooks.hpp)')
 seen = set()
 for rel, text in sources("source/action"):
     allowed = ACTION_SCREENS.get(rel, set())
@@ -61,7 +61,7 @@ for rel, text in sources("source/action"):
         seen.add((rel, inc))
         if inc not in allowed:
             errors.append(f'{rel} includes "{inc}": a flow includes only a screen it opens '
-                          "(else through ui/hooks.hpp; or list it in tools/check_sources.py, ACTION_SCREENS)")
+                          "(else through ui/app_hooks.hpp; or list it in tools/check_sources.py, ACTION_SCREENS)")
 for rel, allowed in sorted(ACTION_SCREENS.items()):
     for inc in sorted(allowed - {i for r, i in seen if r == rel}):
         errors.append(f'tools/check_sources.py: ACTION_SCREENS lists "{inc}" for {rel}, which does not include it')

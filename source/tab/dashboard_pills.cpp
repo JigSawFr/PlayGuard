@@ -5,12 +5,13 @@
 
 #include <utility>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_text.hpp>
+#include <borealis/cadran/ui/motion.hpp>
+
 #include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
 #include "action/session_pause.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_text.hpp"
-#include "ui/motion.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;

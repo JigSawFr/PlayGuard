@@ -5,6 +5,10 @@
 #include <ctime>
 #include <borealis.hpp>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <borealis/cadran/util/text.hpp>
+
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -22,9 +26,6 @@
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "util/sha256.hpp"
-#include "util/text.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_modal.hpp"
 #ifndef __SWITCH__
 #include "sim/sim_homebrew.hpp"
 #endif

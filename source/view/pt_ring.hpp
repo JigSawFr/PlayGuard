@@ -11,7 +11,7 @@
 #include <borealis.hpp>
 #include <string>
 
-#include "view/cadran_digits.hpp"
+#include <borealis/cadran/view/cadran_digits.hpp>
 
 class PtRing : public brls::Box
 {

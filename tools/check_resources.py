@@ -3,11 +3,11 @@
 
 - every i18n JSON file parses, and every language (resources/i18n/<code>/
   playguard.json) defines exactly the keys of en-US, with as many "{}";
-- config::LANGUAGES (source/util/config.hpp) lists exactly those languages,
-  and each has a name under playguard/tools/languages/;
+- Aurore's ui::LANGUAGES (extern/borealis, the language picker's list that
+  config::LANGUAGES names) lists exactly those languages;
 - every "playguard/..." key referenced from C++ or XML exists in en-US;
-- a key built at runtime ("playguard/days/{}", "playguard/history/kinds/" +
-  kind) is under a prefix DYNAMIC_KEYS declares, with the values the code
+- a key built at runtime ("playguard/days_short/{}",
+  "playguard/history/kinds/" + kind) is under a prefix DYNAMIC_KEYS declares, with the values the code
   can put after it (read from the code's own lists where there is one): each
   has its key, and a key under the prefix that is none of them is unused;
 - every en-US key is referenced (exactly, or as such a value): no dead
@@ -72,6 +72,8 @@ import unicodedata
 import xml.parsers.expat
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
+# Aurore's Cadran's preferences: the languages, themes, text sizes, effects.
+PREFS_HPP = "extern/borealis/library/include/borealis/cadran/ui/prefs.hpp"
 errors = []
 warnings = []
 # Names that read the same in every language.
@@ -162,22 +164,21 @@ for lang, cat in sorted(catalogs.items()):
             if width > TAB_WIDTH:
                 errors.append(f"{lang}: tab name {k} \"{v}\" is {width} columns wide, more than {TAB_WIDTH}")
 
-# The language picker's list (config::LANGUAGES) and the catalogs agree.
-config_hpp = open(f"{ROOT}/source/util/config.hpp", encoding="utf-8").read()
-m = re.search(r"LANGUAGES\[\]\s*=\s*\{([^}]*)\}", config_hpp)
+# The language picker's list (Aurore's ui::LANGUAGES, which config::LANGUAGES
+# names) and the catalogs agree; the languages' names are Aurore's
+# (cadran/tools/languages/).
+prefs_hpp = open(f"{ROOT}/{PREFS_HPP}", encoding="utf-8").read()
+m = re.search(r"LANGUAGES\[\]\s*=\s*\{([^}]*)\}", prefs_hpp)
 if not m:
-    errors.append("source/util/config.hpp: config::LANGUAGES not found")
+    errors.append(f"{PREFS_HPP}: ui::LANGUAGES not found")
 else:
     listed = re.findall(r'"([^"]+)"', m.group(1))
     if not listed or listed[0] != "system":
-        errors.append('config::LANGUAGES must start with "system"')
+        errors.append('ui::LANGUAGES must start with "system"')
     for lang in sorted(set(listed) - {"system"} - set(catalogs)):
-        errors.append(f"config::LANGUAGES lists {lang}, which has no resources/i18n/{lang}/playguard.json")
+        errors.append(f"ui::LANGUAGES lists {lang}, which has no resources/i18n/{lang}/playguard.json")
     for lang in sorted(set(catalogs) - set(listed)):
-        errors.append(f"resources/i18n/{lang} is not in config::LANGUAGES (the language picker)")
-    for lang in listed:
-        if f"tools/languages/{lang}" not in base:
-            errors.append(f"no language name playguard/tools/languages/{lang}")
+        errors.append(f"resources/i18n/{lang} is not in ui::LANGUAGES (the language picker)")
 
 en_keys = set(base)
 prefixes = {k.rsplit("/", 1)[0] + "/" for k in en_keys}
@@ -284,14 +285,12 @@ DYNAMIC_KEYS = {
     "activity/formats/": numbers(4),     # history_activity.cpp, activity_tab.cpp: f < 4
     "activity/none/": numbers(4),        # activity_tab.cpp: one per period (activity_summary::PERIODS)
     "activity/periods/": numbers(4),     # activity_tab.cpp: activity_summary::PERIODS
-    "days/": numbers(7),
     "library/views/": numbers(2),        # games_activity.cpp: list, covers
-    "days_lower/": numbers(7),
     "days_short/": numbers(7),
-    "cadran/months/": [str(m) for m in range(1, 13)],   # cadran_kit.cpp, long_date: 1..12
     "restrictions/levels/": numbers(5),  # format_text.cpp, level_name: up to 4
     "history/filters/": numbers(enum_count("source/action/history_logic.hpp", "Filter")),
-    # The code's lists.
+    # The code's lists (the days, months, languages, themes, text sizes and
+    # sidebars are Aurore's Cadran's, in its own cadran.json).
     "clock/region_names/": re.findall(r'^\s*\{\s*"(\w+)",\s*\{', read(f"{ROOT}/source/util/ntp_servers.cpp"), re.M) +
     ["custom"],   # clock_tab.cpp: the servers the parent typed
     "error/": strings_of(re.sub(r"//[^\n]*", "", function_of("source/action/error_hint_logic.cpp", "hint_key"))),
@@ -305,12 +304,7 @@ DYNAMIC_KEYS = {
     "pin_lock/again_on/": [m for m in array_of("source/action/pin_lock_logic.cpp", "MODES") if m != "off"],   # pin_lock.cpp, note_text
     "tabs/": array_of("source/util/config.hpp", "START_TABS") +
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
-    "tools/languages/": array_of("source/util/config.hpp", "LANGUAGES"),
-    "tools/themes/": array_of("source/util/config.hpp", "THEMES"),
-    "tiles/themes/": array_of("source/util/config.hpp", "THEMES"),
-    "prefs/text_sizes/": array_of("source/util/config.hpp", "TEXT_SIZES"),
-    "prefs/effects_values/": array_of("source/util/config.hpp", "EFFECTS"),
-    "prefs/rail_values/": array_of("source/util/config.hpp", "RAILS"),
+    "prefs/effects_values/": array_of(PREFS_HPP, "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
     "forwarders/icon_lib/": array_of("source/util/forwarder_library.cpp", "IDS"),   # icon_sheet.cpp: the library's icons
@@ -539,6 +533,10 @@ for path, text in code_text.items():
     sim_read |= set(re.findall(r'(?:sim_env(?:_flag|_int)?|getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
 for path in glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
     sim_read |= set(re.findall(r'(?:sim_env(?:_flag|_int)?|getenv)\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
+# Aurore's Cadran reads its flags through ui::env_flag("NAME"), which
+# activity/screen_hooks.cpp answers with PLAYGUARD_SIM_NAME.
+for path in glob.glob(f"{ROOT}/extern/borealis/library/lib/cadran/**/*.cpp", recursive=True):
+    sim_read |= {"PLAYGUARD_SIM_" + n for n in re.findall(r'env_flag\(\s*"(\w+)"', read(path))}
 sim_documented = set(re.findall(r"`(PLAYGUARD_SIM_\w+)", simulator_page))
 if not sim_read or not sim_documented:
     errors.append(f"no PLAYGUARD_SIM_* variable found in the code or in {SIMULATOR_PAGE}")

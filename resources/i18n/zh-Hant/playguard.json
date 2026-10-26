@@ -27,46 +27,21 @@
         "exit_leave": "不鎖定直接結束"
     },
     "common": {
-        "yes": "是",
-        "no": "否",
         "on": "開啟",
         "off": "關閉",
-        "unavailable": "無法使用",
         "not_set": "未設定",
         "no_limit": "無限制",
         "no_limit_in_text": "無限制",
         "zero_minutes": "0分鐘（不能遊玩）",
         "line": "{}：{}",
-        "minutes": "{}分鐘",
         "min_sec": "{}分{}秒",
         "sec": "{}秒",
-        "hours": "{}小時",
-        "hours_minutes": "{}小時{}分",
         "custom": "自訂…",
         "later": "稍後",
         "quit": "結束",
         "delete": "刪除",
         "applied": "已儲存。",
-        "read_only_note": "唯讀模式：目前無法透過本軟體變更任何設定。",
-        "hold_hint": "按住「{}」2秒"
-    },
-    "days": {
-        "0": "星期日",
-        "1": "星期一",
-        "2": "星期二",
-        "3": "星期三",
-        "4": "星期四",
-        "5": "星期五",
-        "6": "星期六"
-    },
-    "days_lower": {
-        "0": "星期日",
-        "1": "星期一",
-        "2": "星期二",
-        "3": "星期三",
-        "4": "星期四",
-        "5": "星期五",
-        "6": "星期六"
+        "read_only_note": "唯讀模式：目前無法透過本軟體變更任何設定。"
     },
     "days_short": {
         "0": "週日",
@@ -78,7 +53,6 @@
         "6": "週六"
     },
     "error": {
-        "code": "錯誤{}",
         "code_hint": "錯誤{}：{}",
         "read_only": "唯讀模式已開啟，未做任何變更：請在 關於 › 說明與診斷 › 開發者 › 唯讀模式 中關閉",
         "read_only_fw": "此韌體尚未經過檢查，因此唯讀模式已開啟，未做任何變更：主機 › 相容性 可開啟韌體畫面，在那裡關閉",
@@ -308,7 +282,6 @@
         "gate": {
             "body": "遊玩時間正在倒數，因此會先使用已儲存的PIN碼暫時解除家長監護（您不需要記住PIN碼）。",
             "confirm": "解除並套用",
-            "relock_auto": "變更完成後會立即重新鎖定。",
             "relock_manual": "變更完成後，可立即重新鎖定。",
             "failed": "無法解除家長監護"
         },
@@ -411,7 +384,6 @@
         "account_value": "{}（啟動{}次）",
         "first": "首次遊玩",
         "last": "上次遊玩",
-        "less_than_minute": "< 1分鐘",
         "note": "資料讀取自主機的遊玩紀錄，涵蓋所有使用者。如果更改過主機時鐘，時長可能不準確。在遊戲上開啟的PlayGuard會記為啟動時所選使用者玩該遊戲的時間：請用家長的使用者開啟。",
         "show_all": "顯示所有遊戲",
         "section_summary": "概覽",
@@ -705,14 +677,8 @@
         "weekdays": "星期一至星期五…",
         "weekend": "週末…",
         "copy_today": "將{}的上限套用至每天",
-        "text_size_auto": "自動：電視上較大",
         "text_size": "文字大小",
-        "start_tab": "啟動時顯示",
-        "themes": {
-            "system": "依系統",
-            "light": "淺色",
-            "dark": "深色"
-        }
+        "start_tab": "啟動時顯示"
     },
     "tools": {
         "section_diag": "診斷",
@@ -739,32 +705,7 @@
         "logs_days_n": "{} 天",
         "logs_keep_mb": "報告佔用空間",
         "logs_note": "適用於 {} 中的診斷報告、當機檔案、工作階段記錄和線上傳送的報告連結，各自分別計算，在啟動時和變更限制時執行。最新的一份一律保留。",
-        "language": "語言",
-        "languages": {
-            "system": "系統語言",
-            "en-US": "English",
-            "fr": "Français (France)",
-            "fr-CA": "Français (Canada)",
-            "de": "Deutsch",
-            "es": "Español (España)",
-            "es-419": "Español (Latinoamérica)",
-            "it": "Italiano",
-            "nl": "Nederlands",
-            "pt": "Português (Portugal)",
-            "pt-BR": "Português (Brasil)",
-            "ru": "Русский",
-            "ja": "日本語",
-            "ko": "한국어",
-            "zh-Hans": "简体中文",
-            "zh-Hant": "繁體中文"
-        },
-        "theme": "主題",
         "start_tab": "啟動時顯示",
-        "themes": {
-            "system": "依系統",
-            "light": "淺色",
-            "dark": "深色"
-        },
         "advanced": "顯示遊玩時間限制的進階操作",
         "section_console": "主機",
         "storage": "儲存空間",
@@ -1374,23 +1315,11 @@
         "notices_reminders": "提醒：備份、主機的第二個系統、封鎖遊戲",
         "notices_ack_remind": "30 天後重新計入已忽略的警告",
         "help": "說明與診斷",
-        "text_size": "文字大小",
-        "text_sizes": {
-            "normal": "標準",
-            "large": "較大",
-            "auto": "自動：電視上較大"
-        },
         "effects": "視覺效果",
         "effects_values": {
             "full": "始終完整",
             "auto": "自動：電視上完整",
             "reduced": "減少動態效果"
-        },
-        "rail": "側邊欄",
-        "rail_values": {
-            "auto": "自動：選擇分頁時展開",
-            "open": "始終展開",
-            "icons": "僅圖示"
         }
     },
     "backup": {
@@ -1626,13 +1555,6 @@
         "find_hint": "搜尋",
         "cancelled": "已取消下載。"
     },
-    "markdown": {
-        "note": "注意",
-        "tip": "提示",
-        "important": "重要",
-        "warning": "警告",
-        "caution": "小心"
-    },
     "github": {
         "account": "GitHub 帳戶",
         "not_signed_in": "未登入",
@@ -1823,8 +1745,7 @@
         "failed": "無法取得說明。按 X 重試。"
     },
     "quick": {
-        "hint": "語言和主題",
-        "title_text": "語言、主題和文字大小"
+        "hint": "語言和主題"
     },
     "notices": {
         "title": "通知",
@@ -1876,7 +1797,6 @@
         "went_back": "已退回先前的版本",
         "went_back_detail": "已從 {} 退回到 {}。",
         "went_back_crash": "{} 未能完成啟動（可能已當機），因此 PlayGuard 退回到了 {}。傳送報告有助於修正。",
-        "send_report": "傳送報告",
         "upload": "報告已傳送",
         "upload_show": "顯示連結",
         "crash": "PlayGuard 上次意外關閉",
@@ -1938,21 +1858,6 @@
         }
     },
     "cadran": {
-        "date": "{3}{2}日 {0}",
-        "months": {
-            "1": "1月",
-            "2": "2月",
-            "3": "3月",
-            "4": "4月",
-            "5": "5月",
-            "6": "6月",
-            "7": "7月",
-            "8": "8月",
-            "9": "9月",
-            "10": "10月",
-            "11": "11月",
-            "12": "12月"
-        },
         "today": {
             "kicker": "今天 · {}的限制",
             "kicker_short": "{} · {}",
@@ -2030,7 +1935,6 @@
             "pc_off": "已關閉",
             "unlocked": "已解除",
             "paused": "家長監護已暫停",
-            "read_only": "唯讀",
             "timer_on": "計時中",
             "timer_off": "計時已暫停",
             "timer_none": "無遊玩時間限制",

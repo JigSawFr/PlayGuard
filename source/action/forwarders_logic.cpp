@@ -5,8 +5,9 @@
 #include <cerrno>
 #include <cstdio>
 
+#include <borealis/cadran/util/text.hpp>
+
 #include "core/calendar.h"
-#include "util/text.hpp"
 
 namespace forwarders_logic
 {

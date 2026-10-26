@@ -27,46 +27,21 @@
         "exit_leave": "不锁定直接退出"
     },
     "common": {
-        "yes": "是",
-        "no": "否",
         "on": "开启",
         "off": "关闭",
-        "unavailable": "不可用",
         "not_set": "未设置",
         "no_limit": "无限制",
         "no_limit_in_text": "无限制",
         "zero_minutes": "0分钟（不可游玩）",
         "line": "{}：{}",
-        "minutes": "{}分钟",
         "min_sec": "{}分{}秒",
         "sec": "{}秒",
-        "hours": "{}小时",
-        "hours_minutes": "{}小时{}分",
         "custom": "自定义…",
         "later": "稍后",
         "quit": "退出",
         "delete": "删除",
         "applied": "已保存。",
-        "read_only_note": "只读模式：目前无法通过本应用进行任何更改。",
-        "hold_hint": "按住“{}”2秒"
-    },
-    "days": {
-        "0": "星期日",
-        "1": "星期一",
-        "2": "星期二",
-        "3": "星期三",
-        "4": "星期四",
-        "5": "星期五",
-        "6": "星期六"
-    },
-    "days_lower": {
-        "0": "星期日",
-        "1": "星期一",
-        "2": "星期二",
-        "3": "星期三",
-        "4": "星期四",
-        "5": "星期五",
-        "6": "星期六"
+        "read_only_note": "只读模式：目前无法通过本应用进行任何更改。"
     },
     "days_short": {
         "0": "周日",
@@ -78,7 +53,6 @@
         "6": "周六"
     },
     "error": {
-        "code": "错误{}",
         "code_hint": "错误{}：{}",
         "read_only": "只读模式已开启，未做任何更改：请在 关于 › 帮助与诊断 › 开发者 › 只读模式 中关闭",
         "read_only_fw": "此系统版本尚未经过检查，因此只读模式已开启，未做任何更改：主机 › 兼容性 可打开系统版本画面，在那里关闭",
@@ -308,7 +282,6 @@
         "gate": {
             "body": "游戏时间正在计时，因此会先使用已保存的PIN暂时解除家长控制（无需记住PIN）。",
             "confirm": "解除并应用",
-            "relock_auto": "更改后会立即重新启用家长控制。",
             "relock_manual": "更改后可立即重新启用家长控制。",
             "failed": "无法解除家长控制"
         },
@@ -411,7 +384,6 @@
         "account_value": "{}（启动{}次）",
         "first": "首次游玩",
         "last": "最近游玩",
-        "less_than_minute": "< 1分钟",
         "note": "数据读取自主机的游玩记录，涵盖所有用户。如果更改过主机时钟，时长可能不准确。在游戏上打开的PlayGuard会记为启动时所选用户玩该游戏的时间：请用家长的用户打开。",
         "show_all": "显示所有游戏",
         "section_summary": "概览",
@@ -705,14 +677,8 @@
         "weekdays": "星期一至星期五…",
         "weekend": "周末…",
         "copy_today": "将{}复制到每天",
-        "text_size_auto": "自动：电视上较大",
         "text_size": "文字大小",
-        "start_tab": "启动时显示",
-        "themes": {
-            "system": "跟随系统",
-            "light": "浅色",
-            "dark": "深色"
-        }
+        "start_tab": "启动时显示"
     },
     "tools": {
         "section_diag": "诊断",
@@ -739,32 +705,7 @@
         "logs_days_n": "{} 天",
         "logs_keep_mb": "报告占用空间",
         "logs_note": "适用于 {} 中的诊断报告、崩溃文件、会话日志和在线发送的报告链接，各自分别计算，在启动时和更改限制时执行。最新的一份始终保留。",
-        "language": "语言",
-        "languages": {
-            "system": "系统语言",
-            "en-US": "English",
-            "fr": "Français (France)",
-            "fr-CA": "Français (Canada)",
-            "de": "Deutsch",
-            "es": "Español (España)",
-            "es-419": "Español (Latinoamérica)",
-            "it": "Italiano",
-            "nl": "Nederlands",
-            "pt": "Português (Portugal)",
-            "pt-BR": "Português (Brasil)",
-            "ru": "Русский",
-            "ja": "日本語",
-            "ko": "한국어",
-            "zh-Hans": "简体中文",
-            "zh-Hant": "繁體中文"
-        },
-        "theme": "主题",
         "start_tab": "启动时显示",
-        "themes": {
-            "system": "跟随系统",
-            "light": "浅色",
-            "dark": "深色"
-        },
         "advanced": "显示游戏时间的高级操作",
         "section_console": "主机",
         "storage": "存储",
@@ -1374,23 +1315,11 @@
         "notices_reminders": "提醒：备份、主机的第二个系统、阻止游戏",
         "notices_ack_remind": "30 天后重新计入已忽略的警告",
         "help": "帮助与诊断",
-        "text_size": "文字大小",
-        "text_sizes": {
-            "normal": "标准",
-            "large": "较大",
-            "auto": "自动：电视上较大"
-        },
         "effects": "视觉效果",
         "effects_values": {
             "full": "始终完整",
             "auto": "自动：电视上完整",
             "reduced": "减少动态效果"
-        },
-        "rail": "侧边栏",
-        "rail_values": {
-            "auto": "自动：选择标签页时展开",
-            "open": "始终展开",
-            "icons": "仅图标"
         }
     },
     "backup": {
@@ -1626,13 +1555,6 @@
         "find_hint": "搜索",
         "cancelled": "已取消下载。"
     },
-    "markdown": {
-        "note": "注意",
-        "tip": "提示",
-        "important": "重要",
-        "warning": "警告",
-        "caution": "小心"
-    },
     "github": {
         "account": "GitHub 账户",
         "not_signed_in": "未登录",
@@ -1823,8 +1745,7 @@
         "failed": "无法获取说明。按 X 重试。"
     },
     "quick": {
-        "hint": "语言和主题",
-        "title_text": "语言、主题和文字大小"
+        "hint": "语言和主题"
     },
     "notices": {
         "title": "通知",
@@ -1876,7 +1797,6 @@
         "went_back": "已退回之前的版本",
         "went_back_detail": "已从 {} 退回到 {}。",
         "went_back_crash": "{} 未能完成启动（可能已崩溃），因此 PlayGuard 退回到了 {}。发送报告有助于修复。",
-        "send_report": "发送报告",
         "upload": "报告已发送",
         "upload_show": "显示链接",
         "crash": "PlayGuard 上次意外关闭",
@@ -1938,21 +1858,6 @@
         }
     },
     "cadran": {
-        "date": "{3}{2}日 {0}",
-        "months": {
-            "1": "1月",
-            "2": "2月",
-            "3": "3月",
-            "4": "4月",
-            "5": "5月",
-            "6": "6月",
-            "7": "7月",
-            "8": "8月",
-            "9": "9月",
-            "10": "10月",
-            "11": "11月",
-            "12": "12月"
-        },
         "today": {
             "kicker": "今天 · {}的限制",
             "kicker_short": "{} · {}",
@@ -2030,7 +1935,6 @@
             "pc_off": "已关闭",
             "unlocked": "已解除",
             "paused": "家长控制已暂停",
-            "read_only": "只读",
             "timer_on": "计时中",
             "timer_off": "计时已暂停",
             "timer_none": "无游戏时间限制",

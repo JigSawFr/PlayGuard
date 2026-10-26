@@ -3,11 +3,12 @@
 
 #include <algorithm>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+
 #include "action/profile_flow.hpp"
 #include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
-#include "ui/cadran_list.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;

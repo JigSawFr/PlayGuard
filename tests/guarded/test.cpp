@@ -1,11 +1,11 @@
-// Host tests for source/ui/guarded.hpp: the callback runs while its token is
-// held and true, with its arguments, and does nothing once the token is gone
-// or set to false; it fits a std::function of any arguments.
+// Host tests for Aurore's cadran/ui/guarded.hpp: the callback runs while its
+// token is held and true, with its arguments, and does nothing once the token
+// is gone or set to false; it fits a std::function of any arguments.
 #include "check.h"
 #include <functional>
 #include <string>
 
-#include "ui/guarded.hpp"
+#include <borealis/cadran/ui/guarded.hpp>
 
 static void test_runs_while_alive()
 {

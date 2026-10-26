@@ -9,9 +9,10 @@
 #include <string>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/game_check_text.hpp"
 #include "action/game_verify_flow.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "view/game_tile.hpp"
 

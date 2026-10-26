@@ -6,13 +6,14 @@
 #include <cstdlib>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_modal.hpp>
+
 #include "action/nintendo_dns.hpp"
 #include "action/offline_clock_logic.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_modal.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
@@ -186,7 +187,7 @@ void ClockTab::refresh()
     // frozen here too, or a screenshot would depend on when it was taken.
     if (sim_env_int("PLAYGUARD_SIM_NOW", 0, 0, INT64_MAX)) ticked = 0;
 #endif
-    const std::string na = "playguard/common/unavailable"_i18n;
+    const std::string na = "cadran/common/unavailable"_i18n;
     this->show_clocks(R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na,
                       R_SUCCEEDED(s.network_rc) ? ui::time_text(s.network_time + ticked) : na,
                       R_SUCCEEDED(s.accuracy_rc), s.accuracy);
@@ -249,7 +250,7 @@ void ClockTab::show_clocks(const std::string& user_text, const std::string& netw
     this->network_time->setText(network.second);
 
     const bool bad = known && !accurate;
-    std::string state = !known ? "playguard/common/unavailable"_i18n
+    std::string state = !known ? "cadran/common/unavailable"_i18n
                         : bad  ? "playguard/cadran/clock/inaccurate"_i18n : "playguard/cadran/clock/accurate"_i18n;
     if (known && !network.first.empty() && network.first != user.first) state += " · " + kit::long_date(network.first);
     this->network_state->setText(state);
@@ -344,7 +345,7 @@ void ClockTab::measure()
         this->offline = offline_clock_logic::offer(m.ok, this->snap) != offline_clock_logic::Offer::None;
         // On the screen, the outcome in one line (the details are the dialog's).
         if (m.ok) {
-            const std::string offset = m.offset_known ? clock_flow::offset_text(m.offset) : "playguard/common/unavailable"_i18n;
+            const std::string offset = m.offset_known ? clock_flow::offset_text(m.offset) : "cadran/common/unavailable"_i18n;
             this->show_result(brls::getStr("playguard/clock/last_result", offset, (int)this->answered(m), (int)m.lines.size()));
         } else {
             this->show_result(m.report, this->offline);
@@ -394,7 +395,7 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     words->addView(kicker);
     std::string headline = !m.ok            ? "playguard/clock/dialog_none"_i18n
                            : m.offset_known ? clock_flow::offset_text(m.offset)
-                                            : "playguard/common/unavailable"_i18n;
+                                            : "cadran/common/unavailable"_i18n;
     brls::Label* title = kit::display(headline, m.ok ? 34 : kit::TEXT_TITLE, tone);
     title->setMarginTop(4);
     words->addView(title);

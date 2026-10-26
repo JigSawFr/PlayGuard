@@ -7,9 +7,10 @@
 #include <fmt/format.h>
 #include <vector>
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_list.hpp>
+
 #include "action/pt_flow.hpp"
-#include "ui/cadran_list.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_week.hpp"
 
@@ -65,7 +66,7 @@ void PlayTimerPerDayActivity::bind_cells()
             ui::notify("playguard/play_timer/perday/already_same"_i18n);
             return true;
         }
-        ui::confirm(brls::getStr("playguard/play_timer/perday/copy_today_body", ui::day_name_in_text(today), ui::fmt_minutes(v)),
+        ui::confirm(brls::getStr("playguard/play_timer/perday/copy_today_body", ui::day_name_in_text(today), ui::fmt_limit(v)),
                     "playguard/play_timer/perday/copy_today_confirm"_i18n, copy);
         return true;
     });

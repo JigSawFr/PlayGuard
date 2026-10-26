@@ -168,6 +168,8 @@ playstats_LIBS  := -lz
 # file too (its <name>_CSRC, without having to say so).
 TEST_CXXFLAGS   := -std=c++17 -Isource -isystem extern/borealis/library/include
 CALENDAR_C      := source/core/calendar.c
+# Aurore's Cadran (extern/borealis): the look's helpers PlayGuard tests here.
+C := extern/borealis/library/lib/cadran
 CALENDAR_CFLAGS := -std=gnu11 -Isource/core
 date_SRC    := source/util/date.cpp tests/date/test.cpp
 # The header-only helpers: utf8, emoji, text, json_util.
@@ -193,7 +195,7 @@ sys_updates_net_FLAGS := -std=c++17 -Isource -D__SWITCH__
 sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 dns_hosts_SRC   := source/util/dns_hosts.cpp tests/dns_hosts/test.cpp
-sys_notes_SRC   := source/util/date.cpp source/util/safe_text.cpp source/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
+sys_notes_SRC   := source/util/date.cpp $(C)/util/safe_text.cpp $(C)/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
 clock_logic_SRC   := source/action/clock_logic.cpp tests/clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
@@ -224,11 +226,11 @@ forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
 forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
-markdown_SRC   := source/util/safe_text.cpp source/util/markdown.cpp tests/markdown/test.cpp
+markdown_SRC   := $(C)/util/safe_text.cpp $(C)/util/markdown.cpp tests/markdown/test.cpp
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
-dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp source/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
+dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp $(C)/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
 dev_builds_LIBS  := -lz
 # The download and its resume: without PLAYGUARD_SIM_DEV_BUILDS the desktop
 # build takes the console's path, here against a fake http::download and
@@ -242,11 +244,12 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 # fmt header-only: the report's lines are formatted with it.
 diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
 diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY
-# The text helpers that only translate, over ui/tr.hpp's stand-in for
-# borealis' getStr and fmt header-only (the catalogs read by the test).
-format_text_SRC   := source/ui/format_text.cpp tests/format_text/test.cpp
-format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DPLAYGUARD_HOST_I18N
-cadran_text_SRC   := source/ui/cadran_text.cpp tests/cadran_text/test.cpp
+# The text helpers that only translate (PlayGuard's and Cadran's), over
+# Cadran's ui/tr.hpp stand-in for borealis' getStr and fmt header-only (the
+# catalogs read by the test).
+format_text_SRC   := source/ui/play_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
+format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DBRLS_CADRAN_HOST_I18N
+cadran_text_SRC   := $(C)/ui/cadran_text.cpp tests/cadran_text/test.cpp
 contrast_SRC      := tests/contrast/test.cpp
 cadran_text_FLAGS := $(format_text_FLAGS)
 forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp source/action/forwarders_text.cpp tests/forwarders_text/test.cpp

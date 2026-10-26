@@ -6,8 +6,9 @@
 #include <cstdlib>
 #include <yoga/Yoga.h>
 
+#include <borealis/cadran/ui/effects.hpp>
+
 #include "core/sim_env.h"
-#include "ui/effects.hpp"
 
 namespace
 {

@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/onboarding_activity.hpp"
 
+#include <borealis/cadran/ui/cadran_kit.hpp>
+
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
 #include "action/fw_gate.hpp"
@@ -8,7 +10,6 @@
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
-#include "ui/cadran_kit.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -106,7 +107,7 @@ void OnboardingActivity::refresh()
     const std::string todo = "playguard/onboarding/todo"_i18n;
 
     const bool has_pin = s.pin_length_ok && s.pin_length > 0;
-    pin->setDetailText(!s.pin_length_ok ? "playguard/common/unavailable"_i18n
+    pin->setDetailText(!s.pin_length_ok ? "cadran/common/unavailable"_i18n
                        : has_pin ? "playguard/dashboard/pin_set"_i18n : todo);
     pin->setDetailTextColor(has_pin ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/amber"));
 
@@ -116,7 +117,7 @@ void OnboardingActivity::refresh()
         limit->setDetailText("playguard/play_timer/fw_too_old_short"_i18n);
         limit->setDetailTextColor(cadran::kit::color("cadran/text2"));
     } else if (!pt.valid) {
-        limit->setDetailText("playguard/common/unavailable"_i18n);
+        limit->setDetailText("cadran/common/unavailable"_i18n);
         limit->setDetailTextColor(cadran::kit::color("cadran/text2"));
     } else {
         limit->setDetailText(any_limit ? ui::days_summary(pt.day_min) : todo);
@@ -124,7 +125,7 @@ void OnboardingActivity::refresh()
     }
 
     this->clock_inaccurate = R_SUCCEEDED(accuracy_rc) && !accurate;
-    clock->setDetailText(R_FAILED(accuracy_rc) ? "playguard/common/unavailable"_i18n
+    clock->setDetailText(R_FAILED(accuracy_rc) ? "cadran/common/unavailable"_i18n
                          : accurate ? "playguard/dashboard/clock_ok"_i18n : "playguard/dashboard/clock_bad"_i18n);
     clock->setDetailTextColor(R_FAILED(accuracy_rc) ? cadran::kit::color("cadran/text2") : accurate ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/amber"));
 

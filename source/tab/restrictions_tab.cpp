@@ -1,14 +1,15 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/restrictions_tab.hpp"
 
+#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <borealis/cadran/ui/cadran_text.hpp>
+
 #include "action/history_flow.hpp"
 #include "action/pt_flow.hpp"
 #include "action/rating_flow.hpp"
 #include "action/session_pause.hpp"
 #include "app.hpp"
-#include "ui/cadran_frame.hpp"
-#include "ui/cadran_kit.hpp"
-#include "ui/cadran_text.hpp"
 #include "ui/ui.hpp"
 
 using namespace brls::literals;
@@ -334,7 +335,7 @@ void RestrictionsTab::refresh()
     pctl_status_fetch(&this->st);
     ui::note_unlocked(this->st.temp_unlocked_ok, this->st.temp_unlocked);
     session_pause::shown_as_locked(&this->st, nullptr);   // the restrictions as they are for the child
-    const std::string na = "playguard/common/unavailable"_i18n;
+    const std::string na = "cadran/common/unavailable"_i18n;
     if (this->st.safety_level_ok) cadran::set_pill(brls::getStr("playguard/cadran/pill/level", ui::level_name(this->st.safety_level)), "shield");
     else cadran::set_pill("");
 
