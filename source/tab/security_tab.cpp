@@ -13,6 +13,7 @@
 #include "action/pt_flow.hpp"
 #include "action/session_pause.hpp"
 #include "activity/forwarders_activity.hpp"
+#include "activity/modules_activity.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -108,12 +109,18 @@ SecurityTab::SecurityTab()
         console_actions::delete_all("", this->refresher());
         return true;
     });
+    rescue_about->setSingleLine(false);
+    rescue->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ModulesActivity(ModulesActivity::Tab::Rescue));
+        return true;
+    });
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" }, { "sc_hbmenu", "home" } }, true);
     this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
                        { "sc_pin_pauses", "pause" },
                        { "sc_hbmenu_lock", "home" }, { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" },
                        { "sc_auto_relock", "refresh" }, { "pr_active", "phone" },
-                       { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" } });
+                       { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" },
+                       { "sc_rescue", "tools" } });
     if (cadran::Card* danger = this->list.card_of("sc_delete"))
         danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
 }
@@ -121,6 +128,9 @@ SecurityTab::SecurityTab()
 void SecurityTab::willAppear(bool resetState)
 {
     this->hbmenu_locked = hbmenu_lock::locked();
+    // Locked out? › Optional modules installs and removes the sysmodule while
+    // PlayGuard runs: its state read as the tab comes back.
+    rescue->setDetailText(ui::opens(ModulesActivity::summary(modules::Id::Rescue)));
     TabBase::willAppear(resetState);
 }
 

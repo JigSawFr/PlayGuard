@@ -100,7 +100,7 @@ The entries about the console rather than the parental controls come last, on on
 - the recovery sysmodule out of date (not the one this version ships with, or installed before it said its version; *Update* puts in the one this version carries), then the console to restart for it, until it has;
 - a build that did not finish starting and was gone back from (*Send a report*).
 
-Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
+Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), a newer release of the Home Assistant integration (once it said which version Home Assistant runs: *What's new* shows what changed since and the QR code that opens it in HACS), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
 
 ### How entries behave
 
@@ -228,7 +228,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 - **Profiles** saved on the SD card: apply (a profile already in force just says so), edit, rename or delete one; save the current limits or make a new one.
 - Any name, in any script (*École*, *周末*, *Выходные* …) — a name without Latin letters gets a file name of its own, and two names that would map to the same file are caught.
-- **Scheduled profile** (*Profiles › Scheduled profile*): *Soon*. PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself: switching profiles from a calendar or the school holidays comes with the [MQTT bridge](https://github.com/JigSawFr/PlayGuard/blob/main/ROADMAP.md#horizon) (Home Assistant). A profile scheduled with an earlier version is still offered when its period begins, and the line still changes, removes or ends it.
+- **Scheduled profile** (*Profiles › Scheduled profile*): *With Home Assistant*. PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself: Home Assistant does, from a calendar or the school holidays, once *Console › Remote access* links the console to it (an automation that sets its *Profile* select; [the Home Assistant guide](home-assistant.md)). A profile scheduled with an earlier version is still offered when its period begins, and the line still changes, removes or ends it.
 
 ### Block all games
 
@@ -341,6 +341,10 @@ The PIN in PlayGuard itself:
 
 Two confirmations, irreversible; a backup of the settings is saved first.
 
+### Locked out?
+
+Last in the tab: the optional recovery module, for a forgotten PIN with a 0-minute limit. Ⓐ opens it in *Console › Optional modules*, which installs it.
+
 ## History — what PlayGuard changed, and the backups
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=history)*
@@ -365,7 +369,7 @@ Two confirmations, irreversible; a backup of the settings is saved first.
 
 *[Try it in the simulator ›](https://playguard.link/simulator/?tab=console)*
 
-**At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles, under *Tools* (*Network clock*, *Installed games* and *Forwarders*; the first two show what needs a look in their corner), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
+**At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles, under *Tools* (*Network clock*, *Installed games* and *Forwarders*; the first two show what needs a look in their corner; then *Remote access* and *Optional modules*), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
 ### Network clock
 
@@ -455,6 +459,14 @@ On a console without Internet, *Use the console clock* is offered in the result'
 - **In the settings backups** (*History › Backups*): what PlayGuard made and whether the homebrew menu was locked. Restoring a backup offers, after the rest, to put back the forwarders no longer on the HOME menu (protected as they were, their hours and icon); a lock is only said, to be done again from here.
 - Every change asks for the PIN when *Protect PlayGuard with the PIN* does, is refused in read-only mode, and is in the change history. What PlayGuard made is kept per system (sysMMC / emuMMC), in `forwarders.json`.
 
+### Remote access
+
+*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
+
+### Optional modules
+
+*Optional modules ›*, a tile under *Tools*: install, update, start at boot or remove the recovery module and the remote link's agent, each in its own tab, from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
+
 ### The console's lines
 
 - **Firmware, Atmosphère, hekate** (when its `bootloader/update.bin` is on the SD card) **and sys-patch** (when it is installed; its version from its `config/sys-patch/log.ini`), each a tile with the installed version after a teal check when it is the newest, or an amber warning when the last update check found a newer release, named under it (*23.0.1 available*, with how many versions behind when more than one; the tile outlined in amber); a warning in the firmware tile's corner when the newest firmware needs a newer Atmosphère or hekate first, or is not supported by them yet (the firmware's release notes say why: their release notes say which firmware they support).
@@ -513,7 +525,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 **No more 22.5 crashes.** `pctl:a`, the privileged parental-control service, accepts a **single session**. Older builds of the original app kept it open, so the HOME-menu PIN prompt (or the PIN applet) could not get it and Atmosphère could crash. PlayGuard opens the session for each action and releases it immediately; periodic refreshes pause while the app is in the background. *(Diagnosis by [anbingxi's fork](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).)*
 
-**Nothing runs in the background.** The limit, the PIN, the warnings and the suspension are the console's own; PlayGuard only changes their settings.
+**Nothing runs in the background.** The limit, the PIN, the warnings and the suspension are the console's own; PlayGuard only changes their settings. The optional remote link runs while PlayGuard is open, or all the time once its optional agent is installed, and carries out an order exactly like a change made on the console (the same unlock, relock, read-only mode and history); it can never delete parental controls, unlink the phone app or touch the PIN.
 
 ## What counts as play time
 

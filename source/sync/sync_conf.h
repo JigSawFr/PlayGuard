@@ -1,0 +1,135 @@
+// sync_conf — the remote link's settings (sd:/config/playguard/sync.conf)
+// and the small flat files PlayGuard and the agent exchange: "key=value",
+// one per line, '#' starts a comment. Read by both processes with this one
+// parser (the agent has no JSON library). PlayGuard's Sync screen writes
+// sync.conf; it can also be edited by hand. A key this version does not know
+// is kept and written back.
+// Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#pragma once
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define SYNC_CONF_SCHEMA   1
+#define SYNC_HOST_MAX      254
+#define SYNC_USER_MAX      65
+#define SYNC_PASS_MAX      129
+#define SYNC_PATH_MAX      128
+#define SYNC_ID_LEN        8      // console id: 8 lower-case hex digits
+#define SYNC_NAME_MAX      33
+#define SYNC_PREFIX_MAX    33
+#define SYNC_EXTRA_MAX     1024   // unknown lines kept
+
+typedef enum {
+    SyncPolicy_Ask  = 0,   // PlayGuard open: confirm on the console; the agent alone: refuse
+    SyncPolicy_Auto = 1,   // apply without asking (still behind every write guard)
+    SyncPolicy_Off  = 2,   // publish only, refuse every order
+} SyncPolicy;
+
+// The MQTT version spoken to the broker.
+typedef enum {
+    SyncMqtt_Auto = 0,   // 5.0, else 3.1.1 when the broker refuses 5.0 (then kept until the settings change)
+    SyncMqtt_V5   = 1,
+    SyncMqtt_V311 = 2,
+} SyncMqttVersion;
+
+// What a value belongs to, for the publish_* switches.
+typedef enum {
+    SyncPublish_Controls = 0,   // the parental controls and the link: always
+    SyncPublish_Activity,
+    SyncPublish_Games,
+    SyncPublish_Console,
+    SyncPublish_Network,
+    SyncPublish_Hardware,
+    SyncPublish_Serial,         // needs publish_hardware too
+    SyncPublish_Report,
+    SyncPublish_Count
+} SyncPublish;
+
+typedef struct {
+    int        schema;
+    bool       enabled;
+    char       host[SYNC_HOST_MAX];
+    uint16_t   port;                    // 1883; 8883 turns tls on by default
+    bool       tls;
+    char       ca_file[SYNC_PATH_MAX];  // PEM, for a broker with a private certificate authority
+    SyncMqttVersion mqtt_version;
+    char       username[SYNC_USER_MAX];
+    char       password[SYNC_PASS_MAX];
+    bool       allow_anonymous;         // connect without a user name
+    char       console_id[SYNC_ID_LEN + 1];
+    char       console_name[SYNC_NAME_MAX];
+    SyncPolicy policy;
+    bool       remote_timer_writes;     // orders may change the play timer (unlocking with the stored PIN)
+    // What is published beside the parental controls (always): each on by
+    // default but the serial number. Off: its values are null, its documents
+    // cleared, its entities removed from Home Assistant.
+    bool       publish_report;
+    bool       publish_activity;        // play time: today, the week, the finished days, the game names
+    bool       publish_games;           // the games document (the list, each one's play time)
+    bool       publish_console;         // power, storage, when it started (the system document)
+    bool       publish_network;         // the connection, IP address, Wi-Fi (the system document)
+    bool       publish_hardware;        // versions and hardware: model, firmware, Atmosphère, hekate…
+    bool       publish_serial;          // the serial number, with publish_hardware (off by default)
+    bool       ha_discovery;            // Home Assistant MQTT discovery
+    uint16_t   poll_s;                  // state refresh, 10..300
+    char       topic_prefix[SYNC_PREFIX_MAX];      // "playguard"
+    char       discovery_prefix[SYNC_PREFIX_MAX];  // "homeassistant"
+    int        log_level;               // 0 errors, 1 info, 2 debug
+    char       extra[SYNC_EXTRA_MAX];   // lines with unknown keys, as read
+    // Not in the file: set by the host, which runs on an emuMMC. sync.conf is
+    // shared by every system on the SD card, and each has its own parental
+    // controls: an emuMMC is a device of its own (sync_conf_device_id).
+    bool       emummc;
+} SyncConf;
+
+void sync_conf_defaults(SyncConf *c);
+// Reads `text` over the defaults (call sync_conf_defaults first). Values out
+// of range keep their default. Returns false when nothing could be read at
+// all (an empty file is fine and returns true).
+bool sync_conf_parse(SyncConf *c, const char *text, size_t len);
+// The file's content; the length written, 0 when `cap` is too small.
+size_t sync_conf_write(const SyncConf *c, char *out, size_t cap);
+// What is still missing before connecting: NULL when ready, else an English
+// reason ("no broker host" …). The UI shows its own words.
+const char *sync_conf_problem(const SyncConf *c);
+// 8 lower-case hex digits.
+bool sync_conf_id_valid(const char *id);
+// The id this system goes by on the broker and in Home Assistant (topics,
+// client id, discovery): console_id, or on an emuMMC the same id with its
+// first digit's top bit flipped ("5a0c3e11" -> "da0c3e11"), still 8 hex
+// digits, so that a sysMMC and an emuMMC sharing one sync.conf are two
+// devices. Empty when console_id is not valid yet.
+void sync_conf_device_id(const SyncConf *c, char out[SYNC_ID_LEN + 1]);
+// Its name: console_name ("Nintendo Switch" when empty), " (emuMMC)" added
+// on an emuMMC. `cap` of SYNC_DEVICE_NAME_MAX is always enough.
+#define SYNC_DEVICE_NAME_MAX (SYNC_NAME_MAX + 16)
+void sync_conf_device_name(const SyncConf *c, char *out, size_t cap);
+// "ask" / "auto" / "off".
+const char *sync_policy_name(SyncPolicy p);
+// The category is published (SyncPublish_Controls always).
+bool        sync_conf_publishes(const SyncConf *c, SyncPublish p);
+// "controls", "activity", "games", "console", "network", "hardware", "serial", "report".
+const char *sync_publish_name(SyncPublish p);
+// "auto" / "5" / "3.1.1", as sync.conf writes it.
+const char *sync_mqtt_version_name(SyncMqttVersion v);
+
+// The generic reader the other flat files use: calls `fn` for each
+// "key=value" line (key trimmed, value as written up to the line end, a
+// trailing '\r' dropped).
+typedef void (*SyncKvFn)(void *ctx, const char *key, const char *value);
+void sync_kv_each(const char *text, size_t len, SyncKvFn fn, void *ctx);
+
+// Parses an unsigned integer with bounds; false when it is not one.
+bool sync_parse_uint(const char *s, uint32_t min, uint32_t max, uint32_t *out);
+// "1" / "true" / "on" / "yes" and "0" / "false" / "off" / "no".
+bool sync_parse_bool(const char *s, bool *out);
+
+#ifdef __cplusplus
+}
+#endif

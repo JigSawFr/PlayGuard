@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 d220d2d366f1 -->
+<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
 # Compatibiliteit
 
 Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGuard zich verhoudt tot een vervangende sysmodule. Terug naar de [README](../../README.md).
@@ -66,7 +66,7 @@ Kinderen houden van videogames, en videogames betekenen schermen: een limiet hoo
 
 De paar hulpmiddelen die er waren, deden het niet goed: activiteitsoverzichten die nauwelijks werden onderhouden en weinig detail gaven, ouderlijk toezicht dat ruw en onaf was. En ik wilde ook geen zelfgemaakte vervanging, of een sysmodule die altijd op de achtergrond draait. Het idee was om **het ouderlijk toezicht van de console zelf zoveel mogelijk te hergebruiken**, met alles wat het al doet — de limiet, de pincode, de waarschuwingen, de onderbreking — en de instellingen ervan terug op de console te brengen. Dat is PlayGuard.
 
-Door het toezicht van de console zelf aan te sturen, gaat ook de deur open naar veel meer: speeltijd doorgeven aan een server thuis, er opdrachten van ontvangen, Home Assistant, automatiseringen. Waar dat heen kan gaan, staat in [de horizon van de roadmap](../../ROADMAP.md#horizon) (in het Engels).
+Door het toezicht van de console zelf aan te sturen, gaat ook de deur open naar veel meer: speeltijd doorgeven aan een server thuis, er opdrachten van ontvangen, Home Assistant, automatiseringen. De eerste stap is er, een optionele verbinding met Home Assistant via MQTT ([handleiding](../home-assistant.md), in het Engels); waar het daarna heen kan gaan, staat in [de horizon van de roadmap](../../ROADMAP.md#horizon) (in het Engels).
 
 ## PlayGuard of een vervangende sysmodule?
 
@@ -76,7 +76,7 @@ PlayGuard stuurt het ouderlijk toezicht aan dat in de console zit (de dienst `pc
 |---|---|---|
 | **Speeltijdlimiet** | Eén voor de console (de eigen timer van de console) | Eén per gebruikersaccount |
 | **Pincode, waarschuwingen, onderbreking** | Die van de console | Zijn eigen |
-| **Op de achtergrond** | Niets (de optionele herstel-sysmodule doet alleen iets bij het opstarten, als een `RESCUE`-bestand daarom vraagt) | Een sysmodule, vanaf het opstarten |
+| **Op de achtergrond** | Niets (de optionele herstel-sysmodule doet alleen iets bij het opstarten, als een `RESCUE`-bestand daarom vraagt; de agent van de verbinding met Home Assistant, ook optioneel, draait alleen als hij is geïnstalleerd) | Een sysmodule, vanaf het opstarten |
 | **Na een firmware-update** | Het toezicht van de console blijft werken; PlayGuard opent alleen-lezen tot een versie de firmware ondersteunt | Het toezicht hangt ervan af of de sysmodule nog werkt |
 | **Verwijderd van de SD-kaart** | De limieten blijven op de console | Het toezicht verdwijnt mee |
 

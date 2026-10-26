@@ -1,4 +1,4 @@
-<!-- translated from docs/install.md, sha256 8e4d0c633103 -->
+<!-- translated from docs/install.md, sha256 900d9a183a17 -->
 # Instalação
 
 Como instalar, atualizar e remover o PlayGuard, e o que ele escreve no cartão SD. Depois de instalado: [como começar](getting-started.md). Voltar ao [README](../../README.md).
@@ -11,19 +11,20 @@ Como instalar, atualizar e remover o PlayGuard, e o que ele escreve no cartão S
 - **Manualmente** — Transfira o `playguard.zip` da [versão mais recente](https://github.com/JigSawFr/PlayGuard/releases/latest) e extraia-o para a **raiz** do cartão SD. A aplicação fica em `sd:/switch/playguard/` e os seus ficheiros em `sd:/config/playguard/`.
 - **sphaira › GitHub** — O zip da versão já contém a entrada (`/config/sphaira/github/playguard.json`): depois de uma primeira instalação, atualize a partir de *GitHub* no sphaira.
 
-O **sysmodule de recuperação** opcional (`playguard-rescue.zip`) transfere-se à parte: extraia-o também para a raiz do cartão SD e depois reinicie a consola. Fica em `atmosphere/contents/4200000000505247/` e só atua quando um ficheiro `RESCUE` o pede — veja [Consola bloqueada?](troubleshooting.md#consola-bloqueada).
+O **sysmodule de recuperação** opcional instala-se a partir do PlayGuard (*Consola › Módulos opcionais*, ou *Segurança › Sem acesso?*), ou manualmente a partir da sua própria transferência (`playguard-rescue.zip`): extraia-o também para a raiz do cartão SD e depois reinicie a consola. Fica em `atmosphere/contents/4200000000505247/` e só atua quando um ficheiro `RESCUE` o pede — veja [Consola bloqueada?](troubleshooting.md#consola-bloqueada).
 
 Depois, abra o PlayGuard **sobre um jogo**, com o utilizador de um adulto ([porquê](compatibility.md#launchers)).
 
 ## Atualizar
 
 - **No PlayGuard:** *Preferências › Atualizar com* escolhe a forma — no próprio PlayGuard (transfere a versão, verifica-a, substitui-se a si próprio e reinicia), o sphaira, a Homebrew App Store ou manualmente. Com *Procurar atualizações todos os dias* ativo, o PlayGuard abre na nova versão quando há uma.
-- **O sysmodule de recuperação** acompanha a versão do PlayGuard: depois de cada atualização, extraia de novo o `playguard-rescue.zip` dessa versão (ou *Atualizar* na entrada *O sysmodule de recuperação está desatualizado* do sino) e depois reinicie a consola.
+- **O sysmodule de recuperação** acompanha a versão do PlayGuard: depois de cada atualização, extraia de novo o `playguard-rescue.zip` dessa versão (ou *Atualizar* na entrada *O sysmodule de recuperação está desatualizado* do sino, ou em *Consola › Módulos opcionais*) e depois reinicie a consola.
+- **O agente da ligação remota**, se estiver instalado, é proposto no arranque seguinte quando o PlayGuard traz um mais recente ([Home Assistant](../home-assistant.md#keep-the-link-up-when-playguard-is-closed), em inglês).
 - As definições, o histórico, os perfis e as cópias de segurança ficam: estão em `sd:/config/playguard/`, não junto da aplicação.
 
 ## Remover
 
-Elimine `sd:/switch/playguard/` (a aplicação) e, para remover também os seus ficheiros, `sd:/config/playguard/`; com o sysmodule de recuperação, também `sd:/atmosphere/contents/4200000000505247/`. Os limites, o PIN e as restrições são da própria consola: **ficam na consola**. Para os remover também, use primeiro *Segurança › Eliminar todo o controlo parental*.
+Elimine `sd:/switch/playguard/` (a aplicação) e, para remover também os seus ficheiros, `sd:/config/playguard/`; com os sysmodules opcionais, também `sd:/atmosphere/contents/4200000000505247/` (recuperação) e `sd:/atmosphere/contents/4200000000504741/` (o agente), ou remova-os primeiro em *Consola › Módulos opcionais*. Os limites, o PIN e as restrições são da própria consola: **ficam na consola**. Para os remover também, use primeiro *Segurança › Eliminar todo o controlo parental*.
 
 ## Ficheiros no cartão SD
 
@@ -38,7 +39,9 @@ Todos em `sd:/config/playguard/` (a aplicação em si fica em `sd:/switch/playgu
 - **`gate.nro`**, **`gate-<hash>.nro`**, **`gate_*.txt`** — A porta dos forwarders protegidos (*Consola › Forwarders*): o seu programa, as suas horas livres, as horas em que nunca abre e a pausa após recusas, as suas tentativas até o PlayGuard as ler, e quanto tempo dura o seu ecrã de abertura (`gate_wait.txt`, lido a cada arranque)
 - **`previous_build.json`**, **`boot_check.json`** — Depois de uma compilação ser instalada no lugar da atual: o nome da compilação substituída (guardada junto do `.nro` como `playguard.nro.previous`) e a verificação do arranque seguinte (eliminado assim que o seu primeiro ecrã aparece)
 - **`rescue_report.txt`** — Deixado pelo sysmodule de recuperação depois de atuar, até o PlayGuard o mostrar ao arrancar (se não o puder ler, é removido, e o PlayGuard avisa)
-- **`rescue_nonce`** — Um desafio aleatório a que o sysmodule de recuperação responde no seu relatório, para que o PlayGuard distinga um relatório escrito por ele de um escrito à mão ([sysmodule/README.md](../../sysmodule/README.md), em inglês); um novo a cada arranque
+- **`rescue_nonce`** — Um desafio aleatório a que o sysmodule de recuperação responde no seu relatório, para que o PlayGuard distinga um relatório escrito por ele de um escrito à mão ([sysmodule/rescue/README.md](../../sysmodule/rescue/README.md), em inglês); um novo a cada arranque
+- **`sync.conf`** — Só depois de o *Acesso remoto* ser configurado: as definições da ligação, incluindo a palavra-passe do broker (nunca num relatório nem num envio online)
+- **`sync/`** — Só com o *Acesso remoto*: os perfis guardados, para o agente opcional (`profiles.txt`); o que ele lê e escreve para um sistema está no `nand/<sistema>/sync/` desse sistema (registos, nomes dos jogos, o que alterou, os seus eventos). Um sysMMC e um emuMMC partilham `sync.conf`, mas são dois dispositivos no Home Assistant
 - **`logs/`** — `reports/` os relatórios de diagnóstico guardados (nunca contêm o PIN nem o número de série); `crashes/` um ficheiro por falha (o que fez o PlayGuard parar); `uploads/` um atalho de Internet (`.url`) por relatório enviado online; `play_timer/` os ficheiros do temporizador de jogo das ferramentas de programador. Quantos relatórios, ficheiros de falha e ligações são mantidos: *Sobre › Ajuda e diagnóstico* (por número, idade ou tamanho; o mais recente fica sempre)
 
 Mais em [packaging/README.md](../../packaging/README.md) (em inglês).

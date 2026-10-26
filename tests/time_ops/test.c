@@ -9,7 +9,8 @@ typedef struct { bool active; unsigned root_call; u32 kind; } Handle;
 static struct {
     Handle handles[MAX_HANDLES];
     unsigned next_handle, active, opened, closed, root_calls, writes;
-    unsigned fail_root_call, fail_child_root, fail_read_root, fail_flag_root;
+    unsigned fail_root_call, fail_root_call2, fail_child_root, fail_read_root, fail_flag_root;
+    char last_root[8];        /* the service the last root asked for */
     u32 fail_child_kind, fail_read_kind, fail_flag_command;
     bool fail_write, automatic, accuracy, use_readback;
     u64 clock_value, written, readback;
@@ -51,10 +52,11 @@ static void open_handle(Service *service, unsigned root_call, u32 kind)
 
 Result smGetService(Service *service, const char *name)
 {
-    CHECK(strcmp(name, "time:s") == 0);
+    CHECK(strcmp(name, "time:s") == 0 || strcmp(name, "time:u") == 0);
     CHECK(model.active == 0); /* A prior operation must have released its root. */
+    snprintf(model.last_root, sizeof(model.last_root), "%s", name);
     model.root_calls++;
-    if (model.root_calls == model.fail_root_call) return MOCK_ERROR;
+    if (model.root_calls == model.fail_root_call || model.root_calls == model.fail_root_call2) return MOCK_ERROR;
     open_handle(service, model.root_calls, ROOT_KIND);
     return 0;
 }
@@ -138,8 +140,16 @@ static void test_network_accuracy(void)
     CHECK(time_network_accuracy(&accurate) == 0 && accurate);
     assert_released();
 
+    /* time:s refused (the agent has time:u only): time:u answers. */
     reset();
     model.fail_root_call = 1;
+    CHECK(time_network_accuracy(&accurate) == 0 && accurate);
+    CHECK(model.root_calls == 2 && !strcmp(model.last_root, "time:u"));
+    assert_released();
+
+    reset();
+    model.fail_root_call = 1;
+    model.fail_root_call2 = 2;
     CHECK(time_network_accuracy(&accurate) == MOCK_ERROR && !accurate);
     assert_released();
 

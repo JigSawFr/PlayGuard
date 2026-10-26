@@ -165,10 +165,13 @@ void sanitize(Config& c)
     if (c.update_latest.size() > 32) c.update_latest.clear();
     if (c.sys_latest.size() > 96) c.sys_latest.clear();
     if (!is_date(c.sys_checked)) c.sys_checked.clear();
+    if (c.ha_latest.size() > 32) c.ha_latest.clear();
+    if (!is_date(c.ha_checked)) c.ha_checked.clear();
     if (c.update_snooze_version.size() > 32 || !is_date(c.update_snooze_until))
         c.update_snooze_version.clear(), c.update_snooze_until.clear();
     if (!is_date(c.support_reminded)) c.support_reminded.clear();
     if (c.seen_version.size() > 32) c.seen_version.clear();
+    if (c.agent_update_skipped.size() > 64) c.agent_update_skipped.clear();
     if (c.crash_seen.size() > 64) c.crash_seen.clear();
     if (!is_date(c.summary_seen)) c.summary_seen.clear();
     if (!is_date(c.console_lock_since)) c.console_lock_since.clear();
@@ -325,6 +328,8 @@ static void load_shared()
     read_string(j, "update_latest", c.update_latest);
     read_string(j, "sys_latest", c.sys_latest);
     read_string(j, "sys_checked", c.sys_checked);
+    read_string(j, "ha_latest", c.ha_latest);
+    read_string(j, "ha_checked", c.ha_checked);
     read_string(j, "update_snooze_version", c.update_snooze_version);
     read_string(j, "update_snooze_until", c.update_snooze_until);
     read_string(j, "start_tab", c.start_tab);
@@ -348,6 +353,7 @@ static void load_shared()
     read_bool(j, "support_reminder", c.support_reminder);
     read_string(j, "support_reminded", c.support_reminded);
     read_string(j, "seen_version", c.seen_version);
+    read_string(j, "agent_update_skipped", c.agent_update_skipped);
     read_string(j, "crash_seen", c.crash_seen);
     read_bool(j, "notices_system", c.notices_system);
     read_bool(j, "notices_summary", c.notices_summary);
@@ -403,6 +409,13 @@ void load()
     sanitize(s_config);
 }
 
+static void (*s_saved_hook)() = nullptr;
+
+void set_saved_hook(void (*hook)())
+{
+    s_saved_hook = hook;
+}
+
 bool write(const Snapshot& snap)
 {
     // Both, even when the first fails.
@@ -439,6 +452,8 @@ bool snapshot(Snapshot& snap)
     j["update_latest"]   = s_config.update_latest;
     j["sys_latest"]      = s_config.sys_latest;
     j["sys_checked"]     = s_config.sys_checked;
+    j["ha_latest"]       = s_config.ha_latest;
+    j["ha_checked"]      = s_config.ha_checked;
     j["update_snooze_version"] = s_config.update_snooze_version;
     j["update_snooze_until"]   = s_config.update_snooze_until;
     j["start_tab"]       = s_config.start_tab;
@@ -463,6 +478,7 @@ bool snapshot(Snapshot& snap)
     j["support_reminder"] = s_config.support_reminder;
     j["support_reminded"] = s_config.support_reminded;
     j["seen_version"]    = s_config.seen_version;
+    j["agent_update_skipped"] = s_config.agent_update_skipped;
     j["crash_seen"]      = s_config.crash_seen;
     j["notices_system"]    = s_config.notices_system;
     j["notices_summary"]   = s_config.notices_summary;
@@ -497,6 +513,7 @@ bool snapshot(Snapshot& snap)
     st["schedule_prev"]     = s_config.schedule_prev;
     st["relock_pending"]    = s_config.relock_pending;
     snap.system = dump(st);
+    if (s_saved_hook) s_saved_hook();
     return true;
 }
 

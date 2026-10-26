@@ -3,7 +3,8 @@
 <!-- Console: what it runs (firmware, Atmosphère, hekate, sys-patch: tiles, A on each
      opens its release notes), then under Tools, as tiles too, the network
      clock (its own screen, the former tab), the installed games check and
-     the forwarders (homebrew on the HOME menu), then compatibility,
+     the forwarders (homebrew on the HOME menu), the remote link and the
+     optional sysmodules, then compatibility,
      storage, the serial number and the game patches. -->
 
 <brls:Box
@@ -38,6 +39,11 @@
             <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
             <brls:DetailCell id="cn_games" title="@i18n/playguard/tiles/games"/>
             <brls:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
+            <!-- A second row: the remote link (MQTT, Home Assistant:
+                 activity/sync_activity.hpp) and the optional sysmodules
+                 (activity/modules_activity.hpp). -->
+            <brls:DetailCell id="cn_remote" title="@i18n/playguard/sync/title"/>
+            <brls:DetailCell id="cn_modules" title="@i18n/playguard/modules/open"/>
             <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <brls:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>
             <brls:DetailCell id="cn_storage" focusable="false" title="@i18n/playguard/tools/storage"/>

@@ -68,7 +68,9 @@ Result time_network_accuracy(bool *accurate)
 {
     *accurate = false;
     Service root = {0};
+    // time:s, else time:u (the agent's): the command is the public API's.
     Result rc = smGetService(&root, "time:s");
+    if (R_FAILED(rc)) rc = smGetService(&root, "time:u");
     if (R_SUCCEEDED(rc)) {
         u8 b = 0;
         rc = serviceDispatchOut(&root, 200, b);

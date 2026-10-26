@@ -18,6 +18,7 @@
 #include "action/outside_watch.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
+#include "action/sync_flow.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
@@ -63,6 +64,7 @@ std::string kind_label(const std::string& kind)
 std::string source_label(const history::Entry& e)
 {
     if (e.source == "profile") return brls::getStr("playguard/history/sources/profile", e.detail);
+    if (e.source == "remote_profile") return brls::getStr("playguard/history/sources/remote_profile", e.detail);
     if (history_logic::known_source(e.source)) return brls::getStr("playguard/history/sources/" + e.source);
     return "";
 }
@@ -127,9 +129,10 @@ static void store(history::Entry e)
     s_changes++;
     // A change PlayGuard made: what it reads next is not a change made
     // outside (the outside_* entries are those, and a new account; a refused
-    // change changed nothing).
+    // change changed nothing). An optional module installed or removed
+    // changes nothing it watches.
     if (!text::starts_with(e.kind, "outside_") && !text::starts_with(e.kind, "gate_") && e.kind != "new_account" &&
-        e.result.empty())
+        e.kind != "module" && e.result.empty())
         outside_watch::own_change();
     if (e.when.empty()) e.when = ui::now_stamp();
     e.version = app::version();
@@ -154,6 +157,7 @@ static void store(history::Entry e)
         brls::sync([saved, err]() { notices::note_write("history", saved, err); });
         if (put_aside) brls::sync([]() { data_notice::history_put_aside(); });
     });
+    sync_flow::changed();   // the remote link publishes the new state
     // Developer › Record the play timer: a line marking the change.
     std::string event = e.result.empty() ? e.kind : e.kind + " refused " + e.result;
     for (const std::string* part : { &e.source, &e.detail })
@@ -170,10 +174,11 @@ static void store(history::Entry e)
 }
 
 void record_values(const char* kind, std::vector<int> before, std::vector<int> after,
-                   const std::string& source, const std::string& detail)
+                   const std::string& source, const std::string& detail, const std::string& when)
 {
     if (before == after) return;
     history::Entry e;
+    e.when   = when;
     e.kind   = kind;
     e.source = source;
     e.detail = detail;
@@ -182,9 +187,10 @@ void record_values(const char* kind, std::vector<int> before, std::vector<int> a
     store(e);
 }
 
-void record_event(const char* kind, const std::string& source, const std::string& detail)
+void record_event(const char* kind, const std::string& source, const std::string& detail, const std::string& when)
 {
     history::Entry e;
+    e.when   = when;
     e.kind   = kind;
     e.source = source;
     e.detail = detail;
@@ -260,7 +266,10 @@ static std::string plain_title(const history::Entry& e)
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty() && !after.empty())
         return brls::getStr("playguard/history/title_change", kind_label(e.kind), before, after);
-    if (!e.detail.empty() && e.source.empty()) return brls::getStr("playguard/common/line", kind_label(e.kind), e.detail);
+    // A detail that is the change itself (a bedtime "21:00 → 22:00"), not a
+    // profile's name.
+    if (!e.detail.empty() && (e.source.empty() || e.source == "remote"))
+        return brls::getStr("playguard/common/line", kind_label(e.kind), e.detail);
     return kind_label(e.kind);
 }
 
@@ -286,7 +295,7 @@ std::string details(const history::Entry& e)
     if (!e.commit.empty()) rows.push_back({ "playguard/history/commit"_i18n, e.commit });
     if (e.pr > 0) rows.push_back({ "playguard/history/pr"_i18n, "#" + std::to_string(e.pr) });
     std::string out = kind_label(e.kind) + "\n\n" + cadran_text::table(rows);
-    if (from.empty() && !e.detail.empty()) out += "\n\n" + e.detail;
+    if (!e.detail.empty() && (from.empty() || e.source == "remote")) out += "\n\n" + e.detail;
     // The week's limits: each day that changed, as it was and became.
     const std::vector<int> days = history_logic::changed_days(e);
     if (!days.empty()) {

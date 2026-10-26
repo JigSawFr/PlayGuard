@@ -1,4 +1,4 @@
-<!-- translated from docs/troubleshooting.md, sha256 0f51172fd98a -->
+<!-- translated from docs/troubleshooting.md, sha256 dbe5760f150d -->
 # Problemen oplossen
 
 Weer toegang krijgen tot een vergrendelde console, de veelvoorkomende problemen, een bug melden, en de ontwikkelaarsmodus. Terug naar de [README](../../README.md).
@@ -19,7 +19,7 @@ Je kent de pincode, maar de app op de telefoon van de vorige eigenaar is nog gek
 
 ### De speeltijdtimer blokkeert alles (limiet van 0 minuten) en de pincode is vergeten
 
-PlayGuard zelf kan dan niet starten. Installeer de optionele herstel-sysmodule (`playguard-rescue.zip`) **van tevoren**; als je buitengesloten bent, zet je een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start je op — de module ontgrendelt de console zodat PlayGuard kan openen. Zie [`sysmodule/README.md`](../../sysmodule/README.md) (in het Engels).
+PlayGuard zelf kan dan niet starten. Installeer de optionele herstel-sysmodule **van tevoren** (*Console › Optionele modules*, of `playguard-rescue.zip` met de hand); als je buitengesloten bent, zet je een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start je op — de module ontgrendelt de console zodat PlayGuard kan openen. Zie [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (in het Engels).
 
 De module moet de versie van PlayGuard volgen: pak bij elke update van PlayGuard de `playguard-rescue.zip` van die release opnieuw uit (of *Bijwerken* bij *De herstel-sysmodule is verouderd* onder de meldingenbel), en start de console daarna opnieuw op. Een oudere module laat een rapport achter dat PlayGuard niet kan controleren: het herstelscherm biedt dan niets aan, zegt dat de module ouder is, en `RESCUE` opnieuw doen geeft hetzelfde tot de module is bijgewerkt.
 

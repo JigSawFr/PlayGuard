@@ -11,6 +11,7 @@
 
 #include "action/error_hint_logic.hpp"
 #include "action/fw_gate.hpp"
+#include "action/sync_flow.hpp"
 #include "action/write_queue_logic.hpp"
 #include "ui/app_hooks.hpp"
 #include "util/config.hpp"
@@ -249,6 +250,7 @@ void note_unlocked(bool valid, bool unlocked)
 {
     if (!valid || unlocked == s_unlocked) return;
     s_unlocked = unlocked;
+    sync_flow::changed();
     // Next frame: at start-up the first tab is read before the main screen is
     // on the activity stack.
     brls::sync([]() { update_title(); });

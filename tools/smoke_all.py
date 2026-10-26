@@ -4,7 +4,7 @@ each one that has references, and prints a summary.
 
 The scenarios are read from desktop_smoke.py itself: the default one (no
 argument, named "smoke" like its references, tests/visual/smoke/) and every
-name it tests with SCENARIO == "...". They run N at a time (-j, 3 by
+name it tests with SCENARIO == "..." or SCENARIO in (...). They run N at a time (-j, 3 by
 default), each on its own X display and D-Bus session
 (xvfb-run -a ... dbus-run-session), into <out-dir>/<scenario>/, with its
 output in <out-dir>/<scenario>.log.
@@ -44,7 +44,11 @@ def scenarios():
     """The default scenario, then those desktop_smoke.py tests for, in the
     order it names them."""
     with open(SMOKE, encoding="utf-8") as f:
-        names = re.findall(r'SCENARIO\s*==\s*"(\w+)"', f.read())
+        text = f.read()
+    names = []
+    # A flag for two scenarios names them in a tuple (SCENARIO in ("sync", "sync-311")).
+    for m in re.finditer(r'SCENARIO\s*==\s*"([\w-]+)"|SCENARIO\s+in\s+\(([^)]*)\)', text):
+        names += [m.group(1)] if m.group(1) else re.findall(r'"([\w-]+)"', m.group(2))
     return [DEFAULT] + list(dict.fromkeys(names))
 
 

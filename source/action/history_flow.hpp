@@ -24,13 +24,15 @@ std::vector<int> custom_values(const PctlCustomSettings& s);
 // A value change ("limits", "level", "custom", "org", "vr", "alarm",
 // "time_up"); nothing is recorded when `before` equals `after`. Written off
 // the UI thread (ui::write_later); a failed SD write is only logged: the
-// change itself went through.
+// change itself went through. `when` is now unless given (a change the agent
+// made while PlayGuard was closed: "2026-10-08 18:30").
 void record_values(const char* kind, std::vector<int> before, std::vector<int> after,
-                   const std::string& source = "", const std::string& detail = "");
+                   const std::string& source = "", const std::string& detail = "", const std::string& when = "");
 // An action with no value to put back ("pin", "unlock", "unlink",
 // "remove_game" / "remove_update" / "remove_addon" / "launch_version" with
 // the game in `detail`, …).
-void record_event(const char* kind, const std::string& source = "", const std::string& detail = "");
+void record_event(const char* kind, const std::string& source = "", const std::string& detail = "",
+                  const std::string& when = "");
 // Something seen, not made by PlayGuard (the gate's tries), at `when`
 // ("2026-10-08 18:30"; now when empty).
 void record_seen(const char* kind, const std::string& when, const std::string& detail = "");

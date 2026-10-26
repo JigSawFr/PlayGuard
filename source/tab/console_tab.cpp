@@ -8,14 +8,19 @@
 #include "action/fw_gate.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sigpatch_flow.hpp"
+#include "action/sync_flow.hpp"
 #include "action/sys_update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/forwarders_activity.hpp"
 #include "activity/game_check_activity.hpp"
+#include "activity/modules_activity.hpp"
+#include "activity/sync_activity.hpp"
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
 #include "ui/ui.hpp"
+#include "util/modules.hpp"
 #include "util/patches.hpp"
+#include "util/paths.hpp"
 #include "view/row_icon.hpp"
 
 using namespace brls::literals;
@@ -33,6 +38,14 @@ ConsoleTab::ConsoleTab()
     });
     forwarders->registerClickAction([](brls::View*) {
         brls::Application::pushActivity(new ForwardersActivity());
+        return true;
+    });
+    remote->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new SyncActivity());
+        return true;
+    });
+    modules_cell->registerClickAction([](brls::View*) {
+        brls::Application::pushActivity(new ModulesActivity());
         return true;
     });
 
@@ -131,12 +144,28 @@ ConsoleTab::ConsoleTab()
             head->addView(badge);
         }
     }
+    // The remote link and the optional sysmodules: a second row of them.
+    if (brls::Box* more = this->list.tiles({ { "cn_remote", "server" }, { "cn_modules", "tools" } }, false))
+        more->setMarginBottom(20);
     this->list.apply({ { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
                        { "cn_serial", "tag" }, { "cn_patches", "shield" } });
 }
 
 void ConsoleTab::refresh()
 {
+    // The remote link's state, and how many optional sysmodules are on the SD
+    // card (whether each exefs.nsp is there: a stat, not its hash, which the
+    // screen itself reads).
+    const sync_flow::Status link = sync_flow::status();
+    remote->setDetailText(!link.enabled ? "playguard/sync/state_off"_i18n
+                          : link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
+                                                                              : "playguard/sync/state_offline"_i18n);
+    int installed = 0;
+    for (const auto& m : modules::all())
+        installed += paths::file_exists(modules::dir(paths::sd_root(), m) + "/exefs.nsp") ? 1 : 0;
+    modules_cell->setDetailText(installed == 1 ? "playguard/modules/count_one"_i18n
+                                : installed ? brls::getStr("playguard/modules/count", installed)
+                                            : "playguard/modules/state/none"_i18n);
     SysInfo si;
     sysinfo_get(&si);
     // Each tile: the installed version after a check once a check knows it is

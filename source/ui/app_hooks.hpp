@@ -21,6 +21,7 @@ struct Hooks
     std::function<brls::View*()>      make_help_tab;          // Help & diagnostics, for a screen of its own
     std::function<void(const char* what, bool ok)> note_write;   // notices::note_write
     std::function<void()>             mode_changed;           // the recorders after the developer mode
+    std::function<bool()>             lock_screen_up;         // activity/lock_activity's screen is open
 };
 
 // The one set, filled in at start-up.

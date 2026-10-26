@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <exception>
+#include <functional>
 #include <typeinfo>
 #ifndef __SWITCH__
 #include <fcntl.h>
@@ -35,6 +36,7 @@
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
 #include "action/session_pause.hpp"
+#include "action/sync_flow.hpp"
 #include "activity/init_error_activity.hpp"
 #include "activity/loading_activity.hpp"
 #include "activity/lock_activity.hpp"
@@ -65,6 +67,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
 #include "util/startup.h"
+#include "util/sync_files.hpp"
 #include "view/cadran_week.hpp"
 #include "view/loading_dial.hpp"
 #include "view/loading_mark.hpp"
@@ -228,6 +231,15 @@ brls::Activity* choose_first()
 {
     // Untested firmware: read-only (or the remembered choice) before any tab is built.
     fw_gate::prepare();
+    {
+        // What the agent sysmodule may do on PlayGuard's behalf (sync/nro_state.txt).
+        SysInfo si;
+        sysinfo_get(&si);
+        char fw[16];
+        sysinfo_version_string(si.hos_version, fw, sizeof(fw));
+        sync_files::set_console(fw, app::read_only());
+        sync_files::export_nro_state();
+    }
     // PIN › Protect PlayGuard with the PIN: checked before every change from now on;
     // "To open PlayGuard" starts on the lock screen.
     pin_lock::install();
@@ -236,6 +248,12 @@ brls::Activity* choose_first()
     // The PIN entered pauses parental controls while PlayGuard is open; left
     // or closed, they are back on (after the lock screen's own check).
     session_pause::install();
+    // The remote link (MQTT, Home Assistant), when sync.conf turns it on.
+    // Before the relock below and the first screen: the agent's records
+    // (relock pending, console lock, extra time) are adopted first, and what
+    // it changed while PlayGuard was closed goes into the history as
+    // PlayGuard's own, not as a change made outside it.
+    sync_flow::start();
     // The playguard-rescue sysmodule acted on a RESCUE file: show what it
     // did and let the parent finish, before (and instead of) the lock
     // screen — they are here because they forgot the PIN. Only when the
@@ -346,6 +364,7 @@ void shut_down()
     session_pause::end();
     pt_flow::lock_at_exit_if_asked();
 
+    sync_flow::stop();   // the remote link: "offline" while the network is still up
     // Network tasks still running (an update check, a sign-in waiting for its
     // code): stopped, and waited for a moment, before what they use goes away.
     // The SD-card writes still queued (ui::write_later) are done first.
@@ -433,6 +452,13 @@ int main(int argc, char* argv[])
     // has read it (Aurore's Cadran, in Application::init()).
     config::load();
     startup_mark(StartupStep_Preferences);
+    // Remote link: what the agent sysmodule needs of the settings follows
+    // every save (nro_state.txt, only once the link was set up), its files
+    // written off the UI thread as the settings are.
+    sync_files::set_writer([](const std::string& file, std::function<void()> write) {
+        ui::write_later("remote link file", std::move(write), file);
+    });
+    config::set_saved_hook(sync_files::export_nro_state);
 
     if (!brls::Application::init()) {
         brls::Logger::error("Unable to init borealis Application");
