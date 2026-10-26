@@ -388,8 +388,10 @@ def console(new_page):
         # The button ready to be clicked (visible, still, not covered), on
         # its own: a wait here says why, apart from the reload's.
         page.locator("#console-restart").click(trial=True, timeout=10000)
-        # The page reloads itself once the folder is written.
-        with page.expect_navigation(timeout=15000):
+        # The page reloads itself once the folder is written to IndexedDB:
+        # on a slow runner as long as a start reads it back (keep (again),
+        # some 17 s), hence a start's allowance rather than 15 s.
+        with page.expect_navigation(timeout=START_S * 1000):
             page.click("#console-restart")
         try:
             page.wait_for_function("document.body && document.body.dataset.playguard === 'ready'", timeout=START_S * 1000)
