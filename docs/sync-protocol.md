@@ -32,7 +32,7 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 | `playguard/<id>/names` | yes | console (app) → | Game and account names, published by PlayGuard when it runs. |
 | `playguard/<id>/week` | yes | console (app) → | The 7-day table per game and per account, published by PlayGuard when it runs. |
 | `playguard/<id>/<entity>/set` | yes (by the publisher) | → console | An order. Cleared by the console once handled. |
-| `playguard/<id>/event` | **no** | console → | One event per order handled: `command_applied`, `command_rejected`, `command_waiting` (an order waiting for PlayGuard or the parent) |
+| `playguard/<id>/event` | **no** | console → | One event per order handled: `command_applied`, `command_rejected`, `command_waiting` (an order waiting for PlayGuard or the parent); and what the console does on its own (the agent): `play_started`, `play_stopped`, `time_warning`, `play_blocked` |
 | `playguard/<id>/report` | yes | console → | The last diagnostic report, plain text, at most 128 KiB. Only when `publish_report` is on. |
 | `homeassistant/device/playguard_<id>/config` | yes | console → | HA native discovery. Only when `ha_discovery` is on; cleared when it is turned off. |
 | `homeassistant/status` | — | ← HA | Subscribed: on `online`, the console republishes discovery, state and activity. |
@@ -317,6 +317,29 @@ agent keeps an order for PlayGuard to confirm under *ask*). `rc` is
 `"0x…"` when the console answered, else `null`. Not retained: a consumer that
 was away misses them on purpose; the state carries `link.last_result`.
 
+What the console does on its own, found by comparing each state snapshot with
+the last one (`source/sync/sync_watch.c`), is published the same way, right
+after the state that shows it:
+
+```json
+{ "schema": 1, "source": "agent", "ts": 1791000000,
+  "event_type": "time_warning", "app_id": "0100000000010000",
+  "minutes_left": 10, "blocked_by": null }
+```
+
+| `event_type` | When | `app_id` | `minutes_left` | `blocked_by` |
+|---|---|---|---|---|
+| `play_started` | A game is being played that was not | the game | `null` | `null` |
+| `play_stopped` | The game played is no longer (closed, suspended, another one started: `play_stopped` comes first) | the game | `null` | `null` |
+| `time_warning` | 10 minutes or fewer left of today's limit, while a game is played; once, and again only after extra time takes the time left back above 10 minutes (or on another day). Play starting with fewer left gives it at once. | the game | the minutes left | `null` |
+| `play_blocked` | Games are blocked that were not: the day's limit (or *No more play today*) or bedtime | the game played then, else `null` | `null` | `limit` or `bedtime`, as `timer.blocked_by` |
+
+Only the agent sends them: it builds the state while a game is played, every
+`poll_s` (30 s) and when the play log changes, so an event comes within that.
+PlayGuard does not (nobody plays while it is in front), nor the agent while
+PlayGuard is (it relays PlayGuard's state then). The first snapshot after the
+agent starts says nothing: no event for what was already so.
+
 ## Home Assistant native discovery
 
 One retained, device-based payload on
@@ -350,7 +373,7 @@ the profiles change and when read-only mode changes.
 | select | `restriction_level` (`unrestricted`, `young_child`, `child`, `teen`, `custom`), `profile` (the saved profiles; only when there are some) |
 | switch | `bedtime_enabled`, `console_lock`, `play_timer_alarm`, `vr_restricted`, `sns_post_restricted`, `free_communication_restricted` |
 | button | `sync_now`, `export_report`, `add_bonus_time_15`, `add_bonus_time_30`, `add_bonus_time_60`, `stop_today`, `remove_limit` |
-| event | `events` (event types `command_applied`, `command_rejected`, `command_waiting`) |
+| event | `events` (event types `command_applied`, `command_rejected`, `command_waiting`, `play_started`, `play_stopped`, `time_warning`, `play_blocked`) |
 
 `used_screen_time_log` (*Play time today*) is the play log's figure,
 `used_screen_time` the timer's (off: it only counts while a limit is set);

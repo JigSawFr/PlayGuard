@@ -20,6 +20,7 @@
 #include "sync_exec.h"
 #include "sync_json.h"
 #include "sync_state.h"
+#include "sync_watch.h"
 
 static const char *out_dir = ".";
 
@@ -1017,6 +1018,80 @@ static void test_activity_names_events(void)
     CHECK(contains(buf, "\"reason\":null,\"rc\":\"0x00001234\""));
 }
 
+// What the console does on its own, as events: a game started and stopped,
+// the warning once per stretch, games blocked, nothing for what was already so.
+static void test_watch(void)
+{
+    SyncConf c;
+    sync_conf_defaults(&c);
+    PtState pt;
+    timer_state(&pt);
+    SyncSnapshot s;
+    memset(&s, 0, sizeof(s));
+    s.conf = &c;
+    s.timer = &pt;
+    s.weekday = 1;   // Monday: 120 minutes
+    s.local_min_ok = true;
+    s.local_min = 16 * 60;
+    const uint64_t mario = 0x0100000000010000ULL, kart = 0x01000A10041EA000ULL;
+    SyncWatch w;
+    memset(&w, 0, sizeof(w));
+    SyncNotice n[SYNC_NOTICE_MAX];
+
+    s.now_playing = mario;   // the first snapshot says nothing, even mid-game
+    CHECK(sync_watch_step(&w, &s, n) == 0);
+    CHECK(sync_watch_step(&w, &s, n) == 0);   // nothing changed
+
+    s.now_playing = kart;    // another game: one stopped, then one started
+    CHECK(sync_watch_step(&w, &s, n) == 2);
+    CHECK(!strcmp(n[0].event_type, "play_stopped") && n[0].app_id == mario && n[0].minutes_left == -1);
+    CHECK(!strcmp(n[1].event_type, "play_started") && n[1].app_id == kart && !n[1].blocked_by);
+
+    pt.remaining_ns = 10ULL * 60000000000ULL;   // 10 minutes left: the warning, once
+    CHECK(sync_watch_step(&w, &s, n) == 1);
+    CHECK(!strcmp(n[0].event_type, "time_warning") && n[0].app_id == kart && n[0].minutes_left == 10);
+    pt.remaining_ns = 4ULL * 60000000000ULL;
+    CHECK(sync_watch_step(&w, &s, n) == 0);
+
+    pt.restricted = true;    // the limit: games blocked
+    CHECK(sync_watch_step(&w, &s, n) == 1);
+    CHECK(!strcmp(n[0].event_type, "play_blocked") && !strcmp(n[0].blocked_by, "limit") && n[0].app_id == kart);
+    s.now_playing = 0;       // the game suspended: it stopped, blocked still
+    CHECK(sync_watch_step(&w, &s, n) == 1 && !strcmp(n[0].event_type, "play_stopped"));
+
+    pt.restricted = false;   // extra time, 30 minutes: the warning may come again
+    pt.remaining_ns = 30ULL * 60000000000ULL;
+    CHECK(sync_watch_step(&w, &s, n) == 0);
+    pt.remaining_ns = 8ULL * 60000000000ULL;   // nobody plays: no warning yet
+    CHECK(sync_watch_step(&w, &s, n) == 0);
+    s.now_playing = mario;   // play starts with 8 minutes left: started, then the warning
+    CHECK(sync_watch_step(&w, &s, n) == 2);
+    CHECK(!strcmp(n[0].event_type, "play_started") && !strcmp(n[1].event_type, "time_warning") &&
+          n[1].minutes_left == 8);
+
+    pt.restricted = true;    // bedtime's hours
+    s.local_min = 22 * 60;
+    CHECK(sync_watch_step(&w, &s, n) == 1 && !strcmp(n[0].blocked_by, "bedtime"));
+
+    // No limit today (Saturday): never a warning.
+    memset(&w, 0, sizeof(w));
+    timer_state(&pt);
+    s.weekday = 6;
+    s.local_min = 16 * 60;
+    pt.remaining_ns = 1ULL * 60000000000ULL;
+    CHECK(sync_watch_step(&w, &s, n) == 0);
+    CHECK(sync_watch_step(&w, &s, n) == 0);
+
+    static char buf[256];
+    const SyncNotice warn = { "time_warning", kart, 10, NULL };
+    CHECK(sync_notice_build("agent", 1791000000, &warn, buf, sizeof(buf)) > 0);
+    CHECK(contains(buf, "\"source\":\"agent\",\"ts\":1791000000,\"event_type\":\"time_warning\","
+                        "\"app_id\":\"01000A10041EA000\",\"minutes_left\":10,\"blocked_by\":null"));
+    const SyncNotice blocked = { "play_blocked", 0, -1, "bedtime" };
+    CHECK(sync_notice_build(NULL, 1, &blocked, buf, sizeof(buf)) > 0);
+    CHECK(contains(buf, "\"app_id\":null,\"minutes_left\":null,\"blocked_by\":\"bedtime\""));
+}
+
 // The entity table as entities.json, for the Home Assistant integration's
 // parity test (it carries a copy: JigSawFr/playguard-ha).
 // The system document: every field, then nothing read (every key still
@@ -1199,6 +1274,7 @@ int main(int argc, char **argv)
     test_discovery();
     test_state();
     test_activity_names_events();
+    test_watch();
     test_system_document();
     test_games_document();
     test_export_entities();

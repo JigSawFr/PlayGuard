@@ -20,7 +20,8 @@ CFILES      := main.c agent_core.c agent_ipc.c \
                playstats.c playstats_logic.c playlog.c nacp.c nacp_read.c \
                console_info.c console_info_pure.c \
                sync_json.c mqtt_packet.c mqtt_client.c sync_conf.c sync_apply.c sync_records.c sync_exec.c \
-               sync_entities.c sync_discovery.c sync_state.c sync_system.c sync_engine.c sync_net.c sync_tls.c
+               sync_entities.c sync_discovery.c sync_state.c sync_system.c sync_watch.c sync_engine.c \
+               sync_net.c sync_tls.c
 # nacp.c reads compressed game titles (zlib).
 EXTRA_LIBS  := -lz
 

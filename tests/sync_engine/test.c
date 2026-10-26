@@ -382,6 +382,8 @@ static void io_close(void *ctx)
 
 // ---------------------------------------------------------------- the host
 
+static SyncEngine engine;
+
 static struct {
     unsigned states, activities, orders, reports, conf_changes;
     SyncIntent last_intent;
@@ -401,12 +403,14 @@ static struct {
     uint64_t posix;           // the wall clock (0: 1791000000)
     SyncDevice device;        // what device() gives
     unsigned devices;         // device() calls
+    SyncNotice notice;        // what state() finds, as the agent's sync_watch would (event_type NULL: nothing)
 } host;
 
 static size_t h_state(void *ctx, char *out, size_t cap)
 {
     (void)ctx;
     host.states++;
+    if (host.notice.event_type) sync_engine_notices(&engine, &host.notice, 1);
     return (size_t)snprintf(out, cap, "{\"schema\":1,\"n\":%u}", host.states);
 }
 
@@ -504,7 +508,6 @@ static void h_integration(void *ctx, const char *doc, size_t len)
 
 // ---------------------------------------------------------------- helpers
 
-static SyncEngine engine;
 static SyncConf conf;
 
 static void setup(bool timer_writes, SyncPolicy policy)
@@ -613,6 +616,32 @@ static void test_connect_and_publish(void)
     sync_engine_activity_changed(&engine);
     turns(1);
     CHECK(count_on("playguard/a1b2c3d4/activity") == acts + 1);
+}
+
+// What the host's sync_watch finds while building the state: on the event
+// topic, not retained, after that state, once.
+static void test_notices(void)
+{
+    setup(false, SyncPolicy_Auto);
+    turns(3);
+    const size_t events = count_on("playguard/a1b2c3d4/event");
+    host.notice = (SyncNotice){ "time_warning", 0x0100000000010000ULL, 10, NULL };
+    sync_engine_state_changed(&engine);
+    turns(1);
+    host.notice.event_type = NULL;
+    CHECK(count_on("playguard/a1b2c3d4/event") == events + 1);
+    const Message *m = last_on("playguard/a1b2c3d4/event");
+    CHECK(m && !m->retain && strstr(m->payload, "\"event_type\":\"time_warning\"") &&
+          strstr(m->payload, "\"source\":\"app\",\"ts\":1791000000") &&
+          strstr(m->payload, "\"app_id\":\"0100000000010000\",\"minutes_left\":10"));
+    CHECK(m > last_on("playguard/a1b2c3d4/state"));   // after the state that found it
+    sync_engine_state_changed(&engine);
+    turns(1);
+    CHECK(count_on("playguard/a1b2c3d4/event") == events + 1);
+    // The discovery's event entity knows these events.
+    const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
+    CHECK(disc && strstr(disc->payload, "\"command_waiting\",\"play_started\",\"play_stopped\",\"time_warning\","
+                                        "\"play_blocked\""));
 }
 
 static void test_orders_applied_and_refused(void)
@@ -1233,6 +1262,7 @@ int main(void)
     static Message log[MAX_LOG];
     broker.log = log;
     test_connect_and_publish();
+    test_notices();
     test_orders_applied_and_refused();
     test_policy_off();
     test_limits_merged();

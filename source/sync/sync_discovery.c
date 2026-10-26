@@ -137,8 +137,11 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
             sync_json_kstr(&j, "stat_t", topic);
             sync_json_key(&j, "evt_typ");
             sync_json_arr(&j);
-            // The events the engine sends (sync_engine.c's event()).
-            static const char *const types[] = { "command_applied", "command_rejected", "command_waiting" };
+            // The events the engine sends: the orders' (sync_engine.c's
+            // event_type()), and what the console did on its own (sync_watch.c).
+            static const char *const types[] = { "command_applied", "command_rejected", "command_waiting",
+                                                 "play_started",    "play_stopped",     "time_warning",
+                                                 "play_blocked" };
             for (size_t t = 0; t < sizeof(types) / sizeof(types[0]); t++) sync_json_str(&j, types[t]);
             sync_json_arr_end(&j);
         } else if (e->value_template) {

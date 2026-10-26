@@ -20,6 +20,7 @@
 #include "sync_conf.h"
 #include "sync_discovery.h"
 #include "sync_exec.h"
+#include "sync_notice.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -126,6 +127,10 @@ typedef struct {
     // resends them): entity + payload hash.
     uint32_t    waiting[SYNC_QUEUE_MAX];
 
+    // What the console did on its own (sync_watch), published after the state.
+    SyncNotice  notices[SYNC_NOTICE_MAX];
+    size_t      n_notices;
+
     SyncStatus  status;
     char        profiles[16][SYNC_PROFILE_MAX];
     uint8_t     rx[SYNC_RX_SIZE];
@@ -156,6 +161,10 @@ void sync_engine_replay_orders(SyncEngine *e);
 int  sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, size_t len, bool retained);
 // An event (`event_type`, optional entity) on `<base>/event`.
 void sync_engine_event(SyncEngine *e, const char *event_type, const char *entity);
+// What the console did on its own (sync_watch_step), published on
+// `<base>/event` after the state document; dropped while offline (events
+// are not retained: a consumer that was away misses them).
+void sync_engine_notices(SyncEngine *e, const SyncNotice *n, size_t count);
 // "offline", DISCONNECT, closed. sync_engine_step() reconnects later unless
 // the settings turn the link off.
 void sync_engine_stop(SyncEngine *e);

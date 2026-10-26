@@ -51,7 +51,8 @@ JSON_HPP := library/aurore/library/include/borealis/extern/nlohmann/json.hpp
 # The remote link's console-free C (source/sync/), shared by its host tests.
 SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
-             source/sync/sync_system.c source/sync/sync_games.c source/core/console_info_pure.c
+             source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c \
+             source/core/console_info_pure.c
 
 .PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue agent dist-agent gate-preview FORCE
 

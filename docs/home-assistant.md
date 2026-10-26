@@ -88,7 +88,7 @@ handle the topics yourself). It is the console as Nintendo names it, its model
 | Switches | Block all games, Time's up alarm, Bedtime alarm, VR mode restricted, Posting to social media restricted, Communication restricted |
 | Selects | Restriction level (*unrestricted*, young child, child, teen, custom), Profile (your saved profiles) |
 | Buttons | Sync now, Extra time +15 / +30 min / +1 h, No more play today, Remove the limit, Export a diagnostic report |
-| Event | Events: every order applied, refused (with the reason) or kept waiting for the console |
+| Event | Events: every order applied, refused (with the reason) or kept waiting for the console; and, from the agent, what the console does on its own: a game started or stopped, 10 minutes left of today's limit, games blocked (the limit or bedtime) |
 | The console | Model, Console nickname, Region, hekate, System (sysMMC / emuMMC), PRODINFO blanked, Serial number (off, see below), SD card free space and size, Internal storage free space and size, Battery, Charging, Docked, Temperature, Connection, IP address, Wi-Fi signal, Wi-Fi network (off), Last started |
 | Games | Games installed, Play time (all time), User accounts; the integration below lists every game on *Games installed*, with its play time, and keeps each game's history in a long-term statistic |
 
@@ -229,6 +229,38 @@ actions:
   - action: notify.notify
     data:
       message: "PlayGuard refused {{ trigger.to_state.attributes.entity }}: {{ trigger.to_state.attributes.reason }}"
+```
+
+A notification 10 minutes before the end of today's limit, with a button
+that adds a quarter of an hour (the agent sends `time_warning` while a game
+is played; *Orders may change the play timer* on for the button):
+
+```yaml
+alias: PlayGuard 10 minutes left
+triggers:
+  - trigger: state
+    entity_id: event.living_room_events
+conditions:
+  - condition: template
+    value_template: "{{ trigger.to_state.attributes.event_type == 'time_warning' }}"
+actions:
+  - action: notify.mobile_app_my_phone
+    data:
+      message: "{{ trigger.to_state.attributes.minutes_left }} minutes of play left"
+      data:
+        actions:
+          - action: PLAYGUARD_EXTRA_15
+            title: +15 min
+  - wait_for_trigger:
+      - trigger: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: PLAYGUARD_EXTRA_15
+    timeout: "00:10:00"
+    continue_on_timeout: false
+  - action: button.press
+    target:
+      entity_id: button.living_room_extra_time_15_min
 ```
 
 Entity ids depend on the console's name; check them on the device's page.
