@@ -14,9 +14,9 @@ typedef struct {
 } Rgb;
 
 // PlayGuard's mark keeps the brand's colours in both themes (as the app's
-// LoadingMark): its navy disc, its ring, its teal arc.
-static const Rgb NAVY = { 0x0B, 0x14, 0x24 }, MARK_TRACK = { 0x1F, 0x33, 0x55 }, MARK_PLAY = { 0xEE, 0xF2, 0xF8 },
-                 MARK_TEAL = { 0x2E, 0xC4, 0xA6 }, WHITE = { 0xFF, 0xFF, 0xFF };
+// header): its night, its shield in Aurore's aurora (teal to violet).
+static const Rgb NAVY = { 0x0B, 0x14, 0x24 }, MARK_NIGHT = { 0x0E, 0x1A, 0x33 }, MARK_PLAY = { 0xEE, 0xF2, 0xF8 },
+                 AURORA_TEAL = { 0x00, 0xFF, 0xCC }, AURORA_VIOLET = { 0x8A, 0x5C, 0xFF }, WHITE = { 0xFF, 0xFF, 0xFF };
 
 // Cadran's two palettes (ui/cadran_palette.hpp): each ink for text and
 // lines (4.5:1 on its background), each fill for what glows or fills.
@@ -178,28 +178,83 @@ static void play(Canvas *cv, float cx, float cy, float size, float round, Rgb c)
         }
 }
 
-// PlayGuard's mark (branding/mark.svg): the play button inside the daily
-// play-time ring, `r` its radius. Its arc apart, for the opening's to turn:
-// 292 of the ring's 390 units, from `from` (radians, 0 at the top).
-#define MARK_ARC (6.2831853f * 292.0f / 390.0f)
-static void mark_still(Canvas *cv, float cx, float cy, float r)
+// PlayGuard's mark (branding/mark.svg): the icon's shield, its outline in
+// the aurora's colours around the night, the play sign inside; `r` half its
+// height. While it opens a glint goes round the outline (the motion, `spin`).
+// The shield as a polygon in the 256 box of branding/mark.svg (its curves
+// sampled), about its centre (128, 130).
+#define SHIELD_N 52
+static float shield_x[SHIELD_N], shield_y[SHIELD_N];
+
+static void shield_points(void)
 {
-    const float k = r / 78.0f;
-    fill_circle(cv, cx, cy, r, NAVY, 1);
-    arc(cv, cx, cy, 62 * k, 16 * k, 0, 6.2831853f, MARK_TRACK, 1);
-    play(cv, cx + 0 * k, cy, 56 * k, 4 * k, MARK_PLAY);
+    if (shield_y[0] != 0.0f) return;   // made once (its first point is the top, -88)
+    // M128 42 C154 54 180 60 204 60 L204 126 C204 172 174 200 128 218 C82 200 52 172 52 126 L52 60 C76 60 102 54 128 42
+    static const float C[4][8] = { { 128, 42, 154, 54, 180, 60, 204, 60 },
+                                   { 204, 126, 204, 172, 174, 200, 128, 218 },
+                                   { 128, 218, 82, 200, 52, 172, 52, 126 },
+                                   { 52, 60, 76, 60, 102, 54, 128, 42 } };
+    int n = 0;
+    for (int c = 0; c < 4; c++)
+        for (int i = 0; i < 13; i++) {
+            const float t = (float)i / 13.0f, u = 1 - t;
+            const float a = u * u * u, b = 3 * u * u * t, d = 3 * u * t * t, e = t * t * t;
+            shield_x[n] = a * C[c][0] + b * C[c][2] + d * C[c][4] + e * C[c][6] - 128;
+            shield_y[n] = a * C[c][1] + b * C[c][3] + d * C[c][5] + e * C[c][7] - 130;
+            n++;
+        }
 }
 
-static void mark_arc(Canvas *cv, float cx, float cy, float r, float from)
+// Signed distance from (x, y) to the shield scaled by `k` about (cx, cy), negative inside.
+static float shield_sd(float x, float y, float cx, float cy, float k)
 {
-    const float k = r / 78.0f;
-    arc(cv, cx, cy, 62 * k, 16 * k, from, MARK_ARC, MARK_TEAL, 1);
+    float d = 1e9f, s = 1;
+    for (int i = 0, j = SHIELD_N - 1; i < SHIELD_N; j = i, i++) {
+        const float vix = cx + shield_x[i] * k, viy = cy + shield_y[i] * k;
+        const float vjx = cx + shield_x[j] * k, vjy = cy + shield_y[j] * k;
+        const float ex = vjx - vix, ey = vjy - viy, wx = x - vix, wy = y - viy;
+        const float t = clampf((wx * ex + wy * ey) / (ex * ex + ey * ey), 0.0f, 1.0f);
+        const float bx = wx - ex * t, by = wy - ey * t;
+        d = fminf(d, bx * bx + by * by);
+        const bool c1 = y >= viy, c2 = y < vjy, c3 = ex * wy > ey * wx;
+        if ((c1 && c2 && c3) || (!c1 && !c2 && !c3)) s = -s;
+    }
+    return s * sqrtf(d);
+}
+
+static Rgb mix(Rgb a, Rgb b, float t)
+{
+    return (Rgb){ a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t };
 }
 
 static void mark(Canvas *cv, float cx, float cy, float r)
 {
-    mark_still(cv, cx, cy, r);
-    mark_arc(cv, cx, cy, r, 0);
+    shield_points();
+    const float k = r / 88.0f, t = 16 * k;
+    for (int py = (int)(cy - 92 * k) - 2; py <= (int)(cy + 92 * k) + 2; py++)
+        for (int px = (int)(cx - 80 * k) - 2; px <= (int)(cx + 80 * k) + 2; px++) {
+            const float x = px + 0.5f, y = py + 0.5f;
+            const float d = shield_sd(x, y, cx, cy, k);
+            blend(cv, px, py, MARK_NIGHT, cover(d + t / 2));
+            // The outline, centred on the edge, teal at the top left to violet at the bottom right.
+            const float along = clampf(((x - cx) / (152 * k) + (y - cy) / (176 * k)) * 0.5f + 0.5f, 0.0f, 1.0f);
+            blend(cv, px, py, mix(AURORA_TEAL, AURORA_VIOLET, along), cover(fabsf(d) - t / 2));
+        }
+    play(cv, cx + 2 * k, cy, 64 * k, 5 * k, MARK_PLAY);
+}
+
+// The glint, `turn` (0..1) of the way round the outline from the top.
+static void mark_glint(Canvas *cv, float cx, float cy, float r, float turn)
+{
+    shield_points();
+    const float k = r / 88.0f;
+    const float f = (turn - floorf(turn)) * SHIELD_N;
+    const int i = (int)f % SHIELD_N, j = (i + 1) % SHIELD_N;
+    const float u = f - floorf(f);
+    const float x = cx + (shield_x[i] + (shield_x[j] - shield_x[i]) * u) * k;
+    const float y = cy + (shield_y[i] + (shield_y[j] - shield_y[i]) * u) * k;
+    glow(cv, x, y, 22 * k, WHITE, 0.55f);
+    fill_circle(cv, x, y, 6 * k, WHITE, 0.9f);
 }
 
 // A padlock, `s` high, its body's top left at (x, y).
@@ -634,11 +689,10 @@ static void screen_still(Canvas *cv, const GateScreen *s)
         outcome(cv, s, cx, ink);
     }
 
-    // PlayGuard, quietly at the bottom: its mark whole unless it opens (its
-    // arc turns then, drawn by the motion).
+    // PlayGuard, quietly at the bottom: its mark (a glint goes round it while
+    // it opens, drawn by the motion).
     const float mx = opening_mark_x(s, (float)cv->w);
-    if (opening(s)) mark_still(cv, mx, OPEN_FOOT_Y, OPEN_MARK_R);
-    else mark(cv, mx, OPEN_FOOT_Y, OPEN_MARK_R);
+    mark(cv, mx, OPEN_FOOT_Y, OPEN_MARK_R);
     text(cv, s->brand_font, 24, mx + OPEN_MARK_R + 12, OPEN_FOOT_Y + 9, "PlayGuard", p->text2, 1, 0);
     if (s->button_a && *s->button_a && s->button_b && *s->button_b) buttons(cv, s);
 }
@@ -653,7 +707,7 @@ static void opening_motion(Canvas *cv, const GateScreen *s)
         fill_rrect(cv, cx - OPEN_BAR_W / 2, OPEN_BAR_Y, fw, OPEN_BAR_H, OPEN_BAR_H / 2, cv->pal->teal_fill, 1);
     }
     const float turn = s->spin - floorf(s->spin);
-    mark_arc(cv, opening_mark_x(s, (float)cv->w), OPEN_FOOT_Y, OPEN_MARK_R, turn * 6.2831853f);
+    mark_glint(cv, opening_mark_x(s, (float)cv->w), OPEN_FOOT_Y, OPEN_MARK_R, turn);
 }
 
 static bool canvas(Canvas *cv, uint32_t *px, int w, int h, int stride, const GateScreen *s)

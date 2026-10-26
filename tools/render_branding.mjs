@@ -50,11 +50,17 @@ export const SPLASH = [
 ];
 export const splashName = (w, h, r, landscape) => `iphone-${w}x${h}@${r}-${landscape ? 'landscape' : 'portrait'}.png`;
 
+// <image href="icon.svg" …> in an SVG becomes the icon itself, its corners
+// rounded as a tile (Aurore's .github/branding/render.mjs does the same).
+const iconTile = readFileSync(join(root, 'branding/icon.svg'), 'utf8').replace(/<\/?svg[^>]*>/g, '');
+const inline = (svg) => svg.replace(/<image href="icon\.svg" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="[\d.]+"\/>/g,
+  (_, x, y, w) => `<svg x="${x}" y="${y}" width="${w}" height="${w}" viewBox="0 0 256 256"><clipPath id="icon-round"><rect width="256" height="256" rx="56"/></clipPath><g clip-path="url(#icon-round)">${iconTile}</g></svg>`);
+
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 const splashOnly = process.argv[2] === 'splash';
 const page = await browser.newPage({ deviceScaleFactor: 1 });
 for (const job of splashOnly ? [] : jobs) {
-  const svg = readFileSync(join(root, job.svg), 'utf8');
+  const svg = inline(readFileSync(join(root, job.svg), 'utf8'));
   await page.setViewportSize({ width: job.w, height: job.h });
   await page.setContent(`<!doctype html><html><head>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet">
@@ -86,9 +92,9 @@ html, body { margin: 0; height: 100%; background: #0b1424; }
 body { --s: ${Math.round(Math.min(w, h) * 0.26)}px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--s) * 0.16); }
 .icon { width: var(--s); height: var(--s); border-radius: 22%; overflow: hidden; }
 .icon svg { display: block; width: 100%; height: 100%; }
-.word { font: 700 calc(var(--s) * 0.3)/1 Sora; letter-spacing: -0.02em; color: #E8EEF7; }
-.word b { color: #2EC4A6; font-weight: 700; }
-</style></head><body><div class="icon">${icon}</div><div class="word">Play<b>Guard</b></div></body></html>`);
+.word { font: 700 calc(var(--s) * 0.3)/1 Sora; letter-spacing: -0.02em; color: #E8EEF7; text-align: center; }
+.word::after { content: ""; display: block; width: 28%; height: calc(var(--s) * 0.022); margin: calc(var(--s) * 0.07) auto 0; border-radius: 99px; background: linear-gradient(90deg, #00FFCC, #33BBFF 55%, #8A5CFF); }
+</style></head><body><div class="icon">${icon}</div><div class="word">PlayGuard</div></body></html>`);
     await splash.evaluate(() => document.fonts.ready);
     const out = join('images/splash', splashName(w, h, ratio, landscape));
     await splash.screenshot({ path: join(root, out), type: 'png' });

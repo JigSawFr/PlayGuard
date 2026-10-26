@@ -105,10 +105,11 @@ static void test_screen(void)
     draw_note(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Without the PIN: Sat-Sun", 0);
     CHECK(count_near(380, 574, 900, 604, 0x2E, 0xC4, 0xA6, 40) > 100);
     draw(GateScreen_Error, NULL, 0, font);
-    // No icon: PlayGuard's mark in its place (its teal ring).
-    CHECK(count_near(548, 130, 732, 314, 0x2E, 0xC4, 0xA6, 30) > 2000);
-    // Above PlayGuard's mark at the bottom, with its arc whole.
-    CHECK(count_near(540, 640, 740, 690, 0x2E, 0xC4, 0xA6, 30) > 100);
+    // No icon: PlayGuard's mark in its place (its shield in the aurora's teal and violet).
+    CHECK(count_near(548, 130, 732, 314, 0x00, 0xFF, 0xCC, 40) > 300);
+    CHECK(count_near(548, 130, 732, 314, 0x8A, 0x5C, 0xFF, 40) > 300);
+    // Above PlayGuard's mark at the bottom, its shield's outline.
+    CHECK(count_near(540, 640, 740, 690, 0x00, 0xFF, 0xCC, 50) + count_near(540, 640, 740, 690, 0x8A, 0x5C, 0xFF, 50) > 30);
 
     // A broken icon, no font: drawn all the same, without text.
     static const unsigned char broken[] = { 0xFF, 0xD8, 0xFF, 0x00, 1, 2, 3 };
@@ -234,7 +235,7 @@ static void test_opening(void)
     s.icon_jpeg = NULL;
     s.brand_font = s.text_font = NULL;
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(count_near(548, 130, 732, 314, 0x2E, 0xC4, 0xA6, 30) > 2000);
+    CHECK(count_near(548, 130, 732, 314, 0x00, 0xFF, 0xCC, 40) > 300);
     CHECK(count_near(400, 350, 880, 620, 0xEE, 0xF2, 0xF8, 30) == 0);
 }
 

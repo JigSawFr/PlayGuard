@@ -35,34 +35,38 @@ using namespace brls::literals;
 
 namespace
 {
-// PlayGuard's logo (branding/mark.svg), Cadran's mark in the header: a play
-// button inside the daily play-time ring (75 %).
+// PlayGuard's logo (branding/mark.svg), Cadran's mark in the header: the
+// icon's shield in the aurora's colours (Aurore's teal to violet) around the
+// night, the play sign inside.
 void mark(NVGcontext* vg, float w, float h)
 {
     nvgScale(vg, w / 256.0f, h / 256.0f);
+    nvgTranslate(vg, 128, 130);
+    nvgScale(vg, 1.3f, 1.3f);
+    nvgTranslate(vg, -128, -130);
     nvgBeginPath(vg);
-    nvgCircle(vg, 128, 128, 104);
-    nvgFillColor(vg, nvgRGB(0x0B, 0x14, 0x24));
+    nvgMoveTo(vg, 128, 42);
+    nvgBezierTo(vg, 154, 54, 180, 60, 204, 60);
+    nvgLineTo(vg, 204, 126);
+    nvgBezierTo(vg, 204, 172, 174, 200, 128, 218);
+    nvgBezierTo(vg, 82, 200, 52, 172, 52, 126);
+    nvgLineTo(vg, 52, 60);
+    nvgBezierTo(vg, 76, 60, 102, 54, 128, 42);
+    nvgClosePath(vg);
+    nvgFillColor(vg, nvgRGB(0x0E, 0x1A, 0x33));
     nvgFill(vg);
-    nvgBeginPath(vg);
-    nvgCircle(vg, 128, 128, 74);
-    nvgStrokeWidth(vg, 20);
-    nvgStrokeColor(vg, nvgRGB(0x1F, 0x33, 0x55));
+    nvgStrokeWidth(vg, 16);
+    nvgLineJoin(vg, NVG_ROUND);
+    nvgStrokePaint(vg, nvgLinearGradient(vg, 52, 42, 204, 218, nvgRGB(0x00, 0xFF, 0xCC), nvgRGB(0x8A, 0x5C, 0xFF)));
     nvgStroke(vg);
     nvgBeginPath(vg);
-    nvgArc(vg, 128, 128, 74, -NVG_PI / 2.0f, -NVG_PI / 2.0f + 0.75f * 2.0f * NVG_PI, NVG_CW);
-    nvgLineCap(vg, NVG_ROUND);
-    nvgStrokeColor(vg, nvgRGB(0x2E, 0xC4, 0xA6));
-    nvgStroke(vg);
-    nvgBeginPath(vg);
-    nvgMoveTo(vg, 110, 98);
-    nvgLineTo(vg, 162, 128);
-    nvgLineTo(vg, 110, 158);
+    nvgMoveTo(vg, 108, 98);
+    nvgLineTo(vg, 156, 130);
+    nvgLineTo(vg, 108, 162);
     nvgClosePath(vg);
     nvgFillColor(vg, nvgRGB(0xE8, 0xEE, 0xF7));
     nvgFill(vg);
     nvgStrokeWidth(vg, 10);
-    nvgLineJoin(vg, NVG_ROUND);
     nvgStrokeColor(vg, nvgRGB(0xE8, 0xEE, 0xF7));
     nvgStroke(vg);
 }
