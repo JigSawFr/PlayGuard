@@ -114,6 +114,10 @@ Every object is always there; a value the console could not read is `null`
 (so a Home Assistant template never fails on a missing level).
 
 - `source`: `agent` or `app` (which process produced the snapshot).
+- `console.name`: `console_name` in `sync.conf`, else the console's nickname
+  (System Settings, only with `publish_hardware`), with ` (emuMMC)` on an
+  emuMMC; `null` when neither says one (Home Assistant then shows *Nintendo
+  Switch*).
 - `weekday`: 0 = Sunday, the console's local day; `local_date` the same day.
 - `clock_accurate`: the console reports its network clock as accurate (`time`
   command 200). `ts` is only trustworthy when it is true.
@@ -346,7 +350,7 @@ One retained, device-based payload on
 `homeassistant/device/playguard_<id>/config` (about 13 KiB with every
 entity), which needs **Home Assistant 2026.5 or later** (the MQTT `time`
 platform; an older one refuses the whole payload): `dev` (identifiers
-`playguard_<id>`, the console's name or `Nintendo Switch`, manufacturer
+`playguard_<id>`, the console's name as `console.name` says it, else `Nintendo Switch`, manufacturer
 `Nintendo`, the model as Nintendo names it (`Nintendo Switch`, `Nintendo
 Switch Lite`, `Nintendo Switch – OLED Model`) and `mdl_id` its model number
 (`HAC-001`, `HAC-001(-01)`, `HDH-001`, `HEG-001`), `sw` the system

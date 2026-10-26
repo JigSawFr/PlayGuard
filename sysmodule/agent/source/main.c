@@ -474,6 +474,10 @@ static size_t own_state(char *out, size_t cap)
     pctl_play_timer_sample(&sample);
     phase(was);
     sysinfo_get(&si);
+    char nickname[0x80];
+    was = phase("the console's nickname (set:sys)");
+    console_nickname_read(nickname);
+    phase(was);
     bool accurate = false;
     const bool accurate_ok = R_SUCCEEDED(time_network_accuracy(&accurate));
     char date[11];
@@ -496,6 +500,7 @@ static size_t own_state(char *out, size_t cap)
     s.clock_accurate = accurate;
     s.conf = &g_conf;
     s.sys = &si;
+    s.nickname = nickname;
     s.app_version = NULL;
     s.agent_version = AGENT_VERSION;
     s.read_only = !may_write();

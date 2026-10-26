@@ -80,10 +80,13 @@ void sync_conf_device_id(const SyncConf *c, char out[SYNC_ID_LEN + 1])
     out[0] = (char)(v < 10 ? '0' + v : 'a' + v - 10);
 }
 
-void sync_conf_device_name(const SyncConf *c, char *out, size_t cap)
+void sync_conf_device_name(const SyncConf *c, const char *nickname, char *out, size_t cap)
 {
     if (!cap) return;
-    snprintf(out, cap, "%s%s", c->console_name[0] ? c->console_name : "Nintendo Switch", c->emummc ? " (emuMMC)" : "");
+    const char *name = c->console_name[0]                                 ? c->console_name
+                       : c->publish_hardware && nickname && nickname[0] ? nickname
+                                                                          : "Nintendo Switch";
+    snprintf(out, cap, "%s%s", name, c->emummc ? " (emuMMC)" : "");
 }
 
 // A topic level we put our own names under: letters, digits, '_' and '-'.

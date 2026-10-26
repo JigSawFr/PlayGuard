@@ -733,6 +733,9 @@ void build_state()
     s.clock_accurate = accurate;
     s.conf = &s_conf;
     s.sys = &si;
+    char nickname[0x80];
+    console_nickname_read(nickname);
+    s.nickname = nickname;
     s.app_version = version.c_str();
     s.agent_version = s_agent ? s_hello.version : nullptr;
     s.read_only = app::read_only();
