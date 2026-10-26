@@ -103,10 +103,7 @@ static void controls(SyncJson *j, const SyncSnapshot *s)
     sync_json_obj_end(j);
 }
 
-// Why play is blocked: within the bedtime alarm's hours (from the alarm to
-// the time play is allowed again), else the day's limit (or No more play
-// today). NULL: not blocked, or unknown.
-static const char *blocked_by(const SyncSnapshot *s)
+const char *sync_blocked_by(const SyncSnapshot *s)
 {
     const PtState *pt = s->timer;
     if (!pt || !pt->fw_supported || !pt->restricted_valid || !pt->restricted) return NULL;
@@ -119,6 +116,23 @@ static const char *blocked_by(const SyncSnapshot *s)
         if (s->local_min >= start || s->local_min < end) return "bedtime";
     }
     return "limit";
+}
+
+bool sync_remaining_min(const SyncSnapshot *s, int64_t *left)
+{
+    const PtState *pt = s->timer;
+    const int wd = s->weekday;
+    if (!pt || !pt->fw_supported || !pt->valid || wd < 0 || wd > 6) return false;
+    if (!pt->enabled_valid || !pt->enabled || pt->day_min[wd] == NOLIMIT) return false;
+    // The console's count, or the whole limit while no game has been counted
+    // yet (1454 reads 0 until then).
+    if (pt->restricted_valid && pt->restricted) {
+        *left = 0;
+        return true;
+    }
+    if (!pt->remaining_valid) return false;
+    *left = pt->remaining_ns ? (int64_t)((pt->remaining_ns + 30000000000ULL) / 60000000000ULL) : pt->day_min[wd];
+    return true;
 }
 
 static void timer(SyncJson *j, const SyncSnapshot *s)
@@ -135,7 +149,7 @@ static void timer(SyncJson *j, const SyncSnapshot *s)
     sync_json_kbool_or_null(j, "enabled", enabled_ok, enabled_ok && pt->enabled);
     sync_json_kbool_or_null(j, "limit_reached", pt && pt->fw_supported && pt->restricted_valid,
                             pt && pt->restricted);
-    sync_json_kstr_or_null(j, "blocked_by", blocked_by(s));
+    sync_json_kstr_or_null(j, "blocked_by", sync_blocked_by(s));
 
     sync_json_key(j, "limits");
     sync_json_obj(j);
@@ -158,19 +172,8 @@ static void timer(SyncJson *j, const SyncSnapshot *s)
     const uint16_t limit = today_ok ? pt->day_min[wd] : NOLIMIT;
     sync_json_kint_or_null(j, "limit_today_min", today_ok, wire_limit(limit));
 
-    // Time left today: the console's count, or the whole limit while no game
-    // has been counted yet (1454 reads 0 until then).
-    bool left_ok = false;
     int64_t left = 0;
-    if (today_ok && enabled_ok && pt->enabled && limit != NOLIMIT) {
-        if (pt->restricted_valid && pt->restricted) {
-            left_ok = true;
-            left = 0;
-        } else if (pt->remaining_valid) {
-            left_ok = true;
-            left = pt->remaining_ns ? (int64_t)((pt->remaining_ns + 30000000000ULL) / 60000000000ULL) : limit;
-        }
-    }
+    const bool left_ok = sync_remaining_min(s, &left);
     sync_json_kint_or_null(j, "remaining_min", left_ok, left);
     const int played = pt ? sync_played_today_min(pt, wd) : -1;
     sync_json_kint_or_null(j, "used_min", played >= 0, played);

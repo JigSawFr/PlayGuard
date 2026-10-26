@@ -54,6 +54,13 @@ typedef struct {
 } SyncSnapshot;
 
 size_t sync_state_build(const SyncSnapshot *s, char *out, size_t cap);
+// Why play is blocked: "bedtime" within the bedtime alarm's hours (from the
+// alarm to the time play is allowed again), else "limit" (the day's limit,
+// or No more play today). NULL: not blocked, or unknown.
+const char *sync_blocked_by(const SyncSnapshot *s);
+// Minutes left of today's limit (0 once games are blocked). false: no limit
+// today, the timer off, or unknown.
+bool sync_remaining_min(const SyncSnapshot *s, int64_t *left);
 
 // Time played per application (today's, or a finished day's).
 typedef struct {

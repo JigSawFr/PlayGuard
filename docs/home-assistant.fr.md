@@ -97,7 +97,7 @@ l'origine.
 | Interrupteurs | Bloquer tous les jeux, Alarme « temps écoulé », Alarme du coucher, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
 | Sélecteurs | Niveau de restriction (*unrestricted* : sans restriction, young child, child, teen, custom), Profil (vos profils enregistrés) |
 | Boutons | Synchroniser maintenant, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
-| Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console |
+| Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console ; et, venant de l'agent, ce que la console fait d'elle-même : un jeu lancé ou arrêté, 10 minutes restantes sur la limite du jour, les jeux bloqués (la limite ou le coucher) |
 | La console | Modèle, Surnom de la console, Région, hekate, Système (sysMMC / emuMMC), PRODINFO masqué, Numéro de série (désactivé, voir plus bas), Espace libre et taille de la carte SD, Espace libre et taille du stockage interne, Batterie, En charge, Sur le dock, Température, Connexion, Adresse IP, Signal Wi-Fi, Réseau Wi-Fi (désactivé), Dernier démarrage |
 | Jeux | Jeux installés, Temps de jeu (depuis toujours), Comptes utilisateurs ; l'intégration ci-dessous liste chaque jeu sur *Jeux installés*, avec son temps de jeu, et garde l'historique de chacun dans une statistique à long terme |
 
@@ -248,6 +248,38 @@ actions:
   - action: notify.notify
     data:
       message: "PlayGuard a refusé {{ trigger.to_state.attributes.entity }} : {{ trigger.to_state.attributes.reason }}"
+```
+
+Une notification 10 minutes avant la fin de la limite du jour, avec un bouton
+qui ajoute un quart d'heure (l'agent envoie `time_warning` pendant une partie ;
+*Les ordres peuvent changer le temps de jeu* activé pour le bouton) :
+
+```yaml
+alias: PlayGuard plus que 10 minutes
+triggers:
+  - trigger: state
+    entity_id: event.salon_events
+conditions:
+  - condition: template
+    value_template: "{{ trigger.to_state.attributes.event_type == 'time_warning' }}"
+actions:
+  - action: notify.mobile_app_mon_telephone
+    data:
+      message: "Plus que {{ trigger.to_state.attributes.minutes_left }} minutes de jeu"
+      data:
+        actions:
+          - action: PLAYGUARD_EXTRA_15
+            title: +15 min
+  - wait_for_trigger:
+      - trigger: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: PLAYGUARD_EXTRA_15
+    timeout: "00:10:00"
+    continue_on_timeout: false
+  - action: button.press
+    target:
+      entity_id: button.salon_extra_time_15_min
 ```
 
 Les identifiants d'entités dépendent du nom de la console ; vérifiez-les sur

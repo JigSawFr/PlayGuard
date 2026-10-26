@@ -225,6 +225,15 @@ connection) is not taken twice. HA's writable entities are
 `optimistic`, so a slider moved while the console sleeps keeps its value; the
 `pending_orders` sensor and the events say what is still waiting.
 
+What the console does on its own is told on the same `/event` topic: the
+agent compares each state snapshot it builds with the last one
+(`sync_watch`) and the engine publishes, right after that state, a game
+started or stopped, 10 minutes left of today's limit, games blocked (the
+limit or bedtime). Home Assistant can then react at once (a notification
+with a button that adds time) instead of templating on the state, and an
+event is not lost when two states fall between two of its checks. Only the
+agent sends them: it is the one running while a game is played.
+
 Play statistics: the agent publishes today's totals from the play log on each
 cycle and, at the first cycle after local midnight, yesterday's final totals on
 `activity/<date>` (the last 14 days stay retained). PlayGuard, when open,

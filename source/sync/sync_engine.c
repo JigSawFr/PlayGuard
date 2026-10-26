@@ -311,6 +311,21 @@ void sync_engine_event(SyncEngine *e, const char *type, const char *entity)
 }
 
 // Reports one queued order's outcome and frees its slot.
+void sync_engine_notices(SyncEngine *e, const SyncNotice *n, size_t count)
+{
+    for (size_t i = 0; i < count && e->n_notices < SYNC_NOTICE_MAX; i++) e->notices[e->n_notices++] = n[i];
+}
+
+static void publish_notices(SyncEngine *e)
+{
+    for (size_t i = 0; i < e->n_notices; i++) {
+        char json[256];
+        const size_t n = sync_notice_build(e->source, now_posix(e), &e->notices[i], json, sizeof(json));
+        if (n) sync_engine_publish(e, "event", json, n, false);
+    }
+    e->n_notices = 0;
+}
+
 static void finish_one(SyncEngine *e, SyncQueued *q, const SyncOutcome *out)
 {
     const bool waiting = out->reason == SyncReason_Waiting;
@@ -577,6 +592,7 @@ static void publish_due(SyncEngine *e)
         if (now >= e->next_state_ms || e->want_state) {
             size_t n = e->host.state ? e->host.state(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "state", e->scratch, n, true);
+            publish_notices(e);   // what building the state found (the host's sync_watch)
             n = e->host.system && e->mqtt.connected ? e->host.system(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "system", e->scratch, n, true);
             if (n && e->host.device && e->conf.ha_discovery) {

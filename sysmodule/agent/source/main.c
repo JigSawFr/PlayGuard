@@ -38,6 +38,7 @@
 #include "sync_state.h"
 #include "sync_system.h"
 #include "sync_tls.h"
+#include "sync_watch.h"
 #include "sysinfo.h"
 #include "time_ops.h"
 #include "write_guard.h"
@@ -520,6 +521,12 @@ static size_t own_state(char *out, size_t cap)
         uint16_t days[7];
         if (profile_days(NULL, profiles[i], days) && !memcmp(days, pt.day_min, sizeof(days))) s.profile_now = profiles[i];
     }
+    // What changed since the last snapshot (a game started, a few minutes
+    // left, games blocked): events, published after this state.
+    static SyncWatch watch;
+    SyncNotice notices[SYNC_NOTICE_MAX];
+    const size_t n_notices = sync_watch_step(&watch, &s, notices);
+    sync_engine_notices(&g_engine, notices, n_notices);
     return sync_state_build(&s, out, cap);
 }
 
