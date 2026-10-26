@@ -1,13 +1,15 @@
 # Remote link design: the optional MQTT agent and Home Assistant
 
-**Status: phases A, B0 and B implemented** (the C core in `source/sync/`,
+**Status: phases A, B0, B and C implemented** (the C core in `source/sync/`,
 PlayGuard's autonomous mode and its *Remote access* screen, CI against a
 local Mosquitto; the optional modules screen; the agent sysmodule, its
 `pg:agent` service, PlayGuard's agent mode and the agent's update from
 PlayGuard with its roll-back, with a simulated agent in CI;
-user guide in [`home-assistant.md`](home-assistant.md)). Not yet tried on a
-console: the agent itself (its IPC server, TLS, its start without a reboot).
-Phase C (the Home Assistant integration) is not done yet. This document records the decisions
+user guide in [`home-assistant.md`](home-assistant.md); the Home Assistant
+integration, in its own repository,
+[JigSawFr/playguard-ha](https://github.com/JigSawFr/playguard-ha)). Not yet
+tried on a console: the agent itself (its IPC server, TLS, its start without a
+reboot). This document records the decisions
 behind an optional link between PlayGuard and a home-automation setup, so that
 a parent can see the console's state and play time, and change the limits,
 from a phone, through [Home Assistant](https://www.home-assistant.io/) (HA).
