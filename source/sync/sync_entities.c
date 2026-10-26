@@ -62,8 +62,9 @@ static const SyncEntity ENTITIES[] = {
       "{{ value_json.activity_today.now_playing.name or value_json.activity_today.now_playing.app_id }}",
       "\"ic\":\"mdi:gamepad-variant\"", D_ACTIVITY },
     { "rating_age", "sensor", SyncWrite_None, "Age rating", "{{ value_json.controls.rating_age }}", E_DIAG E_OFF, D_STATE },
-    { "firmware", "sensor", SyncWrite_None, "Firmware", "{{ value_json.console.firmware }}", E_DIAG, D_VERSIONS },
-    { "atmosphere", "sensor", SyncWrite_None, "Atmosphère", "{{ value_json.console.atmosphere }}", E_DIAG, D_VERSIONS },
+    // Off: the device's own versions already show both (sw_version).
+    { "firmware", "sensor", SyncWrite_None, "Firmware", "{{ value_json.console.firmware }}", E_DIAG E_OFF, D_VERSIONS },
+    { "atmosphere", "sensor", SyncWrite_None, "Atmosphère", "{{ value_json.console.atmosphere }}", E_DIAG E_OFF, D_VERSIONS },
     { "spent_raw", "sensor", SyncWrite_None, "Time spent (1952)", "{{ value_json.timer.spent_raw_min }}",
       E_MINUTES "," E_DIAG E_OFF, D_STATE },
     { "last_order", "sensor", SyncWrite_None, "Last order", "{{ value_json.link.last_result }}", E_DIAG E_OFF, D_STATE },
