@@ -583,7 +583,7 @@ static void publish_due(SyncEngine *e)
                 SyncDevice dev;
                 e->host.device(e->host.ctx, &dev);
                 if (dev.model != e->device.model || dev.hos_version != e->device.hos_version ||
-                    dev.ams_version != e->device.ams_version)
+                    dev.ams_version != e->device.ams_version || strcmp(dev.nickname, e->device.nickname))
                     e->want_discovery = true;
             }
             e->want_state = false;

@@ -29,6 +29,7 @@ typedef struct {
 
     const SyncConf    *conf;            // id, name, policy, switches
     const SysInfo     *sys;             // NULL: unknown
+    const char        *nickname;        // System Settings' console nickname (its name when sync.conf names none); NULL unknown
     const char        *app_version;     // NULL or "": unknown
     const char        *agent_version;   // NULL or "": no agent
     bool               read_only;

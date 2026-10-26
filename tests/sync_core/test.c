@@ -798,7 +798,7 @@ static void test_discovery(void)
     char id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX];
     sync_conf_device_id(&c, id);
     CHECK(!strcmp(id, "21b2c3d4") && !strcmp(c.console_id, "a1b2c3d4"));
-    sync_conf_device_name(&c, name, sizeof(name));
+    sync_conf_device_name(&c, "Switch de Léa", name, sizeof(name));   // sync.conf's name first
     CHECK(!strcmp(name, "Salon \"Léa\" (emuMMC)"));
     CHECK(sync_discovery_topic(&c, topic, sizeof(topic)) > 0);
     CHECK(!strcmp(topic, "homeassistant/device/playguard_21b2c3d4/config"));
@@ -810,8 +810,22 @@ static void test_discovery(void)
     sync_conf_device_id(&c, id);
     CHECK(!strcmp(id, "70000000"));
     c.console_name[0] = '\0';
-    sync_conf_device_name(&c, name, sizeof(name));
+    sync_conf_device_name(&c, NULL, name, sizeof(name));
     CHECK(!strcmp(name, "Nintendo Switch (emuMMC)"));
+    // None in sync.conf: the console's nickname, unless its hardware is not published.
+    sync_conf_device_name(&c, "Switch de Léa", name, sizeof(name));
+    CHECK(!strcmp(name, "Switch de Léa (emuMMC)"));
+    sync_conf_device_name(&c, "", name, sizeof(name));
+    CHECK(!strcmp(name, "Nintendo Switch (emuMMC)"));
+    c.publish_hardware = false;
+    sync_conf_device_name(&c, "Switch de Léa", name, sizeof(name));
+    CHECK(!strcmp(name, "Nintendo Switch (emuMMC)"));
+    c.publish_hardware = true;
+    SyncDevice nicknamed = { ConsoleModel_Oled, 0, 0, "Switch de Léa" };
+    d.device = &nicknamed;
+    n = sync_discovery_build(&d, buf, sizeof(buf));
+    CHECK(n > 0 && contains(buf, "\"name\":\"Switch de Léa (emuMMC)\""));
+    d.device = NULL;
     c.console_id[0] = '\0';   // no id yet: none
     sync_conf_device_id(&c, id);
     CHECK(!id[0]);
@@ -933,6 +947,15 @@ static void test_state(void)
     n = sync_state_build(&s, buf, sizeof(buf));
     CHECK(contains(buf, "\"console\":{\"id\":\"21b2c3d4\",\"name\":\"Salon (emuMMC)\""));
     c.emummc = false;
+    // No name in sync.conf: the console's nickname; without one, null.
+    strcpy(c.console_name, "");
+    s.nickname = "Switch de Léa";
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"console\":{\"id\":\"a1b2c3d4\",\"name\":\"Switch de Léa\""));
+    s.nickname = NULL;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"console\":{\"id\":\"a1b2c3d4\",\"name\":null"));
+    strcpy(c.console_name, "Salon");
 
     // Nothing counted yet today (1454 reads 0): the whole limit is left, the
     // time played is unknown.

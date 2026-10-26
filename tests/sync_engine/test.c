@@ -818,6 +818,12 @@ static void test_device(void)
     now += (uint64_t)conf.poll_s * 1000ULL;
     turns(3);
     CHECK(count_on(topic) == 2 && strstr(last_on(topic)->payload, "\"sw\":\"24.0.0 \xc2\xb7 Atmosph"));
+    // Its nickname changed, sync.conf naming none: published again, under it.
+    strcpy(engine.conf.console_name, "");
+    strcpy(host.device.nickname, "Switch de Léa");
+    now += (uint64_t)conf.poll_s * 1000ULL;
+    turns(3);
+    CHECK(count_on(topic) == 3 && strstr(last_on(topic)->payload, "\"name\":\"Switch de Léa\""));
 }
 
 // What is not published leaves nothing on the broker: cleared at each

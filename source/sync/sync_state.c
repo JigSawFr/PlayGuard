@@ -65,7 +65,11 @@ static void console(SyncJson *j, const SyncSnapshot *s)
     char id[SYNC_ID_LEN + 1] = "", name[SYNC_DEVICE_NAME_MAX] = "";
     if (s->conf) {
         sync_conf_device_id(s->conf, id);
-        if (s->conf->console_name[0] || s->conf->emummc) sync_conf_device_name(s->conf, name, sizeof(name));
+        // Named when sync.conf names it, by its nickname, or on an emuMMC; else
+        // null (the integration says "Nintendo Switch" itself).
+        const bool nicknamed = s->conf->publish_hardware && s->nickname && s->nickname[0];
+        if (s->conf->console_name[0] || nicknamed || s->conf->emummc)
+            sync_conf_device_name(s->conf, s->nickname, name, sizeof(name));
     }
     sync_json_key(j, "console");
     sync_json_obj(j);

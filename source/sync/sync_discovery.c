@@ -28,7 +28,10 @@ size_t sync_discovery_topic(const SyncConf *conf, char *out, size_t cap)
 void sync_device_of(const SysInfo *sys, const ConsoleLive *live, SyncDevice *out)
 {
     memset(out, 0, sizeof(*out));
-    if (live) out->model = live->model;
+    if (live) {
+        out->model = live->model;
+        snprintf(out->nickname, sizeof(out->nickname), "%s", live->nickname);
+    }
     if (!sys) return;
     out->hos_version = sys->hos_version;
     if (sys->ams_valid)
@@ -76,7 +79,7 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     char base[96], topic[160], uid[96], id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX], system[48];
     if (!sync_topic_base(c, base, sizeof(base))) return 0;
     sync_conf_device_id(c, id);
-    sync_conf_device_name(c, name, sizeof(name));
+    sync_conf_device_name(c, d->device ? d->device->nickname : NULL, name, sizeof(name));
     const char *version = d->sw_version && *d->sw_version ? d->sw_version : "unknown";
 
     SyncJson j;

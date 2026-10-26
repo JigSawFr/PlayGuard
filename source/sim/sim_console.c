@@ -36,6 +36,11 @@ void console_live_read(ConsoleLive *out)
     out->uptime_s = 5 * 3600 + (uint64_t)(time(NULL) % 60);
 }
 
+void console_nickname_read(char out[0x80])
+{
+    snprintf(out, 0x80, "%s", "PlayGuard's Switch");
+}
+
 void console_space_read(ConsoleSpace *sd, ConsoleSpace *nand)
 {
     sd->total_mb = 59640;

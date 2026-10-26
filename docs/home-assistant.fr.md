@@ -44,7 +44,9 @@ Mosquitto de Home Assistant est le plus simple.
    plus haut. Un broker qui accepte les clients anonymes : *Nom d'utilisateur
    › Aucun*.
 4. **Nom dans Home Assistant** : le nom de l'appareil (*Salon*, *Switch de
-   Léa*…).
+   Léa*…). Laissé vide, c'est le surnom de la console (Paramètres de la
+   console › Console › Surnom), ou *Nintendo Switch* quand *Publier les
+   versions et le matériel* est désactivé.
 5. Activez **Lien à distance**. La console reçoit un identifiant aléatoire
    (8 caractères, jamais le numéro de série), et **État** affiche *En ligne*
    en quelques secondes.

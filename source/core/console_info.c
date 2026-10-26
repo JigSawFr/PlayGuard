@@ -9,18 +9,32 @@
 #include <string.h>
 #include <switch.h>
 
+static void nickname_of(char out[0x80])
+{
+    SetSysDeviceNickName nick;
+    memset(&nick, 0, sizeof(nick));
+    out[0] = '\0';
+    if (R_SUCCEEDED(setsysGetDeviceNickname(&nick))) {
+        _Static_assert(sizeof(((ConsoleLive *)0)->nickname) == sizeof(nick.nickname), "the nickname's size");
+        memcpy(out, nick.nickname, 0x80 - 1);
+        out[0x80 - 1] = '\0';
+    }
+}
+
 static void read_setsys(ConsoleLive *out)
 {
     if (R_FAILED(setsysInitialize())) return;
     SetSysProductModel model = SetSysProductModel_Invalid;
     if (R_SUCCEEDED(setsysGetProductModel(&model))) out->model = console_model_of((int)model);
-    SetSysDeviceNickName nick;
-    memset(&nick, 0, sizeof(nick));
-    if (R_SUCCEEDED(setsysGetDeviceNickname(&nick))) {
-        _Static_assert(sizeof(out->nickname) == sizeof(nick.nickname), "the nickname's size");
-        memcpy(out->nickname, nick.nickname, sizeof(out->nickname) - 1);
-        out->nickname[sizeof(out->nickname) - 1] = '\0';
-    }
+    nickname_of(out->nickname);
+    setsysExit();
+}
+
+void console_nickname_read(char out[0x80])
+{
+    out[0] = '\0';
+    if (R_FAILED(setsysInitialize())) return;
+    nickname_of(out);
     setsysExit();
 }
 

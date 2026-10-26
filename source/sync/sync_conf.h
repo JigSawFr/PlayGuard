@@ -106,10 +106,12 @@ bool sync_conf_id_valid(const char *id);
 // digits, so that a sysMMC and an emuMMC sharing one sync.conf are two
 // devices. Empty when console_id is not valid yet.
 void sync_conf_device_id(const SyncConf *c, char out[SYNC_ID_LEN + 1]);
-// Its name: console_name ("Nintendo Switch" when empty), " (emuMMC)" added
-// on an emuMMC. `cap` of SYNC_DEVICE_NAME_MAX is always enough.
-#define SYNC_DEVICE_NAME_MAX (SYNC_NAME_MAX + 16)
-void sync_conf_device_name(const SyncConf *c, char *out, size_t cap);
+// Its name: console_name; when empty, the console's nickname (System
+// Settings, NULL or "" unknown) if the hardware is published, else
+// "Nintendo Switch"; " (emuMMC)" added on an emuMMC. `cap` of
+// SYNC_DEVICE_NAME_MAX is always enough.
+#define SYNC_DEVICE_NAME_MAX (SYNC_NAME_MAX + 0x80 + 16)
+void sync_conf_device_name(const SyncConf *c, const char *nickname, char *out, size_t cap);
 // "ask" / "auto" / "off".
 const char *sync_policy_name(SyncPolicy p);
 // The category is published (SyncPublish_Controls always).

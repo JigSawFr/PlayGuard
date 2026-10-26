@@ -24,6 +24,7 @@ typedef struct {
     ConsoleModel model;         // ConsoleModel_Unknown: unknown
     uint32_t     hos_version;   // MAKEHOSVERSION layout; 0 unknown
     uint32_t     ams_version;   // Atmosphère's, the same layout; 0 not running or unknown
+    char         nickname[0x80];   // System Settings' console nickname, its name when sync.conf names none ("" unknown)
 } SyncDevice;
 
 // From what the system document reads (either may be NULL: unknown).

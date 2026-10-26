@@ -39,7 +39,9 @@ Assistant is the easy path.
 3. **User name** and **Password**: the broker user created above. A broker
    that accepts anonymous clients: *User name › None*.
 4. **Name in Home Assistant**: the device's name (*Living room*, *Léa's
-   Switch* …).
+   Switch* …). Left empty, it is the console's nickname (System Settings ›
+   System › Console Nickname), or *Nintendo Switch* when *Publish the
+   versions and hardware* is off.
 5. Turn **Remote link** on. The console gets a random id (8 characters, never
    the serial number), and **Status** reads *Online* within a few seconds.
 

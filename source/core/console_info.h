@@ -51,6 +51,9 @@ typedef struct {
 
 void console_live_init(ConsoleLive *out);   // every field unknown
 void console_live_read(ConsoleLive *out);
+// The console nickname alone (System Settings), "" unknown: the console's
+// name in Home Assistant when sync.conf names none.
+void console_nickname_read(char out[0x80]);
 // The SD card's, and the NAND's user partition (the system in use: the
 // emuMMC's on an emuMMC).
 void console_space_read(ConsoleSpace *sd, ConsoleSpace *nand);
