@@ -1,4 +1,4 @@
-// Host tests for source/util/safe_text.cpp and markdown.cpp: what text from
+// Host tests for Aurore's cadran/util/safe_text.cpp and markdown.cpp: what text from
 // GitHub keeps (valid UTF-8, no control, bidi or zero-width character, cut
 // between two characters; notes cut after a whole line), versions, and
 // GitHub-flavoured Markdown as blocks

@@ -8,7 +8,7 @@ on the tabs, shows every tab of the rail, then, from Today, Stop for today:
 its picker, the confirmation of the unlock it needs and the failure dialog
 of that unlock (PLAYGUARD_SIM_FAIL=unlock); then Show the child. It reads
 what PLAYGUARD_SIM_CUT_TEXT=1 gathered in the run folder's cut_text.txt
-(source/ui/cut_text.cpp: every label its box cuts, by screen; "dashboard ›
+(Aurore's cadran/ui/cut_text.cpp: every label its box cuts, by screen; "dashboard ›
 dialog" for a dialog over Today). A cut not listed in
 tests/cut_text/allowed.txt fails the check; a listed one that no longer
 happens is reported (the line can go).
@@ -38,7 +38,9 @@ FAILURE_LOGGED = "0x0000C88E"
 
 
 def languages():
-    with open(os.path.join(ROOT, "source", "util", "config.hpp"), encoding="utf-8") as f:
+    # Aurore's ui::LANGUAGES, which config::LANGUAGES names.
+    prefs = os.path.join(ROOT, "extern", "borealis", "library", "include", "borealis", "cadran", "ui", "prefs.hpp")
+    with open(prefs, encoding="utf-8") as f:
         m = re.search(r"LANGUAGES\[\]\s*=\s*\{([^}]*)\}", f.read())
     return [l for l in re.findall(r'"([^"]+)"', m.group(1)) if l != "system"]
 

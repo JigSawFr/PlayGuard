@@ -1,4 +1,4 @@
-// Host tests for source/ui/guarded.hpp: the callback runs while its token is
+// Host tests for Aurore's cadran/ui/guarded.hpp: the callback runs while its token is
 // held and true, with its arguments, and does nothing once the token is gone
 // or set to false; it fits a std::function of any arguments.
 #include <functional>

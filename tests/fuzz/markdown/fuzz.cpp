@@ -1,4 +1,4 @@
-// libFuzzer target: source/util/markdown.cpp and safe_text.cpp, on any
+// libFuzzer target: Aurore's cadran/util/markdown.cpp and safe_text.cpp, on any
 // bytes (a pull request's description, a release's notes, as GitHub sends
 // them). Beyond the sanitizers: the bounds markdown.hpp promises (blocks,
 // code lines, table rows and columns, nesting), every string of a block valid
