@@ -4,6 +4,7 @@
 // (in a word in the list, every one in Details; paused first; to make
 // again; a protected menu seen working), the list's text and icons, a
 // rule's days and hours (two spans). Every key asked for exists.
+#include "check.h"
 #include <borealis/extern/nlohmann/json.hpp>
 #include <cstdio>
 #include <fstream>
@@ -12,8 +13,6 @@
 #include <string>
 
 #include <borealis/cadran/ui/tr.hpp>
-
-#include "check.h"
 
 #include "action/forwarders_text.hpp"
 

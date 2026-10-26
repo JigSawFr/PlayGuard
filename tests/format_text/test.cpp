@@ -1,6 +1,7 @@
-// Host tests for source/ui/format_text.cpp and Aurore's Cadran's, translated
-// by the real catalogs (resources/i18n/<lang>/playguard.json and Aurore's
-// cadran.json, read from the repository root `make test` runs in) through ui/tr.hpp's stand-in for borealis: limits ("No
+// Host tests for source/ui/play_text.cpp and Aurore's Cadran format_text.cpp,
+// translated by the real catalogs (resources/i18n/<lang>/playguard.json and
+// Aurore's cadran.json, read from the repository root `make test` runs in)
+// through ui/tr.hpp's stand-in for borealis: limits ("No
 // limit", "0 min (no play)", "45 min", "2 h", "2 h 05"), the week's limits in
 // a few words, time played and left (rounded to the minute, at most a day),
 // play time over any length ("< 1 min", "52 h 30", "278 h"), a daily
@@ -8,6 +9,7 @@
 // a sentence, French for the difference), the restriction
 // levels and ages, yes / no, "Unavailable", and the chevron of a line that
 // opens a screen. Every key the helpers ask for exists in the catalog.
+#include "check.h"
 #include <cstdint>
 #include <fstream>
 #include <map>
@@ -17,9 +19,7 @@
 
 #include <borealis/cadran/ui/tr.hpp>
 
-#include "check.h"
-
-#include "ui/format_text.hpp"
+#include "ui/play_text.hpp"
 #include "util/pctl_ops_c.hpp"
 
 static std::map<std::string, std::string> s_catalog;

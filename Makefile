@@ -247,7 +247,7 @@ diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib
 # The text helpers that only translate (PlayGuard's and Cadran's), over
 # Cadran's ui/tr.hpp stand-in for borealis' getStr and fmt header-only (the
 # catalogs read by the test).
-format_text_SRC   := source/ui/format_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
+format_text_SRC   := source/ui/play_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
 format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DBRLS_CADRAN_HOST_I18N
 cadran_text_SRC   := $(C)/ui/cadran_text.cpp tests/cadran_text/test.cpp
 contrast_SRC      := tests/contrast/test.cpp

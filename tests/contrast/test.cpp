@@ -2,12 +2,11 @@
 // 4.5:1 or more on each surface it is drawn on, a translucent one blended
 // first over the background, in both themes (WCAG 1.4.3); the focus ring
 // and its glow at 3:1 or more on the background (WCAG 1.4.11).
+#include "check.h"
 #include <cmath>
 #include <cstdio>
 
 #include <borealis/cadran/ui/cadran_palette.hpp>
-
-#include "check.h"
 
 using cadran::palette::Palette;
 using cadran::palette::Rgba;

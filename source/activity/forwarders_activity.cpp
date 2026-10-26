@@ -15,7 +15,7 @@
 #include "activity/forwarders_pickers.hpp"
 #include "activity/icon_sheet.hpp"
 #include "app.hpp"
-#include "ui/format_text.hpp"
+#include "ui/play_text.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"

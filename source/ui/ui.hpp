@@ -16,7 +16,7 @@
 #include "core/calendar.h"
 #include "core/nx_types.h"
 #include "core/sysinfo.h"
-#include "ui/format_text.hpp"
+#include "ui/play_text.hpp"
 #include "util/patches.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/prodinfo.hpp"

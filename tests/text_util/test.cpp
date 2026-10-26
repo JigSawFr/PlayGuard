@@ -4,6 +4,7 @@
 // case and capital, a prefix and a suffix, lines, a URL without its scheme,
 // percent-encoding, parts joined) and json_util.hpp (fields read by type,
 // arrays and objects, a text that is no JSON).
+#include "check.h"
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -11,8 +12,6 @@
 #include <borealis/cadran/util/emoji.hpp>
 #include <borealis/cadran/util/text.hpp>
 #include <borealis/cadran/util/utf8.hpp>
-
-#include "check.h"
 
 #include "util/json_util.hpp"
 

@@ -12,7 +12,7 @@
 #include <borealis/cadran/view/cadran_icon.hpp>
 
 #include "action/pt_logic.hpp"
-#include "ui/format_text.hpp"
+#include "ui/play_text.hpp"
 
 using namespace brls::literals;
 

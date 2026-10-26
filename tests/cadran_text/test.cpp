@@ -1,9 +1,10 @@
 // Host tests for Aurore's Cadran cadran_text.cpp, translated by the real
-// catalogs (resources/i18n/<lang>/playguard.json and Aurore's cadran.json,
-// read from the repository root `make test` runs in) through ui/tr.hpp's stand-in for borealis: a dialog's table
-// marked and read back, a week's identical lines as one (and a short table
-// left alone), and a failure's title, reason, code and report, in English and
-// French, with or without each part.
+// catalogs (resources/i18n/<lang>/playguard.json and Aurore's cadran.json, read
+// from the repository root `make test` runs in) through ui/tr.hpp's stand-in
+// for borealis: a dialog's table marked and read back, a week's identical lines
+// as one (and a short table left alone), and a failure's title, reason, code
+// and report, in English and French, with or without each part.
+#include "check.h"
 #include <fstream>
 #include <map>
 #include <borealis/extern/nlohmann/json.hpp>
@@ -14,8 +15,6 @@
 
 #include <borealis/cadran/ui/cadran_text.hpp>
 #include <borealis/cadran/ui/tr.hpp>
-
-#include "check.h"
 
 static std::map<std::string, std::string> s_catalog;
 static std::set<std::string>              s_missing;   // keys asked for that the catalog lacks

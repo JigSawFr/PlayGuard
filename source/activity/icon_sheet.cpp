@@ -16,7 +16,7 @@
 #include "action/icon_logic.hpp"
 #include "core/album.h"
 #include "core/calendar.h"
-#include "ui/format_text.hpp"
+#include "ui/play_text.hpp"
 #include "ui/ui.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/forwarder_library.hpp"

@@ -1,6 +1,6 @@
 // ui — time limits, play time, level and age names as text.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
-#include "ui/format_text.hpp"
+#include "ui/play_text.hpp"
 
 #include <algorithm>
 #include <fmt/format.h>
