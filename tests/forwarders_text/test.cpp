@@ -36,9 +36,9 @@ static void flatten(const nlohmann::json& j, const std::string& prefix)
 static bool load(const std::string& lang)
 {
     s_catalog.clear();
-    // PlayGuard's catalog, and Aurore's Cadran's (extern/borealis).
+    // PlayGuard's catalog, and Aurore's Cadran's (library/aurore).
     std::ifstream in("resources/i18n/" + lang + "/playguard.json");
-    std::ifstream cadran("extern/borealis/resources/i18n/" + lang + "/cadran.json");
+    std::ifstream cadran("library/aurore/resources/i18n/" + lang + "/cadran.json");
     if (!in || !cadran) return false;
     flatten(nlohmann::json::parse(in), "playguard/");
     flatten(nlohmann::json::parse(cadran), "cadran/");

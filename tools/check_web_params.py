@@ -62,7 +62,7 @@ def main():
                     once |= set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", m.group(1)))
     # Aurore's Cadran reads its flags through ui::env_flag("NAME"), which
     # activity/screen_hooks.cpp answers with PLAYGUARD_SIM_NAME.
-    for folder, _, files in os.walk(os.path.join(root, "extern", "borealis", "library", "lib", "cadran")):
+    for folder, _, files in os.walk(os.path.join(root, "library", "aurore", "library", "lib", "cadran")):
         for name in files:
             if name.endswith(".cpp"):
                 with open(os.path.join(folder, name), encoding="utf-8", errors="replace") as f:
@@ -134,7 +134,7 @@ def main():
 
     # The console's languages (Aurore's ui::LANGUAGES, which config::LANGUAGES
     # names): one catalog each, all in the page's `lang` entry.
-    prefs_hpp = os.path.join("extern", "borealis", "library", "include", "borealis", "cadran", "ui", "prefs.hpp")
+    prefs_hpp = os.path.join("library", "aurore", "library", "include", "borealis", "cadran", "ui", "prefs.hpp")
     with open(os.path.join(root, prefs_hpp), encoding="utf-8") as f:
         m = re.search(r"LANGUAGES\[\]\s*=\s*\{([^}]*)\}", f.read())
     languages = [l for l in re.findall(r'"([^"]+)"', m.group(1)) if l != "system"] if m else []

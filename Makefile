@@ -47,7 +47,7 @@ SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 # Run inside the tree, the zip file last.
 ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindepth 1 | LC_ALL=C sort | TZ=UTC zip -X -@
 CMAKE_ARGS ?=
-JSON_HPP := extern/borealis/library/include/borealis/extern/nlohmann/json.hpp
+JSON_HPP := library/aurore/library/include/borealis/extern/nlohmann/json.hpp
 
 .PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue gate-preview FORCE
 
@@ -85,7 +85,7 @@ rescue:
 # The PIN gate's screen as PNG files, one per state (tools/gate_preview.c).
 gate-preview:
 	@mkdir -p build/gate-preview
-	@$(CC) -std=gnu11 -O2 -Isource/core -Iextern/stb -isystem extern/borealis/library/include tools/gate_preview.c source/core/gate.c \
+	@$(CC) -std=gnu11 -O2 -Isource/core -Iextern/stb -isystem library/aurore/library/include tools/gate_preview.c source/core/gate.c \
 		source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c extern/stb/stb_image_write.c -lm \
 		-o build/gate-preview/gate_preview
 	@build/gate-preview/gate_preview build/gate-preview $(or $(GATE_LANG),1) $(or $(GATE_THEME),dark)
@@ -140,7 +140,7 @@ calendar_FLAGS := -std=gnu11 -Isource/core
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
 rescue_FLAGS := -std=c11 -Isource/core
 gate_screen_SRC   := source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c tests/gate_screen/test.c
-gate_screen_FLAGS := -std=gnu11 -Isource/core -Iextern/stb -isystem extern/borealis/library/include
+gate_screen_FLAGS := -std=gnu11 -Isource/core -Iextern/stb -isystem library/aurore/library/include
 gate_screen_LIBS  := -lm
 rescue_page_SRC   := source/util/rescue_page.cpp extern/qrcodegen/qrcodegen.cpp tests/rescue_page/test.cpp
 rescue_page_FLAGS := $(TEST_CXXFLAGS) -Isource -isystem extern/qrcodegen
@@ -166,10 +166,10 @@ playstats_LIBS  := -lz
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 # util/date stands on core/calendar.c: a suite that links it builds that C
 # file too (its <name>_CSRC, without having to say so).
-TEST_CXXFLAGS   := -std=c++17 -Isource -isystem extern/borealis/library/include
+TEST_CXXFLAGS   := -std=c++17 -Isource -isystem library/aurore/library/include
 CALENDAR_C      := source/core/calendar.c
-# Aurore's Cadran (extern/borealis): the look's helpers PlayGuard tests here.
-C := extern/borealis/library/lib/cadran
+# Aurore's Cadran (library/aurore): the look's helpers PlayGuard tests here.
+C := library/aurore/library/lib/cadran
 CALENDAR_CFLAGS := -std=gnu11 -Isource/core
 date_SRC    := source/util/date.cpp tests/date/test.cpp
 # The header-only helpers: utf8, emoji, text, json_util.
@@ -217,9 +217,9 @@ update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cp
 config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
 forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_library.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
-forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
-forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
 forwarder_rules_logic_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/util/date.cpp source/util/gate_tally.cpp source/action/forwarders_logic.cpp source/action/forwarder_rules_logic.cpp tests/forwarder_rules_logic/test.cpp
 forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
@@ -243,12 +243,12 @@ perf_SRC   := source/util/perf.cpp tests/perf/test.cpp
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
 # fmt header-only: the report's lines are formatted with it.
 diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
-diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY
+diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY
 # The text helpers that only translate (PlayGuard's and Cadran's), over
 # Cadran's ui/tr.hpp stand-in for borealis' getStr and fmt header-only (the
 # catalogs read by the test).
 format_text_SRC   := source/ui/play_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
-format_text_FLAGS := $(TEST_CXXFLAGS) -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DBRLS_CADRAN_HOST_I18N
+format_text_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DBRLS_CADRAN_HOST_I18N
 cadran_text_SRC   := $(C)/ui/cadran_text.cpp tests/cadran_text/test.cpp
 contrast_SRC      := tests/contrast/test.cpp
 cadran_text_FLAGS := $(format_text_FLAGS)
@@ -262,21 +262,21 @@ forwarders_text_CFLAGS := -std=gnu11 -Isource/core
 # it, rewritten only then).
 I18N_COPY    := $(TESTOUT)/borealis_i18n
 I18N_STAMP   := $(TESTOUT)/borealis_i18n.commit
-I18N_COMMIT  := $(shell git -C extern/borealis rev-parse HEAD 2>/dev/null)
+I18N_COMMIT  := $(shell git -C library/aurore rev-parse HEAD 2>/dev/null)
 $(I18N_STAMP): FORCE | $(TESTOUT)
 	@echo '$(I18N_COMMIT)' | cmp -s - $@ || echo '$(I18N_COMMIT)' > $@
 $(I18N_COPY)/i18n.cpp: $(I18N_STAMP) | $(TESTOUT)
 	@rm -rf $(I18N_COPY) && mkdir -p $(I18N_COPY)/library/lib/core $(I18N_COPY)/library/include/borealis/core
-	@git -C extern/borealis show HEAD:library/lib/core/i18n.cpp > $(I18N_COPY)/library/lib/core/i18n.cpp
-	@git -C extern/borealis show HEAD:library/include/borealis/core/i18n.hpp > $(I18N_COPY)/library/include/borealis/core/i18n.hpp
-	@git -C extern/borealis show HEAD:library/include/borealis/core/platform.hpp > $(I18N_COPY)/library/include/borealis/core/platform.hpp
+	@git -C library/aurore show HEAD:library/lib/core/i18n.cpp > $(I18N_COPY)/library/lib/core/i18n.cpp
+	@git -C library/aurore show HEAD:library/include/borealis/core/i18n.hpp > $(I18N_COPY)/library/include/borealis/core/i18n.hpp
+	@git -C library/aurore show HEAD:library/include/borealis/core/platform.hpp > $(I18N_COPY)/library/include/borealis/core/platform.hpp
 	@# The suffix without a space, as newer clang wants it (-Wdeprecated-literal-operator),
 	@# in this copy only: borealis itself is built as it is.
 	@sed 's/operator"" _i18n/operator""_i18n/' $(I18N_COPY)/library/lib/core/i18n.cpp > $@
 i18n_threads_SRC   := $(I18N_COPY)/i18n.cpp tests/i18n_threads/test.cpp
-i18n_threads_FLAGS := -std=c++17 -isystem $(I18N_COPY)/library/include -isystem extern/borealis/library/include \
-                      -isystem extern/borealis/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
-                      $(addprefix -isystem extern/borealis/library/,include/borealis/extern include/borealis/extern/nanovg \
+i18n_threads_FLAGS := -std=c++17 -isystem $(I18N_COPY)/library/include -isystem library/aurore/library/include \
+                      -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
+                      $(addprefix -isystem library/aurore/library/,include/borealis/extern include/borealis/extern/nanovg \
                         include/borealis/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga/src) \
                       -DBRLS_RESOURCES='"./"'
 i18n_threads_LIBS  := -pthread
@@ -302,8 +302,8 @@ sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c
 # Atomic coverage counters: the suite runs the same code from several threads
 # at once, and gcov's plain counters then come out wrong (negative ones, that
 # gcovr refuses).
-sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
-sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic -isystem extern/borealis/library/include/borealis/extern/nanovg -isystem extern/stb
+sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
+sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
 sim_backend_LIBS   := -pthread -lm
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
@@ -368,7 +368,7 @@ FUZZ_SECONDS ?= 30
 FUZZ_CC      ?= clang
 FUZZ_CXX     ?= clang++
 FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -g -O1
-FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(FUZZ_SAN) -Itests/fuzz -Isource -isystem extern/borealis/library/include
+FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(FUZZ_SAN) -Itests/fuzz -Isource -isystem library/aurore/library/include
 zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
 markdown_FUZZ      := $(filter-out tests/%,$(markdown_SRC)) tests/fuzz/markdown/fuzz.cpp

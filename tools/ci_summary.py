@@ -560,7 +560,7 @@ def cmd_build(a):
     for line in info.splitlines():
         if line.startswith("image: "):
             rows.append(["image", code(line[len("image: "):])])
-        elif re.match(r"^ ?[0-9a-f]{40} extern/", line):   # git submodule status: sha path (ref)
+        elif re.match(r"^ ?[0-9a-f]{40} (?:extern|library)/", line):   # git submodule status: sha path (ref)
             parts = line.split()
             rows.append([code(parts[1]), code(parts[0][:7]) + (" " + " ".join(parts[2:]) if len(parts) > 2 else "")])
     out.append(details("🧰 Toolchain (build-info.txt)", table(["Component", "Version"], rows)))
@@ -658,7 +658,7 @@ def cmd_tidy(a):
         path = m["file"]
         if path.startswith(root):
             path = path[len(root):]
-        if "extern/" in path:   # borealis' own: the matcher leaves them out too
+        if "extern/" in path or "library/" in path:   # borealis' own: the matcher leaves them out too
             continue
         checks = m["checks"] or ""
         key = (path, int(m["line"]), int(m["col"]), checks, m["text"])

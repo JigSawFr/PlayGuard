@@ -16,7 +16,7 @@ TARGET      := gate
 BUILD       := build
 OUTDIR      := out
 SOURCES     := source ../source/core ../extern/stb
-INCLUDES    := ../source/core ../extern/stb ../extern/borealis/library/include
+INCLUDES    := ../source/core ../extern/stb ../library/aurore/library/include
 # Its screen's brand font, from PlayGuard's resources, in its romfs.
 ROMFS       := build/romfs
 # A NACP too: elf2nro writes the assets (the romfs with them) only when it
