@@ -150,7 +150,12 @@ std::vector<Line> parse(const std::string& md, int max_releases)
             lines.push_back({ Line::Text, clean(t) });
             in_item = false;
         }
-        if (!lines.empty() && lines.back().text.empty() && lines.back().title.empty()) lines.pop_back();
+        // Nothing left once cleaned (a bullet of bare "**"): not a line, and
+        // no item for an indented line after it to continue.
+        if (!lines.empty() && lines.back().text.empty() && lines.back().title.empty()) {
+            lines.pop_back();
+            in_item = false;
+        }
     };
 
     // HTML comments, invisible on GitHub: skipped, except the console's own

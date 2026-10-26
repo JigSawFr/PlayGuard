@@ -186,6 +186,13 @@ int main()
     CHECK(changelog::parse("<!-- console:hide -->\n* gone\n", 0).empty());
     CHECK(changelog::parse("<!-- open\n* gone\n", 0).empty());
 
+    // A bullet with nothing left once cleaned is dropped, and an indented line
+    // after it continues nothing (the fuzzer's find: it read past an empty list).
+    const auto empty_item = changelog::parse("* **\n  continued\n", 0);
+    CHECK(empty_item.size() == 1 && empty_item[0].kind == Line::Text && empty_item[0].text == "continued");
+    const auto after_item = changelog::parse("* one\n* **\n  two\n", 0);
+    CHECK(after_item.size() == 2 && after_item[0].text == "one" && after_item[1].kind == Line::Text);
+
     CHECK(changelog::parse("", 0).empty());
     CHECK(changelog::parse("# Changelog\n", 0).empty());
 
