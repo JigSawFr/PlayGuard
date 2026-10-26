@@ -82,7 +82,7 @@ typedef struct {
     bool                   final;           // a finished day (activity/<date>)
     const SyncAppTime     *apps;
     size_t                 n_apps;
-    const SyncAccountTime *accounts;        // NULL: not known (the agent does not read accounts)
+    const SyncAccountTime *accounts;        // NULL: not known
     size_t                 n_accounts;
     uint64_t               now_playing;     // not for a finished day
     uint64_t               now_playing_since;

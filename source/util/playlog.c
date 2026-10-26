@@ -175,6 +175,29 @@ static void hour_range(void *ctx, uint64_t app_id, uint64_t start, uint64_t end)
     while (h->day > 0 && start >= ds[h->day - 1]) h->day--;
 }
 
+size_t playlog_account_days(const PlayLogEvent *events, size_t n, uint64_t now, const uint64_t day_starts[7],
+                            PlayLogEvent *scratch, PlayLogTotal *totals, size_t totals_max,
+                            PlayLogAccountDays *out, size_t max)
+{
+    size_t count = 0;
+    for (size_t i = 0; i < n && count < max; i++) {
+        if (events[i].kind != PlayLogEv_AccountOpen || (!events[i].uid[0] && !events[i].uid[1])) continue;
+        bool known = false;
+        for (size_t a = 0; a < count && !known; a++)
+            known = out[a].uid[0] == events[i].uid[0] && out[a].uid[1] == events[i].uid[1];
+        if (known) continue;
+        PlayLogAccountDays *a = &out[count++];
+        memset(a, 0, sizeof(*a));
+        a->uid[0] = events[i].uid[0];
+        a->uid[1] = events[i].uid[1];
+        const size_t m = playlog_for_account(events, n, a->uid, scratch, n);
+        const size_t games = playlog_fold_days(scratch, m, now, day_starts, totals, totals_max);
+        for (size_t g = 0; g < games; g++)
+            for (int k = 0; k < 7; k++) a->day_s[k] += totals[g].day_s[k];
+    }
+    return count;
+}
+
 void playlog_fold_hours(const PlayLogEvent *events, size_t n, uint64_t now,
                         const uint64_t day_starts[7], PlayLogHours *out)
 {
