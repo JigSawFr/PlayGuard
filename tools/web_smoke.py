@@ -236,7 +236,12 @@ def run(fn):
         try:
             fn(new_page)
         except Exception as e:   # a timeout, a browser gone: the scenario fails, not the others
-            fail(f"{fn.__name__}: {str(e).splitlines()[0]}")
+            lines = str(e).splitlines()
+            fail(f"{fn.__name__}: {lines[0] if lines else e!r}")
+            # Playwright's call log: what it was waiting for (an element not
+            # visible, not stable, covered by another).
+            for line in lines[1:40]:
+                print("     ", line)
         finally:
             for browser in browsers:
                 browser.close()
@@ -380,6 +385,9 @@ def console(new_page):
         except Exception:
             fail(f"console: not unlocked ({page.inner_text('#console-line')})")
             return
+        # The button ready to be clicked (visible, still, not covered), on
+        # its own: a wait here says why, apart from the reload's.
+        page.locator("#console-restart").click(trial=True, timeout=10000)
         # The page reloads itself once the folder is written.
         with page.expect_navigation(timeout=15000):
             page.click("#console-restart")
