@@ -296,6 +296,40 @@ static void test_accounts(void)
     CHECK(k == 2 && find(t, k, A)->today_s == 600 + 300 && find(t, k, B)->today_s == 300);
 }
 
+// Each account's days, as the agent publishes them: Alice and Leo in the
+// order they were first opened, each day summed over the games.
+static void test_account_days(void)
+{
+    enum { ALICE = 7, LEO = 9 };
+    uint64_t starts[7];
+    for (int k = 0; k < 7; k++) starts[k] = DAY_START - (uint64_t)k * DAY;
+    const uint64_t Y = DAY_START - DAY + 20 * H;   // yesterday, 20:00
+    const uint64_t T = DAY_START + 9 * H;
+    const PlayLogEvent log[] = {
+        ev(A, PlayLogEv_Launch, Y), acc(PlayLogEv_AccountOpen, Y, LEO), ev(A, PlayLogEv_Focus, Y),
+        ev(A, PlayLogEv_Unfocus, Y + 900), acc(PlayLogEv_AccountClose, Y + 900, LEO),
+        ev(B, PlayLogEv_Launch, T), acc(PlayLogEv_AccountOpen, T, ALICE), acc(PlayLogEv_AccountOpen, T, LEO),
+        ev(B, PlayLogEv_Focus, T), ev(B, PlayLogEv_Unfocus, T + 1200),
+        acc(PlayLogEv_AccountClose, T + 1200, ALICE), acc(PlayLogEv_AccountClose, T + 1200, LEO),
+        ev(A, PlayLogEv_Launch, T + H), acc(PlayLogEv_AccountOpen, T + H, LEO), ev(A, PlayLogEv_Focus, T + H),
+        ev(A, PlayLogEv_Unfocus, T + H + 600),
+    };
+    const size_t n = sizeof(log) / sizeof(log[0]);
+    PlayLogEvent scratch[sizeof(log) / sizeof(log[0])];
+    PlayLogTotal t[8];
+    PlayLogAccountDays out[4];
+    size_t k = playlog_account_days(log, n, NOW, starts, scratch, t, 8, out, 4);
+    CHECK(k == 2);
+    CHECK(out[0].uid[0] == LEO && out[0].uid[1] == LEO + 100);   // first opened
+    CHECK(out[0].day_s[0] == 1200 + 600 && out[0].day_s[1] == 900 && out[0].day_s[2] == 0);
+    CHECK(out[1].uid[0] == ALICE && out[1].day_s[0] == 1200 && out[1].day_s[1] == 0);
+
+    // At most `max`; none without an account event.
+    CHECK(playlog_account_days(log, n, NOW, starts, scratch, t, 8, out, 1) == 1 && out[0].uid[0] == LEO);
+    const PlayLogEvent plain[] = { ev(A, PlayLogEv_Focus, T), ev(A, PlayLogEv_Unfocus, T + 600) };
+    CHECK(playlog_account_days(plain, 2, NOW, starts, scratch, t, 8, out, 4) == 0);
+}
+
 // When the week's play happened (Activity's hours): each hour of each day,
 // and the sessions, games and short breaks together.
 static void test_hours(void)
@@ -355,6 +389,7 @@ int main(void)
     test_days();
     test_week_before();
     test_accounts();
+    test_account_days();
     test_hours();
     test_since();
     return CHECK_DONE("playlog session, window and per-account assertions passed");

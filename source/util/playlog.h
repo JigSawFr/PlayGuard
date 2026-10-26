@@ -92,6 +92,20 @@ void playlog_fold_hours(const PlayLogEvent *events, size_t n, uint64_t now,
 size_t playlog_for_account(const PlayLogEvent *events, size_t n, const uint64_t uid[2],
                            PlayLogEvent *out, size_t max);
 
+// Each user account's play time per day over the same 7 days: the accounts
+// opened in the log, in the order they first were (at most `max`), each with
+// playlog_for_account() then playlog_fold_days() summed over its games.
+// `scratch` holds `n` events and `totals` `totals_max` games, both for the
+// work. Returns the number of accounts written to `out`.
+typedef struct {
+    uint64_t uid[2];
+    uint32_t day_s[7];    // [0] today … [6] six days ago
+} PlayLogAccountDays;
+
+size_t playlog_account_days(const PlayLogEvent *events, size_t n, uint64_t now, const uint64_t day_starts[7],
+                            PlayLogEvent *scratch, PlayLogTotal *totals, size_t totals_max,
+                            PlayLogAccountDays *out, size_t max);
+
 #ifdef __cplusplus
 }
 #endif

@@ -93,8 +93,12 @@ bool playstats_cancelled(void);
 // (pdm:qry), `day_wday` as in PlayStats, and the game that has the focus now
 // (*playing 0: none) since when (user clock). *now: the user clock used.
 // Returns how many totals were written to `out`; *rc says why none.
+// `accounts`: each user account's time per day (playlog_account_days), at
+// most `max_accounts`, their number in *n_accounts; none when the room to
+// work it out was missing (*n_accounts = SIZE_MAX: not known).
 size_t playstats_days(PlayLogTotal *out, size_t max, u64 *now, u8 day_wday[7], u64 *playing,
-                      u64 *playing_since, Result *rc);
+                      u64 *playing_since, PlayLogAccountDays *accounts, size_t max_accounts, size_t *n_accounts,
+                      Result *rc);
 
 // One game's all-time play time per user account on the console (pdm:qry by
 // account, acc:u0 for the nicknames). Accounts that never played it are left
