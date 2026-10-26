@@ -188,7 +188,9 @@ with the state. Every unknown value is `null`.
   system in use (the emuMMC's on an emuMMC).
 - `power.charging`: a charger that gives power (`charger`: `official` — the
   charger or the dock —, `low_power`, `not_supported`, `none`). `docked`:
-  the boost performance mode. `temperature_c`: the internal sensor.
+  the operation mode `omm` keeps (the dock's, the console asleep in it too),
+else the boost performance mode (docked and awake only). `temperature_c`:
+the internal sensor.
 - `network.type`: `wifi`, `ethernet` or `none`; `wifi_bars` 0–3. The
   network's passphrase, which the same call returns, is wiped at once.
 - `boot_ts`: when the console started (POSIX, to the minute), not when it

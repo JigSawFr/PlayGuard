@@ -43,9 +43,16 @@ static void read_power(ConsoleLive *out)
             out->charger = (int)charger;
         psmExit();
     }
-    // Docked: the boost performance mode (the applet's operation mode is
-    // not there for a sysmodule).
-    if (R_SUCCEEDED(apmInitialize())) {
+    // Docked: the operation mode omm keeps (what the dock says, the console
+    // asleep in it too; the applet's is not there for a sysmodule), else the
+    // boost performance mode (docked and awake only).
+    Service omm;
+    if (R_SUCCEEDED(smGetService(&omm, "omm"))) {
+        u8 mode = 0xFF;
+        if (R_SUCCEEDED(serviceDispatchOut(&omm, 0, mode)) && mode <= 1) out->docked = mode;   // GetOperationMode: 1 console
+        serviceClose(&omm);
+    }
+    if (out->docked < 0 && R_SUCCEEDED(apmInitialize())) {
         ApmPerformanceMode mode = ApmPerformanceMode_Invalid;
         if (R_SUCCEEDED(apmGetPerformanceMode(&mode)) && mode != ApmPerformanceMode_Invalid)
             out->docked = mode == ApmPerformanceMode_Boost;

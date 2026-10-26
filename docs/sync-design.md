@@ -236,10 +236,12 @@ into long-term statistics.
 
 - Built like the recovery sysmodule (`sysmodule/agent/`, shared
   `sysmodule/common.mk`), `__nx_applet_type = None`, a static heap of
-  512–768 KiB, a minimal `socketInitialize` (two 16 KiB TCP buffers, no UDP:
-  about 32 KiB of transfer memory). Services: `pctl:a/s/r`, `fsp-srv`,
-  `set:sys`, `set:`, `psm`, `ts`, `apm` (the system document: region,
-  battery, temperature, docked), `time:u`, `nifm:u`, `bsd:u`, `sfdnsres`,
+  1.5 MiB, a small `socketInitialize` (8 KiB TCP buffers that grow to 32 KiB,
+  no UDP, `sb_efficiency` 4: a 256 KiB transfer memory pool, room for the
+  games document; two bsd sessions, the second the watchdog's). Services:
+  `pctl:a/s/r`, `fsp-srv`, `set:sys`, `set:`, `psm`, `ts`, `apm`, `omm` (the
+  system document: region, battery, temperature, docked), `time:u` (the
+  clock and its accuracy), `nifm:u`, `bsd:u`, `sfdnsres`,
   `ssl`, `pdm:qry`, `spl:`, `csrng`; hosts `pg:agent` (which needs the session syscalls 0x40–0x45, as
   sys-clk's `perms.json` shows).
 - Starts after qlaunch and once `nifm` reports a connection; reads
