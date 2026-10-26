@@ -71,8 +71,10 @@ static void console(SyncJson *j, const SyncSnapshot *s)
     sync_json_obj(j);
     sync_json_kstr_or_null(j, "id", id[0] ? id : NULL);
     sync_json_kstr_or_null(j, "name", name[0] ? name : NULL);
-    version(j, "firmware", s->sys, false);
-    version(j, "atmosphere", s->sys, true);
+    // The system's versions are versions and hardware (publish_hardware).
+    const SysInfo *versions = !s->conf || s->conf->publish_hardware ? s->sys : NULL;
+    version(j, "firmware", versions, false);
+    version(j, "atmosphere", versions, true);
     sync_json_kstr_or_null(j, "app_version", s->app_version);
     sync_json_kstr_or_null(j, "agent_version", s->agent_version);
     sync_json_kbool_or_null(j, "emummc", s->sys && s->sys->emummc_valid, s->sys && s->sys->emummc);
@@ -200,21 +202,25 @@ static void timer(SyncJson *j, const SyncSnapshot *s)
         extended = r->extra_value - r->extra_base;
     sync_json_kint_or_null(j, "extended_today_min", today_ok, extended);
     sync_json_kbool(j, "console_locked", r && r->console_lock);
+    sync_json_kstr_or_null(j, "profile", s->profile_now);
     sync_json_obj_end(j);
 }
 
 static void activity_today(SyncJson *j, const SyncSnapshot *s)
 {
+    // Play time (publish_activity): null while it is not published.
+    const bool on = !s->conf || s->conf->publish_activity;
+    const uint64_t playing = on ? s->now_playing : 0;
     sync_json_key(j, "activity_today");
     sync_json_obj(j);
-    sync_json_kint_or_null(j, "used_min", s->activity_ok, (s->activity_s + 30) / 60);
+    sync_json_kint_or_null(j, "used_min", on && s->activity_ok, (s->activity_s + 30) / 60);
     sync_json_key(j, "now_playing");
     sync_json_obj(j);
     sync_json_key(j, "app_id");
-    if (s->now_playing) sync_json_hex64(j, s->now_playing);
+    if (playing) sync_json_hex64(j, playing);
     else sync_json_null(j);
-    sync_json_kstr_or_null(j, "name", s->now_playing ? s->now_playing_name : NULL);
-    sync_json_kint_or_null(j, "since", s->now_playing && s->now_playing_since, (int64_t)s->now_playing_since);
+    sync_json_kstr_or_null(j, "name", playing ? s->now_playing_name : NULL);
+    sync_json_kint_or_null(j, "since", playing && s->now_playing_since, (int64_t)s->now_playing_since);
     sync_json_obj_end(j);
     sync_json_obj_end(j);
 }
@@ -228,6 +234,12 @@ static void link(SyncJson *j, const SyncSnapshot *s)
     sync_json_kbool(j, "ha_discovery", s->conf && s->conf->ha_discovery);
     sync_json_kbool(j, "agent", s->agent);
     sync_json_kstr_or_null(j, "last_result", s->last_result);
+    // What is published beside the parental controls (sync.conf's publish_*).
+    sync_json_key(j, "publishes");
+    sync_json_obj(j);
+    for (int p = SyncPublish_Controls + 1; p < SyncPublish_Count; p++)
+        sync_json_kbool(j, sync_publish_name((SyncPublish)p), !s->conf || sync_conf_publishes(s->conf, (SyncPublish)p));
+    sync_json_obj_end(j);
     sync_json_obj_end(j);
 }
 

@@ -29,8 +29,15 @@ static void space(SyncJson *j, const char *key, const ConsoleSpace *s)
 
 size_t sync_system_build(const SyncSystem *s, char *out, size_t cap)
 {
-    const SysInfo *si = s->sys;
-    const ConsoleLive *l = s->live;
+    // What is not published reads as unknown (sync.conf's publish_*; no
+    // settings: everything).
+    const SyncConf *c = s->conf;
+    const bool hw = !c || sync_conf_publishes(c, SyncPublish_Hardware);
+    const bool con = !c || sync_conf_publishes(c, SyncPublish_Console);
+    const bool net = !c || sync_conf_publishes(c, SyncPublish_Network);
+    const SysInfo *si = hw ? s->sys : NULL;
+    const ConsoleLive *lh = hw ? s->live : NULL, *lc = con ? s->live : NULL, *ln = net ? s->live : NULL;
+    const ConsoleSpace *sd = con ? s->sd : NULL, *nand = con ? s->nand : NULL;
     SyncJson j;
     sync_json_init(&j, out, cap);
     sync_json_obj(&j);
@@ -43,28 +50,29 @@ size_t sync_system_build(const SyncSystem *s, char *out, size_t cap)
     kversion(&j, "firmware", hos != 0, (hos >> 16) & 0xFF, (hos >> 8) & 0xFF, hos & 0xFF);
     kversion(&j, "atmosphere", si && si->ams_valid, si ? si->ams_major : 0, si ? si->ams_minor : 0,
              si ? si->ams_micro : 0);
-    sync_json_kstr_or_null(&j, "hekate", s->hekate);
+    sync_json_kstr_or_null(&j, "hekate", hw ? s->hekate : NULL);
     sync_json_kstr_or_null(&j, "app", s->app_version);
     sync_json_kstr_or_null(&j, "agent", s->agent_version);
     sync_json_obj_end(&j);
 
     sync_json_key(&j, "hardware");
     sync_json_obj(&j);
-    sync_json_kstr_or_null(&j, "model", l ? console_model_name(l->model) : NULL);
-    sync_json_kstr_or_null(&j, "nickname", l ? l->nickname : NULL);
-    sync_json_kstr_or_null(&j, "region", l ? l->region : NULL);
+    sync_json_kstr_or_null(&j, "model", lh ? console_model_name(lh->model) : NULL);
+    sync_json_kstr_or_null(&j, "nickname", lh ? lh->nickname : NULL);
+    sync_json_kstr_or_null(&j, "region", lh ? lh->region : NULL);
     const SysStorage st = si ? sysinfo_storage(si) : SysStorage_Unknown;
     sync_json_kstr_or_null(&j, "system", st == SysStorage_EmuMMC ? "emummc" : st == SysStorage_SysMMC ? "sysmmc" : NULL);
     sync_json_kbool_or_null(&j, "prodinfo_blanked", si && si->blank_valid, si && si->blank);
-    sync_json_kstr_or_null(&j, "serial", s->serial);
+    sync_json_kstr_or_null(&j, "serial", hw ? s->serial : NULL);
     sync_json_obj_end(&j);
 
     sync_json_key(&j, "storage");
     sync_json_obj(&j);
-    space(&j, "sd", s->sd);
-    space(&j, "nand", s->nand);
+    space(&j, "sd", sd);
+    space(&j, "nand", nand);
     sync_json_obj_end(&j);
 
+    const ConsoleLive *l = lc;
     sync_json_key(&j, "power");
     sync_json_obj(&j);
     sync_json_kint_or_null(&j, "battery_pct", l && l->battery_pct >= 0, l ? l->battery_pct : 0);
@@ -77,10 +85,10 @@ size_t sync_system_build(const SyncSystem *s, char *out, size_t cap)
 
     sync_json_key(&j, "network");
     sync_json_obj(&j);
-    sync_json_kstr_or_null(&j, "type", l ? console_network_name(l->network) : NULL);
-    sync_json_kstr_or_null(&j, "ip", l ? l->ip : NULL);
-    sync_json_kint_or_null(&j, "wifi_bars", l && l->wifi_bars >= 0, l ? l->wifi_bars : 0);
-    sync_json_kstr_or_null(&j, "ssid", l ? l->ssid : NULL);
+    sync_json_kstr_or_null(&j, "type", ln ? console_network_name(ln->network) : NULL);
+    sync_json_kstr_or_null(&j, "ip", ln ? ln->ip : NULL);
+    sync_json_kint_or_null(&j, "wifi_bars", ln && ln->wifi_bars >= 0, ln ? ln->wifi_bars : 0);
+    sync_json_kstr_or_null(&j, "ssid", ln ? ln->ssid : NULL);
     sync_json_obj_end(&j);
 
     // When it started, to the minute: the same from one document to the next.

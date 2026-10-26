@@ -38,6 +38,19 @@ typedef enum {
     SyncMqtt_V311 = 2,
 } SyncMqttVersion;
 
+// What a value belongs to, for the publish_* switches.
+typedef enum {
+    SyncPublish_Controls = 0,   // the parental controls and the link: always
+    SyncPublish_Activity,
+    SyncPublish_Games,
+    SyncPublish_Console,
+    SyncPublish_Network,
+    SyncPublish_Hardware,
+    SyncPublish_Serial,         // needs publish_hardware too
+    SyncPublish_Report,
+    SyncPublish_Count
+} SyncPublish;
+
 typedef struct {
     int        schema;
     bool       enabled;
@@ -53,9 +66,16 @@ typedef struct {
     char       console_name[SYNC_NAME_MAX];
     SyncPolicy policy;
     bool       remote_timer_writes;     // orders may change the play timer (unlocking with the stored PIN)
+    // What is published beside the parental controls (always): each on by
+    // default but the serial number. Off: its values are null, its documents
+    // cleared, its entities removed from Home Assistant.
     bool       publish_report;
-    bool       publish_activity;
-    bool       publish_serial;          // the serial number in the system document (off by default)
+    bool       publish_activity;        // play time: today, the week, the finished days, the game names
+    bool       publish_games;           // the games document (the list, each one's play time)
+    bool       publish_console;         // power, storage, when it started (the system document)
+    bool       publish_network;         // the connection, IP address, Wi-Fi (the system document)
+    bool       publish_hardware;        // versions and hardware: model, firmware, Atmosphère, hekate…
+    bool       publish_serial;          // the serial number, with publish_hardware (off by default)
     bool       ha_discovery;            // Home Assistant MQTT discovery
     uint16_t   poll_s;                  // state refresh, 10..300
     char       topic_prefix[SYNC_PREFIX_MAX];      // "playguard"
@@ -92,6 +112,10 @@ void sync_conf_device_id(const SyncConf *c, char out[SYNC_ID_LEN + 1]);
 void sync_conf_device_name(const SyncConf *c, char *out, size_t cap);
 // "ask" / "auto" / "off".
 const char *sync_policy_name(SyncPolicy p);
+// The category is published (SyncPublish_Controls always).
+bool        sync_conf_publishes(const SyncConf *c, SyncPublish p);
+// "controls", "activity", "games", "console", "network", "hardware", "serial", "report".
+const char *sync_publish_name(SyncPublish p);
 // "auto" / "5" / "3.1.1", as sync.conf writes it.
 const char *sync_mqtt_version_name(SyncMqttVersion v);
 

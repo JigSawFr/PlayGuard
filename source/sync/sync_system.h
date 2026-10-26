@@ -12,6 +12,7 @@
 
 #include "../core/console_info.h"
 #include "../core/sysinfo.h"
+#include "sync_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +27,7 @@ typedef struct {
     const char         *app_version;     // PlayGuard's; NULL unknown
     const char         *agent_version;   // NULL: no agent
     const char         *serial;          // NULL: not published (or not known)
+    const SyncConf     *conf;            // what is published (publish_*); NULL: everything
 } SyncSystem;
 
 size_t sync_system_build(const SyncSystem *s, char *out, size_t cap);

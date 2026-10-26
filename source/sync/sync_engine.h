@@ -114,6 +114,7 @@ typedef struct {
     uint64_t    backoff_ms;
     uint8_t     proto_ok;        // "auto": the version the broker took (0: try 5.0 first)
     bool        want_state, want_activity, want_discovery, want_names, want_online;
+    bool        want_clear;      // the documents of what is not published, cleared
     uint64_t    next_state_ms, next_activity_ms;
     bool        discovery_published;
     SyncDevice  device;          // as the last discovery said it

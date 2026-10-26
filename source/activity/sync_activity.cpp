@@ -85,6 +85,7 @@ void SyncActivity::onContentAvailable()
 {
     intro->setSingleLine(false);
     note->setSingleLine(false);
+    published_note->setSingleLine(false);
     this->conf = sync_files::load();
 
     enabled->init("playguard/sync/enabled"_i18n, conf.enabled, [this](bool on) {
@@ -248,17 +249,18 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    report->init("playguard/sync/report"_i18n, conf.publish_report, [this](bool on) {
-        SyncConf next = this->conf;
-        next.publish_report = on;
-        if (!this->commit(next)) report->setOn(this->conf.publish_report, false);
-    });
-    // Off by default: the serial number goes to the broker only, never into a report.
-    serial->init("playguard/sync/serial"_i18n, conf.publish_serial, [this](bool on) {
-        SyncConf next = this->conf;
-        next.publish_serial = on;
-        if (!this->commit(next)) serial->setOn(this->conf.publish_serial, false);
-    });
+    // What is published beside the parental controls (always): one switch
+    // each. The serial number is off by default and goes to the broker only,
+    // never into a report; it is shown with the versions and hardware.
+    for (const Published& p : this->published()) {
+        brls::BooleanCell* cell = p.cell;
+        bool SyncConf::*flag = p.flag;
+        cell->init(brls::getStr(p.title), conf.*flag, [this, cell, flag](bool on) {
+            SyncConf next = this->conf;
+            next.*flag = on;
+            if (!this->commit(next)) cell->setOn(this->conf.*flag, false);
+        });
+    }
 
     status->registerClickAction([this](brls::View*) {
         const sync_flow::Status st = sync_flow::status();
@@ -367,13 +369,27 @@ void SyncActivity::refresh()
     policy->setDetailText(policy_text(conf.policy));
     timer->setOn(conf.remote_timer_writes, false);
     discovery->setOn(conf.ha_discovery, false);
-    report->setOn(conf.publish_report, false);
-    serial->setOn(conf.publish_serial, false);
+    for (const Published& p : this->published()) p.cell->setOn(conf.*p.flag, false);
+    serial->setVisibility(conf.publish_hardware ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    published_note->setText("playguard/sync/published_note"_i18n);
     char device[SYNC_ID_LEN + 1];
     sync_conf_device_id(&conf, device);
     id->setDetailText(device[0] ? std::string(device) : "playguard/sync/none"_i18n);
     note->setText("playguard/sync/note"_i18n);
     this->refresh_status();
+}
+
+std::vector<SyncActivity::Published> SyncActivity::published()
+{
+    return {
+        { pub_activity, "playguard/sync/publish_activity", &SyncConf::publish_activity },
+        { pub_games, "playguard/sync/publish_games", &SyncConf::publish_games },
+        { pub_console, "playguard/sync/publish_console", &SyncConf::publish_console },
+        { pub_network, "playguard/sync/publish_network", &SyncConf::publish_network },
+        { pub_hardware, "playguard/sync/publish_hardware", &SyncConf::publish_hardware },
+        { serial, "playguard/sync/serial", &SyncConf::publish_serial },
+        { report, "playguard/sync/report", &SyncConf::publish_report },
+    };
 }
 
 void SyncActivity::refresh_ha_install()

@@ -10,6 +10,8 @@
 
 #include <stddef.h>
 
+#include "sync_conf.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,6 +31,7 @@ typedef struct {
     const char *extra;            // more discovery options, a JSON fragment without braces ("" none)
     const char *topic;            // the document value_template reads, under <base>/: NULL the state,
                                   // "system", "games" (docs/sync-protocol.md)
+    SyncPublish publish;          // what it shows: offered only while that is published
 } SyncEntity;
 
 const SyncEntity *sync_entities(size_t *count);

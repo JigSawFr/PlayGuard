@@ -98,10 +98,19 @@ play timer's), each day's limit, Age rating, Last order, Network clock accurate,
 report, User accounts, and the console's own but the free space, Battery,
 Charging and Docked.
 
+**What is published** (*Remote access › What is published*, behind the PIN):
+the parental controls and the play timer always are; the play time, the
+games, the console's state (battery, storage, dock), the network (IP address,
+Wi-Fi), the versions and hardware (model, firmware, Atmosphère) and the
+diagnostic reports each have a switch, on by default but the reports. What
+you turn off is cleared from the broker and its entities go from Home
+Assistant (the integration below follows too); turn it on again and they
+come back.
+
 The console's own entities read `playguard/<id>/system`, which the agent
 keeps fresh while PlayGuard is closed; the games ones read
 `playguard/<id>/games`, which PlayGuard publishes after each read of the play
-log. **The serial number** is only published once *Remote access › Publish
+log. **The serial number** is only published once *Remote access › What is published › Publish
 the serial number* is on (off by default): it then goes to the broker, and
 never into a report. On a console whose PRODINFO is blanked, it is the real
 one, from Atmosphère's backup of it on the SD card. Its entity, and the

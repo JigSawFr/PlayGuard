@@ -820,6 +820,34 @@ static void test_device(void)
     CHECK(count_on(topic) == 2 && strstr(last_on(topic)->payload, "\"sw\":\"24.0.0 \xc2\xb7 Atmosph"));
 }
 
+// What is not published leaves nothing on the broker: cleared at each
+// connection and when the settings change.
+static void test_unpublished_cleared(void)
+{
+    setup(false, SyncPolicy_Auto);   // the report is off by default
+    turns(3);
+    const Message *m = last_on("playguard/a1b2c3d4/report");
+    CHECK(m && m->retain && m->len == 0);
+    CHECK(!last_on("playguard/a1b2c3d4/games") && !last_on("playguard/a1b2c3d4/week"));
+    // Play time and the games turned off: their documents go.
+    SyncConf next = conf;
+    next.publish_activity = next.publish_games = false;
+    sync_engine_reconfigure(&engine, &next);
+    turns(2);
+    static const char *const gone[] = { "activity", "week", "names", "games" };
+    for (size_t i = 0; i < sizeof(gone) / sizeof(gone[0]); i++) {
+        char topic[96];
+        snprintf(topic, sizeof(topic), "playguard/a1b2c3d4/%s", gone[i]);
+        m = last_on(topic);
+        CHECK(m && m->retain && m->len == 0);
+    }
+    // No activity published meanwhile.
+    const size_t activities = host.activities;
+    now += 120000;
+    turns(3);
+    CHECK(host.activities == activities);
+}
+
 static void test_home_assistant_restart_and_discovery_switch(void)
 {
     setup(false, SyncPolicy_Auto);
@@ -1211,6 +1239,7 @@ int main(void)
     test_async_and_waiting();
     test_replay_in_flight();
     test_device();
+    test_unpublished_cleared();
     test_home_assistant_restart_and_discovery_switch();
     test_custom_discovery_prefix();
     test_integration_version();

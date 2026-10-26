@@ -100,7 +100,7 @@ size_t sync_engine_pending(const SyncEngine *e)
 
 void sync_engine_sync_now(SyncEngine *e)
 {
-    e->want_state = e->want_activity = e->want_discovery = e->want_names = true;
+    e->want_state = e->want_activity = e->want_discovery = e->want_names = e->want_clear = true;
     // "online" again: another client of the same console (PlayGuard's own
     // session, handing over to the agent) may have left "offline" behind.
     e->want_online = true;
@@ -536,6 +536,26 @@ static void publish_discovery(SyncEngine *e)
     }
 }
 
+// What is not published leaves nothing on the broker: its documents are
+// cleared (an empty retained publish) at each connection and when the
+// settings change. The finished days (activity/<date>) are PlayGuard's to
+// clear, which knows their dates.
+static void clear_unpublished(SyncEngine *e)
+{
+    static const struct {
+        SyncPublish what;
+        const char *sub;
+    } DOCS[] = {
+        { SyncPublish_Activity, "activity" },
+        { SyncPublish_Activity, "week" },
+        { SyncPublish_Activity, "names" },
+        { SyncPublish_Games, "games" },
+        { SyncPublish_Report, "report" },
+    };
+    for (size_t i = 0; i < sizeof(DOCS) / sizeof(DOCS[0]); i++)
+        if (!sync_conf_publishes(&e->conf, DOCS[i].what)) sync_engine_publish(e, DOCS[i].sub, "", 0, true);
+}
+
 static void publish_due(SyncEngine *e)
 {
     const uint64_t now = e->now_ms();
@@ -544,6 +564,10 @@ static void publish_due(SyncEngine *e)
         if (e->conf.ha_discovery) publish_discovery(e);
     }
     if (!e->mqtt.connected) return;
+    if (e->want_clear) {
+        e->want_clear = false;
+        clear_unpublished(e);
+    }
     if (e->want_online) {
         char topic[160];
         snprintf(topic, sizeof(topic), "%s/availability", e->base);

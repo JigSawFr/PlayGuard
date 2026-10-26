@@ -118,11 +118,13 @@ activity and the names, carry out a limit order (event, retained order
 cleared, new state, change history), refuse one out of range, publish the
 discovery again when Home Assistant says it restarted, publish the system
 document (the simulated console; the serial number only in sync-311, which
-sets publish_serial) and the games document, show the link online
+sets publish_serial and leaves the network unpublished) and the games
+document, describe the device as Nintendo's OLED model, show the link online
 in Console › Remote access with the Home Assistant integration's QR
 codes, keep the integration's version once it says it (integration.json),
 find its newer release (PLAYGUARD_SIM_HA_LATEST, its changelog) and show
-what changed, and leave "offline" behind at exit. It
+what changed, stop publishing the games once turned off (their document
+cleared, their entities removed), and leave "offline" behind at exit. It
 connects in MQTT 5.0 ("auto"); "sync-311" runs the same with
 mqtt_version=3.1.1 (Mosquitto's log says which version the client spoke).
 The broker runs from a copy of its binary (Ubuntu's AppArmor profile for
@@ -441,6 +443,7 @@ if SYNC:
         f"port={mqtt_port}\nallow_anonymous=1\nconsole_id={SYNC_ID}\nconsole_name=Smoke\n"
         f"mqtt_version={'3.1.1' if MQTT311 else 'auto'}\n"
         f"publish_serial={1 if MQTT311 else 0}\n"
+        f"publish_network={0 if MQTT311 else 1}\n"
         "policy=auto\nremote_timer_writes=1\npoll_s=10\n")
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
@@ -1486,6 +1489,10 @@ if SYNC:
     discovery = wait_for("discovery", lambda: doc(f"homeassistant/device/playguard_{SYNC_ID}/config"))
     if "limit_mon" not in discovery.get("cmps", {}) or discovery["dev"]["name"] != "Smoke":
         fail("the discovery lacks the timer entities or the console's name")
+    # The device is the console as Nintendo names it (the simulated OLED).
+    dev = discovery["dev"]
+    if dev.get("mf") != "Nintendo" or dev.get("mdl_id") != "HEG-001" or "OLED" not in dev.get("mdl", ""):
+        fail(f"unexpected device: {dev}")
     state = wait_for("state", lambda: doc(f"{BASE}/state"))
     if state.get("source") != "app" or state.get("local_date") != "2026-10-08":
         fail(f"unexpected state: {json.dumps(state)[:300]}")
@@ -1495,7 +1502,13 @@ if SYNC:
     # discovery; the serial number only with publish_serial (sync-311).
     system = wait_for("the system document", lambda: doc(f"{BASE}/system"))
     hw, power = system.get("hardware", {}), system.get("power", {})
-    if hw.get("model") != "oled" or power.get("battery_pct") != 87 or system.get("network", {}).get("ssid") != "Maison" \
+    # sync-311 leaves the network unpublished: null, its entities removed.
+    want_ssid = None if MQTT311 else "Maison"
+    if MQTT311 and discovery["cmps"].get("ip_address") != {"p": "sensor"}:
+        fail(f"the network's entities are still offered: {discovery['cmps'].get('ip_address')}")
+    if state.get("link", {}).get("publishes", {}).get("network") is not (not MQTT311):
+        fail(f"the state does not say what is published: {state.get('link')}")
+    if hw.get("model") != "oled" or power.get("battery_pct") != 87 or system.get("network", {}).get("ssid") != want_ssid \
             or (system.get("storage", {}).get("sd") or {}).get("free_mb") is None \
             or not system.get("versions", {}).get("firmware") or not system.get("boot_ts"):
         fail(f"unexpected system document: {json.dumps(system)[:400]}")
@@ -1555,6 +1568,15 @@ if SYNC:
     # The integration removed: the document cleared, so is the file.
     mqtt_pub(f"{BASE}/integration", "")
     wait_for("the integration's document removed", lambda: not os.path.exists(integration_json), 10)
+    # What is published: the games turned off, their document goes from the
+    # broker and their entities from the discovery.
+    go_to("Publish the games (the list, each one's play time)")
+    shot("07_published")
+    key("Return")
+    wait_for("publish_games saved off", lambda: "publish_games=0" in open(sync_conf).read(), 10)
+    wait_for("the games document cleared", lambda: mqtt_get(f"{BASE}/games", 1) is None, 20)
+    wait_for("the games' entities removed", lambda: (doc(f"homeassistant/device/playguard_{SYNC_ID}/config") or {})
+             .get("cmps", {}).get("games_installed") == {"p": "sensor"}, 20)
 
     def checked():
         try:

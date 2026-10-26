@@ -9,6 +9,7 @@
 #include <borealis.hpp>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <borealis/cadran/ui/guarded.hpp>
 
@@ -38,6 +39,13 @@ class SyncActivity : public brls::Activity
     // (ui::write_later), then applies it. False when refused (the settings on
     // screen go back); a save that fails says so and shows the file again.
     bool commit(SyncConf next);
+    // What is published: each switch, its title and its setting.
+    struct Published {
+        brls::BooleanCell* cell;
+        const char* title;
+        bool SyncConf::*flag;
+    };
+    std::vector<Published> published();
 
     BRLS_BIND(brls::Label,       intro,     "sy_intro");
     BRLS_BIND(brls::BooleanCell, enabled,   "sy_enabled");
@@ -52,8 +60,14 @@ class SyncActivity : public brls::Activity
     BRLS_BIND(brls::BooleanCell, timer,     "sy_timer");
     BRLS_BIND(brls::DetailCell,  ha_install, "sy_ha_install");
     BRLS_BIND(brls::BooleanCell, discovery, "sy_discovery");
-    BRLS_BIND(brls::BooleanCell, report,    "sy_report");
+    BRLS_BIND(brls::Label,       published_note, "sy_published_note");
+    BRLS_BIND(brls::BooleanCell, pub_activity, "sy_pub_activity");
+    BRLS_BIND(brls::BooleanCell, pub_games, "sy_pub_games");
+    BRLS_BIND(brls::BooleanCell, pub_console, "sy_pub_console");
+    BRLS_BIND(brls::BooleanCell, pub_network, "sy_pub_network");
+    BRLS_BIND(brls::BooleanCell, pub_hardware, "sy_pub_hardware");
     BRLS_BIND(brls::BooleanCell, serial,    "sy_serial");
+    BRLS_BIND(brls::BooleanCell, report,    "sy_report");
     BRLS_BIND(brls::DetailCell,  status,    "sy_status");
     BRLS_BIND(brls::DetailCell,  sync_now,  "sy_sync_now");
     BRLS_BIND(brls::DetailCell,  log,       "sy_log");

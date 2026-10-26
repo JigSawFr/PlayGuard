@@ -624,7 +624,7 @@ std::string system_doc(const SysInfo& si, uint64_t ts, SyncDevice* device)
     sync_device_of(&si, &live, device);
     const std::string version = app::version();
     SyncSystem s{ ts, &si, &live, &sd, &nand, hekate.c_str(), version.c_str(), nullptr,
-                  serial.empty() ? nullptr : serial.c_str() };
+                  serial.empty() ? nullptr : serial.c_str(), &s_conf };
     std::string out(4096, '\0');
     const size_t n = sync_system_build(&s, &out[0], out.size());
     out.resize(n);
@@ -654,26 +654,29 @@ void on_play_data()
         s_shared->activity = activity;
         wake(*s_shared);
     }
+    // Play time and the games go out only while they are published
+    // (sync.conf's publish_activity, publish_games).
+    const bool activity_on = s_conf.publish_activity, games_on = s_conf.publish_games;
     const std::string names = names_doc(*stats, posix);
     if (without_ts(names) != without_ts(s_names_sent)) {
         s_names_sent = names;
-        post_publish("names", names, true);
+        if (activity_on) post_publish("names", names, true);
         std::vector<std::pair<uint64_t, std::string>> list;
         for (uint32_t i = 0; i < stats->count; i++)
             if (stats->games[i].name[0]) list.push_back({ stats->games[i].app_id, stats->games[i].name });
         sync_files::write_names(list);   // for the agent's "now playing"
     }
     const std::string week = week_doc(*stats, today, posix);
-    if (without_ts(week) != without_ts(s_week_sent)) {
+    if (activity_on && without_ts(week) != without_ts(s_week_sent)) {
         s_week_sent = week;
         post_publish("week", week, true);
     }
-    const std::string games = games_doc(*stats, posix);
+    const std::string games = games_on ? games_doc(*stats, posix) : "";
     if (!games.empty() && without_ts(games) != without_ts(s_games_sent)) {
         s_games_sent = games;
         post_publish("games", games, true);
     }
-    for (int k = 1; k <= 6; k++) {
+    for (int k = 1; k <= 6 && activity_on; k++) {
         const std::string day = date_before(today, k);
         if (day.empty() || s_finals_sent.count(day)) continue;
         s_finals_sent.insert(day);
@@ -751,6 +754,9 @@ void build_state()
     }
     s.profiles = profile_names;
     s.n_profiles = n_profiles;
+    // The profile in effect: the saved one whose seven limits are the timer's.
+    const std::string profile_now = pt.fw_supported && pt.valid ? profiles::match(pt.day_min) : "";
+    s.profile_now = profile_now.empty() ? nullptr : profile_now.c_str();
 
     std::string doc(16384, '\0');
     const size_t n = sync_state_build(&s, &doc[0], doc.size());
@@ -1213,9 +1219,23 @@ void stop()
 
 void reload()
 {
+    const SyncConf was = s_conf;
     s_conf = sync_files::load();
     s_dirty = true;
     if (s_started) apply_conf();
+    // What is published again goes out at once.
+    if (s_conf.publish_activity != was.publish_activity) {
+        s_names_sent.clear();
+        s_week_sent.clear();
+        s_finals_sent.clear();
+    }
+    if (s_conf.publish_games != was.publish_games) s_games_sent.clear();
+    // Play time no longer published: the finished days go from the broker
+    // too (the link clears today's, the week and the names itself).
+    u64 posix = 0;
+    LocalTime today{};
+    if (was.publish_activity && !s_conf.publish_activity && running() && time_local_now(&posix, &today))
+        for (int k = 1; k <= 14; k++) post_publish("activity/" + date_before(today, k), "", true);
 }
 
 void sync_now()

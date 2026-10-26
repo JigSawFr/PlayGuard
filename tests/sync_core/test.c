@@ -408,6 +408,8 @@ static void test_conf(void)
                        "console_name=Salon\n"
                        "policy=auto\n"
                        "remote_timer_writes=yes\n"
+                       "publish_games=0\n"
+                       "publish_network=off\n"
                        "poll_s=5\n"                      // out of range: default kept
                        "topic_prefix=bad/prefix\n"       // refused
                        "future_key=keep me\n"
@@ -420,6 +422,16 @@ static void test_conf(void)
     CHECK(!strcmp(c.password, " p=a ss#word"));
     CHECK(!strcmp(c.console_id, "a1b2c3d4") && !strcmp(c.console_name, "Salon"));
     CHECK(c.policy == SyncPolicy_Auto && c.remote_timer_writes);
+    // What is published: everything but the serial number by default.
+    CHECK(!c.publish_games && !c.publish_network && c.publish_activity && c.publish_console && c.publish_hardware);
+    CHECK(!c.publish_serial && !c.publish_report);
+    CHECK(!sync_conf_publishes(&c, SyncPublish_Games) && sync_conf_publishes(&c, SyncPublish_Hardware));
+    c.publish_serial = true;
+    CHECK(sync_conf_publishes(&c, SyncPublish_Serial));
+    c.publish_hardware = false;
+    CHECK(!sync_conf_publishes(&c, SyncPublish_Serial));   // with the hardware only
+    c.publish_hardware = true;
+    c.publish_serial = false;
     CHECK(c.poll_s == 30 && !strcmp(c.topic_prefix, "playguard"));
     CHECK(contains(c.extra, "future_key=keep me\n"));
     CHECK(sync_conf_problem(&c) == NULL);
@@ -429,6 +441,7 @@ static void test_conf(void)
     const size_t n = sync_conf_write(&c, out, sizeof(out));
     CHECK(n > 0 && contains(out, "future_key=keep me\n") && contains(out, "policy=auto\n"));
     CHECK(contains(out, "mqtt_version=3.1.1\n"));
+    CHECK(contains(out, "publish_activity=1\npublish_games=0\npublish_console=1\npublish_network=0\npublish_hardware=1\n"));
     SyncConf back;
     sync_conf_defaults(&back);
     CHECK(sync_conf_parse(&back, out, n));
@@ -668,9 +681,15 @@ static void test_discovery(void)
     CHECK(contains(buf, "\"stat_t\":\"playguard/a1b2c3d4/event\",\"evt_typ\":["));
     const size_t without = n;
 
-    // On: the timer entities appear, retained and optimistic, with the profiles.
+    // The serial number is off by default: its entity removed.
+    CHECK(contains(buf, "\"serial\":{\"p\":\"sensor\"}"));
+
+    // On: the timer entities appear, retained and optimistic, with the
+    // profiles (and the profile in effect); with the serial number.
     c.remote_timer_writes = true;
+    c.publish_serial = true;
     n = sync_discovery_build(&d, buf, sizeof(buf));
+    CHECK(contains(buf, "\"val_tpl\":\"{{ value_json.timer.profile }}\""));
     CHECK(n > without);
     CHECK(contains(buf, "\"limit_mon\":{\"p\":\"number\""));
     CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/limit_mon/set\",\"ret\":true,\"opt\":true"));
@@ -695,6 +714,32 @@ static void test_discovery(void)
     save("discovery.json", buf);
     printf("discovery: %zu bytes, %zu components\n", n, total);
 
+    // What is not published: its entities removed (their platform alone).
+    const struct {
+        bool       *flag;
+        const char *gone, *kept;
+    } cats[] = {
+        { &c.publish_activity, "\"used_screen_time_log\":{\"p\":\"sensor\"}", "\"used_screen_time\":{\"p\":\"sensor\"," },
+        { &c.publish_games, "\"games_installed\":{\"p\":\"sensor\"}", "\"battery\":{\"p\":\"sensor\"," },
+        { &c.publish_console, "\"battery\":{\"p\":\"sensor\"}", "\"ip_address\":{\"p\":\"sensor\"," },
+        { &c.publish_network, "\"ip_address\":{\"p\":\"sensor\"}", "\"model\":{\"p\":\"sensor\"," },
+        { &c.publish_hardware, "\"firmware\":{\"p\":\"sensor\"}", "\"battery\":{\"p\":\"sensor\"," },
+        { &c.publish_serial, "\"serial\":{\"p\":\"sensor\"}", "\"model\":{\"p\":\"sensor\"," },
+    };
+    for (size_t i = 0; i < sizeof(cats) / sizeof(cats[0]); i++) {
+        *cats[i].flag = false;
+        CHECK(sync_discovery_build(&d, buf, sizeof(buf)) > 0);
+        CHECK(contains(buf, cats[i].gone) && contains(buf, cats[i].kept));
+        *cats[i].flag = true;
+    }
+    // Versions and hardware off: the serial number and the model go too.
+    c.publish_hardware = false;
+    CHECK(sync_discovery_build(&d, buf, sizeof(buf)) > 0);
+    CHECK(contains(buf, "\"serial\":{\"p\":\"sensor\"}") && contains(buf, "\"model\":{\"p\":\"sensor\"}"));
+    CHECK(contains(buf, "\"atmosphere\":{\"p\":\"sensor\"}") && contains(buf, "\"hekate\":{\"p\":\"sensor\"}"));
+    c.publish_hardware = true;
+    CHECK(sync_conf_publishes(&c, SyncPublish_Controls) && !strcmp(sync_publish_name(SyncPublish_Network), "network"));
+
     // The console as Nintendo names it, its system as the software.
     SysInfo si;
     memset(&si, 0, sizeof(si));
@@ -711,6 +756,11 @@ static void test_discovery(void)
     d.device = &dev;
     n = sync_discovery_build(&d, buf, sizeof(buf));
     CHECK(contains(buf, "\"mf\":\"Nintendo\",\"mdl\":\"Nintendo Switch Lite\",\"mdl_id\":\"HDH-001\",\"sw\":\"20.1.5\"}"));
+    // Versions and hardware not published: the console unknown.
+    c.publish_hardware = false;
+    n = sync_discovery_build(&d, buf, sizeof(buf));
+    CHECK(contains(buf, "\"mf\":\"Nintendo\",\"mdl\":\"Nintendo Switch\"},\"o\":"));
+    c.publish_hardware = true;
     si.ams_valid = true;
     si.ams_major = 1, si.ams_minor = 10, si.ams_micro = 1;
     static const struct {
@@ -863,6 +913,21 @@ static void test_state(void)
     CHECK(contains(buf, "\"link\":{\"policy\":\"ask\""));
     CHECK(contains(buf, "\"profiles\":[\"School week\",\"Vacances d'été\"]}"));
     CHECK(contains(buf, "\"console\":{\"id\":\"a1b2c3d4\",\"name\":\"Salon\""));
+    // What is published, and the profile in effect (none here).
+    CHECK(contains(buf, "\"publishes\":{\"activity\":true,\"games\":true,\"console\":true,\"network\":true,"
+                        "\"hardware\":true,\"serial\":false,\"report\":false}}"));
+    CHECK(contains(buf, "\"console_locked\":false,\"profile\":null}"));
+    s.profile_now = "School week";
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"profile\":\"School week\"}"));
+    s.profile_now = NULL;
+    // Play time and the versions not published: null.
+    c.publish_activity = c.publish_hardware = false;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"activity_today\":{\"used_min\":null,\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null}}"));
+    CHECK(contains(buf, "\"firmware\":null,\"atmosphere\":null,\"app_version\":\"1.1.0\""));
+    CHECK(contains(buf, "\"publishes\":{\"activity\":false,\"games\":true,\"console\":true,\"network\":true,\"hardware\":false,"));
+    c.publish_activity = c.publish_hardware = true;
     // On an emuMMC: this system's device, its own id and name.
     c.emummc = true;
     n = sync_state_build(&s, buf, sizeof(buf));
@@ -976,7 +1041,7 @@ static void test_system_document(void)
     snprintf(l.ssid, sizeof(l.ssid), "Maison");
     l.uptime_s = 5 * 3600 + 17;
     const ConsoleSpace sd = { 21344, 59640 }, nand = { 18470, 26592 };
-    SyncSystem s = { 1790990000, &sys, &l, &sd, &nand, "6.5.4", "1.2.0", "1.2.0", NULL };
+    SyncSystem s = { 1790990000, &sys, &l, &sd, &nand, "6.5.4", "1.2.0", "1.2.0", NULL, NULL };
     static char buf[4096];
     size_t n = sync_system_build(&s, buf, sizeof(buf));
     CHECK(n > 0);
@@ -1000,6 +1065,28 @@ static void test_system_document(void)
     n = sync_system_build(&s, buf, sizeof(buf));
     CHECK(contains(buf, "\"charging\":false,\"charger\":\"none\""));
     CHECK(!sync_system_build(&s, buf, 64));   // too small: nothing
+
+    // What is not published reads as unknown; PlayGuard's versions stay.
+    SyncConf c;
+    sync_conf_defaults(&c);
+    s.conf = &c;
+    c.publish_console = false;
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"battery_pct\":null,\"charging\":null,\"charger\":null,\"docked\":null,\"temperature_c\":null"));
+    CHECK(contains(buf, "\"sd\":{\"free_mb\":null,\"total_mb\":null}") && contains(buf, "\"boot_ts\":null"));
+    CHECK(contains(buf, "\"ip\":\"192.168.1.20\"") && contains(buf, "\"model\":\"oled\""));
+    c.publish_console = true;
+    c.publish_network = false;
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"network\":{\"type\":null,\"ip\":null,\"wifi_bars\":null,\"ssid\":null}"));
+    CHECK(contains(buf, "\"battery_pct\":87"));
+    c.publish_network = true;
+    c.publish_hardware = false;
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"versions\":{\"firmware\":null,\"atmosphere\":null,\"hekate\":null,\"app\":\"1.2.0\",\"agent\":\"1.2.0\"}"));
+    CHECK(contains(buf, "\"hardware\":{\"model\":null,\"nickname\":null,\"region\":null,\"system\":null,"
+                        "\"prodinfo_blanked\":null,\"serial\":null}"));
+    s.conf = NULL;
 
     SyncSystem empty;
     memset(&empty, 0, sizeof(empty));

@@ -94,7 +94,7 @@ for 22 s, and connects again at once after a sleep longer than 45 s.
     "spent_raw_min": 76,
     "alarm_on": true,
     "bedtime": { "enabled": true, "start": "21:30:00", "end": "06:00:00" },
-    "extended_today_min": 30, "console_locked": false
+    "extended_today_min": 30, "console_locked": false, "profile": null
   },
   "activity_today": {
     "used_min": 74,
@@ -102,7 +102,9 @@ for 22 s, and connects again at once after a sleep longer than 45 s.
   },
   "link": {
     "policy": "ask", "remote_timer_writes": false, "ha_discovery": true,
-    "agent": false, "last_result": "limit_mon: applied"
+    "agent": false, "last_result": "limit_mon: applied",
+    "publishes": { "activity": true, "games": true, "console": true, "network": true,
+                   "hardware": true, "serial": false, "report": false }
   },
   "profiles": ["School week", "Holidays"]
 }
@@ -139,6 +141,11 @@ Every object is always there; a value the console could not read is `null`
   front, so no game is being played); filled by the agent.
 - `console.read_only`: PlayGuard's runtime read-only mode (an untested
   firmware); every order is then refused.
+- `link.publishes`: what is published (`activity`, `games`, `console`,
+  `network`, `hardware`, `serial`, `report`: true or false; *What is
+  published* below).
+- `timer.profile`: the profile in effect, the saved profile whose seven
+  limits are the timer's; `null` when none is.
 - `link.last_result`: the last order handled, `<entity>: applied` or
   `<entity>: <reason>`.
 - `profiles`: the saved profiles' names, the choices of the `profile` order
@@ -169,7 +176,8 @@ with the state. Every unknown value is `null`.
   Settings' console nickname. `region`: `jpn`, `usa`, `eur`, `aus`, `htk`
   (Hong Kong, Taiwan, Korea), `chn`. `system`: `sysmmc` or `emummc`.
 - `hardware.serial`: only when `sync.conf`'s `publish_serial` is on
-  (*Remote access › Publish the serial number*, off by default); `null`
+  (*Remote access › What is published › Publish the serial number*, off by
+  default; with `publish_hardware`); `null`
   otherwise. It is the console's own one, the number *Console › Serial
   number* shows: the system's when PRODINFO is not blanked, else the one in
   Atmosphère's backup of this console's PRODINFO
@@ -415,12 +423,37 @@ password.
 `3.1.1`), `username`, `password`,
 `allow_anonymous`, `console_id`, `console_name`, `policy` (`ask` / `auto` /
 `off`; the agent alone only applies `auto`), `remote_timer_writes`,
-`publish_report`, `publish_activity`, `publish_serial` (0: the serial number
-stays off the broker), `ha_discovery`, `poll_s` (30, 10–300),
+`publish_report`, `publish_activity`, `publish_games`, `publish_console`,
+`publish_network`, `publish_hardware`, `publish_serial` (0: the serial number
+stays off the broker; it needs `publish_hardware` too) (see *What is
+published* below), `ha_discovery`, `poll_s` (30, 10–300),
 `topic_prefix` (`playguard`), `discovery_prefix` (`homeassistant`),
 `log_level`. A value out of range keeps its default; unknown keys are kept
 when PlayGuard writes the file again. Anonymous brokers need
 `allow_anonymous=1`; without a user name the link otherwise stays off.
+
+### What is published
+
+The parental controls, the play timer and the link are always published.
+The rest is on by default, the serial number off, each with its key
+(*Remote access › What is published*, behind the PIN like every setting):
+
+| Key | What | Where |
+|---|---|---|
+| `publish_activity` | Play time | `activity`, `week`, `names`, `activity/<date>`, the state's `activity_today` |
+| `publish_games` | The games | `games` |
+| `publish_console` | The console's state | the system document's `power`, `storage`, `boot_ts` |
+| `publish_network` | The network | the system document's `network` |
+| `publish_hardware` | Versions and hardware | the system document's `versions` (but PlayGuard's and the agent's) and `hardware`, the state's `console.firmware` and `console.atmosphere`, the discovery device's model and system |
+| `publish_serial` | The serial number (with `publish_hardware`) | `hardware.serial` |
+| `publish_report` | Diagnostic reports | `report` |
+
+What is off reads `null` in the documents that stay (every key still
+there); a document of its own is cleared (an empty retained publish) when
+it is turned off and at each connection, the finished days by PlayGuard;
+its entities are sent as their platform alone in the discovery, which
+removes them from Home Assistant. The state's `link.publishes` says what is
+published, for the integration to follow.
 
 ## IPC service `pg:agent` (PlayGuard ↔ agent)
 

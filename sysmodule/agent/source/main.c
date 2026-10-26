@@ -459,6 +459,7 @@ static void name_of(u64 app_id, char *out, size_t cap)
 }
 
 static size_t host_profiles(void *ctx, char (*names)[SYNC_PROFILE_MAX], size_t max);
+static bool profile_days(void *ctx, const char *name, uint16_t days[7]);
 
 static size_t own_state(char *out, size_t cap)
 {
@@ -514,6 +515,11 @@ static size_t own_state(char *out, size_t cap)
     static char profiles[16][SYNC_PROFILE_MAX];
     s.n_profiles = host_profiles(NULL, profiles, 16);
     s.profiles = profiles;
+    // The profile in effect: the saved one whose seven limits are the timer's.
+    for (size_t i = 0; i < s.n_profiles && pt.fw_supported && pt.valid && !s.profile_now; i++) {
+        uint16_t days[7];
+        if (profile_days(NULL, profiles[i], days) && !memcmp(days, pt.day_min, sizeof(days))) s.profile_now = profiles[i];
+    }
     return sync_state_build(&s, out, cap);
 }
 
@@ -781,7 +787,7 @@ static size_t host_system(void *ctx, char *out, size_t cap)
     u64 now = 0;
     time_local_now(&now, NULL);
     SyncSystem s = { now, &si, &live, &sd, &nand, hekate, g_app_version[0] ? g_app_version : NULL, AGENT_VERSION,
-                     g_conf.publish_serial && g_nro.serial[0] ? g_nro.serial : NULL };
+                     g_conf.publish_serial && g_nro.serial[0] ? g_nro.serial : NULL, &g_conf };
     return sync_system_build(&s, out, cap);
 }
 
@@ -1067,15 +1073,15 @@ static void hand_over(void)
     mutexLock(&g_lock);
     n = agent_take_doc(g_shared.names, &g_shared.names_info, g_doc, sizeof(g_doc));
     mutexUnlock(&g_lock);
-    if (n) sync_engine_publish(&g_engine, "names", g_doc, n, true);
+    if (n && g_conf.publish_activity) sync_engine_publish(&g_engine, "names", g_doc, n, true);
     mutexLock(&g_lock);
     n = agent_take_doc(g_shared.week, &g_shared.week_info, g_doc, sizeof(g_doc));
     mutexUnlock(&g_lock);
-    if (n) sync_engine_publish(&g_engine, "week", g_doc, n, true);
+    if (n && g_conf.publish_activity) sync_engine_publish(&g_engine, "week", g_doc, n, true);
     mutexLock(&g_lock);
     n = agent_take_doc(g_shared.games, &g_shared.games_info, g_doc, sizeof(g_doc));
     mutexUnlock(&g_lock);
-    if (n) sync_engine_publish(&g_engine, "games", g_doc, n, true);
+    if (n && g_conf.publish_games) sync_engine_publish(&g_engine, "games", g_doc, n, true);
     for (int i = 0; i < AGENT_FINALS; i++) {
         char sub[32] = "";
         n = 0;
@@ -1088,8 +1094,9 @@ static void hand_over(void)
             f->fresh = false;
         }
         mutexUnlock(&g_lock);
-        // An empty document clears the day (PlayGuard drops the old ones).
-        if (sub[0]) sync_engine_publish(&g_engine, sub, g_doc, n, true);
+        // An empty document clears the day (PlayGuard drops the old ones, and
+        // every one when play time is no longer published).
+        if (sub[0] && (g_conf.publish_activity || !n)) sync_engine_publish(&g_engine, sub, g_doc, n, true);
     }
 }
 

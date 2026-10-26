@@ -50,6 +50,7 @@ typedef struct {
 
     const char       (*profiles)[SYNC_PROFILE_MAX];   // the saved profiles' names (the profile order's choices)
     size_t             n_profiles;
+    const char        *profile_now;     // the saved profile whose seven limits are the timer's; NULL none
 } SyncSnapshot;
 
 size_t sync_state_build(const SyncSnapshot *s, char *out, size_t cap);

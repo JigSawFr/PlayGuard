@@ -62,6 +62,7 @@ static void system_of(const SyncDevice *dev, char *out, size_t cap)
 
 static bool announced(const SyncEntity *e, const SyncDiscovery *d)
 {
+    if (!sync_conf_publishes(d->conf, e->publish)) return false;   // what it shows is not published
     if (e->write == SyncWrite_None) return true;
     if (d->read_only) return false;
     if (e->write == SyncWrite_Timer && !d->conf->remote_timer_writes) return false;
@@ -90,12 +91,14 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     sync_json_str(&j, uid);
     sync_json_arr_end(&j);
     sync_json_kstr(&j, "name", name);
+    // The model and the system are versions and hardware: unknown while not published.
+    const SyncDevice *dev = c->publish_hardware ? d->device : NULL;
     const char *model, *number;
-    model_of(d->device ? d->device->model : ConsoleModel_Unknown, &model, &number);
+    model_of(dev ? dev->model : ConsoleModel_Unknown, &model, &number);
     sync_json_kstr(&j, "mf", "Nintendo");
     sync_json_kstr(&j, "mdl", model);
     if (number) sync_json_kstr(&j, "mdl_id", number);
-    system_of(d->device, system, sizeof(system));
+    system_of(dev, system, sizeof(system));
     if (system[0]) sync_json_kstr(&j, "sw", system);
     sync_json_obj_end(&j);
 
