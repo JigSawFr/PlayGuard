@@ -396,12 +396,30 @@ function setLive(name, value) {
 
 let syncing = false;
 let forgetting = false;
-// The data folder to IndexedDB, at most one write at a time.
+let waiting = [];   // what waits for the next write, the one in flight being older
+// The data folder to IndexedDB (every 3 s, and when the page goes).
 function saveData() {
+  if (!forgetting) writeData(null);
+}
+
+// The data folder to IndexedDB, one write at a time: two at once would each
+// write the whole folder, and on a slow machine take seconds more. `done`
+// comes once what the folder holds now is kept: after the write in flight,
+// if any, one more of its own.
+function writeData(done) {
   const FS = window.Module?.FS;
-  if (!FS || syncing || forgetting) return;
+  if (!FS) { done?.(); return; }
+  if (syncing) { if (done) waiting.push(done); return; }
   syncing = true;
-  FS.syncfs(false, (e) => { syncing = false; if (e) log(`keep: ${e}`, true); });
+  FS.syncfs(false, (e) => {
+    syncing = false;
+    if (e) log(`keep: ${e}`, true);
+    done?.();
+    if (waiting.length) {
+      const next = waiting.splice(0);
+      writeData(() => next.forEach((f) => f()));
+    }
+  });
 }
 
 // Before PlayGuard starts: the data folder from IndexedDB, then config.json
@@ -751,10 +769,7 @@ function restartConsole() {
   log('console: restarted');
   running = false;
   forgetting = true;   // no other write of the folder meanwhile
-  FS.syncfs(false, (e) => {
-    if (e) log(`keep: ${e}`, true);
-    location.reload();
-  });
+  writeData(() => location.reload());
 }
 
 function setUpConsole() {
