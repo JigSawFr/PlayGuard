@@ -10,6 +10,23 @@
 
 #include "gate.h"
 
+// Two rule sets alike, field by field: GateHours has a padding byte after
+// `days`, which memcmp would compare too (whatever the compiler left there).
+static bool same_spans(const GateHours *a, const GateHours *b, unsigned n)
+{
+    for (unsigned i = 0; i < n; i++)
+        if (a[i].days != b[i].days || a[i].from != b[i].from || a[i].to != b[i].to) return false;
+    return true;
+}
+
+static bool same_rules(const GateRules *a, const GateRules *b)
+{
+    return a->carried == b->carried && a->free_n == b->free_n && a->closed_n == b->closed_n &&
+           same_spans(a->free, b->free, a->free_n) && same_spans(a->closed, b->closed, a->closed_n) &&
+           a->has_pause == b->has_pause && a->pause_tries == b->pause_tries && a->pause_minutes == b->pause_minutes &&
+           a->limit == b->limit;
+}
+
 static void test_argv(void)
 {
     char nro[64];
@@ -241,7 +258,7 @@ static void test_carried(void)
     char again[320];
     snprintf(again, sizeof(again), "sdmc:/g.nro --pin-gate%s sdmc:/x.nro", tokens);
     GateRules back;
-    CHECK(gate_argv_rules(again, nro, sizeof(nro), &argv, &back) && memcmp(&back, &r, sizeof(r)) == 0);
+    CHECK(gate_argv_rules(again, nro, sizeof(nro), &argv, &back) && same_rules(&back, &r));
     // A forwarder made before: none carried; nothing after the rules: not a gate's.
     CHECK(gate_argv_rules("sdmc:/g.nro --pin-gate sdmc:/x.nro", nro, sizeof(nro), &argv, &r) && !r.carried && !r.free_n);
     CHECK(!gate_argv_rules("sdmc:/g.nro --pin-gate --gate-rules", nro, sizeof(nro), &argv, &r));
