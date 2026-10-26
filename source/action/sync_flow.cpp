@@ -88,6 +88,7 @@ struct Shared
     SyncConf conf{};
     bool sync_now = false, state_changed = false, activity_changed = false, discovery_changed = false;
     std::string state, activity, system;    // the documents the engine publishes
+    SyncDevice device{};                    // the console, for the discovery's device
     Clock::time_point state_at{};
     std::vector<std::string> profiles;
     std::map<std::string, std::pair<std::string, bool>> pubs;   // sub -> payload, retained (sent once online)
@@ -139,6 +140,13 @@ size_t host_system(void* ctx, char* out, size_t cap)
     auto* sh = (Shared*)ctx;
     std::lock_guard<std::mutex> lk(sh->m);
     return copy_out(sh->system, out, cap);
+}
+
+void host_device(void* ctx, SyncDevice* out)
+{
+    auto* sh = (Shared*)ctx;
+    std::lock_guard<std::mutex> lk(sh->m);
+    *out = sh->device;
 }
 
 void pump();
@@ -249,6 +257,7 @@ void worker(std::shared_ptr<Shared> sh, SyncConf conf, std::string version)
     host.log = host_log;
     host.integration = host_integration;
     host.system = host_system;
+    host.device = host_device;
 
     // About 40 KiB: on the heap, not on this thread's stack.
     std::unique_ptr<Link> link(new Link());
@@ -590,8 +599,9 @@ std::string games_doc(const PlayStats& stats, uint64_t ts)
 // minutes (hekate as PlayGuard read it this run), the serial number only
 // with publish_serial: the one Console › Serial number shows (ui::real_serial,
 // Atmosphère's PRODINFO backup of this console when blanked), which the
-// agent publishes too (sync_files::set_serial, nro_state.txt).
-std::string system_doc(const SysInfo& si, uint64_t ts)
+// agent publishes too (sync_files::set_serial, nro_state.txt). `device`: the
+// console as it read it, for the discovery.
+std::string system_doc(const SysInfo& si, uint64_t ts, SyncDevice* device)
 {
     static ConsoleSpace sd{ -1, -1 }, nand{ -1, -1 };
     static std::string hekate;
@@ -611,6 +621,7 @@ std::string system_doc(const SysInfo& si, uint64_t ts)
     }
     ConsoleLive live;
     console_live_read(&live);
+    sync_device_of(&si, &live, device);
     const std::string version = app::version();
     SyncSystem s{ ts, &si, &live, &sd, &nand, hekate.c_str(), version.c_str(), nullptr,
                   serial.empty() ? nullptr : serial.c_str() };
@@ -762,10 +773,12 @@ void build_state()
         }
         return;
     }
-    const std::string system = system_doc(si, posix);
+    SyncDevice device;
+    const std::string system = system_doc(si, posix, &device);
     std::lock_guard<std::mutex> lk(s_shared->m);
     s_shared->state = doc;
     s_shared->system = system;
+    s_shared->device = device;
     s_shared->state_at = Clock::now();
     s_shared->read_only = app::read_only();
     if (s_read_only_sent != (app::read_only() ? 1 : 0)) {
@@ -995,6 +1008,11 @@ void launch()
     for (const auto& p : list) s_profiles_sent.push_back(p.name);
     sh->profiles = s_profiles_sent;
     sync_files::write_profiles(list);
+    SysInfo si;
+    sysinfo_get(&si);
+    ConsoleLive live;
+    console_live_read(&live);
+    sync_device_of(&si, &live, &sh->device);
     try {
         s_worker = std::thread(worker, sh, s_conf, app::version());
     } catch (const std::system_error& e) {

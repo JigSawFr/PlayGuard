@@ -25,6 +25,41 @@ size_t sync_discovery_topic(const SyncConf *conf, char *out, size_t cap)
     return n < 0 || (size_t)n >= cap ? 0 : (size_t)n;
 }
 
+void sync_device_of(const SysInfo *sys, const ConsoleLive *live, SyncDevice *out)
+{
+    memset(out, 0, sizeof(*out));
+    if (live) out->model = live->model;
+    if (!sys) return;
+    out->hos_version = sys->hos_version;
+    if (sys->ams_valid)
+        out->ams_version = ((uint32_t)sys->ams_major << 16) | ((uint32_t)sys->ams_minor << 8) | sys->ams_micro;
+}
+
+// Nintendo's name and model number (on the back of the console).
+static void model_of(ConsoleModel m, const char **name, const char **number)
+{
+    *number = NULL;
+    switch (m) {
+    case ConsoleModel_Erista: *name = "Nintendo Switch", *number = "HAC-001"; break;
+    case ConsoleModel_Mariko: *name = "Nintendo Switch", *number = "HAC-001(-01)"; break;
+    case ConsoleModel_Lite:   *name = "Nintendo Switch Lite", *number = "HDH-001"; break;
+    case ConsoleModel_Oled:   *name = "Nintendo Switch \xe2\x80\x93 OLED Model", *number = "HEG-001"; break;
+    default:                  *name = "Nintendo Switch"; break;
+    }
+}
+
+// "23.0.1 · Atmosphère 1.10.1"; "" unknown.
+static void system_of(const SyncDevice *dev, char *out, size_t cap)
+{
+    out[0] = '\0';
+    if (!dev || !dev->hos_version) return;
+    const uint32_t h = dev->hos_version, a = dev->ams_version;
+    int n = snprintf(out, cap, "%u.%u.%u", (h >> 16) & 0xFF, (h >> 8) & 0xFF, h & 0xFF);
+    if (a && n > 0 && (size_t)n < cap)
+        snprintf(out + n, cap - (size_t)n, " \xc2\xb7 Atmosph\xc3\xa8re %u.%u.%u", (a >> 16) & 0xFF, (a >> 8) & 0xFF,
+                 a & 0xFF);
+}
+
 static bool announced(const SyncEntity *e, const SyncDiscovery *d)
 {
     if (e->write == SyncWrite_None) return true;
@@ -37,7 +72,7 @@ static bool announced(const SyncEntity *e, const SyncDiscovery *d)
 size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
 {
     const SyncConf *c = d->conf;
-    char base[96], topic[160], uid[96], id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX];
+    char base[96], topic[160], uid[96], id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX], system[48];
     if (!sync_topic_base(c, base, sizeof(base))) return 0;
     sync_conf_device_id(c, id);
     sync_conf_device_name(c, name, sizeof(name));
@@ -55,9 +90,13 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     sync_json_str(&j, uid);
     sync_json_arr_end(&j);
     sync_json_kstr(&j, "name", name);
-    sync_json_kstr(&j, "mf", "PlayGuard");
-    sync_json_kstr(&j, "mdl", "Nintendo Switch");
-    sync_json_kstr(&j, "sw", version);
+    const char *model, *number;
+    model_of(d->device ? d->device->model : ConsoleModel_Unknown, &model, &number);
+    sync_json_kstr(&j, "mf", "Nintendo");
+    sync_json_kstr(&j, "mdl", model);
+    if (number) sync_json_kstr(&j, "mdl_id", number);
+    system_of(d->device, system, sizeof(system));
+    if (system[0]) sync_json_kstr(&j, "sw", system);
     sync_json_obj_end(&j);
 
     sync_json_key(&j, "o");

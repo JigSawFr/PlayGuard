@@ -6,7 +6,7 @@
 // Discovery abbreviations (HA): unit_of_meas, dev_cla, stat_cla, ent_cat,
 // pl_on / pl_off (binary_sensor, switch commands), stat_on / stat_off
 // (switch state), ops (select options), cmd_tpl (command template), en
-// (enabled by default), ic (icon).
+// (enabled by default), ic (icon), sug_dsp_prc (decimals shown).
 #define E_MINUTES "\"unit_of_meas\":\"min\",\"dev_cla\":\"duration\""
 #define E_MEASURE E_MINUTES ",\"stat_cla\":\"measurement\""
 // A daily total, back to 0 at midnight (HA's "total_increasing", like a daily meter).
@@ -29,7 +29,8 @@ static const SyncEntity ENTITIES[] = {
       "{{ value_json.controls.enabled }}", E_BINARY ",\"ic\":\"mdi:shield-account\"", NULL },
     { "temp_unlocked", "binary_sensor", SyncWrite_None, "Temporarily unlocked",
       "{{ value_json.controls.temp_unlocked }}", E_BINARY ",\"dev_cla\":\"lock\"", NULL },
-    { "pin_set", "binary_sensor", SyncWrite_None, "PIN set", "{{ value_json.controls.pin_set }}", E_BINARY "," E_DIAG, NULL },
+    { "pin_set", "binary_sensor", SyncWrite_None, "PIN set", "{{ value_json.controls.pin_set }}",
+      E_BINARY ",\"ic\":\"mdi:form-textbox-password\"," E_DIAG, NULL },
     { "companion_linked", "binary_sensor", SyncWrite_None, "Companion app linked",
       "{{ value_json.controls.companion_linked }}", E_BINARY ",\"ic\":\"mdi:cellphone-link\"", NULL },
     { "timer_enabled", "binary_sensor", SyncWrite_None, "Play timer", "{{ value_json.timer.enabled }}",
@@ -37,7 +38,7 @@ static const SyncEntity ENTITIES[] = {
     { "limit_reached", "binary_sensor", SyncWrite_None, "Time is up", "{{ value_json.timer.limit_reached }}",
       E_BINARY ",\"ic\":\"mdi:timer-alert-outline\"", NULL },
     { "clock_accurate", "binary_sensor", SyncWrite_None, "Network clock accurate",
-      "{{ value_json.clock_accurate }}", E_BINARY "," E_DIAG E_OFF, NULL },
+      "{{ value_json.clock_accurate }}", E_BINARY ",\"ic\":\"mdi:clock-check-outline\"," E_DIAG E_OFF, NULL },
 
     // sensors
     { "used_screen_time", "sensor", SyncWrite_None, "Used screen time", "{{ value_json.timer.used_min }}", E_TOTAL, NULL },
@@ -70,24 +71,27 @@ static const SyncEntity ENTITIES[] = {
       "{{ value_json.timer.limit_today_min }}", E_LIMIT, NULL },
 
     // bedtime
-    { "bedtime_alarm", "time", SyncWrite_Timer, "Bedtime alarm", "{{ value_json.timer.bedtime.start }}", E_CONFIG, NULL },
-    { "bedtime_end_time", "time", SyncWrite_Timer, "Bedtime end time", "{{ value_json.timer.bedtime.end }}", E_CONFIG, NULL },
-    { "bedtime_enabled", "switch", SyncWrite_Timer, "Bedtime alarm enabled",
-      "{{ value_json.timer.bedtime.enabled }}", E_SWITCH "," E_CONFIG, NULL },
+    { "bedtime_alarm", "time", SyncWrite_Timer, "Bedtime", "{{ value_json.timer.bedtime.start }}",
+      "\"ic\":\"mdi:weather-night\"," E_CONFIG, NULL },
+    { "bedtime_end_time", "time", SyncWrite_Timer, "Wake-up time", "{{ value_json.timer.bedtime.end }}",
+      "\"ic\":\"mdi:weather-sunset-up\"," E_CONFIG, NULL },
+    { "bedtime_enabled", "switch", SyncWrite_Timer, "Bedtime alarm", "{{ value_json.timer.bedtime.enabled }}",
+      E_SWITCH ",\"ic\":\"mdi:bed-clock\"," E_CONFIG, NULL },
 
     // switches
     { "console_lock", "switch", SyncWrite_Timer, "Block all games", "{{ value_json.timer.console_locked }}",
       E_SWITCH ",\"ic\":\"mdi:lock\"", NULL },
     { "play_timer_alarm", "switch", SyncWrite_Timer, "Time's up alarm", "{{ value_json.timer.alarm_on }}",
-      E_SWITCH "," E_CONFIG, NULL },
+      E_SWITCH ",\"ic\":\"mdi:alarm\"," E_CONFIG, NULL },
     { "unlocked", "switch", SyncWrite_Timer, "Unlocked", "{{ value_json.controls.temp_unlocked }}",
       E_SWITCH ",\"ic\":\"mdi:lock-open-variant\"", NULL },
     { "vr_restricted", "switch", SyncWrite_Free, "VR mode restricted", "{{ value_json.controls.vr_restricted }}",
-      E_SWITCH "," E_CONFIG, NULL },
+      E_SWITCH ",\"ic\":\"mdi:virtual-reality\"," E_CONFIG, NULL },
     { "sns_post_restricted", "switch", SyncWrite_Free, "Posting to social media restricted",
-      "{{ value_json.controls.sns_post_restricted }}", E_SWITCH "," E_CONFIG, NULL },
+      "{{ value_json.controls.sns_post_restricted }}", E_SWITCH ",\"ic\":\"mdi:share-off\"," E_CONFIG, NULL },
     { "free_communication_restricted", "switch", SyncWrite_Free, "Communication restricted",
-      "{{ value_json.controls.free_communication_restricted }}", E_SWITCH "," E_CONFIG, NULL },
+      "{{ value_json.controls.free_communication_restricted }}", E_SWITCH ",\"ic\":\"mdi:message-lock\"," E_CONFIG,
+      NULL },
 
     // selects (the profile's options are added when the discovery is built).
     // The level "none" is shown as "unrestricted": HA reads a select's "None"
@@ -95,13 +99,15 @@ static const SyncEntity ENTITIES[] = {
     { "restriction_level", "select", SyncWrite_Free, "Restriction level",
       "{{ 'unrestricted' if value_json.controls.level == 'none' else value_json.controls.level }}",
       "\"ops\":[\"unrestricted\",\"young_child\",\"child\",\"teen\",\"custom\"],"
-      "\"cmd_tpl\":\"{{ 'none' if value == 'unrestricted' else value }}\"," E_CONFIG, NULL },
-    { "profile", "select", SyncWrite_Timer, "Profile", "{{ None }}", E_CONFIG, NULL },
+      "\"cmd_tpl\":\"{{ 'none' if value == 'unrestricted' else value }}\",\"ic\":\"mdi:account-child-circle\","
+      E_CONFIG, NULL },
+    { "profile", "select", SyncWrite_Timer, "Profile", "{{ None }}", "\"ic\":\"mdi:account-switch\"," E_CONFIG, NULL },
 
     // buttons
     { "sync_now", "button", SyncWrite_Free, "Sync now", NULL, "\"ic\":\"mdi:sync\"," E_DIAG, NULL },
     { "lock_now", "button", SyncWrite_Free, "Turn parental controls back on", NULL, "\"ic\":\"mdi:lock\"", NULL },
-    { "export_report", "button", SyncWrite_Free, "Export a diagnostic report", NULL, E_DIAG E_OFF, NULL },
+    { "export_report", "button", SyncWrite_Free, "Export a diagnostic report", NULL,
+      "\"ic\":\"mdi:file-document-outline\"," E_DIAG E_OFF, NULL },
     { "add_bonus_time_15", "button", SyncWrite_Timer, "Extra time +15 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
     { "add_bonus_time_30", "button", SyncWrite_Timer, "Extra time +30 min", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
     { "add_bonus_time_60", "button", SyncWrite_Timer, "Extra time +1 h", NULL, "\"ic\":\"mdi:timer-plus-outline\"", NULL },
@@ -142,7 +148,8 @@ static const SyncEntity ENTITIES[] = {
     { "docked", "binary_sensor", SyncWrite_None, "Docked", "{{ value_json.power.docked }}",
       E_BINARY ",\"ic\":\"mdi:television\"", T_SYSTEM },
     { "temperature", "sensor", SyncWrite_None, "Temperature", "{{ value_json.power.temperature_c }}",
-      "\"unit_of_meas\":\"\xc2\xb0" "C\",\"dev_cla\":\"temperature\",\"stat_cla\":\"measurement\"," E_DIAG E_OFF, T_SYSTEM },
+      "\"unit_of_meas\":\"\xc2\xb0" "C\",\"dev_cla\":\"temperature\",\"stat_cla\":\"measurement\",\"sug_dsp_prc\":0,"
+      E_DIAG E_OFF, T_SYSTEM },
     { "network", "sensor", SyncWrite_None, "Connection", "{{ value_json.network.type }}",
       "\"dev_cla\":\"enum\",\"ops\":[\"none\",\"wifi\",\"ethernet\"]," E_DIAG E_OFF, T_SYSTEM },
     { "ip_address", "sensor", SyncWrite_None, "IP address", "{{ value_json.network.ip }}",
@@ -156,8 +163,7 @@ static const SyncEntity ENTITIES[] = {
       "{{ as_datetime(value_json.boot_ts) if value_json.boot_ts else None }}", "\"dev_cla\":\"timestamp\"," E_DIAG E_OFF,
       T_SYSTEM },
 
-    // The games (the games document, PlayGuard's): the per-game sensors are
-    // the integration's (one device payload could not hold dozens).
+    // The games (the games document, PlayGuard's).
     { "games_installed", "sensor", SyncWrite_None, "Games installed", "{{ value_json.installed }}",
       "\"stat_cla\":\"measurement\",\"ic\":\"mdi:gamepad-square\"", T_GAMES },
     { "play_time_total", "sensor", SyncWrite_None, "Play time (all time)", "{{ value_json.total_min }}",

@@ -18,6 +18,7 @@
 #include "mqtt_client.h"
 #include "sync_apply.h"
 #include "sync_conf.h"
+#include "sync_discovery.h"
 #include "sync_exec.h"
 
 #ifdef __cplusplus
@@ -84,6 +85,10 @@ typedef struct {
     // The system document (sync_system_build), published with the state.
     // 0: nothing now. May be NULL.
     size_t (*system)(void *ctx, char *out, size_t cap);
+    // What the console is (model, system), for the discovery's device; read
+    // again with each system document, the discovery following a change. May
+    // be NULL (unknown).
+    void (*device)(void *ctx, SyncDevice *out);
 } SyncHost;
 
 typedef struct {
@@ -111,6 +116,7 @@ typedef struct {
     bool        want_state, want_activity, want_discovery, want_names, want_online;
     uint64_t    next_state_ms, next_activity_ms;
     bool        discovery_published;
+    SyncDevice  device;          // as the last discovery said it
     uint64_t    seen_posix;      // the wall clock at the last call (0: not read yet)
 
     SyncQueued  queue[SYNC_QUEUE_MAX];

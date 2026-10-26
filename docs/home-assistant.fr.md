@@ -82,15 +82,18 @@ son heure, à la prochaine ouverture de PlayGuard.
 
 Paramètres › Appareils et services › MQTT : un appareil au nom de la console,
 créé par la découverte MQTT (désactivez *Créer l'appareil dans Home
-Assistant* pour gérer les topics vous-même).
+Assistant* pour gérer les topics vous-même). C'est la console telle que
+Nintendo la nomme, son modèle (*Nintendo Switch – OLED Model*, HEG-001) et son
+système comme firmware (*23.0.1 · Atmosphère 1.10.1*) ; PlayGuard en est
+l'origine.
 
 | Type | Entités |
 |---|---|
 | Capteurs | Temps d'écran utilisé (le décompte du minuteur), Temps d'écran utilisé (journal de jeu), Temps d'écran restant, Temps d'écran prolongé, En cours de jeu (inconnu tant que PlayGuard est ouvert : personne ne joue alors), Âge de classification, Firmware, Atmosphère, Dernier ordre |
 | Capteurs binaires | Contrôle parental, Déverrouillé temporairement, Code PIN défini, Appli mobile liée, Minuteur, Temps écoulé, Horloge réseau exacte |
 | Nombres | Limite dimanche … samedi, Limite tous les jours, Temps d'écran max aujourd'hui (0 à 1440 minutes ; 1440 = pas de limite) |
-| Heures | Alarme du coucher, Fin du coucher |
-| Interrupteurs | Bloquer tous les jeux, Alarme « temps écoulé », Déverrouillé, Alarme du coucher activée, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
+| Heures | Coucher, Lever |
+| Interrupteurs | Bloquer tous les jeux, Alarme « temps écoulé », Déverrouillé, Alarme du coucher, Mode VR restreint, Publication sur les réseaux sociaux restreinte, Communication restreinte |
 | Sélecteurs | Niveau de restriction (*unrestricted* : sans restriction, young child, child, teen, custom), Profil (vos profils enregistrés) |
 | Boutons | Synchroniser maintenant, Réactiver le contrôle parental, Temps en plus +15 / +30 min / +1 h, Fin du jeu pour aujourd'hui, Supprimer la limite, Exporter un rapport de diagnostic |
 | Événement | Événements : chaque ordre exécuté, refusé (avec la raison) ou mis en attente de la console |

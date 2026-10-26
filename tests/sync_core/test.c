@@ -613,7 +613,7 @@ static void test_discovery(void)
 
     static char buf[SYNC_SCRATCH_SIZE];
     const char profiles[2][SYNC_PROFILE_MAX] = { "School week", "Holidays" };
-    SyncDiscovery d = { &c, "1.1.0", false, profiles, 2 };
+    SyncDiscovery d = { &c, "1.1.0", false, profiles, 2, NULL };
 
     // remote_timer_writes off: no limit, bedtime, lock or extra time entity,
     // each sent as its platform alone, which removes it from Home Assistant.
@@ -621,6 +621,8 @@ static void test_discovery(void)
     CHECK(n > 0 && n < sizeof(buf));
     CHECK(contains(buf, "\"ids\":[\"playguard_a1b2c3d4\"]"));
     CHECK(contains(buf, "\"name\":\"Salon \\\"Léa\\\"\""));
+    // The console unknown: a Nintendo Switch, no model number nor system.
+    CHECK(contains(buf, "\"mf\":\"Nintendo\",\"mdl\":\"Nintendo Switch\"},\"o\":{\"name\":\"PlayGuard\",\"sw\":\"1.1.0\""));
     CHECK(contains(buf, "\"avty_t\":\"playguard/a1b2c3d4/availability\""));
     CHECK(contains(buf, "\"used_screen_time\":{\"p\":\"sensor\""));
     CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/vr_restricted/set\""));
@@ -668,6 +670,40 @@ static void test_discovery(void)
     (void)list;
     save("discovery.json", buf);
     printf("discovery: %zu bytes, %zu components\n", n, total);
+
+    // The console as Nintendo names it, its system as the software.
+    SysInfo si;
+    memset(&si, 0, sizeof(si));
+    ConsoleLive live;
+    console_live_init(&live);
+    SyncDevice dev;
+    sync_device_of(&si, &live, &dev);
+    CHECK(dev.model == ConsoleModel_Unknown && !dev.hos_version && !dev.ams_version);
+    sync_device_of(NULL, NULL, &dev);
+    CHECK(dev.model == ConsoleModel_Unknown && !dev.hos_version);
+    si.hos_version = (20u << 16) | (1u << 8) | 5u;
+    live.model = ConsoleModel_Lite;
+    sync_device_of(&si, &live, &dev);
+    d.device = &dev;
+    n = sync_discovery_build(&d, buf, sizeof(buf));
+    CHECK(contains(buf, "\"mf\":\"Nintendo\",\"mdl\":\"Nintendo Switch Lite\",\"mdl_id\":\"HDH-001\",\"sw\":\"20.1.5\"}"));
+    si.ams_valid = true;
+    si.ams_major = 1, si.ams_minor = 10, si.ams_micro = 1;
+    static const struct {
+        ConsoleModel m;
+        const char  *dev;
+    } models[] = {
+        { ConsoleModel_Erista, "\"mdl\":\"Nintendo Switch\",\"mdl_id\":\"HAC-001\",\"sw\":\"20.1.5 \xc2\xb7 Atmosph\xc3\xa8re 1.10.1\"}" },
+        { ConsoleModel_Mariko, "\"mdl\":\"Nintendo Switch\",\"mdl_id\":\"HAC-001(-01)\",\"sw\":" },
+        { ConsoleModel_Oled, "\"mdl\":\"Nintendo Switch \xe2\x80\x93 OLED Model\",\"mdl_id\":\"HEG-001\",\"sw\":" },
+        { ConsoleModel_Other, "\"mdl\":\"Nintendo Switch\",\"sw\":" },
+    };
+    for (size_t i = 0; i < sizeof(models) / sizeof(models[0]); i++) {
+        live.model = models[i].m;
+        sync_device_of(&si, &live, &dev);
+        CHECK(sync_discovery_build(&d, buf, sizeof(buf)) > 0 && contains(buf, models[i].dev));
+    }
+    d.device = NULL;
 
     // Without profiles, no profile select (nothing to choose from): removed.
     d.n_profiles = 0;

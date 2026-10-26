@@ -74,15 +74,17 @@ history, with its time, the next time PlayGuard opens.
 
 Settings › Devices & services › MQTT: a device with the console's name,
 created by MQTT discovery (turn *Create the device in Home Assistant* off to
-handle the topics yourself).
+handle the topics yourself). It is the console as Nintendo names it, its model
+(*Nintendo Switch – OLED Model*, HEG-001) and its system as its firmware
+(*23.0.1 · Atmosphère 1.10.1*); PlayGuard is where it comes from.
 
 | Kind | Entities |
 |---|---|
 | Sensors | Used screen time (the play timer's count), Used screen time (play log), Screen time remaining, Extended screen time, Now playing (unknown while PlayGuard is open: nobody plays then), Age rating, Firmware, Atmosphère, Last order |
 | Binary sensors | Parental controls, Temporarily unlocked, PIN set, Companion app linked, Play timer, Time is up, Network clock accurate |
 | Numbers | Limit Sunday … Saturday, Limit every day, Max screentime today (0 to 1440 minutes; 1440 means no limit) |
-| Time | Bedtime alarm, Bedtime end time |
-| Switches | Block all games, Time's up alarm, Unlocked, Bedtime alarm enabled, VR mode restricted, Posting to social media restricted, Communication restricted |
+| Time | Bedtime, Wake-up time |
+| Switches | Block all games, Time's up alarm, Unlocked, Bedtime alarm, VR mode restricted, Posting to social media restricted, Communication restricted |
 | Selects | Restriction level (*unrestricted*, young child, child, teen, custom), Profile (your saved profiles) |
 | Buttons | Sync now, Turn parental controls back on, Extra time +15 / +30 min / +1 h, No more play today, Remove the limit, Export a diagnostic report |
 | Event | Events: every order applied, refused (with the reason) or kept waiting for the console |

@@ -309,7 +309,11 @@ One retained, device-based payload on
 entity), which needs **Home Assistant 2026.5 or later** (the MQTT `time`
 platform; an older one refuses the whole payload): `dev` (identifiers
 `playguard_<id>`, the console's name or `Nintendo Switch`, manufacturer
-`PlayGuard`, model `Nintendo Switch`, `sw`), `o` (origin `PlayGuard`,
+`Nintendo`, the model as Nintendo names it (`Nintendo Switch`, `Nintendo
+Switch Lite`, `Nintendo Switch – OLED Model`) and `mdl_id` its model number
+(`HAC-001`, `HAC-001(-01)`, `HDH-001`, `HEG-001`), `sw` the system
+(`23.0.1 · Atmosphère 1.10.1`; read again with each system document, the
+discovery following a change)), `o` (origin `PlayGuard`,
 version, support URL), `avty_t`, and `cmps` keyed by object id. Every
 component but the buttons and the event reads the shared state
 (`stat_t` `playguard/<id>/state`) through a `val_tpl`; writable ones have

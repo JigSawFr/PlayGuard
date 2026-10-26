@@ -399,6 +399,8 @@ static struct {
     unsigned refused_logs;    // "the broker refused <base>/integration" lines
     unsigned systems;         // system() calls
     uint64_t posix;           // the wall clock (0: 1791000000)
+    SyncDevice device;        // what device() gives
+    unsigned devices;         // device() calls
 } host;
 
 static size_t h_state(void *ctx, char *out, size_t cap)
@@ -483,6 +485,13 @@ static size_t h_system(void *ctx, char *out, size_t cap)
     return (size_t)snprintf(out, cap, "{\"schema\":1,\"n\":%u}", host.systems);
 }
 
+static void h_device(void *ctx, SyncDevice *out)
+{
+    (void)ctx;
+    host.devices++;
+    *out = host.device;
+}
+
 static void h_integration(void *ctx, const char *doc, size_t len)
 {
     (void)ctx;
@@ -513,7 +522,8 @@ static void setup(bool timer_writes, SyncPolicy policy)
     conf.policy = policy;
     SyncIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
-                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system };
+                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
+                   h_device };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
 }
 
@@ -783,6 +793,33 @@ static void test_replay_in_flight(void)
     CHECK(sync_engine_pending(&engine) == 0 && !retained_order("console_lock"));
 }
 
+// The device is the console as Nintendo names it, its system as its software;
+// the discovery follows when the system changes (an update, then the agent
+// sees the new one).
+static void test_device(void)
+{
+    setup(false, SyncPolicy_Auto);
+    host.device.model = ConsoleModel_Oled;
+    host.device.hos_version = (23u << 16) | (0u << 8) | 1u;
+    host.device.ams_version = (1u << 16) | (10u << 8) | 1u;
+    turns(3);
+    const char *topic = "homeassistant/device/playguard_a1b2c3d4/config";
+    CHECK(count_on(topic) == 1 && host.devices >= 1);
+    const Message *disc = last_on(topic);
+    CHECK(strstr(disc->payload, "\"mf\":\"Nintendo\",\"mdl\":\"Nintendo Switch \xe2\x80\x93 OLED Model\","
+                                "\"mdl_id\":\"HEG-001\",\"sw\":\"23.0.1 \xc2\xb7 Atmosph\xc3\xa8re 1.10.1\"}"));
+    CHECK(strstr(disc->payload, "\"o\":{\"name\":\"PlayGuard\",\"sw\":\"1.1.0\""));
+    // The same console at the next state: no new discovery.
+    now += (uint64_t)conf.poll_s * 1000ULL;
+    turns(2);
+    CHECK(count_on(topic) == 1 && host.systems >= 2);
+    // Another system: published again.
+    host.device.hos_version = (24u << 16);
+    now += (uint64_t)conf.poll_s * 1000ULL;
+    turns(3);
+    CHECK(count_on(topic) == 2 && strstr(last_on(topic)->payload, "\"sw\":\"24.0.0 \xc2\xb7 Atmosph"));
+}
+
 static void test_home_assistant_restart_and_discovery_switch(void)
 {
     setup(false, SyncPolicy_Auto);
@@ -863,7 +900,8 @@ static void test_custom_discovery_prefix(void)
     strcpy(conf.discovery_prefix, "ha");
     SyncIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
-                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system };
+                   h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
+                   h_device };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
     turns(3);
     CHECK(sync_engine_online(&engine) && find_retained("ha/device/playguard_a1b2c3d4/config"));
@@ -1172,6 +1210,7 @@ int main(void)
     test_limits_merged();
     test_async_and_waiting();
     test_replay_in_flight();
+    test_device();
     test_home_assistant_restart_and_discovery_switch();
     test_custom_discovery_prefix();
     test_integration_version();

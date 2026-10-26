@@ -522,7 +522,9 @@ static void publish_discovery(SyncEngine *e)
     char topic[160];
     if (!sync_discovery_topic(&e->conf, topic, sizeof(topic))) return;
     const size_t n_profiles = e->host.profiles ? e->host.profiles(e->host.ctx, e->profiles, 16) : 0;
-    SyncDiscovery d = { &e->conf, e->sw_version, read_only(e), (const char(*)[SYNC_PROFILE_MAX])e->profiles, n_profiles };
+    if (e->host.device) e->host.device(e->host.ctx, &e->device);
+    SyncDiscovery d = { &e->conf, e->sw_version, read_only(e), (const char(*)[SYNC_PROFILE_MAX])e->profiles, n_profiles,
+                        &e->device };
     const size_t n = sync_discovery_build(&d, e->scratch, sizeof(e->scratch));
     if (!n) {
         logf_(e, "remote link: the discovery does not fit%s%s", NULL, NULL);
@@ -553,6 +555,13 @@ static void publish_due(SyncEngine *e)
             if (n) sync_engine_publish(e, "state", e->scratch, n, true);
             n = e->host.system && e->mqtt.connected ? e->host.system(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "system", e->scratch, n, true);
+            if (n && e->host.device && e->conf.ha_discovery) {
+                SyncDevice dev;
+                e->host.device(e->host.ctx, &dev);
+                if (dev.model != e->device.model || dev.hos_version != e->device.hos_version ||
+                    dev.ams_version != e->device.ams_version)
+                    e->want_discovery = true;
+            }
             e->want_state = false;
             e->next_state_ms = now + (uint64_t)e->conf.poll_s * 1000ULL;
         }

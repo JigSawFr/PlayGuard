@@ -749,6 +749,7 @@ static void host_log(void *ctx, const char *line)
 // number only when sync.conf's publish_serial asks for it.
 #define SPACE_EVERY_MS (5 * 60 * 1000ULL)
 static char g_app_version[AGENT_VERSION_MAX];
+static SyncDevice g_device;   // the console as the last system document read it
 
 static size_t host_system(void *ctx, char *out, size_t cap)
 {
@@ -769,6 +770,7 @@ static size_t host_system(void *ctx, char *out, size_t cap)
         if (!console_hekate("sdmc:/", hekate)) hekate[0] = '\0';
     }
     phase(was);
+    sync_device_of(&si, &live, &g_device);
     mutexLock(&g_lock);
     if (g_shared.app_session && g_shared.app_version[0])
         snprintf(g_app_version, sizeof(g_app_version), "%s", g_shared.app_version);
@@ -778,6 +780,23 @@ static size_t host_system(void *ctx, char *out, size_t cap)
     SyncSystem s = { now, &si, &live, &sd, &nand, hekate, g_app_version[0] ? g_app_version : NULL, AGENT_VERSION,
                      g_conf.publish_serial && g_nro.serial[0] ? g_nro.serial : NULL };
     return sync_system_build(&s, out, cap);
+}
+
+// The console for the discovery's device: as the last system document read
+// it, or read now when the discovery comes first (at the first connection).
+static void host_device(void *ctx, SyncDevice *out)
+{
+    (void)ctx;
+    if (!g_device.hos_version) {
+        SysInfo si;
+        ConsoleLive live;
+        sysinfo_get(&si);
+        const char *was = phase("the console's readings (psm, ts, apm, nifm)");
+        console_live_read(&live);
+        phase(was);
+        sync_device_of(&si, &live, &g_device);
+    }
+    *out = g_device;
 }
 
 // The Home Assistant integration's document, kept as it came for PlayGuard
@@ -798,7 +817,7 @@ static void host_integration(void *ctx, const char *doc, size_t len)
 
 static const SyncHost HOST = {
     NULL, host_state, host_activity, host_order, host_report, host_profiles, host_conf_changed,
-    host_read_only, host_now_posix, host_log, host_integration, host_system,
+    host_read_only, host_now_posix, host_log, host_integration, host_system, host_device,
 };
 
 // ---- the loop ----
