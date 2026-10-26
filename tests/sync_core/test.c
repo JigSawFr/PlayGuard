@@ -1153,6 +1153,7 @@ static void test_export_entities(void)
         sync_json_kstr(&j, "name", e[i].name);
         sync_json_kstr_or_null(&j, "value_template", e[i].value_template);
         sync_json_kstr(&j, "topic", e[i].topic ? e[i].topic : "state");
+        sync_json_kstr(&j, "publish", sync_publish_name(e[i].publish));
         sync_json_key(&j, "extra");
         sync_json_obj(&j);
         sync_json_members(&j, e[i].extra);
@@ -1176,6 +1177,8 @@ static void test_export_entities(void)
     const size_t n = sync_json_end(&j);
     CHECK(n > 0 && contains(buf, "\"id\":\"limit_mon\",\"platform\":\"number\",\"write\":\"timer\""));
     CHECK(contains(buf, "\"retired\":[{\"id\":\"temp_unlocked\",\"platform\":\"binary_sensor\"}"));
+    CHECK(contains(buf, "\"id\":\"ip_address\",\"platform\":\"sensor\",\"write\":\"none\",\"name\":\"IP address\","
+                        "\"value_template\":\"{{ value_json.network.ip }}\",\"topic\":\"system\",\"publish\":\"network\""));
     save("entities.json", buf);
 }
 

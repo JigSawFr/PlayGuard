@@ -27,6 +27,10 @@ def keys_of(doc, prefix=""):
     return out
 
 
+# What an entity shows (sync.conf's publish_* switches; "controls" always).
+PUBLISH = ("controls", "activity", "games", "console", "network", "hardware", "serial", "report")
+
+
 def main():
     folder = Path(sys.argv[1] if len(sys.argv) > 1 else "build/host-tests/sync")
     docs = {}
@@ -95,7 +99,7 @@ def main():
         fail("entities.json repeats an id")
     for e in table:
         if e["write"] not in ("none", "free", "timer") or not isinstance(e["extra"], dict) \
-                or e.get("topic") not in topic_keys:
+                or e.get("topic") not in topic_keys or e.get("publish") not in PUBLISH:
             fail(f"entities.json: {e['id']} is malformed")
         for p in re.findall(r"value_json\.([a-z0-9_.]+)", e["value_template"] or ""):
             if p not in topic_keys[e["topic"]]:
