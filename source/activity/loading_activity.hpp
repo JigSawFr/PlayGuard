@@ -9,6 +9,9 @@
 // a fraction of a second, too short to see this screen, so it stays at least
 // INTRO_US, its bar filling at a steady pace; Ⓐ or Ⓑ skip the rest. Nothing
 // else to press here.
+// It follows the theme as it changes: its inks, the theme's background
+// picture showing through it, the theme's picture for the wordmark (the
+// image slot playguard/loading/wordmark, ui/palette.hpp).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -28,6 +31,7 @@ class LoadingActivity : public brls::Activity
     };
 
     explicit LoadingActivity(Mode shown = Mode::Start) : mode(shown) {}
+    ~LoadingActivity() override;
 
     // The start-up steps, in order.
     enum class Step
@@ -53,6 +57,21 @@ class LoadingActivity : public brls::Activity
     BRLS_BIND(brls::Label, step_text, "loading_step");
     BRLS_BIND(brls::Rectangle, anchor, "loading_anchor");
     BRLS_BIND(brls::Image, wordmark, "loading_wordmark");
+    BRLS_BIND(brls::Box, root, "loading_root");
+
+    // The look of the theme in use: the background (none over a theme's
+    // picture), the wordmark, the bar's colours.
+    void takeTheme();
+    enum class Wordmark
+    {
+        Dark,    // wordmark.png, the XML's
+        Light,   // wordmark-light.png
+        Theme,   // the theme's picture of the slot
+    };
+    Wordmark   shownWordmark = Wordmark::Dark;
+    bool       transparent   = false;
+    bool       following     = false;
+    brls::Event<brls::ThemeVariant>::Subscription themeChanged;
 
     Mode       mode;
     brls::Time introStart = 0;   // 0: no intro

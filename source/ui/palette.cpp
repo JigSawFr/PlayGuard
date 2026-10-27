@@ -17,6 +17,7 @@ void install_palette()
         light.addColor(key.name, c(key.light));
     }
     for (const pal::Contrast& pair : pal::CONTRAST) brls::Theme::addContrastCheck(pair.ink, pair.surface, pair.minimum);
+    for (const pal::ImageSlot& slot : pal::IMAGE_SLOTS) brls::Theme::addImageSlot(slot.key, slot.fallback, slot.max_side);
 }
 
 }   // namespace ui

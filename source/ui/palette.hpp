@@ -4,7 +4,10 @@
 // variants before the theme file is read, so a theme file can restyle them
 // like any other key (docs/themes.md); a host suite checks the pairs below
 // in both variants (tests/contrast), Theme::checkContrast those of a theme
-// file. Everything else PlayGuard draws takes Cadran's keys.
+// file. Everything else PlayGuard draws takes Cadran's keys. None of these
+// keys is a surface (a card, a panel): a theme's surface_opacity has nothing
+// of PlayGuard's own to make translucent (Theme::addSurfaceKey), its cards
+// are Cadran's (cadran/surf, surf2).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -35,6 +38,27 @@ constexpr Key KEYS[] = {
     { "playguard/ring/tip", { 0xFF, 0xFF, 0xFF, 255 }, { 0xFF, 0xFF, 0xFF, 255 } },
     // The "!" on a cover's coral disc (a game that stays, view/cover_strip).
     { "playguard/badge/ink", cadran::palette::NAVY, { 0xFF, 0xFF, 0xFF, 255 } },
+};
+
+// PlayGuard's pictures a theme may replace (`image.<key> = file.png`,
+// Aurore's image slots, docs/themes.md): the key, PlayGuard's own picture
+// (a resource), the largest side it is made at. install_palette() declares
+// them before the theme file is read.
+struct ImageSlot
+{
+    const char* key;
+    const char* fallback;
+    int max_side;
+};
+
+constexpr ImageSlot IMAGE_SLOTS[] = {
+    // The loading screen's picture in the middle (view/loading_mark): the
+    // app's icon, drawn 168 units square.
+    { "playguard/loading/art", "@res/img/app_icon.jpg", 512 },
+    // The name under it (activity/loading_activity), 360 x 88 units: the
+    // wordmark, in light ink (wordmark-light.png, the light theme's, is
+    // PlayGuard's own choice when the theme gives none).
+    { "playguard/loading/wordmark", "@res/img/wordmark.png", 720 },
 };
 
 // The pairs PlayGuard's keys keep readable (an ink on what it is drawn on):
