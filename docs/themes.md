@@ -26,9 +26,17 @@ Back to the [README](../README.md).
 | *Ocean* | dark | Deep blue, a sky-blue accent |
 | *Amethyst* | light and dark | Violet |
 | *Sand* | light | Warm paper, a terracotta accent |
+| *Winter*, *Valentine's Day*, *Lunar New Year*, *Spring*, *Summer*, *Autumn*, *Halloween*, *Christmas*, *New Year's Eve* | light and dark | One for each season and feast: frost and silver, rose, red lacquer and gold, cherry blossoms, sea and sunset, maple, pumpkin on a violet night, fir and gold, midnight and champagne |
+| *Seasonal* | light and dark | The one of the day, by the calendar: Halloween from 17 October, Christmas in December, and so on |
 
 They come from Aurore, the library PlayGuard is built on, and their names are
 in every language of the console.
+
+*Seasonal* changes by itself: on the day a season or a feast begins, the
+screens take its palette at midnight, or as soon as the console wakes up. The
+seasons are the northern hemisphere's; Aurore's [theme
+guide](https://github.com/JigSawFr/Aurore/blob/main/docs/themes.md#the-seasons)
+has the exact days.
 
 ## Adding your own
 

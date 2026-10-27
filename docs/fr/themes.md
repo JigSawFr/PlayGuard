@@ -1,4 +1,4 @@
-<!-- translated from docs/themes.md, sha256 ecc7cac0cccf -->
+<!-- translated from docs/themes.md, sha256 6b5b00247c49 -->
 # Thèmes et palettes
 
 PlayGuard dessine chaque écran selon deux choix des *Préférences* :
@@ -28,9 +28,17 @@ Retour au [README](../../README.md).
 | *Océan* | sombre | Bleu profond, un accent bleu ciel |
 | *Améthyste* | clair et sombre | Violet |
 | *Sable* | clair | Papier chaud, un accent terre cuite |
+| *Hiver*, *Saint-Valentin*, *Nouvel An lunaire*, *Printemps*, *Été*, *Automne*, *Halloween*, *Noël*, *Nouvel An* | clair et sombre | Une par saison et par fête : givre et argent, rose, laque rouge et or, fleurs de cerisier, mer et coucher de soleil, érable, citrouille sur une nuit violette, sapin et or, minuit et champagne |
+| *Au fil des saisons* | clair et sombre | Celle du jour, selon le calendrier : Halloween à partir du 17 octobre, Noël en décembre, et ainsi de suite |
 
 Elles viennent d'Aurore, la bibliothèque sur laquelle PlayGuard est construit,
 et leurs noms existent dans toutes les langues de la console.
+
+*Au fil des saisons* change d'elle-même : le jour où commence une saison ou
+une fête, les écrans prennent sa palette à minuit, ou dès que la console sort
+de veille. Les saisons sont celles de l'hémisphère nord ; le
+[guide des thèmes d'Aurore](https://github.com/JigSawFr/Aurore/blob/main/docs/themes.md#the-seasons)
+(en anglais) donne les jours exacts.
 
 ## Ajouter les vôtres
 
