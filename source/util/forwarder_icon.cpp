@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cmath>
+#include <iterator>
 
 #include "util/nro.hpp"
 
@@ -244,8 +245,8 @@ std::vector<uint8_t> with_thumbnail(const std::vector<uint8_t>& jpeg, const std:
     out.push_back(0xE1);
     out.push_back((uint8_t)(len >> 8));
     out.push_back((uint8_t)len);
-    const char exif[6] = { 'E', 'x', 'i', 'f', 0, 0 };
-    out.insert(out.end(), exif, exif + 6);
+    const uint8_t exif[6] = { 'E', 'x', 'i', 'f', 0, 0 };
+    out.insert(out.end(), std::begin(exif), std::end(exif));
     out.insert(out.end(), t.begin(), t.end());
     out.insert(out.end(), jpeg.begin() + 2, jpeg.end());
     return out;

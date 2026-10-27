@@ -28,6 +28,7 @@
 #include "ui/app_hooks.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/paths.hpp"
 #include "util/sync_files.hpp"
 #include "view/title_state.hpp"
 
@@ -179,6 +180,8 @@ void install_screen_hooks()
     // The look's preferences live in config.json; the simulators' flags are
     // PLAYGUARD_SIM_* (core/sim_env.h).
     h.save_prefs = []() { return ui::save_config(); };
+    // Preferences › Palette lists the user's theme files there, after Aurore's presets.
+    h.themes_dir = []() { return paths::themes_dir(); };
     h.env_flag = [](const char* name) { return sim_env_flag((std::string("PLAYGUARD_SIM_") + name).c_str()); };
     ui::use_prefs(config::get().look);
 

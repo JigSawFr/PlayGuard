@@ -54,6 +54,8 @@ class CadranWeekView : public brls::Box
     // The bars on their way to their new heights (ui/motion), then the week.
     void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
               brls::FrameContext* ctx) override;
+    // The played parts' colours are mixed from the theme's: mixed again.
+    void onThemeChanged() override;
 
     static brls::View* create();
     // Whether `day` (0 = Sunday) comes after today in the week laid out from

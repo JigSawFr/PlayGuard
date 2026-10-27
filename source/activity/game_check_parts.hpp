@@ -73,7 +73,7 @@ class IssueCell : public brls::DetailCell
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->setTextColor(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : cadran::kit::color("cadran/text"));
+        this->title->setThemeColor("textColor", on ? "brls/list/listItem_value_color" : "cadran/text");
     }
 
   private:
@@ -98,7 +98,7 @@ class IssueTile : public GameTile
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->set_name_color(on ? brls::Application::getTheme()["brls/list/listItem_value_color"] : cadran::kit::color("cadran/text"));
+        this->set_name_color(on ? "brls/list/listItem_value_color" : "cadran/text");
     }
 
     u64 app_id = 0;

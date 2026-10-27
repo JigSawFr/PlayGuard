@@ -150,7 +150,8 @@ ClockTab::ClockTab()
         auto* state = new brls::Box(brls::Axis::ROW);
         state->setAlignItems(brls::AlignItems::CENTER);
         state->setMarginTop(4);
-        this->network_dot = new brls::Rectangle(brls::Application::getTheme()["cadran/teal_fill"]);
+        this->network_dot = new brls::Rectangle();
+        this->network_dot->setThemeColor("color", "cadran/teal_fill");
         this->network_dot->setWidth(9);
         this->network_dot->setHeight(9);
         this->network_dot->setCornerRadius(4.5f);
@@ -194,7 +195,7 @@ void ClockTab::refresh()
     ui::set_detail(autosync, ui::bool_text(R_SUCCEEDED(s.automatic_rc), s.automatic,
                                            "playguard/common/on"_i18n, "playguard/common/off"_i18n));
     this->autosync_off = R_SUCCEEDED(s.automatic_rc) && !s.automatic;
-    autosync->setDetailTextColor(this->autosync_off ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    autosync->detail->setThemeColor("textColor", this->autosync_off ? "cadran/amber" : "cadran/text2");
     ui::set_detail(zone, R_SUCCEEDED(s.location_rc) && s.location[0] ? std::string(s.location) : na);
 
     ui::set_detail(region, region_label(this->region_id));
@@ -242,7 +243,6 @@ void ClockTab::show_clocks(const std::string& user_text, const std::string& netw
 {
     namespace kit = cadran::kit;
     if (!this->user_time) return;
-    brls::Theme theme = brls::Application::getTheme();
     const auto user = split_time(user_text);
     const auto network = split_time(network_text);
     this->user_time->setText(user.second);
@@ -254,11 +254,11 @@ void ClockTab::show_clocks(const std::string& user_text, const std::string& netw
                         : bad  ? "playguard/cadran/clock/inaccurate"_i18n : "playguard/cadran/clock/accurate"_i18n;
     if (known && !network.first.empty() && network.first != user.first) state += " · " + kit::long_date(network.first);
     this->network_state->setText(state);
-    this->network_state->setTextColor(!known ? theme["cadran/text3"] : bad ? theme["cadran/amber"] : theme["cadran/teal"]);
-    this->network_dot->setColor(!known ? theme["cadran/text3"] : bad ? theme["cadran/amber_fill"] : theme["cadran/teal_fill"]);
-    this->network_time->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text"]);
-    this->network_card->setBackgroundColor(bad ? theme["cadran/amber_surf"] : theme["cadran/surf"]);
-    this->network_card->setBorderColor(bad ? theme["cadran/amber_line"] : theme["cadran/line"]);
+    this->network_state->setThemeColor("textColor", !known ? "cadran/text3" : bad ? "cadran/amber" : "cadran/teal");
+    this->network_dot->setThemeColor("color", !known ? "cadran/text3" : bad ? "cadran/amber_fill" : "cadran/teal_fill");
+    this->network_time->setThemeColor("textColor", bad ? "cadran/amber" : "cadran/text");
+    this->network_card->setThemeColor("backgroundColor", bad ? "cadran/amber_surf" : "cadran/surf");
+    this->network_card->setThemeColor("borderColor", bad ? "cadran/amber_line" : "cadran/line");
 }
 
 void ClockTab::choose_region()
@@ -370,7 +370,6 @@ size_t ClockTab::answered(const clock_flow::Measurement& m)
 void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::string& warn)
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     // Within a second: nothing to set (the servers answer to the second).
     const bool on_time = m.ok && m.offset_known && m.offset >= -1 && m.offset <= 1;
     const char* tone = !m.ok ? "cadran/amber" : on_time ? "cadran/teal" : m.offset_known ? "cadran/amber" : "cadran/text2";
@@ -413,7 +412,7 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
         }
         auto* table = new brls::Box(brls::Axis::COLUMN);
         table->setAlignItems(brls::AlignItems::STRETCH);
-        table->setBackgroundColor(theme["cadran/surf2"]);
+        table->setThemeColor("backgroundColor", "cadran/surf2");
         table->setCornerRadius(kit::RADIUS_ROW);
         table->setPadding(6, 20, 6, 20);
         if (name.empty()) table->setMarginTop(20);
@@ -425,7 +424,7 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
         if (!table->getChildren().empty()) {
             brls::View* above = table->getChildren().back();
             above->setLineBottom(1);
-            above->setLineColor(theme["cadran/line"]);
+            above->setThemeColor("lineColor", "cadran/line");
         }
         auto* line = new brls::Box(brls::Axis::ROW);
         line->setAlignItems(brls::AlignItems::CENTER);
@@ -484,8 +483,8 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     if (!notes.empty()) {
         auto* card = new brls::Box(brls::Axis::ROW);
         card->setAlignItems(brls::AlignItems::FLEX_START);
-        card->setBackgroundColor(theme["cadran/amber_surf"]);
-        card->setBorderColor(theme["cadran/amber_line"]);
+        card->setThemeColor("backgroundColor", "cadran/amber_surf");
+        card->setThemeColor("borderColor", "cadran/amber_line");
         card->setBorderThickness(1);
         card->setCornerRadius(kit::RADIUS_ROW);
         card->setPadding(12, 18, 12, 16);
@@ -534,7 +533,6 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
 
 void ClockTab::show_result(const std::string& text, bool no_answer)
 {
-    brls::Theme theme = brls::Application::getTheme();
     std::string title, body = text;
     if (no_answer) {
         // The report's last line ("No server answered…") is what matters.
@@ -545,9 +543,9 @@ void ClockTab::show_result(const std::string& text, bool no_answer)
     ui::set_text(result_title, title);
     ui::set_visible(result_title.getView(), !title.empty());
     ui::set_text(result, body);
-    result->setTextColor(theme[no_answer ? "cadran/text2" : "cadran/text"]);
-    result_card->setBackgroundColor(theme[no_answer ? "cadran/amber_surf" : "cadran/none"]);
-    result_card->setBorderColor(theme["cadran/amber_line"]);
+    result->setThemeColor("textColor", no_answer ? "cadran/text2" : "cadran/text");
+    result_card->setThemeColor("backgroundColor", no_answer ? "cadran/amber_surf" : "cadran/none");
+    result_card->setThemeColor("borderColor", "cadran/amber_line");
     result_card->setBorderThickness(no_answer ? 1 : 0);
     const float pad = no_answer ? 18 : 0;
     result_card->setPadding(pad - 4, pad, pad - 4, pad);

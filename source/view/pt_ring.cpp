@@ -21,15 +21,25 @@ float radius_of(float size) { return size / 2.0f - stroke_of(size) / 2.0f - 4.0f
 constexpr float FIGURE_SHARE = 0.70f;
 }   // namespace
 
-PtRing::PtRing()
+void PtRing::take_colours()
 {
-    // Looked up once (a theme change makes every view again, live_prefs; each
-    // lookup builds a key).
     brls::Theme theme = brls::Application::getTheme();
     this->track = theme["cadran/track"];
     this->teal  = theme["cadran/teal_fill"];
     this->amber = theme["cadran/amber_fill"];
     this->coral = theme["cadran/coral_fill"];
+    this->tip_light = theme["playguard/ring/tip"];
+}
+
+void PtRing::onThemeChanged()
+{
+    this->take_colours();
+    brls::Box::onThemeChanged();
+}
+
+PtRing::PtRing()
+{
+    this->take_colours();
 
     this->setAxis(brls::Axis::COLUMN);
     this->setJustifyContent(brls::JustifyContent::CENTER);
@@ -46,7 +56,7 @@ PtRing::PtRing()
 
     this->caption = new brls::Label();
     this->caption->setFontSize(17);
-    this->caption->setTextColor(theme["cadran/text2"]);
+    this->caption->setThemeColor("textColor", "cadran/text2");
     this->caption->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     this->caption->setMarginTop(2);
     this->addView(this->caption);
@@ -158,8 +168,8 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
         // around it (one gradient, a small square).
         if (this->tip) {
             const float tx = cx + r * std::cos(end), ty = cy + r * std::sin(end);
-            NVGcolor light = nvgRGBA(255, 255, 255, 0);
-            NVGcolor core  = nvgRGBA(255, 255, 255, (unsigned char)(color.a * 110.0f));
+            NVGcolor light = nvgTransRGBA(this->tip_light, 0);
+            NVGcolor core  = nvgTransRGBA(this->tip_light, (unsigned char)(color.a * 110.0f));
             nvgBeginPath(vg);
             nvgCircle(vg, tx, ty, stroke * 0.9f);
             nvgFillPaint(vg, nvgRadialGradient(vg, tx, ty, 0.0f, stroke * 0.9f, core, light));

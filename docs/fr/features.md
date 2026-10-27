@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 f6399849cfd1 -->
+<!-- translated from docs/features.md, sha256 aa9ec325191c -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -62,7 +62,7 @@ L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets
 
 Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le badge de la cloche indique *2* quand deux choses sont à faire).
 
-À gauche de la cloche, la langue (son code, *FR*, *EN*…) et le thème (un soleil pour clair, une lune pour sombre, un cercle à moitié plein quand il suit la console), puis la taille du texte (**AA**, son grand A en turquoise quand le texte est agrandi) : un appui ouvre la même liste que dans *Préférences*, et **−** les propose depuis n'importe quel onglet. Un nouveau thème ou une nouvelle langue prend effet tout de suite, chaque écran refait sur le même onglet avec la sélection sur la même ligne, chinois et sa police compris.
+À gauche de la cloche, la langue (son code, *FR*, *EN*…) et le thème (un soleil pour clair, une lune pour sombre, un cercle à moitié plein quand il suit la console), puis la taille du texte (**AA**, son grand A en turquoise quand le texte est agrandi) : un appui ouvre la même liste que dans *Préférences*, et **−** les propose depuis n'importe quel onglet. Un nouveau thème ou une nouvelle palette prend effet tout de suite sur chaque écran, sans rien refaire ; une nouvelle langue aussi, chaque écran refait sur le même onglet avec la sélection sur la même ligne, chinois et sa police compris. La liste des thèmes finit par la palette ([plus bas](#préférences)).
 
 ### À faire
 
@@ -482,6 +482,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 - Ce qui règle PlayGuard lui-même :
   - En tuiles d'abord : langue (toutes celles de la console, ou celle de la console), thème (sombre par défaut, clair, ou celui de la console), taille du texte (automatique / normale / plus grande) et l'onglet d'ouverture.
+  - **La palette** : les couleurs de PlayGuard (*Par défaut*), les palettes fournies avec lui (contraste élevé sombre et clair, Océan, Améthyste, Sable) ou un fichier de thème à vous copié dans `config/playguard/themes/` sur la carte SD, appliquée tout de suite. Comment en écrire un : [themes.md](themes.md).
   - **L'intro** au lancement : l'écran de chargement (son icône à l'anneau tournant, la barre, le cadran de Cadran à droite) pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).

@@ -22,8 +22,6 @@
 #include "util/paths.hpp"
 #include "view/game_cell.hpp"
 
-#include <yoga/Yoga.h>
-
 using namespace brls::literals;
 using forwarders_logic::Row;
 using forwarders_logic::State;
@@ -91,7 +89,7 @@ brls::Box* legend(const std::vector<std::string>& used)
         { "pause", "playguard/forwarders/detail_paused" },
     };
     auto* box = new brls::Box(brls::Axis::ROW);
-    YGNodeStyleSetFlexWrap(box->getYGNode(), YGWrapWrap);   // on two lines when the words are long
+    box->setWrap(brls::Wrap::WRAP);   // on two lines when the words are long
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setMargins(8, 8, 0, 10);
     for (const auto& [icon, key] : MARKS) {
@@ -308,7 +306,7 @@ void ForwardersActivity::show_lock()
     const hbmenu_lock::Summary s = hbmenu_lock::summary();
     const bool on = s.locked;
     lock_cell->setDetailText(on ? "playguard/hbmenu/state_locked"_i18n : "playguard/hbmenu/state_open"_i18n);
-    ui::show_writable(lock_cell, !app::read_only(), cadran::kit::color("cadran/text"), on ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
+    ui::show_writable(lock_cell, !app::read_only(), "cadran/text", on ? "cadran/teal" : "cadran/text2");
     const GatePauseRule rule = forwarder_flow::pause_rule();
     pause_cell->setDetailText(forwarder_flow::pause_label(rule.tries, rule.minutes));
     wait_cell->setDetailText(forwarder_flow::wait_label(forwarder_flow::launch_wait()));
@@ -383,8 +381,8 @@ void ForwardersActivity::show_self()
     const bool on = own && own->state != State::NotInstalled;
     self_cell->setDetailText(on ? state_text(*own) : "playguard/forwarders/add"_i18n);
     // Read-only: greyed when it would add it (its details stay a press away).
-    ui::show_writable(self_cell, on || !app::read_only(), cadran::kit::color("cadran/text"),
-                      on && own->state == State::Ready ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/text2"));
+    ui::show_writable(self_cell, on || !app::read_only(), "cadran/text",
+                      on && own->state == State::Ready ? "cadran/teal" : "cadran/text2");
 }
 
 std::function<void(bool)> ForwardersActivity::then_rebuild(uint64_t id)
@@ -464,10 +462,10 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 cell->setText(r.name);
                 cell->setDetailText(list_text(r));
                 cell->set_marks(list_marks(r));
-                cell->setDetailTextColor(r.paused_until || (r.pin && !r.carried) ? cadran::kit::color("cadran/amber")
-                                         : r.state == State::Ready     ? cadran::kit::color("cadran/teal")
-                                         : r.state == State::Elsewhere ? cadran::kit::color("cadran/text2")
-                                                                       : cadran::kit::color("cadran/amber"));
+                cell->detail->setThemeColor("textColor", r.paused_until || (r.pin && !r.carried) ? "cadran/amber"
+                                                         : r.state == State::Ready     ? "cadran/teal"
+                                                         : r.state == State::Elsewhere ? "cadran/text2"
+                                                                                       : "cadran/amber");
                 // On its icon: protected (a lock; a check for a menu seen
                 // working), or made here and starting without the PIN.
                 if (r.pin) cell->set_badge(r.verified && forwarders_logic::is_menu(r.nro) ? "check" : "lock");

@@ -25,7 +25,6 @@ namespace
 void stick_minutes(const std::string& header, uint16_t initial, std::function<void(uint16_t)> on_value)
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     auto minutes = std::make_shared<int>(std::min<int>(initial, 24 * 60));
     auto* body = new brls::Box(brls::Axis::COLUMN);
     body->setAlignItems(brls::AlignItems::CENTER);
@@ -39,7 +38,7 @@ void stick_minutes(const std::string& header, uint16_t initial, std::function<vo
     auto* value = new CadranDigits();
     value->setFontSize(56);
     value->setSmallUnits(true);
-    value->setTextColor(theme["cadran/text"]);
+    value->setThemeColor("textColor", "cadran/text");
     value->setText(ui::fmt_played((uint16_t)*minutes));
     body->addView(value);
     CadranIcon* down = kit::icon("caret-down", 30, "cadran/teal");

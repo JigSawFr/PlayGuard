@@ -91,7 +91,7 @@ PlayTimerTab::PlayTimerTab()
                        { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" }, { "pt_remove", "trash" } });
     // Removing the limit: last, apart, in coral (as Security's "Delete all").
     if (cadran::Card* danger = this->list.card_of("pt_remove"))
-        danger->setAccent(brls::Application::getTheme()["cadran/coral_line"]);
+        danger->setAccent("cadran/coral_line");
 
     // The week: edited here, saved together (+ or Save), as in the per-day editor.
     week_editor->set_can_edit([this]() {
@@ -266,7 +266,7 @@ void PlayTimerTab::refresh()
         ui::show_writable(c, writable);
     const bool locked = console_lock::active();
     ui::set_detail(console_lock_cell, locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
-    console_lock_cell->setDetailTextColor(locked ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    console_lock_cell->detail->setThemeColor("textColor", locked ? "cadran/amber" : "cadran/text2");
     ui::set_text(console_lock_note, locked ? "playguard/console_lock/note_on"_i18n : "playguard/console_lock/note_off"_i18n);
     for (brls::View* v : { (brls::View*)bedtime_header.getView(), (brls::View*)bedtime_reset.getView(),
                            (brls::View*)bedtime_note.getView() })
@@ -275,7 +275,7 @@ void PlayTimerTab::refresh()
                            (brls::View*)extra_auto.getView(), (brls::View*)advanced.getView(),
                            (brls::View*)remove_cell.getView() })
         ui::set_visible(v, fw_ok);
-    ui::show_writable(remove_cell, writable, cadran::kit::color("cadran/coral"), cadran::kit::color("cadran/text2"));
+    ui::show_writable(remove_cell, writable, "cadran/coral", "cadran/text2");
     const auto& cfg = config::get();
     ui::set_detail(extra_amounts, amounts_text(config::EXTRA_SETS[extra_set_index(cfg.extra_amounts)]));
     extra_auto->setOn(cfg.extra_auto_restore, false);
@@ -404,7 +404,6 @@ void PlayTimerTab::show_played_key(int day)
 
 void PlayTimerTab::rerender()
 {
-    brls::Theme theme = brls::Application::getTheme();
     const PtState& timer = this->pt;
     cadran::kit::set_kicker(kicker, "playguard/play_timer/week_title"_i18n);
     summary->setText(timer.valid ? summary_of(this->pending) : "cadran/common/unavailable"_i18n);
@@ -434,13 +433,13 @@ void PlayTimerTab::rerender()
                               brls::getStr("playguard/cadran/week/first_change",
                                            brls::getStr(fmt::format("playguard/days_short/{}", first)),
                                            limit_text(timer.day_min[first]), limit_text(this->pending[first])));
-        pending_text->setTextColor(theme["cadran/amber"]);
+        pending_text->setThemeColor("textColor", "cadran/amber");
     } else {
         // A bonus planned raises its day for now: said, so that day's bar is
         // understood. Nothing waiting and no bonus: no line.
         const std::string bonus = pt_flow::bonus_text();
         pending_text->setText(bonus);
-        pending_text->setTextColor(theme["cadran/text3"]);
+        pending_text->setThemeColor("textColor", "cadran/text3");
     }
     ui::set_visible(this->getView("pt_pending_row"), changed > 0 || !pt_flow::bonus_text().empty());
     this->show_played_key(this->week_editor->focused_day());   // a day over its limit may no longer be

@@ -32,7 +32,7 @@ brls::Box* new_slot()
     day->setMarginBottom(4);
     slot->addView(day);
     auto* cell = new brls::DetailCell();
-    cell->setDetailTextColor(cadran::kit::color("cadran/text2"));
+    cell->detail->setThemeColor("textColor", "cadran/text2");
     slot->addView(cell);
     // Each change a card of its own, under its day.
     cadran::List::section(day);
@@ -135,7 +135,7 @@ void HistoryActivity::rebuild()
             cell->setText(history_flow::title(e));
             cell->setDetailText(history_flow::time_of(e));
             // A change the console refused stands out.
-            cell->setDetailTextColor(e.result.empty() ? cadran::kit::color("cadran/text2") : cadran::kit::color("cadran/amber"));
+            cell->detail->setThemeColor("textColor", e.result.empty() ? "cadran/text2" : "cadran/amber");
             cell->registerClickAction([this, e](brls::View*) {
                 history_flow::open(e, [this]() { this->rebuild(); });
                 return true;

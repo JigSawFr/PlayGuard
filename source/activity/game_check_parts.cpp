@@ -161,10 +161,9 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     box->addView(head);
 
     // Each block on the second surface, its title a kicker.
-    brls::Theme theme = brls::Application::getTheme();
-    auto block = [box, &theme](const std::string& title, const std::string& text) {
+    auto block = [box](const std::string& title, const std::string& text) {
         auto* card = new brls::Box(brls::Axis::COLUMN);
-        card->setBackgroundColor(theme["cadran/surf2"]);
+        card->setThemeColor("backgroundColor", "cadran/surf2");
         card->setCornerRadius(14);
         card->setPadding(14, 18, 16, 18);
         card->setMarginTop(14);
@@ -204,10 +203,8 @@ void card_look(brls::Box* list, bool grid)
 {
     auto* card = dynamic_cast<cadran::Card*>(list);
     if (!card) return;
-    brls::Theme theme = brls::Application::getTheme();
-    const NVGcolor none = nvgRGBA(0, 0, 0, 0);
-    card->setFill(grid ? none : theme["cadran/surf"]);
-    card->setAccent(grid ? none : theme["cadran/line"]);
+    card->setFill(grid ? "cadran/none" : "cadran/surf");
+    card->setAccent(grid ? "cadran/none" : "cadran/line");
 }
 
 void round_button(brls::Button* button)

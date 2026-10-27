@@ -118,7 +118,7 @@ void GameCheckActivity::build_group(GameCategory category)
     group.box->addView(group.note);
     cadran::List::section(group.title);
     group.note->setFontSize(15.5f);
-    group.note->setTextColor(brls::Application::getTheme()["cadran/text3"]);
+    group.note->setThemeColor("textColor", "cadran/text3");
     group.note->setMarginLeft(8);
     // The games to install again: their list kept on the SD card, then
     // all of them removed at once (an installer counts them as installed
@@ -152,7 +152,7 @@ void GameCheckActivity::build_group(GameCategory category)
         actions->addView(group.send);
         group.remove_all = new brls::Button();
         group.remove_all->setGrow(1.0f);
-        group.remove_all->setTextColor(cadran::kit::color("cadran/coral"));
+        group.remove_all->setThemeColor("textColor", "cadran/coral");
         group.remove_all->registerClickAction([this, category](brls::View*) {
             this->remove_games(this->groups[category].games);
             return true;
@@ -362,10 +362,10 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
     });
 }
 
-void GameCheckActivity::status_text(const std::string& text, NVGcolor color)
+void GameCheckActivity::status_text(const std::string& text, const char* color)
 {
     status->setText(text);
-    status->setTextColor(color);
+    status->setThemeColor("textColor", color);
     ui::set_visible(status.getView(), !text.empty());
 }
 
@@ -440,7 +440,7 @@ void GameCheckActivity::checking_text(const std::string& text)
 
 void GameCheckActivity::status_text(const std::string& text)
 {
-    this->status_text(text, cadran::kit::color("cadran/text"));
+    this->status_text(text, "cadran/text");
 }
 
 void GameCheckActivity::show()
@@ -483,7 +483,7 @@ void GameCheckActivity::show()
         for (size_t i = 0; i < shown.size(); i++) {
             const Broken b = shown[i];
             const bool picked = this->selected.count(b.game.app_id) != 0;
-            const NVGcolor color = warn_only(b.issue) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/coral");
+            const char* color = warn_only(b.issue) ? "cadran/amber" : "cadran/coral";
             group.games.push_back(b.game);
             brls::View* view;
             if (this->grid) {
@@ -510,7 +510,7 @@ void GameCheckActivity::show()
                 cell->setText(line_names[b.game.app_id]);
                 cell->set_selected(picked);
                 cell->setDetailText(short_text(b.game, b.issue));
-                cell->setDetailTextColor(color);
+                cell->detail->setThemeColor("textColor", color);
                 view = cell;
             }
             view->registerClickAction([this, b, hos](brls::View*) {
@@ -546,7 +546,7 @@ void GameCheckActivity::show()
     // Above the sections once a game is picked (Ⓨ, in the footer on each
     // game): how many, A for what to do with them.
     this->selection->setText(this->selection_text());
-    this->selection->setTextColor(brls::Application::getTheme()["brls/list/listItem_value_color"]);
+    this->selection->title->setThemeColor("textColor", "brls/list/listItem_value_color");
     ui::set_visible(this->selection, !this->selected.empty());
 
     // The card while no game has a problem, a check under way included (its
@@ -590,7 +590,7 @@ void GameCheckActivity::show()
                                                    : "playguard/games/searching"_i18n;
         this->checking_text(text);
     } else if (R_FAILED(this->list_rc)) {
-        this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), cadran::kit::color("cadran/coral"));
+        this->status_text("playguard/games/err_list"_i18n + " — " + ui::rc_text(this->list_rc), "cadran/coral");
     } else {
         const std::string found = broken.empty() ? (count == 1 ? "playguard/games/none_one"_i18n
                                                                : brls::getStr("playguard/games/none", (int)count))
@@ -605,7 +605,7 @@ void GameCheckActivity::show()
             this->all_clear.text->setText(game_check_text::result_line(age, true, "", notes));
             this->status_text("");
         } else {
-            this->status_text(game_check_text::result_line(found, false, age, notes), cadran::kit::color("cadran/text3"));
+            this->status_text(game_check_text::result_line(found, false, age, notes), "cadran/text3");
         }
     }
     // What this screen is for, while there is no game above which it would

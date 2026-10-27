@@ -217,6 +217,7 @@ static void test_round_trip()
     c = config::Config{};
     c.look.language = "fr";
     c.look.theme = "light";
+    c.look.theme_file = "builtin:ocean";
     c.ntp_server = "fr.pool.ntp.org";
     c.custom_servers = { "time.example" };
     c.dev_mode = true;
@@ -234,7 +235,8 @@ static void test_round_trip()
     CHECK(paths::read_file(paths::config_file(), text) && text.find("\"schema\": 1") != std::string::npos);
     c = config::Config{};
     config::load();
-    CHECK(c.look.language == "fr" && c.look.theme == "light" && c.ntp_server == "fr.pool.ntp.org");
+    CHECK(c.look.language == "fr" && c.look.theme == "light" && c.look.theme_file == "builtin:ocean");
+    CHECK(c.ntp_server == "fr.pool.ntp.org");
     CHECK(c.custom_servers.size() == 1 && c.dev_mode && c.pt_log && c.relock_pending);
     CHECK(c.extra_weekday == 0 && c.extra_base == 120 && c.extra_value == 150 && c.extra_auto_restore);
     CHECK(!c.intro);

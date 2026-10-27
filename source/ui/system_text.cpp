@@ -34,21 +34,21 @@ std::string fw_text(const SysInfo& info)
     return fmt::format("{} · Atmosphère {}", fw, ams);
 }
 
-std::string compat_text(const SysInfo& info, NVGcolor* color)
+std::string compat_text(const SysInfo& info, const char** color)
 {
     const std::string tested = hos_text(PCTL_FW_TESTED_MAX);
     switch (sysinfo_compat(&info)) {
         case SysCompat_Ok:
-            if (color) *color = cadran::kit::color("cadran/teal");
+            if (color) *color = "cadran/teal";
             return "playguard/compat/ok"_i18n;
         case SysCompat_UntestedNewer:
-            if (color) *color = cadran::kit::color("cadran/amber");
+            if (color) *color = "cadran/amber";
             return brls::getStr("playguard/compat/untested", std::string(tested));
         case SysCompat_PlayTimerUnsupported:
-            if (color) *color = cadran::kit::color("cadran/amber");
+            if (color) *color = "cadran/amber";
             return "playguard/compat/too_old"_i18n;
         default:
-            if (color) *color = cadran::kit::color("cadran/coral");
+            if (color) *color = "cadran/coral";
             return "playguard/compat/not_ams"_i18n;
     }
 }
@@ -86,13 +86,13 @@ bool serial_warning(const SysInfo& info)
     return sysinfo_storage(&info) == SysStorage_EmuMMC && info.blank_valid && !info.blank;
 }
 
-std::string blank_text(const SysInfo& info, NVGcolor* color)
+std::string blank_text(const SysInfo& info, const char** color)
 {
     if (!info.blank_valid) {
-        if (color) *color = cadran::kit::color("cadran/text2");
+        if (color) *color = "cadran/text2";
         return "cadran/common/unavailable"_i18n;
     }
-    if (color) *color = info.blank ? cadran::kit::color("cadran/teal") : (serial_warning(info) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    if (color) *color = info.blank ? "cadran/teal" : (serial_warning(info) ? "cadran/amber" : "cadran/text2");
     if (!info.blank) return "cadran/common/no"_i18n;
     // With what the system sees instead.
     return info.serial_valid && info.serial[0] ? brls::getStr("playguard/tools/blank_yes", std::string(info.serial))
@@ -188,20 +188,20 @@ static std::string join_list(const std::vector<std::string>& items)
     return out;
 }
 
-std::string patches_text(const patches::Report& report, NVGcolor* color)
+std::string patches_text(const patches::Report& report, const char** color)
 {
     switch (patches::status(report)) {
         case patches::Status::SysPatch:
-            if (color) *color = cadran::kit::color("cadran/teal");
+            if (color) *color = "cadran/teal";
             return "playguard/tools/patches_syspatch"_i18n;
         case patches::Status::SysPatchIncomplete:
-            if (color) *color = cadran::kit::color("cadran/amber");
+            if (color) *color = "cadran/amber";
             return "playguard/tools/patches_incomplete"_i18n;
         case patches::Status::FilesOnly:
-            if (color) *color = cadran::kit::color("cadran/amber");
+            if (color) *color = "cadran/amber";
             return brls::getStr("playguard/tools/patches_files", join_list(report.files));
         default:
-            if (color) *color = cadran::kit::color("cadran/text2");
+            if (color) *color = "cadran/text2";
             return "playguard/tools/patches_none"_i18n;
     }
 }

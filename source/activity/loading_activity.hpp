@@ -16,8 +16,6 @@
 
 #include <borealis/cadran/view/loading_bar.hpp>
 
-#include "view/loading_dial.hpp"
-
 class LoadingActivity : public brls::Activity
 {
   public:
@@ -52,12 +50,9 @@ class LoadingActivity : public brls::Activity
 
   private:
     BRLS_BIND(LoadingBar, bar, "loading_bar");
-    BRLS_BIND(LoadingDial, dial, "loading_dial");
     BRLS_BIND(brls::Label, step_text, "loading_step");
     BRLS_BIND(brls::Rectangle, anchor, "loading_anchor");
-    BRLS_BIND(brls::Box, root, "loading_root");
     BRLS_BIND(brls::Image, wordmark, "loading_wordmark");
-    BRLS_BIND(brls::Label, tagline, "loading_tagline");
 
     Mode       mode;
     brls::Time introStart = 0;   // 0: no intro

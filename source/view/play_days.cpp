@@ -53,11 +53,11 @@ PlayDaysView::PlayDaysView()
         lane->setHeight(BAR_MAX);
         lane->setAlignItems(brls::AlignItems::CENTER);
         lane->setJustifyContent(brls::JustifyContent::FLEX_END);
-        c.bar = new brls::Rectangle(cadran::kit::color("cadran/text2"));
+        c.bar = new brls::Rectangle();
         c.bar->setWidth(BAR_WIDTH);
         c.bar->setHeight(BAR_MIN);
         c.bar->setCornerRadius(4);
-        c.limit = new brls::Rectangle(cadran::kit::color("cadran/text"));
+        c.limit = new brls::Rectangle();
         c.limit->setWidth(LANE_WIDTH);
         c.limit->setHeight(2);
         c.limit->setPositionType(brls::PositionType::ABSOLUTE);
@@ -70,7 +70,8 @@ PlayDaysView::PlayDaysView()
         c.day->setFontSize(LABEL_FONT);
         c.day->setHorizontalAlign(brls::HorizontalAlign::CENTER);
         c.day->setMarginTop(6);
-        c.mark = new brls::Rectangle(cadran::kit::color("cadran/text2"));
+        c.mark = new brls::Rectangle();
+        c.mark->setThemeColor("color", "cadran/text2");
         c.mark->setWidth(BAR_WIDTH);
         c.mark->setHeight(3);
         c.mark->setCornerRadius(1.5f);
@@ -86,7 +87,7 @@ PlayDaysView::PlayDaysView()
     this->legend = new brls::Label();
     this->legend->setFontSize(LEGEND_FONT);
     this->legend->setHorizontalAlign(brls::HorizontalAlign::CENTER);
-    this->legend->setTextColor(cadran::kit::color("cadran/text3"));
+    this->legend->setThemeColor("textColor", "cadran/text3");
     this->legend->setMarginTop(10);
     this->addView(this->legend);
 }
@@ -115,26 +116,27 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
         const bool has_limit = limits && limits[k] != PT_DAY_NOLIMIT;
         const bool over = has_limit && day_s[k] > (uint64_t)limits[k] * 60;
         c.bar->setHeight(bar_height(day_s[k], top));
-        // Played in the teal it is everywhere else (the week, Activity's cards).
-        NVGcolor colour = over ? cadran::kit::color("cadran/amber") : brls::Application::getTheme()["cadran/teal_fill"];
-        if (!day_s[k]) colour = nvgTransRGBA(colour, 40);   // nothing played: a faint stub
-        else if (!today && !over) colour = nvgTransRGBA(colour, 120);
-        c.bar->setColor(colour);
+        // Played in the teal it is everywhere else (the week, Activity's cards);
+        // nothing played: a faint stub. The faint ones through the view's
+        // alpha, so the colour stays the theme's key.
+        c.bar->setThemeColor("color", over ? "cadran/amber" : "cadran/teal_fill");
+        c.bar->setAlpha(!day_s[k] ? 40 / 255.0f : !today && !over ? 120 / 255.0f : 1.0f);
         c.limit->setVisibility(has_limit ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         if (has_limit) {
             // 0 min (no play) sits on the floor of the lane.
             const float h = limits[k] ? bar_height((uint64_t)limits[k] * 60, top) : 0.0f;
             c.limit->setPositionBottom(std::max(0.0f, h - 1.0f));
-            c.limit->setColor(over ? cadran::kit::color("cadran/amber") : nvgTransRGBA(cadran::kit::color("cadran/text"), 150));
+            c.limit->setThemeColor("color", over ? "cadran/amber" : "cadran/text");
+            c.limit->setAlpha(over ? 1.0f : 150 / 255.0f);
         }
         any_over = any_over || over;
         // Over the limit is marked by "!", not by the colour alone.
         const std::string played = day_s[k] ? ui::fmt_duration(day_s[k]) : "—";
         c.value->setText(over ? "! " + played : played);
-        c.value->setTextColor(over ? cadran::kit::color("cadran/amber") : today ? cadran::kit::color("cadran/text") : cadran::kit::color("cadran/text3"));
+        c.value->setThemeColor("textColor", over ? "cadran/amber" : today ? "cadran/text" : "cadran/text3");
         c.day->setText(brls::getStr(fmt::format("playguard/days_short/{}", (int)day_wday[k])));
-        c.day->setTextColor(today ? cadran::kit::color("cadran/text2") : cadran::kit::color("cadran/text3"));
-        c.mark->setColor(today ? cadran::kit::color("cadran/text2") : nvgTransRGBA(cadran::kit::color("cadran/text2"), 0));
+        c.day->setThemeColor("textColor", today ? "cadran/text2" : "cadran/text3");
+        c.mark->setAlpha(today ? 1.0f : 0.0f);
     }
 
     // The order differs from the play timer's week (Monday first): say so,

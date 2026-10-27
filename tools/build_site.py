@@ -84,7 +84,7 @@ OG_LOCALES = {"en-US": "en_US", "fr": "fr_FR", "fr-CA": "fr_CA", "de": "de_DE", 
 # The documentation, in the sidebar's order.
 DOCS = [("getting-started", "guide"), ("features", "guide"), ("install", "guide"), ("compatibility", "guide"),
         ("troubleshooting", "guide"),
-        ("companion-app", "reference"), ("config", "reference"), ("parental-controls", "reference")]
+        ("companion-app", "reference"), ("config", "reference"), ("themes", "reference"), ("parental-controls", "reference")]
 # The documentation's folder of a language (docs/<folder>/), when not its own code.
 DOC_FOLDERS = {"fr-CA": "fr"}
 # The pages' Content-Security-Policy (GitHub Pages sends no headers): only the

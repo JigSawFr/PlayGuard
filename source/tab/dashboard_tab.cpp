@@ -2,7 +2,6 @@
 #include "tab/dashboard_tab.hpp"
 
 #include <algorithm>
-#include <yoga/Yoga.h>
 
 #include <borealis/cadran/ui/cadran_frame.hpp>
 #include <borealis/cadran/ui/cadran_kit.hpp>
@@ -56,7 +55,7 @@ DashboardTab::DashboardTab()
     // changed outside PlayGuard.
     const auto& lines = column->getChildren();
     const int at = (int)(std::find(lines.begin(), lines.end(), this->getView("dash_top")) - lines.begin());
-    YGNodeStyleSetFlexWrap(pills->getYGNode(), YGWrapWrap);
+    pills->setWrap(brls::Wrap::WRAP);
     this->build_outside_card(column, at);
     this->build_steps_card(column, at);
 
@@ -92,7 +91,7 @@ DashboardTab::DashboardTab()
     });
     // Shown only while the alarm is off: A turns it back on (the dialog says why).
     ui::set_detail(alarm, "playguard/dashboard/alarm_off"_i18n);
-    alarm->setDetailTextColor(cadran::kit::color("cadran/amber"));
+    alarm->detail->setThemeColor("textColor", "cadran/amber");
     alarm->registerClickAction([this](brls::View*) {
         pt_flow::turn_alarm_on("overview", this->refresher());
         return true;
@@ -151,8 +150,8 @@ DashboardTab::DashboardTab()
     for (brls::Button* b : { stop.getView(), child.getView(), limit.getView(), profile.getView() }) kit::fit_button(b);
     for (brls::Box* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() })
         kit::fit_head(dynamic_cast<brls::Box*>(card->getChildren().front()));
-    YGNodeStyleSetGap(actions2->getYGNode(), YGGutterColumn, 12);
-    YGNodeStyleSetGap(actions2->getYGNode(), YGGutterRow, 10);
+    actions2->setColumnGap(12);
+    actions2->setRowGap(10);
     // Wrapped, the row's buttons are one line to borealis: ↓ would leave it
     // past the last button, on the line under. Between its lines, ↑ and ↓ go
     // to the nearest button of the next line.

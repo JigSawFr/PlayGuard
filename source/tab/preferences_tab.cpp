@@ -42,6 +42,12 @@ PreferencesTab::PreferencesTab()
         ui::pick_theme(this->refresher());
         return true;
     });
+    // The colours: PlayGuard's, Aurore's presets or the user's theme files
+    // (docs/themes.md), applied at once.
+    palette->registerClickAction([this](brls::View*) {
+        ui::pick_palette(this->refresher());
+        return true;
+    });
     text_size->registerClickAction([this](brls::View*) {
         ui::pick_text_size(this->refresher());
         return true;
@@ -131,7 +137,7 @@ PreferencesTab::PreferencesTab()
 
     this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
                        { "pf_start_tab", "home" } }, false);
-    this->list.apply({ { "pf_effects", "sparkle" }, { "pf_rail", "rail-auto" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
+    this->list.apply({ { "pf_palette", "contrast" }, { "pf_effects", "sparkle" }, { "pf_rail", "rail-auto" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
                        { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
                        { "pf_support_reminder", "heart" }, { "pf_update_daily", "calendar" }, { "pf_update_via", "server" },
                        { "pf_first_steps", "sparkle" } });
@@ -142,6 +148,7 @@ void PreferencesTab::refresh()
     const auto& cfg = config::get();
     language->setDetailText(ui::language_name(true));
     theme->setDetailText(ui::theme_name(true));
+    palette->setDetailText(ui::palette_name());
     text_size->setDetailText(ui::text_size_name(true));
     effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.look.effects)])));
     rail->setDetailText(ui::rail_name());

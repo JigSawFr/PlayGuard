@@ -43,6 +43,7 @@ class PtRing : public brls::Box
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
               brls::Style style, brls::FrameContext* ctx) override;
+    void onThemeChanged() override;
 
     static brls::View* create();
 
@@ -59,5 +60,8 @@ class PtRing : public brls::Box
     bool tip = false;
     CadranDigits* value  = nullptr;
     brls::Label* caption = nullptr;
-    NVGcolor track, teal, amber, coral;
+    // The arc's colours, looked up when the theme changes rather than at
+    // each frame (each lookup builds a key).
+    void take_colours();
+    NVGcolor track, teal, amber, coral, tip_light;
 };

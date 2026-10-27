@@ -22,17 +22,18 @@ void LoadingDial::draw(NVGcontext* vg, float x, float y, float width, float heig
     (void)width;
     (void)height;
     (void)style;
-    (void)ctx;
     const float cx = x + CX, cy = y + CY;
-    // The lines: white over the navy, navy (twice as strong) over the light theme's white.
-    const bool on_white = this->light;
-    const auto line = [on_white](float strength) {
-        const unsigned char a = (unsigned char)std::lround((on_white ? strength * 2.0f : strength) * 255.0f);
-        return on_white ? nvgRGBA(0x0B, 0x14, 0x24, a) : nvgRGBA(0xFF, 0xFF, 0xFF, a);
+    // The lines, at a strength of their full colour: a dark one (over a
+    // light background) twice as strong, to show as much.
+    const NVGcolor ink = ctx->theme["playguard/loading/line"];
+    const bool dark_ink = 0.2126f * ink.r + 0.7152f * ink.g + 0.0722f * ink.b < 0.5f;
+    const auto line = [ink, dark_ink](float strength) {
+        return nvgTransRGBA(ink, (unsigned char)std::lround((dark_ink ? strength * 2.0f : strength) * ink.a * 255.0f));
     };
 
-    // The teal glow.
-    NVGpaint glow = nvgRadialGradient(vg, cx, cy, 0.0f, 290.0f, nvgRGBA(0x2E, 0xC4, 0xA6, 23), nvgRGBA(0x2E, 0xC4, 0xA6, 0));
+    // The glow.
+    const NVGcolor glow_ink = ctx->theme["playguard/loading/glow"];
+    NVGpaint glow = nvgRadialGradient(vg, cx, cy, 0.0f, 290.0f, glow_ink, nvgTransRGBA(glow_ink, 0));
     nvgBeginPath(vg);
     nvgCircle(vg, cx, cy, 290.0f);
     nvgFillPaint(vg, glow);
@@ -64,11 +65,11 @@ void LoadingDial::draw(NVGcontext* vg, float x, float y, float width, float heig
     nvgStrokeWidth(vg, 18.0f);
     nvgBeginPath(vg);
     nvgCircle(vg, cx, cy, 182.0f);
-    nvgStrokeColor(vg, nvgRGBA(0x1F, 0x33, 0x55, this->light ? 30 : 71));
+    nvgStrokeColor(vg, ctx->theme["playguard/loading/track"]);
     nvgStroke(vg);
     nvgBeginPath(vg);
     nvgArc(vg, cx, cy, 182.0f, -PI / 2.0f, -PI / 2.0f + 1.5f * PI, NVG_CW);
-    nvgStrokeColor(vg, nvgRGBA(0x2E, 0xC4, 0xA6, 41));
+    nvgStrokeColor(vg, ctx->theme["playguard/loading/arc"]);
     nvgLineCap(vg, NVG_ROUND);
     nvgStroke(vg);
     nvgLineCap(vg, NVG_BUTT);

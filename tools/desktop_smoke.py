@@ -2333,7 +2333,25 @@ if CADRAN:
     key("Return")
     time.sleep(1)
     shot("21_live_theme")      # the focus back on Theme
-    key("Left")                # Language
+    # Preferences › Palette, applied at once too: the presets listed, then
+    # Amethyst (it styles both variants: still light), then PlayGuard's own
+    # colours again.
+    go_to("Palette")
+    key("Return")
+    time.sleep(1)
+    shot("21a_palettes")       # Default, then Aurore's presets
+    go_to("Amethyst")
+    key("Return")
+    time.sleep(1)
+    shot("21b_live_palette")   # the focus back on Palette
+    if json.load(open(config_file)).get("theme_file") != "builtin:amethyst":
+        fail("the palette was not set to Amethyst")
+    key("Return")
+    go_to("Default", "Up")
+    key("Return")
+    time.sleep(1)
+    key("Up")                  # the tiles
+    go_to("Language", "Left", most=4)
     key("Return")
     go_to("Français (France)")
     key("Return")

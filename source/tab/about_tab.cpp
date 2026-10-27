@@ -82,7 +82,7 @@ AboutTab::AboutTab()
         badge->setHeight(84);
         badge->setCornerRadius(24);
         badge->setShrink(0);
-        badge->setBackgroundColor(brls::Application::getTheme()["cadran/teal_soft"]);
+        badge->setThemeColor("backgroundColor", "cadran/teal_soft");
         badge->setAlignItems(brls::AlignItems::CENTER);
         badge->setJustifyContent(brls::JustifyContent::CENTER);
         badge->setMarginRight(22);
@@ -142,7 +142,7 @@ void AboutTab::refresh()
     // With the newer release the last update check found, as in Console.
     bool newer = false;
     version->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::PlayGuard, &newer) + commit + flags));
-    version->setDetailTextColor(newer ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    version->detail->setThemeColor("textColor", newer ? "cadran/amber" : "cadran/text2");
     this->list.sync();
     if (this->version_line) {
         const std::string version_text = app::commit().empty() ? app::version() : app::version() + " · " + app::commit();

@@ -45,7 +45,7 @@ void OnboardingActivity::onContentAvailable()
         return true;
     });
     alarm->setDetailText("playguard/dashboard/alarm_off"_i18n);   // the title says why
-    alarm->setDetailTextColor(cadran::kit::color("cadran/amber"));
+    alarm->detail->setThemeColor("textColor", "cadran/amber");
     alarm->registerClickAction([this](brls::View*) {
         pt_flow::turn_alarm_on("first_steps", [this]() { this->refresh(); });
         return true;
@@ -109,31 +109,31 @@ void OnboardingActivity::refresh()
     const bool has_pin = s.pin_length_ok && s.pin_length > 0;
     pin->setDetailText(!s.pin_length_ok ? "cadran/common/unavailable"_i18n
                        : has_pin ? "playguard/dashboard/pin_set"_i18n : todo);
-    pin->setDetailTextColor(has_pin ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/amber"));
+    pin->detail->setThemeColor("textColor", has_pin ? "cadran/teal" : "cadran/amber");
 
     bool any_limit = false;
     for (int d = 0; d < 7 && pt.valid; d++) any_limit |= pt.day_min[d] != PT_DAY_NOLIMIT;
     if (!pt.fw_supported) {
         limit->setDetailText("playguard/play_timer/fw_too_old_short"_i18n);
-        limit->setDetailTextColor(cadran::kit::color("cadran/text2"));
+        limit->detail->setThemeColor("textColor", "cadran/text2");
     } else if (!pt.valid) {
         limit->setDetailText("cadran/common/unavailable"_i18n);
-        limit->setDetailTextColor(cadran::kit::color("cadran/text2"));
+        limit->detail->setThemeColor("textColor", "cadran/text2");
     } else {
         limit->setDetailText(any_limit ? ui::days_summary(pt.day_min) : todo);
-        limit->setDetailTextColor(any_limit ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/amber"));
+        limit->detail->setThemeColor("textColor", any_limit ? "cadran/teal" : "cadran/amber");
     }
 
     this->clock_inaccurate = R_SUCCEEDED(accuracy_rc) && !accurate;
     clock->setDetailText(R_FAILED(accuracy_rc) ? "cadran/common/unavailable"_i18n
                          : accurate ? "playguard/dashboard/clock_ok"_i18n : "playguard/dashboard/clock_bad"_i18n);
-    clock->setDetailTextColor(R_FAILED(accuracy_rc) ? cadran::kit::color("cadran/text2") : accurate ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/amber"));
+    clock->detail->setThemeColor("textColor", R_FAILED(accuracy_rc) ? "cadran/text2" : accurate ? "cadran/teal" : "cadran/amber");
 
     // Step 4 only while the phone app is linked: its next sync would undo the
     // rest (none when Atmosphère's DNS blocks its server).
     const bool paired = pairing_state::syncs(s);
     unlink->setDetailText("playguard/dashboard/pairing_on"_i18n);
-    unlink->setDetailTextColor(cadran::kit::color("cadran/amber"));
+    unlink->detail->setThemeColor("textColor", "cadran/amber");
     ui::set_visible(unlink.getView(), paired);
 
     // Then, while the timer runs with its alarm off: nothing says time is up.
@@ -145,7 +145,7 @@ void OnboardingActivity::refresh()
     const bool protected_ = config::get().pin_lock != "off";
     protect->setText(brls::getStr("playguard/onboarding/step_protect", 4 + (paired ? 1 : 0) + (alarm_off ? 1 : 0)));
     protect->setDetailText(protected_ ? pin_lock::mode_text() : todo);
-    protect->setDetailTextColor(protected_ ? cadran::kit::color("cadran/teal") : cadran::kit::color("cadran/amber"));
+    protect->detail->setThemeColor("textColor", protected_ ? "cadran/teal" : "cadran/amber");
     ui::set_visible(protect.getView(), has_pin);
 
     const bool done = has_pin && (!pt.fw_supported || any_limit) && (R_FAILED(accuracy_rc) || accurate) && !paired

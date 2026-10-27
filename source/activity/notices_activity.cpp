@@ -25,7 +25,7 @@ brls::Label* detail_label(const std::string& detail)
     auto* text = new brls::Label();
     text->setSingleLine(false);
     text->setFontSize(18);
-    text->setTextColor(cadran::kit::color("cadran/text3"));
+    text->setThemeColor("textColor", "cadran/text3");
     text->setText(detail);
     text->setMarginLeft(16);
     text->setMarginRight(16);
@@ -94,7 +94,7 @@ brls::DetailCell* NoticesActivity::console_line(const std::vector<notices::Entry
         if (c.item.group == notice_logic::Group::Console) count++, todos += c.item.level == notices::Level::Action;
     auto* more = new brls::DetailCell();
     more->setText(brls::getStr("playguard/notices/console_count", count));
-    if (todos) more->title->setTextColor(cadran::kit::color("cadran/amber"));
+    if (todos) more->title->setThemeColor("textColor", "cadran/amber");
     more->setDetailText(ui::opens("playguard/notices/console_show"_i18n));
     more->registerClickAction([this](brls::View*) {
         // Next frame: the rebuild deletes this cell.
@@ -112,8 +112,8 @@ brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo
 {
     auto* cell = new brls::DetailCell();
     cell->setText(e.item.title);
-    if (todo) cell->title->setTextColor(cadran::kit::color("cadran/amber"));
-    cell->setDetailTextColor(cadran::kit::color("cadran/text2"));
+    if (todo) cell->title->setThemeColor("textColor", "cadran/amber");
+    cell->detail->setThemeColor("textColor", "cadran/text2");
     const bool has_action = !e.action_label.empty() && e.action;
     // To do with nothing PlayGuard can do (fixed on the SD card, from a
     // computer): no button text, as it goes only once fixed.
@@ -162,7 +162,7 @@ brls::DetailCell* NoticesActivity::ignored_cell(const notices::Entry& e)
 {
     auto* cell = new brls::DetailCell();
     cell->setText(e.item.title);
-    cell->setDetailTextColor(cadran::kit::color("cadran/text2"));
+    cell->detail->setThemeColor("textColor", "cadran/text2");
     cell->setDetailText("playguard/notices/reactivate"_i18n);
     const std::string id = e.item.id;
     cell->registerClickAction([id](brls::View*) {

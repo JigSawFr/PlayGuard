@@ -33,7 +33,7 @@ GameTile::GameTile()
     this->icon->setWidth(COVER);
     this->icon->setHeight(COVER);
     this->icon->setCornerRadius(8);
-    this->icon->setBackgroundColor(cadran::kit::color("cadran/well"));
+    this->icon->setThemeColor("backgroundColor", "cadran/well");
     // Until the icon arrives (or for a game without one): the placeholder,
     // its own size in the middle of the cover.
     if (const int waiting = game_icons::placeholder()) {
@@ -52,7 +52,7 @@ GameTile::GameTile()
     this->detail = new brls::Label();
     this->detail->setFontSize(15);
     this->detail->setSingleLine(true);
-    this->detail->setTextColor(cadran::kit::color("cadran/text3"));
+    this->detail->setThemeColor("textColor", "cadran/text3");
     this->detail->setMarginTop(2);
     this->addView(this->detail);
 }
@@ -67,14 +67,14 @@ void GameTile::set_detail(const std::string& text)
     this->detail->setText(text);
 }
 
-void GameTile::set_name_color(NVGcolor color)
+void GameTile::set_name_color(const char* key)
 {
-    this->name->setTextColor(color);
+    this->name->setThemeColor("textColor", key);
 }
 
-void GameTile::set_detail_color(NVGcolor color)
+void GameTile::set_detail_color(const char* key)
 {
-    this->detail->setTextColor(color);
+    this->detail->setThemeColor("textColor", key);
 }
 
 void GameTile::set_icon_texture(int texture, bool owned)

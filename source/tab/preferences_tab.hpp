@@ -24,6 +24,7 @@ class PreferencesTab : public TabBase
     cadran::List list;
     BRLS_BIND(brls::DetailCell,  language,      "pf_language");
     BRLS_BIND(brls::DetailCell,  theme,         "pf_theme");
+    BRLS_BIND(brls::DetailCell,  palette,       "pf_palette");
     BRLS_BIND(brls::DetailCell,  start_tab,     "pf_start_tab");
     BRLS_BIND(brls::DetailCell,  text_size,     "pf_text_size");
     BRLS_BIND(brls::DetailCell,  effects,       "pf_effects");

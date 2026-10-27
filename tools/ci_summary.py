@@ -10,7 +10,7 @@ Markdown on stdout: each job appends one section to $GITHUB_STEP_SUMMARY.
   build      the Switch build: sizes vs main, downloads, what makes the .nro
              big (the linker map), toolchain, checksums
   map        that linker-map table alone (also for a local build:
-             tools/ci_summary.py map build/borealis.map --nro playguard.nro)
+             tools/ci_summary.py map build/playguard.map --nro playguard.nro)
   release    the assets attached to a release
   tidy-files the files clang-tidy checks (.github/workflows/clang-tidy.yml):
              the changed sources the desktop build compiles, on stdout
@@ -764,7 +764,7 @@ def main():
     p.set_defaults(func=cmd_smoke)
 
     p = sub.add_parser("map", help="what makes the .nro big, from the linker map")
-    p.add_argument("map", help="build/borealis.map")
+    p.add_argument("map", help="build/playguard.map")
     p.add_argument("--nro", help="playguard.nro, for the assets' share")
     p.add_argument("--top", type=int, default=12)
     p.set_defaults(func=cmd_map)
@@ -786,7 +786,7 @@ def main():
     p.add_argument("--ccache", help="ccache --print-stats output")
     p.add_argument("--gcc", default="", help="aarch64-none-elf-gcc -dumpfullversion")
     p.add_argument("--libnx-min", default="4.12.0")
-    p.add_argument("--map", help="build/borealis.map")
+    p.add_argument("--map", help="build/playguard.map")
     p.add_argument("--top", type=int, default=12)
     p.add_argument("--artifact", action="append", help="name|url|contents, once per artifact")
     p.add_argument("--baseline")

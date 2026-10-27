@@ -175,7 +175,7 @@ void ConsoleTab::refresh()
     const auto version_tile = [this](brls::DetailCell* cell, const char* tile_id, sys_notes::Which which) {
         const sys_notes_flow::Status s = sys_notes_flow::status(which);
         cell->setDetailText(s.installed.empty() ? "cadran/common/unavailable"_i18n : s.installed);
-        cell->setDetailTextColor(cadran::kit::color(s.installed.empty() ? "cadran/text2" : "cadran/text"));
+        cell->detail->setThemeColor("textColor", s.installed.empty() ? "cadran/text2" : "cadran/text");
         std::string note;
         if (s.newer) {
             note = brls::getStr("playguard/tools/tile_newer", s.latest);
@@ -199,15 +199,15 @@ void ConsoleTab::refresh()
     // a newer release (their notes say): its corner's warning, the tile in amber.
     const bool fw_advice = !sys_notes_flow::firmware_advice().empty();
     fw_warn->set_shown(fw_advice);
-    if (fw_advice) fw->setBorderColor(cadran::kit::color("cadran/amber_line"));
-    NVGcolor c = cadran::kit::color("cadran/text2");
+    if (fw_advice) fw->setThemeColor("borderColor", "cadran/amber_line");
+    const char* c = "cadran/text2";
     const std::string compat_value = ui::compat_text(si, &c);
     // Checked: the line's icon says it (a teal check) and no word is needed;
     // anything else, a warning in the value's colour and the words.
     const SysCompat compat_state = sysinfo_compat(&si);
     const bool compat_ok = compat_state == SysCompat_Ok;
     compat->setDetailText(compat_ok ? "" : compat_value);
-    compat->setDetailTextColor(c);
+    compat->detail->setThemeColor("textColor", c);
     const bool compat_warns = compat_state == SysCompat_UntestedNewer || compat_state == SysCompat_PlayTimerUnsupported;
     cadran::List::recolor_icon(compat, compat_ok ? "check" : "alert",
                            compat_ok ? "cadran/teal" : compat_warns ? "cadran/amber" : "cadran/coral");
@@ -216,18 +216,18 @@ void ConsoleTab::refresh()
     this->storage_note = ui::other_storage_note(si);
     storage->setFocusable(!this->storage_note.empty());
     storage_info->set_shown(!this->storage_note.empty());
-    c = cadran::kit::color("cadran/text2");
+    c = "cadran/text2";
     blank->setDetailText(ui::blank_text(si, &c));
-    blank->setDetailTextColor(c);
+    blank->detail->setThemeColor("textColor", c);
     blank->setFocusable(ui::serial_warning(si));
     blank_warn->set_shown(ui::serial_warning(si));
     serial->setDetailText(ui::serial_text(si));
-    serial->setDetailTextColor(ui::serial_warning(si) ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    serial->detail->setThemeColor("textColor", ui::serial_warning(si) ? "cadran/amber" : "cadran/text2");
     serial_info->set_shown(!ui::real_serial(si).note.empty());
 
-    c = cadran::kit::color("cadran/text2");
+    c = "cadran/text2";
     game_patches->setDetailText(ui::patches_text(report, &c));
-    game_patches->setDetailTextColor(c);
+    game_patches->detail->setThemeColor("textColor", c);
     bool warn = false;
     this->patches_note = ui::patches_note(report, si, &warn);
     patches_icon->set_kind(warn ? RowIcon::Kind::Warning : RowIcon::Kind::Info);

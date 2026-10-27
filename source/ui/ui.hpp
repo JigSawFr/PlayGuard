@@ -127,10 +127,11 @@ private:
     bool outer_;
 };
 
-// System / compatibility strings shared by the dashboard and the About section.
+// System / compatibility strings shared by the dashboard and the About section;
+// `color`, when given, the theme key of the ink to show them in.
 std::string hos_text(u32 version);                        // "23.0.1" (MAKEHOSVERSION), "?" for 0
 std::string fw_text(const SysInfo& info);                 // "23.0.1 · Atmosphère 1.12.0"
-std::string compat_text(const SysInfo& info, NVGcolor* color = nullptr);
+std::string compat_text(const SysInfo& info, const char** color = nullptr);
 
 // The Console tab's and Today's warnings.
 std::string storage_text(const SysInfo& info);             // "emuMMC (Atmosphère)"
@@ -141,7 +142,7 @@ std::string other_storage_note(const SysInfo& info);
 // The serial-number warning only applies on emuMMC: on sysMMC the real serial
 // is normal (online play), blanking it would cut Nintendo's services.
 bool        serial_warning(const SysInfo& info);
-std::string blank_text(const SysInfo& info, NVGcolor* color = nullptr);
+std::string blank_text(const SysInfo& info, const char** color = nullptr);
 // The console's real serial number: the system's when Atmosphère does not
 // blank it, else read from its PRODINFO backup on the SD card
 // (util/prodinfo.hpp). `note` says where it comes from, the whole number in
@@ -162,7 +163,7 @@ bool        patches_warning(const patches::Report& report);
 const patches::Report& patch_report();
 // After PlayGuard itself moved patch files (sigpatch_flow): read again.
 void                   reread_patch_report();
-std::string patches_text(const patches::Report& report, NVGcolor* color = nullptr);
+std::string patches_text(const patches::Report& report, const char** color = nullptr);
 // Explanation under the Game patches line ("" when there is nothing to say);
 // *warn tells whether it is a warning (amber) or a plain note.
 std::string patches_note(const patches::Report& report, const SysInfo& info, bool* warn);
@@ -210,5 +211,10 @@ bool known_paused();
 // starts or stops the play-timer recorder (action/pt_log_flow) and re-reads
 // the tab on screen.
 void on_mode_changed();
+
+// PlayGuard's own theme keys (ui/palette.hpp) in both variants, with the
+// pairs they keep readable: before the window, whose theme file then
+// changes them like any other key.
+void install_palette();
 
 }   // namespace ui

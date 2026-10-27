@@ -19,7 +19,7 @@
 struct BuildTag
 {
     std::string text;
-    NVGcolor    color;
+    const char* color;            // its ink's theme key
     const char* icon = nullptr;   // a glyph before the text (cadran_icon), or in its place
 };
 
@@ -27,7 +27,8 @@ struct BuildTag
 std::vector<BuildTag> build_tags(const dev_builds::Build& b, bool newer);
 // Its title as the list shows it.
 std::string build_title(const dev_builds::Build& b);
-// A tag as a view: its icon and text in its colour, on a tint of it.
+// A tag as a view: its icon and text in its colour, on a tint of it (taken
+// again when the theme changes).
 brls::Box* tag_view(const BuildTag& tag, float font_size = 18);
 
 class BuildCell : public brls::RecyclerCell

@@ -40,7 +40,6 @@ void CadranChildActivity::onContentAvailable()
     // footer keeps the child's own, alone).
     cadran::style_header(frame, nullptr, "", false, false);
     if (brls::Box* header = frame ? frame->getHeader() : nullptr) {
-        brls::Theme theme = brls::Application::getTheme();
         auto* keys = new brls::Box(brls::Axis::ROW);
         keys->setAlignItems(brls::AlignItems::CENTER);
         keys->setMarginRight(16);
@@ -55,7 +54,7 @@ void CadranChildActivity::onContentAvailable()
             label->setFontSize(15);
             label->setFontScaled(false);
             label->setSingleLine(true);
-            label->setTextColor(theme["cadran/text2"]);
+            label->setThemeColor("textColor", "cadran/text2");
             keys->addView(label);
         }
         header->addView(keys, 1);
@@ -178,9 +177,8 @@ void CadranChildActivity::refresh()
     ring->setValue(left);
     ring->setCaption(caption);
     if (ending) ui::set_text(end_text, brls::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", n.at / 60, n.at % 60)));
-    brls::Theme theme = brls::Application::getTheme();
-    end_icon->setColor(theme[last ? "cadran/amber" : "cadran/teal"]);
-    end_text->setTextColor(theme[last ? "cadran/amber" : "cadran/text"]);
+    end_icon->setThemeColor("color", last ? "cadran/amber" : "cadran/teal");
+    end_text->setThemeColor("textColor", last ? "cadran/amber" : "cadran/text");
     ui::set_visible(end_chip.getView(), ending);
     // The beat of the last minutes, faster in the last one.
     ring->setPulse(last, last && n.in <= 1);
@@ -196,8 +194,8 @@ void CadranChildActivity::refresh()
         // Amber only once it is near: before, nothing calls for attention.
         const int until = (pt.bedtime_hour * 60 + pt.bedtime_minute - (now.hour * 60 + now.minute) + 24 * 60) % (24 * 60);
         const bool soon = until <= BED_SOON;
-        bed_icon->setColor(theme[soon ? "cadran/amber" : "cadran/text2"]);
-        bedtime->setTextColor(theme[soon ? "cadran/amber" : "cadran/text"]);
+        bed_icon->setThemeColor("color", soon ? "cadran/amber" : "cadran/text2");
+        bedtime->setThemeColor("textColor", soon ? "cadran/amber" : "cadran/text");
     }
     // What the console does then (When the time is up).
     time_up->setText(pt.valid && pt.alarm_only ? "playguard/cadran/child/warns"_i18n : "playguard/cadran/child/stops"_i18n);

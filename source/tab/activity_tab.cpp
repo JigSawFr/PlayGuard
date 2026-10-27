@@ -87,13 +87,12 @@ uint64_t value_of(const GameStat& g, int period)
 template <typename T>
 void show_bars(const std::vector<brls::View*>& bars, const T* values, float most)
 {
-    brls::Theme theme = brls::Application::getTheme();
     uint64_t top = 0;
     for (int k = 0; k < 7; k++) top = std::max<uint64_t>(top, values[k]);
     for (size_t i = 0; i < bars.size() && i < 7; i++) {
         const uint64_t v = values[6 - i];
         bars[i]->setHeight(v && top ? std::max(4.0f, most * (float)v / (float)top) : 3.0f);
-        bars[i]->setBackgroundColor(i == 6 ? theme["cadran/teal_fill"] : theme["cadran/bar"]);
+        bars[i]->setThemeColor("backgroundColor", i == 6 ? "cadran/teal_fill" : "cadran/bar");
     }
 }
 }   // namespace
@@ -298,7 +297,7 @@ void ActivityTab::show_status(const PlayStats& s, bool none_played)
         error = false;
     }
     status->setText(text);
-    status->setTextColor(error ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text3"));
+    status->setThemeColor("textColor", error ? "cadran/amber" : "cadran/text3");
     ui::set_visible(status, !text.empty());
 }
 
@@ -383,7 +382,6 @@ void ActivityTab::choose_period()
 void ActivityTab::build_cards()
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     // The game cards, built once, two rows of two; filled by show_top().
     brls::Box* row = nullptr;
     for (size_t i = 0; i < CARDS; i++) {
@@ -398,7 +396,7 @@ void ActivityTab::build_cards()
         c.icon_fallback->setWidth(60);
         c.icon_fallback->setHeight(60);
         c.icon_fallback->setCornerRadius(cadran::kit::RADIUS_ICON);
-        c.icon_fallback->setBackgroundColor(theme["cadran/surf2"]);
+        c.icon_fallback->setThemeColor("backgroundColor", "cadran/surf2");
         c.icon_fallback->setMarginRight(16);
         c.box->addView(c.icon_fallback);
         c.icon = new brls::Image();
@@ -505,7 +503,6 @@ void ActivityTab::build_cards()
 
 void ActivityTab::build_chips()
 {
-    brls::Theme theme = brls::Application::getTheme();
     const auto& accounts = play_data::accounts();
     // No account to choose between on a console with one (as the tab's line).
     if (accounts.size() < 2) return;
@@ -535,7 +532,7 @@ void ActivityTab::build_chips()
             avatar->setWidth(32);
             avatar->setHeight(32);
             avatar->setCornerRadius(16);
-            avatar->setBackgroundColor(cadran::kit::color(AVATARS[i % 4]));
+            avatar->setThemeColor("backgroundColor", AVATARS[i % 4]);
             avatar->setAlignItems(brls::AlignItems::CENTER);
             avatar->setJustifyContent(brls::JustifyContent::CENTER);
             avatar->setMarginRight(10);
@@ -545,7 +542,7 @@ void ActivityTab::build_chips()
             size_t len = 1;
             while (len < nick.size() && (nick[len] & 0xC0) == 0x80) len++;
             initial->setText(nick.substr(0, len));
-            initial->setTextColor(theme["cadran/navy"]);   // 4.6:1 or more on every avatar colour
+            initial->setThemeColor("textColor", "cadran/navy");   // 4.6:1 or more on every avatar colour
             avatar->addView(initial);
             chip->addView(avatar);
             brls::Label* name = cadran::kit::label(nick, 16);
@@ -563,17 +560,16 @@ void ActivityTab::build_chips()
 
 void ActivityTab::show_top()
 {
-    brls::Theme theme = brls::Application::getTheme();
     const int who = shown_account();
     for (size_t i = 0; i < this->chips.size(); i++) {
         // The account shown: a soft fill and its ink, the hairline kept; the
         // teal ring is the focus's alone.
         const bool on = (int)i - 1 == who;
-        this->chips[i]->setBackgroundColor(on ? theme["cadran/teal_soft"] : theme["cadran/surf"]);
-        this->chips[i]->setBorderColor(theme["cadran/line"]);
+        this->chips[i]->setThemeColor("backgroundColor", on ? "cadran/teal_soft" : "cadran/surf");
+        this->chips[i]->setThemeColor("borderColor", "cadran/line");
         this->chips[i]->setBorderThickness(1);
         for (brls::View* v : this->chips[i]->getChildren())
-            if (auto* l = dynamic_cast<brls::Label*>(v)) l->setTextColor(on ? theme["cadran/teal"] : theme["cadran/text"]);
+            if (auto* l = dynamic_cast<brls::Label*>(v)) l->setThemeColor("textColor", on ? "cadran/teal" : "cadran/text");
     }
     const int p = this->period;
     const std::string period_name = brls::getStr(fmt::format("playguard/activity/periods/{}", p));
@@ -622,10 +618,10 @@ void ActivityTab::show_top()
         ui::set_text(week_trend, more   ? brls::getStr("playguard/cadran/activity/trend_up", ui::fmt_limit(trend.amount_min))
                                  : less ? brls::getStr("playguard/cadran/activity/trend_down", ui::fmt_limit(trend.amount_min))
                                         : "playguard/cadran/activity/trend_same"_i18n);
-        week_trend->setTextColor(theme[more ? "cadran/amber" : less ? "cadran/teal" : "cadran/text3"]);
+        week_trend->setThemeColor("textColor", more ? "cadran/amber" : less ? "cadran/teal" : "cadran/text3");
         // Up or down said by the shape too, not by the colour alone.
         week_trend_icon->setIcon(trend.per_day_min >= 0 ? "caret-up" : "caret-down");
-        week_trend_icon->setColor(theme[more ? "cadran/amber" : "cadran/teal"]);
+        week_trend_icon->setThemeColor("color", more ? "cadran/amber" : "cadran/teal");
         ui::set_visible(week_trend_icon.getView(), more || less);
     }
     ui::set_visible(week_trend_row.getView(), trend.known);
@@ -666,7 +662,7 @@ void ActivityTab::show_top()
         ids.push_back(g.app_id);
         c.name->setText(play_data::game_name(g));
         c.today->setText(s.windows_ok && g.today_s ? ui::fmt_duration(g.today_s) : "—");
-        c.today->setTextColor(g.today_s ? theme["cadran/text"] : theme["cadran/text3"]);
+        c.today->setThemeColor("textColor", g.today_s ? "cadran/text" : "cadran/text3");
         // The period is the section's title: "in all" over it.
         c.rest->setText(p == Today ? "playguard/cadran/activity/card_today"_i18n
                                    : brls::getStr("playguard/cadran/activity/card_total", ui::fmt_duration(activity_summary::value(g, p))));

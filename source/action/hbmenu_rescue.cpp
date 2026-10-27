@@ -124,7 +124,7 @@ void detail::rescue_sheet(bool locked)
     auto* steps = new brls::Box(brls::Axis::COLUMN);
     steps->setGrow(1.0f);
     steps->setWidth(0);
-    steps->setBackgroundColor(brls::Application::getTheme()["cadran/surf2"]);
+    steps->setThemeColor("backgroundColor", "cadran/surf2");
     steps->setCornerRadius(14);
     steps->setPadding(16, 18, 16, 18);
     steps->addView(rescue_step("1", "playguard/hbmenu/rescue_pc_title"_i18n,
