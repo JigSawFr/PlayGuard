@@ -8,8 +8,7 @@
 # focus into the content with one Right press, lets the screen settle, takes
 # a screenshot and quits. The app records one line per frame while it runs
 # (PLAYGUARD_SIM_STATS, main.cpp): the frame time with the FPS limiter off
-# and, with tools/perf_nanovg_stats.patch applied to library/aurore,
-# nanovg's own counters (draw calls, triangles). The summary covers the last
+# and nanovg's own counters (draw calls, triangles). The summary covers the last
 # 4 s, the steady state. Everything lands in build-desktop/perf/<name>/.
 #
 # PERF_THEME=light runs the light variant, PERF_KEYS the keys to press first
@@ -66,9 +65,6 @@ ft = sorted(r[1] for r in win)
 p95 = ft[min(len(ft) - 1, int(0.95 * len(ft)))]
 print(f"frames: {len(win)} in the last 4 s ({len(win) / 4:.0f} fps, limiter off)")
 print(f"frame time: median {statistics.median(ft) / 1000:.2f} ms, p95 {p95 / 1000:.2f} ms, mean {statistics.mean(ft) / 1000:.2f} ms")
-if any(r[2] for r in win):
-    m = lambda i: statistics.mean(r[i] for r in win)
-    print(f"nanovg per frame: {m(2):.0f} draw calls, {m(3):.0f} fill tris, {m(4):.0f} stroke tris, {m(5):.0f} text tris")
-else:
-    print("nanovg counters: not available (apply tools/perf_nanovg_stats.patch in library/aurore)")
+m = lambda i: statistics.mean(r[i] for r in win)
+print(f"nanovg per frame: {m(2):.0f} draw calls, {m(3):.0f} fill tris, {m(4):.0f} stroke tris, {m(5):.0f} text tris")
 PY

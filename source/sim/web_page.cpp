@@ -37,13 +37,12 @@ extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_setenv(const char* name, const
 // the Latin one, as borealis does at start-up when it is there already.
 extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_cjk_font(const char* path)
 {
-    NVGcontext* vg = brls::Application::getNVGContext();
-    if (!vg || !path || brls::Application::getFont(brls::FONT_CHINESE_SIMPLIFIED) != brls::FONT_INVALID)
+    if (!brls::Application::getNVGContext() || !path ||
+        brls::Application::getFont(brls::FONT_CHINESE_SIMPLIFIED) != brls::FONT_INVALID)
         return 0;
     if (!brls::Application::loadFontFromFile(brls::FONT_CHINESE_SIMPLIFIED, path))
         return 0;
-    nvgAddFallbackFontId(vg, brls::Application::getFont(brls::FONT_REGULAR),
-                         brls::Application::getFont(brls::FONT_CHINESE_SIMPLIFIED));
+    brls::Application::addFontFallback(brls::FONT_REGULAR, brls::FONT_CHINESE_SIMPLIFIED);
     brls::Logger::info("Using {} font: {}", brls::FONT_CHINESE_SIMPLIFIED, path);
     return 1;
 }

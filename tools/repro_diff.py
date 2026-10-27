@@ -5,7 +5,8 @@ twice to check they come out the same, docs/contributing/releases.md "Reproducib
 Compares <first> and <second>, two folders holding the outputs of a build:
 the zips (entry by entry: name, size, CRC-32), playguard.nro (the bytes that
 differ, and where: a code segment, the icon, the NACP, or which RomFS file),
-playguard.nacp, the shaders (dksh/*.dksh) and resources.sha256 (the checksum
+playguard.nacp, the deko3d shaders Aurore compiled into the .nro
+(dksh/*.dksh, from build/borealis_library/dksh/) and resources.sha256 (the checksum
 of every file the RomFS was built from, `find . -type f | sort | xargs
 sha256sum` in build/resources). Prints what differs, and exits 1 when
 anything does.

@@ -296,25 +296,10 @@ forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source
 forwarders_text_FLAGS := $(format_text_FLAGS)
 forwarders_text_CSRC   := source/core/calendar.c
 forwarders_text_CFLAGS := -std=gnu11 -Isource/core
-# borealis' own string tables (core/i18n.cpp), read from other threads while
-# the language changes. A copy of the files at the submodule's commit, first
-# in the include path, made again when that commit changes (the stamp holds
-# it, rewritten only then).
-I18N_COPY    := $(TESTOUT)/borealis_i18n
-I18N_STAMP   := $(TESTOUT)/borealis_i18n.commit
-I18N_COMMIT  := $(shell git -C library/aurore rev-parse HEAD 2>/dev/null)
-$(I18N_STAMP): FORCE | $(TESTOUT)
-	@echo '$(I18N_COMMIT)' | cmp -s - $@ || echo '$(I18N_COMMIT)' > $@
-$(I18N_COPY)/i18n.cpp: $(I18N_STAMP) | $(TESTOUT)
-	@rm -rf $(I18N_COPY) && mkdir -p $(I18N_COPY)/library/lib/core $(I18N_COPY)/library/include/borealis/core
-	@git -C library/aurore show HEAD:library/lib/core/i18n.cpp > $(I18N_COPY)/library/lib/core/i18n.cpp
-	@git -C library/aurore show HEAD:library/include/borealis/core/i18n.hpp > $(I18N_COPY)/library/include/borealis/core/i18n.hpp
-	@git -C library/aurore show HEAD:library/include/borealis/core/platform.hpp > $(I18N_COPY)/library/include/borealis/core/platform.hpp
-	@# The suffix without a space, as newer clang wants it (-Wdeprecated-literal-operator),
-	@# in this copy only: borealis itself is built as it is.
-	@sed 's/operator"" _i18n/operator""_i18n/' $(I18N_COPY)/library/lib/core/i18n.cpp > $@
-i18n_threads_SRC   := $(I18N_COPY)/i18n.cpp tests/i18n_threads/test.cpp
-i18n_threads_FLAGS := -std=c++20 -isystem $(I18N_COPY)/library/include -isystem library/aurore/library/include \
+# Aurore's own string tables (core/i18n.cpp), read from other threads while
+# the language changes: built from the submodule as it is.
+i18n_threads_SRC   := library/aurore/library/lib/core/i18n.cpp tests/i18n_threads/test.cpp
+i18n_threads_FLAGS := -std=c++20 -isystem library/aurore/library/include \
                       -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
                       $(addprefix -isystem library/aurore/library/,include/borealis/extern include/borealis/extern/nanovg \
                         include/borealis/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga) \

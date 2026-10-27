@@ -65,19 +65,13 @@ struct Choice
     brls::Box*   cell = nullptr;
 };
 
-int texture_of(const std::vector<uint8_t>& rgba, int px)
+// `image` shows the `px`-square pixels `rgba`, in a texture of its own
+// (updated in place when it has one of that size already).
+void show_pixels(brls::Image* image, const std::vector<uint8_t>& rgba, int px)
 {
-    if (rgba.size() != (size_t)px * px * 4) return 0;
-    return nvgCreateImageRGBA(brls::Application::getNVGContext(), px, px, 0, rgba.data());
-}
-
-// `image` shows `texture`, its own: it frees the one before (its own too).
-void set_texture(brls::Image* image, int texture)
-{
-    if (!image || !texture) return;
+    if (!image || rgba.size() != (size_t)px * px * 4) return;
     image->setScalingType(brls::ImageScalingType::FIT);
-    image->innerSetImage(texture);
-    image->setFreeTexture(true);
+    image->setImageFromRGBA(rgba.data(), px, px);
 }
 
 // An image of the app's resources ("img/…"), as its bytes.
@@ -512,20 +506,18 @@ class Sheet : public brls::Box
         std::vector<uint8_t> rgba = forwarder_icon::square_rgba(p.rgba.data(), p.w, p.h, c.x, 256);
         if (this->row.pin && !this->shield.rgba.empty())
             forwarder_icon::draw_over(rgba, 256, this->shield.rgba.data(), this->shield.w, this->shield.h);
-        set_texture(this->after, texture_of(rgba, 256));
+        show_pixels(this->after, rgba, 256);
     }
 
     void draw_cell(size_t index)
     {
         const Choice& c = this->choices[index];
         if (c.small.rgba.empty()) return;
-        set_texture(c.image, texture_of(forwarder_icon::square_rgba(c.small.rgba.data(), c.small.w, c.small.h, c.x, TILE_PX),
-                                        TILE_PX));
+        show_pixels(c.image, forwarder_icon::square_rgba(c.small.rgba.data(), c.small.w, c.small.h, c.x, TILE_PX), TILE_PX);
         // What the HOME menu shows now: the one in use, its square where it was.
         if (index == this->in_use) {
             const int x = c.shot.empty() || !c.lib.empty() ? forwarders::ICON_X_MIDDLE : this->row.icon_x;
-            set_texture(this->now, texture_of(forwarder_icon::square_rgba(c.small.rgba.data(), c.small.w, c.small.h, x, TILE_PX),
-                                              TILE_PX));
+            show_pixels(this->now, forwarder_icon::square_rgba(c.small.rgba.data(), c.small.w, c.small.h, x, TILE_PX), TILE_PX);
         }
     }
 

@@ -780,13 +780,13 @@ jobs:
           ccache --show-stats
           # The same commit gives the same zips (CONTRIBUTING.md, "Reproducible
           # zips"): build them once more and compare. What each build packed
-          # is kept (the zips, the .nro, its NACP, the shaders, the checksum
+          # is kept (the zips, the .nro, its NACP, the shaders Aurore built into it, the checksum
           # of every RomFS file): tools/repro_diff.py says what differs, down
           # to the RomFS file, and a failed check uploads both builds.
           keep() {
             mkdir -p "$1/dksh"
             cp playguard.zip playguard-rescue.zip playguard-agent.zip build/playguard.nro build/playguard.nacp "$1/"
-            cp build/dksh/*.dksh "$1/dksh/"
+            cp build/borealis_library/dksh/*.dksh "$1/dksh/"
             (cd build/resources && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$1/resources.sha256"
           }
           # The second build starts from a clean tree (make clean: no object,

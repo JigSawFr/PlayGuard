@@ -78,11 +78,6 @@
 #include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
 
-// nanovg's per-frame counters, through the getter
-// tools/perf_nanovg_stats.patch adds to the borealis tree. Weak: without the
-// patch, the frame time alone is recorded.
-extern "C" void nvgDebugGetStats(NVGcontext*, int*, int*, int*, int*) __attribute__((weak));
-
 using namespace brls::literals;
 
 namespace
@@ -403,7 +398,7 @@ bool run_frame()
 #ifndef __SWITCH__
     if (s_stats) {
         int draws = 0, fill = 0, stroke = 0, text = 0;
-        if (nvgDebugGetStats) nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
+        nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
         const brls::Time now = brls::getCPUTimeUsec();
         std::fprintf(s_stats, "%lld %lld %d %d %d %d\n", (long long)now, (long long)(now - s_stats_last), draws, fill,
                      stroke, text);
@@ -480,14 +475,6 @@ int main(int argc, char* argv[])
     // picker's takes half of it.
     brls::getStyle().addMetric("brls/animations/show", 2.0f);
 
-    // The console clears the screen with a colour deko3d records once
-    // (SwitchVideoContext::recordStaticCommands: at start-up and on a theme
-    // change), so before this palette: the space behind the tabs stayed
-    // borealis' grey next to the rail's navy. A theme change records it
-    // again (the desktop clears with the theme's colour every frame).
-    brls::Platform* platform = brls::Application::getPlatform();
-    platform->setThemeVariant(platform->getThemeVariant());
-
     // We own the quit path (B on the sidebar / error screen).
     brls::Application::setGlobalQuit(false);
 
@@ -509,9 +496,9 @@ int main(int argc, char* argv[])
 #ifndef __SWITCH__
     // Desktop measurement (PLAYGUARD_SIM_STATS=<file>, tools/perf_frames.sh):
     // one line per frame, "<time us> <frame us> <draw calls> <fill tris>
-    // <stroke tris> <text tris>", the counters from nanovg's own (zero without
-    // tools/perf_nanovg_stats.patch). The FPS limiter is turned off so the
-    // frame time is the work alone.
+    // <stroke tris> <text tris>", the counters nanovg's own
+    // (nvgDebugGetStats). The FPS limiter is turned off so the frame time is
+    // the work alone.
     if (const char* path = sim_env("PLAYGUARD_SIM_STATS")) {
         // Created with an explicit mode (CodeQL: fopen's depends on the umask).
         const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);

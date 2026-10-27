@@ -22,8 +22,6 @@
 #include "util/paths.hpp"
 #include "view/game_cell.hpp"
 
-#include <yoga/Yoga.h>
-
 using namespace brls::literals;
 using forwarders_logic::Row;
 using forwarders_logic::State;
@@ -91,7 +89,7 @@ brls::Box* legend(const std::vector<std::string>& used)
         { "pause", "playguard/forwarders/detail_paused" },
     };
     auto* box = new brls::Box(brls::Axis::ROW);
-    YGNodeStyleSetFlexWrap(box->getYGNode(), YGWrapWrap);   // on two lines when the words are long
+    box->setWrap(brls::Wrap::WRAP);   // on two lines when the words are long
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setMargins(8, 8, 0, 10);
     for (const auto& [icon, key] : MARKS) {

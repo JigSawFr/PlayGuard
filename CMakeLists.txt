@@ -35,53 +35,6 @@ include(${BOREALIS_LIBRARY}/cmake/toolchain.cmake)
 
 project(playguard LANGUAGES CXX C)
 
-# borealis' toolchain.cmake sets CMAKE_C_FLAGS / CMAKE_CXX_FLAGS as normal
-# variables (include paths), which hides the cache values devkitPro's
-# NintendoSwitch platform file initialises: the Cortex-A57 tuning, the crc and
-# crypto extensions and the thread-local model libnx is built with. Put them
-# back for every target (borealis, yoga, fmt, tinyxml2 and the app).
-if (PLATFORM_SWITCH AND NX_ARCH_SETTINGS)
-    string(PREPEND CMAKE_C_FLAGS "${NX_ARCH_SETTINGS} ")
-    string(PREPEND CMAKE_CXX_FLAGS "${NX_ARCH_SETTINGS} ")
-endif ()
-# devkitPro's platform file defaults to Release (-O2 -g; elf2nro keeps no
-# debug data). borealis prints its "Build Type:" line before project() picks
-# that default, so say what is actually used.
-# deko3d draws with precompiled shaders: borealis' nanovg loads them from
-# romfs:/shaders/. uam (part of switch-dev) does not always give the same
-# bytes for the same GLSL (one scheduling word of fill_vsh differs from run to
-# run), which broke the reproducible zips, so the compiled shaders are kept in
-# shaders/ and copied as they are. shaders/glsl.sha256 is the GLSL they were
-# compiled from: after a borealis bump changes it, configure with
-# -DPLAYGUARD_UAM=ON, copy build/dksh/*.dksh to shaders/ and update the checksums.
-option(PLAYGUARD_UAM "Switch: compile the deko3d shaders with uam instead of using shaders/" OFF)
-set(PLAYGUARD_DKSH_DIR ${CMAKE_BINARY_DIR}/dksh)
-set(PLAYGUARD_SHADERS fill_vsh fill_fsh fill_aa_fsh)
-if (PLATFORM_SWITCH AND USE_DEKO3D)
-    if (PLAYGUARD_UAM)
-        gen_dksh(${PLAYGUARD_DKSH_DIR})
-        foreach (shader ${PLAYGUARD_SHADERS})
-            if (NOT EXISTS ${PLAYGUARD_DKSH_DIR}/${shader}.dksh)
-                message(FATAL_ERROR "uam did not produce ${shader}.dksh")
-            endif ()
-        endforeach ()
-    else ()
-        file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/shaders/glsl.sha256 PLAYGUARD_GLSL_SUMS)
-        foreach (line ${PLAYGUARD_GLSL_SUMS})
-            string(REGEX MATCH "^([0-9a-f]+)  (.+)$" _ "${line}")
-            file(SHA256 ${BOREALIS_LIBRARY}/lib/extern/nanovg/deko3d/shaders/${CMAKE_MATCH_2} PLAYGUARD_GLSL_SUM)
-            if (NOT PLAYGUARD_GLSL_SUM STREQUAL CMAKE_MATCH_1)
-                message(FATAL_ERROR "borealis' ${CMAKE_MATCH_2} changed since shaders/ was compiled: "
-                        "configure with -DPLAYGUARD_UAM=ON, copy build/dksh/*.dksh to shaders/ "
-                        "and update shaders/glsl.sha256")
-            endif ()
-        endforeach ()
-        file(REMOVE_RECURSE ${PLAYGUARD_DKSH_DIR})
-        foreach (shader ${PLAYGUARD_SHADERS})
-            file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders/${shader}.dksh DESTINATION ${PLAYGUARD_DKSH_DIR})
-        endforeach ()
-    endif ()
-endif ()
 if (PLATFORM_SWITCH)
     if (USE_DEKO3D)
         message(STATUS "PlayGuard renderer: deko3d")
@@ -89,6 +42,9 @@ if (PLATFORM_SWITCH)
         message(STATUS "PlayGuard renderer: OpenGL (mesa)")
     endif ()
 endif ()
+# devkitPro's platform file defaults to Release (-O2 -g; elf2nro keeps no
+# debug data). borealis prints its "Build Type:" line before project() picks
+# that default, so say what is actually used.
 string(TOUPPER "${CMAKE_BUILD_TYPE}" PLAYGUARD_BUILD_TYPE_UC)
 message(STATUS "PlayGuard build type: ${CMAKE_BUILD_TYPE}; C++ flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${PLAYGUARD_BUILD_TYPE_UC}}")
 
@@ -329,7 +285,6 @@ set(ASSEMBLE_RESOURCES
             -DAPP_VERSION=${APP_VERSION} -DAPP_COMMIT=${APP_COMMIT}
             -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/bundle_sysmodules.cmake)
 
-set(PLAYGUARD_COPY_SHADERS)
 # The web simulator: Japanese, Korean and Chinese drawn with the characters
 # the catalogs use, cut out of Noto Sans CJK (tools/web_cjk_font.py), as the
 # console draws them with its system fonts. It is served next to the page, not
@@ -361,10 +316,6 @@ if (PLAYGUARD_WEB)
     endif ()
 endif ()
 
-if (PLATFORM_SWITCH AND USE_DEKO3D)
-    set(PLAYGUARD_COPY_SHADERS COMMAND ${CMAKE_COMMAND} -E copy_directory ${PLAYGUARD_DKSH_DIR} ${MERGED_RESOURCES}/shaders)
-endif ()
-
 if (PLATFORM_SWITCH)
     # The program of the NRO forwarders PlayGuard installs (core/forwarder.h)
     # rides in the .nro (romfs:/forwarder/main and main.npdm), built by
@@ -386,7 +337,6 @@ if (PLATFORM_SWITCH)
         COMMAND ${NX_NACPTOOL_EXE} --create "PlayGuard" "${PROJECT_AUTHOR}"
                 "${APP_VERSION}" ${PROJECT_NAME}.nacp --titleid=${PROJECT_TITLEID}
         ${ASSEMBLE_RESOURCES}
-        ${PLAYGUARD_COPY_SHADERS}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/forwarder
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.nso ${MERGED_RESOURCES}/forwarder/main
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.npdm ${MERGED_RESOURCES}/forwarder/main.npdm
