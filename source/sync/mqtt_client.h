@@ -70,6 +70,11 @@ int  mqtt_client_subscribe(MqttClient *c, const char *const *topics, const uint8
                            size_t required, int timeout_ms);
 // QoS 0.
 int  mqtt_client_publish(MqttClient *c, const char *topic, const void *payload, size_t len, bool retain);
+// The same with its payload in pieces (a file read a piece at a time): the
+// header says `len`, then exactly `len` bytes follow, through _more. A
+// payload that cannot be finished leaves the stream unusable: close it.
+int  mqtt_client_publish_begin(MqttClient *c, const char *topic, size_t len, bool retain);
+int  mqtt_client_publish_more(MqttClient *c, const void *bytes, size_t n);
 // Reads for up to `timeout_ms`, delivers messages, keeps the connection alive
 // (PINGREQ, and a missing PINGRESP closes it).
 int  mqtt_client_poll(MqttClient *c, int timeout_ms);

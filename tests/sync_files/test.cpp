@@ -256,6 +256,17 @@ void test_agent_events()
     struct stat st;
     CHECK(stat((sync_files::system_dir() + "/agent_events.log").c_str(), &st) != 0);
     CHECK(stat((sync_files::system_dir() + "/agent_events.log.read").c_str(), &st) != 0);
+
+    // The icons the agent published: taken the same way; icons.txt next to it.
+    CHECK(sync_files::take_agent_icons().empty());
+    CHECK(paths::atomic_write(sync_files::system_dir() + "/agent_icons.txt", "target=0a1b2c3d\n0100000000010000=5\n"));
+    CHECK(sync_files::take_agent_icons() == "target=0a1b2c3d\n0100000000010000=5\n");
+    CHECK(sync_files::take_agent_icons().empty());
+    CHECK(stat((sync_files::system_dir() + "/agent_icons.txt.read").c_str(), &st) != 0);
+    sync_files::write_icons("target=0a1b2c3d\n");
+    CHECK(sync_files::icons_file() == sync_files::system_dir() + "/icons.txt");
+    std::string written;
+    CHECK(paths::read_file(sync_files::icons_file(), written) && written == "target=0a1b2c3d\n");
 }
 
 int main()

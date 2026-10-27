@@ -27,7 +27,7 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 | `playguard/<id>/state` | yes | console → | The state snapshot (below). |
 | `playguard/<id>/system` | yes | console → | The console itself: versions, model, name, storage, power, network (below). With the state, every `poll_s`. |
 | `playguard/<id>/games` | yes | console (app) → | The games installed and played, each with its play time in all (below), published by PlayGuard after a read of the play log. |
-| `playguard/<id>/icon/<APP_ID>` | yes | console (app) → | A game's icon: the raw JPEG of its control data, for the games played lately (below). An empty retained message clears it. |
+| `playguard/<id>/icon/<APP_ID>` | yes | console (app; agent: the game played) → | A game's icon: the raw JPEG of its control data, for every game installed or played (below). An empty retained message clears it. |
 | `playguard/<id>/activity` | yes | console → | Today's play time from the play log. |
 | `playguard/<id>/activity/<YYYY-MM-DD>` | yes | console → | A finished day's totals, published at the first cycle after local midnight. The console keeps the last 14 and clears older ones (empty retained publish). |
 | `playguard/<id>/names` | yes | console (app) → | Game and account names, published by PlayGuard when it runs. |
@@ -227,29 +227,46 @@ each game's history in a long-term statistic, with no sensor per game.
 ## `icon/<APP_ID>`
 
 A game's icon, as the HOME menu shows it: the JPEG of its control data
-(256 × 256, at most 128 KiB, most of them 20 to 60 KiB), raw bytes, retained.
-`<APP_ID>` is 16 uppercase hex characters, as in `names`. Only the games
-played lately have one: those played over the last 7 days, then the others
-most recently played, 24 at most (the most recent kept), so the broker holds
-a few hundred KiB to a few MiB, never the whole library. The game the agent
-reports in `now_playing` is among them once PlayGuard has read the play log
-since it was started; a game picked up again after weeks often already is
-(one of the most recent).
+(256 × 256), raw bytes, retained. `<APP_ID>` is 16 uppercase hex characters,
+as in `names`. Every game has one: those installed (the last check of them,
+*Console › Check the installed games*, which PlayGuard also runs at
+start-up) and those played, installed or not, when PlayGuard can still read
+an icon for it (its icon cache on the SD card, or the console's own cache),
+512 at most. An icon is 128 KiB at most; a game's is detailed art, most
+likely 20 to 60 KiB (an estimate: no console's icons were measured here;
+PlayGuard's own, a flat drawing, is 12 KiB), so a library of 200 games is
+some 4 to 12 MiB on the broker, a large one up to 64 MiB in the worst case.
 
-Published by PlayGuard only, never by the agent (its heap cannot spare an
-icon): while PlayGuard runs and the link is online, its own session's or the
-agent's, after a read of the play log. They go over a short connection of
-their own (`pg-<id>-icons`, no last will, nothing subscribed), one icon read
-at a time, so they never hold the session nor go through `pg:agent`; a
-connection that fails is tried again 5 minutes later. Each icon is sent once:
-what was sent, and to which broker, host, port and `<prefix>/<id>` (a hash),
-is kept in `nand/<system>/sync/icons.txt`, so a new run sends only the games
-new to the set, and a new broker or console id gets them all again. A game
-that leaves the set has its icon cleared (an empty retained message), and so
-does every one when `publish_icons` is turned off. *Sync now* on the console
-sends the set again (an icon the broker lost, a game whose update changed its
-icon). A broker whose maximum packet size (5.0) is smaller than an icon does
-not get it; that one is not tried again.
+**PlayGuard publishes them**, while it runs and the link is online (its own
+session's or the agent's), after a read of the play log. They go over a
+short connection of their own (`pg-<id>-icons`, no last will, nothing
+subscribed), 32 at most per connection (a large library takes a few, one
+after the other), one icon read at a time, so they never hold the session
+nor go through `pg:agent`; a connection that fails is tried again 5 minutes
+later. Each icon is sent once: what was sent, and to which broker, host,
+port and `<prefix>/<id>` (a hash), is kept in `nand/<system>/sync/icons.txt`,
+so a new run sends only the new games, and a new broker or console id gets
+them all again. A game no longer installed nor in the play log has its icon
+cleared (an empty retained message), and so does every one when
+`publish_icons` is turned off; nothing is cleared before the installed games
+were checked once. *Sync now* on the console sends them all again (an icon
+the broker lost, a game whose update changed its icon). A broker whose
+maximum packet size (5.0) is smaller than an icon does not get it; that one
+is not tried again.
+
+**The agent publishes one icon itself:** the game played, when the broker
+does not have it yet (neither `icons.txt` nor its own `agent_icons.txt`
+lists it for this broker and console) and PlayGuard's icon cache on the SD
+card (`config/playguard/cache/icons/<APP_ID>.jpg`) has it, looked for once
+per game while it runs. It streams the file in pieces (the header says the
+length, then the bytes follow through the engine's 32 KiB scratch buffer:
+no buffer of its own), on its own session, then adds the game to
+`agent_icons.txt`, which PlayGuard takes into `icons.txt` when it next reads
+the play log. That covers a game PlayGuard read the icon of but could not
+send (its link was offline, `publish_icons` was off). A game installed or
+first played since PlayGuard last ran is not in that cache: the agent has
+no `ns` session to read its control data (and an icon is more than its heap
+can spare), so that icon waits for PlayGuard to be opened.
 
 ## `activity`, `activity/<date>`, `names`, `week`
 
@@ -466,6 +483,8 @@ release's `CHANGELOG.md`) and the QR code that opens it in HACS.
 | `config/playguard/nand/<system>/sync/nro_state.txt` | PlayGuard, after every settings save (`config.json`, this system's `state.json`) once `sync.conf` exists, when read-only mode changes and when the serial number it publishes does | The extra-time record, the console lock and its saved limits, `relock_pending`, `extra_auto_restore`, the firmware choice (`fw_gate_*`), `pin_lock`, `read_only` and `firmware` (the one PlayGuard last ran on): what the agent must know to act on PlayGuard's behalf; and `serial`, the serial number PlayGuard read, only with `publish_serial`. The agent changes nothing when `read_only=1`, when the key is missing, or when the console's firmware is no longer `firmware` (a system update PlayGuard has not seen). A line break in a value is written as a space. |
 | `config/playguard/nand/<system>/sync/names.txt` | PlayGuard, after a read of the play log | `0100000000010000=Super Mario Odyssey`: the agent's "now playing". |
 | `config/playguard/nand/<system>/sync/icons.txt` | PlayGuard, after it published or cleared game icons | `target=<8 hex>` (a hash of the broker's host, port and `<prefix>/<id>`), then `0100000000010000=40123`: each icon on the broker and its size in bytes (0: the game has none to publish). Read when PlayGuard starts. |
+| `config/playguard/nand/<system>/sync/agent_icons.txt` | the agent, after it published the icon of the game played | The same form, for what the agent sent itself. PlayGuard takes it (renamed, read, removed) after each read of the play log and adds its games to `icons.txt`; the agent reads both before publishing an icon. |
+| `config/playguard/cache/icons/<APP_ID>.jpg` | PlayGuard, each icon it reads (its screens, its names, the icons it publishes) | Its icon cache, shared by every system on the SD card (16 MiB, 512 icons at most, emptied when the console language changes or it is full); the agent reads it, never writes it. |
 | `config/playguard/nand/<system>/sync/agent_state.txt` | the agent | The same records, for what the agent changed itself. At start the agent takes the newer of this file and `nro_state.txt`; PlayGuard adopts the agent's records (`GetRecords`) when it opens. |
 | `config/playguard/nand/<system>/sync/integration.json` | the link that got it (PlayGuard's or the agent's) | The HA integration's document (`integration`, above), as it came; removed when the integration clears it. PlayGuard reads it at start, and every 30 s while the agent holds the link. |
 | `config/playguard/nand/<system>/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. |
@@ -507,7 +526,7 @@ The rest is on by default, the serial number off, each with its key
 |---|---|---|
 | `publish_activity` | Play time | `activity`, `week`, `names`, `activity/<date>`, the state's `activity_today` |
 | `publish_games` | The games | `games` |
-| `publish_icons` | The games' icons | `icon/<APP_ID>`, cleared by PlayGuard (it knows which it sent) |
+| `publish_icons` | The games' icons | `icon/<APP_ID>`, cleared by PlayGuard (it knows which were sent) |
 | `publish_console` | The console's state | the system document's `power`, `storage`, `boot_ts` |
 | `publish_network` | The network | the system document's `network` |
 | `publish_hardware` | Versions and hardware | the system document's `versions` (but PlayGuard's and the agent's) and `hardware`, the state's `console.firmware` and `console.atmosphere`, the discovery device's model and system |

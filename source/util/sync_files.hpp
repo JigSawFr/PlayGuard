@@ -76,9 +76,13 @@ void write_names(const std::vector<std::pair<uint64_t, std::string>>& names);
 
 // nand/<system>/sync/icons.txt: the game icons PlayGuard published, and to
 // which broker (action/sync_icons_logic's text), so a new run sends only
-// what changed. PlayGuard's alone: the agent publishes no icons.
+// what changed. PlayGuard writes it, the agent only reads it.
 std::string icons_file();
 void write_icons(const std::string& text);
+// nand/<system>/sync/agent_icons.txt: the icons the agent published itself
+// (the game played, from PlayGuard's icon cache), in the same form. Taken as
+// agent_events.log is (renamed, read, removed): its text, "" when none.
+std::string take_agent_icons();
 
 // nand/<system>/sync/integration.json: PlayGuard's Home Assistant integration's
 // document, as the link got it from the broker (docs/sync-protocol.md):

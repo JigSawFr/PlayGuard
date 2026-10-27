@@ -338,6 +338,17 @@ std::vector<AgentEvent> parse_agent_events(const std::string& text)
     return out;
 }
 
+std::string take_agent_icons()
+{
+    const std::string file = system_dir() + "/agent_icons.txt", taken = file + ".read";
+    struct stat st;
+    if (stat(taken.c_str(), &st) != 0 && std::rename(file.c_str(), taken.c_str()) != 0) return "";
+    std::string text;
+    paths::read_file(taken, text);
+    std::remove(taken.c_str());
+    return text;
+}
+
 std::vector<AgentEvent> take_agent_events()
 {
     const std::string file = system_dir() + "/agent_events.log", taken = file + ".read";

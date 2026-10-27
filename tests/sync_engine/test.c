@@ -1263,6 +1263,51 @@ static void test_mqtt5_properties(void)
     CHECK(strstr(engine.status.error, "session taken over by another client (taken)"));
 }
 
+// A file published a piece at a time (the agent's icon of the game played).
+typedef struct {
+    const char *data;
+    size_t      len, at, piece;
+} Reader;
+
+static size_t read_piece(void *ctx, void *buf, size_t cap)
+{
+    Reader *r = (Reader *)ctx;
+    size_t n = r->len - r->at;
+    if (n > cap) n = cap;
+    if (n > r->piece) n = r->piece;
+    memcpy(buf, r->data + r->at, n);
+    r->at += n;
+    return n;
+}
+
+static void test_publish_stream(void)
+{
+    setup(false, SyncPolicy_Auto);
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    static char icon[20000];
+    for (size_t i = 0; i < sizeof(icon); i++) icon[i] = (char)(i * 7 + 1);
+    const uint32_t publishes = sync_engine_status(&engine)->publishes;
+    Reader r = { icon, sizeof(icon), 0, 1500 };
+    CHECK(sync_engine_publish_stream(&engine, "icon/0100000000010000", sizeof(icon), true, read_piece, &r) == 0);
+    const Message *m = last_on("playguard/a1b2c3d4/icon/0100000000010000");
+    CHECK(m && m->retain && m->len == sizeof(icon) && !memcmp(m->payload, icon, sizeof(icon)));
+    CHECK(sync_engine_status(&engine)->publishes == publishes + 1 && sync_engine_online(&engine));
+    // A file that comes short: half a packet went out, so the connection is
+    // closed, and the next step connects again; nothing was published.
+    Reader cut = { icon, 5000, 0, 1500 };
+    CHECK(sync_engine_publish_stream(&engine, "icon/0100000000020000", 6000, true, read_piece, &cut) < 0);
+    CHECK(!sync_engine_online(&engine));
+    CHECK(strstr(sync_engine_status(&engine)->error, "cut short") != NULL);
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    CHECK(!last_on("playguard/a1b2c3d4/icon/0100000000020000"));
+    // Offline: refused at once.
+    sync_engine_stop(&engine);
+    Reader none = { icon, 10, 0, 10 };
+    CHECK(sync_engine_publish_stream(&engine, "icon/0100000000030000", 10, true, read_piece, &none) < 0 && none.at == 0);
+}
+
 int main(void)
 {
     static Message log[MAX_LOG];
@@ -1285,5 +1330,6 @@ int main(void)
     test_oversized_and_reconfigure();
     test_mqtt_versions();
     test_mqtt5_properties();
+    test_publish_stream();
     return CHECK_DONE("sync_engine: all tests passed");
 }

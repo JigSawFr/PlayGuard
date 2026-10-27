@@ -240,10 +240,12 @@ Play statistics: the agent publishes today's totals from the play log on each
 cycle and, at the first cycle after local midnight, yesterday's final totals on
 `activity/<date>` (the last 14 days stay retained). PlayGuard, when open,
 publishes the 7-day table and the table of game names (it has the NACP data
-cached; the agent never loads it), and the icons of the games played lately
-(`icon/<app id>`, up to 128 KiB each: more than the agent's heap can spare,
-so they go over a short connection of PlayGuard's own, `pg-<id>-icons`,
-whoever holds the link). The HA integration turns the daily totals
+cached; the agent never loads it), and the icon of every game installed or
+played (`icon/<app id>`, up to 128 KiB each: more than the agent's heap can
+spare, so they go over a short connection of PlayGuard's own,
+`pg-<id>-icons`, whoever holds the link). The agent only adds the icon of
+the game played when PlayGuard's icon cache has it and the broker does not,
+streamed from the SD card a piece at a time (no `ns`, no buffer of its own). The HA integration turns the daily totals
 into long-term statistics.
 
 ### The agent

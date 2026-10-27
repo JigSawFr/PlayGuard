@@ -35,6 +35,7 @@
 #include "pctl_ops.h"
 #include "playstats.h"
 #include "sync_engine.h"
+#include "sync_icons.h"
 #include "sync_net.h"
 #include "sync_state.h"
 #include "sync_system.h"
@@ -53,10 +54,12 @@
 #define SYNC_DIR     DATA_DIR "/sync"
 #define PROFILES     SYNC_DIR "/profiles.txt"
 #define REPORTS_DIR  DATA_DIR "/logs/reports"
+#define ICON_CACHE   DATA_DIR "/cache/icons"   // PlayGuard's (playstats_set_icon_dir), read only
 
 // This system's (nand/<key>/sync/), once the system is known (system_paths()).
 static char g_system_dir[64];
 static char NRO_STATE[96], AGENT_STATE[96], AGENT_EVENTS[96], NAMES[96], INTEGRATION[96], AGENT_WATCHDOG[96];
+static char ICONS[96], AGENT_ICONS[96];
 static bool g_emummc;
 
 #define ACTIVITY_EVERY_MS (5 * 60 * 1000ULL)
@@ -68,6 +71,7 @@ static bool g_emummc;
 // itself, and puts back the part it was called from.
 static const char PHASE_LINK[] = "the link (network)";
 static const char PHASE_HANDOVER[] = "the hand-over (network)";
+static const char PHASE_ICON[] = "the game's icon (SD card, network)";
 static const char *volatile g_phase = "start-up";
 static volatile uint64_t g_turn_ms;
 
@@ -283,6 +287,8 @@ static void system_paths(void)
     snprintf(NAMES, sizeof(NAMES), "%s/sync/names.txt", g_system_dir);
     snprintf(INTEGRATION, sizeof(INTEGRATION), "%s/sync/integration.json", g_system_dir);
     snprintf(AGENT_WATCHDOG, sizeof(AGENT_WATCHDOG), "%s/sync/agent_watchdog.log", g_system_dir);
+    snprintf(ICONS, sizeof(ICONS), "%s/sync/icons.txt", g_system_dir);
+    snprintf(AGENT_ICONS, sizeof(AGENT_ICONS), "%s/sync/agent_icons.txt", g_system_dir);
 }
 
 // ---- the agent's state ----
@@ -952,7 +958,7 @@ static void watchdog(void *arg)
         told = turn;
         const char *where = g_phase;
         bool freed = false;
-        if (where == PHASE_LINK || where == PHASE_HANDOVER) {
+        if (where == PHASE_LINK || where == PHASE_HANDOVER || where == PHASE_ICON) {
             const int fd = g_conf.tls ? g_tls.tcp.fd : g_tcp.fd;
             freed = fd >= 0 && shutdown(fd, SHUT_RDWR) == 0;
         }
@@ -1145,6 +1151,57 @@ static void publish_status(void)
     mutexUnlock(&g_lock);
 }
 
+// ---- the icon of the game played ----
+
+static u64 g_icon_looked;   // the game whose icon was looked for last (0: none)
+
+static size_t read_icon(void *ctx, void *buf, size_t cap)
+{
+    return fread(buf, 1, cap, (FILE *)ctx);
+}
+
+// The game played has no icon on the broker yet (PlayGuard publishes them,
+// docs/sync-protocol.md: one it has not sent, its link offline then, or
+// publish_icons turned on since): its JPEG from PlayGuard's icon cache on the
+// SD card, streamed a piece at a time (the engine's scratch: no buffer of its
+// own), then added to agent_icons.txt, which PlayGuard takes into its
+// icons.txt. A game PlayGuard never read (installed or first played since it
+// last ran) is not in the cache: without ns the agent cannot read its
+// control data, PlayGuard publishes it next time. Looked for once per game.
+static void publish_playing_icon(void)
+{
+    const u64 id = g_playing;
+    if (!id || id == g_icon_looked || !g_conf.publish_icons || !sync_engine_online(&g_engine)) return;
+    g_icon_looked = id;
+    char target[SYNC_ICONS_TARGET_LEN + 1];
+    sync_icons_target(g_conf.host, g_conf.port, g_engine.base, target);
+    size_t n = read_file(ICONS, g_text, sizeof(g_text));
+    if (sync_icons_listed(g_text, n, target, id)) return;
+    n = read_file(AGENT_ICONS, g_text, sizeof(g_text));
+    if (sync_icons_listed(g_text, n, target, id)) return;
+    char path[96], sub[32], id_text[17];
+    snprintf(id_text, sizeof(id_text), "%016llX", (unsigned long long)id);
+    snprintf(path, sizeof(path), ICON_CACHE "/%s.jpg", id_text);
+    snprintf(sub, sizeof(sub), "icon/%s", id_text);
+    struct stat st;
+    if (stat(path, &st) != 0 || st.st_size < 4 || st.st_size > PLAYSTATS_ICON_MAX) return;   // PlayGuard's to send
+    FILE *f = fopen(path, "rb");
+    if (!f) return;
+    unsigned char head[2];
+    const bool jpeg = fread(head, 1, 2, f) == 2 && head[0] == 0xFF && head[1] == 0xD8 && fseek(f, 0, SEEK_SET) == 0;
+    const int rc = jpeg ? sync_engine_publish_stream(&g_engine, sub, (size_t)st.st_size, true, read_icon, f) : -1;
+    fclose(f);
+    if (rc < 0) {
+        // The connection lost on the way: again once it is back.
+        if (jpeg && !sync_engine_online(&g_engine)) g_icon_looked = 0;
+        return;
+    }
+    n = read_file(AGENT_ICONS, g_text, sizeof(g_text));
+    n = sync_icons_add(g_text, n, sizeof(g_text), target, id, (uint32_t)st.st_size);
+    if (n) write_file(AGENT_ICONS, g_text, n);
+    slog("icon of %s published from PlayGuard's cache%s", id_text, NULL);
+}
+
 int main(int argc, char **argv)
 {
     (void)argc;
@@ -1220,6 +1277,8 @@ int main(int argc, char **argv)
         hand_over();
         phase(PHASE_LINK);
         const int sleep_ms = sync_engine_step(&g_engine, 500);
+        phase(PHASE_ICON);
+        publish_playing_icon();
         publish_status();
         phase("waiting");
         if (sleep_ms > 0) svcSleepThread((u64)(sleep_ms > 1000 ? 1000 : sleep_ms) * 1000000ULL);

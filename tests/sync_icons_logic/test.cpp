@@ -19,19 +19,27 @@ static void test_wanted()
         { 0, 9000, 60 },     // no id
         { B, 5000, 600 },    // twice: once
     };
-    // This week's first, the most recent of them first (one unknown: last of them).
-    CHECK(wanted(games) == std::vector<uint64_t>({ B, D, E, A }));
-    CHECK(wanted(games, 2) == std::vector<uint64_t>({ B, D }));
-    CHECK(wanted(games, 0).empty());
-    CHECK(wanted({}).empty());
+    // Every game played: this week's first, the most recent of them first
+    // (one unknown: last of them), then the others most recent first.
+    CHECK(wanted(games, {}) == std::vector<uint64_t>({ B, D, E, A }));
+    CHECK(wanted(games, {}, 2) == std::vector<uint64_t>({ B, D }));
+    CHECK(wanted(games, {}, 0).empty());
+    CHECK(wanted({}, {}).empty());
+    // Then every one installed, in its order, once (C never played: in; A played: already).
+    CHECK(wanted(games, { C, A, 0, C }) == std::vector<uint64_t>({ B, D, E, A, C }));
+    CHECK(wanted({}, { C, A }) == std::vector<uint64_t>({ C, A }));
+    CHECK(wanted(games, { C }, 4) == std::vector<uint64_t>({ B, D, E, A }));   // the played ones first
     // As recent: the one played more this week first.
-    CHECK(wanted({ { A, 100, 60 }, { B, 100, 120 } }) == std::vector<uint64_t>({ B, A }));
-    // A large library: ICONS_MAX at most, the most recent kept.
+    CHECK(wanted({ { A, 100, 60 }, { B, 100, 120 } }, {}) == std::vector<uint64_t>({ B, A }));
+    // A large library: ICONS_MAX at most, the played ones and the first installed kept.
     std::vector<Played> many;
+    std::vector<uint64_t> installed;
     for (uint64_t i = 1; i <= 100; i++) many.push_back({ 0x0100000000000000ULL + i, i, 0 });
-    const auto kept = wanted(many);
+    for (uint64_t i = 1; i <= 600; i++) installed.push_back(0x0200000000000000ULL + i);
+    const auto kept = wanted(many, installed);
     CHECK(kept.size() == ICONS_MAX);
-    CHECK(kept.front() == 0x0100000000000000ULL + 100 && kept.back() == 0x0100000000000000ULL + 100 - ICONS_MAX + 1);
+    CHECK(kept.front() == 0x0100000000000000ULL + 100 && kept[99] == 0x0100000000000000ULL + 1);
+    CHECK(kept[100] == 0x0200000000000001ULL && kept.back() == 0x0200000000000000ULL + ICONS_MAX - 100);
 }
 
 static void test_plan()
@@ -94,10 +102,27 @@ static void test_file()
     CHECK(topic(0x01000A10041EA000ULL) == "icon/01000A10041EA000");
 }
 
+static void test_merge()
+{
+    const std::string t = target_of("broker.lan", 1883, "playguard/a1b2c3d4");
+    Sent sent;
+    record(sent, t, 1, 100, false);
+    // The agent's record (sync/sync_icons.c's form) read by the app.
+    Sent agent = parse("# The game icons the agent published.\ntarget=" + t + "\n0000000000000002=200\n0000000000000001=100\n");
+    CHECK(merge(sent, agent, t));
+    CHECK(sent.icons.size() == 2 && sent.icons.at(2) == 200);
+    CHECK(!merge(sent, agent, t));   // nothing new
+    CHECK(plan({ 1, 2 }, sent, t).empty());
+    // Sent to another broker or console: not ours.
+    CHECK(!merge(sent, agent, target_of("other.lan", 1883, "playguard/a1b2c3d4")));
+    CHECK(!merge(sent, Sent{}, t));
+}
+
 int main()
 {
     test_wanted();
     test_plan();
     test_file();
+    test_merge();
     return CHECK_DONE("sync_icons_logic: all tests passed");
 }

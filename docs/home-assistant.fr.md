@@ -122,11 +122,11 @@ suit aussi) ; réactivé, elles reviennent.
 Les entités de la console lisent `playguard/<id>/system`, que l'agent tient à
 jour quand PlayGuard est fermé ; celles des jeux lisent
 `playguard/<id>/games`, que PlayGuard publie après chaque lecture du journal
-de jeu. Les icônes des jeux joués récemment (les 7 derniers jours, puis les
-plus récents, 24 au plus) vont sur `playguard/<id>/icon/<id du jeu>`, chacune
-envoyée une fois par PlayGuard, pas par l'agent, quand il est ouvert et le
-lien en ligne : un jeu nouveau dans la liste a son icône la prochaine fois
-que PlayGuard est ouvert. **Le numéro de série** n'est publié qu'une fois *Accès à distance ›
+de jeu. L'icône de chaque jeu (installé ou joué) va
+sur `playguard/<id>/icon/<id du jeu>`, envoyée une fois par PlayGuard quand
+il est ouvert et le lien en ligne ; l'agent ajoute celle du jeu en cours
+quand PlayGuard l'a lue sans l'envoyer. Un jeu installé depuis la dernière
+ouverture de PlayGuard a son icône à la prochaine. **Le numéro de série** n'est publié qu'une fois *Accès à distance ›
 Ce qui est publié › Publier le numéro de série* activé (désactivé par défaut) : il part alors vers
 le broker, et jamais dans un rapport. Sur une console dont le PRODINFO est
 masqué, c'est le vrai, tiré de la sauvegarde qu'Atmosphère en garde sur la

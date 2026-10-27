@@ -1530,17 +1530,19 @@ if SYNC:
                             "-F", "%t %l", "-W", "2"], capture_output=True, text=True)
         return {t: int(n) for t, n in (l.split() for l in r.stdout.splitlines() if l.strip())}
 
-    # The games played lately: their icons, the control data's JPEG,
+    # Every game installed or played: its icon, the control data's JPEG,
     # retained, over a connection of their own; icons.txt says what was sent.
     shown = wait_for("the games' icons", icons, 30)
     first = sorted(shown)[0]
     icon = subprocess.run(["mosquitto_sub", "-h", "127.0.0.1", "-p", str(mqtt_port), "-t", first, "-C", "1", "-N",
                            "-W", "3"], capture_output=True).stdout
     # (the control data's JPEG on a console; the simulator's made-up games have PNG ones)
-    if not icon.startswith((b"\xff\xd8", b"\x89PNG")) or len(shown) > 24 or first.rsplit("/", 1)[1] != first.rsplit("/", 1)[1].upper():
+    if not icon.startswith((b"\xff\xd8", b"\x89PNG")) or len(shown) > 512 or first.rsplit("/", 1)[1] != first.rsplit("/", 1)[1].upper():
         fail(f"unexpected icons: {shown}, {first}: {icon[:8]!r}")
     if f"as pg-{SYNC_ID}-icons" not in open(os.path.join(OUT, "mosquitto.log"), errors="replace").read():
         fail("the icons did not come over their own connection")
+    # Sky Kingdom: installed, never played.
+    wait_for("an installed game's icon", lambda: f"{BASE}/icon/0100A1B2C3D4A000" in icons(), 30)
     wait_for("icons.txt", lambda: os.path.exists(icons_txt) and first.rsplit("/", 1)[1] in open(icons_txt).read(), 10)
 
     events = watch(f"{BASE}/event", "events.txt")
@@ -1600,7 +1602,7 @@ if SYNC:
     wait_for("the games' entities removed", lambda: (doc(f"homeassistant/device/playguard_{SYNC_ID}/config") or {})
              .get("cmps", {}).get("games_installed") == {"p": "sensor"}, 20)
     # The icons turned off: each one cleared from the broker.
-    go_to("Publish the games' icons (those played lately)")
+    go_to("Publish the games' icons (installed and played)")
     key("Return")
     wait_for("publish_icons saved off", lambda: "publish_icons=0" in open(sync_conf).read(), 10)
     wait_for("the icons cleared", lambda: not icons(), 20)

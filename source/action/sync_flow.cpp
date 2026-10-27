@@ -686,7 +686,8 @@ void on_play_data()
         s_games_sent = games;
         post_publish("games", games, true);
     }
-    // The games played lately, for their icons (action/sync_icons).
+    // Every game played, for their icons (action/sync_icons, which adds
+    // the installed ones).
     std::vector<sync_icons_logic::Played> played;
     for (uint32_t i = 0; i < stats->count; i++) {
         const GameStat& g = stats->games[i];

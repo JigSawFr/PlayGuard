@@ -1792,7 +1792,7 @@
         "published_note": "みまもり設定は常に送信されます。オフにした情報はブローカーから消去され、Home Assistant から削除されます。",
         "publish_activity": "プレイ時間を送信する（今日、今週、毎日）",
         "publish_games": "ソフトを送信する（一覧、それぞれのプレイ時間）",
-        "publish_icons": "ソフトのアイコンを送信する（最近遊んだもの）",
+        "publish_icons": "ソフトのアイコンを送信する（インストール済み・プレイ済み）",
         "publish_console": "本体の状態を送信する（バッテリー、保存容量、ドック）",
         "publish_network": "ネットワークを送信する（IP アドレス、Wi-Fi）",
         "publish_hardware": "バージョンとハードウェアを送信する（モデル、ファームウェア、Atmosphère）",

@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <set>
 
+#include "sync/sync_icons.h"
+
 namespace sync_icons_logic
 {
 
@@ -36,7 +38,7 @@ bool parse_id(const std::string& s, uint64_t* out)
 }
 }   // namespace
 
-std::vector<uint64_t> wanted(std::vector<Played> games, size_t max)
+std::vector<uint64_t> wanted(std::vector<Played> games, const std::vector<uint64_t>& installed, size_t max)
 {
     games.erase(std::remove_if(games.begin(), games.end(),
                                [](const Played& g) { return !g.app_id || (!g.week_s && !g.last_played); }),
@@ -55,17 +57,17 @@ std::vector<uint64_t> wanted(std::vector<Played> games, size_t max)
         if (out.size() == max) break;
         if (seen.insert(g.app_id).second) out.push_back(g.app_id);
     }
+    for (const uint64_t id : installed) {
+        if (out.size() == max) break;
+        if (id && seen.insert(id).second) out.push_back(id);
+    }
     return out;
 }
 
 std::string target_of(const std::string& host, uint16_t port, const std::string& base)
 {
-    // FNV-1a over "host:port/base".
-    const std::string key = host + ":" + std::to_string(port) + "/" + base;
-    uint32_t h = 2166136261u;
-    for (const char c : key) h = (h ^ (uint8_t)c) * 16777619u;
-    char out[9];
-    std::snprintf(out, sizeof(out), "%08x", (unsigned)h);
+    char out[SYNC_ICONS_TARGET_LEN + 1];
+    sync_icons_target(host.c_str(), port, base.c_str(), out);   // the agent's too
     return out;
 }
 
@@ -90,6 +92,18 @@ void record(Sent& sent, const std::string& target, uint64_t app_id, uint32_t byt
     }
     if (cleared) sent.icons.erase(app_id);
     else sent.icons[app_id] = bytes;
+}
+
+bool merge(Sent& sent, const Sent& agent, const std::string& target)
+{
+    if (agent.target != target) return false;
+    bool added = false;
+    for (const auto& a : agent.icons) {
+        if (sent.target == target && sent.icons.count(a.first)) continue;
+        record(sent, target, a.first, a.second, false);
+        added = true;
+    }
+    return added;
 }
 
 std::string text(const Sent& sent)

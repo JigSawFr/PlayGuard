@@ -1792,7 +1792,7 @@
         "published_note": "家長監護設定一律會發布。關閉的項目會從 broker 清除，並從 Home Assistant 移除。",
         "publish_activity": "發布遊戲時間（今天、本週、每天）",
         "publish_games": "發布遊戲（清單、每款的遊戲時間）",
-        "publish_icons": "發布遊戲圖示（最近玩過的）",
+        "publish_icons": "發布遊戲圖示（已安裝和玩過的）",
         "publish_console": "發布主機狀態（電池、儲存空間、底座）",
         "publish_network": "發布網路（IP 位址、Wi-Fi）",
         "publish_hardware": "發布版本與硬體（型號、韌體、Atmosphère）",

@@ -1792,7 +1792,7 @@
         "published_note": "자녀 보호 기능은 항상 전송됩니다. 끈 항목은 브로커에서 지워지고 Home Assistant에서 제거됩니다.",
         "publish_activity": "플레이 시간 전송 (오늘, 이번 주, 매일)",
         "publish_games": "소프트웨어 전송 (목록, 각각의 플레이 시간)",
-        "publish_icons": "소프트웨어 아이콘 전송 (최근 플레이한 것)",
+        "publish_icons": "소프트웨어 아이콘 전송 (설치한 것과 플레이한 것)",
         "publish_console": "본체 상태 전송 (배터리, 저장 공간, 독)",
         "publish_network": "네트워크 전송 (IP 주소, Wi-Fi)",
         "publish_hardware": "버전 및 하드웨어 전송 (모델, 펌웨어, Atmosphère)",

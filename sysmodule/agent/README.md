@@ -32,6 +32,10 @@ started again (`source/action/agent_update.cpp`, the steps host-tested in
   the last 7 days (`pdm:qry`, no game names: those come from `names.txt`,
   which PlayGuard writes), and publishes `state`, `activity` and, after
   midnight, the finished day.
+- Publishes the icon of the game played when the broker does not have it
+  yet and PlayGuard's icon cache on the SD card does
+  (`config/playguard/cache/icons/`), streamed from the file a piece at a time;
+  every other icon is PlayGuard's to publish (no `ns` here to read one).
 - Carries out orders **only under the *auto* policy**, through the same gate,
   unlock and relock as PlayGuard (`source/sync/sync_exec.c`). Under *ask*,
   orders wait on the broker until PlayGuard opens and asks on the console.
@@ -62,7 +66,8 @@ PlayGuard's own session at once.
 In `sd:/config/playguard/`, as PlayGuard's: it reads `sync.conf` and
 `sync/profiles.txt`, shared by every system on the SD card; in this system's
 folder, `nand/<system>/sync/` (`sysmmc`, `emummc` or `unknown`, as PlayGuard
-names it), it reads `nro_state.txt` and `names.txt` and writes
+names it), it reads `nro_state.txt`, `names.txt` and `icons.txt` and writes
+`agent_icons.txt` (the icons it published itself),
 `agent_state.txt` (what it changed: extra time, console lock, a relock
 pending), `agent_events.log` (the orders it carried out, imported into
 PlayGuard's history) and `agent_watchdog.log` (where its loop stopped, when

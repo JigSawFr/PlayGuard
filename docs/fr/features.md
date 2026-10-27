@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 eaa56ba07d4a -->
+<!-- translated from docs/features.md, sha256 7720cba592a7 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -462,7 +462,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 ### Accès à distance
 
-*Accès à distance ›*, une tuile sous *Outils* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux et les icônes de ceux joués récemment ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal.
+*Accès à distance ›*, une tuile sous *Outils* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux et l'icône de chacun ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal.
 
 ### Modules facultatifs
 

@@ -9,9 +9,11 @@
 #include <fmt/format.h>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
 #include <thread>
 
+#include "action/game_scan.hpp"
 #include "sync/sync_net.h"
 #include "sync/sync_tls.h"
 #include "util/paths.hpp"
@@ -29,6 +31,7 @@ using namespace sync_icons_logic;
 constexpr int CONNECT_TIMEOUT_MS = 8000;
 constexpr auto RETRY_AFTER = std::chrono::minutes(5);   // a batch that could not connect
 constexpr auto EXIT_WAIT = std::chrono::seconds(4);
+constexpr size_t BATCH_MAX = 32;   // icons sent over one connection
 
 // One batch: what the thread needs, and what it did.
 struct Job
@@ -46,7 +49,7 @@ struct Job
     std::vector<uint64_t> cleared;
     size_t too_large = 0;
     std::string error;   // could not connect, or the connection was lost ("" neither)
-    bool resend = false;
+    bool resend = false, last_batch = true;
 };
 
 struct
@@ -55,7 +58,9 @@ struct
     bool played_known = false;   // a read of the play log came: an empty set is one
     Sent sent;
     bool sent_loaded = false;
-    bool resend = false;         // Sync now: every icon of the set again, until a batch got through
+    Sent agent;                  // what the agent published itself, not merged yet
+    bool resend = false;         // Sync now: every icon of the set again, until all got through
+    std::set<uint64_t> resent;   // those sent again since
     std::shared_ptr<Job> job;
     std::thread thread;
     Clock::time_point retry_at{};
@@ -179,7 +184,11 @@ void collect()
         for (size_t at; n && (at = error.find(j.conf.host)) != std::string::npos;) error.replace(at, n, "<broker>");
         brls::Logger::warning("sync: game icons: {} (again in 5 min)", error);
     } else if (j.resend) {
-        s.resend = false;
+        for (const auto& e : j.sent) s.resent.insert(e.first);
+        if (j.last_batch) {
+            s.resend = false;
+            s.resent.clear();
+        }
     }
     if (!j.sent.empty() || !j.cleared.empty() || j.error.empty())
         brls::Logger::info("sync: game icons: {} published, {} cleared{}", j.sent.size(), j.cleared.size(),
@@ -188,9 +197,15 @@ void collect()
 }
 }   // namespace
 
-void set_played(const std::vector<Played>& games)
+void set_played(const std::vector<Played>& played)
 {
-    s.played = games;
+    s.played = played;
+    // What the agent published while PlayGuard was closed (its record taken).
+    const Sent taken = parse(sync_files::take_agent_icons());
+    if (!taken.icons.empty()) {
+        if (s.agent.target != taken.target) s.agent = Sent{ taken.target, {} };
+        for (const auto& t : taken.icons) s.agent.icons[t.first] = t.second;
+    }
     s.played_known = true;
 }
 
@@ -208,15 +223,33 @@ void step(const SyncConf& conf, bool online)
     job->conf = conf;
     job->base = std::string(conf.topic_prefix) + "/" + id;
     job->target = target_of(conf.host, conf.port, job->base);
+    if (!s.agent.icons.empty()) {
+        if (merge(s.sent, s.agent, job->target)) sync_files::write_icons(text(s.sent));
+        s.agent = Sent{};
+    }
     std::snprintf(job->client_id, sizeof(job->client_id), "pg-%s-icons", id);
-    const std::vector<uint64_t> want = conf.publish_icons ? wanted(s.played) : std::vector<uint64_t>{};
+    // The installed games: the last check of them (none yet: an icon not in
+    // the set may be one of theirs, so none is cleared).
+    const std::shared_ptr<const game_cache::Cache> checked = game_scan::latest();
+    std::vector<uint64_t> installed;
+    if (checked)
+        for (const GameFacts& f : checked->games) installed.push_back(f.app_id);
+    const std::vector<uint64_t> want = conf.publish_icons ? wanted(s.played, installed) : std::vector<uint64_t>{};
     job->plan = plan(want, s.sent, job->target);
+    if (conf.publish_icons && !checked) job->plan.clear.clear();
     if (s.resend) {
-        job->plan.send = want;
+        // Those not sent again yet: a batch at a time, as the others.
+        job->plan.send.clear();
+        for (const uint64_t app_id : want)
+            if (!s.resent.count(app_id)) job->plan.send.push_back(app_id);
         job->resend = true;
     }
+    // A large library: a batch at a time, the next one at the next step.
+    job->last_batch = job->plan.send.size() <= BATCH_MAX;
+    if (!job->last_batch) job->plan.send.resize(BATCH_MAX);
     if (job->plan.empty()) {
         s.resend = false;
+        s.resent.clear();
         return;
     }
     try {
@@ -232,6 +265,7 @@ void step(const SyncConf& conf, bool online)
 void again()
 {
     s.resend = true;
+    s.resent.clear();
     s.retry_at = {};
 }
 
