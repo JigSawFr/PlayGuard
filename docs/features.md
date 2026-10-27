@@ -461,7 +461,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### Remote access
 
-*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
+*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games and the icons of those played lately; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
 
 ### Optional modules
 

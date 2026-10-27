@@ -240,6 +240,7 @@ offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline
 clock_logic_SRC   := source/action/clock_logic.cpp tests/clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
 games_logic_SRC   := source/action/games_logic.cpp tests/games_logic/test.cpp
+sync_icons_logic_SRC   := source/action/sync_icons_logic.cpp tests/sync_icons_logic/test.cpp
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
 write_queue_logic_LIBS  := -pthread
 worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp

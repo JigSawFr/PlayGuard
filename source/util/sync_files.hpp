@@ -74,6 +74,12 @@ void write_profiles(const std::vector<profiles::Profile>& list);
 std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& names);
 void write_names(const std::vector<std::pair<uint64_t, std::string>>& names);
 
+// nand/<system>/sync/icons.txt: the game icons PlayGuard published, and to
+// which broker (action/sync_icons_logic's text), so a new run sends only
+// what changed. PlayGuard's alone: the agent publishes no icons.
+std::string icons_file();
+void write_icons(const std::string& text);
+
 // nand/<system>/sync/integration.json: PlayGuard's Home Assistant integration's
 // document, as the link got it from the broker (docs/sync-protocol.md):
 // written by PlayGuard's own link or by the agent, removed when cleared (the

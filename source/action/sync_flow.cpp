@@ -23,6 +23,7 @@
 #include "action/ha_update_flow.hpp"
 #include "action/play_data.hpp"
 #include "action/session_pause.hpp"
+#include "action/sync_icons.hpp"
 #include "action/sync_orders.hpp"
 #include "action/sys_update_flow.hpp"
 #include "app.hpp"
@@ -374,6 +375,15 @@ bool wanted()
     return s_conf.enabled && !sync_conf_problem(&s_conf);
 }
 
+// The link is up: the agent's, or PlayGuard's own session.
+bool online()
+{
+    if (s_agent) return s_agent_status.link.state == SyncLink_Online;
+    if (!s_shared) return false;
+    std::lock_guard<std::mutex> lk(s_shared->m);
+    return s_shared->status.state == SyncLink_Online;
+}
+
 void agent_lost();
 
 // A pg:agent call's result: false when it failed. A session that went away
@@ -676,6 +686,13 @@ void on_play_data()
         s_games_sent = games;
         post_publish("games", games, true);
     }
+    // The games played lately, for their icons (action/sync_icons).
+    std::vector<sync_icons_logic::Played> played;
+    for (uint32_t i = 0; i < stats->count; i++) {
+        const GameStat& g = stats->games[i];
+        played.push_back({ g.app_id, g.totals_ok ? g.last_played : 0, g.week_s });
+    }
+    sync_icons::set_played(played);
     for (int k = 1; k <= 6 && activity_on; k++) {
         const std::string day = date_before(today, k);
         if (day.empty() || s_finals_sent.count(day)) continue;
@@ -994,6 +1011,7 @@ void tick()
     if (s_agent) agent_tick();
     if (!running()) return;
     pump();
+    sync_icons::step(s_conf, online());
     if (!app::in_focus()) return;
     if (s_dirty || now - s_last_state >= std::chrono::seconds(s_conf.poll_s)) {
         s_dirty = false;
@@ -1209,6 +1227,7 @@ void start()
 void stop()
 {
     if (!s_started) return;
+    sync_icons::stop();
     halt();
     agent_leave();
     if (s_timer) {
@@ -1247,6 +1266,7 @@ void sync_now()
     s_names_sent.clear();
     s_week_sent.clear();
     s_finals_sent.clear();
+    sync_icons::again();
     if (s_agent) {
         agent_ok(agent_client::sync_now(), "sync now");
     } else if (s_shared) {

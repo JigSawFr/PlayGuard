@@ -11,7 +11,8 @@
 // publishes is built here on the UI thread, while the app is in the
 // foreground (the state every poll_s seconds and right after a change,
 // today's activity, the names, the week and the finished days after each
-// read of the play log), and every order it receives is carried out here on
+// read of the play log; the games' icons go over a connection of their own,
+// action/sync_icons), and every order it receives is carried out here on
 // the UI thread (action/sync_orders), one at a time, then answered. The
 // settings are sync.conf (util/sync_files), written by the Sync screen.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
