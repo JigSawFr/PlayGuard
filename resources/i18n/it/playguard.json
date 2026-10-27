@@ -1792,6 +1792,7 @@
         "published_note": "Il filtro famiglia viene sempre pubblicato. Ciò che è disattivato viene cancellato dal broker e rimosso da Home Assistant.",
         "publish_activity": "Pubblica il tempo di gioco (oggi, la settimana, ogni giorno)",
         "publish_games": "Pubblica i giochi (l'elenco, il tempo di gioco di ciascuno)",
+        "publish_icons": "Pubblica le icone dei giochi (quelli giocati di recente)",
         "publish_console": "Pubblica lo stato della console (batteria, memoria, base)",
         "publish_network": "Pubblica la rete (indirizzo IP, Wi-Fi)",
         "publish_hardware": "Pubblica le versioni e l'hardware (modello, firmware, Atmosphère)",

@@ -1792,6 +1792,7 @@
         "published_note": "El control parental siempre se publica. Lo que se desactiva se borra del broker y se quita de Home Assistant.",
         "publish_activity": "Publicar el tiempo de juego (hoy, la semana, cada día)",
         "publish_games": "Publicar los juegos (la lista, el tiempo de juego de cada uno)",
+        "publish_icons": "Publicar los iconos de los juegos (los jugados últimamente)",
         "publish_console": "Publicar el estado de la consola (batería, almacenamiento, base)",
         "publish_network": "Publicar la red (dirección IP, Wi-Fi)",
         "publish_hardware": "Publicar las versiones y el hardware (modelo, firmware, Atmosphère)",

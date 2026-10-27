@@ -1792,6 +1792,7 @@
         "published_note": "Het ouderlijk toezicht wordt altijd gepubliceerd. Wat is uitgeschakeld, wordt van de broker gewist en uit Home Assistant verwijderd.",
         "publish_activity": "De speeltijd publiceren (vandaag, de week, elke dag)",
         "publish_games": "De games publiceren (de lijst, de speeltijd van elke game)",
+        "publish_icons": "De pictogrammen van de games publiceren (de laatst gespeelde)",
         "publish_console": "De staat van de console publiceren (batterij, opslag, station)",
         "publish_network": "Het netwerk publiceren (IP-adres, wifi)",
         "publish_hardware": "De versies en hardware publiceren (model, firmware, Atmosphère)",

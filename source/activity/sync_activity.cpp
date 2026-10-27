@@ -384,6 +384,7 @@ std::vector<SyncActivity::Published> SyncActivity::published()
     return {
         { pub_activity, "playguard/sync/publish_activity", &SyncConf::publish_activity },
         { pub_games, "playguard/sync/publish_games", &SyncConf::publish_games },
+        { pub_icons, "playguard/sync/publish_icons", &SyncConf::publish_icons },
         { pub_console, "playguard/sync/publish_console", &SyncConf::publish_console },
         { pub_network, "playguard/sync/publish_network", &SyncConf::publish_network },
         { pub_hardware, "playguard/sync/publish_hardware", &SyncConf::publish_hardware },

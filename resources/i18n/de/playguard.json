@@ -1792,6 +1792,7 @@
         "published_note": "Die Altersbeschränkungen werden immer veröffentlicht. Was ausgeschaltet ist, wird vom Broker gelöscht und aus Home Assistant entfernt.",
         "publish_activity": "Die Spielzeit veröffentlichen (heute, die Woche, jeder Tag)",
         "publish_games": "Die Spiele veröffentlichen (die Liste, die Spielzeit jedes Spiels)",
+        "publish_icons": "Die Symbole der Spiele veröffentlichen (der zuletzt gespielten)",
         "publish_console": "Den Zustand der Konsole veröffentlichen (Akku, Speicher, Station)",
         "publish_network": "Das Netzwerk veröffentlichen (IP-Adresse, WLAN)",
         "publish_hardware": "Versionen und Hardware veröffentlichen (Modell, Firmware, Atmosphère)",

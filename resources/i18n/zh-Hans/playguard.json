@@ -1792,6 +1792,7 @@
         "published_note": "家长控制始终会发布。关闭的项目会从 broker 清除，并从 Home Assistant 移除。",
         "publish_activity": "发布游戏时间（今天、本周、每天）",
         "publish_games": "发布游戏（列表、每款的游戏时间）",
+        "publish_icons": "发布游戏图标（最近玩过的）",
         "publish_console": "发布主机状态（电池、存储空间、底座）",
         "publish_network": "发布网络（IP 地址、Wi-Fi）",
         "publish_hardware": "发布版本和硬件（型号、固件、Atmosphère）",
