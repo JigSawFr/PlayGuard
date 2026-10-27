@@ -1726,6 +1726,18 @@
         "empty_title": "まだ記録はありません",
         "empty_text": "PlayGuardが本体に対して行った変更（上限、制限レベル、暗証番号、一時解除など）がここに一覧表示されます。"
     },
+    "system_titles": {
+        "home": "HOMEメニュー",
+        "album": "アルバム",
+        "eshop": "ニンテンドーeショップ",
+        "mii": "Miiエディター",
+        "controllers": "コントローラー",
+        "user_select": "ユーザー選択",
+        "web": "ブラウザー",
+        "user_page": "ユーザーページ",
+        "amiibo": "amiibo設定",
+        "maintenance": "メンテナンスモード"
+    },
     "sync": {
         "title": "リモートアクセス",
         "intro": "この本体を MQTT ブローカー（Home Assistant の Mosquitto アプリ、またはほかのもの）に接続します。Home Assistant で本体の状態とプレイ時間を表示し、本体に指示を送れるようになります。接続は PlayGuard を開いている間、または追加のエージェント（本体 › 追加モジュール）があれば常に動作します。設定は {} に保存されます。",

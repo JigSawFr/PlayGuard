@@ -290,7 +290,13 @@ the focus while it was open (local play: each account the whole time); an
 account that did not play then is left out, and the agent does not open the
 account service. Application ids are 16 uppercase hex characters, as the
 console prints them. PlayGuard's own time over a game is excluded, as in the
-Activity tab.
+Activity tab. The HOME menu and the system applets (the Album, the eShop, the
+Mii editor, the web browser…) are never counted: the play log keeps only
+applications, as the console's own statistics do, and the HOME menu taking
+the focus ends a game's session; so none is ever `now_playing` either. Were
+one of them to show (a title ID of `util/system_titles.cpp`'s table), `names`,
+`games` and `names.txt` give it its name in PlayGuard's language rather than
+none.
 
 ```json
 { "schema": 1, "ts": 1760000000,

@@ -2,6 +2,7 @@
 #include "action/play_data.hpp"
 
 #include <borealis.hpp>
+#include <cstdlib>
 #include <fmt/format.h>
 #include <functional>
 #include <map>
@@ -12,6 +13,7 @@
 
 #include "util/paths.hpp"
 #include "util/play_cache.hpp"
+#include "util/system_titles.hpp"
 
 namespace play_data
 {
@@ -176,9 +178,28 @@ void unlisten(int id)
     s_listeners.erase(id);
 }
 
+std::string system_name(u64 app_id)
+{
+    const char* key = system_titles::key(app_id);
+    return key ? brls::getStr("playguard/system_titles/" + std::string(key)) : "";
+}
+
+std::string unnamed(const std::string& id)
+{
+    const std::string system = system_name(std::strtoull(id.c_str(), nullptr, 16));
+    return system.empty() ? brls::getStr("playguard/games/unnamed", id) : system;
+}
+
+std::string known_name(const GameStat& g)
+{
+    return g.name[0] ? std::string(g.name) : system_name(g.app_id);
+}
+
 std::string game_name(const GameStat& g)
 {
     if (g.name[0]) return g.name;
+    const std::string system = system_name(g.app_id);
+    if (!system.empty()) return system;
     return brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", (unsigned long long)g.app_id));
 }
 

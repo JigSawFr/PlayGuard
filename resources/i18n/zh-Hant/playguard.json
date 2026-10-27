@@ -1726,6 +1726,18 @@
         "empty_title": "尚無紀錄",
         "empty_text": "PlayGuard對主機所做的每項變更（上限、限制等級、PIN碼、解除…）都會列在此處。"
     },
+    "system_titles": {
+        "home": "HOME選單",
+        "album": "相簿",
+        "eshop": "Nintendo eShop",
+        "mii": "Mii編輯器",
+        "controllers": "控制器",
+        "user_select": "選擇使用者",
+        "web": "網頁瀏覽器",
+        "user_page": "使用者頁面",
+        "amiibo": "amiibo設定",
+        "maintenance": "維護模式"
+    },
     "sync": {
         "title": "遠端存取",
         "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（主機 › 選用模組）。設定儲存在 {} 中。",

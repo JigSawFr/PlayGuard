@@ -1726,6 +1726,18 @@
         "empty_title": "Aún no hay nada registrado",
         "empty_text": "Aquí aparece cada cambio que PlayGuard hace en la consola (límites, nivel de restricción, PIN, desbloqueos…)."
     },
+    "system_titles": {
+        "home": "Menú HOME",
+        "album": "Álbum",
+        "eshop": "Nintendo eShop",
+        "mii": "Editor de Mii",
+        "controllers": "Mandos",
+        "user_select": "Selección de usuario",
+        "web": "Navegador web",
+        "user_page": "Página de usuario",
+        "amiibo": "Configuración de amiibo",
+        "maintenance": "Modo de mantenimiento"
+    },
     "sync": {
         "title": "Acceso remoto",
         "intro": "Enlaza esta consola con un broker MQTT (la app Mosquitto de Home Assistant, o cualquier otro): Home Assistant muestra entonces su estado y su tiempo de juego, y puede enviarle órdenes. El enlace funciona mientras PlayGuard está abierto, o todo el tiempo con el agente opcional (Consola › Módulos opcionales). Los ajustes se guardan en {}.",

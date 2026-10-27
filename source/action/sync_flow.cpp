@@ -510,9 +510,13 @@ std::string activity_doc(const PlayStats& stats, int k, const std::string& date,
 
 std::string names_doc(const PlayStats& stats, uint64_t ts)
 {
+    // A system program (the HOME menu …) by its translated name, as the screens.
+    std::vector<std::string> names(stats.count);
     std::vector<SyncAppName> apps;
-    for (uint32_t i = 0; i < stats.count; i++)
-        if (stats.games[i].name[0]) apps.push_back({ stats.games[i].app_id, stats.games[i].name });
+    for (uint32_t i = 0; i < stats.count; i++) {
+        names[i] = play_data::known_name(stats.games[i]);
+        if (!names[i].empty()) apps.push_back({ stats.games[i].app_id, names[i].c_str() });
+    }
     std::vector<SyncAccountName> accounts;
     for (const auto& a : play_data::accounts()) accounts.push_back({ { a.uid[0], a.uid[1] }, a.nickname });
     std::string out(8192 + apps.size() * 300, '\0');
@@ -577,10 +581,15 @@ std::string games_doc(const PlayStats& stats, uint64_t ts)
         if (f.display_version[0]) g.version = f.display_version;
     }
     int64_t total_s = 0;
+    std::vector<std::string> system(stats.count);   // the system programs' names, kept for the document
     for (uint32_t i = 0; i < stats.count; i++) {
         const GameStat& s = stats.games[i];
         SyncGame& g = game_of(s.app_id);
         if (!g.name && s.name[0]) g.name = s.name;
+        if (!g.name) {
+            system[i] = play_data::system_name(s.app_id);
+            if (!system[i].empty()) g.name = system[i].c_str();
+        }
         if (!s.totals_ok) continue;
         g.total_min = (int64_t)(s.total_s / 60);
         g.launches = s.launches;
@@ -672,8 +681,10 @@ void on_play_data()
         s_names_sent = names;
         if (activity_on) post_publish("names", names, true);
         std::vector<std::pair<uint64_t, std::string>> list;
-        for (uint32_t i = 0; i < stats->count; i++)
-            if (stats->games[i].name[0]) list.push_back({ stats->games[i].app_id, stats->games[i].name });
+        for (uint32_t i = 0; i < stats->count; i++) {
+            const std::string name = play_data::known_name(stats->games[i]);
+            if (!name.empty()) list.push_back({ stats->games[i].app_id, name });
+        }
         sync_files::write_names(list);   // for the agent's "now playing"
     }
     const std::string week = week_doc(*stats, today, posix);

@@ -1726,6 +1726,18 @@
         "empty_title": "尚无记录",
         "empty_text": "PlayGuard对主机进行的每项更改（限制、限制等级、PIN、解除…）都会列在这里。"
     },
+    "system_titles": {
+        "home": "HOME菜单",
+        "album": "相册",
+        "eshop": "Nintendo eShop",
+        "mii": "Mii编辑器",
+        "controllers": "手柄",
+        "user_select": "选择用户",
+        "web": "网页浏览器",
+        "user_page": "用户页面",
+        "amiibo": "amiibo设置",
+        "maintenance": "维护模式"
+    },
     "sync": {
         "title": "远程访问",
         "intro": "把这台主机连接到 MQTT broker（Home Assistant 的 Mosquitto 应用，或其他任何 broker）：Home Assistant 随后会显示它的状态和游戏时间，并可以向它发送指令。连接在 PlayGuard 打开期间运行，安装可选的代理程序后则始终运行（主机 › 可选模块）。设置保存在 {} 中。",

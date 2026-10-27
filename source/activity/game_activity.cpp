@@ -1,10 +1,10 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/game_activity.hpp"
 
-#include <fmt/format.h>
 #include <string>
 #include <vector>
 
+#include "action/play_data.hpp"
 #include "action/rating_flow.hpp"
 #include "action/rating_logic.hpp"
 #include "ui/ui.hpp"
@@ -24,8 +24,7 @@ void GameActivity::onContentAvailable()
     const std::string na = "cadran/common/unavailable"_i18n;
     const GameStat& g = this->game;
 
-    name->setText(g.name[0] ? std::string(g.name)
-                            : brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", (unsigned long long)g.app_id)));
+    name->setText(play_data::game_name(g));
     if (!this->icon_bytes.empty()) icon->setImageFromMem(this->icon_bytes.data(), (int)this->icon_bytes.size());
     else ui::set_visible(icon.getView(), false);
 
