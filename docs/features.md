@@ -61,7 +61,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
 
 A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the bell's badge says *2* when two things are to do).
 
-Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new theme or language takes effect at once, every screen made again on the same tab with the focus on the same line, Chinese and its own font included.
+Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new theme or palette takes effect at once on every screen, nothing made again; a new language too, every screen made again on the same tab with the focus on the same line, Chinese and its own font included. The theme list ends with the palette ([below](#preferences)).
 
 ### To do
 
@@ -481,6 +481,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 - What sets PlayGuard itself up:
   - As tiles first: language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger) and the tab to start on.
+  - **The palette**: PlayGuard's own colours (*Default*), the palettes that come with it (high contrast dark and light, Ocean, Amethyst, Sand) or a theme file of your own copied to `config/playguard/themes/` on the SD card, applied at once. How to write one: [themes.md](themes.md).
   - **The intro** at start-up: the loading screen (its icon with the ring turning, the bar, Cadran's dial on the right) for 2 seconds (on by default; Ⓐ or Ⓑ skips it; off, PlayGuard opens as soon as it is ready).
 - The messages it shows:
   - The kinds of notifications (see [above](#how-entries-behave)).

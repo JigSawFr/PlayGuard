@@ -1,0 +1,9 @@
+# Mint: PlayGuard's dark look with a mint accent.
+# Copy it to sd:/config/playguard/themes/ and pick it in Preferences > Palette.
+name = Mint
+author = PlayGuard
+version = 1
+description = The dark look, a mint accent.
+
+inherit = dark
+accent = #3ddc97

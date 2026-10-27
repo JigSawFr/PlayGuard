@@ -1,0 +1,28 @@
+# Paper and ink: warm paper in the light theme, warm ink in the dark one.
+# It styles both variants: PlayGuard's Theme (light, dark or the console's)
+# picks the one shown.
+name = Paper and ink
+author = PlayGuard
+version = 1
+description = Warm paper by day, warm ink by night, a terracotta accent.
+
+[light]
+background = #f4efe6
+surface = #fffaf2
+text = #2b2622
+accent = #a4502a
+warning = #8a5a00
+danger = #b3261e
+
+[dark]
+background = #17130f
+surface = #221c17
+text = #f0e7da
+accent = #e39a6b
+warning = #f2b84b
+danger = #ff8a80
+
+# PlayGuard's own keys, like any other: the light at the end of the play
+# timer's ring, a little warmer.
+[colors]
+playguard/ring/tip = #fff1dc

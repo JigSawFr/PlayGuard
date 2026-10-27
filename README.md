@@ -35,7 +35,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - 🕒 **Console** — a network clock that counts right offline, the installed games checked and repaired, homebrew on the HOME menu behind the PIN.
 - ↩️ **History, backups, notifications** — every change logged and undoable.
 - 🏠 **Home Assistant (optional)** — over MQTT on your local network: the state and play time in Home Assistant, orders from it (extra time, limits, *Block all games*). Off by default. [Guide](docs/home-assistant.md).
-- 🌍 **Everywhere** — every console language, light and dark themes.
+- 🌍 **Everywhere** — every console language, light and dark themes, palettes, and [theme files of your own](docs/themes.md).
 
 → Everything else: [**features**](https://playguard.link/docs/features/).
 
@@ -88,7 +88,7 @@ The real app, against a simulated console, in your browser:
 - 📦 [Install, update, remove](https://playguard.link/docs/install/)
 - 🛠️ [Troubleshooting](https://playguard.link/docs/troubleshooting/) · [Locked out?](https://playguard.link/docs/troubleshooting/#locked-out)
 
-The Markdown sources live in [`docs/`](docs/), with the reference pages: [`config.json`](docs/config.md) · [how parental controls work](docs/parental-controls.md) · [companion app](docs/companion-app.md) · [optional sysmodules](sysmodule/README.md).
+The Markdown sources live in [`docs/`](docs/), with the reference pages: [`config.json`](docs/config.md) · [themes](docs/themes.md) · [how parental controls work](docs/parental-controls.md) · [companion app](docs/companion-app.md) · [optional sysmodules](sysmodule/README.md).
 
 ## 🤝 Contributing
 
