@@ -109,21 +109,23 @@ void DashboardTab::build_pills()
 
 void DashboardTab::show_pills()
 {
-    namespace kit = cadran::kit;
     const SysInfo& si = this->sys;
     // Something to look at: its title and what it says, in its colour; else
     // the all-fine words, or nothing.
-    const auto show = [](Pill& p, bool issue, const std::string& title, const std::string& value, NVGcolor color,
+    const auto show = [](Pill& p, bool issue, const std::string& title, const std::string& value, const char* color,
                          const std::string& fine) {
         const std::string text = issue ? title + " · " + value : fine;
         ui::set_text(p.text, text);
-        const std::string dot = issue ? kit::dot_of(color) : "cadran/teal_fill";
+        // The value's ink as a dot: its fill, or the quiet one.
+        const std::string ink = color;
+        const bool inked = ink == "cadran/teal" || ink == "cadran/amber" || ink == "cadran/coral";
+        const std::string dot = !issue ? "cadran/teal_fill" : inked ? ink + "_fill" : "cadran/text3";
         p.dot->set(dot.c_str());
         p.rank = dot == "cadran/teal_fill" ? 1 : dot == "cadran/text3" ? 2 : 0;
         p.on = !text.empty();
     };
     // The firmware's compatibility: the firmware with it when all is fine.
-    NVGcolor c = cadran::kit::color("cadran/text2");
+    const char* c = "cadran/text2";
     const std::string compat = ui::compat_text(si, &c);
     show(this->compat_pill, sysinfo_compat(&si) != SysCompat_Ok, "playguard/dashboard/compat"_i18n, compat, c,
          ui::fw_text(si) + " · " + compat);
@@ -132,13 +134,13 @@ void DashboardTab::show_pills()
     show(this->pairing_pill, pairing_state::syncs(s), "playguard/dashboard/pairing"_i18n,
          ui::bool_text(s.pairing_active_ok, s.pairing_active, "playguard/dashboard/pairing_on"_i18n,
                        "playguard/dashboard/pairing_off"_i18n),
-         cadran::kit::color("cadran/amber"), "");
+         "cadran/amber", "");
     // The serial number visible on emuMMC.
     show(this->serial_pill, ui::serial_warning(si), "playguard/dashboard/serial"_i18n, "playguard/dashboard/serial_visible"_i18n,
-         cadran::kit::color("cadran/amber"), "playguard/cadran/today/serial_hidden"_i18n);
+         "cadran/amber", "playguard/cadran/today/serial_hidden"_i18n);
     // Sigpatch files only, or sys-patch incomplete.
     const patches::Report& report = ui::patch_report();
-    c = cadran::kit::color("cadran/text2");
+    c = "cadran/text2";
     const std::string patches_text = ui::patches_text(report, &c);
     show(this->patches_pill, ui::patches_warning(report), "playguard/dashboard/patches"_i18n, patches_text, c, "");
     const bool sync = nintendo_dns::pctl_blocked(), time = nintendo_dns::time_blocked();

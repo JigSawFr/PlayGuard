@@ -49,21 +49,21 @@ void record(const modules::Module& m, const char* what)
 
 // The module's state: in full (its tab), or short enough to share one line
 // with the title of a cell that opens this screen; its colour in `color`.
-std::string state_text(modules::Id id, bool brief, NVGcolor* color)
+std::string state_text(modules::Id id, bool brief, const char** color)
 {
     const modules::Module& m = modules::get(id);
     const modules::State s = modules::state(paths::sd_root(), m);
     const modules::Bundle b = modules::bundled(bundled_modules::dir(), m);
     std::string text;
-    NVGcolor c = cadran::kit::color("cadran/text2");
+    const char* c = "cadran/text2";
     if (!s.installed) {
         text = b.present ? "playguard/modules/state/not_installed"_i18n : "playguard/modules/state/not_bundled"_i18n;
     } else if (modules::offer(s, b) == modules::Offer::Update) {
         text = brief ? "playguard/modules/short/update"_i18n : "playguard/modules/state/update"_i18n;
-        c = cadran::kit::color("cadran/amber");
+        c = "cadran/amber";
     } else {
         text = brief ? "playguard/modules/short/installed"_i18n : "playguard/modules/state/installed"_i18n;
-        c = cadran::kit::color("cadran/teal");
+        c = "cadran/teal";
     }
     if (!brief && m.resident && s.installed)
         text += " · " + (module_running(m.tid, nullptr) ? "playguard/modules/state/running"_i18n
@@ -135,11 +135,11 @@ ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml"), li
 
 void ModulesOverview::refresh()
 {
-    NVGcolor color;
+    const char* color = nullptr;
     rescue->setDetailText(ModulesActivity::summary(modules::Id::Rescue, &color));
-    rescue->setDetailTextColor(color);
+    rescue->detail->setThemeColor("textColor", color);
     agent->setDetailText(ModulesActivity::summary(modules::Id::Agent, &color));
-    agent->setDetailTextColor(color);
+    agent->detail->setThemeColor("textColor", color);
     this->list.sync();
 }
 
@@ -297,9 +297,9 @@ void ModuleTab::refresh()
     const modules::Offer offer = modules::offer(s, b);
     const bool running = m.resident && s.installed && module_running(m.tid, nullptr);
 
-    NVGcolor color;
+    const char* color = nullptr;
     status->setDetailText(state_text(id, false, &color));
-    status->setDetailTextColor(color);
+    status->detail->setThemeColor("textColor", color);
 
     action->setText(offer == modules::Offer::Update ? "playguard/modules/update"_i18n : "playguard/modules/install"_i18n);
     action->setDetailText(b.present ? b.version : "");
@@ -356,7 +356,7 @@ ModulesActivity::ModulesActivity(Tab first) : start(first)
 {
 }
 
-std::string ModulesActivity::summary(modules::Id id, NVGcolor* color)
+std::string ModulesActivity::summary(modules::Id id, const char** color)
 {
     return state_text(id, true, color);
 }

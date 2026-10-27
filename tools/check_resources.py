@@ -5,7 +5,8 @@
   playguard.json) defines exactly the keys of en-US, with as many "{}";
 - Aurore's ui::LANGUAGES (library/aurore, the language picker's list that
   config::LANGUAGES names) lists exactly those languages;
-- every "playguard/..." key referenced from C++ or XML exists in en-US;
+- every "playguard/..." key referenced from C++ or XML exists in en-US (but
+  the theme keys source/ui/palette.hpp declares: colours);
 - a key built at runtime ("playguard/days_short/{}",
   "playguard/history/kinds/" + kind) is under a prefix DYNAMIC_KEYS declares, with the values the code
   can put after it (read from the code's own lists where there is one): each
@@ -188,7 +189,14 @@ used_exact = set()
 used_prefixes = set()
 
 
+# PlayGuard's theme keys (source/ui/palette.hpp's KEYS): colours, not strings.
+THEME_KEYS = set(re.findall(r'\{\s*"(playguard/[^"]+)",',
+                            open(f"{ROOT}/source/ui/palette.hpp", encoding="utf-8").read()))
+
+
 def check_key(key, where):
+    if key in THEME_KEYS:
+        return
     if "{" in key or key.endswith("/"):
         prefix = key.split("{")[0]
         used_prefixes.add(prefix.replace("playguard/", "", 1))

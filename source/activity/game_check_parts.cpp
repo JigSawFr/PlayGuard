@@ -161,10 +161,9 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     box->addView(head);
 
     // Each block on the second surface, its title a kicker.
-    brls::Theme theme = brls::Application::getTheme();
-    auto block = [box, &theme](const std::string& title, const std::string& text) {
+    auto block = [box](const std::string& title, const std::string& text) {
         auto* card = new brls::Box(brls::Axis::COLUMN);
-        card->setBackgroundColor(theme["cadran/surf2"]);
+        card->setThemeColor("backgroundColor", "cadran/surf2");
         card->setCornerRadius(14);
         card->setPadding(14, 18, 16, 18);
         card->setMarginTop(14);

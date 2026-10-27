@@ -398,13 +398,13 @@ void SyncActivity::refresh_ha_install()
     if (installed.empty()) {
         ha_install->setText("playguard/sync/ha_install"_i18n);
         ha_install->setDetailText("HACS");
-        ha_install->setDetailTextColor(cadran::kit::color("cadran/text2"));
+        ha_install->detail->setThemeColor("textColor", "cadran/text2");
         return;
     }
     const std::string newer = ha_update_flow::newer();
     ha_install->setText("playguard/sync/ha_installed"_i18n);
     ha_install->setDetailText(newer.empty() ? installed : brls::getStr("playguard/tools/available", installed, newer));
-    ha_install->setDetailTextColor(newer.empty() ? cadran::kit::color("cadran/text2") : cadran::kit::color("cadran/amber"));
+    ha_install->detail->setThemeColor("textColor", newer.empty() ? "cadran/text2" : "cadran/amber");
 }
 
 void SyncActivity::refresh_status()
@@ -412,32 +412,32 @@ void SyncActivity::refresh_status()
     this->refresh_ha_install();
     const sync_flow::Status st = sync_flow::status();
     std::string text;
-    NVGcolor color = cadran::kit::color("cadran/text2");
+    const char* color = "cadran/text2";
     if (!conf.enabled) {
         text = "playguard/sync/state_off"_i18n;
     } else if (!st.ready) {
         text = brls::getStr("playguard/sync/state_incomplete", problem_text(conf));
-        color = cadran::kit::color("cadran/amber");
+        color = "cadran/amber";
     } else if (st.agent_refused) {
         text = brls::getStr("playguard/sync/state_agent_refused", st.agent_version);
-        color = cadran::kit::color("cadran/amber");
+        color = "cadran/amber";
     } else if (!st.running) {
         text = "playguard/sync/state_stopped"_i18n;
-        color = cadran::kit::color("cadran/amber");
+        color = "cadran/amber";
     } else {
         switch (st.link.state) {
             case SyncLink_Online: {
                 const std::string since = since_text(st.link.online_since_ms);
                 text = since.empty() ? "playguard/sync/state_online"_i18n
                                      : brls::getStr("playguard/sync/state_online_since", since);
-                color = cadran::kit::color("cadran/teal");
+                color = "cadran/teal";
                 break;
             }
             case SyncLink_Connecting: text = "playguard/sync/state_connecting"_i18n; break;
             case SyncLink_Waiting:
                 text = st.link.error[0] ? brls::getStr("playguard/sync/state_retry", st.link.error)
                                         : "playguard/sync/state_waiting"_i18n;
-                color = cadran::kit::color("cadran/amber");
+                color = "cadran/amber";
                 break;
             default: text = "playguard/sync/state_off"_i18n; break;
         }
@@ -446,5 +446,5 @@ void SyncActivity::refresh_status()
     if (text == this->status_line) return;
     this->status_line = text;
     status->setDetailText(text);
-    status->setDetailTextColor(color);
+    status->detail->setThemeColor("textColor", color);
 }

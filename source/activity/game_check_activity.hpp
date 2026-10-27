@@ -132,7 +132,7 @@ class GameCheckActivity : public brls::Activity
     void refresh(bool all, u64 also);
     void check(std::vector<GameRecord> records, bool full);
     void status_text(const std::string& text);
-    void status_text(const std::string& text, NVGcolor color);
+    void status_text(const std::string& text, const char* color);
     // The check under way: in the card when it shows, else on the status line.
     void checking_text(const std::string& text);
     void show();

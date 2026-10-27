@@ -286,7 +286,7 @@ void GameCheckActivity::removal_summary(const Removal& r)
             cover->setMarginRight(10);
             cover->setScalingType(brls::ImageScalingType::FIT);
             cover->setCornerRadius(10);
-            cover->setBorderColor(cadran::kit::color("cadran/coral"));
+            cover->setThemeColor("borderColor", "cadran/coral");
             cover->setBorderThickness(2);
             bool own = false;
             int tex = game_icons::texture(r.failed[i].app_id, own);
@@ -357,7 +357,7 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
             circle->setCornerRadius(32);
             circle->setAlignSelf(brls::AlignSelf::CENTER);
             circle->setMarginBottom(16);
-            circle->setBackgroundColor(brls::Application::getTheme()["cadran/teal_soft"]);
+            circle->setThemeColor("backgroundColor", "cadran/teal_soft");
             circle->setAlignItems(brls::AlignItems::CENTER);
             circle->setJustifyContent(brls::JustifyContent::CENTER);
             circle->addView(cadran::kit::icon("check", 28, "cadran/teal"));
@@ -367,7 +367,7 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
                                                  : brls::getStr("playguard/games/removed_n", (int)r.removed));
             r.body.show(1.0f, r.freed ? brls::getStr("playguard/games/remove_freed", game_verify_flow::size_text(r.freed))
                                       : "");
-            r.body.detail->setTextColor(cadran::kit::color("cadran/teal"));
+            r.body.detail->setThemeColor("textColor", "cadran/teal");
             // Nothing left to cancel: its button says OK.
             if (auto* button = dynamic_cast<brls::Button*>(r.dialog->getView("brls/dialog/button1"))) {
                 button->setText("hints/ok"_i18n);
@@ -409,7 +409,7 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
         detail += (detail.empty() ? "" : " · ") + (failed == 1 ? "playguard/games/remove_failed_one"_i18n
                                                                : brls::getStr("playguard/games/remove_failed", (int)failed));
     removal->body.show((float)at / (float)total, detail);
-    if (failed) removal->body.detail->setTextColor(cadran::kit::color("cadran/coral"));
+    if (failed) removal->body.detail->setThemeColor("textColor", "cadran/coral");
     // On the UI thread, as the PIN it may ask for: the first game once the
     // dialog is fully on screen, each next one once the last one's cover is
     // gone (STEP_MS).

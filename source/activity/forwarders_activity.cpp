@@ -462,10 +462,10 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 cell->setText(r.name);
                 cell->setDetailText(list_text(r));
                 cell->set_marks(list_marks(r));
-                cell->setDetailTextColor(r.paused_until || (r.pin && !r.carried) ? cadran::kit::color("cadran/amber")
-                                         : r.state == State::Ready     ? cadran::kit::color("cadran/teal")
-                                         : r.state == State::Elsewhere ? cadran::kit::color("cadran/text2")
-                                                                       : cadran::kit::color("cadran/amber"));
+                cell->detail->setThemeColor("textColor", r.paused_until || (r.pin && !r.carried) ? "cadran/amber"
+                                                         : r.state == State::Ready     ? "cadran/teal"
+                                                         : r.state == State::Elsewhere ? "cadran/text2"
+                                                                                       : "cadran/amber");
                 // On its icon: protected (a lock; a check for a menu seen
                 // working), or made here and starting without the PIN.
                 if (r.pin) cell->set_badge(r.verified && forwarders_logic::is_menu(r.nro) ? "check" : "lock");

@@ -462,6 +462,10 @@ int main(int argc, char* argv[])
     }
     startup_mark(StartupStep_Borealis);
 
+    // PlayGuard's own colours, before the window reads the theme file that
+    // may change them.
+    ui::install_palette();
+
     // Aurore starts Cadran itself: the preferences' language (in init()), then
     // their font and theme, the palettes after the design boards, the text
     // size, the footer's hints, the header's version badge and settings, and

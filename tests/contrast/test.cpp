@@ -1,12 +1,16 @@
 // Host tests for the boards' palettes (ui/cadran_palette.hpp): every ink at
 // 4.5:1 or more on each surface it is drawn on, a translucent one blended
 // first over the background, in both themes (WCAG 1.4.3); the focus ring
-// and its glow at 3:1 or more on the background (WCAG 1.4.11).
+// and its glow at 3:1 or more on the background (WCAG 1.4.11). PlayGuard's
+// own keys (ui/palette.hpp): each pair it keeps readable, in both themes.
 #include "check.h"
 #include <cmath>
 #include <cstdio>
+#include <cstring>
 
 #include <borealis/cadran/ui/cadran_palette.hpp>
+
+#include "ui/palette.hpp"
 
 using cadran::palette::Palette;
 using cadran::palette::Rgba;
@@ -71,6 +75,36 @@ void check(const char* theme, const Palette& p)
     CHECK(at_least(theme, "hl1 on bg", p.hl1, p.bg, p, 3.0));
     CHECK(at_least(theme, "hl2 on bg", p.hl2, p.bg, p, 3.0));
 }
+// A key's colour in a theme: PlayGuard's own, else Cadran's.
+bool lookup(const char* name, bool dark, Rgba* out)
+{
+    for (const playguard::palette::Key& k : playguard::palette::KEYS)
+        if (std::strcmp(k.name, name) == 0) {
+            *out = dark ? k.dark : k.light;
+            return true;
+        }
+    const Palette& p = dark ? cadran::palette::DARK : cadran::palette::LIGHT;
+    for (const cadran::palette::Key& k : cadran::palette::KEYS)
+        if (std::strcmp(k.name, name) == 0) {
+            *out = p.*k.color;
+            return true;
+        }
+    return false;
+}
+
+void check_playguard(const char* theme, bool dark)
+{
+    for (const playguard::palette::Key& k : playguard::palette::KEYS)
+        CHECK(std::strncmp(k.name, "playguard/", 10) == 0);
+    const Palette& p = dark ? cadran::palette::DARK : cadran::palette::LIGHT;
+    for (const playguard::palette::Contrast& pair : playguard::palette::CONTRAST) {
+        Rgba ink{}, surface{};
+        CHECK(lookup(pair.ink, dark, &ink) && lookup(pair.surface, dark, &surface));
+        char what[96];
+        std::snprintf(what, sizeof(what), "%s on %s", pair.ink, pair.surface);
+        CHECK(at_least(theme, what, ink, surface, p, pair.minimum));
+    }
+}
 }   // namespace
 
 int main()
@@ -80,5 +114,7 @@ int main()
     CHECK(std::fabs(ratio({ 0x12, 0x34, 0x56, 255 }, { 0x12, 0x34, 0x56, 255 }) - 1.0) < 1e-9);
     check("dark", cadran::palette::DARK);
     check("light", cadran::palette::LIGHT);
+    check_playguard("dark", true);
+    check_playguard("light", false);
     return CHECK_DONE("palette contrast assertions passed");
 }

@@ -159,8 +159,8 @@ void SecurityTab::refresh()
     if (paused) ui::set_detail(temp, "playguard/cadran/pill/paused"_i18n);
     else ui::set_detail(temp, ui::bool_text(s.temp_unlocked_ok, s.temp_unlocked,
                                             "playguard/cadran/pill/unlocked"_i18n, "playguard/dashboard/pc_active"_i18n));
-    temp->setDetailTextColor(s.temp_unlocked_ok && s.temp_unlocked && !paused ? cadran::kit::color("cadran/amber")
-                                                                               : cadran::kit::color("cadran/text2"));
+    temp->detail->setThemeColor("textColor", s.temp_unlocked_ok && s.temp_unlocked && !paused ? "cadran/amber"
+                                                                                               : "cadran/text2");
     // Each tile's state at a glance: a check when it is as it should be, a
     // warning when it needs the parent; nothing when it could not be read.
     constexpr const char* OK = "cadran/teal_fill";
@@ -182,10 +182,10 @@ void SecurityTab::refresh()
     std::string active = ui::bool_text(s.pairing_active_ok, s.pairing_active, "cadran/common/yes"_i18n, "cadran/common/no"_i18n);
     if (paired && !syncs) active += " · " + "playguard/pairing/dns_blocked"_i18n;
     ui::set_detail(pr_active, active);
-    pr_active->setDetailTextColor(syncs ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text2"));
+    pr_active->detail->setThemeColor("textColor", syncs ? "cadran/amber" : "cadran/text2");
     ui::set_detail(pr_updated, s.last_updated_ok ? ui::time_text(s.last_updated) : "cadran/common/unavailable"_i18n);
     ui::set_text(pr_note, paired && !syncs ? "playguard/pairing/dns_note"_i18n : "playguard/pairing/note"_i18n);
-    pr_note->setTextColor(syncs ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text3"));
+    pr_note->setThemeColor("textColor", syncs ? "cadran/amber" : "cadran/text3");
 
     ui::set_detail(pin_lock_cell, pin_lock::mode_text());
     ui::set_text(pin_lock_note, pin_lock::note_text());

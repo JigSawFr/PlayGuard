@@ -30,7 +30,7 @@ class ModulesActivity : public brls::Activity
     // "Installed", "Update available" … short enough to share one line with
     // the title of a cell that opens this screen (and the overview's), and
     // its colour when `color` is given.
-    static std::string summary(modules::Id id, NVGcolor* color = nullptr);
+    static std::string summary(modules::Id id, const char** color = nullptr);
 
   private:
     Tab start;

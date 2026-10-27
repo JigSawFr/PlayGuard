@@ -125,13 +125,12 @@ void confirm_preview(const std::vector<uint8_t>& icon, const std::string& name, 
                      const std::string& body, std::function<void()> yes, std::function<void()> no)
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::STRETCH);
     box->setPadding(28, 36, 22, 36);
     auto* tile = new brls::Box(brls::Axis::ROW);
     tile->setAlignItems(brls::AlignItems::CENTER);
-    tile->setBackgroundColor(theme["cadran/surf2"]);
+    tile->setThemeColor("backgroundColor", "cadran/surf2");
     tile->setCornerRadius(18);
     tile->setPadding(14, 18, 14, 14);
     if (!icon.empty()) {

@@ -71,14 +71,13 @@ void GamesActivity::onContentAvailable()
     });
     // The game's figures in a card, the view and the period as two rows of
     // their own.
-    brls::Theme theme = brls::Application::getTheme();
     auto* head = static_cast<brls::Box*>(this->getView("gs_head"));
     head->setLineBottom(0);
     head->setMargins(16, 60, 0, 60);
     head->setPadding(18, 24, 18, 24);
     head->setCornerRadius(cadran::kit::RADIUS_CARD);
-    head->setBackgroundColor(theme["cadran/surf"]);
-    head->setBorderColor(theme["cadran/line"]);
+    head->setThemeColor("backgroundColor", "cadran/surf");
+    head->setThemeColor("borderColor", "cadran/line");
     head->setBorderThickness(1);
     cadran::List::row(view_cell, "list", true);
     cadran::List::row(period_cell, "calendar", true);
@@ -418,7 +417,7 @@ void GamesActivity::show_status()
         error = false;
     }
     status->setText(text);
-    status->setTextColor(error ? cadran::kit::color("cadran/amber") : cadran::kit::color("cadran/text3"));
+    status->setThemeColor("textColor", error ? "cadran/amber" : "cadran/text3");
     ui::set_visible(status, !text.empty());
 }
 

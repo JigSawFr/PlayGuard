@@ -183,7 +183,7 @@ void SysNotesActivity::fill()
         b->setStyle(style);
         // The check in the tab's ink: dark on the chosen tab's teal.
         auto* check = (CadranIcon*)b->getChildren().back();
-        check->setColor(brls::Application::getTheme()[style->enabledLabelColor]);
+        check->setThemeColor("color", style->enabledLabelColor);
         ui::set_visible(check, (int)this->shown[i] == installed_at);
     }
     brls::View* focus = brls::Application::getCurrentFocus();
@@ -207,7 +207,7 @@ void SysNotesActivity::fill()
     // highlights as cards, then the lists); the installed version's are in
     // the app too, for when GitHub's are not there (offline, not fetched yet).
     const bool own = this->which == Which::PlayGuard;
-    const NVGcolor accent = brls::Application::getTheme()["brls/sidebar/active_item"];
+    const char* accent = "brls/sidebar/active_item";
     if (this->shown.empty()) {
         // Nothing kept: the list of releases online.
         this->page = this->which == Which::Firmware ? "https://switchbrew.org/wiki/System_Versions"
@@ -236,11 +236,11 @@ void SysNotesActivity::fill()
         if ((int)this->shown[this->tab] == installed_at)
             mark->addView(tag_view({ "", accent, "check" }, 18));
         else if (!mine.empty() && this->tab >= newer_from)
-            mark->addView(tag_view({ "", cadran::kit::color("cadran/amber"), "sparkle" }, 18));
+            mark->addView(tag_view({ "", "cadran/amber", "sparkle" }, 18));
         if (!r.supports.empty())
-            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), cadran::kit::color("cadran/text2") }, 18));
-        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, cadran::kit::color("cadran/amber") }, 18));
-        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, cadran::kit::color("cadran/amber") }, 18));
+            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), "cadran/text2" }, 18));
+        if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, "cadran/amber" }, 18));
+        if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, "cadran/amber" }, 18));
         ui::set_visible(tags.getView(), !tags->getChildren().empty());
 
         header->setTitle(title_of(this->which) + " " + r.version);

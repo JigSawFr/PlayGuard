@@ -13,8 +13,8 @@ constexpr int   SIDE    = 5;           // covers drawn on each side of the middl
 constexpr int   AHEAD   = 8;           // icons read ahead of the middle
 constexpr float GONE_US = 350000.0f;   // a removed cover floating away, in µs (a removal's step)
 
-// A coral disc with a "!" on the top right corner of a cover at
-// (left, top, w): a game that stays.
+// A coral disc with a "!" (in an ink that reads on it) on the top right
+// corner of a cover at (left, top, w): a game that stays.
 void failed_badge(NVGcontext* vg, float left, float top, float w, float alpha)
 {
     NVGcolor coral = brls::Application::getTheme()["cadran/coral"];
@@ -25,11 +25,12 @@ void failed_badge(NVGcontext* vg, float left, float top, float w, float alpha)
     nvgCircle(vg, cx, cy, r);
     nvgFillColor(vg, coral);
     nvgFill(vg);
-    const NVGcolor white = nvgRGBAf(1, 1, 1, alpha);
+    NVGcolor ink = brls::Application::getTheme()["playguard/badge/ink"];
+    ink.a *= alpha;
     nvgBeginPath(vg);
     nvgRoundedRect(vg, cx - r * 0.11f, cy - r * 0.55f, r * 0.22f, r * 0.68f, r * 0.11f);
     nvgCircle(vg, cx, cy + r * 0.42f, r * 0.13f);
-    nvgFillColor(vg, white);
+    nvgFillColor(vg, ink);
     nvgFill(vg);
 }
 

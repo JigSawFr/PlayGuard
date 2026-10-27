@@ -32,6 +32,7 @@ std::string uploads_dir()  { return logs_dir() + "/uploads"; }
 std::string play_timer_dir() { return logs_dir() + "/play_timer"; }
 std::string profiles_dir() { return data_dir() + "/profiles"; }
 std::string exports_dir()  { return data_dir() + "/exports"; }
+std::string themes_dir()   { return data_dir() + "/themes"; }
 std::string config_file()  { return data_dir() + "/config.json"; }
 std::string migrations_file() { return data_dir() + "/migrations.json"; }
 std::string cache_dir()    { return data_dir() + "/cache"; }

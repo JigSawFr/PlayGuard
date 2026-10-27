@@ -14,11 +14,11 @@ namespace ha_links
 
 namespace
 {
-brls::Label* centered_label(const std::string& text, float font_size, NVGcolor color)
+brls::Label* centered_label(const std::string& text, float font_size, const char* color)
 {
     auto* label = new brls::Label();
     label->setFontSize(font_size);
-    label->setTextColor(color);
+    label->setThemeColor("textColor", color);
     label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
     label->setSingleLine(false);
     label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the card's width
@@ -33,10 +33,10 @@ brls::Box* qr_card(const std::string& title, const std::string& url, const std::
     card->setAlignItems(brls::AlignItems::CENTER);
     card->setWidth(320);
     card->addView(new QrView(url, 220));
-    brls::Label* name = centered_label(title, cadran::kit::TEXT_LEAD, cadran::kit::color("cadran/text"));
+    brls::Label* name = centered_label(title, cadran::kit::TEXT_LEAD, "cadran/text");
     name->setMarginTop(6);
     card->addView(name);
-    card->addView(centered_label(caption, cadran::kit::TEXT_NOTE, cadran::kit::color("cadran/text3")));
+    card->addView(centered_label(caption, cadran::kit::TEXT_NOTE, "cadran/text3"));
     return card;
 }
 
@@ -45,7 +45,7 @@ void show(const std::string& device)
     auto* box = new brls::Box(brls::Axis::COLUMN);
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setPadding(24, 24, 12, 24);
-    box->addView(centered_label("playguard/sync/ha_install_body"_i18n, cadran::kit::TEXT_LEAD, cadran::kit::color("cadran/text")));
+    box->addView(centered_label("playguard/sync/ha_install_body"_i18n, cadran::kit::TEXT_LEAD, "cadran/text"));
     auto* row = new brls::Box(brls::Axis::ROW);
     row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
     row->setMarginTop(14);

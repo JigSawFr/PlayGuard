@@ -135,9 +135,8 @@ class Sheet : public brls::Box
         // these when it is older than the newest thirty).
         this->in_use = !forwarder.custom_icon ? 0 : this->focus ? this->focus : this->choices.size();
 
-        brls::Theme theme = brls::Application::getTheme();
         this->setId("cadran_sheet");
-        this->setBackgroundColor(theme["brls/backdrop"]);
+        this->setThemeColor("backgroundColor", "brls/backdrop");
         this->setAlignItems(brls::AlignItems::STRETCH);
         this->addView(ui::sheet_outside(0, true));
 
@@ -145,8 +144,8 @@ class Sheet : public brls::Box
         panel->setWidth(PANEL_W);
         panel->setHeight(PANEL_H);
         panel->setCornerRadius(cadran::PICKER_CORNER);
-        panel->setBackgroundColor(theme["cadran/surf"]);
-        panel->setBorderColor(theme["cadran/line"]);
+        panel->setThemeColor("backgroundColor", "cadran/surf");
+        panel->setThemeColor("borderColor", "cadran/line");
         panel->setBorderThickness(1);
         panel->setAlignItems(brls::AlignItems::STRETCH);
         panel->addView(this->header());
@@ -244,10 +243,9 @@ class Sheet : public brls::Box
 
     brls::Box* header()
     {
-        brls::Theme theme = brls::Application::getTheme();
         auto* head = new brls::Box(brls::Axis::COLUMN);
         head->setPadding(20, 36, 18, 36);
-        head->setLineColor(theme["cadran/line"]);
+        head->setThemeColor("lineColor", "cadran/line");
         head->setLineBottom(1);
         head->setShrink(0);
         brls::Label* name = kit::label("playguard/forwarders/icon_title"_i18n, 22, "cadran/text");
@@ -325,7 +323,6 @@ class Sheet : public brls::Box
 
     brls::Box* cell(size_t index)
     {
-        brls::Theme theme = brls::Application::getTheme();
         Choice& c = this->choices[index];
         auto* cell = new brls::Box(brls::Axis::COLUMN);
         cell->setAlignItems(brls::AlignItems::CENTER);
@@ -340,7 +337,7 @@ class Sheet : public brls::Box
         image->setWidth(TILE);
         image->setHeight(TILE);
         image->setCornerRadius(kit::RADIUS_ICON + 4);
-        image->setBackgroundColor(theme["cadran/well"]);
+        image->setThemeColor("backgroundColor", "cadran/well");
         slot->addView(image);
         // The one the HOME menu shows: its check on its corner.
         if (index == this->in_use) {
@@ -351,7 +348,7 @@ class Sheet : public brls::Box
             badge->setWidth(26);
             badge->setHeight(26);
             badge->setCornerRadius(13);
-            badge->setBackgroundColor(theme["cadran/teal"]);
+            badge->setThemeColor("backgroundColor", "cadran/teal");
             badge->setJustifyContent(brls::JustifyContent::CENTER);
             badge->setAlignItems(brls::AlignItems::CENTER);
             badge->addView(kit::icon("check", 16, "cadran/surf"));
@@ -386,12 +383,11 @@ class Sheet : public brls::Box
     // Beside the grid: now, then after; the game and when; the frame's place.
     brls::Box* preview()
     {
-        brls::Theme theme = brls::Application::getTheme();
         auto* side = new brls::Box(brls::Axis::COLUMN);
         side->setGrow(1);
         side->setWidth(0);
         side->setPadding(26, 32, 24, 28);
-        side->setLineColor(theme["cadran/line"]);
+        side->setThemeColor("lineColor", "cadran/line");
         side->setLineLeft(1);
         auto* kicker = new brls::Label();
         kit::set_kicker(kicker, "playguard/forwarders/icon_preview"_i18n);
@@ -401,14 +397,14 @@ class Sheet : public brls::Box
         auto* pair = new brls::Box(brls::Axis::ROW);
         pair->setAlignItems(brls::AlignItems::FLEX_END);
         pair->setMarginTop(18);
-        auto figure = [&theme](float px, const std::string& label, brls::Image** out) {
+        auto figure = [](float px, const std::string& label, brls::Image** out) {
             auto* box = new brls::Box(brls::Axis::COLUMN);
             box->setAlignItems(brls::AlignItems::CENTER);
             auto* image = new brls::Image();
             image->setWidth(px);
             image->setHeight(px);
             image->setCornerRadius(px * 0.14f);
-            image->setBackgroundColor(theme["cadran/well"]);
+            image->setThemeColor("backgroundColor", "cadran/well");
             box->addView(image);
             brls::Label* l = kit::label(label, 14, "cadran/text3");
             l->setSingleLine(true);
@@ -488,7 +484,7 @@ class Sheet : public brls::Box
         }
         this->frame_row->setVisibility(c.shot.empty() || !c.lib.empty() ? brls::Visibility::INVISIBLE : brls::Visibility::VISIBLE);
         for (size_t i = 0; i < this->frame_dots.size(); i++)
-            this->frame_dots[i]->setBackgroundColor(kit::color((int)i == (c.x + 12) / 25 ? "cadran/teal" : "cadran/line"));
+            this->frame_dots[i]->setThemeColor("backgroundColor", (int)i == (c.x + 12) / 25 ? "cadran/teal" : "cadran/line");
         this->draw_after();
         if (!c.shot.empty() && c.lib.empty() && c.shot != this->full_shot) this->read_full(c.shot);
     }

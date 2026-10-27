@@ -66,7 +66,6 @@ constexpr int ORDER[7] = { 1, 2, 3, 4, 5, 6, 0 };
 
 CadranWeekView::CadranWeekView()
 {
-    brls::Theme theme = brls::Application::getTheme();
     this->setAxis(brls::Axis::ROW);
     this->setAlignItems(brls::AlignItems::FLEX_END);
     this->setJustifyContent(brls::JustifyContent::SPACE_BETWEEN);
@@ -93,7 +92,7 @@ CadranWeekView::CadranWeekView()
         c.up->setIcon("caret-up");
         c.up->setWidth(22);
         c.up->setHeight(22);
-        c.up->setColor(theme["cadran/teal"]);
+        c.up->setThemeColor("color", "cadran/teal");
         c.up->setMarginBottom(4);
         c.box->addView(c.up);
         auto* value_row = new brls::Box(brls::Axis::ROW);
@@ -103,7 +102,7 @@ CadranWeekView::CadranWeekView()
         c.over->setIcon("alert");
         c.over->setWidth(16);
         c.over->setHeight(16);
-        c.over->setColor(theme["cadran/coral"]);
+        c.over->setThemeColor("color", "cadran/coral");
         c.over->setMarginRight(5);
         c.over->setVisibility(brls::Visibility::GONE);
         value_row->addView(c.over);
@@ -141,7 +140,7 @@ CadranWeekView::CadranWeekView()
         c.down->setIcon("caret-down");
         c.down->setWidth(22);
         c.down->setHeight(22);
-        c.down->setColor(theme["cadran/teal"]);
+        c.down->setThemeColor("color", "cadran/teal");
         c.down->setMarginTop(4);
         c.box->addView(c.down);
         c.bed = new brls::Box(brls::Axis::ROW);
@@ -153,13 +152,13 @@ CadranWeekView::CadranWeekView()
         moon->setIcon("moon");
         moon->setWidth(13);
         moon->setHeight(13);
-        moon->setColor(theme["cadran/text3"]);
+        moon->setThemeColor("color", "cadran/text3");
         moon->setMarginRight(4);
         c.bed->addView(moon);
         c.bed_time = new brls::Label();
         c.bed_time->setFontSize(14);
         c.bed_time->setSingleLine(true);
-        c.bed_time->setTextColor(theme["cadran/text2"]);
+        c.bed_time->setThemeColor("textColor", "cadran/text2");
         c.bed->addView(c.bed_time);
         c.box->addView(c.bed);
 
@@ -319,6 +318,12 @@ void CadranWeekView::set_can_edit(std::function<bool()> f) { this->can_edit = st
 void CadranWeekView::set_on_mode(std::function<void(bool)> f) { this->on_mode = std::move(f); }
 void CadranWeekView::set_on_focus(std::function<void(int)> f) { this->on_focus = std::move(f); }
 
+void CadranWeekView::onThemeChanged()
+{
+    brls::Box::onThemeChanged();
+    if (this->bars_set) this->render();
+}
+
 void CadranWeekView::render()
 {
     brls::Theme theme = brls::Application::getTheme();
@@ -337,13 +342,13 @@ void CadranWeekView::render()
         // A limit gone past in coral, as its bar (the key says so), after a
         // triangle; one not
         // saved in amber, its bar ringed in amber too.
-        c.value->setTextColor(is_focused ? theme["cadran/teal"] : changed ? theme["cadran/amber"] : over ? theme["cadran/coral"] : theme["cadran/text"]);
+        c.value->setThemeColor("textColor", is_focused ? "cadran/teal" : changed ? "cadran/amber" : over ? "cadran/coral" : "cadran/text");
         // Not the colour alone: a triangle before it too (the key shows one).
         c.over->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         const float bar = !this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top);
         target[d] = bar;   // laid out below, on its way there
-        c.bar->setBackgroundColor(is_focused ? theme["cadran/teal_fill"] : d == today ? theme["cadran/bar_today"] : theme["cadran/bar"]);
-        c.bar->setBorderColor(theme["cadran/amber_fill"]);
+        c.bar->setThemeColor("backgroundColor", is_focused ? "cadran/teal_fill" : d == today ? "cadran/bar_today" : "cadran/bar");
+        c.bar->setThemeColor("borderColor", "cadran/amber_fill");
         c.bar->setBorderThickness(changed ? 2 : 0);
         // What was played that day, against its limit: up to the top. Past
         // it, the bar full: the part within the limit as below it, the part
@@ -372,10 +377,10 @@ void CadranWeekView::render()
             c.within->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         }
         c.fill->setVisibility(fills ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
-        c.day->setTextColor(d == today ? theme["cadran/teal"] : theme["cadran/text3"]);
+        c.day->setThemeColor("textColor", d == today ? "cadran/teal" : "cadran/text3");
         // The day being edited on the soft teal, its arrows shown.
         const bool editing = is_focused && this->edit;
-        c.box->setBackgroundColor(editing ? theme["cadran/teal_soft"] : is_focused ? theme["cadran/surf2"] : theme["cadran/none"]);
+        c.box->setThemeColor("backgroundColor", editing ? "cadran/teal_soft" : is_focused ? "cadran/surf2" : "cadran/none");
         c.up->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
         c.down->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
     }

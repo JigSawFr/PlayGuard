@@ -22,14 +22,13 @@ using namespace brls::literals;
 void DashboardTab::build_outside_card(brls::Box* column, int at)
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     // What changed outside PlayGuard, as one card above the ring: its title,
     // the changes one under the other, Ⓐ to dismiss it.
     auto* card = kit::card(true, false);
     card->setAxis(brls::Axis::ROW);
     card->setAlignItems(brls::AlignItems::FLEX_START);
-    card->setBackgroundColor(theme["cadran/amber_surf"]);
-    card->setBorderColor(theme["cadran/amber_line"]);
+    card->setThemeColor("backgroundColor", "cadran/amber_surf");
+    card->setThemeColor("borderColor", "cadran/amber_line");
     card->setPadding(18, 24, 18, 20);
     card->setMarginBottom(16);
     card->setVisibility(brls::Visibility::GONE);
@@ -67,7 +66,6 @@ void DashboardTab::build_outside_card(brls::Box* column, int at)
 void DashboardTab::build_steps_card(brls::Box* column, int at)
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     auto* card = kit::card(false, false);
     card->setPadding(16, 16, 10, 16);
     card->setMarginBottom(16);
@@ -103,7 +101,7 @@ void DashboardTab::build_steps_card(brls::Box* column, int at)
         s.todo->setWidth(20);
         s.todo->setHeight(20);
         s.todo->setCornerRadius(10);
-        s.todo->setBorderColor(theme["cadran/amber"]);
+        s.todo->setThemeColor("borderColor", "cadran/amber");
         s.todo->setBorderThickness(2);
         s.todo->setMarginRight(12);
         s.row->addView(s.todo);
@@ -160,7 +158,6 @@ void DashboardTab::show_steps_card(bool has_pin)
     }
     ui::set_visible(this->steps_card, shown);
     this->steps_shown = true;
-    brls::Theme theme = brls::Application::getTheme();
     const bool clock_ok = R_SUCCEEDED(this->accuracy_rc) && this->accurate;
     const bool done[3] = { has_pin, limits, clock_ok };
     const std::string state[3] = {
@@ -178,7 +175,7 @@ void DashboardTab::show_steps_card(bool has_pin)
         ui::set_visible(s.done, done[i]);
         ui::set_visible(s.todo, !done[i]);
         ui::set_text(s.state, state[i]);
-        s.state->setTextColor(theme[done[i] ? "cadran/teal" : "cadran/amber"]);
+        s.state->setThemeColor("textColor", done[i] ? "cadran/teal" : "cadran/amber");
     }
     this->steps_read = true;
     ui::set_text(this->steps_count, brls::getStr("playguard/cadran/today/steps_count", count, 3));
@@ -193,7 +190,6 @@ void DashboardTab::show_outside_card(const std::vector<std::string>& lines)
         this->outside_shown = text;
         while (!this->outside_lines->getChildren().empty())
             this->outside_lines->removeView(this->outside_lines->getChildren().back());
-        brls::Theme theme = brls::Application::getTheme();
         size_t from = 0;
         while (from < text.size()) {
             size_t to = text.find('\n', from);
@@ -201,7 +197,8 @@ void DashboardTab::show_outside_card(const std::vector<std::string>& lines)
             auto* row = new brls::Box(brls::Axis::ROW);
             row->setAlignItems(brls::AlignItems::FLEX_START);
             row->setMarginTop(4);
-            auto* dot = new brls::Rectangle(theme["cadran/amber_fill"]);
+            auto* dot = new brls::Rectangle();
+            dot->setThemeColor("color", "cadran/amber_fill");
             dot->setWidth(6);
             dot->setHeight(6);
             dot->setCornerRadius(3);
@@ -233,7 +230,6 @@ void DashboardTab::show_low(bool unlocked)
         const bool up = pt_logic::over_limit_min(timer, today) >= 0 || (timer.restricted_valid && timer.restricted);
         low = up || (timer.remaining_valid && timer.remaining_ns > 0 && timer.remaining_ns <= QUARTER_NS);
     }
-    brls::Theme theme = brls::Application::getTheme();
     // Lit anew: one breath of the chip, so the eye finds it.
     if (low && !this->low_lit && !this->amount_chips.empty() && chips->getVisibility() == brls::Visibility::VISIBLE &&
         this->amount_chips[0]->getVisibility() == brls::Visibility::VISIBLE)
@@ -242,17 +238,16 @@ void DashboardTab::show_low(bool unlocked)
     for (size_t i = 0; i < this->amount_chips.size(); i++) {
         brls::Box* chip = this->amount_chips[i];
         const bool lit = low && i == 0;
-        chip->setBackgroundColor(lit ? theme["cadran/teal_soft"] : theme["cadran/surf2"]);
-        chip->setBorderColor(lit ? theme["cadran/teal_fill"] : theme["cadran/line"]);
+        chip->setThemeColor("backgroundColor", lit ? "cadran/teal_soft" : "cadran/surf2");
+        chip->setThemeColor("borderColor", lit ? "cadran/teal_fill" : "cadran/line");
         chip->setBorderThickness(lit ? 2 : 1);
         for (brls::View* v : chip->getChildren())
-            if (auto* digits = dynamic_cast<CadranDigits*>(v)) digits->setTextColor(lit ? theme["cadran/teal"] : theme["cadran/text"]);
+            if (auto* digits = dynamic_cast<CadranDigits*>(v)) digits->setThemeColor("textColor", lit ? "cadran/teal" : "cadran/text");
     }
 }
 
 void DashboardTab::show_cards(bool unlocked, bool has_pin)
 {
-    brls::Theme theme = brls::Application::getTheme();
     const std::string na = "cadran/common/unavailable"_i18n;
     const PtState& timer = this->pt;
     const PctlStatus& s = this->status;
@@ -261,7 +256,7 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
     // does not ring, and A sets it.
     const bool bed_off = timer.bedtime_valid && !timer.bedtime_enabled;
     ui::set_visible(bed_key.getView(), bed_off && !app::read_only());
-    bed_value->setTextColor(theme[bed_off ? "cadran/text2" : "cadran/text"]);
+    bed_value->setThemeColor("textColor", bed_off ? "cadran/text2" : "cadran/text");
     if (bed_off) {
         bed_value->setText("playguard/cadran/today/bed_off_value"_i18n);
         bed_state->setText("");
@@ -269,7 +264,7 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
     } else if (timer.bedtime_valid) {
         bed_value->setText(fmt::format("{:02d}:{:02d}", timer.bedtime_hour, timer.bedtime_minute));
         bed_state->setText("playguard/cadran/today/on"_i18n);
-        bed_state->setTextColor(theme["cadran/teal"]);
+        bed_state->setThemeColor("textColor", "cadran/teal");
         std::string sub;
         if (timer.bedtime_reset_valid) {
             // The time kept with the word before it: "again at / 06:00" never
@@ -295,10 +290,10 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
     pc_value->setText(s.safety_level_ok ? ui::level_name(s.safety_level) : na);
     if (unlocked) {
         pc_state->setText("playguard/cadran/today/pc_unlocked"_i18n);
-        pc_state->setTextColor(theme["cadran/amber"]);
+        pc_state->setThemeColor("textColor", "cadran/amber");
     } else {
         pc_state->setText(has_pin ? "playguard/cadran/today/pin_set"_i18n : "playguard/cadran/today/no_pin"_i18n);
-        pc_state->setTextColor(has_pin ? theme["cadran/teal"] : theme["cadran/amber"]);
+        pc_state->setThemeColor("textColor", has_pin ? "cadran/teal" : "cadran/amber");
     }
     pc_sub->setText(!s.restriction_enabled_ok ? na
                     : unlocked                ? "playguard/cadran/today/pc_lifted"_i18n
@@ -311,16 +306,16 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
     clock_value->setText(R_FAILED(this->accuracy_rc) ? na
                          : this->accurate              ? "playguard/cadran/today/clock_ok"_i18n
                                                        : "playguard/cadran/today/clock_bad"_i18n);
-    clock_value->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text"]);
-    clock_title->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/text3"]);
+    clock_value->setThemeColor("textColor", bad ? "cadran/amber" : "cadran/text");
+    clock_title->setThemeColor("textColor", bad ? "cadran/amber" : "cadran/text3");
     clock_state->setText(bad ? "playguard/cadran/today/to_set"_i18n : "playguard/cadran/today/ok"_i18n);
-    clock_state->setTextColor(bad ? theme["cadran/amber"] : theme["cadran/teal"]);
+    clock_state->setThemeColor("textColor", bad ? "cadran/amber" : "cadran/teal");
     // Nintendo's time server blocked by the DNS: why it went wrong.
     clock_sub->setText(!bad                         ? "playguard/cadran/today/clock_fine"_i18n
                        : nintendo_dns::time_blocked() ? "playguard/cadran/today/clock_fix_dns"_i18n
                                                     : "playguard/cadran/today/clock_fix"_i18n);
-    clock_sub->setTextColor(bad ? theme["cadran/text"] : theme["cadran/text2"]);
+    clock_sub->setThemeColor("textColor", bad ? "cadran/text" : "cadran/text2");
     ui::set_visible(clock_key.getView(), bad && !app::read_only());
-    clock_card->setBackgroundColor(bad ? theme["cadran/amber_surf"] : theme["cadran/surf"]);
-    clock_card->setBorderColor(bad ? theme["cadran/amber_line"] : theme["cadran/line"]);
+    clock_card->setThemeColor("backgroundColor", bad ? "cadran/amber_surf" : "cadran/surf");
+    clock_card->setThemeColor("borderColor", bad ? "cadran/amber_line" : "cadran/line");
 }

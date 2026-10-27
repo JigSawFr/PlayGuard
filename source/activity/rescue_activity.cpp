@@ -76,9 +76,9 @@ void RescueActivity::refresh()
                     : report.result == RescueResult_Refused ? "playguard/rescue/outcome/refused"
                                                             : "playguard/rescue/outcome/failed";
     outcome->setText(brls::getStr(key));
-    outcome->setTextColor(ok ? cadran::kit::color("cadran/teal")
-                             : old_module || (report.result == RescueResult_NoPin && !doubted) ? cadran::kit::color("cadran/amber")
-                                                                                               : cadran::kit::color("cadran/coral"));
+    outcome->setThemeColor("textColor", ok                                                                ? "cadran/teal"
+                                        : old_module || (report.result == RescueResult_NoPin && !doubted) ? "cadran/amber"
+                                                                                                          : "cadran/coral");
 
     std::string n = old_module                            ? brls::getStr("playguard/rescue/note_old_module", app::version())
                   : doubted                               ? "playguard/rescue/note_unconfirmed"_i18n
@@ -107,7 +107,7 @@ void RescueActivity::refresh()
     reset_pin->setDetailText("playguard/rescue/hint/reset_pin"_i18n);
     del->setDetailText("playguard/rescue/hint/delete"_i18n);
     for (brls::DetailCell* c : { (brls::DetailCell*)reset_pin.getView(), (brls::DetailCell*)del.getView() })
-        c->setDetailTextColor(cadran::kit::color("cadran/text3"));
+        c->detail->setThemeColor("textColor", "cadran/text3");
 
     // After the sysmodule deleted everything, only "Open PlayGuard" is left.
     // Otherwise: delete needs a PIN to exist; "Set a new PIN" is always

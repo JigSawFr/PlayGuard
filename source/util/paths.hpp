@@ -22,6 +22,9 @@ std::string uploads_dir();
 std::string play_timer_dir();
 std::string profiles_dir();
 std::string exports_dir();
+// The user's theme files (*.theme), listed by Preferences › Palette
+// (docs/themes.md); PlayGuard never writes there.
+std::string themes_dir();
 std::string config_file();
 // The last migration done and the build that last started (util/migrations.hpp).
 std::string migrations_file();

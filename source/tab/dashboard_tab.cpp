@@ -91,7 +91,7 @@ DashboardTab::DashboardTab()
     });
     // Shown only while the alarm is off: A turns it back on (the dialog says why).
     ui::set_detail(alarm, "playguard/dashboard/alarm_off"_i18n);
-    alarm->setDetailTextColor(cadran::kit::color("cadran/amber"));
+    alarm->detail->setThemeColor("textColor", "cadran/amber");
     alarm->registerClickAction([this](brls::View*) {
         pt_flow::turn_alarm_on("overview", this->refresher());
         return true;

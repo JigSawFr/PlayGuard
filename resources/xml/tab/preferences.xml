@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Preferences: only what sets PlayGuard itself up — the app (language,
-     theme, text size and start tab as tiles first, the effects, the
-     sidebar, the intro),
+     theme, text size and start tab as tiles first, the palette, the
+     effects, the sidebar, the intro),
      the messages it shows (the kinds of notifications, the monthly "Support
      PlayGuard" reminder), how it updates and the first steps again. A
      setting that shapes one feature sits with it (extra time in Play timer,
@@ -34,6 +34,7 @@
             <brls:DetailCell id="pf_theme" title="@i18n/cadran/tools/theme"/>
             <brls:DetailCell id="pf_text_size" title="@i18n/playguard/tiles/text_size"/>
             <brls:DetailCell id="pf_start_tab" title="@i18n/playguard/tiles/start_tab"/>
+            <brls:DetailCell id="pf_palette" title="@i18n/cadran/tools/palette"/>
             <brls:DetailCell id="pf_effects" title="@i18n/playguard/prefs/effects"/>
             <brls:DetailCell id="pf_rail" title="@i18n/cadran/prefs/rail"/>
             <brls:BooleanCell id="pf_intro"/>

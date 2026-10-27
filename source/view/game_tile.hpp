@@ -19,8 +19,8 @@ class GameTile : public brls::Box
 
     void set_name(const std::string& text);
     void set_detail(const std::string& text);
-    void set_name_color(NVGcolor color);
-    void set_detail_color(NVGcolor color);
+    void set_name_color(const char* key);
+    void set_detail_color(const char* key);
     // As GameCell::set_icon_texture: `owned`, this tile frees it.
     void set_icon_texture(int texture, bool owned);
     bool has_icon() const { return this->iconed; }

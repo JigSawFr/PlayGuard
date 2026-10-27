@@ -284,7 +284,7 @@ void batch_next(std::shared_ptr<Batch> batch, size_t at)
         if (batch->failed)
             detail += (detail.empty() ? "" : " · ") + brls::getStr("playguard/forwarders/batch_failed", batch->failed);
         batch->body.show((float)at / (float)total, detail);
-        if (batch->failed) batch->body.detail->setTextColor(cadran::kit::color("cadran/coral"));
+        if (batch->failed) batch->body.detail->setThemeColor("textColor", "cadran/coral");
     }
     // On the UI thread, as the PIN install() may ask for; a frame between
     // two, so the dialog shows each one.

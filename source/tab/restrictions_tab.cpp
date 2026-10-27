@@ -23,14 +23,13 @@ const uint8_t AGES[] = { 0, 3, 4, 6, 7, 8, 10, 12, 13, 14, 15, 16, 17, 18 };
 // force).
 brls::Box* badge()
 {
-    brls::Theme theme = brls::Application::getTheme();
     auto* box = new brls::Box(brls::Axis::ROW);
     box->setHeight(26);
     box->setShrink(0);
     box->setCornerRadius(13);
     box->setPaddingLeft(7);
     box->setPaddingRight(10);
-    box->setBackgroundColor(theme["cadran/teal_fill"]);
+    box->setThemeColor("backgroundColor", "cadran/teal_fill");
     box->setAlignItems(brls::AlignItems::CENTER);
     box->setMarginLeft(6);
     CadranIcon* check = cadran::kit::icon("check", 15, "cadran/navy");
@@ -143,7 +142,6 @@ RestrictionsTab::RestrictionsTab()
 RestrictionsTab::Tile RestrictionsTab::make_tile(uint32_t level, bool last)
 {
     namespace kit = cadran::kit;
-    brls::Theme theme = brls::Application::getTheme();
     Tile t;
     t.level = level;
     if (level == PctlSafetyLevel_None) {
@@ -202,7 +200,7 @@ RestrictionsTab::Tile RestrictionsTab::make_tile(uint32_t level, bool last)
         t.box->addView(spacer);
         auto* rule = new brls::Box();
         rule->setHeight(1);
-        rule->setBackgroundColor(theme["cadran/line"]);
+        rule->setThemeColor("backgroundColor", "cadran/line");
         rule->setMarginTop(10);
         rule->setMarginBottom(10);
         t.box->addView(rule);
@@ -395,18 +393,17 @@ void line(brls::Label* name, brls::Label* state, CadranIcon* icon, const std::st
 {
     name->setText(what);
     state->setText(known ? words : "\u2014");
-    state->setTextColor(brls::Application::getTheme()["cadran/text"]);
+    state->setThemeColor("textColor", "cadran/text");
     ui::set_visible(state, !state->getFullText().empty());
     const bool allowed = known && !restricts && words.empty();
     icon->setIcon(allowed ? "check" : "lock");
-    icon->setColor(brls::Application::getTheme()[allowed ? "cadran/teal_fill" : "cadran/coral_fill"]);
+    icon->setThemeColor("color", allowed ? "cadran/teal_fill" : "cadran/coral_fill");
     icon->setVisibility(known && (restricts || allowed) ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
 }
 }   // namespace
 
 void RestrictionsTab::show_tiles(bool custom)
 {
-    brls::Theme theme = brls::Application::getTheme();
     const PctlStatus& status = this->st;
     const std::string org_name = status.rating_org_ok ? pctl_rating_org_name(status.rating_org) : "";
     for (Tile& t : this->tiles) {
@@ -421,8 +418,8 @@ void RestrictionsTab::show_tiles(bool custom)
         }
         // The level in force: a soft fill and its check; the teal ring is
         // the focus's alone.
-        t.box->setBackgroundColor(selected ? theme["cadran/teal_soft"] : theme["cadran/surf"]);
-        t.box->setBorderColor(theme["cadran/line"]);
+        t.box->setThemeColor("backgroundColor", selected ? "cadran/teal_soft" : "cadran/surf");
+        t.box->setThemeColor("borderColor", "cadran/line");
         // Gone, not only hidden: its words would take the title's room.
         t.badge->setVisibility(selected ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
         if (t.level == PctlSafetyLevel_Custom && t.to_settings != custom) {
@@ -434,7 +431,7 @@ void RestrictionsTab::show_tiles(bool custom)
         // Read-only: the levels stay, dimmed; A says why nothing changes.
         t.box->setAlpha(app::read_only() && !selected ? 0.6f : 1.0f);
         if (!t.age) continue;   // no restriction: its words say it all
-        t.age->setTextColor(selected ? theme["cadran/teal"] : theme["cadran/text"]);
+        t.age->setThemeColor("textColor", selected ? "cadran/teal" : "cadran/text");
         t.age->setText(!known ? "—" : ui::age_text(s.rating_age));
         // "PEGI 12" kept on one line; Custom says its own settings too.
         const std::string rated = known && s.rating_age

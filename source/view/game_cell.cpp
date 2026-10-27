@@ -35,7 +35,6 @@ void GameCell::set_badge(const char* icon_name, const char* color_key)
         this->badge = nullptr;
     }
     if (!icon_name) return;
-    brls::Theme theme = brls::Application::getTheme();
     this->badge = new brls::Box();
     this->badge->setPositionType(brls::PositionType::ABSOLUTE);
     this->badge->setPositionRight(-6);
@@ -43,8 +42,8 @@ void GameCell::set_badge(const char* icon_name, const char* color_key)
     this->badge->setWidth(22);
     this->badge->setHeight(22);
     this->badge->setCornerRadius(11);
-    this->badge->setBackgroundColor(theme["cadran/surf2"]);
-    this->badge->setBorderColor(theme[color_key]);
+    this->badge->setThemeColor("backgroundColor", "cadran/surf2");
+    this->badge->setThemeColor("borderColor", color_key);
     this->badge->setBorderThickness(1.5f);
     this->badge->setAlignItems(brls::AlignItems::CENTER);
     this->badge->setJustifyContent(brls::JustifyContent::CENTER);

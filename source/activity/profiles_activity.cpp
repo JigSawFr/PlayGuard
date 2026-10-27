@@ -57,12 +57,12 @@ void ProfilesActivity::show_schedule()
     if (s.empty()) {
         // A new one: through Home Assistant (Console › Remote access).
         schedule->setDetailText("playguard/schedule/soon"_i18n);
-        schedule->setDetailTextColor(cadran::kit::color("cadran/text2"));
+        schedule->detail->setThemeColor("textColor", "cadran/text2");
         schedule_note->setText("playguard/schedule/soon_note"_i18n);
         return;
     }
     schedule->setDetailText(ui::opens(s));
-    schedule->setDetailTextColor(cadran::kit::color("cadran/text2"));
+    schedule->detail->setThemeColor("textColor", "cadran/text2");
     schedule_note->setText("playguard/schedule/note"_i18n);
 }
 
@@ -83,7 +83,7 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
         const std::string summary = ui::days_summary(p.days.data());
         if (p.name == current) {
             cell->setDetailText(brls::getStr("playguard/play_timer/profile_current", summary));
-            cell->setDetailTextColor(cadran::kit::color("cadran/teal"));
+            cell->detail->setThemeColor("textColor", "cadran/teal");
         } else {
             cell->setDetailText(summary);
         }

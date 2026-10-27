@@ -46,6 +46,7 @@ settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)
 | `schema` | integer | `1` | `1` | written by PlayGuard, not read |
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"dark"`, `"system"` (the console's), `"light"` | `"dark"` | Preferences |
+| `theme_file` | string | the palette: `""` (PlayGuard's own colours), one of Aurore's presets (`"builtin:high-contrast-dark"`, `"builtin:high-contrast-light"`, `"builtin:ocean"`, `"builtin:amethyst"`, `"builtin:sand"`) or the path of a theme file in `config/playguard/themes/` ([themes.md](themes.md)); a palette made for one variant only (light or dark) sets `theme` to it; a file that cannot be read: PlayGuard's own colours | `""` | Preferences › Palette |
 | `effects` | string | `"auto"` (in full on the dock, lighter in hand: no background glow, no pulse of the child screen's ring, no movement at all while the console is off its dock, charging or not), `"full"` (the glow and every movement of the look, in hand too) or `"reduced"` (no decorative movement, the glow kept) | `"auto"` | Preferences › Visual effects |
 | `text_size` | string | `"auto"` (larger while the console is docked, on a TV), `"normal"` or `"large"`; larger text draws every label 25 % bigger, the sidebar's too, and the header's and the footer's 15 to 20 %, at once (no restart) | `"auto"` | Preferences › Text size, the header's AA |
 | `rail` | string | the main screen's sidebar: `"auto"` (on its icons while a tab has the focus, open over the tab, which keeps its width, while the focus is on the sidebar), `"open"` (always open, the names beside the icons) or `"icons"` (always on its icons, the tab wider) | `"auto"` | Preferences › Sidebar |
@@ -248,6 +249,7 @@ line; the order does not matter when it reads them:
   "schema": 1,
   "language": "fr",
   "theme": "dark",
+  "theme_file": "",
   "text_size": "auto",
   "effects": "auto",
   "rail": "auto",
