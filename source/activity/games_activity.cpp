@@ -145,10 +145,13 @@ void GamesActivity::switch_view()
     this->grid = !this->grid;
     config::get().games_grid = this->grid;   // the next visit opens on it
     ui::save_config();
-    this->set_hints();
-    // Next frame: rebuilding deletes the cell whose action runs now.
+    // Next frame: rebuilding deletes the cell whose action runs now, and the
+    // hints register the frame's actions again, this one among them.
     const u64 focus_id = this->selected < this->entries.size() ? this->entries[this->selected].app_id : 0;
-    brls::sync(ui::guarded(this->alive, [this, focus_id]() { this->build(focus_id); }));
+    brls::sync(ui::guarded(this->alive, [this, focus_id]() {
+        this->set_hints();
+        this->build(focus_id);
+    }));
 }
 
 void GamesActivity::pick_period()
