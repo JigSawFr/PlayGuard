@@ -43,6 +43,7 @@ typedef enum {
     SyncPublish_Controls = 0,   // the parental controls and the link: always
     SyncPublish_Activity,
     SyncPublish_Games,
+    SyncPublish_Icons,          // PlayGuard's alone (action/sync_icons)
     SyncPublish_Console,
     SyncPublish_Network,
     SyncPublish_Hardware,
@@ -72,6 +73,7 @@ typedef struct {
     bool       publish_report;
     bool       publish_activity;        // play time: today, the week, the finished days, the game names
     bool       publish_games;           // the games document (the list, each one's play time)
+    bool       publish_icons;           // the icons of the games played lately (icon/<app id>)
     bool       publish_console;         // power, storage, when it started (the system document)
     bool       publish_network;         // the connection, IP address, Wi-Fi (the system document)
     bool       publish_hardware;        // versions and hardware: model, firmware, Atmosphère, hekate…
@@ -116,7 +118,7 @@ void sync_conf_device_name(const SyncConf *c, const char *nickname, char *out, s
 const char *sync_policy_name(SyncPolicy p);
 // The category is published (SyncPublish_Controls always).
 bool        sync_conf_publishes(const SyncConf *c, SyncPublish p);
-// "controls", "activity", "games", "console", "network", "hardware", "serial", "report".
+// "controls", "activity", "games", "icons", "console", "network", "hardware", "serial", "report".
 const char *sync_publish_name(SyncPublish p);
 // "auto" / "5" / "3.1.1", as sync.conf writes it.
 const char *sync_mqtt_version_name(SyncMqttVersion v);

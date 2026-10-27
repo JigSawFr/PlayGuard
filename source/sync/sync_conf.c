@@ -15,7 +15,7 @@ void sync_conf_defaults(SyncConf *c)
     c->schema = SYNC_CONF_SCHEMA;
     c->port = 1883;
     c->policy = SyncPolicy_Ask;
-    c->publish_activity = c->publish_games = c->publish_console = c->publish_network = c->publish_hardware = true;
+    c->publish_activity = c->publish_games = c->publish_icons = c->publish_console = c->publish_network = c->publish_hardware = true;
     c->ha_discovery = true;
     c->poll_s = 30;
     copy(c->topic_prefix, sizeof(c->topic_prefix), "playguard");
@@ -216,6 +216,8 @@ static void on_kv(void *vctx, const char *key, const char *value)
         if (sync_parse_bool(value, &b)) c->publish_activity = b;
     } else if (!strcmp(key, "publish_games")) {
         if (sync_parse_bool(value, &b)) c->publish_games = b;
+    } else if (!strcmp(key, "publish_icons")) {
+        if (sync_parse_bool(value, &b)) c->publish_icons = b;
     } else if (!strcmp(key, "publish_console")) {
         if (sync_parse_bool(value, &b)) c->publish_console = b;
     } else if (!strcmp(key, "publish_network")) {
@@ -271,6 +273,7 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         "publish_report=%d\n"
         "publish_activity=%d\n"
         "publish_games=%d\n"
+        "publish_icons=%d\n"
         "publish_console=%d\n"
         "publish_network=%d\n"
         "publish_hardware=%d\n"
@@ -284,7 +287,7 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         SYNC_CONF_SCHEMA, c->enabled, c->host, (unsigned)c->port, c->tls, c->ca_file,
         sync_mqtt_version_name(c->mqtt_version), c->username, c->password,
         c->allow_anonymous, c->console_id, c->console_name, sync_policy_name(c->policy), c->remote_timer_writes,
-        c->publish_report, c->publish_activity, c->publish_games, c->publish_console, c->publish_network,
+        c->publish_report, c->publish_activity, c->publish_games, c->publish_icons, c->publish_console, c->publish_network,
         c->publish_hardware, c->publish_serial, c->ha_discovery, (unsigned)c->poll_s, c->topic_prefix,
         c->discovery_prefix, c->log_level, c->extra);
     if (n < 0 || (size_t)n >= cap) return 0;
@@ -296,6 +299,7 @@ bool sync_conf_publishes(const SyncConf *c, SyncPublish p)
     switch (p) {
     case SyncPublish_Activity: return c->publish_activity;
     case SyncPublish_Games:    return c->publish_games;
+    case SyncPublish_Icons:    return c->publish_icons;
     case SyncPublish_Console:  return c->publish_console;
     case SyncPublish_Network:  return c->publish_network;
     case SyncPublish_Hardware: return c->publish_hardware;
@@ -307,7 +311,7 @@ bool sync_conf_publishes(const SyncConf *c, SyncPublish p)
 
 const char *sync_publish_name(SyncPublish p)
 {
-    static const char *const NAMES[SyncPublish_Count] = { "controls", "activity", "games",  "console",
+    static const char *const NAMES[SyncPublish_Count] = { "controls", "activity", "games",  "icons",  "console",
                                                           "network",  "hardware", "serial", "report" };
     return p < SyncPublish_Count ? NAMES[p] : "controls";
 }

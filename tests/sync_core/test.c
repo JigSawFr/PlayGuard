@@ -394,6 +394,7 @@ static void test_conf(void)
     sync_conf_defaults(&c);
     CHECK(c.port == 1883 && c.policy == SyncPolicy_Ask && c.ha_discovery && !c.remote_timer_writes);
     CHECK(!strcmp(c.topic_prefix, "playguard") && !strcmp(c.discovery_prefix, "homeassistant"));
+    CHECK(c.publish_icons && c.publish_games && !c.publish_serial);   // the icons on by default, as the games
     CHECK(c.mqtt_version == SyncMqtt_Auto);
     CHECK(sync_conf_problem(&c) != NULL);   // no host
 
@@ -410,6 +411,7 @@ static void test_conf(void)
                        "policy=auto\n"
                        "remote_timer_writes=yes\n"
                        "publish_games=0\n"
+                       "publish_icons=no\n"
                        "publish_network=off\n"
                        "poll_s=5\n"                      // out of range: default kept
                        "topic_prefix=bad/prefix\n"       // refused
@@ -427,6 +429,8 @@ static void test_conf(void)
     CHECK(!c.publish_games && !c.publish_network && c.publish_activity && c.publish_console && c.publish_hardware);
     CHECK(!c.publish_serial && !c.publish_report);
     CHECK(!sync_conf_publishes(&c, SyncPublish_Games) && sync_conf_publishes(&c, SyncPublish_Hardware));
+    CHECK(!c.publish_icons && !sync_conf_publishes(&c, SyncPublish_Icons));
+    CHECK(!strcmp(sync_publish_name(SyncPublish_Icons), "icons"));
     c.publish_serial = true;
     CHECK(sync_conf_publishes(&c, SyncPublish_Serial));
     c.publish_hardware = false;
@@ -442,7 +446,7 @@ static void test_conf(void)
     const size_t n = sync_conf_write(&c, out, sizeof(out));
     CHECK(n > 0 && contains(out, "future_key=keep me\n") && contains(out, "policy=auto\n"));
     CHECK(contains(out, "mqtt_version=3.1.1\n"));
-    CHECK(contains(out, "publish_activity=1\npublish_games=0\npublish_console=1\npublish_network=0\npublish_hardware=1\n"));
+    CHECK(contains(out, "publish_activity=1\npublish_games=0\npublish_icons=0\npublish_console=1\npublish_network=0\npublish_hardware=1\n"));
     SyncConf back;
     sync_conf_defaults(&back);
     CHECK(sync_conf_parse(&back, out, n));
@@ -929,7 +933,7 @@ static void test_state(void)
     CHECK(contains(buf, "\"profiles\":[\"School week\",\"Vacances d'été\"]}"));
     CHECK(contains(buf, "\"console\":{\"id\":\"a1b2c3d4\",\"name\":\"Salon\""));
     // What is published, and the profile in effect (none here).
-    CHECK(contains(buf, "\"publishes\":{\"activity\":true,\"games\":true,\"console\":true,\"network\":true,"
+    CHECK(contains(buf, "\"publishes\":{\"activity\":true,\"games\":true,\"icons\":true,\"console\":true,\"network\":true,"
                         "\"hardware\":true,\"serial\":false,\"report\":false}}"));
     CHECK(contains(buf, "\"console_locked\":false,\"profile\":null}"));
     s.profile_now = "School week";
@@ -941,7 +945,7 @@ static void test_state(void)
     n = sync_state_build(&s, buf, sizeof(buf));
     CHECK(contains(buf, "\"activity_today\":{\"used_min\":null,\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null}}"));
     CHECK(contains(buf, "\"firmware\":null,\"atmosphere\":null,\"app_version\":\"1.1.0\""));
-    CHECK(contains(buf, "\"publishes\":{\"activity\":false,\"games\":true,\"console\":true,\"network\":true,\"hardware\":false,"));
+    CHECK(contains(buf, "\"publishes\":{\"activity\":false,\"games\":true,\"icons\":true,\"console\":true,\"network\":true,\"hardware\":false,"));
     c.publish_activity = c.publish_hardware = true;
     // On an emuMMC: this system's device, its own id and name.
     c.emummc = true;
