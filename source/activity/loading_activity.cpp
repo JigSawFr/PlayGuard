@@ -3,15 +3,50 @@
 
 using namespace brls::literals;
 
-void LoadingActivity::onContentAvailable()
+namespace
+{
+// The image slot of the wordmark (ui/palette.hpp).
+constexpr const char* WORDMARK_SLOT = "playguard/loading/wordmark";
+}   // namespace
+
+LoadingActivity::~LoadingActivity()
+{
+    if (this->following) brls::Application::getThemeChangedEvent()->unsubscribe(this->themeChanged);
+}
+
+void LoadingActivity::takeTheme()
 {
     // The theme's background and inks (the XML's), so the screen does not
     // flash navy before the first one on the light theme (the icon keeps
     // its tile): there, the wordmark in its inks and the bar in the theme's
     // teal. Else the brand's bar, as the store banner.
-    const bool light = brls::Application::getPlatform()->getThemeVariant() == brls::ThemeVariant::LIGHT;
+    const brls::ThemeVariant variant = brls::Application::getPlatform()->getThemeVariant();
+    const bool light = variant == brls::ThemeVariant::LIGHT;
     this->bar->setBrand(!light);
-    if (light) this->wordmark->setImageFromRes("img/wordmark-light.png");
+
+    // The theme's picture behind the screens shows through this one too.
+    const bool picture = brls::Theme::getBackground(variant).hasImage();
+    if (picture != this->transparent) {
+        this->root->setThemeColor("backgroundColor", picture ? "cadran/none" : "brls/background");
+        this->transparent = picture;
+    }
+
+    // The theme's wordmark when it gives one, else PlayGuard's for the variant.
+    Wordmark wanted = light ? Wordmark::Light : Wordmark::Dark;
+    if (brls::Theme::getPictures(variant).images.count(WORDMARK_SLOT)) wanted = Wordmark::Theme;
+    if (wanted == this->shownWordmark) return;
+    if (wanted == Wordmark::Theme)
+        this->wordmark->setThemeImage(WORDMARK_SLOT);
+    else
+        this->wordmark->setImageFromRes(wanted == Wordmark::Light ? "img/wordmark-light.png" : "img/wordmark.png");
+    this->shownWordmark = wanted;
+}
+
+void LoadingActivity::onContentAvailable()
+{
+    this->takeTheme();
+    this->themeChanged = brls::Application::getThemeChangedEvent()->subscribe([this](brls::ThemeVariant) { this->takeTheme(); });
+    this->following = true;
     if (this->mode == Mode::Closing) {
         this->step_text->setText("playguard/loading/step_closing"_i18n);
         this->bar->setProgress(1.0f);

@@ -5,7 +5,8 @@
      dial on the right (the light theme: the wordmark and the bar in its inks,
      LoadingActivity::onContentAvailable): the icon over
      Aurore's aurora glow, breathing, the wordmark, the tagline, and a
-     progress bar over the start-up steps. -->
+     progress bar over the start-up steps. Over a theme's background
+     picture, the root is transparent (LoadingActivity::takeTheme). -->
 
 <brls:Box
     id="loading_root"
@@ -64,7 +65,7 @@
         id="loading_anchor"
         width="1"
         height="1"
-        color="@theme/brls/background"
+        color="@theme/cadran/none"
         focusable="true"
         hideHighlight="true"/>
 

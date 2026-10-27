@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 381383251bac -->
+<!-- translated from docs/features.md, sha256 585fe166c713 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -482,7 +482,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 - Ce qui règle PlayGuard lui-même :
   - En tuiles d'abord : langue (toutes celles de la console, ou celle de la console), thème (sombre par défaut, clair, ou celui de la console), taille du texte (automatique / normale / plus grande) et l'onglet d'ouverture.
-  - **La palette** : les couleurs de PlayGuard (*Par défaut*), les palettes fournies avec lui (contraste élevé sombre et clair, Océan, Améthyste, Sable, une par saison et par fête, et *Au fil des saisons*, qui suit le calendrier) ou un fichier de thème à vous copié dans `config/playguard/themes/` sur la carte SD, appliquée tout de suite. Comment en écrire un : [themes.md](themes.md).
+  - **La palette** : les couleurs de PlayGuard (*Par défaut*), les palettes fournies avec lui (contraste élevé sombre et clair, Océan, Améthyste, Sable, une par saison et par fête, et *Au fil des saisons*, qui suit le calendrier) ou un thème à vous copié dans `config/playguard/themes/` sur la carte SD, appliquée tout de suite : un fichier, ou un dossier avec des images (un fond derrière chaque écran, un logo, l'image de l'écran de chargement, des décorations, des particules qui ne bougent que si les *Effets visuels* permettent le mouvement). Chaque ligne de la liste montre les couleurs de la palette et son motif. Comment en écrire un : [themes.md](themes.md).
   - **L'intro** au lancement : l'écran de chargement (son icône à l'anneau tournant, la barre, le cadran de Cadran à droite) pendant 2 secondes (activée par défaut ; Ⓐ ou Ⓑ la passe ; désactivée, PlayGuard s'ouvre dès qu'il est prêt).
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).

@@ -1,0 +1,54 @@
+# A theme folder: this file is theme.theme, its pictures are next to it.
+# Copy the whole dusk/ folder into config/playguard/themes/ (docs/themes.md).
+# The pictures are drawn by tools/make_example_theme.py.
+name = Dusk
+author = PlayGuard
+version = 1
+description = A starry sky at night, the dawn by day, with a logo and a loading picture of its own.
+icon = moon
+
+# Behind every screen: the sky, the cards slightly see-through over it
+background_fit = cover
+surface_opacity = 0.88
+
+# The palette list shows this picture instead of a swatch of the colours
+preview = preview.png
+
+# The loading screen's picture (an image slot of PlayGuard's)
+image.playguard/loading/art = loading.png
+
+# Cadran's settings icon (the rail, Preferences), drawn in the icon's colour
+icon.settings = icons/settings.png
+icon.settings.tint = true
+
+# A few stars twinkling behind the screens (not with reduced motion)
+particles = sparkles
+particles_density = low
+
+[light]
+background = #f1edf4
+surface = #fdfbff
+text = #2a2238
+accent = #6a3a7c
+warning = #8a5a00
+danger = #b3261e
+background_image = day.jpg
+background_dim = 0.6
+logo = logo-light.png
+# Over the picture, a little darker than the palette makes them
+cadran/text3 = #574d66
+brls/header/subtitle = #574d66
+
+[dark]
+background = #1b1838
+surface = #26224a
+text = #f4eefb
+accent = #ffc496
+warning = #f2b84b
+danger = #ff8a80
+background_image = night.jpg
+background_dim = 0.3
+logo = logo-dark.png
+# Stars hanging from the top of the screen, repeated sideways
+decor.top = stars.png
+decor.top_fit = tile
