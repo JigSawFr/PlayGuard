@@ -168,7 +168,8 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   below as borealis' fallback when it is there at start-up.
 - **Japanese, Korean and Chinese**: a browser has no system font for borealis
   to fall back on, and PlayGuard's Latin font has no han, kana or hangul. The
-  web build cuts the characters the four catalogs use out of Noto Sans CJK
+  web build cuts the characters those four languages' catalogs use
+  (PlayGuard's and Aurore's, for the theme names) out of Noto Sans CJK
   (SIL Open Font License; about 660 KiB, `tools/web_cjk_font.py`, which needs
   fontTools) into `cjk.otf`, served next to the page rather than packaged:
   in those four languages the page fetches it before PlayGuard starts, into
