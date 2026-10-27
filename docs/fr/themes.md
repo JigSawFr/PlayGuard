@@ -134,7 +134,7 @@ toutes les vérifications.
 ### Deux exemples
 
 Les deux fichiers sont dans [`docs/themes/`](../themes/), prêts à copier (un
-dossier de thème avec des images est [plus bas](#un-dossier-de-thème-dusk)).
+dossier de thème avec des images est [plus bas](#un-dossier-de-thème--dusk)).
 
 [`mint.theme`](../themes/mint.theme) : l'apparence sombre de PlayGuard avec un
 autre accent.
