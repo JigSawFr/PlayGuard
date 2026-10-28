@@ -255,9 +255,10 @@ if (PLATFORM_SWITCH)
     target_link_options(${PROJECT_NAME} PRIVATE -Wl,--wrap=userAppInit)
 endif ()
 
-# Resources: borealis built-ins first, then ours on top. On the Switch
-# borealis' bundled fonts and demo assets are dropped (the system shared font
-# is used); ours stay (resources/font: Cadran's figures).
+# Resources: borealis built-ins first, then ours on top, without Aurore's demo
+# assets. On the Switch Aurore's desktop fonts (Inter, PromptFont's buttons)
+# are dropped too (the system shared font is used); ours stay (resources/font:
+# Cadran's figures).
 # en-GB reuses the English strings, already in British spelling (borealis looks
 # the locale up verbatim), except the quoted system menu labels, spelt as on a
 # US console ("Synchronize Clock via Internet").
@@ -268,7 +269,7 @@ set(ASSEMBLE_RESOURCES
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOREALIS_RESOURCES} ${MERGED_RESOURCES}
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/xml
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/themes
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/img/pokemon
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/img/gallery
     COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/img/tiles.png ${MERGED_RESOURCES}/img/demo_icon.jpg
             ${MERGED_RESOURCES}/img/aurore_96.png ${MERGED_RESOURCES}/img/aurore_256.png
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_RESOURCES} ${MERGED_RESOURCES}
@@ -346,7 +347,8 @@ if (PLATFORM_SWITCH)
         COMMAND ${CMAKE_COMMAND} -E copy ${FORWARDER_OUT}/forwarder.npdm ${MERGED_RESOURCES}/forwarder/main.npdm
         COMMAND ${CMAKE_COMMAND} -E make_directory ${MERGED_RESOURCES}/gate
         COMMAND ${CMAKE_COMMAND} -E copy ${GATE_NRO} ${MERGED_RESOURCES}/gate/gate.nro
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/font/switch_font.ttf ${MERGED_RESOURCES}/font/switch_icons.ttf
+        COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/font/aurore_text.ttf ${MERGED_RESOURCES}/font/aurore_buttons.ttf
+                ${MERGED_RESOURCES}/font/OFL-Inter.txt ${MERGED_RESOURCES}/font/OFL-PromptFont.txt
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${PROJECT_NAME}.nro
                 --icon=${PROJECT_ICON} --nacp=${PROJECT_NAME}.nacp
                 --romfsdir=${MERGED_RESOURCES}
