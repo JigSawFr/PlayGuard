@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
+<!-- translated from docs/getting-started.md, sha256 6b46b5d26c07 -->
 # 快速上手
 
 从 SD 卡到一台为孩子设置好的主机，大约十分钟，然后是日常操作。返回 [README](../../README.md)。
@@ -9,7 +9,7 @@
 - **受支持的系统版本。** 21.0.0 到 23.0.1 可以使用所有功能；更早的版本，除游戏时间计时器外都可用；更新的版本会以只读方式打开，直到有发布版本支持它（[兼容性](compatibility.md)）。
 - **整台主机一个限制。** 游戏时间计时器是主机的：对所有用户都一样。想给每个孩子设置不同的限制，需要另一种工具（[原因](compatibility.md#playguard-还是替代型-sysmodule)）。
 
-想先看看？[在浏览器中试用 PlayGuard](https://playguard.link/simulator/?not_set_up=1)，对着一台首次启动的模拟主机。
+想先看看？[在浏览器中试用 PlayGuard](https://guard.boreale.dev/simulator/?not_set_up=1)，对着一台首次启动的模拟主机。
 
 ## 1. 安装
 

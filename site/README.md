@@ -1,6 +1,6 @@
 # The website
 
-PlayGuard's website, on GitHub Pages: <https://playguard.link/>.
+PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
 
 - **A home page and the documentation in the console's 15 languages**:
   English at the root, the others in `/fr/`, `/fr-ca/`, `/de/`, `/es/`,
@@ -159,7 +159,7 @@ pages; no framework, nothing to install but that.
   (1280×720), the home page's video in that language; English keeps
   `images/video/playguard-tour.mp4`. A few minutes each: rendered with the
   screenshots (a release, or by hand), else main's.
-- **The site's address**: `SITE_URL` (`https://playguard.link/`
+- **The site's address**: `SITE_URL` (`https://guard.boreale.dev/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
   `SITE_NOINDEX=1` for a preview.

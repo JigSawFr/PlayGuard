@@ -47,7 +47,7 @@ import markdown
 REPO_URL = "https://github.com/JigSawFr/PlayGuard"
 # The site's address, for the links that must be absolute (the canonical
 # page, the other languages, the preview image, the sitemap, llms.txt).
-SITE_URL = os.environ.get("SITE_URL", "https://playguard.link/").rstrip("/") + "/"
+SITE_URL = os.environ.get("SITE_URL", "https://guard.boreale.dev/").rstrip("/") + "/"
 # A pull request's preview: not for search engines (main's site is the one).
 NOINDEX = os.environ.get("SITE_NOINDEX") == "1"
 # The audience, counted by Umami Cloud (site/README.md): its tracker, served
@@ -64,7 +64,7 @@ SCREENSHOT_DIR = os.environ.get("SITE_SCREENSHOTS", "")
 SIMULATOR_DIR = os.environ.get("SITE_SIMULATOR", "")
 # The documentation's "Try it in the simulator" links (main's simulator, as
 # GitHub shows them): the site's own simulator on the site, in its language.
-SIMULATOR_URL = "https://playguard.link/simulator/"
+SIMULATOR_URL = "https://guard.boreale.dev/simulator/"
 # The console's languages: config.json's code, the site's folder ('' for the
 # root), the name in its own words, the html lang.
 LANGUAGES = [

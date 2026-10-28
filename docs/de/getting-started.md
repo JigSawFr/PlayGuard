@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
+<!-- translated from docs/getting-started.md, sha256 6b46b5d26c07 -->
 # Einstieg
 
 Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa zehn Minuten, dann die alltäglichen Aufgaben. Zurück zum [README](../../README.md).
@@ -9,7 +9,7 @@ Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa 
 - **Eine unterstützte Firmware.** 21.0.0 bis 23.0.1 für alle Funktionen; ältere: alles außer dem Timer; eine neuere öffnet schreibgeschützt, bis eine Version sie unterstützt ([Kompatibilität](compatibility.md)).
 - **Ein Limit für die ganze Konsole.** Der Timer ist der der Konsole: Er ist für jeden Benutzer derselbe. Unterschiedliche Limits pro Kind brauchen ein anderes Werkzeug ([warum](compatibility.md#playguard-oder-ein-ersatz-sysmodul)).
 
-Willst du dich erst einmal umsehen? [Probiere PlayGuard im Browser aus](https://playguard.link/simulator/?not_set_up=1), mit einer simulierten Konsole bei ihrem ersten Start.
+Willst du dich erst einmal umsehen? [Probiere PlayGuard im Browser aus](https://guard.boreale.dev/simulator/?not_set_up=1), mit einer simulierten Konsole bei ihrem ersten Start.
 
 ## 1. Installieren
 
