@@ -363,14 +363,14 @@ def lang_dir(lang):
     return f"{folder}/" if folder else ""
 
 
-def screenshot(lang, name, dark=False):
+def screenshot(lang, name):
     """The screenshot `name` under assets/: the console's in `lang` when
-    SITE_SCREENSHOTS has it, else the English one of images/screenshots/.
-    With `dark`, its dark theme's, or None."""
-    file = f"{name}-dark.webp" if dark else f"{name}.webp"
-    if SCREENSHOT_DIR and os.path.exists(os.path.join(SCREENSHOT_DIR, lang, file)):
-        return f"images/screenshots/{lang}/{file}"
-    return None if dark else f"images/screenshots/{name}.png"
+    SITE_SCREENSHOTS has it, in its dark theme as the site is (its light one
+    when there is no dark one), else the English one of images/screenshots/."""
+    for file in (f"{name}-dark.webp", f"{name}.webp"):
+        if SCREENSHOT_DIR and os.path.exists(os.path.join(SCREENSHOT_DIR, lang, file)):
+            return f"images/screenshots/{lang}/{file}"
+    return f"images/screenshots/{name}.png"
 
 
 def social_image(lang):
@@ -390,16 +390,10 @@ def tour_video(lang):
 
 
 def gallery_image(t, lang, to_root, name):
-    """A screenshot of the gallery, in the page's theme: its dark one under
-    the dark theme (site.css), when there is one."""
-    light, dark = screenshot(lang, name), screenshot(lang, name, dark=True)
+    """A screenshot of the gallery."""
     # A sentence saying what the screen shows (its name is the caption).
     alt = t(f"shot_{name}_alt")
-    img = f'<img src="{to_root}assets/{light}" alt="{alt}" width="1280" height="720" loading="lazy"'
-    if not dark:
-        return img + ">"
-    return (img + ' class="shot-light">'
-            f'<img src="{to_root}assets/{dark}" alt="{alt}" width="1280" height="720" loading="lazy" class="shot-dark">')
+    return f'<img src="{to_root}assets/{screenshot(lang, name)}" alt="{alt}" width="1280" height="720" loading="lazy">'
 
 
 def back_to_readme(text):
@@ -458,22 +452,7 @@ def render_doc(page, lang, to_root, assets):
     body = re.sub(r"<!-- github-only[^>]*-->\s*<p>.*?</p>\s*", "", body, flags=re.S)
     body = re.sub(r"<table>.*?</table>", screenshot_table, body, flags=re.S)
     body = re.sub(r"<table>", '<div class="table"><table>', body).replace("</table>", "</table></div>")
-    body = re.sub(r"<img [^>]*>", lambda m: dark_twin(m.group(0), lang, assets), body)
     return html.unescape(title), body, md.toc_tokens, translated, source
-
-
-def dark_twin(img, lang, assets):
-    """A screenshot of the documentation in the page's theme: its dark one
-    beside it under the dark theme (site.css), as the gallery's, when there
-    is one."""
-    src = re.search(r'src="([^"]*)"', img)
-    name = re.search(r"images/screenshots/[^/]+/(\w+)\.webp$", src.group(1)) if src else None
-    dark = screenshot(lang, name.group(1), dark=True) if name else None
-    if not dark:
-        return img
-    assets.add(dark)
-    twin = img.replace(src.group(1), src.group(1).rsplit("images/", 1)[0] + dark)
-    return img.replace("<img ", '<img class="shot-light" ', 1) + twin.replace("<img ", '<img class="shot-dark" ', 1)
 
 
 def screenshot_table(m):
@@ -502,8 +481,10 @@ def json_ld(data):
 
 
 def page(t, lang, to_root, path, title, body, description=None, body_class="", full_title=None, structured=(),
-         markdown_url=None, indexed=True):
-    """A whole page: `path` is its place under the language's folder ('' or 'docs/x/')."""
+         markdown_url=None, indexed=True, hero=""):
+    """A whole page: `path` is its place under the language's folder ('' or 'docs/x/').
+    The header stands on the sky (site.css), with the home page's `hero`
+    under it and its aurora behind both (site.js)."""
     code, folder, _, html_lang = next(l for l in LANGUAGES if l[0] == lang)
     description = description or t("meta_description")
     head = []
@@ -546,8 +527,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <meta property="og:image:height" content="640">
   <meta property="og:image:alt" content="PlayGuard">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#111d31" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#0b1424">
   <link rel="icon" href="{to_root}assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{to_root}assets/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="PlayGuard">
@@ -556,11 +536,13 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <link rel="manifest" href="{to_root}assets/site.webmanifest">
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
-{"".join(json_ld(d) for d in structured)}  <script src="{to_root}assets/theme.js"></script>
+{"".join(json_ld(d) for d in structured)}
   <link rel="stylesheet" href="{to_root}assets/site.css">
 {umami}</head>
 <body class="{body_class}">
   <a class="skip" href="#main">{t('skip')}</a>
+  <div class="sky{' sky-home' if hero else ''}">
+  {'<canvas id="sky" aria-hidden="true"></canvas>' if hero else ''}
   <header class="top">
     <a class="brand" href="{home}"><img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span></a>
     <nav class="nav" aria-label="PlayGuard">
@@ -575,14 +557,9 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
       <select id="site-language" aria-label="{t('language')}">
 {options}
       </select></span>
-      <span class="picker picker-theme"><span class="picker-face" aria-hidden="true"></span>
-      <select id="site-theme" aria-label="{t('theme')}">
-        <option value="auto">{t('theme_auto')}</option>
-        <option value="light">{t('theme_light')}</option>
-        <option value="dark">{t('theme_dark')}</option>
-      </select></span>
     </div>
   </header>
+{hero}  </div>
   <main id="main">
 {body}
   </main>
@@ -625,7 +602,17 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
 """
 
 
+def hero_title(t):
+    """The home page's title, its end in the aurora's gradient (site.css):
+    `hero_em`, the words of `hero_title` to colour, where the catalog has them."""
+    title, em = t("hero_title"), t("hero_em")
+    if em and em in title:
+        return title.replace(em, f"<em>{em}</em>", 1)
+    return title
+
+
 def home_body(t, lang, to_root):
+    """The home page: its hero (under the header, on the sky), and the rest."""
     code = lang
     def feature(key):
         return (f'      <li class="card">{icon(key)}'
@@ -651,8 +638,8 @@ def home_body(t, lang, to_root):
     home = f"{to_root}{lang_dir(lang)}"
     return f"""    <section class="hero">
       <div class="hero-text">
-        <p class="wordmark" aria-hidden="true">PlayGuard</p>
-        <h1>{t('hero_title')}</h1>
+        <p class="eyebrow">{t('hero_eyebrow')}</p>
+        <h1>{hero_title(t)}</h1>
         <p class="sub">{t('hero_sub')}</p>
         <p>{t('hero_text')}</p>
         <div class="actions">
@@ -670,10 +657,10 @@ def home_body(t, lang, to_root):
         <button class="video-sound" type="button" hidden aria-pressed="false" aria-label="{t('video_sound_on')}" data-on="{t('video_sound_on')}" data-off="{t('video_sound_off')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="m16 9 6 6M22 9l-6 6"/></svg></button>
       </div>
     </section>
-
-    <aside class="callout warning wide"><p><strong>{t('cfw_title')}</strong> {t('cfw_text')}</p></aside>
+""", f"""    <aside class="callout warning wide"><p><strong>{t('cfw_title')}</strong> {t('cfw_text')}</p></aside>
 
     <section id="features" class="section">
+      <p class="eyebrow">{t('features_eyebrow')}</p>
       <h2>{t('features_title')}</h2>
       <ul class="cards">
 {featured}
@@ -685,6 +672,7 @@ def home_body(t, lang, to_root):
     </section>
 
     <section id="compare" class="section">
+      <p class="eyebrow">{t('compare_eyebrow')}</p>
       <h2>{t('compare_title')}</h2>
       <div class="table compare">
         <table>
@@ -697,6 +685,7 @@ def home_body(t, lang, to_root):
     </section>
 
     <section id="screens" class="section">
+      <p class="eyebrow">{t('screens_eyebrow')}</p>
       <h2>{t('screens_title')}</h2>
       <div class="gallery">
 {shots}
@@ -705,6 +694,7 @@ def home_body(t, lang, to_root):
 
     <section id="simulator" class="section band">
       <div>
+        <p class="eyebrow">{t('simulator_eyebrow')}</p>
         <h2>{t('simulator_title')}</h2>
         <p>{t('simulator_text')}</p>
       </div>
@@ -713,6 +703,7 @@ def home_body(t, lang, to_root):
 
     <section id="install" class="section columns">
       <div>
+        <p class="eyebrow">{t('install_eyebrow')}</p>
         <h2>{t('install_title')}</h2>
         <!-- One way or the other: tabs (site.js), else both under their names. -->
         <div class="tabs">
@@ -733,6 +724,7 @@ def home_body(t, lang, to_root):
         </div>
       </div>
       <div>
+        <p class="eyebrow">{t('start_eyebrow')}</p>
         <h2>{t('start_title')}</h2>
         <ol class="steps">
           <li>{t('start_1')}</li>
@@ -744,11 +736,13 @@ def home_body(t, lang, to_root):
     </section>
 
     <section id="compatibility" class="section">
+      <p class="eyebrow">{t('compat_eyebrow')}</p>
       <h2>{t('compat_title')}</h2>
       <p>{t('compat_text')} <a href="{home}docs/compatibility/">{t('compat_link')}</a></p>
     </section>
 
     <section id="faq" class="section">
+      <p class="eyebrow">{t('faq_eyebrow')}</p>
       <h2>{t('faq_title')}</h2>
       <div class="faq">
 {faq}
@@ -756,6 +750,7 @@ def home_body(t, lang, to_root):
     </section>
 
     <section id="docs" class="section">
+      <p class="eyebrow">{t('docs_eyebrow')}</p>
       <h2>{t('docs_title')}</h2>
 {docs}
     </section>
@@ -1296,8 +1291,8 @@ def main():
         to_root = "../" if folder else ""
         assets.update(screenshot(lang, s) for s in SCREENSHOTS)
         assets.update((social_image(lang), tour_video(lang)))
-        assets.update(filter(None, (screenshot(lang, s, dark=True) for s in SCREENSHOTS)))
-        write(out, f"{base}index.html", page(t, lang, to_root, "", "", home_body(t, lang, to_root), body_class="home",
+        hero, body = home_body(t, lang, to_root)
+        write(out, f"{base}index.html", page(t, lang, to_root, "", "", body, body_class="home", hero=hero,
                                              full_title=f"PlayGuard — {t('hero_title', escape=False)}",
                                              structured=home_data(t, lang, version)))
         descriptions, markdown, index = {}, [], []
@@ -1388,7 +1383,7 @@ def main():
     # opens in the browser, at its root (the visitor's language from there).
     write(out, "assets/site.webmanifest", json.dumps({
         "name": "PlayGuard", "short_name": "PlayGuard", "start_url": "../", "scope": "../", "display": "browser",
-        "background_color": "#ffffff", "theme_color": "#0a705f",
+        "background_color": "#0b1424", "theme_color": "#0b1424",
         "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"},
                   {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
                   {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
