@@ -317,6 +317,8 @@ static uint64_t g_activity_at;
 static uint32_t g_activity_s;            // today's total, for the state
 static bool     g_activity_ok;
 static u64      g_playing, g_playing_since;
+static u64      g_waiting;               // none in front: the one suspended in the background
+static bool     g_front_ok;              // the last read of what is in front worked
 static PlayLogTotal g_totals[PLAYSTATS_MAX];
 static size_t   g_n_totals;
 static PlayLogAccountDays g_accounts[PLAYSTATS_MAX_ACCOUNTS];
@@ -424,8 +426,8 @@ static void read_activity(uint64_t now_ms, bool force)
     u64 now = 0;
     Result rc = 0;
     const char *was = phase("the play log (pdm)");
-    g_n_totals = playstats_days(g_totals, PLAYSTATS_MAX, &now, g_day_wday, &g_playing, &g_playing_since, g_accounts,
-                                PLAYSTATS_MAX_ACCOUNTS, &g_n_accounts, &rc);
+    g_n_totals = playstats_days(g_totals, PLAYSTATS_MAX, &now, g_day_wday, &g_playing, &g_playing_since, &g_waiting,
+                                g_accounts, PLAYSTATS_MAX_ACCOUNTS, &g_n_accounts, &rc);
     phase(was);
     g_activity_ok = R_SUCCEEDED(rc);
     phase("titles.txt (SD card)");
@@ -557,10 +559,25 @@ static size_t own_state(char *out, size_t cap)
     s.records = &g_records;
     s.activity_ok = g_activity_ok;
     s.activity_s = g_activity_s;
-    load_titles();   // titles.txt: what each title is
+    // What is in front, from the newest events (the totals above are read
+    // every 5 minutes, this with every state: within poll_s).
+    {
+        u64 playing = 0, since = 0, waiting = 0;
+        load_titles();   // titles.txt: what each title is
+        const char *front_was = phase("the play log's newest events (pdm)");
+        g_front_ok = R_SUCCEEDED(playstats_front(&playing, &since, &waiting));
+        if (g_front_ok) {
+            g_playing = playing;
+            g_playing_since = since;
+            g_waiting = waiting;
+        }
+        phase(front_was);
+    }
     s.now_playing = g_playing;
     s.now_playing_since = g_playing_since;
     s.now_playing_kind = sync_titles_kind(&g_titles, g_playing);
+    // Nothing in front: the HOME menu (or an applet), a game waiting or not.
+    s.now = !(g_front_ok || g_activity_ok) ? SyncNow_Unknown : g_waiting ? SyncNow_Suspended : SyncNow_Home;
     char playing_name[129];
     name_of(g_playing, playing_name, sizeof(playing_name));
     s.now_playing_name = playing_name[0] ? playing_name : NULL;

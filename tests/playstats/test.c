@@ -52,7 +52,8 @@ static void test_convert(void)
                            PdmAppletEventType_Exit5, PdmAppletEventType_Exit6 };
     for (size_t i = 0; i < sizeof(unfocus); i++) {
         p = applet(AppletId_application, unfocus[i], GAME, 1000);
-        CHECK(playstats_convert(&p, &e) && e.kind == PlayLogEv_Unfocus && e.app_id == GAME);
+        // Out of focus: it waits in the background; the three exits: gone.
+        CHECK(playstats_convert(&p, &e) && e.kind == (i < 2 ? PlayLogEv_Unfocus : PlayLogEv_Exit) && e.app_id == GAME);
     }
     // A launch ends what was in focus, whatever game it is.
     p = applet(AppletId_application, PdmAppletEventType_Launch, GAME, 1000);

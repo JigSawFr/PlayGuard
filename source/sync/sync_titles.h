@@ -44,6 +44,9 @@ SyncTitleKind sync_titles_kind(const SyncTitles *t, uint64_t id);
 const char   *sync_title_kind_name(SyncTitleKind k);
 // What the documents call it: the same, PlayGuard's own forwarder "homebrew".
 const char   *sync_title_kind_label(SyncTitleKind k);
+// activity_today.now: "game", "homebrew", "playguard", "home", "suspended";
+// NULL unknown.
+const char   *sync_now_name(uint64_t playing, SyncTitleKind kind, SyncNow now);
 // Keeps the games of `apps` in place, in their order, and returns how many;
 // the others' seconds are added to *other_s.
 size_t        sync_titles_games_only(const SyncTitles *t, SyncAppTime *apps, size_t n, uint32_t *other_s);

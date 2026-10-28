@@ -27,6 +27,15 @@ typedef enum {
     SyncTitle_PlayGuard,  // PlayGuard's own forwarder: a homebrew, told apart
 } SyncTitleKind;
 
+// What the console is doing when no title has the focus (activity_today.now):
+// with one, its kind says.
+typedef enum {
+    SyncNow_Unknown = 0,   // null: the play log unread
+    SyncNow_PlayGuard,     // PlayGuard in front (it publishes the state itself)
+    SyncNow_Home,          // the HOME menu or a system applet, nothing waiting
+    SyncNow_Suspended,     // the same, with a game (or homebrew) waiting in the background
+} SyncNow;
+
 typedef struct {
     const char        *source;          // "agent" or "app"
     uint64_t           ts;              // user clock, POSIX seconds
@@ -55,6 +64,7 @@ typedef struct {
     uint64_t           now_playing_since;
     const char        *now_playing_name;
     SyncTitleKind      now_playing_kind;
+    SyncNow            now;                // with no title in front
 
     bool               agent;           // the agent sysmodule runs (and publishes)
     const char        *last_result;     // "limit_mon: applied", NULL or "": none

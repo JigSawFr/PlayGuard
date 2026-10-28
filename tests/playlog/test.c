@@ -379,6 +379,48 @@ static void test_since(void)
     CHECK(n == 1 && t[0].app_id == A && t[0].week_s == 2 * H && t[0].today_s == 0 && t[0].day_s[0] == 0);
 }
 
+// An exit ends a session as losing the focus does; what is in front, and
+// what waits in the background (playlog_now).
+static void test_now(void)
+{
+    const uint64_t T = 10 * DAY + 9 * H;
+    PlayLogTotal out[4];
+    const PlayLogEvent exited[] = { ev(A, PlayLogEv_Focus, T), ev(A, PlayLogEv_Exit, T + 1800) };
+    CHECK(fold(exited, 2, out) == 1 && out[0].today_s == 1800);
+
+    uint64_t focused, since, waiting;
+    playlog_now(exited, 2, &focused, &since, &waiting);
+    CHECK(focused == 0 && waiting == 0);   // quit: the HOME menu, nothing waits
+    // Playing, an account opened in it since: still A.
+    PlayLogEvent playing[] = { ev(A, PlayLogEv_Focus, T), ev(0, PlayLogEv_AccountOpen, T + 10) };
+    playing[1].uid[0] = 1;
+    playlog_now(playing, 2, &focused, &since, &waiting);
+    CHECK(focused == A && since == T && waiting == 0);
+    // HOME pressed: out of focus, then the HOME menu's focus (Away): A waits.
+    const PlayLogEvent home[] = { ev(A, PlayLogEv_Focus, T), ev(A, PlayLogEv_Unfocus, T + 600),
+                                  ev(0, PlayLogEv_Away, T + 601) };
+    playlog_now(home, 3, &focused, &since, &waiting);
+    CHECK(focused == 0 && waiting == A);
+    // Closed from the HOME menu afterwards: nothing waits.
+    const PlayLogEvent closed[] = { ev(A, PlayLogEv_Focus, T), ev(A, PlayLogEv_Unfocus, T + 600),
+                                    ev(0, PlayLogEv_Away, T + 601), ev(A, PlayLogEv_Exit, T + 700) };
+    playlog_now(closed, 4, &focused, &since, &waiting);
+    CHECK(focused == 0 && waiting == 0);
+    // Back in it, then another started (a launch closes the first).
+    const PlayLogEvent back[] = { ev(A, PlayLogEv_Unfocus, T), ev(A, PlayLogEv_Focus, T + 60) };
+    playlog_now(back, 2, &focused, &since, &waiting);
+    CHECK(focused == A && since == T + 60 && waiting == 0);
+    const PlayLogEvent other[] = { ev(A, PlayLogEv_Unfocus, T), ev(0, PlayLogEv_Launch, T + 60), ev(B, PlayLogEv_Focus, T + 70) };
+    playlog_now(other, 3, &focused, &since, &waiting);
+    CHECK(focused == B && waiting == 0);
+    // Crashed: the HOME menu took the focus with no event of the game's own.
+    const PlayLogEvent crashed[] = { ev(A, PlayLogEv_Focus, T), ev(0, PlayLogEv_Away, T + 60) };
+    playlog_now(crashed, 2, &focused, &since, &waiting);
+    CHECK(focused == 0 && waiting == 0);
+    playlog_now(NULL, 0, &focused, &since, &waiting);
+    CHECK(focused == 0 && since == 0 && waiting == 0);
+}
+
 int main(void)
 {
     test_sessions();
@@ -392,5 +434,6 @@ int main(void)
     test_account_days();
     test_hours();
     test_since();
+    test_now();
     return CHECK_DONE("playlog session, window and per-account assertions passed");
 }

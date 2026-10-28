@@ -931,15 +931,29 @@ static void test_state(void)
     CHECK(contains(buf, "\"extended_today_min\":30"));
     CHECK(contains(buf, "\"now_playing\":{\"app_id\":\"0100000000010000\",\"name\":\"Super Mario Odyssey\""));
     CHECK(contains(buf, "\"since\":1790990000,\"kind\":\"game\"}"));
+    CHECK(contains(buf, "\"activity_today\":{\"used_min\":74,\"now\":\"game\",\"now_playing\""));
     // A homebrew in front: named as a game is, its kind says.
     s.now_playing_kind = SyncTitle_Homebrew;
     n = sync_state_build(&s, buf, sizeof(buf));
-    CHECK(contains(buf, "\"now_playing\":{\"app_id\":\"0100000000010000\",\"name\":\"Super Mario Odyssey\",\"since\":1790990000,\"kind\":\"homebrew\"}"));
-    // PlayGuard's own forwarder: a homebrew too.
+    CHECK(contains(buf, "\"now\":\"homebrew\",\"now_playing\":{\"app_id\":\"0100000000010000\",\"name\":\"Super Mario Odyssey\",\"since\":1790990000,\"kind\":\"homebrew\"}"));
+    // PlayGuard's own forwarder: a homebrew, the console in PlayGuard.
     s.now_playing_kind = SyncTitle_PlayGuard;
     n = sync_state_build(&s, buf, sizeof(buf));
-    CHECK(contains(buf, "\"kind\":\"homebrew\"}"));
+    CHECK(contains(buf, "\"now\":\"playguard\",") && contains(buf, "\"kind\":\"homebrew\"}"));
     s.now_playing_kind = SyncTitle_Game;
+    // Nothing in front: what `now` says.
+    const uint64_t was_playing = s.now_playing;
+    s.now_playing = 0;
+    static const struct { SyncNow now; const char *text; } NOWS[] = {
+        { SyncNow_Unknown, "\"now\":null," }, { SyncNow_PlayGuard, "\"now\":\"playguard\"," },
+        { SyncNow_Home, "\"now\":\"home\"," }, { SyncNow_Suspended, "\"now\":\"suspended\"," } };
+    for (size_t k = 0; k < sizeof(NOWS) / sizeof(NOWS[0]); k++) {
+        s.now = NOWS[k].now;
+        n = sync_state_build(&s, buf, sizeof(buf));
+        CHECK(contains(buf, NOWS[k].text) && contains(buf, "\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null,\"kind\":null}"));
+    }
+    s.now = SyncNow_Unknown;
+    s.now_playing = was_playing;
     CHECK(contains(buf, "\"activity_today\":{\"used_min\":74"));
     CHECK(contains(buf, "\"link\":{\"policy\":\"ask\""));
     CHECK(contains(buf, "\"profiles\":[\"School week\",\"Vacances d'été\"]}"));
@@ -955,7 +969,7 @@ static void test_state(void)
     // Play time and the versions not published: null.
     c.publish_activity = c.publish_hardware = false;
     n = sync_state_build(&s, buf, sizeof(buf));
-    CHECK(contains(buf, "\"activity_today\":{\"used_min\":null,\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null,\"kind\":null}}"));
+    CHECK(contains(buf, "\"activity_today\":{\"used_min\":null,\"now\":null,\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null,\"kind\":null}}"));
     CHECK(contains(buf, "\"firmware\":null,\"atmosphere\":null,\"app_version\":\"1.1.0\""));
     CHECK(contains(buf, "\"publishes\":{\"activity\":false,\"games\":true,\"icons\":true,\"console\":true,\"network\":true,\"hardware\":false,"));
     c.publish_activity = c.publish_hardware = true;

@@ -102,6 +102,7 @@ for 22 s, and connects again at once after a sleep longer than 45 s.
   },
   "activity_today": {
     "used_min": 74,
+    "now": "game",
     "now_playing": { "app_id": "0100000000010000", "name": "Super Mario Odyssey", "since": 1790990000,
                      "kind": "game" }
   },
@@ -152,6 +153,8 @@ Every object is always there; a value the console could not read is `null`
   known), `since` and `kind` (`game`, `homebrew`, or `system`, which the play
   log never gives); every field `null` while none is (PlayGuard publishing:
   it is in front itself). Filled by the agent.
+- `activity_today.now`: what the console is doing (below, *What the console
+  is doing*); `null` while play time is not published.
 - `console.read_only`: PlayGuard's runtime read-only mode (an untested
   firmware); every order is then refused.
 - `link.publishes`: what is published (`activity`, `games`, `icons`,
@@ -290,7 +293,7 @@ Only games are listed on the broker: `names`, `games`, `icon/<APP_ID>`,
 forwarder on the HOME menu: PlayGuard's own, those PlayGuard made, those
 another app made, sphaira's for instance) is told as totals (`homebrew_s`,
 `homebrew_min`) and counts (`homebrews`, `forwarders`); the one in front is
-named, game or homebrew (`now_playing`, the events). What a title is
+named, game or homebrew (`now_playing`, the events, `now`). What a title is
 (`source/sync/sync_titles.h`, shared by PlayGuard and the agent):
 
 | Signal | Says | How sure |
@@ -316,6 +319,36 @@ from `names`, `games`, `per_app` and `week`), a `total_s` / `total_min` that
 no longer equals `per_app`'s sum (the homebrews' time is in it, not listed),
 and fields it ignores (`homebrew_s`, `homebrew_min`, `homebrews`,
 `forwarders`, `kind`); nothing changes meaning, so `schema` stays 1.
+
+## What the console is doing
+
+The state's `activity_today.now`, for a sensor of its own:
+
+| Value | When | `now_playing` |
+|---|---|---|
+| `game` | A game has the focus | the game |
+| `homebrew` | A homebrew has the focus (a forwarder of another app's or PlayGuard made) | the homebrew, by its name |
+| `playguard` | PlayGuard is in front: it publishes the state itself (its own session, or pushed to the agent), or the agent sees PlayGuard's own forwarder in focus | `null` (PlayGuard publishing), or PlayGuard's forwarder |
+| `home` | No application has the focus and none waits: the HOME menu, or a system applet over it (the Album, System Settings, the eShop…; the play log does not say which) | `null` |
+| `suspended` | No application has the focus, one waits in the background (HOME pressed in a game, not closed) | `null` |
+| `null` | Play time not published (`publish_activity`), or the play log could not be read | `null` |
+
+Asleep or off is not a value: the console publishes nothing then, and the
+broker's last will says `offline` on `availability` within 45 s.
+
+Where it comes from: PlayGuard says `playguard` whenever it publishes (it
+builds its state only in front). The agent reads the play log's newest
+events with each state it builds, every `poll_s` (30 s; 5 s for a minute
+after an order) and after a change PlayGuard pushes: the newest focus change
+names the title in front; with none, the newest application event says
+whether one waits (out of focus, not exited) or not (exited, or none since a
+launch). So a value is at most `poll_s` late, plus the time `pdm` takes to
+write the event (at once, as far as seen). Limits: a game that crashed (no
+event of its own before the HOME menu took the focus) reads `home`; a
+system applet over a game reads `suspended`, as the HOME menu does; PlayGuard
+opened over a game (an applet) is `playguard` only while PlayGuard publishes,
+which it does in front only. `play_started` / `play_stopped` keep their
+meaning (the title in focus changing); they now come within `poll_s` too.
 
 ## `activity`, `activity/<date>`, `names`, `week`
 

@@ -222,6 +222,9 @@ static void activity_today(SyncJson *j, const SyncSnapshot *s)
     sync_json_key(j, "activity_today");
     sync_json_obj(j);
     sync_json_kint_or_null(j, "used_min", on && s->activity_ok, (s->activity_s + 30) / 60);
+    // What the console is doing: a game, a homebrew, PlayGuard, the HOME
+    // menu, the HOME menu with a game waiting (sync_now_name).
+    sync_json_kstr_or_null(j, "now", on ? sync_now_name(playing, s->now_playing_kind, s->now) : NULL);
     sync_json_key(j, "now_playing");
     sync_json_obj(j);
     sync_json_key(j, "app_id");

@@ -29,6 +29,8 @@ typedef enum {
     PlayLogEv_AccountClose = 4,   // user account `uid` is closed by the game
     PlayLogEv_Launch       = 5,   // a game starts: as Away, and the accounts the
                                   // previous one had open are closed with it
+    PlayLogEv_Exit         = 6,   // `app_id` exits: as Unfocus for the time played; it
+                                  // no longer waits in the background either
 } PlayLogKind;
 
 typedef struct {
@@ -56,6 +58,14 @@ typedef struct {
 // days back began (strictly decreasing: [0] today's midnight, [6] the
 // window's start). Days are taken as given, so a 23 or 25 h day (a
 // daylight-saving change, calendar.h) is one day.
+// What the newest events (oldest first) say is in front: `*focused` the
+// application with the focus and `*since` when it got it (0: none, the HOME
+// menu or an applet in front); `*waiting` an application out of focus that
+// has not exited (it waits in the background, suspended), 0 none or one has
+// the focus. A game that lost the focus with no event of its own (it
+// crashed) waits nowhere.
+void playlog_now(const PlayLogEvent *events, size_t n, uint64_t *focused, uint64_t *since, uint64_t *waiting);
+
 size_t playlog_fold_days(const PlayLogEvent *events, size_t n, uint64_t now,
                          const uint64_t day_starts[7], PlayLogTotal *out, size_t max);
 

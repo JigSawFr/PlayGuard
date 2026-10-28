@@ -75,6 +75,7 @@ static void each_range(const PlayLogEvent *events, size_t n, uint64_t now, Range
                 open = e->app_id ? e : NULL;
                 break;
             case PlayLogEv_Unfocus:
+            case PlayLogEv_Exit:
                 if (!open || open->app_id != e->app_id) break;   // not the game in focus
                 played(range, ctx, open->app_id, e->ts_user, duration(open, e));
                 open = NULL;
@@ -95,6 +96,29 @@ static void each_range(const PlayLogEvent *events, size_t n, uint64_t now, Range
 static void fold_range(void *ctx, uint64_t app_id, uint64_t start, uint64_t end)
 {
     add_range((Fold *)ctx, app_id, start, end);
+}
+
+void playlog_now(const PlayLogEvent *events, size_t n, uint64_t *focused, uint64_t *since, uint64_t *waiting)
+{
+    *focused = *since = *waiting = 0;
+    // The newest focus change says which game is in front.
+    for (size_t i = n; i-- > 0;) {
+        const uint8_t k = events[i].kind;
+        if (k == PlayLogEv_AccountOpen || k == PlayLogEv_AccountClose) continue;
+        if (k == PlayLogEv_Focus) {
+            *focused = events[i].app_id;
+            *since = events[i].ts_user;
+        }
+        break;
+    }
+    if (*focused) return;
+    // None: the newest application's own event says whether it waits.
+    for (size_t i = n; i-- > 0;) {
+        const uint8_t k = events[i].kind;
+        if (k == PlayLogEv_AccountOpen || k == PlayLogEv_AccountClose || k == PlayLogEv_Away) continue;
+        if (k == PlayLogEv_Unfocus) *waiting = events[i].app_id;
+        break;
+    }
 }
 
 size_t playlog_fold_days(const PlayLogEvent *events, size_t n, uint64_t now,
@@ -246,6 +270,7 @@ size_t playlog_for_account(const PlayLogEvent *events, size_t n, const uint64_t 
                 if (playing) emit(out, &count, max, PlayLogEv_Focus, focused, e);
                 break;
             case PlayLogEv_Unfocus:
+            case PlayLogEv_Exit:
                 if (focused != e->app_id) break;   // not the game in focus
                 if (playing) emit(out, &count, max, PlayLogEv_Unfocus, focused, e);
                 focused = 0;

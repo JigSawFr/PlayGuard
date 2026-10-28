@@ -91,14 +91,22 @@ bool playstats_cancelled(void);
 // What the agent sysmodule reads (it cannot afford ns and its 147 KiB of
 // control data per game): the last 7 days per game from the play log alone
 // (pdm:qry), `day_wday` as in PlayStats, and the game that has the focus now
-// (*playing 0: none) since when (user clock). *now: the user clock used.
+// (*playing 0: none) since when (user clock), and with none, the one waiting
+// in the background (*waiting, may be NULL; playlog_now). *now: the user
+// clock used.
 // Returns how many totals were written to `out`; *rc says why none.
 // `accounts`: each user account's time per day (playlog_account_days), at
 // most `max_accounts`, their number in *n_accounts; none when the room to
 // work it out was missing (*n_accounts = SIZE_MAX: not known).
 size_t playstats_days(PlayLogTotal *out, size_t max, u64 *now, u8 day_wday[7], u64 *playing,
-                      u64 *playing_since, PlayLogAccountDays *accounts, size_t max_accounts, size_t *n_accounts,
-                      Result *rc);
+                      u64 *playing_since, u64 *waiting, PlayLogAccountDays *accounts, size_t max_accounts,
+                      size_t *n_accounts, Result *rc);
+
+// What is in front now, from the newest events of the play log only (a few
+// dozen, pdm:qry): the application with the focus since when, else the one
+// waiting in the background (playlog_now). Cheap enough for every state the
+// agent publishes.
+Result playstats_front(u64 *playing, u64 *since, u64 *waiting);
 
 // One game's all-time play time per user account on the console (pdm:qry by
 // account, acc:u0 for the nicknames). Accounts that never played it are left

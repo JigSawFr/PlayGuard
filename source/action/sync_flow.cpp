@@ -815,6 +815,7 @@ void build_state()
     s.records = &rec;
     s.activity_ok = activity_ok;
     s.activity_s = activity_ok ? (uint32_t)play_data::today_total_s(*stats) : 0;
+    s.now = SyncNow_PlayGuard;   // in front: no title has the focus but PlayGuard
     s.agent = s_agent;
     s.last_result = last_result.c_str();
     // The profile order's choices (Home Assistant's select).

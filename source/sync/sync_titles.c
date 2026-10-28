@@ -78,6 +78,24 @@ const char *sync_title_kind_label(SyncTitleKind k)
     return k == SyncTitle_PlayGuard ? "homebrew" : sync_title_kind_name(k);
 }
 
+const char *sync_now_name(uint64_t playing, SyncTitleKind kind, SyncNow now)
+{
+    if (playing) {
+        switch (kind) {
+        case SyncTitle_Homebrew:  return "homebrew";
+        case SyncTitle_PlayGuard: return "playguard";
+        case SyncTitle_System:    return "home";
+        default:                  return "game";
+        }
+    }
+    switch (now) {
+    case SyncNow_PlayGuard: return "playguard";
+    case SyncNow_Home:      return "home";
+    case SyncNow_Suspended: return "suspended";
+    default:                return NULL;
+    }
+}
+
 size_t sync_titles_games_only(const SyncTitles *t, SyncAppTime *apps, size_t n, uint32_t *other_s)
 {
     size_t kept = 0;

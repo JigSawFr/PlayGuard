@@ -55,10 +55,12 @@ bool playstats_convert(const PdmPlayEvent *p, PlayLogEvent *e)
             return true;
         case PdmAppletEventType_OutOfFocus:
         case PdmAppletEventType_OutOfFocus4:
+            e->kind = PlayLogEv_Unfocus;   // the HOME menu in front: it waits in the background
+            return true;
         case PdmAppletEventType_Exit:
         case PdmAppletEventType_Exit5:
         case PdmAppletEventType_Exit6:
-            e->kind = PlayLogEv_Unfocus;
+            e->kind = PlayLogEv_Exit;
             return true;
         case PdmAppletEventType_Launch:   // a new start: whatever was in focus is over,
             e->app_id = 0;                // and the accounts the previous game had open

@@ -1498,6 +1498,9 @@ if SYNC:
     if dev.get("mf") != "Nintendo" or dev.get("mdl_id") != "HEG-001" or "OLED" not in dev.get("mdl", ""):
         fail(f"unexpected device: {dev}")
     state = wait_for("state", lambda: doc(f"{BASE}/state"))
+    # PlayGuard publishing: it is what the console is doing.
+    if state.get("activity_today", {}).get("now") != "playguard":
+        fail(f"the state's now: {state.get('activity_today')}")
     if state.get("source") != "app" or state.get("local_date") != "2026-10-08":
         fail(f"unexpected state: {json.dumps(state)[:300]}")
     wait_for("today's activity", lambda: doc(f"{BASE}/activity"))
