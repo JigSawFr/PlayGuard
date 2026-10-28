@@ -1297,6 +1297,7 @@
         "credit_upstream_value": "Pctl Manager de Taylor",
         "credit_fixes": "Correctifs fw 22.5 et NTP",
         "credit_ui": "Interface",
+        "credit_family": "Fait partie de",
         "section_support": "Soutenir PlayGuard",
         "support_note": "PlayGuard est gratuit, libre et sans publicité. S'il aide votre famille, vous pouvez soutenir son développement : scannez un code avec votre téléphone (sélectionnez-le pour l'agrandir).",
         "made_in_france": "Made in France",

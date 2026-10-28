@@ -189,6 +189,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           MAIN_RUN: ${{ steps.gather.outputs.main }}
+          # A token allowed to send repository_dispatch to JigSawFr/boreale
+          # (Contents: read and write on it alone): boreale.dev rebuilds and
+          # shows the release. Without it, boreale.dev catches up within a day.
+          BOREALE_DISPATCH_TOKEN: ${{ secrets.BOREALE_DISPATCH_TOKEN }}
         run: |
           set -euo pipefail
           site=$(gh api "repos/$REPO/actions/runs/$MAIN_RUN" --jq .head_sha)
@@ -206,6 +210,11 @@ jobs:
             fi
             gh release edit "$tag" -R "$REPO" --prerelease=false --latest
             echo "$tag: published (assets, page and site out)" >> "$GITHUB_STEP_SUMMARY"
+            if [ -n "$BOREALE_DISPATCH_TOKEN" ]; then
+              GH_TOKEN="$BOREALE_DISPATCH_TOKEN" gh api repos/JigSawFr/boreale/dispatches -f event_type=release > /dev/null \
+                && echo "$tag: boreale.dev told" >> "$GITHUB_STEP_SUMMARY" \
+                || echo "::warning::$tag: boreale.dev not told (its daily build will show the release)"
+            fi
           done
       # The pull request whose build started this run: its comment points to
       # its preview (one comment, edited at each push).

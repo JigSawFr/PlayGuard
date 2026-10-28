@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="images/store/banner.png" alt="PlayGuard" width="100%">
+<img src=".github/readme/banner.png" alt="PlayGuard" width="100%">
 
 ### Nintendo Switch parental controls, right on the console
 

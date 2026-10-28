@@ -25,6 +25,7 @@ const jobs = [
   { svg: 'branding/store-icon.svg', out: 'images/store/icon.png',   w: 256, h: 150, type: 'png' },
   { svg: 'branding/banner.svg',     out: 'images/store/banner.png', w: 848, h: 208, type: 'png' },
   { svg: 'branding/social-preview.svg', out: 'images/social-preview.png', w: 1280, h: 640, type: 'png' },
+  { svg: 'branding/readme-banner.svg', out: '.github/readme/banner.png', w: 1280, h: 320, type: 'png' },
   { svg: 'branding/wordmark.svg',   out: 'resources/img/wordmark.png', w: 720, h: 176, type: 'png', transparent: true },
   { svg: 'branding/wordmark-light.svg', out: 'resources/img/wordmark-light.png', w: 720, h: 176, type: 'png', transparent: true },
   { svg: 'branding/icon.svg',       out: 'images/apple-touch-icon.png', w: 180, h: 180, type: 'png' },
@@ -63,7 +64,7 @@ for (const job of splashOnly ? [] : jobs) {
   const svg = inline(readFileSync(join(root, job.svg), 'utf8'));
   await page.setViewportSize({ width: job.w, height: job.h });
   await page.setContent(`<!doctype html><html><head>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;700&display=swap" rel="stylesheet">
 <style>html,body{margin:0;overflow:hidden}svg{display:block;width:100vw;height:100vh}</style></head><body>${svg}</body></html>`,
     { waitUntil: 'networkidle' });
   await page.evaluate(async () => {
