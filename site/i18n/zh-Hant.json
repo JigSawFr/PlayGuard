@@ -269,6 +269,7 @@
  "compat_invalid": "請輸入類似 {{max}} 的版本號。",
  "support": "支持本專案",
  "footer_license": "以 GNU GPL v3 授權的自由軟體。",
+ "footer_boreale": "Boréale 旗下專案，與 PlayShelf 和 Aurore 一起",
  "footer_nintendo": "PlayGuard 與任天堂無關，也未獲任天堂認可。Nintendo Switch 是任天堂的商標。",
  "footer_changelog": "更新紀錄",
  "changelog_english": "版本說明以英文撰寫。",

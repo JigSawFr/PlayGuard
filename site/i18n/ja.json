@@ -269,6 +269,7 @@
  "compat_invalid": "{{max}} のようなバージョンを入力してください。",
  "support": "プロジェクトを支援",
  "footer_license": "GNU GPL v3 のフリーソフトウェアです。",
+ "footer_boreale": "Boréale のプロジェクト（PlayShelf、Aurore とともに）",
  "footer_nintendo": "PlayGuard は Nintendo と提携・承認関係にありません。Nintendo Switch は Nintendo の商標です。",
  "footer_changelog": "変更履歴",
  "changelog_english": "リリースノートは英語で書かれています。",

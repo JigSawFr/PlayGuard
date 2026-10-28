@@ -269,6 +269,7 @@
  "compat_invalid": "Eine Version wie {{max}}.",
  "support": "Das Projekt unterstützen",
  "footer_license": "Freie Software unter der GNU GPL v3.",
+ "footer_boreale": "Teil von Boréale, mit PlayShelf und Aurore",
  "footer_nintendo": "PlayGuard ist weder mit Nintendo verbunden noch von Nintendo unterstützt. Nintendo Switch ist eine Marke von Nintendo.",
  "footer_changelog": "Änderungen",
  "changelog_english": "Die Versionshinweise sind auf Englisch.",
