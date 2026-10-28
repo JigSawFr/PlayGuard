@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
+<!-- translated from docs/getting-started.md, sha256 6b46b5d26c07 -->
 # Per iniziare
 
 Dalla scheda SD a una console configurata per tuo figlio, in una decina di minuti, poi le attività di tutti i giorni. Torna al [README](../../README.md).
@@ -9,7 +9,7 @@ Dalla scheda SD a una console configurata per tuo figlio, in una decina di minut
 - **Un firmware supportato.** Dalla 21.0.0 alla 23.0.1 per tutte le funzioni; con i precedenti, tutto tranne il tempo di gioco; uno più recente si apre in sola lettura finché una versione non lo supporta ([compatibilità](compatibility.md)).
 - **Un solo limite per tutta la console.** Il timer è quello della console: è lo stesso per tutti gli utenti. Per limiti diversi per ogni bambino serve un altro strumento ([perché](compatibility.md#playguard-o-un-sysmodule-sostitutivo)).
 
-Vuoi dare prima un'occhiata? [Prova PlayGuard nel browser](https://playguard.link/simulator/?not_set_up=1), su una console simulata al suo primo avvio.
+Vuoi dare prima un'occhiata? [Prova PlayGuard nel browser](https://guard.boreale.dev/simulator/?not_set_up=1), su una console simulata al suo primo avvio.
 
 ## 1. Installalo
 

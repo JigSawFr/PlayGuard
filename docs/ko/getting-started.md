@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
+<!-- translated from docs/getting-started.md, sha256 6b46b5d26c07 -->
 # 시작하기
 
 SD 카드에서 시작해 아이에게 맞게 설정된 본체까지 약 10분, 그다음 매일 하는 일을 설명합니다. 처음으로 돌아가기: [README](../../README.md).
@@ -9,7 +9,7 @@ SD 카드에서 시작해 아이에게 맞게 설정된 본체까지 약 10분, 
 - **지원하는 펌웨어.** 21.0.0~23.0.1에서는 모든 기능, 그보다 이전 펌웨어에서는 플레이 타이머를 뺀 모든 기능을 쓸 수 있습니다. 더 새로운 펌웨어에서는 그 펌웨어를 지원하는 버전이 나올 때까지 읽기 전용으로 열립니다([호환성](compatibility.md)).
 - **본체 전체에 제한 하나.** 플레이 타이머는 본체의 것이라 모든 사용자에게 같습니다. 아이마다 다른 제한이 필요하면 다른 도구를 쓰세요([이유](compatibility.md#playguard와-대체-sysmodule-중-무엇을-쓸까요)).
 
-먼저 둘러보고 싶나요? 처음 시작하는 본체를 시뮬레이션한 [브라우저에서 PlayGuard 체험하기](https://playguard.link/simulator/?not_set_up=1).
+먼저 둘러보고 싶나요? 처음 시작하는 본체를 시뮬레이션한 [브라우저에서 PlayGuard 체험하기](https://guard.boreale.dev/simulator/?not_set_up=1).
 
 ## 1. 설치하기
 

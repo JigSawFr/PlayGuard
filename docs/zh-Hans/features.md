@@ -115,7 +115,7 @@ PlayGuard 的外观名为 Cadran：标签页使用图标侧栏，配色为海军
 
 ## 今天——一天的情况一目了然
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/)*
 
 ### 圆环和时间线
 
@@ -192,7 +192,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 游戏时间——一周就是编辑器
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=play_timer)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
 
 ### 修改一周
 
@@ -251,7 +251,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 游玩记录——谁玩了什么，玩了多久
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=activity)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=activity)*
 
 每个游戏在**今天**、**最近7天**和**累计**的时间，来自主机自身的游玩记录——可以看所有用户，也可以只看**一个用户**（主机有多个用户时，用户以标签按钮显示在顶部）。PlayGuard 启动时显示上次查看的用户，或 *首先显示的账户* 中设置的那个（所有用户，或其中一个；在标签页底部，和 *所有游戏* 在一起）。
 
@@ -288,7 +288,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 限制——限制等级、年龄分级、交流
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=restrictions)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
 
 - **限制等级**：幼儿、儿童、青少年和自定义以方块并排显示，每个都写明它限制的内容（受限的显示珊瑚色的锁，允许的则显示绿色对勾，并列出它会阻止的已安装游戏；按 Ⓐ 设置；*自定义* 正在生效时，按 Ⓐ 前往下方它的设置）；*无* 在它们下方。正在生效的等级显示 *✓ 当前*；青绿色边框只出现在焦点所在之处。设置某个等级之前，会再说明一次它限制的内容（年龄限制、发布、交流）；*无* 会以珊瑚色询问，因为它会解除所有限制。
 - **等级的设置：** 年龄分级、发布到社交媒体、与他人交流。在预设等级下，这些是它自己的设置：更改其中一项会使等级变为 *自定义*，以该预设的设置加上这项更改为起点，更改前会先询问（列出各项设置）。
@@ -301,7 +301,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 安全——PIN、解除、Homebrew 菜单、手机应用
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=security)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=security)*
 
 - **顶部**有四个方块：PIN、限制、暂时解除和 Homebrew 菜单，状态正常时（已设置 PIN、限制已开启、已锁定）各带青绿色勾号，需要处理时带琥珀色警告标志；Homebrew 菜单显示 *已开放* 或 *已锁定*（锁定后带勾号：没有转发器时，开放也没有问题）。
 - **设置或更改PIN**（系统的 PIN 画面）。
@@ -347,7 +347,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 历史记录——PlayGuard 更改了什么，以及备份
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=history)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=history)*
 
 **顶部**以方块显示记录了多少项更改以及最近一次备份的日期：青绿色勾号；没有备份或 30 天内没有备份时显示琥珀色警告。
 
@@ -367,7 +367,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 主机——网络时钟、已安装的游戏、主机运行的系统
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=console)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=console)*
 
 **顶部**在 *系统* 下以方块显示主机运行的系统（系统版本、Atmosphère、SD 卡上有 hekate 时的 hekate，以及安装了 sys-patch 时的 sys-patch；按 Ⓐ 打开它的版本说明），然后在 *工具* 下以方块显示工具（*网络时钟*、*已安装的游戏* 和 *转发器*；前两个在角上显示需要留意的事项；然后是 *远程访问* 和 *可选模块*），再然后是主机的各行信息，兼容性排在最前（PlayGuard 已在此系统版本上验证过时只显示青绿色勾号，否则显示警告和问题所在）。
 
@@ -477,7 +477,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 偏好设置
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=preferences)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=preferences)*
 
 - PlayGuard 自身的设置：
   - 先以方块显示：语言（主机的所有语言，或跟随主机）、主题（默认深色，也可选浅色或跟随系统）、文字大小（自动 / 标准 / 较大）以及启动时显示的标签页。
@@ -491,7 +491,7 @@ PlayGuard 作为应用运行时，它自己的时间也会计入，所以今天�
 
 ## 关于
 
-*[在模拟器中试试 ›](https://playguard.link/simulator/?tab=about)*
+*[在模拟器中试试 ›](https://guard.boreale.dev/simulator/?tab=about)*
 
 ### 版本和更新
 

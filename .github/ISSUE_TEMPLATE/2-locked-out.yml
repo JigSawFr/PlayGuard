@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before filing: the [Locked out?](https://playguard.link/docs/troubleshooting/#locked-out)
+        Before filing: the [Locked out?](https://guard.boreale.dev/docs/troubleshooting/#locked-out)
         section of the troubleshooting guide covers the usual cases, including the optional recovery
         sysmodule for a limit that blocks every program.
 

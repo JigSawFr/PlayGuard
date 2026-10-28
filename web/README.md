@@ -9,9 +9,9 @@ name, the links to the website, the language and theme menus, a short face of
 them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
 `branding/mark.svg`, copied by CMake).
 
-- **main**: <https://playguard.link/simulator/>, on PlayGuard's
+- **main**: <https://guard.boreale.dev/simulator/>, on PlayGuard's
   website ([`site/README.md`](../site/README.md)).
-- **a pull request**: `https://playguard.link/pr-<number>/simulator/`,
+- **a pull request**: `https://guard.boreale.dev/pr-<number>/simulator/`,
   linked in a comment on the pull request and updated at each push. It goes
   when the pull request is closed. Pull requests from forks are built but not
   published (their pages would be served from this site).

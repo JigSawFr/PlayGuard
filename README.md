@@ -12,9 +12,9 @@
 [![license: GPLv3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
 
 [**Download**](https://github.com/JigSawFr/PlayGuard/releases/latest) ·
-[**Try&nbsp;it&nbsp;in&nbsp;your&nbsp;browser**](https://playguard.link/simulator/) ·
-[**Documentation**](https://playguard.link/) ·
-[**Locked&nbsp;out?**](https://playguard.link/docs/troubleshooting/#locked-out)
+[**Try&nbsp;it&nbsp;in&nbsp;your&nbsp;browser**](https://guard.boreale.dev/simulator/) ·
+[**Documentation**](https://guard.boreale.dev/) ·
+[**Locked&nbsp;out?**](https://guard.boreale.dev/docs/troubleshooting/#locked-out)
 
 <img src="images/video/playguard-tour.gif" alt="PlayGuard in 90 seconds" width="100%">
 
@@ -37,7 +37,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 - 🏠 **Home Assistant (optional)** — over MQTT on your local network: the state and play time in Home Assistant, orders from it (extra time, limits, *Block all games*). Off by default. [Guide](docs/home-assistant.md).
 - 🌍 **Everywhere** — every console language, light and dark themes, palettes, and [theme files of your own](docs/themes.md).
 
-→ Everything else: [**features**](https://playguard.link/docs/features/).
+→ Everything else: [**features**](https://guard.boreale.dev/docs/features/).
 
 <details>
 <summary><b>📸 Screenshots</b></summary>
@@ -67,7 +67,7 @@ PlayGuard brings the settings of Nintendo's [Parental Controls](https://apps.app
 
 The real app, against a simulated console, in your browser:
 
-[Unlocked for now](https://playguard.link/simulator/?unlocked=1) · [Time's up](https://playguard.link/simulator/?restricted=1) · [First start, no PIN](https://playguard.link/simulator/?not_set_up=1) · [On the TV, larger text](https://playguard.link/simulator/?docked=1)
+[Unlocked for now](https://guard.boreale.dev/simulator/?unlocked=1) · [Time's up](https://guard.boreale.dev/simulator/?restricted=1) · [First start, no PIN](https://guard.boreale.dev/simulator/?not_set_up=1) · [On the TV, larger text](https://guard.boreale.dev/simulator/?docked=1)
 
 ## 📦 Install
 
@@ -78,15 +78,15 @@ The real app, against a simulated console, in your browser:
 > [!TIP]
 > Still linked to the companion app? Use *Security › Unlink the companion app*, or its next sync overwrites what you set.
 
-**Compatibility:** tested on firmware 22.0.0, 22.1.0, 22.5.0 and 23.0.1 (Atmosphère 1.11–1.12); 23.0.0 and 21.x should work, untested; older firmware, everything but the play timer. Details: [compatibility](https://playguard.link/docs/compatibility/). **No Switch 2.**
+**Compatibility:** tested on firmware 22.0.0, 22.1.0, 22.5.0 and 23.0.1 (Atmosphère 1.11–1.12); 23.0.0 and 21.x should work, untested; older firmware, everything but the play timer. Details: [compatibility](https://guard.boreale.dev/docs/compatibility/). **No Switch 2.**
 
 ## 📖 Documentation
 
-**[playguard.link](https://playguard.link/)**, in the console's 15 languages:
+**[guard.boreale.dev](https://guard.boreale.dev/)**, in the console's 15 languages:
 
-- 🚀 [Getting started](https://playguard.link/docs/getting-started/)
-- 📦 [Install, update, remove](https://playguard.link/docs/install/)
-- 🛠️ [Troubleshooting](https://playguard.link/docs/troubleshooting/) · [Locked out?](https://playguard.link/docs/troubleshooting/#locked-out)
+- 🚀 [Getting started](https://guard.boreale.dev/docs/getting-started/)
+- 📦 [Install, update, remove](https://guard.boreale.dev/docs/install/)
+- 🛠️ [Troubleshooting](https://guard.boreale.dev/docs/troubleshooting/) · [Locked out?](https://guard.boreale.dev/docs/troubleshooting/#locked-out)
 
 The Markdown sources live in [`docs/`](docs/), with the reference pages: [`config.json`](docs/config.md) · [themes](docs/themes.md) · [how parental controls work](docs/parental-controls.md) · [companion app](docs/companion-app.md) · [optional sysmodules](sysmodule/README.md).
 

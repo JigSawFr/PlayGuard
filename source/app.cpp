@@ -90,7 +90,7 @@ void set_self_path(const char* argv0)
         s_self_path = path.substr(prefix.size() - 1);
 }
 const char* repo_url()         { return "https://github.com/JigSawFr/PlayGuard"; }
-const char* site_url()         { return "https://playguard.link/"; }
+const char* site_url()         { return "https://guard.boreale.dev/"; }
 
 std::string doc_url(const std::string& page, const std::string& anchor)
 {
