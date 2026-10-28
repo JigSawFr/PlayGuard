@@ -49,7 +49,7 @@ Each has its own parental controls, and PlayGuard only sees those of the system 
 
 ### Can it get the console banned?
 
-PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub (updates, and the reports you send). What gets consoles banned is custom firmware or an emuMMC going online to Nintendo ([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)). No ban tied to parental-control or clock changes is documented; that is not a guarantee.
+PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub (updates, and the reports you send) and switchbrew (the latest firmware and its release notes). What gets consoles banned is custom firmware or an emuMMC going online to Nintendo ([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)). No ban tied to parental-control or clock changes is documented; that is not a guarantee.
 
 ### A console without Internet
 
