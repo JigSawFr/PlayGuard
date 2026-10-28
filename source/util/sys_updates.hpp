@@ -2,9 +2,10 @@
 // the Switch firmware and sys-patch; and of PlayGuard's Home Assistant
 // integration. The latest of each is the tag GitHub's releases/latest page
 // redirects to (no API call, so no rate limit): Atmosphere-NX/Atmosphere,
-// CTCaer/hekate, THZoria/NX_Firmware for the firmware (it mirrors each
-// Nintendo release), impeeza/sys-patch and JigSawFr/playguard-ha. Parsing is
-// plain C++ (host-tested); fetch() goes to the network (sys_updates_net.cpp).
+// CTCaer/hekate, impeeza/sys-patch and JigSawFr/playguard-ha; the firmware's
+// is the newest version in switchbrew's System_Versions table (its wikitext),
+// which lists each Nintendo release (nothing to download). Parsing is plain
+// C++ (host-tested); fetch() goes to the network (sys_updates_net.cpp).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -28,6 +29,13 @@ std::string version_of_tag(const std::string& tag);
 // The tag at the end of a release page's URL
 // (".../releases/tag/v6.5.4" -> "v6.5.4"); "" for any other URL.
 std::string tag_of_url(const std::string& url);
+
+// The newest firmware in switchbrew's System_Versions page, as wikitext
+// (https://switchbrew.org/w/index.php?title=System_Versions&action=raw):
+// its table has a row per release, the version first ("| [[23.0.1]]", a
+// note after it such as "(CHN-only)" ignored); the highest of three numbers
+// wins, wherever it sits. "" when the page lists none.
+std::string firmware_of_versions(const std::string& wikitext);
 
 // hekate's version in bootloader/update.bin: the "ICTC" magic of its
 // ipl_ver, then one byte per number ('0' + major, minor, hotfix), within

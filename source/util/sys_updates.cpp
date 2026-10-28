@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/sys_updates.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <vector>
 
@@ -38,6 +39,56 @@ std::string tag_of_url(const std::string& url)
     const size_t end = tag.find_first_of("/?#");
     if (end != std::string::npos) tag.erase(end);
     return tag;
+}
+
+namespace
+{
+// "23.0.1" -> {23, 0, 1}; false unless exactly three numbers.
+bool firmware_numbers(const std::string& v, long out[3])
+{
+    size_t at = 0;
+    for (int i = 0; i < 3; i++) {
+        if (i > 0) {
+            if (at >= v.size() || v[at] != '.') return false;
+            at++;
+        }
+        const size_t from = at;
+        long n = 0;
+        while (at < v.size() && std::isdigit((unsigned char)v[at]) && at - from < 4) n = n * 10 + (v[at++] - '0');
+        if (at == from) return false;
+        out[i] = n;
+    }
+    return at == v.size();
+}
+}   // namespace
+
+std::string firmware_of_versions(const std::string& wikitext)
+{
+    // Rows: "|-", then a cell per line, the version's first: "| [[23.0.1]]"
+    // (or "| [[23.0.1|23.0.1]]", "| [[19.0.2]] (CHN-only)").
+    std::string best;
+    long best_n[3] = { 0, 0, 0 };
+    size_t start = 0;
+    while (start < wikitext.size()) {
+        size_t end = wikitext.find('\n', start);
+        if (end == std::string::npos) end = wikitext.size();
+        size_t i = start;
+        while (i < end && (wikitext[i] == ' ' || wikitext[i] == '\t')) i++;
+        if (wikitext.compare(i, 4, "| [[") == 0 && i + 4 <= end) {
+            const size_t close = wikitext.find_first_of("]|\n", i + 4);
+            if (close != std::string::npos && close < end) {
+                const std::string v = wikitext.substr(i + 4, close - i - 4);
+                long n[3];
+                if (firmware_numbers(v, n) &&
+                    (best.empty() || std::lexicographical_compare(best_n, best_n + 3, n, n + 3))) {
+                    best = v;
+                    std::copy(n, n + 3, best_n);
+                }
+            }
+        }
+        start = end + 1;
+    }
+    return best;
 }
 
 std::string hekate_version(const std::string& bytes)

@@ -27,6 +27,22 @@ std::string latest_of(const char* repo, std::string* error)
     }
     return version_of_tag(tag_of_url(target));
 }
+
+// switchbrew's System_Versions table, as wikitext: about 6 KB.
+constexpr const char* FIRMWARE_PAGE = "https://switchbrew.org/w/index.php?title=System_Versions&action=raw";
+constexpr size_t      FIRMWARE_MAX  = 256 * 1024;
+
+// The newest firmware switchbrew lists; "" (and *error) when its page
+// cannot be read.
+std::string latest_firmware(std::string* error)
+{
+    std::string page, err;
+    if (!http::get(FIRMWARE_PAGE, &page, &err, FIRMWARE_MAX, 20)) {
+        if (error && error->empty()) *error = "switchbrew: " + err;
+        return "";
+    }
+    return firmware_of_versions(page);
+}
 }   // namespace
 #endif
 
@@ -57,7 +73,7 @@ Latest fetch(std::string* error)
 #else
     out.atmosphere = latest_of("Atmosphere-NX/Atmosphere", error);
     out.hekate     = latest_of("CTCaer/hekate", error);
-    out.firmware   = latest_of("THZoria/NX_Firmware", error);
+    out.firmware   = latest_firmware(error);
     out.syspatch   = latest_of("impeeza/sys-patch", error);
     return out;
 #endif

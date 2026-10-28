@@ -1,5 +1,6 @@
 // Host tests for source/util/sys_updates.cpp: release tags as versions, the
-// tag of a release page's URL, hekate's version in update.bin, and the text
+// tag of a release page's URL, the newest firmware in switchbrew's
+// System_Versions table, hekate's version in update.bin, and the text
 // config.json keeps.
 #include "check.h"
 
@@ -31,9 +32,77 @@ static void test_tag_of_url()
 {
     CHECK(tag_of_url("https://github.com/CTCaer/hekate/releases/tag/v6.5.4") == "v6.5.4");
     CHECK(tag_of_url("https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.0?x=1") == "1.12.0");
-    CHECK(tag_of_url("https://github.com/THZoria/NX_Firmware/releases/tag/23.0.1/") == "23.0.1");
+    CHECK(tag_of_url("https://github.com/impeeza/sys-patch/releases/tag/v1.6.3.0/") == "v1.6.3.0");
     CHECK(tag_of_url("https://github.com/CTCaer/hekate/releases").empty());
     CHECK(tag_of_url("").empty());
+}
+
+// An excerpt of switchbrew's System_Versions page as its wikitext comes
+// (action=raw): a header row, then a row per release, a cell per line.
+// Made up for the test (dates and builds), in its layout.
+static const char* VERSIONS_PAGE = R"({| class="wikitable"
+|-
+! System version 
+! Release date
+! Package1 build date
+! [[NCA_Format|SDK versions]]
+|-
+| [[1.0.0]]
+| Before console release
+| 2016-11-21 18:30:08
+| 
+|-
+| [[9.2.0]]
+| March 3, 2020 (UTC)
+| 2019-10-21 11:38:48
+| 9.3.0
+|-
+| [[19.0.2]] (CHN-only)
+| January 20, 2026 (UTC)
+| 
+| 19.3.0.0
+|-
+| [[22.5.0]]
+| June 16, 2026 (UTC)
+| 2026-01-23 11:18:04
+| 22.2.0.0-22.2.2.0
+|-
+| [[23.0.1]]
+| October 1, 2026 (UTC)
+| 2026-07-30 13:54:23
+| 23.3.0.0
+|-
+| [[23.0.0]]
+| September 10, 2026 (UTC)
+| 2026-07-30 13:54:23
+| 23.2.2.0-23.3.0.0
+|}
+)";
+
+static void test_firmware_of_versions()
+{
+    CHECK(firmware_of_versions(VERSIONS_PAGE) == "23.0.1");   // the highest, not the last row
+    // Numbers compared as numbers: 10.0.0 above 9.2.0, 23.0.10 above 23.0.9.
+    CHECK(firmware_of_versions("| [[9.2.0]]\n| [[10.0.0]]\n| [[2.3.0]]\n") == "10.0.0");
+    CHECK(firmware_of_versions("| [[23.0.10]]\n| [[23.0.9]]\n") == "23.0.10");
+    // A note after the version, a link with its own text, CRLF lines, indented.
+    CHECK(firmware_of_versions("| [[24.0.0]] (CHN-only)\n| [[23.0.1]]\n") == "24.0.0");
+    CHECK(firmware_of_versions("| [[24.1.0|24.1.0]]\r\n| [[23.0.1]]\r\n") == "24.1.0");
+    CHECK(firmware_of_versions("  | [[24.0.1]]\n") == "24.0.1");
+    // Not a version cell: the header's link, an SDK range, a page link, a
+    // version of two or four numbers, other text in the brackets.
+    CHECK(firmware_of_versions("! [[NCA_Format|SDK versions]]\n| 23.3.0.0\n| [[23.0]]\n| [[23.3.0.0]]\n"
+                               "| [[Main Page]]\n| [[23.0.1-rc]]\n| [[v23.0.1]]\n| [[23..1]]\n")
+              .empty());
+    CHECK(firmware_of_versions("text [[30.0.0]]\n| [[23.0.1]]\n") == "23.0.1");   // only a cell's start
+    // Nothing there: an empty page, an HTML error page, a cut row.
+    CHECK(firmware_of_versions("").empty());
+    CHECK(firmware_of_versions("<html><body>Too many requests</body></html>").empty());
+    CHECK(firmware_of_versions("| [[23.0.1").empty());
+    CHECK(firmware_of_versions("| [[").empty());
+    CHECK(firmware_of_versions("| [").empty());
+    // Absurdly long numbers are refused rather than overflowing.
+    CHECK(firmware_of_versions("| [[123456789012345678901.0.0]]\n| [[23.0.1]]\n") == "23.0.1");
 }
 
 static void test_hekate_version()
@@ -101,6 +170,7 @@ int main()
 {
     test_version_of_tag();
     test_tag_of_url();
+    test_firmware_of_versions();
     test_hekate_version();
     test_text();
     test_syspatch_version();
