@@ -126,6 +126,7 @@
   "idle": {"label": "Nenhum jogo em andamento"},
   "no_game": {"label": "Nada aberto por trás do PlayGuard"},
   "no_play": {"label": "Nada jogado há semanas"},
+  "homebrew": {"label": "Homebrews jogados esta semana"},
   "no_pdm": {"label": "Sem registro de atividade"},
   "games": {"label": "Jogos a mais jogados nesta semana"},
   "accounts": {"label": "Contas de usuário", "help": "De 0 a 8 (2 por padrão), cada uma joga o dobro da seguinte."},

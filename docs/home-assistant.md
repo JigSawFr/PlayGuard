@@ -117,7 +117,11 @@ log. Every game's icon (installed or played) goes to
 `playguard/<id>/icon/<game id>`, each sent once by PlayGuard while it is open
 and the link online; the agent adds the one of the game being played when
 PlayGuard has read it but not sent it. A game installed since PlayGuard last
-ran gets its icon the next time PlayGuard is opened. **The serial number** is only published once *Remote access › What is published › Publish
+ran gets its icon the next time PlayGuard is opened. Only games are listed
+(their names, icons, play time per game): a homebrew (a forwarder on the HOME
+menu, PlayGuard's own or another) counts in the play time as one total, the
+homebrews and forwarders as numbers in the games document, and the one in
+front is named in *Now playing*, game or homebrew. **The serial number** is only published once *Remote access › What is published › Publish
 the serial number* is on (off by default): it then goes to the broker, and
 never into a report. On a console whose PRODINFO is blanked, it is the real
 one, from Atmosphère's backup of it on the SD card. Its entity, and the

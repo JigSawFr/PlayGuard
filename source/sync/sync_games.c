@@ -19,6 +19,9 @@ size_t sync_games_build(const SyncGames *g, char *out, size_t cap, size_t *kept)
     sync_json_kint_or_null(&j, "installed", g->installed >= 0, g->installed);
     sync_json_kint_or_null(&j, "accounts", g->accounts >= 0, g->accounts);
     sync_json_kint_or_null(&j, "total_min", g->total_min >= 0, g->total_min);
+    sync_json_kint_or_null(&j, "homebrews", g->homebrews >= 0, g->homebrews);
+    sync_json_kint_or_null(&j, "forwarders", g->forwarders >= 0, g->forwarders);
+    sync_json_kint_or_null(&j, "homebrew_min", g->homebrew_min >= 0, g->homebrew_min);
     size_t n = 0;
     sync_json_key(&j, "games");
     sync_json_obj(&j);

@@ -245,8 +245,11 @@ played (`icon/<app id>`, up to 128 KiB each: more than the agent's heap can
 spare, so they go over a short connection of PlayGuard's own,
 `pg-<id>-icons`, whoever holds the link). The agent only adds the icon of
 the game played when PlayGuard's icon cache has it and the broker does not,
-streamed from the SD card a piece at a time (no `ns`, no buffer of its own). The HA integration turns the daily totals
-into long-term statistics.
+streamed from the SD card a piece at a time (no `ns`, no buffer of its own). Only games are listed by
+their ID or name: a homebrew (an NRO forwarder) is a total and a count, and
+named only while it is in front (`sync/sync_titles.h`; the agent reads what
+each title is in PlayGuard's `sync/titles.txt`, else from the title ID). The
+HA integration turns the daily totals into long-term statistics.
 
 ### The agent
 

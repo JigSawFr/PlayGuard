@@ -14,6 +14,7 @@
 #include <thread>
 
 #include "action/game_scan.hpp"
+#include "action/title_names.hpp"
 #include "sync/sync_net.h"
 #include "sync/sync_tls.h"
 #include "util/paths.hpp"
@@ -233,8 +234,13 @@ void step(const SyncConf& conf, bool online)
     const std::shared_ptr<const game_cache::Cache> checked = game_scan::latest();
     std::vector<uint64_t> installed;
     if (checked)
-        for (const GameFacts& f : checked->games) installed.push_back(f.app_id);
-    const std::vector<uint64_t> want = conf.publish_icons ? wanted(s.played, installed) : std::vector<uint64_t>{};
+        for (const GameFacts& f : checked->games)
+            if (title_names::kind(f.app_id) == SyncTitle_Game) installed.push_back(f.app_id);
+    // Games only: a homebrew's icon (one sent before) is cleared.
+    std::vector<Played> played;
+    for (const Played& p : s.played)
+        if (title_names::kind(p.app_id) == SyncTitle_Game) played.push_back(p);
+    const std::vector<uint64_t> want = conf.publish_icons ? wanted(played, installed) : std::vector<uint64_t>{};
     job->plan = plan(want, s.sent, job->target);
     if (conf.publish_icons && !checked) job->plan.clear.clear();
     if (s.resend) {

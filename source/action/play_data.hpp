@@ -41,16 +41,20 @@ void unlisten(int id);
 // Calls every listener now, as at the end of a read.
 void notify();
 
-// A game's name, a system program's (the HOME menu, the Album …:
-// util/system_titles), or "Deleted game (<title ID>)" when it has none.
+// A title's name: its own, a system program's (the HOME menu, the Album …:
+// util/system_titles), the one recorded for a forwarder deleted since
+// (action/title_names), "PlayGuard" for its own forwarder, "Homebrew (<title
+// ID>)" for another homebrew, or
+// "Deleted game (<title ID>)" for a game with none.
 std::string game_name(const GameStat& g);
 // A system program's name, translated; "" for any other title ID.
 std::string system_name(u64 app_id);
 // What an installed title without a name is called, from its 16-digit ID: a
-// system program's name, else "Unknown game (<ID>)".
+// system program's name, a forwarder's recorded one, "Homebrew (<ID>)", else
+// "Unknown game (<ID>)".
 std::string unnamed(const std::string& id);
-// The game's name, else a system program's; "" when neither is known (what
-// the remote link publishes and the agent reads in names.txt).
+// The title's own name, a system program's or the one recorded; "" when none
+// is known (names.txt, which the agent reads).
 std::string known_name(const GameStat& g);
 
 // The console's user accounts, read once per run (acc:u0 is quick).

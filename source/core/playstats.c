@@ -201,12 +201,13 @@ static bool played_totals(void *ctx, u64 app_id, GameStat *g)
 }
 
 size_t playstats_days(PlayLogTotal *out, size_t max, u64 *now, u8 day_wday[7], u64 *playing,
-                      u64 *playing_since, PlayLogAccountDays *accounts, size_t max_accounts, size_t *n_accounts,
-                      Result *rc_out)
+                      u64 *playing_since, u64 *waiting, PlayLogAccountDays *accounts, size_t max_accounts,
+                      size_t *n_accounts, Result *rc_out)
 {
     *n_accounts = SIZE_MAX;
     *now = 0;
     *playing = *playing_since = 0;
+    if (waiting) *waiting = 0;
     time_local_now(now, NULL);
     Result rc = pdmqryInitialize();
     if (R_FAILED(rc)) {
@@ -234,21 +235,39 @@ size_t playstats_days(PlayLogTotal *out, size_t max, u64 *now, u8 day_wday[7], u
                                                accounts, max_accounts);
         free(scratch);
         free(totals);
-        // The newest focus change says which game is in front.
-        for (size_t i = count; i-- > 0;) {
-            const u8 k = events[i].kind;
-            if (k == PlayLogEv_AccountOpen || k == PlayLogEv_AccountClose) continue;
-            if (k == PlayLogEv_Focus) {
-                *playing = events[i].app_id;
-                *playing_since = events[i].ts_user;
-            }
-            break;
-        }
+        u64 waiting_id = 0;
+        playlog_now(events, count, playing, playing_since, &waiting_id);
+        if (waiting) *waiting = waiting_id;
     }
     free(events);
     pdmqryExit();
     if (rc_out) *rc_out = rc;
     return n;
+}
+
+#define FRONT_EVENTS 32
+
+Result playstats_front(u64 *playing, u64 *since, u64 *waiting)
+{
+    *playing = *since = *waiting = 0;
+    Result rc = pdmqryInitialize();
+    if (R_FAILED(rc)) return rc;
+    s32 total = 0, start = 0, end = 0;
+    rc = pdmqryGetAvailablePlayEventRange(&total, &start, &end);
+    if (R_SUCCEEDED(rc) && total > 0) {
+        // Static: the agent's stack is small, and one thread asks.
+        static PdmPlayEvent raw[FRONT_EVENTS];
+        static PlayLogEvent events[FRONT_EVENTS];
+        const s32 n = total < FRONT_EVENTS ? total : FRONT_EVENTS;
+        s32 got = 0;
+        rc = query_events(start + total - n, raw, n, &got);
+        size_t count = 0;
+        for (s32 i = 0; R_SUCCEEDED(rc) && i < got && i < n; i++)
+            if (playstats_convert(&raw[i], &events[count])) count++;
+        if (R_SUCCEEDED(rc)) playlog_now(events, count, playing, since, waiting);
+    }
+    pdmqryExit();
+    return rc;
 }
 
 void playstats_fetch(PlayStats *out)

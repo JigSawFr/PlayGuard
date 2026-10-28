@@ -24,6 +24,7 @@
 #include "action/play_data.hpp"
 #include "action/session_pause.hpp"
 #include "action/sync_icons.hpp"
+#include "action/title_names.hpp"
 #include "action/sync_orders.hpp"
 #include "action/sys_update_flow.hpp"
 #include "app.hpp"
@@ -39,6 +40,7 @@
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
 #include "util/game_cache.hpp"
+#include "util/nro.hpp"
 #include "util/paths.hpp"
 #include "util/profiles.hpp"
 #include "util/sync_files.hpp"
@@ -474,12 +476,22 @@ std::vector<std::pair<PlayAccount, std::shared_ptr<const PlayStats>>> accounts_f
 }
 
 // Today's activity (k = 0) or a finished day's (k = 1..6).
+// Only games go to the broker by their ID or name (sync/sync_titles.h): a
+// homebrew's time is told as one total, homebrew_s / homebrew_min.
+bool is_game(uint64_t id)
+{
+    return title_names::kind(id) == SyncTitle_Game;
+}
+
 std::string activity_doc(const PlayStats& stats, int k, const std::string& date, uint64_t ts)
 {
     std::vector<SyncAppTime> apps;
+    uint32_t homebrew_s = 0;
     for (uint32_t i = 0; i < stats.count; i++) {
         const uint32_t s = k == 0 ? stats.games[i].today_s : stats.games[i].day_s[k];
-        if (s) apps.push_back({ stats.games[i].app_id, s });
+        if (!s) continue;
+        if (is_game(stats.games[i].app_id)) apps.push_back({ stats.games[i].app_id, s });
+        else homebrew_s += s;
     }
     std::vector<SyncAccountTime> accounts;
     const auto fresh = accounts_fresh();
@@ -498,6 +510,7 @@ std::string activity_doc(const PlayStats& stats, int k, const std::string& date,
     act.final = k > 0;
     act.apps = apps.data();
     act.n_apps = apps.size();
+    act.homebrew_s = homebrew_s;
     act.accounts = fresh.empty() ? nullptr : accounts.data();
     act.n_accounts = accounts.size();
     // While PlayGuard is in front, no game is being played.
@@ -510,13 +523,11 @@ std::string activity_doc(const PlayStats& stats, int k, const std::string& date,
 
 std::string names_doc(const PlayStats& stats, uint64_t ts)
 {
-    // A system program (the HOME menu …) by its translated name, as the screens.
-    std::vector<std::string> names(stats.count);
+    // The games' names only: a homebrew's nor the console's own programs' go out.
     std::vector<SyncAppName> apps;
-    for (uint32_t i = 0; i < stats.count; i++) {
-        names[i] = play_data::known_name(stats.games[i]);
-        if (!names[i].empty()) apps.push_back({ stats.games[i].app_id, names[i].c_str() });
-    }
+    for (uint32_t i = 0; i < stats.count; i++)
+        if (stats.games[i].name[0] && is_game(stats.games[i].app_id))
+            apps.push_back({ stats.games[i].app_id, stats.games[i].name });
     std::vector<SyncAccountName> accounts;
     for (const auto& a : play_data::accounts()) accounts.push_back({ { a.uid[0], a.uid[1] }, a.nickname });
     std::string out(8192 + apps.size() * 300, '\0');
@@ -534,9 +545,14 @@ std::string week_doc(const PlayStats& stats, const LocalTime& today, uint64_t ts
     for (int k = 6; k >= 0; k--) days.push_back(date_before(today, k));
     j["days"] = days;
     nlohmann::json games = nlohmann::json::array();
+    uint32_t homebrew_s[7] = { 0 };   // the homebrews' days, as one total
     for (uint32_t i = 0; i < stats.count; i++) {
         const GameStat& g = stats.games[i];
         if (!g.week_s) continue;
+        if (!is_game(g.app_id)) {
+            for (int k = 0; k < 7; k++) homebrew_s[k] += g.day_s[k];
+            continue;
+        }
         nlohmann::json min = nlohmann::json::array();
         for (int k = 6; k >= 0; k--) min.push_back(g.day_s[k] / 60);
         nlohmann::json game = { { "app_id", hex16(g.app_id) }, { "min", min } };
@@ -545,6 +561,9 @@ std::string week_doc(const PlayStats& stats, const LocalTime& today, uint64_t ts
         games.push_back(game);
     }
     j["games"] = games;
+    nlohmann::json homebrew = nlohmann::json::array();
+    for (int k = 6; k >= 0; k--) homebrew.push_back(homebrew_s[k] / 60);
+    j["homebrew_min"] = homebrew;
     nlohmann::json accounts = nlohmann::json::array();
     for (const auto& a : accounts_fresh()) {
         nlohmann::json min = nlohmann::json::array();
@@ -560,7 +579,9 @@ std::string week_doc(const PlayStats& stats, const LocalTime& today, uint64_t ts
 }
 
 // The games document: the installed games (the last check of them, Console ›
-// Check the installed games) and the played ones, most played first.
+// Check the installed games) and the played ones, most played first; the
+// homebrews as counts only: the .nro files of the SD card, the forwarders
+// installed (PlayGuard's own among them) and their play time.
 std::string games_doc(const PlayStats& stats, uint64_t ts)
 {
     game_cache::Cache cache;
@@ -574,22 +595,31 @@ std::string games_doc(const PlayStats& stats, uint64_t ts)
         g.total_min = g.launches = -1;
         return by_id.emplace(id, g).first->second;
     };
+    int installed = 0, forwarders = 0;
     for (const GameFacts& f : cache.games) {
+        if (!is_game(f.app_id)) {
+            const SyncTitleKind k = title_names::kind(f.app_id);
+            forwarders += k == SyncTitle_Homebrew || k == SyncTitle_PlayGuard;
+            continue;
+        }
+        installed++;
         SyncGame& g = game_of(f.app_id);
         g.installed = true;
         if (f.name[0]) g.name = f.name;
         if (f.display_version[0]) g.version = f.display_version;
     }
-    int64_t total_s = 0;
-    std::vector<std::string> system(stats.count);   // the system programs' names, kept for the document
+    int64_t total_s = 0, homebrew_s = 0;
     for (uint32_t i = 0; i < stats.count; i++) {
         const GameStat& s = stats.games[i];
+        if (!is_game(s.app_id)) {
+            if (s.totals_ok) {
+                total_s += (int64_t)s.total_s;
+                homebrew_s += (int64_t)s.total_s;
+            }
+            continue;
+        }
         SyncGame& g = game_of(s.app_id);
         if (!g.name && s.name[0]) g.name = s.name;
-        if (!g.name) {
-            system[i] = play_data::system_name(s.app_id);
-            if (!system[i].empty()) g.name = system[i].c_str();
-        }
         if (!s.totals_ok) continue;
         g.total_min = (int64_t)(s.total_s / 60);
         g.launches = s.launches;
@@ -603,7 +633,10 @@ std::string games_doc(const PlayStats& stats, uint64_t ts)
                      [](const SyncGame& a, const SyncGame& b) { return a.total_min > b.total_min; });
     SyncGames doc{};
     doc.ts = ts;
-    doc.installed = listed ? (int)cache.games.size() : -1;
+    doc.installed = listed ? installed : -1;
+    doc.forwarders = listed ? forwarders : -1;
+    doc.homebrews = (int)nro::find(paths::sd_root()).size();
+    doc.homebrew_min = R_SUCCEEDED(stats.stats_rc) ? homebrew_s / 60 : -1;
     doc.accounts = play_data::accounts().empty() ? -1 : (int)play_data::accounts().size();
     doc.total_min = R_SUCCEEDED(stats.stats_rc) ? total_s / 60 : -1;
     doc.games = games.data();
@@ -680,12 +713,19 @@ void on_play_data()
     if (without_ts(names) != without_ts(s_names_sent)) {
         s_names_sent = names;
         if (activity_on) post_publish("names", names, true);
-        std::vector<std::pair<uint64_t, std::string>> list;
-        for (uint32_t i = 0; i < stats->count; i++) {
-            const std::string name = play_data::known_name(stats->games[i]);
-            if (!name.empty()) list.push_back({ stats->games[i].app_id, name });
-        }
-        sync_files::write_names(list);   // for the agent's "now playing"
+    }
+    // For the agent's "now playing": every title's name, the homebrews' too
+    // (the one in front is named whatever it is).
+    std::vector<std::pair<uint64_t, std::string>> list;
+    for (uint32_t i = 0; i < stats->count; i++) {
+        const std::string name = play_data::known_name(stats->games[i]);
+        if (!name.empty()) list.push_back({ stats->games[i].app_id, name });
+    }
+    static std::string s_names_written;
+    const std::string names_text = sync_files::names_text(list);
+    if (names_text != s_names_written) {
+        s_names_written = names_text;
+        sync_files::write_names(list);
     }
     const std::string week = week_doc(*stats, today, posix);
     if (activity_on && without_ts(week) != without_ts(s_week_sent)) {
@@ -775,6 +815,7 @@ void build_state()
     s.records = &rec;
     s.activity_ok = activity_ok;
     s.activity_s = activity_ok ? (uint32_t)play_data::today_total_s(*stats) : 0;
+    s.now = SyncNow_PlayGuard;   // in front: no title has the focus but PlayGuard
     s.agent = s_agent;
     s.last_result = last_result.c_str();
     // The profile order's choices (Home Assistant's select).

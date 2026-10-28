@@ -36,6 +36,7 @@
 #include "playstats.h"
 #include "sync_engine.h"
 #include "sync_icons.h"
+#include "sync_titles.h"
 #include "sync_net.h"
 #include "sync_state.h"
 #include "sync_system.h"
@@ -59,7 +60,7 @@
 // This system's (nand/<key>/sync/), once the system is known (system_paths()).
 static char g_system_dir[64];
 static char NRO_STATE[96], AGENT_STATE[96], AGENT_EVENTS[96], NAMES[96], INTEGRATION[96], AGENT_WATCHDOG[96];
-static char ICONS[96], AGENT_ICONS[96];
+static char ICONS[96], AGENT_ICONS[96], TITLES[96];
 static bool g_emummc;
 
 #define ACTIVITY_EVERY_MS (5 * 60 * 1000ULL)
@@ -289,6 +290,7 @@ static void system_paths(void)
     snprintf(AGENT_WATCHDOG, sizeof(AGENT_WATCHDOG), "%s/sync/agent_watchdog.log", g_system_dir);
     snprintf(ICONS, sizeof(ICONS), "%s/sync/icons.txt", g_system_dir);
     snprintf(AGENT_ICONS, sizeof(AGENT_ICONS), "%s/sync/agent_icons.txt", g_system_dir);
+    snprintf(TITLES, sizeof(TITLES), "%s/sync/titles.txt", g_system_dir);
 }
 
 // ---- the agent's state ----
@@ -315,6 +317,8 @@ static uint64_t g_activity_at;
 static uint32_t g_activity_s;            // today's total, for the state
 static bool     g_activity_ok;
 static u64      g_playing, g_playing_since;
+static u64      g_waiting;               // none in front: the one suspended in the background
+static bool     g_front_ok;              // the last read of what is in front worked
 static PlayLogTotal g_totals[PLAYSTATS_MAX];
 static size_t   g_n_totals;
 static PlayLogAccountDays g_accounts[PLAYSTATS_MAX_ACCOUNTS];
@@ -404,6 +408,17 @@ static const SyncAccountTime *accounts_of(int k, SyncAccountTime out[PLAYSTATS_M
     return out;
 }
 
+// What each title is (sync_titles.h): PlayGuard's titles.txt, read with
+// each read of the play log; without it, or for a title it does not list
+// (one installed since PlayGuard last ran), the title's ID says.
+static SyncTitles g_titles;
+
+static void load_titles(void)
+{
+    const size_t n = read_file(TITLES, g_text, sizeof(g_text));
+    sync_titles_parse(&g_titles, g_text, n);
+}
+
 static void read_activity(uint64_t now_ms, bool force)
 {
     if (!force && g_activity_at && now_ms - g_activity_at < ACTIVITY_EVERY_MS) return;
@@ -411,10 +426,13 @@ static void read_activity(uint64_t now_ms, bool force)
     u64 now = 0;
     Result rc = 0;
     const char *was = phase("the play log (pdm)");
-    g_n_totals = playstats_days(g_totals, PLAYSTATS_MAX, &now, g_day_wday, &g_playing, &g_playing_since, g_accounts,
-                                PLAYSTATS_MAX_ACCOUNTS, &g_n_accounts, &rc);
+    g_n_totals = playstats_days(g_totals, PLAYSTATS_MAX, &now, g_day_wday, &g_playing, &g_playing_since, &g_waiting,
+                                g_accounts, PLAYSTATS_MAX_ACCOUNTS, &g_n_accounts, &rc);
     phase(was);
     g_activity_ok = R_SUCCEEDED(rc);
+    phase("titles.txt (SD card)");
+    load_titles();
+    phase(was);
     g_activity_s = 0;
     for (size_t i = 0; i < g_n_totals; i++) g_activity_s += g_totals[i].today_s;
     if (!g_activity_ok) {
@@ -433,10 +451,12 @@ static void read_activity(uint64_t now_ms, bool force)
     a.source = "agent";
     a.ts = now;
     a.local_date = date;
+    // Only games by their ID: the homebrews' time as one total.
+    a.n_apps = sync_titles_games_only(&g_titles, apps, n, &a.homebrew_s);
     a.apps = apps;
-    a.n_apps = n;
     a.now_playing = g_playing;
     a.now_playing_since = g_playing_since;
+    a.now_playing_kind = sync_titles_kind(&g_titles, g_playing);
     static SyncAccountTime accounts[PLAYSTATS_MAX_ACCOUNTS];
     a.accounts = accounts_of(0, accounts, &a.n_accounts);
     g_activity_len = sync_activity_build(&a, g_activity, sizeof(g_activity));
@@ -457,8 +477,8 @@ static size_t final_doc(int k, const char *date, char *out, size_t cap)
     a.ts = now;
     a.local_date = date;
     a.final = true;
+    a.n_apps = sync_titles_games_only(&g_titles, apps, n, &a.homebrew_s);
     a.apps = apps;
-    a.n_apps = n;
     static SyncAccountTime accounts[PLAYSTATS_MAX_ACCOUNTS];
     a.accounts = accounts_of(k, accounts, &a.n_accounts);
     return sync_activity_build(&a, out, cap);
@@ -539,8 +559,25 @@ static size_t own_state(char *out, size_t cap)
     s.records = &g_records;
     s.activity_ok = g_activity_ok;
     s.activity_s = g_activity_s;
+    // What is in front, from the newest events (the totals above are read
+    // every 5 minutes, this with every state: within poll_s).
+    {
+        u64 playing = 0, since = 0, waiting = 0;
+        load_titles();   // titles.txt: what each title is
+        const char *front_was = phase("the play log's newest events (pdm)");
+        g_front_ok = R_SUCCEEDED(playstats_front(&playing, &since, &waiting));
+        if (g_front_ok) {
+            g_playing = playing;
+            g_playing_since = since;
+            g_waiting = waiting;
+        }
+        phase(front_was);
+    }
     s.now_playing = g_playing;
     s.now_playing_since = g_playing_since;
+    s.now_playing_kind = sync_titles_kind(&g_titles, g_playing);
+    // Nothing in front: the HOME menu (or an applet), a game waiting or not.
+    s.now = !(g_front_ok || g_activity_ok) ? SyncNow_Unknown : g_waiting ? SyncNow_Suspended : SyncNow_Home;
     char playing_name[129];
     name_of(g_playing, playing_name, sizeof(playing_name));
     s.now_playing_name = playing_name[0] ? playing_name : NULL;
@@ -1172,6 +1209,7 @@ static void publish_playing_icon(void)
 {
     const u64 id = g_playing;
     if (!id || id == g_icon_looked || !g_conf.publish_icons || !sync_engine_online(&g_engine)) return;
+    if (sync_titles_kind(&g_titles, id) != SyncTitle_Game) return;   // only games' icons
     g_icon_looked = id;
     char target[SYNC_ICONS_TARGET_LEN + 1];
     sync_icons_target(g_conf.host, g_conf.port, g_engine.base, target);

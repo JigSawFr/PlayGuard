@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 1231f8826f52 -->
+<!-- translated from docs/features.md, sha256 dcb539228ccc -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -275,6 +275,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 - Les icônes sont lues autour du jeu sélectionné (pas en mode applet, pour économiser la mémoire) ; une manette grise les remplace en attendant, et pour un jeu qui n'en a pas.
 - Une grande bibliothèque affiche ses 50 premiers jeux, puis *Afficher tous les jeux* (100 jeux au plus en mode applet) ; l'export les contient toujours tous. PlayGuard lit 256 jeux au plus (ceux de la semaine d'abord) : au-delà, l'onglet Activité, Tous les jeux et l'export (sauf CSV) signalent qu'il en manque, et le total depuis toujours ne les compte pas.
 - **Ⓐ sur un jeu :** ses sept derniers jours en barres, ses lancements, ses première et dernière parties, le temps de chaque compte. Les jeux supprimés gardent leurs chiffres depuis toujours, même un jeu supprimé avant l'installation de PlayGuard tant que le journal de jeu de la console le cite encore, et leur nom dès que PlayGuard l'a vu (sinon *Jeu supprimé* et son ID de titre). Les programmes de la console elle-même (le menu HOME, l'Album, le Nintendo eShop…) ne comptent jamais comme des jeux : si l'ID de titre de l'un d'eux apparaît, il est appelé par son nom plutôt que comme un jeu inconnu.
+- **Les homebrews** (un forwarder du menu HOME : celui de PlayGuard, ceux qu'il a créés, ceux d'une autre application) comptent dans l'Activité comme les jeux, puisque le minuteur de la console compte leur temps : chacun sous le nom de son homebrew, *PlayGuard* pour le sien, le dernier nom que PlayGuard a vu pour un forwarder supprimé depuis, sinon *Homebrew* et son ID de titre. *Accès à distance* ne publie que les jeux par leur nom ; le temps des homebrews y part en un seul total.
 
 ### Comptes
 

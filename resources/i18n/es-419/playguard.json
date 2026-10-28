@@ -785,6 +785,7 @@
         "truncated": "Solo se comprobaron los {} primeros juegos.",
         "many": "Varios juegos a la vez: comprueba la tarjeta SD en un computadora y que la consola se haya iniciado desde la misma memoria ({} ahora) que cuando se instalaron estos juegos. Un juego instalado desde sysMMC no funciona desde emuMMC, y al revés.",
         "unnamed": "Juego desconocido ({})",
+        "homebrew_unnamed": "Homebrew ({})",
         "id": "ID del título: {}",
         "cause": "Causa",
         "fix": "Qué hacer",

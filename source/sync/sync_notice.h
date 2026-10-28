@@ -14,6 +14,7 @@ extern "C" {
 typedef struct {
     const char *event_type;    // "play_started", "play_stopped", "time_warning", "play_blocked"
     uint64_t    app_id;        // the game (0: none or unknown)
+    int         kind;          // its SyncTitleKind (sync_state.h)
     int         minutes_left;  // time_warning: the minutes left; else -1
     const char *blocked_by;    // play_blocked: "limit" or "bedtime"; else NULL
 } SyncNotice;

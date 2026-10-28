@@ -785,6 +785,7 @@
         "truncated": "Nur die ersten {} Spiele wurden geprüft.",
         "many": "Mehrere Spiele auf einmal: Prüfen Sie die SD-Karte an einem Computer auf Fehler und ob die Konsole vom selben Speicher ({} gerade) gestartet ist wie bei der Installation dieser Spiele. Ein von sysMMC installiertes Spiel funktioniert nicht unter emuMMC und umgekehrt.",
         "unnamed": "Unbekanntes Spiel ({})",
+        "homebrew_unnamed": "Homebrew ({})",
         "id": "Titel-ID: {}",
         "cause": "Ursache",
         "fix": "Was tun",

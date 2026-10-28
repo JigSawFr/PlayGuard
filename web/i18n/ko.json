@@ -126,6 +126,7 @@
   "idle": {"label": "실행 중인 게임 없음"},
   "no_game": {"label": "PlayGuard 뒤에 열린 것 없음"},
   "no_play": {"label": "몇 주째 플레이 없음"},
+  "homebrew": {"label": "이번 주에 플레이한 홈브루"},
   "no_pdm": {"label": "플레이 기록 없음"},
   "games": {"label": "이번 주에 추가로 플레이한 게임 수"},
   "accounts": {"label": "사용자 계정", "help": "0~8개(기본 2개), 각 계정은 다음 계정의 두 배를 플레이합니다."},

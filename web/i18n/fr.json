@@ -126,6 +126,7 @@
   "idle": {"label": "Aucun jeu en cours"},
   "no_game": {"label": "Rien d'ouvert derrière PlayGuard"},
   "no_play": {"label": "Rien joué depuis des semaines"},
+  "homebrew": {"label": "Homebrews joués cette semaine"},
   "no_pdm": {"label": "Pas de journal d'activité"},
   "games": {"label": "Jeux joués en plus cette semaine"},
   "accounts": {"label": "Comptes utilisateur", "help": "De 0 à 8 (2 par défaut), chacun jouant deux fois plus que le suivant."},

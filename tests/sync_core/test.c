@@ -17,6 +17,7 @@
 #include "sync_entities.h"
 #include "sync_games.h"
 #include "sync_icons.h"
+#include "sync_titles.h"
 #include "sync_system.h"
 #include "sync_exec.h"
 #include "sync_json.h"
@@ -929,6 +930,30 @@ static void test_state(void)
     CHECK(contains(buf, "\"bedtime\":{\"enabled\":true,\"start\":\"21:30:00\",\"end\":\"06:00:00\"}"));
     CHECK(contains(buf, "\"extended_today_min\":30"));
     CHECK(contains(buf, "\"now_playing\":{\"app_id\":\"0100000000010000\",\"name\":\"Super Mario Odyssey\""));
+    CHECK(contains(buf, "\"since\":1790990000,\"kind\":\"game\"}"));
+    CHECK(contains(buf, "\"activity_today\":{\"used_min\":74,\"now\":\"game\",\"now_playing\""));
+    // A homebrew in front: named as a game is, its kind says.
+    s.now_playing_kind = SyncTitle_Homebrew;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"now\":\"homebrew\",\"now_playing\":{\"app_id\":\"0100000000010000\",\"name\":\"Super Mario Odyssey\",\"since\":1790990000,\"kind\":\"homebrew\"}"));
+    // PlayGuard's own forwarder: a homebrew, the console in PlayGuard.
+    s.now_playing_kind = SyncTitle_PlayGuard;
+    n = sync_state_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"now\":\"playguard\",") && contains(buf, "\"kind\":\"homebrew\"}"));
+    s.now_playing_kind = SyncTitle_Game;
+    // Nothing in front: what `now` says.
+    const uint64_t was_playing = s.now_playing;
+    s.now_playing = 0;
+    static const struct { SyncNow now; const char *text; } NOWS[] = {
+        { SyncNow_Unknown, "\"now\":null," }, { SyncNow_PlayGuard, "\"now\":\"playguard\"," },
+        { SyncNow_Home, "\"now\":\"home\"," }, { SyncNow_Suspended, "\"now\":\"suspended\"," } };
+    for (size_t k = 0; k < sizeof(NOWS) / sizeof(NOWS[0]); k++) {
+        s.now = NOWS[k].now;
+        n = sync_state_build(&s, buf, sizeof(buf));
+        CHECK(contains(buf, NOWS[k].text) && contains(buf, "\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null,\"kind\":null}"));
+    }
+    s.now = SyncNow_Unknown;
+    s.now_playing = was_playing;
     CHECK(contains(buf, "\"activity_today\":{\"used_min\":74"));
     CHECK(contains(buf, "\"link\":{\"policy\":\"ask\""));
     CHECK(contains(buf, "\"profiles\":[\"School week\",\"Vacances d'été\"]}"));
@@ -944,7 +969,7 @@ static void test_state(void)
     // Play time and the versions not published: null.
     c.publish_activity = c.publish_hardware = false;
     n = sync_state_build(&s, buf, sizeof(buf));
-    CHECK(contains(buf, "\"activity_today\":{\"used_min\":null,\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null}}"));
+    CHECK(contains(buf, "\"activity_today\":{\"used_min\":null,\"now\":null,\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null,\"kind\":null}}"));
     CHECK(contains(buf, "\"firmware\":null,\"atmosphere\":null,\"app_version\":\"1.1.0\""));
     CHECK(contains(buf, "\"publishes\":{\"activity\":false,\"games\":true,\"icons\":true,\"console\":true,\"network\":true,\"hardware\":false,"));
     c.publish_activity = c.publish_hardware = true;
@@ -1004,7 +1029,7 @@ static void test_state(void)
     CHECK(contains(buf, "\"limits\":{\"sun\":null"));
     CHECK(contains(buf, "\"limits_min\":null"));
     CHECK(contains(buf, "\"bedtime\":{\"enabled\":null,\"start\":null,\"end\":null}"));
-    CHECK(contains(buf, "\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null}"));
+    CHECK(contains(buf, "\"now_playing\":{\"app_id\":null,\"name\":null,\"since\":null,\"kind\":null}"));
     CHECK(contains(buf, "\"enabled\":null"));
     CHECK(contains(buf, "\"weekday\":null"));
     CHECK(contains(buf, "\"profiles\":[]}"));
@@ -1015,7 +1040,8 @@ static void test_activity_names_events(void)
     static char buf[4096];
     const SyncAppTime apps[] = { { 0x0100000000010000ULL, 3600 }, { 0x01000A10041EA000ULL, 840 }, { 0x1, 0 } };
     const SyncAccountTime accts[] = { { { 0x0011223344556677ULL, 0x8899AABBCCDDEEFFULL }, 4440 } };
-    SyncActivity a = { "agent", 1791000000, "2026-10-05", false, apps, 3, NULL, 0, 0x0100000000010000ULL, 1790990000 };
+    SyncActivity a = { "agent", 1791000000, "2026-10-05", false, apps, 3, NULL, 0, 0x0100000000010000ULL, 1790990000,
+                       SyncTitle_Game, 0 };
     size_t n = sync_activity_build(&a, buf, sizeof(buf));
     CHECK(n > 0);
     CHECK(contains(buf, "\"total_s\":4440,\"total_min\":74"));
@@ -1111,13 +1137,13 @@ static void test_watch(void)
     CHECK(sync_watch_step(&w, &s, n) == 0);
 
     static char buf[256];
-    const SyncNotice warn = { "time_warning", kart, 10, NULL };
+    const SyncNotice warn = { "time_warning", kart, SyncTitle_Game, 10, NULL };
     CHECK(sync_notice_build("agent", 1791000000, &warn, buf, sizeof(buf)) > 0);
     CHECK(contains(buf, "\"source\":\"agent\",\"ts\":1791000000,\"event_type\":\"time_warning\","
-                        "\"app_id\":\"01000A10041EA000\",\"minutes_left\":10,\"blocked_by\":null"));
-    const SyncNotice blocked = { "play_blocked", 0, -1, "bedtime" };
+                        "\"app_id\":\"01000A10041EA000\",\"kind\":\"game\",\"minutes_left\":10,\"blocked_by\":null"));
+    const SyncNotice blocked = { "play_blocked", 0, SyncTitle_Game, -1, "bedtime" };
     CHECK(sync_notice_build(NULL, 1, &blocked, buf, sizeof(buf)) > 0);
-    CHECK(contains(buf, "\"app_id\":null,\"minutes_left\":null,\"blocked_by\":\"bedtime\""));
+    CHECK(contains(buf, "\"app_id\":null,\"kind\":null,\"minutes_left\":null,\"blocked_by\":\"bedtime\""));
 }
 
 // The entity table as entities.json, for the Home Assistant integration's
@@ -1214,12 +1240,13 @@ static void test_games_document(void)
     }
     games[0].name = "Super Mario Odyssey";
     games[0].version = "1.3.0";
-    SyncGames g = { 1790990000, 150, 3, 123456, games, 200 };
+    SyncGames g = { 1790990000, 150, 3, 123456, games, 200, 12, 4, 950 };
     static char buf[65536];
     size_t kept = 0;
     size_t n = sync_games_build(&g, buf, sizeof(buf), &kept);
     CHECK(n > 0 && kept == 200 && contains(buf, "\"complete\":true"));
-    CHECK(contains(buf, "\"installed\":150,\"accounts\":3,\"total_min\":123456,\"games\":{\"0100000000010000\":"
+    CHECK(contains(buf, "\"installed\":150,\"accounts\":3,\"total_min\":123456,\"homebrews\":12,\"forwarders\":4,"
+                        "\"homebrew_min\":950,\"games\":{\"0100000000010000\":"
                         "{\"name\":\"Super Mario Odyssey\",\"version\":\"1.3.0\",\"installed\":true,\"total_min\":5000,"
                         "\"launches\":300,\"first_played\":1700000000,\"last_played\":1790000000}"));
     CHECK(contains(buf, "\"Game 1 \\\"deluxe\\\"\""));
@@ -1231,9 +1258,10 @@ static void test_games_document(void)
     CHECK(n > 0 && n < sizeof(small) && kept > 20 && kept < 200 && contains(small, "\"complete\":false"));
     CHECK(contains(small, "\"0100000000010000\"") && !contains(small, "\"01000000000D7000\""));
 
-    SyncGames none = { 0, -1, -1, -1, NULL, 0 };
+    SyncGames none = { 0, -1, -1, -1, NULL, 0, -1, -1, -1 };
     n = sync_games_build(&none, buf, sizeof(buf), NULL);
-    CHECK(n > 0 && contains(buf, "\"ts\":null,\"installed\":null,\"accounts\":null,\"total_min\":null,\"games\":{},\"complete\":true"));
+    CHECK(n > 0 && contains(buf, "\"ts\":null,\"installed\":null,\"accounts\":null,\"total_min\":null,\"homebrews\":null,"
+                        "\"forwarders\":null,\"homebrew_min\":null,\"games\":{},\"complete\":true"));
 }
 
 static void test_export_entities(void)
@@ -1285,6 +1313,81 @@ static void test_export_entities(void)
     save("entities.json", buf);
 }
 
+// What a title is, and only games by their ID (sync_titles.c).
+static void test_titles(void)
+{
+    CHECK(sync_title_kind_of_id(0x0100000000010000ULL) == SyncTitle_Game);
+    CHECK(sync_title_kind_of_id(0x01FFFFFFFFFFF000ULL) == SyncTitle_Game);
+    CHECK(sync_title_kind_of_id(0x0100000000001000ULL) == SyncTitle_System);   // the HOME menu
+    CHECK(sync_title_kind_of_id(0x010000000000100DULL) == SyncTitle_System);   // the Album
+    CHECK(sync_title_kind_of_id(0x050537E2542E2000ULL) == SyncTitle_Homebrew); // sphaira's and PlayGuard's forwarders
+    CHECK(sync_title_kind_of_id(0x0400000000000000ULL) == SyncTitle_Homebrew);
+    CHECK(sync_title_kind_of_id(0) == SyncTitle_Homebrew);
+
+    SyncTitles t;
+    const char *text = "# Written by PlayGuard\n"
+                       "0100ABCDEF012000=homebrew:A homebrew under a game's ID\r\n"
+                       "052eb87e6426d000=homebrew:sphaira\n"
+                       "0500000000001000=game\n"
+                       "0100000000020000=odd\n"
+                       "broken line\n"
+                       "0100000000030000=homebrews\n";
+    sync_titles_parse(&t, text, strlen(text));
+    CHECK(t.n == 3);
+    CHECK(sync_titles_kind(&t, 0x0100ABCDEF012000ULL) == SyncTitle_Homebrew);
+    CHECK(sync_titles_kind(&t, 0x052EB87E6426D000ULL) == SyncTitle_Homebrew);
+    CHECK(sync_titles_kind(&t, 0x0500000000001000ULL) == SyncTitle_Game);      // the record over the ID
+    CHECK(sync_titles_kind(&t, 0x0100000000020000ULL) == SyncTitle_Game);      // not understood: the ID
+    CHECK(sync_titles_kind(NULL, 0x05446530ACA7E000ULL) == SyncTitle_Homebrew); // no record: the ID
+    CHECK(!strcmp(sync_title_kind_name(SyncTitle_Homebrew), "homebrew") && !strcmp(sync_title_kind_name(SyncTitle_Game), "game"));
+
+    // The games kept, in their order; the others' time added up.
+    SyncAppTime apps[] = { { 0x0100000000010000ULL, 600 }, { 0x050537E2542E2000ULL, 300 },
+                           { 0x0100ABCDEF012000ULL, 120 }, { 0x01000A10041EA000ULL, 60 } };
+    uint32_t other = 5;
+    const size_t kept = sync_titles_games_only(&t, apps, 4, &other);
+    CHECK(kept == 2 && apps[0].app_id == 0x0100000000010000ULL && apps[1].app_id == 0x01000A10041EA000ULL);
+    CHECK(other == 5 + 300 + 120);
+
+    // The activity: the homebrews' time in the total, per_app without them.
+    static char buf[2048];
+    SyncActivity a;
+    memset(&a, 0, sizeof(a));
+    a.source = "agent";
+    a.ts = 1791000000;
+    a.local_date = "2026-10-05";
+    a.apps = apps;
+    a.n_apps = kept;
+    a.homebrew_s = 420;
+    a.now_playing = 0x050537E2542E2000ULL;
+    a.now_playing_since = 1790990000;
+    a.now_playing_kind = SyncTitle_Homebrew;
+    CHECK(sync_activity_build(&a, buf, sizeof(buf)) > 0);
+    CHECK(contains(buf, "\"total_s\":1080,\"total_min\":18,\"homebrew_s\":420,\"homebrew_min\":7"));
+    // The one in front named, whatever it is; the lists games only.
+    CHECK(contains(buf, "\"now_playing\":{\"app_id\":\"050537E2542E2000\",\"since\":1790990000,\"kind\":\"homebrew\"}"));
+    CHECK(!contains(buf, "ABCDEF") && !contains(buf, "{\"app_id\":\"050537E2542E2000\",\"s\""));
+
+    // Events: a homebrew started and stopped, no ID.
+    const SyncNotice started = { "play_started", 0x050537E2542E2000ULL, SyncTitle_Homebrew, -1, NULL };
+    CHECK(sync_notice_build("agent", 1, &started, buf, sizeof(buf)) > 0);
+    CHECK(contains(buf, "\"app_id\":\"050537E2542E2000\",\"kind\":\"homebrew\""));
+    SyncSnapshot snap;
+    memset(&snap, 0, sizeof(snap));
+    SyncWatch w;
+    memset(&w, 0, sizeof(w));
+    SyncNotice out[SYNC_NOTICE_MAX];
+    sync_watch_step(&w, &snap, out);
+    snap.now_playing = 0x050537E2542E2000ULL;
+    snap.now_playing_kind = SyncTitle_Homebrew;
+    CHECK(sync_watch_step(&w, &snap, out) == 1 && out[0].kind == SyncTitle_Homebrew);
+    snap.now_playing = 0x0100000000010000ULL;
+    snap.now_playing_kind = SyncTitle_Game;
+    const size_t got = sync_watch_step(&w, &snap, out);
+    CHECK(got == 2 && !strcmp(out[0].event_type, "play_stopped") && out[0].kind == SyncTitle_Homebrew);
+    CHECK(!strcmp(out[1].event_type, "play_started") && out[1].kind == SyncTitle_Game);
+}
+
 // The game icons' records, PlayGuard's and the agent's (sync_icons.c).
 static void test_icons_record(void)
 {
@@ -1324,6 +1427,7 @@ int main(int argc, char **argv)
     if (argc > 1) out_dir = argv[1];
     test_json();
     test_icons_record();
+    test_titles();
     test_connect_encoding();
     test_publish_roundtrip();
     test_remaining_length();
