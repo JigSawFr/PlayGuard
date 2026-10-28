@@ -1297,6 +1297,7 @@
         "credit_upstream_value": "Pctl Manager by Taylor",
         "credit_fixes": "fw 22.5 fixes and NTP",
         "credit_ui": "Interface",
+        "credit_family": "Part of",
         "section_support": "Support PlayGuard",
         "support_note": "PlayGuard is free, open source and has no ads. If it helps your family, you can support its development: scan a code with your phone (select it to enlarge it).",
         "made_in_france": "Made in France",

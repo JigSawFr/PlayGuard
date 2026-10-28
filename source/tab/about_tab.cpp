@@ -63,6 +63,7 @@ AboutTab::AboutTab()
                                  line("playguard/about/credit_upstream", "playguard/about/credit_upstream_value"_i18n) + "\n" +
                                  line("playguard/about/credit_fixes", "anbingxi") + "\n" +
                                  line("playguard/about/credit_ui", "borealis (Apache 2.0)") + "\n" +
+                                 line("playguard/about/credit_family", "Boréale (boreale.dev)") + "\n" +
                                  line("playguard/tools/license", "GPLv3") + "\n" +
                                  line("playguard/tools/source", app::repo_url());
         ui::qr_dialog(text, app::repo_url());
