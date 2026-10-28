@@ -130,7 +130,7 @@ pages; no framework, nothing to install but that.
   before the first paint) and `fonts/sora.woff2`, the Sora headings' font
   (SIL Open Font License, `fonts/OFL.txt`; its Latin letters, cut out of
   google/fonts' `ofl/sora/Sora[wght].ttf`), served with the site so that no
-  visitor's browser asks Google Fonts or anyone else for anything.
+  visitor's browser loads anything from Google Fonts or anyone else.
 - **The screenshots**: `tools/site_screenshots.mjs <simulator> <out-dir>
   [version]` (Node and Playwright) runs the web simulator in a headless
   Chromium and saves each screen of the home page's gallery in each language,
@@ -163,8 +163,17 @@ pages; no framework, nothing to install but that.
   by default). CI asks GitHub Pages for it (its custom domain, when it has
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
   `SITE_NOINDEX=1` for a preview.
+- **The audience**, counted by Umami Cloud (<https://cloud.umami.is>):
+  `assets/umami.js` is its tracker, served with the site, that sends each
+  page seen to `gateway.umami.is`, without cookie, and only from the site's
+  own address (`SITE_URL`'s, not a local copy); a preview has none. It is a
+  copy: take it again from <https://cloud.umami.is/script.js> when Umami
+  changes it. Its site in Umami (`UMAMI_WEBSITE` in `build_site.py`) is
+  Boréale's, shared with the other projects' sites: Umami's *Hostname*
+  filter tells them apart.
 - **A Content-Security-Policy** on every page (a `<meta>`: GitHub Pages sends
-  no headers): only the site's own files, no inline script or style. The
+  no headers): only the site's own files, no inline script or style; the one
+  address it may send to is Umami's (`connect-src`). The
   JSON-LD blocks are data, not scripts: the policy does not apply to them. A page
   needing something else (a script inline, a file from another site) is
   blocked: put it in `site/assets/`. The pages also use
