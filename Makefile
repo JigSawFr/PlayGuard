@@ -305,7 +305,8 @@ forwarders_text_CSRC   := source/core/calendar.c
 forwarders_text_CFLAGS := -std=gnu11 -Isource/core
 # Aurore's own string tables (core/i18n.cpp), read from other threads while
 # the language changes: built from the submodule as it is.
-i18n_threads_SRC   := library/aurore/library/lib/core/i18n.cpp tests/i18n_threads/test.cpp
+i18n_threads_SRC   := library/aurore/library/lib/core/i18n.cpp library/aurore/library/lib/core/util.cpp \
+                      tests/i18n_threads/test.cpp
 i18n_threads_FLAGS := -std=c++20 -isystem library/aurore/library/include \
                       -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
                       $(addprefix -isystem library/aurore/library/,include/borealis/extern include/borealis/extern/nanovg \
