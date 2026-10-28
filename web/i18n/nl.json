@@ -126,6 +126,7 @@
   "idle": {"label": "Er draait geen game"},
   "no_game": {"label": "Niets open achter PlayGuard"},
   "no_play": {"label": "Al weken niets gespeeld"},
+  "homebrew": {"label": "Deze week gespeelde homebrews"},
   "no_pdm": {"label": "Geen activiteitenlogboek"},
   "games": {"label": "Extra games gespeeld deze week"},
   "accounts": {"label": "Gebruikersaccounts", "help": "0 tot 8 (standaard 2), elk speelt twee keer zoveel als het volgende."},

@@ -13,6 +13,7 @@
 
 #include "util/paths.hpp"
 #include "util/play_cache.hpp"
+#include "action/title_names.hpp"
 #include "util/system_titles.hpp"
 
 namespace play_data
@@ -150,6 +151,7 @@ void fetch(const PlayAccount* account)
         // must not hold a frame (one file per account, one read at a time).
         save(key, *data);
         brls::sync([key, data]() {
+            title_names::learn(*data);   // the forwarders' names, kept for when they are gone
             Entry& done = s_entries[key];
             done.busy    = false;
             done.stats   = data;
@@ -184,23 +186,43 @@ std::string system_name(u64 app_id)
     return key ? brls::getStr("playguard/system_titles/" + std::string(key)) : "";
 }
 
+namespace
+{
+// A title with no name of its own (its control data gone or unreadable): a
+// system program's, else the one recorded (a forwarder deleted since), else
+// "Homebrew (<ID>)" for a homebrew; "" for a game.
+std::string fallback_name(u64 app_id, const std::string& id)
+{
+    const std::string system = system_name(app_id);
+    if (!system.empty()) return system;
+    const std::string kept = title_names::recorded(app_id);
+    if (!kept.empty()) return kept;
+    const SyncTitleKind kind = title_names::kind(app_id);
+    if (kind == SyncTitle_PlayGuard) return "PlayGuard";   // its own forwarder
+    if (kind == SyncTitle_Homebrew) return brls::getStr("playguard/games/homebrew_unnamed", id);
+    return "";
+}
+}   // namespace
+
 std::string unnamed(const std::string& id)
 {
-    const std::string system = system_name(std::strtoull(id.c_str(), nullptr, 16));
-    return system.empty() ? brls::getStr("playguard/games/unnamed", id) : system;
+    const std::string name = fallback_name(std::strtoull(id.c_str(), nullptr, 16), id);
+    return name.empty() ? brls::getStr("playguard/games/unnamed", id) : name;
 }
 
 std::string known_name(const GameStat& g)
 {
-    return g.name[0] ? std::string(g.name) : system_name(g.app_id);
+    if (g.name[0]) return g.name;
+    const std::string system = system_name(g.app_id);
+    return system.empty() ? title_names::recorded(g.app_id) : system;
 }
 
 std::string game_name(const GameStat& g)
 {
     if (g.name[0]) return g.name;
-    const std::string system = system_name(g.app_id);
-    if (!system.empty()) return system;
-    return brls::getStr("playguard/activity/deleted_game", fmt::format("{:016X}", (unsigned long long)g.app_id));
+    const std::string id = fmt::format("{:016X}", (unsigned long long)g.app_id);
+    const std::string name = fallback_name(g.app_id, id);
+    return name.empty() ? brls::getStr("playguard/activity/deleted_game", id) : name;
 }
 
 const std::vector<PlayAccount>& accounts()

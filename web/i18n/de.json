@@ -126,6 +126,7 @@
   "idle": {"label": "Kein Spiel läuft"},
   "no_game": {"label": "Nichts hinter PlayGuard geöffnet"},
   "no_play": {"label": "Seit Wochen nichts gespielt"},
+  "homebrew": {"label": "Diese Woche gespielte Homebrews"},
   "no_pdm": {"label": "Kein Aktivitätsprotokoll"},
   "games": {"label": "Weitere Spiele diese Woche gespielt"},
   "accounts": {"label": "Benutzerkonten", "help": "0 bis 8 (standardmäßig 2), jedes spielt doppelt so viel wie das nächste."},

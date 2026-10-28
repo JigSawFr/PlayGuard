@@ -47,6 +47,7 @@
   {"name": "idle", "live": true, "group": "games", "type": "bool"},
   {"name": "no_game", "group": "games", "type": "bool"},
   {"name": "no_play", "group": "games", "type": "bool"},
+  {"name": "homebrew", "group": "games", "type": "bool"},
   {"name": "no_pdm", "live": true, "group": "games", "type": "bool"},
   {"name": "games", "live": true, "group": "games", "type": "number", "min": 0},
   {"name": "accounts", "live": true, "group": "games", "type": "number", "min": 0, "max": 8, "placeholder": "2"},

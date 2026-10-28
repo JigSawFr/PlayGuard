@@ -274,6 +274,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 - Icons are read around the selected game (not in applet mode, to spare memory); a grey controller stands in until one arrives, and for a game without one.
 - A large library shows its first 50 games, then *Show every game* (100 games at most in applet mode); the export always holds them all. PlayGuard reads 256 games at most (this week's first): beyond that, the Activity tab, All games and the export (not CSV) say that some are missing, and the all-time total leaves them out.
 - **Ⓐ on a game:** its last seven days as bars, launches, first and last play, time per user account. Deleted games keep their all-time figures, even one deleted before PlayGuard was installed as long as the console's play log still names it, and their name once PlayGuard has seen it (else *Deleted game* and its title ID). The console's own programs (the HOME menu, the Album, the eShop…) are never counted as games: should one of their title IDs show, it is called by its name rather than as an unknown game.
+- **Homebrews** (a forwarder on the HOME menu: PlayGuard's own, those it made, those another app made) count in the Activity as the games do, since the console's play timer counts their time: each under its homebrew's name, *PlayGuard* for its own, the name PlayGuard last saw for one deleted since, else *Homebrew* and its title ID. *Remote access* publishes only the games by name; the homebrews' time goes there as one total.
 
 ### Accounts
 

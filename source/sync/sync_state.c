@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "sync_json.h"
+#include "sync_titles.h"
 
 #define NOLIMIT PT_DAY_NOLIMIT
 
@@ -228,6 +229,7 @@ static void activity_today(SyncJson *j, const SyncSnapshot *s)
     else sync_json_null(j);
     sync_json_kstr_or_null(j, "name", playing ? s->now_playing_name : NULL);
     sync_json_kint_or_null(j, "since", playing && s->now_playing_since, (int64_t)s->now_playing_since);
+    sync_json_kstr_or_null(j, "kind", playing ? sync_title_kind_label(s->now_playing_kind) : NULL);
     sync_json_obj_end(j);
     sync_json_obj_end(j);
 }
@@ -291,10 +293,13 @@ size_t sync_activity_build(const SyncActivity *a, char *out, size_t cap)
     sync_json_kint(&j, "ts", (int64_t)a->ts);
     sync_json_kstr_or_null(&j, "local_date", a->local_date);
     sync_json_kbool(&j, "final", a->final);
-    uint64_t total = 0;
+    uint64_t total = a->homebrew_s;
     for (size_t i = 0; i < a->n_apps; i++) total += a->apps[i].seconds;
     sync_json_kint(&j, "total_s", (int64_t)total);
     sync_json_kint(&j, "total_min", (int64_t)((total + 30) / 60));
+    // The homebrews' time: in the total, not in per_app.
+    sync_json_kint(&j, "homebrew_s", (int64_t)a->homebrew_s);
+    sync_json_kint(&j, "homebrew_min", (int64_t)((a->homebrew_s + 30) / 60));
     sync_json_key(&j, "per_app");
     sync_json_arr(&j);
     for (size_t i = 0; i < a->n_apps; i++) {
@@ -329,6 +334,7 @@ size_t sync_activity_build(const SyncActivity *a, char *out, size_t cap)
         if (a->now_playing) sync_json_hex64(&j, a->now_playing);
         else sync_json_null(&j);
         sync_json_kint_or_null(&j, "since", a->now_playing && a->now_playing_since, (int64_t)a->now_playing_since);
+        sync_json_kstr_or_null(&j, "kind", a->now_playing ? sync_title_kind_label(a->now_playing_kind) : NULL);
         sync_json_obj_end(&j);
     }
     sync_json_obj_end(&j);

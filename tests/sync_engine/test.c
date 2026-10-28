@@ -12,6 +12,7 @@
 #include "mqtt_client.h"
 #include "mqtt_packet.h"
 #include "sync_engine.h"
+#include "sync_state.h"
 
 // ---------------------------------------------------------------- clock
 
@@ -625,7 +626,7 @@ static void test_notices(void)
     setup(false, SyncPolicy_Auto);
     turns(3);
     const size_t events = count_on("playguard/a1b2c3d4/event");
-    host.notice = (SyncNotice){ "time_warning", 0x0100000000010000ULL, 10, NULL };
+    host.notice = (SyncNotice){ "time_warning", 0x0100000000010000ULL, SyncTitle_Game, 10, NULL };
     sync_engine_state_changed(&engine);
     turns(1);
     host.notice.event_type = NULL;
@@ -633,7 +634,7 @@ static void test_notices(void)
     const Message *m = last_on("playguard/a1b2c3d4/event");
     CHECK(m && !m->retain && strstr(m->payload, "\"event_type\":\"time_warning\"") &&
           strstr(m->payload, "\"source\":\"app\",\"ts\":1791000000") &&
-          strstr(m->payload, "\"app_id\":\"0100000000010000\",\"minutes_left\":10"));
+          strstr(m->payload, "\"app_id\":\"0100000000010000\",\"kind\":\"game\",\"minutes_left\":10"));
     CHECK(m > last_on("playguard/a1b2c3d4/state"));   // after the state that found it
     sync_engine_state_changed(&engine);
     turns(1);

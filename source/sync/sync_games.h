@@ -29,9 +29,15 @@ typedef struct {
     uint64_t        ts;
     int             installed;   // games installed; -1 unknown
     int             accounts;    // user accounts; -1 unknown
-    int64_t         total_min;   // every game, every account; -1 unknown
-    const SyncGame *games;       // most played first: the ones that do not fit are left out
+    int64_t         total_min;   // every title played, every account (the homebrews' too); -1 unknown
+    const SyncGame *games;       // games only, most played first: the ones that do not fit are left out
     size_t          n_games;
+    // The homebrews, as counts only (no ID, no name): the .nro files on the
+    // SD card, the forwarders installed (PlayGuard's own among them), and
+    // their play time since first played, in total_min. -1 unknown.
+    int             homebrews;
+    int             forwarders;
+    int64_t         homebrew_min;
 } SyncGames;
 
 // The document; `*kept` (may be NULL) gets the number of games it holds.

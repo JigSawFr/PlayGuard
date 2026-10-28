@@ -126,6 +126,7 @@
   "idle": {"label": "ソフトを起動していない"},
   "no_game": {"label": "PlayGuardの裏で何も開いていない"},
   "no_play": {"label": "何週間も遊んでいない"},
+  "homebrew": {"label": "今週遊んだHomebrew"},
   "no_pdm": {"label": "プレイ記録なし"},
   "games": {"label": "今週追加で遊んだソフトの数"},
   "accounts": {"label": "ユーザー", "help": "0～8（既定は 2）。それぞれ次のユーザーの 2 倍遊びます。"},

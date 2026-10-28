@@ -51,7 +51,7 @@ JSON_HPP := library/aurore/library/include/borealis/extern/nlohmann/json.hpp
 # The remote link's console-free C (source/sync/), shared by its host tests.
 SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
-             source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c source/sync/sync_icons.c \
+             source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c source/sync/sync_icons.c source/sync/sync_titles.c \
              source/core/console_info_pure.c
 
 .PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue agent dist-agent gate-preview FORCE
@@ -241,6 +241,9 @@ clock_logic_SRC   := source/action/clock_logic.cpp tests/clock_logic/test.cpp
 icon_logic_SRC   := source/action/icon_logic.cpp tests/icon_logic/test.cpp
 games_logic_SRC   := source/action/games_logic.cpp tests/games_logic/test.cpp
 system_titles_SRC   := source/util/system_titles.cpp tests/system_titles/test.cpp
+titles_SRC   := source/util/titles.cpp tests/titles/test.cpp
+titles_CSRC  := source/sync/sync_titles.c
+titles_CFLAGS := -std=gnu11 -Isource/sync
 sync_icons_logic_SRC   := source/action/sync_icons_logic.cpp tests/sync_icons_logic/test.cpp
 sync_icons_logic_CSRC  := source/sync/sync_icons.c
 sync_icons_logic_CFLAGS := -std=gnu11 -Isource/sync
@@ -349,7 +352,7 @@ sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/core
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
 sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
-sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_json.c tests/sync_exec/test.c
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c source/sync/sync_json.c tests/sync_exec/test.c
 sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync
 sync_engine_SRC   := $(SYNC_PURE) source/sync/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
 sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/core

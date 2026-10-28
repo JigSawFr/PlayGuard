@@ -432,6 +432,7 @@ if SYNC:
     env.setdefault("PLAYGUARD_SIM_HA_LATEST", "0.2.0")
     env.setdefault("PLAYGUARD_SIM_HA_CHANGELOG", ha_changelog)
     env.setdefault("PLAYGUARD_SIM_LATEST", "offline")   # PlayGuard's own daily check: nothing found
+    env.setdefault("PLAYGUARD_SIM_HOMEBREW", "1")        # two homebrews played: none may reach the broker
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
     integration_json = os.path.join(nand_dir, "sync", "integration.json")
@@ -1541,8 +1542,31 @@ if SYNC:
         fail(f"unexpected icons: {shown}, {first}: {icon[:8]!r}")
     if f"as pg-{SYNC_ID}-icons" not in open(os.path.join(OUT, "mosquitto.log"), errors="replace").read():
         fail("the icons did not come over their own connection")
+    # Only games go to the broker: the homebrews played this week
+    # (PLAYGUARD_SIM_HOMEBREW) by neither their ID nor their name, their time
+    # as one total (homebrew_min), which the totals still count.
+    homebrew_ids = ("050537E2542E2000", "052EB87E6426D000")
+    week = wait_for("the week", lambda: doc(f"{BASE}/week"))
+    if week.get("homebrew_min") != [0, 0, 0, 0, 20, 10, 0]:
+        fail(f"the week's homebrew time: {week.get('homebrew_min')}")
+    days = {}
+    for d in week.get("days", [])[:-1]:
+        days[d] = wait_for(f"the finished day {d}", lambda d=d: doc(f"{BASE}/activity/{d}"))
+    two_days_ago = days[week["days"][4]]
+    if two_days_ago.get("homebrew_min") != 20 or \
+            two_days_ago.get("total_s") != sum(a["s"] for a in two_days_ago["per_app"]) + two_days_ago.get("homebrew_s", -1):
+        fail(f"a finished day's homebrew time: {json.dumps(two_days_ago)[:300]}")
+    games_doc = doc(f"{BASE}/games")
+    if games_doc.get("homebrew_min") != 340 or "forwarders" not in games_doc or not isinstance(games_doc.get("homebrews"), int):
+        fail(f"the games document's homebrews: {json.dumps(games_doc)[:300]}")
+    for topic in ("names", "games", "week", "activity", "state") + tuple(f"activity/{d}" for d in days):
+        text = mqtt_get(f"{BASE}/{topic}") or ""
+        if any(h in text.upper() for h in homebrew_ids) or "sphaira" in text:
+            fail(f"a homebrew on {topic}: {text[:300]}")
     # Sky Kingdom: installed, never played.
     wait_for("an installed game's icon", lambda: f"{BASE}/icon/0100A1B2C3D4A000" in icons(), 30)
+    if any(t.endswith(h) for t in icons() for h in homebrew_ids):
+        fail("a homebrew's icon on the broker")
     wait_for("icons.txt", lambda: os.path.exists(icons_txt) and first.rsplit("/", 1)[1] in open(icons_txt).read(), 10)
 
     events = watch(f"{BASE}/event", "events.txt")

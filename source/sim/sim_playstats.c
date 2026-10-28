@@ -184,6 +184,30 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     out->prev_week_ok = true;
     out->prev_week_s = idle_weeks ? 0 : (u32)share(480ULL * 60, account);
     out->month_ok = true;
+    // Homebrews played this week (PLAYGUARD_SIM_HOMEBREW): sphaira's
+    // forwarder, 20 minutes two days ago, and a forwarder deleted since, its
+    // name gone, 10 minutes yesterday; the remote link sends neither.
+    if (sim_env_flag("PLAYGUARD_SIM_HOMEBREW") && !idle_weeks && !account) {
+        static const struct {
+            u64         id;
+            const char *name;
+            int         day;
+            u32         min, total_min;
+        } HOMEBREW[] = { { 0x050537E2542E2000ULL, "sphaira", 2, 20, 300 }, { 0x052EB87E6426D000ULL, "", 1, 10, 40 } };
+        for (size_t h = 0; h < sizeof(HOMEBREW) / sizeof(HOMEBREW[0]) && out->count < PLAYSTATS_MAX; h++) {
+            GameStat *g = &out->games[out->count++];
+            memset(g, 0, sizeof(*g));
+            g->app_id = HOMEBREW[h].id;
+            snprintf(g->name, sizeof(g->name), "%s", HOMEBREW[h].name);
+            g->totals_ok = true;
+            g->day_s[HOMEBREW[h].day] = HOMEBREW[h].min * 60;
+            g->week_s = g->month_s = HOMEBREW[h].min * 60;
+            g->total_s = (u64)HOMEBREW[h].total_min * 60;
+            g->launches = 2;
+            g->last_played = out->now - (u64)HOMEBREW[h].day * 86400;
+            g->first_played = out->now - 60ULL * 86400;
+        }
+    }
     // A large library: filler games, each played a little this week.
     const int n = (int)sim_env_int("PLAYGUARD_SIM_GAMES", 0, 0, 100000);
     int i = 0;

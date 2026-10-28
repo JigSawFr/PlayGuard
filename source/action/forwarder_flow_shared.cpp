@@ -13,6 +13,7 @@
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
+#include "action/title_names.hpp"
 #include "app.hpp"
 #include "core/forwarder.h"
 #include "core/forwarder_pack.h"
@@ -235,6 +236,11 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         game_icons::forget(id);   // its icon as built now in the lists, not the one read before
         std::string werr;
         if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
+        // A homebrew from now on, by this name, even once deleted.
+        const u64 made_id = id;
+        const std::string made_name = made.name;
+        const bool own = self;
+        brls::sync([made_id, made_name, own]() { title_names::learn_forwarder(made_id, made_name, own); });
         if (kind) history_flow::record_event(kind, "", history_label(made.name, id));
         write_rules();
         hbmenu_lock::forwarder_notices();   // made again: off the bell

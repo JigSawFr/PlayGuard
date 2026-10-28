@@ -26,12 +26,12 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 | `playguard/<id>/availability` | yes | console → | `online` or `offline`. Last will (`offline`), and `offline` published before a clean disconnect. |
 | `playguard/<id>/state` | yes | console → | The state snapshot (below). |
 | `playguard/<id>/system` | yes | console → | The console itself: versions, model, name, storage, power, network (below). With the state, every `poll_s`. |
-| `playguard/<id>/games` | yes | console (app) → | The games installed and played, each with its play time in all (below), published by PlayGuard after a read of the play log. |
+| `playguard/<id>/games` | yes | console (app) → | The games installed and played, each with its play time in all, and the homebrews as counts only (below), published by PlayGuard after a read of the play log. |
 | `playguard/<id>/icon/<APP_ID>` | yes | console (app; agent: the game played) → | A game's icon: the raw JPEG of its control data, for every game installed or played (below). An empty retained message clears it. |
-| `playguard/<id>/activity` | yes | console → | Today's play time from the play log. |
+| `playguard/<id>/activity` | yes | console → | Today's play time from the play log: each game's, the homebrews' as one total. |
 | `playguard/<id>/activity/<YYYY-MM-DD>` | yes | console → | A finished day's totals, published at the first cycle after local midnight. The console keeps the last 14 and clears older ones (empty retained publish). |
-| `playguard/<id>/names` | yes | console (app) → | Game and account names, published by PlayGuard when it runs. |
-| `playguard/<id>/week` | yes | console (app) → | The 7-day table per game and per account, published by PlayGuard when it runs. |
+| `playguard/<id>/names` | yes | console (app) → | Game and account names (games only), published by PlayGuard when it runs. |
+| `playguard/<id>/week` | yes | console (app) → | The 7-day table per game, for the homebrews together and per account, published by PlayGuard when it runs. |
 | `playguard/<id>/<entity>/set` | yes (by the publisher) | → console | An order. Cleared by the console once handled. |
 | `playguard/<id>/event` | **no** | console → | One event per order handled: `command_applied`, `command_rejected`, `command_waiting` (an order waiting for PlayGuard or the parent); and what the console does on its own (the agent): `play_started`, `play_stopped`, `time_warning`, `play_blocked` |
 | `playguard/<id>/report` | yes | console → | The last diagnostic report, plain text, at most 128 KiB. Only when `publish_report` is on. |
@@ -102,7 +102,8 @@ for 22 s, and connects again at once after a sleep longer than 45 s.
   },
   "activity_today": {
     "used_min": 74,
-    "now_playing": { "app_id": "0100000000010000", "name": "Super Mario Odyssey", "since": 1790990000 }
+    "now_playing": { "app_id": "0100000000010000", "name": "Super Mario Odyssey", "since": 1790990000,
+                     "kind": "game" }
   },
   "link": {
     "policy": "ask", "remote_timer_writes": false, "ha_discovery": true,
@@ -145,8 +146,12 @@ Every object is always there; a value the console could not read is `null`
   own answer (20.0.0+), else what today's block holds.
 - `extended_today_min`: extra time granted today by PlayGuard or by an order
   and still on today's limit.
-- `activity_today.now_playing`: `null` while PlayGuard publishes (it is in
-  front, so no game is being played); filled by the agent.
+- `activity_today.now_playing`: the title in front, game or homebrew,
+  named whatever it is (*Games and homebrews* below): `app_id`, `name` (the
+  game's, the homebrew's, `PlayGuard` for its own forwarder; `null` when not
+  known), `since` and `kind` (`game`, `homebrew`, or `system`, which the play
+  log never gives); every field `null` while none is (PlayGuard publishing:
+  it is in front itself). Filled by the agent.
 - `console.read_only`: PlayGuard's runtime read-only mode (an untested
   firmware); every order is then refused.
 - `link.publishes`: what is published (`activity`, `games`, `icons`,
@@ -208,10 +213,12 @@ the internal sensor.
 
 PlayGuard's (the agent relays the last one): every game installed (the last
 check of them, *Console › Check the installed games*) or played, most played
-first, as many as fit in 64 KiB (`complete` says whether all did).
+first, as many as fit in 64 KiB (`complete` says whether all did). Games only:
+the homebrews are counts (*Games and homebrews* below).
 
 ```json
 {"schema": 1, "ts": 1790990000, "installed": 42, "accounts": 3, "total_min": 12345,
+ "homebrews": 23, "forwarders": 4, "homebrew_min": 640,
  "games": {"0100000000010000": {"name": "Super Mario Odyssey", "version": "1.3.0", "installed": true,
                                 "total_min": 1234, "launches": 56, "first_played": 1700000000,
                                 "last_played": 1790000000}},
@@ -220,7 +227,14 @@ first, as many as fit in 64 KiB (`complete` says whether all did).
 
 `total_min` is a game's play time since it was first played, every account
 (the play log's statistics); `version` the installed one, `null` for a game
-no longer installed. Home Assistant's native discovery has the totals; the
+no longer installed. At the top, `installed` counts the games installed (the
+forwarders left out), `total_min` every title played, every account, the
+homebrews included: the games' `total_min` and `homebrew_min` (the homebrews'
+time since first played) add up to it. `homebrews` is the number of `.nro`
+files in the SD card's `/switch` folder and its sub-folders one level down
+(what *Console › Forwarders* offers), `forwarders` the forwarders installed
+(PlayGuard's own included); `null` when not known (the installed titles never
+checked). Home Assistant's native discovery has the totals; the
 integration lists every game on *Games installed* (an attribute) and keeps
 each game's history in a long-term statistic, with no sensor per game.
 
@@ -228,7 +242,8 @@ each game's history in a long-term statistic, with no sensor per game.
 
 A game's icon, as the HOME menu shows it: the JPEG of its control data
 (256 × 256), raw bytes, retained. `<APP_ID>` is 16 uppercase hex characters,
-as in `names`. Every game has one: those installed (the last check of them,
+as in `names`. Every game has one, and only games (a homebrew's icon sent by
+an earlier version is cleared): those installed (the last check of them,
 *Console › Check the installed games*, which PlayGuard also runs at
 start-up) and those played, installed or not, when PlayGuard can still read
 an icon for it (its icon cache on the SD card, or the console's own cache),
@@ -268,17 +283,55 @@ first played since PlayGuard last ran is not in that cache: the agent has
 no `ns` session to read its control data (and an icon is more than its heap
 can spare), so that icon waits for PlayGuard to be opened.
 
+## Games and homebrews
+
+Only games are listed on the broker: `names`, `games`, `icon/<APP_ID>`,
+`week`'s and the activity documents' per-game entries. A homebrew (an NRO
+forwarder on the HOME menu: PlayGuard's own, those PlayGuard made, those
+another app made, sphaira's for instance) is told as totals (`homebrew_s`,
+`homebrew_min`) and counts (`homebrews`, `forwarders`); the one in front is
+named, game or homebrew (`now_playing`, the events). What a title is
+(`source/sync/sync_titles.h`, shared by PlayGuard and the agent):
+
+| Signal | Says | How sure |
+|---|---|---|
+| The title ID below `0100000000010000` | The console's own program | Certain: Nintendo numbers its applications from `0100000000010000` (switchbrew's title list) |
+| The title ID's top byte other than `01` | A homebrew | Certain the other way round: no Nintendo application has one. sphaira and PlayGuard give their forwarders `05` (`core/forwarder_pack.h`); a homebrew under a `01…` ID is not caught by this |
+| *Console › Forwarders*' record (`forwarders.json`) | A homebrew, PlayGuard's own told apart | Certain for those PlayGuard made, whatever their ID |
+| PlayGuard's record, `nand/<system>/titles.txt` | What was seen before | As sure as when it was written: a forwarder keeps its kind and name after it is deleted |
+
+What a control.nacp says was looked at and not used: a forwarder's is its
+homebrew's own (name, author, version), which nothing tells from a game's.
+PlayGuard writes the record after each read of the play log (the forwarders'
+names from their control data, the installed titles of its last check, the
+forwarders it made) and when it makes a forwarder, and gives the agent its
+copy without names, `nand/<system>/sync/titles.txt`. The agent, which reads
+no control data, takes a title neither file lists (one installed since
+PlayGuard last ran) by its ID: a forwarder of sphaira's or PlayGuard's kind
+is a homebrew at once, a homebrew under a `01…` ID a game until PlayGuard
+has seen it.
+
+An older Home Assistant integration sees fewer entries (the homebrews gone
+from `names`, `games`, `per_app` and `week`), a `total_s` / `total_min` that
+no longer equals `per_app`'s sum (the homebrews' time is in it, not listed),
+and fields it ignores (`homebrew_s`, `homebrew_min`, `homebrews`,
+`forwarders`, `kind`); nothing changes meaning, so `schema` stays 1.
+
 ## `activity`, `activity/<date>`, `names`, `week`
 
 ```json
 { "schema": 1, "source": "agent", "ts": 1791000000, "local_date": "2026-10-05", "final": false,
-  "total_s": 4440, "total_min": 74,
+  "total_s": 5040, "total_min": 84, "homebrew_s": 600, "homebrew_min": 10,
   "per_app": [ { "app_id": "0100000000010000", "s": 3600, "min": 60 },
                { "app_id": "01000A10041EA000", "s": 840, "min": 14 } ],
   "per_account": null,
-  "now_playing": { "app_id": "0100000000010000", "since": 1790990000 } }
+  "now_playing": { "app_id": "0100000000010000", "since": 1790990000, "kind": "game" } }
 ```
 
+`per_app` lists games only; `homebrew_s` / `homebrew_min` is the homebrews'
+time together, in `total_s` with the games' (the console's play timer counts
+it): `total_s` is `per_app`'s seconds plus `homebrew_s`. `now_playing` is the
+title in front, as the state's (`kind`; `app_id` a homebrew's too).
 `activity/<date>` is the same document with `"final": true` and no
 `now_playing`. PlayGuard publishes the six finished days its play-log window
 holds, once per run, and clears the days 15 to 30 days old. `per_account`
@@ -294,9 +347,10 @@ Activity tab. The HOME menu and the system applets (the Album, the eShop, the
 Mii editor, the web browser…) are never counted: the play log keeps only
 applications, as the console's own statistics do, and the HOME menu taking
 the focus ends a game's session; so none is ever `now_playing` either. Were
-one of them to show (a title ID of `util/system_titles.cpp`'s table), `names`,
-`games` and `names.txt` give it its name in PlayGuard's language rather than
-none.
+one of them to show, it is no game: none of the lists has it.
+
+`names` has the games' names only. `week`'s `games` lists games only, and
+`homebrew_min` the homebrews' minutes per day, in `days`' order.
 
 ```json
 { "schema": 1, "ts": 1760000000,
@@ -307,6 +361,7 @@ none.
 ```json
 { "schema": 1, "ts": 1760000000, "days": ["2026-10-03", "2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09"],
   "games": [ { "app_id": "0100000000010000", "min": [0, 45, 60, 30, 0, 90, 60], "total_min": 5400, "launches": 123 } ],
+  "homebrew_min": [0, 0, 20, 10, 0, 0, 0],
   "accounts": [ { "uid": "00112233445566778899AABBCCDDEEFF", "min": [0, 45, 60, 30, 0, 90, 60] } ] }
 ```
 
@@ -385,16 +440,21 @@ after the state that shows it:
 
 ```json
 { "schema": 1, "source": "agent", "ts": 1791000000,
-  "event_type": "time_warning", "app_id": "0100000000010000",
+  "event_type": "time_warning", "app_id": "0100000000010000", "kind": "game",
   "minutes_left": 10, "blocked_by": null }
 ```
 
 | `event_type` | When | `app_id` | `minutes_left` | `blocked_by` |
 |---|---|---|---|---|
-| `play_started` | A game is being played that was not | the game | `null` | `null` |
+| `play_started` | A game (or a homebrew) is being played that was not | the game | `null` | `null` |
 | `play_stopped` | The game played is no longer (closed, suspended, another one started: `play_stopped` comes first) | the game | `null` | `null` |
 | `time_warning` | 10 minutes or fewer left of today's limit, while a game is played; once, and again only after extra time takes the time left back above 10 minutes (or on another day). Play starting with fewer left gives it at once. | the game | the minutes left | `null` |
 | `play_blocked` | Games are blocked that were not: the day's limit (or *No more play today*) or bedtime | the game played then, else `null` | `null` | `limit` or `bedtime`, as `timer.blocked_by` |
+
+`app_id` is the title's, a homebrew's too (it is in front: named, as
+`now_playing`), and `kind` says which (`game`, `homebrew`; `null` with no
+`app_id`). A homebrew's session is an event as a game's: the play timer counts
+it, and the time warning matters as much.
 
 Only the agent sends them: it builds the state while a game is played, every
 `poll_s` (30 s) and when the play log changes, so an event comes within that.
@@ -488,6 +548,8 @@ release's `CHANGELOG.md`) and the QR code that opens it in HACS.
 | `config/playguard/sync/profiles.txt` | PlayGuard, when the link starts and when the profiles change | `60,90,120,120,120,180,180=School week`: minutes Sunday first (65535 no limit), then the name. Shared, as the profiles are. |
 | `config/playguard/nand/<system>/sync/nro_state.txt` | PlayGuard, after every settings save (`config.json`, this system's `state.json`) once `sync.conf` exists, when read-only mode changes and when the serial number it publishes does | The extra-time record, the console lock and its saved limits, `relock_pending`, `extra_auto_restore`, the firmware choice (`fw_gate_*`), `pin_lock`, `read_only` and `firmware` (the one PlayGuard last ran on): what the agent must know to act on PlayGuard's behalf; and `serial`, the serial number PlayGuard read, only with `publish_serial`. The agent changes nothing when `read_only=1`, when the key is missing, or when the console's firmware is no longer `firmware` (a system update PlayGuard has not seen). A line break in a value is written as a space. |
 | `config/playguard/nand/<system>/sync/names.txt` | PlayGuard, after a read of the play log | `0100000000010000=Super Mario Odyssey`: the agent's "now playing". |
+| `config/playguard/nand/<system>/titles.txt` | PlayGuard, after each read of the play log and when it makes a forwarder | The titles that are not games (*Games and homebrews*), each with its name: `050537E2542E2000=homebrew:sphaira` (`homebrew`, `playguard` for PlayGuard's own forwarder, `system`, `game` for one the ID would misplace). Never deleted: a forwarder deleted since keeps its name. |
+| `config/playguard/nand/<system>/sync/titles.txt` | PlayGuard, with the record | The same without the names (`050537E2542E2000=homebrew`): what the agent reads before it publishes play time, `now_playing`, an event or an icon. |
 | `config/playguard/nand/<system>/sync/icons.txt` | PlayGuard, after it published or cleared game icons | `target=<8 hex>` (a hash of the broker's host, port and `<prefix>/<id>`), then `0100000000010000=40123`: each icon on the broker and its size in bytes (0: the game has none to publish). Read when PlayGuard starts. |
 | `config/playguard/nand/<system>/sync/agent_icons.txt` | the agent, after it published the icon of the game played | The same form, for what the agent sent itself. PlayGuard takes it (renamed, read, removed) after each read of the play log and adds its games to `icons.txt`; the agent reads both before publishing an icon. |
 | `config/playguard/cache/icons/<APP_ID>.jpg` | PlayGuard, each icon it reads (its screens, its names, the icons it publishes) | Its icon cache, shared by every system on the SD card (16 MiB, 512 icons at most, emptied when the console language changes or it is full); the agent reads it, never writes it. |

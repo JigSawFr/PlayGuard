@@ -20,6 +20,7 @@ extern "C" {
 typedef struct {
     bool     seen;       // a first snapshot was taken (it says nothing: no event for what was already so)
     uint64_t playing;    // the game being played, 0 none
+    int      playing_kind;   // its SyncTitleKind
     bool     blocked;
     bool     warned;     // the warning was given; again only once the time left goes back above SYNC_WARN_MIN
 } SyncWatch;

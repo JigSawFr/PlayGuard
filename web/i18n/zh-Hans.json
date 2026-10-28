@@ -126,6 +126,7 @@
   "idle": {"label": "没有正在运行的游戏"},
   "no_game": {"label": "PlayGuard 后面没有打开任何内容"},
   "no_play": {"label": "几周没有游玩"},
+  "homebrew": {"label": "本周玩过的自制软件"},
   "no_pdm": {"label": "没有游玩记录"},
   "games": {"label": "本周额外玩过的游戏数"},
   "accounts": {"label": "用户账户", "help": "0 到 8 个（默认 2 个），每个账户玩的时间是下一个的两倍。"},

@@ -785,6 +785,7 @@
         "truncated": "Alleen de eerste {} games zijn gecontroleerd.",
         "many": "Meerdere games tegelijk: controleer de SD-kaart op een computer, en of de console is opgestart vanaf hetzelfde geheugen ({} nu) als toen deze games werden geïnstalleerd. Een game die vanaf sysMMC is geïnstalleerd werkt niet vanaf emuMMC, en andersom.",
         "unnamed": "Onbekende game ({})",
+        "homebrew_unnamed": "Homebrew ({})",
         "id": "Titel-ID: {}",
         "cause": "Oorzaak",
         "fix": "Wat te doen",

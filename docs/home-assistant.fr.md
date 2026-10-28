@@ -126,7 +126,12 @@ de jeu. L'icône de chaque jeu (installé ou joué) va
 sur `playguard/<id>/icon/<id du jeu>`, envoyée une fois par PlayGuard quand
 il est ouvert et le lien en ligne ; l'agent ajoute celle du jeu en cours
 quand PlayGuard l'a lue sans l'envoyer. Un jeu installé depuis la dernière
-ouverture de PlayGuard a son icône à la prochaine. **Le numéro de série** n'est publié qu'une fois *Accès à distance ›
+ouverture de PlayGuard a son icône à la prochaine. Seuls les jeux sont
+listés (leurs noms, icônes, temps de jeu par jeu) : un homebrew (un forwarder
+du menu HOME, celui de PlayGuard ou un autre) compte dans le temps de jeu en un
+seul total, les homebrews et les forwarders en nombres dans le document des
+jeux, et celui au premier plan est nommé dans *En cours de jeu*, jeu ou
+homebrew. **Le numéro de série** n'est publié qu'une fois *Accès à distance ›
 Ce qui est publié › Publier le numéro de série* activé (désactivé par défaut) : il part alors vers
 le broker, et jamais dans un rapport. Sur une console dont le PRODINFO est
 masqué, c'est le vrai, tiré de la sauvegarde qu'Atmosphère en garde sur la

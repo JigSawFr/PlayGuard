@@ -40,6 +40,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_NO_PDM=1` | No activity log |
 | `PLAYGUARD_SIM_NO_PLAY=1` | Nothing played for weeks (the all-time totals stay): the Activity tab's empty state |
 | `PLAYGUARD_SIM_GAMES=200` | That many more games played this week (a large library) |
+| `PLAYGUARD_SIM_HOMEBREW=1` | Two homebrews played this week: sphaira's forwarder, and a forwarder deleted since whose name is gone (the remote link publishes neither) |
 | `PLAYGUARD_SIM_IDLE=1` | No game running |
 | `PLAYGUARD_SIM_SKIP=900` | The console's time that many seconds later, a game played all along (unless `IDLE`): the time left goes down by as much, to the limit and past it, and the Activity tab counts it on the first game (read at each call: the web page's time buttons move it while PlayGuard runs) |
 | `PLAYGUARD_SIM_ACCOUNTS=5` | That many user accounts, 0 to 8 (default 2: Alice and Léo), each playing twice as much as the next |
