@@ -98,7 +98,7 @@ AI coding assistants help with development; every change is reviewed, unit-teste
 
 ## 📜 License and credits
 
-**GPLv3**, see [`LICENSE`](LICENSE). Maintained by [JigSawFr](https://github.com/JigSawFr).
+**GPLv3**, see [`LICENSE`](LICENSE). Maintained by [JigSawFr](https://github.com/JigSawFr), part of [Boréale](https://boreale.dev/) with [PlayShelf](https://github.com/JigSawFr/PlayShelf) and [Aurore](https://github.com/JigSawFr/Aurore).
 
 <details>
 <summary>Credits</summary>

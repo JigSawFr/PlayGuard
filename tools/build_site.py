@@ -581,6 +581,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
         <div>
           <p><img src="{to_root}assets/mark.svg" alt="" width="20" height="20"> <strong>PlayGuard</strong></p>
           <p>{t('footer_license')}</p>
+          <p><a class="boreale" href="https://boreale.dev/">{t('footer_boreale')}</a></p>
         </div>
         <div>
           <h2>{t('docs_title')}</h2>
