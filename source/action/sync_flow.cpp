@@ -23,6 +23,7 @@
 #include "action/ha_update_flow.hpp"
 #include "action/play_data.hpp"
 #include "action/session_pause.hpp"
+#include "action/sync_icons.hpp"
 #include "action/sync_orders.hpp"
 #include "action/sys_update_flow.hpp"
 #include "app.hpp"
@@ -374,6 +375,15 @@ bool wanted()
     return s_conf.enabled && !sync_conf_problem(&s_conf);
 }
 
+// The link is up: the agent's, or PlayGuard's own session.
+bool online()
+{
+    if (s_agent) return s_agent_status.link.state == SyncLink_Online;
+    if (!s_shared) return false;
+    std::lock_guard<std::mutex> lk(s_shared->m);
+    return s_shared->status.state == SyncLink_Online;
+}
+
 void agent_lost();
 
 // A pg:agent call's result: false when it failed. A session that went away
@@ -500,9 +510,13 @@ std::string activity_doc(const PlayStats& stats, int k, const std::string& date,
 
 std::string names_doc(const PlayStats& stats, uint64_t ts)
 {
+    // A system program (the HOME menu …) by its translated name, as the screens.
+    std::vector<std::string> names(stats.count);
     std::vector<SyncAppName> apps;
-    for (uint32_t i = 0; i < stats.count; i++)
-        if (stats.games[i].name[0]) apps.push_back({ stats.games[i].app_id, stats.games[i].name });
+    for (uint32_t i = 0; i < stats.count; i++) {
+        names[i] = play_data::known_name(stats.games[i]);
+        if (!names[i].empty()) apps.push_back({ stats.games[i].app_id, names[i].c_str() });
+    }
     std::vector<SyncAccountName> accounts;
     for (const auto& a : play_data::accounts()) accounts.push_back({ { a.uid[0], a.uid[1] }, a.nickname });
     std::string out(8192 + apps.size() * 300, '\0');
@@ -567,10 +581,15 @@ std::string games_doc(const PlayStats& stats, uint64_t ts)
         if (f.display_version[0]) g.version = f.display_version;
     }
     int64_t total_s = 0;
+    std::vector<std::string> system(stats.count);   // the system programs' names, kept for the document
     for (uint32_t i = 0; i < stats.count; i++) {
         const GameStat& s = stats.games[i];
         SyncGame& g = game_of(s.app_id);
         if (!g.name && s.name[0]) g.name = s.name;
+        if (!g.name) {
+            system[i] = play_data::system_name(s.app_id);
+            if (!system[i].empty()) g.name = system[i].c_str();
+        }
         if (!s.totals_ok) continue;
         g.total_min = (int64_t)(s.total_s / 60);
         g.launches = s.launches;
@@ -662,8 +681,10 @@ void on_play_data()
         s_names_sent = names;
         if (activity_on) post_publish("names", names, true);
         std::vector<std::pair<uint64_t, std::string>> list;
-        for (uint32_t i = 0; i < stats->count; i++)
-            if (stats->games[i].name[0]) list.push_back({ stats->games[i].app_id, stats->games[i].name });
+        for (uint32_t i = 0; i < stats->count; i++) {
+            const std::string name = play_data::known_name(stats->games[i]);
+            if (!name.empty()) list.push_back({ stats->games[i].app_id, name });
+        }
         sync_files::write_names(list);   // for the agent's "now playing"
     }
     const std::string week = week_doc(*stats, today, posix);
@@ -676,6 +697,14 @@ void on_play_data()
         s_games_sent = games;
         post_publish("games", games, true);
     }
+    // Every game played, for their icons (action/sync_icons, which adds
+    // the installed ones).
+    std::vector<sync_icons_logic::Played> played;
+    for (uint32_t i = 0; i < stats->count; i++) {
+        const GameStat& g = stats->games[i];
+        played.push_back({ g.app_id, g.totals_ok ? g.last_played : 0, g.week_s });
+    }
+    sync_icons::set_played(played);
     for (int k = 1; k <= 6 && activity_on; k++) {
         const std::string day = date_before(today, k);
         if (day.empty() || s_finals_sent.count(day)) continue;
@@ -994,6 +1023,7 @@ void tick()
     if (s_agent) agent_tick();
     if (!running()) return;
     pump();
+    sync_icons::step(s_conf, online());
     if (!app::in_focus()) return;
     if (s_dirty || now - s_last_state >= std::chrono::seconds(s_conf.poll_s)) {
         s_dirty = false;
@@ -1209,6 +1239,7 @@ void start()
 void stop()
 {
     if (!s_started) return;
+    sync_icons::stop();
     halt();
     agent_leave();
     if (s_timer) {
@@ -1247,6 +1278,7 @@ void sync_now()
     s_names_sent.clear();
     s_week_sent.clear();
     s_finals_sent.clear();
+    sync_icons::again();
     if (s_agent) {
         agent_ok(agent_client::sync_now(), "sync now");
     } else if (s_shared) {

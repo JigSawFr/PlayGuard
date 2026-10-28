@@ -5,6 +5,7 @@
 
 #include <borealis/cadran/ui/cadran_list.hpp>
 
+#include "action/play_data.hpp"
 #include "app.hpp"
 
 using namespace brls::literals;
@@ -15,10 +16,10 @@ namespace
 {
 constexpr float ICON_SIZE = 72;
 
-// A game without a name: its ID.
+// A game without a name: its ID (a system program: its name).
 std::string unnamed_text(const std::string& id)
 {
-    return brls::getStr("playguard/games/unnamed", id);
+    return play_data::unnamed(id);
 }
 
 // A version as people know it: "version 1.4.0" when it is the installed

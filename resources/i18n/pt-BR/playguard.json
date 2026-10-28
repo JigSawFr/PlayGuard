@@ -1726,6 +1726,18 @@
         "empty_title": "Nada registrado ainda",
         "empty_text": "Toda alteração que o PlayGuard faz no console (limites, nível de restrição, PIN, desbloqueios…) aparece aqui."
     },
+    "system_titles": {
+        "home": "Menu HOME",
+        "album": "Álbum",
+        "eshop": "Nintendo eShop",
+        "mii": "Editor de Mii",
+        "controllers": "Controles",
+        "user_select": "Seleção de usuário",
+        "web": "Navegador da web",
+        "user_page": "Página do usuário",
+        "amiibo": "Configurações de amiibo",
+        "maintenance": "Modo de manutenção"
+    },
     "sync": {
         "title": "Acesso remoto",
         "intro": "Conecta este console a um broker MQTT (o app Mosquitto do Home Assistant, ou qualquer outro): o Home Assistant passa a mostrar o estado e o tempo de jogo dele, e pode enviar ordens a ele. A conexão funciona enquanto o PlayGuard está aberto, ou o tempo todo com o agente opcional (Console › Módulos opcionais). As configurações ficam salvas em {}.",
@@ -1792,6 +1804,7 @@
         "published_note": "O controle dos pais é sempre publicado. O que estiver desativado é apagado do broker e removido do Home Assistant.",
         "publish_activity": "Publicar o tempo de jogo (hoje, a semana, cada dia)",
         "publish_games": "Publicar os jogos (a lista, o tempo de jogo de cada um)",
+        "publish_icons": "Publicar os ícones dos jogos (instalados e jogados)",
         "publish_console": "Publicar o estado do console (bateria, armazenamento, base)",
         "publish_network": "Publicar a rede (endereço IP, Wi-Fi)",
         "publish_hardware": "Publicar as versões e o hardware (modelo, firmware, Atmosphère)",

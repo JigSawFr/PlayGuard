@@ -1726,6 +1726,18 @@
         "empty_title": "Noch nichts erfasst",
         "empty_text": "Jede Änderung, die PlayGuard an der Konsole vornimmt (Limits, Einschränkungskategorie, Geheimzahl, Aufhebungen…), wird hier aufgeführt."
     },
+    "system_titles": {
+        "home": "HOME-Menü",
+        "album": "Album",
+        "eshop": "Nintendo eShop",
+        "mii": "Mii-Editor",
+        "controllers": "Controller",
+        "user_select": "Benutzerauswahl",
+        "web": "Webbrowser",
+        "user_page": "Nutzerseite",
+        "amiibo": "amiibo-Einstellungen",
+        "maintenance": "Wartungsmodus"
+    },
     "sync": {
         "title": "Fernzugriff",
         "intro": "Verbindet diese Konsole mit einem MQTT-Broker (der Mosquitto-App von Home Assistant oder einem anderen): Home Assistant zeigt dann ihren Status und ihre Spielzeit an und kann ihr Befehle senden. Die Verbindung läuft, solange PlayGuard geöffnet ist, oder ständig mit dem optionalen Agenten (Konsole › Optionale Module). Die Einstellungen werden in {} gespeichert.",
@@ -1792,6 +1804,7 @@
         "published_note": "Die Altersbeschränkungen werden immer veröffentlicht. Was ausgeschaltet ist, wird vom Broker gelöscht und aus Home Assistant entfernt.",
         "publish_activity": "Die Spielzeit veröffentlichen (heute, die Woche, jeder Tag)",
         "publish_games": "Die Spiele veröffentlichen (die Liste, die Spielzeit jedes Spiels)",
+        "publish_icons": "Die Symbole der Spiele veröffentlichen (installierte und gespielte)",
         "publish_console": "Den Zustand der Konsole veröffentlichen (Akku, Speicher, Station)",
         "publish_network": "Das Netzwerk veröffentlichen (IP-Adresse, WLAN)",
         "publish_hardware": "Versionen und Hardware veröffentlichen (Modell, Firmware, Atmosphère)",

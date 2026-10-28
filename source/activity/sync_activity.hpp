@@ -63,6 +63,7 @@ class SyncActivity : public brls::Activity
     BRLS_BIND(brls::Label,       published_note, "sy_published_note");
     BRLS_BIND(brls::BooleanCell, pub_activity, "sy_pub_activity");
     BRLS_BIND(brls::BooleanCell, pub_games, "sy_pub_games");
+    BRLS_BIND(brls::BooleanCell, pub_icons, "sy_pub_icons");
     BRLS_BIND(brls::BooleanCell, pub_console, "sy_pub_console");
     BRLS_BIND(brls::BooleanCell, pub_network, "sy_pub_network");
     BRLS_BIND(brls::BooleanCell, pub_hardware, "sy_pub_hardware");

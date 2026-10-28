@@ -56,6 +56,7 @@
             <brls:Label id="sy_published_note" text="" fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
             <brls:BooleanCell id="sy_pub_activity"/>
             <brls:BooleanCell id="sy_pub_games"/>
+            <brls:BooleanCell id="sy_pub_icons"/>
             <brls:BooleanCell id="sy_pub_console"/>
             <brls:BooleanCell id="sy_pub_network"/>
             <brls:BooleanCell id="sy_pub_hardware"/>

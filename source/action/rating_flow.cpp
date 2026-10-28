@@ -7,6 +7,7 @@
 
 #include "action/game_check_text.hpp"
 #include "action/game_scan.hpp"
+#include "action/play_data.hpp"
 #include "action/rating_logic.hpp"
 #include "ui/ui.hpp"
 
@@ -65,9 +66,7 @@ void show_blocked(const PctlStatus& st, int age)
     }
     std::vector<std::string> names, ratings;
     for (const GameFacts* g : b.games) {
-        names.push_back(game_check_text::game_name(*g, [](const std::string& id) {
-            return brls::getStr("playguard/games/unnamed", id);
-        }));
+        names.push_back(game_check_text::game_name(*g, play_data::unnamed));
         ratings.push_back(game_rating(st, *g));
     }
     ui::pick(brls::getStr("playguard/restrictions/blocked_title", org, age), names, 0, [](int) {}, false, ratings);

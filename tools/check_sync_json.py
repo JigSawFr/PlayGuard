@@ -28,7 +28,7 @@ def keys_of(doc, prefix=""):
 
 
 # What an entity shows (sync.conf's publish_* switches; "controls" always).
-PUBLISH = ("controls", "activity", "games", "console", "network", "hardware", "serial", "report")
+PUBLISH = ("controls", "activity", "games", "icons", "console", "network", "hardware", "serial", "report")
 
 
 def main():

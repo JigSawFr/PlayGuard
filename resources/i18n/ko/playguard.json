@@ -1726,6 +1726,18 @@
         "empty_title": "아직 기록이 없습니다",
         "empty_text": "PlayGuard가 본체에서 변경한 모든 내용(제한, 제한 레벨, PIN, 일시 해제…)이 여기에 표시됩니다."
     },
+    "system_titles": {
+        "home": "HOME 메뉴",
+        "album": "앨범",
+        "eshop": "닌텐도 e숍",
+        "mii": "Mii 편집기",
+        "controllers": "컨트롤러",
+        "user_select": "사용자 선택",
+        "web": "웹 브라우저",
+        "user_page": "사용자 페이지",
+        "amiibo": "amiibo 설정",
+        "maintenance": "유지보수 모드"
+    },
     "sync": {
         "title": "원격 접속",
         "intro": "이 본체를 MQTT 브로커(Home Assistant의 Mosquitto 앱 또는 다른 브로커)에 연결합니다. 그러면 Home Assistant에서 본체의 상태와 플레이 시간을 보고 명령을 보낼 수 있습니다. 연결은 PlayGuard가 열려 있는 동안 작동하며, 선택 사항인 에이전트(본체 › 추가 모듈)가 있으면 항상 작동합니다. 설정은 {}에 저장됩니다.",
@@ -1792,6 +1804,7 @@
         "published_note": "자녀 보호 기능은 항상 전송됩니다. 끈 항목은 브로커에서 지워지고 Home Assistant에서 제거됩니다.",
         "publish_activity": "플레이 시간 전송 (오늘, 이번 주, 매일)",
         "publish_games": "소프트웨어 전송 (목록, 각각의 플레이 시간)",
+        "publish_icons": "소프트웨어 아이콘 전송 (설치한 것과 플레이한 것)",
         "publish_console": "본체 상태 전송 (배터리, 저장 공간, 독)",
         "publish_network": "네트워크 전송 (IP 주소, Wi-Fi)",
         "publish_hardware": "버전 및 하드웨어 전송 (모델, 펌웨어, Atmosphère)",

@@ -213,6 +213,16 @@ void write_names(const std::vector<std::pair<uint64_t, std::string>>& names)
     write(system_dir(), "names.txt", names_text(names));
 }
 
+std::string icons_file()
+{
+    return system_dir() + "/icons.txt";
+}
+
+void write_icons(const std::string& text)
+{
+    write(system_dir(), "icons.txt", text);
+}
+
 std::string integration_file()
 {
     return system_dir() + "/integration.json";
@@ -326,6 +336,17 @@ std::vector<AgentEvent> parse_agent_events(const std::string& text)
         out.push_back(std::move(e));
     }
     return out;
+}
+
+std::string take_agent_icons()
+{
+    const std::string file = system_dir() + "/agent_icons.txt", taken = file + ".read";
+    struct stat st;
+    if (stat(taken.c_str(), &st) != 0 && std::rename(file.c_str(), taken.c_str()) != 0) return "";
+    std::string text;
+    paths::read_file(taken, text);
+    std::remove(taken.c_str());
+    return text;
 }
 
 std::vector<AgentEvent> take_agent_events()

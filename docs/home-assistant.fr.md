@@ -112,7 +112,7 @@ Batterie, En charge et Sur le dock.
 
 **Ce qui est publié** (*Accès à distance › Ce qui est publié*, derrière le
 code PIN) : le contrôle parental et le minuteur le sont toujours ; le temps de
-jeu, les jeux, l'état de la console (batterie, stockage, dock), le réseau
+jeu, les jeux, les icônes des jeux, l'état de la console (batterie, stockage, dock), le réseau
 (adresse IP, Wi-Fi), les versions et le matériel (modèle, firmware,
 Atmosphère) et les rapports de diagnostic ont chacun leur interrupteur,
 activé par défaut sauf les rapports. Ce que vous désactivez est effacé du
@@ -122,7 +122,11 @@ suit aussi) ; réactivé, elles reviennent.
 Les entités de la console lisent `playguard/<id>/system`, que l'agent tient à
 jour quand PlayGuard est fermé ; celles des jeux lisent
 `playguard/<id>/games`, que PlayGuard publie après chaque lecture du journal
-de jeu. **Le numéro de série** n'est publié qu'une fois *Accès à distance ›
+de jeu. L'icône de chaque jeu (installé ou joué) va
+sur `playguard/<id>/icon/<id du jeu>`, envoyée une fois par PlayGuard quand
+il est ouvert et le lien en ligne ; l'agent ajoute celle du jeu en cours
+quand PlayGuard l'a lue sans l'envoyer. Un jeu installé depuis la dernière
+ouverture de PlayGuard a son icône à la prochaine. **Le numéro de série** n'est publié qu'une fois *Accès à distance ›
 Ce qui est publié › Publier le numéro de série* activé (désactivé par défaut) : il part alors vers
 le broker, et jamais dans un rapport. Sur une console dont le PRODINFO est
 masqué, c'est le vrai, tiré de la sauvegarde qu'Atmosphère en garde sur la

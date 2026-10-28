@@ -1726,6 +1726,18 @@
         "empty_title": "Nog niets vastgelegd",
         "empty_text": "Elke wijziging die PlayGuard op de console maakt (limieten, beperkingsniveau, pincode, ontgrendelingen…) wordt hier vermeld."
     },
+    "system_titles": {
+        "home": "HOME-menu",
+        "album": "Album",
+        "eshop": "Nintendo eShop",
+        "mii": "Mii-editor",
+        "controllers": "Controllers",
+        "user_select": "Gebruikerskeuze",
+        "web": "Webbrowser",
+        "user_page": "Gebruikerspagina",
+        "amiibo": "amiibo-instellingen",
+        "maintenance": "Onderhoudsmodus"
+    },
     "sync": {
         "title": "Toegang op afstand",
         "intro": "Verbindt deze console met een MQTT-broker (de Mosquitto-app van Home Assistant, of een andere): Home Assistant toont dan de status en speeltijd ervan, en kan er opdrachten naartoe sturen. De verbinding werkt terwijl PlayGuard open is, of altijd met de optionele agent (Console › Optionele modules). De instellingen worden bewaard in {}.",
@@ -1792,6 +1804,7 @@
         "published_note": "Het ouderlijk toezicht wordt altijd gepubliceerd. Wat is uitgeschakeld, wordt van de broker gewist en uit Home Assistant verwijderd.",
         "publish_activity": "De speeltijd publiceren (vandaag, de week, elke dag)",
         "publish_games": "De games publiceren (de lijst, de speeltijd van elke game)",
+        "publish_icons": "De pictogrammen van de games publiceren (geïnstalleerd en gespeeld)",
         "publish_console": "De staat van de console publiceren (batterij, opslag, station)",
         "publish_network": "Het netwerk publiceren (IP-adres, wifi)",
         "publish_hardware": "De versies en hardware publiceren (model, firmware, Atmosphère)",

@@ -135,6 +135,37 @@ int sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, siz
     return rc;
 }
 
+int sync_engine_publish_stream(SyncEngine *e, const char *sub, size_t len, bool retained, SyncReadFn read, void *ctx)
+{
+    woke(e);
+    if (!e->mqtt.connected) return -1;
+    char topic[160];
+    snprintf(topic, sizeof(topic), "%s/%s", e->base, sub);
+    if (mqtt_client_publish_begin(&e->mqtt, topic, len, retained) < 0) {
+        if (!e->mqtt.connected) lost(e);
+        return -1;
+    }
+    for (size_t sent = 0; sent < len;) {
+        const size_t want = len - sent < sizeof(e->scratch) ? len - sent : sizeof(e->scratch);
+        const size_t got = read(ctx, e->scratch, want);
+        if (got == 0 || got > want || mqtt_client_publish_more(&e->mqtt, e->scratch, got) < 0) {
+            // Half a packet went out: the broker would read what comes next
+            // as its end. Closed, connected again at the next step.
+            if (e->mqtt.connected) {
+                mqtt_client_close(&e->mqtt, false);
+                snprintf(e->mqtt.error, sizeof(e->mqtt.error), "%s cut short, connecting again", sub);
+            }
+            e->backoff_ms = 0;
+            lost(e);
+            return -1;
+        }
+        sent += got;
+    }
+    e->status.publishes++;
+    e->status.last_publish_ms = e->now_ms();
+    return 0;
+}
+
 static void lost(SyncEngine *e)
 {
     snprintf(e->status.error, sizeof(e->status.error), "%s", e->mqtt.error[0] ? e->mqtt.error : "connection lost");

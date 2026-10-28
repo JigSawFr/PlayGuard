@@ -1726,6 +1726,18 @@
         "empty_title": "Nothing recorded yet",
         "empty_text": "Every change PlayGuard makes on the console (limits, restriction level, PIN, unlocks…) is listed here."
     },
+    "system_titles": {
+        "home": "HOME Menu",
+        "album": "Album",
+        "eshop": "Nintendo eShop",
+        "mii": "Mii Maker",
+        "controllers": "Controllers",
+        "user_select": "User selection",
+        "web": "Web browser",
+        "user_page": "User page",
+        "amiibo": "amiibo settings",
+        "maintenance": "Maintenance Mode"
+    },
     "sync": {
         "title": "Remote access",
         "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the optional agent (Console › Optional modules). The settings are kept in {}.",
@@ -1792,6 +1804,7 @@
         "published_note": "The parental controls are always published. What is turned off is cleared from the broker and removed from Home Assistant.",
         "publish_activity": "Publish the play time (today, the week, each day)",
         "publish_games": "Publish the games (the list, each one's play time)",
+        "publish_icons": "Publish the games' icons (installed and played)",
         "publish_console": "Publish the console's state (battery, storage, dock)",
         "publish_network": "Publish the network (IP address, Wi-Fi)",
         "publish_hardware": "Publish the versions and hardware (model, firmware, Atmosphère)",

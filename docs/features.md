@@ -273,7 +273,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 - **All games**, on a screen of their own: every game played over the period, most played first, as a **grid of covers** or a **list** (Ⓨ switches, and the choice is kept), with the selected game's figures always on top: its icon and name, the period's play time, all time, launches and last play. Ⓧ picks the period (the Activity tab follows).
 - Icons are read around the selected game (not in applet mode, to spare memory); a grey controller stands in until one arrives, and for a game without one.
 - A large library shows its first 50 games, then *Show every game* (100 games at most in applet mode); the export always holds them all. PlayGuard reads 256 games at most (this week's first): beyond that, the Activity tab, All games and the export (not CSV) say that some are missing, and the all-time total leaves them out.
-- **Ⓐ on a game:** its last seven days as bars, launches, first and last play, time per user account. Deleted games keep their all-time figures, even one deleted before PlayGuard was installed as long as the console's play log still names it, and their name once PlayGuard has seen it (else *Deleted game* and its title ID).
+- **Ⓐ on a game:** its last seven days as bars, launches, first and last play, time per user account. Deleted games keep their all-time figures, even one deleted before PlayGuard was installed as long as the console's play log still names it, and their name once PlayGuard has seen it (else *Deleted game* and its title ID). The console's own programs (the HOME menu, the Album, the eShop…) are never counted as games: should one of their title IDs show, it is called by its name rather than as an unknown game.
 
 ### Accounts
 
@@ -461,7 +461,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### Remote access
 
-*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
+*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker and its MQTT version, the console's name, what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games and every game's icon; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from HACS and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
 
 ### Optional modules
 

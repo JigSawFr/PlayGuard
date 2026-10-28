@@ -276,7 +276,7 @@ int mqtt_client_subscribe(MqttClient *c, const char *const *topics, const uint8_
     return refused;
 }
 
-int mqtt_client_publish(MqttClient *c, const char *topic, const void *payload, size_t len, bool retain)
+int mqtt_client_publish_begin(MqttClient *c, const char *topic, size_t len, bool retain)
 {
     if (!c->connected) return -1;
     const size_t n = mqtt_encode_publish_head(c->tx, sizeof(c->tx), c->version, topic, len, 0, retain, false, 0);
@@ -286,9 +286,19 @@ int mqtt_client_publish(MqttClient *c, const char *topic, const void *payload, s
         c->too_large++;
         return -1;
     }
-    if (send_bytes(c, c->tx, n) < 0) return -1;
-    if (len && send_bytes(c, payload, len) < 0) return -1;
-    return 0;
+    return send_bytes(c, c->tx, n);
+}
+
+int mqtt_client_publish_more(MqttClient *c, const void *bytes, size_t n)
+{
+    if (!c->connected) return -1;
+    return n ? send_bytes(c, bytes, n) : 0;
+}
+
+int mqtt_client_publish(MqttClient *c, const char *topic, const void *payload, size_t len, bool retain)
+{
+    if (mqtt_client_publish_begin(c, topic, len, retain) < 0) return -1;
+    return mqtt_client_publish_more(c, payload, len);
 }
 
 int mqtt_client_poll(MqttClient *c, int timeout_ms)

@@ -1,4 +1,4 @@
-<!-- translated from docs/features.md, sha256 585fe166c713 -->
+<!-- translated from docs/features.md, sha256 1231f8826f52 -->
 # Fonctions
 
 Ce que fait chaque onglet, comment PlayGuard écrit sans risque, et ce que la console compte comme temps de jeu. Nouveau sur PlayGuard ? Commencez par la [prise en main](getting-started.md). Retour au [README](../../README.md).
@@ -274,7 +274,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 - **Tous les jeux**, sur un écran à part : chaque jeu joué sur la période, les plus joués d'abord, en **grille de jaquettes** ou en **liste** (Ⓨ bascule, et le choix est gardé), avec les chiffres du jeu sélectionné toujours en haut : son icône et son nom, le temps sur la période, depuis toujours, les lancements et la dernière partie. Ⓧ choisit la période (l'onglet Activité suit).
 - Les icônes sont lues autour du jeu sélectionné (pas en mode applet, pour économiser la mémoire) ; une manette grise les remplace en attendant, et pour un jeu qui n'en a pas.
 - Une grande bibliothèque affiche ses 50 premiers jeux, puis *Afficher tous les jeux* (100 jeux au plus en mode applet) ; l'export les contient toujours tous. PlayGuard lit 256 jeux au plus (ceux de la semaine d'abord) : au-delà, l'onglet Activité, Tous les jeux et l'export (sauf CSV) signalent qu'il en manque, et le total depuis toujours ne les compte pas.
-- **Ⓐ sur un jeu :** ses sept derniers jours en barres, ses lancements, ses première et dernière parties, le temps de chaque compte. Les jeux supprimés gardent leurs chiffres depuis toujours, même un jeu supprimé avant l'installation de PlayGuard tant que le journal de jeu de la console le cite encore, et leur nom dès que PlayGuard l'a vu (sinon *Jeu supprimé* et son ID de titre).
+- **Ⓐ sur un jeu :** ses sept derniers jours en barres, ses lancements, ses première et dernière parties, le temps de chaque compte. Les jeux supprimés gardent leurs chiffres depuis toujours, même un jeu supprimé avant l'installation de PlayGuard tant que le journal de jeu de la console le cite encore, et leur nom dès que PlayGuard l'a vu (sinon *Jeu supprimé* et son ID de titre). Les programmes de la console elle-même (le menu HOME, l'Album, le Nintendo eShop…) ne comptent jamais comme des jeux : si l'ID de titre de l'un d'eux apparaît, il est appelé par son nom plutôt que comme un jeu inconnu.
 
 ### Comptes
 
@@ -462,7 +462,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 ### Accès à distance
 
-*Accès à distance ›*, une tuile sous *Outils* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal.
+*Accès à distance ›*, une tuile sous *Outils* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Le broker et sa version MQTT, le nom de la console, que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux et l'icône de chacun ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis HACS et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal.
 
 ### Modules facultatifs
 

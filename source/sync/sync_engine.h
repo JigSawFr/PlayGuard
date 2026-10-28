@@ -159,6 +159,12 @@ void sync_engine_order_done(SyncEngine *e, uint32_t id, const SyncOutcome *out);
 void sync_engine_replay_orders(SyncEngine *e);
 // Publishes `<base>/<sub>` (retained or not). 0 or negative.
 int  sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, size_t len, bool retained);
+// Publishes `<base>/<sub>`, `len` bytes that `read` gives a piece at a time
+// (into the engine's scratch: a file sent without holding it whole). A read
+// that fails or comes short closes the connection, the packet cannot be
+// finished: the next step connects again. 0 or negative.
+typedef size_t (*SyncReadFn)(void *ctx, void *buf, size_t cap);
+int  sync_engine_publish_stream(SyncEngine *e, const char *sub, size_t len, bool retained, SyncReadFn read, void *ctx);
 // An event (`event_type`, optional entity) on `<base>/event`.
 void sync_engine_event(SyncEngine *e, const char *event_type, const char *entity);
 // What the console did on its own (sync_watch_step), published on

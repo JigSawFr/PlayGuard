@@ -307,6 +307,7 @@ DYNAMIC_KEYS = {
     "games/issues/": issue_suffixes(),
     "history/kinds/": array_of("source/action/history_logic.cpp", "KINDS"),
     "history/sources/": array_of("source/action/history_logic.cpp", "SOURCES"),
+    "system_titles/": array_of("source/util/system_titles.cpp", "TITLES"),
     "pin_lock/modes/": array_of("source/action/pin_lock_logic.cpp", "MODES"),
     "pin_lock/notes/": array_of("source/action/pin_lock_logic.cpp", "MODES"),
     "pin_lock/again_on/": [m for m in array_of("source/action/pin_lock_logic.cpp", "MODES") if m != "off"],   # pin_lock.cpp, note_text
