@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
+<!-- translated from docs/getting-started.md, sha256 6b46b5d26c07 -->
 # Aan de slag
 
 Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien minuten, en daarna de dagelijkse taken. Terug naar de [README](../../README.md).
@@ -9,7 +9,7 @@ Van de SD-kaart tot een console die voor je kind is ingesteld, in ongeveer tien 
 - **Een ondersteunde firmware.** 21.0.0 tot 23.0.1 voor alle functies; oudere: alles behalve de speeltijdtimer; een nieuwere opent alleen-lezen tot een release hem ondersteunt ([compatibiliteit](compatibility.md)).
 - **Eén limiet voor de hele console.** De speeltijdtimer is die van de console: hij is dezelfde voor elke gebruiker. Voor verschillende limieten per kind heb je een ander hulpmiddel nodig ([waarom](compatibility.md#playguard-of-een-vervangende-sysmodule)).
 
-Wil je eerst rondkijken? [Probeer PlayGuard in je browser](https://playguard.link/simulator/?not_set_up=1), met een gesimuleerde console bij zijn eerste start.
+Wil je eerst rondkijken? [Probeer PlayGuard in je browser](https://guard.boreale.dev/simulator/?not_set_up=1), met een gesimuleerde console bij zijn eerste start.
 
 ## 1. Installeer het
 

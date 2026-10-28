@@ -115,7 +115,7 @@ Die zur Information: ein Build, von dem zurückgekehrt wurde, eine mit dieser Ve
 
 ## Heute — der Tag auf einen Blick
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/)*
 
 ### Der Ring und die Linie
 
@@ -192,7 +192,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 ## Spielzeit — die Woche ist der Editor
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=play_timer)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
 
 ### Die Woche bearbeiten
 
@@ -251,7 +251,7 @@ Bei größerem Text passt *Heute* weiterhin auf einen Bildschirm: Die Zeile übe
 
 ## Aktivität — wer was gespielt hat, und wie lange
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=activity)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=activity)*
 
 Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem eigenen Aktivitätsprotokoll der Konsole — für alle Benutzer oder **ein Benutzerkonto** (die Benutzer als Chips oben, wenn die Konsole mehrere hat). PlayGuard startet mit dem zuletzt angezeigten Benutzer, oder mit dem unter *Zuerst angezeigtes Konto* festgelegten (alle Benutzer, oder einer; unten im Tab, mit *Alle Spiele*).
 
@@ -288,7 +288,7 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 ## Einschränkungen — Kategorie, Altersfreigabe, Kommunikation
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=restrictions)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
 
 - **Die Einschränkungskategorie:** Kleinkinder, Kinder, Jugendliche und Nutzerdefiniert nebeneinander als Kacheln, jede mit dem, was sie einschränkt (ein korallenrotes Vorhängeschloss für eingeschränkt, sonst ein grünes Häkchen, und die installierten Spiele, die sie sperrt; Ⓐ legt sie fest; ist *Nutzerdefiniert* aktiv, führt Ⓐ zu seinen Einstellungen darunter); *Keine* darunter. Die geltende Kategorie zeigt *✓ Aktiv*; der Ring in Petrol steht nur dort, wo der Fokus ist. Was eine Kategorie einschränkt (Altersgrenze, Posten, Kommunikation), wird noch einmal gesagt, bevor sie festgelegt wird; *Keine* fragt in Korallenrot nach, da sie jede Einschränkung aufhebt.
 - **Die Einstellungen der Kategorie:** Altersfreigabe, Posten in sozialen Netzwerken, Kommunikation mit anderen. Bei einer vorgegebenen Kategorie sind es ihre eigenen: Eine davon zu ändern macht die Kategorie zu *Nutzerdefiniert*, ausgehend von den Einstellungen der vorgegebenen mit dieser Änderung, nach einer Nachfrage (die Einstellungen aufgelistet).
@@ -301,7 +301,7 @@ Zeit pro Spiel **heute**, in den **letzten 7 Tagen** und **insgesamt**, aus dem 
 
 ## Sicherheit — die Geheimzahl, Aufheben, das Homebrew-Menü, Smart-Geräte-App
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=security)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=security)*
 
 - **Oben** vier Kacheln: die Geheimzahl, die Einschränkungen, das vorübergehende Aufheben und das Homebrew-Menü, jede mit einem Häkchen in Petrol, wenn alles ist, wie es sein soll (eine Geheimzahl festgelegt, Einschränkungen aktiv, gesperrt), oder einem bernsteinfarbenen Warnzeichen, wenn etwas zu tun ist; das Homebrew-Menü sagt *Offen* oder *Gesperrt* (ein Häkchen, sobald es gesperrt ist: offen ist ohne Forwarder in Ordnung).
 - **Geheimzahl festlegen oder ändern** (Geheimzahl-Bildschirm des Systems).
@@ -347,7 +347,7 @@ Als Letztes im Tab: das optionale Wiederherstellungsmodul, für eine vergessene 
 
 ## Verlauf — was PlayGuard geändert hat, und die Sicherungen
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=history)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=history)*
 
 **Oben** als Kacheln, wie viele Änderungen aufgezeichnet sind und der Tag der letzten Sicherung: ein Häkchen in Petrol, oder ein bernsteinfarbenes Warnzeichen, wenn es keine gibt oder seit 30 Tagen keine.
 
@@ -367,7 +367,7 @@ Als Letztes im Tab: das optionale Wiederherstellungsmodul, für eine vergessene 
 
 ## Konsole — die Netzwerkuhr, die installierten Spiele, was auf der Konsole läuft
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=console)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=console)*
 
 **Oben**, was auf der Konsole läuft, als Kacheln, unter *System* (die Firmware, Atmosphère, hekate, wenn es auf der SD-Karte liegt, und sys-patch, wenn es installiert ist; Ⓐ öffnet seine Versionshinweise), dann die Werkzeuge als Kacheln, unter *Werkzeuge* (*Netzwerkuhr*, *Installierte Spiele* und *Forwarder*; die ersten beiden zeigen in ihrer Ecke, was einen Blick braucht; dann *Fernzugriff* und *Optionale Module*), dann die Zeilen der Konsole, die Kompatibilität zuerst (nur ein Häkchen in Petrol, wenn PlayGuard auf dieser Firmware geprüft wurde, sonst eine Warnung und was nicht stimmt).
 
@@ -477,7 +477,7 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 
 ## Optionen
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=preferences)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=preferences)*
 
 - Was PlayGuard selbst einrichtet:
   - Zuerst als Kacheln: Sprache (jede Sprache der Konsole, oder die der Konsole), Design (standardmäßig dunkel, hell oder das der Konsole), Textgröße (automatisch / normal / größer) und der Tab, mit dem gestartet wird.
@@ -491,7 +491,7 @@ Auf einer Konsole ohne Internet wird *Konsolenuhr verwenden* im Dialog des Ergeb
 
 ## Info
 
-*[Im Simulator ausprobieren ›](https://playguard.link/simulator/?tab=about)*
+*[Im Simulator ausprobieren ›](https://guard.boreale.dev/simulator/?tab=about)*
 
 ### Version und Updates
 

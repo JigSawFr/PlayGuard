@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
+<!-- translated from docs/getting-started.md, sha256 6b46b5d26c07 -->
 # はじめに
 
 SD カードから、子どものために設定した本体まで、約 10 分で進めます。そのあとは、ふだんの操作です。トップページは [README](../../README.md)。
@@ -9,7 +9,7 @@ SD カードから、子どものために設定した本体まで、約 10 分�
 - **対応するファームウェア。** 21.0.0～23.0.1 ならすべての機能が使えます。それより前は、プレイ時間の制限以外すべてが使えます。それより新しい場合は、対応するリリースが出るまで閲覧のみで開きます（[対応状況](compatibility.md)）。
 - **本体全体でひとつの上限。** タイマーは本体のもので、すべてのユーザーに共通です。子どもごとに別の上限が必要なら、別のツールが必要です（[理由](compatibility.md#playguard-か置き換え型の-sysmodule-か)）。
 
-先にようすを見てみたいですか？ [ブラウザーで PlayGuard を試す](https://playguard.link/simulator/?not_set_up=1)と、初めて起動したときの本体をシミュレーションで操作できます。
+先にようすを見てみたいですか？ [ブラウザーで PlayGuard を試す](https://guard.boreale.dev/simulator/?not_set_up=1)と、初めて起動したときの本体をシミュレーションで操作できます。
 
 ## 1. インストールする
 

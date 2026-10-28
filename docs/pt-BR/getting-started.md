@@ -1,4 +1,4 @@
-<!-- translated from docs/getting-started.md, sha256 072466f3432a -->
+<!-- translated from docs/getting-started.md, sha256 6b46b5d26c07 -->
 # Primeiros passos
 
 Do cartão SD a um console configurado para a sua criança, em cerca de dez minutos, e depois as tarefas do dia a dia. Volte ao [README](../../README.md).
@@ -9,7 +9,7 @@ Do cartão SD a um console configurado para a sua criança, em cerca de dez minu
 - **Um firmware compatível.** Do 21.0.0 ao 23.0.1, todos os recursos; nos mais antigos, tudo menos o temporizador; um mais recente abre somente leitura até uma versão oferecer suporte a ele ([compatibilidade](compatibility.md)).
 - **Um único limite para o console inteiro.** O temporizador é do console: ele é o mesmo para todos os usuários. Limites diferentes para cada criança exigem outra ferramenta ([por quê](compatibility.md#playguard-ou-um-sysmodule-substituto)).
 
-Quer dar uma olhada antes? [Experimente o PlayGuard no navegador](https://playguard.link/simulator/?not_set_up=1), com um console simulado na primeira abertura.
+Quer dar uma olhada antes? [Experimente o PlayGuard no navegador](https://guard.boreale.dev/simulator/?not_set_up=1), com um console simulado na primeira abertura.
 
 ## 1. Instale
 

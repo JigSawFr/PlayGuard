@@ -61,7 +61,7 @@ FIGURES = {
     "Polish": ("✨", "polish", "polish"),
 }
 # The website (tools/build_site.py): the latest release's documentation at docs/.
-SITE_URL = "https://playguard.link/"
+SITE_URL = "https://guard.boreale.dev/"
 HIDE, SHOW = "<!-- console:hide -->", "<!-- /console -->"
 
 INSTALL = """## 📦 Install
