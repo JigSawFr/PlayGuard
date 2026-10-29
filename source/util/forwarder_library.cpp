@@ -74,7 +74,7 @@ const std::vector<std::string>& ids()
 
 bool is_ref(const std::string& icon)
 {
-    return icon.rfind(PREFIX, 0) == 0;
+    return icon.starts_with(PREFIX);
 }
 
 std::string id_of(const std::string& icon)
@@ -82,7 +82,7 @@ std::string id_of(const std::string& icon)
     if (!is_ref(icon)) return "";
     const std::string id = icon.substr(std::char_traits<char>::length(PREFIX));
     const auto& all = ids();
-    return std::find(all.begin(), all.end(), id) != all.end() ? id : "";
+    return std::ranges::contains(all, id) ? id : "";
 }
 
 std::string ref_of(const std::string& id)
@@ -102,7 +102,7 @@ std::string suggest(const std::string& name, const std::string& nro)
     const std::string seen = text::lower_ascii(name + " " + (slash == std::string::npos ? nro : nro.substr(slash + 1)));
     for (const auto& kind : WORDS)
         for (const char* word : kind.second)
-            if (seen.find(word) != std::string::npos) return kind.first;
+            if (seen.contains(word)) return kind.first;
     return "";
 }
 

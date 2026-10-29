@@ -11,7 +11,7 @@ namespace
 
 std::string quoted(const std::string& path)
 {
-    return path.find(' ') == std::string::npos ? path : "\"" + path + "\"";
+    return path.contains(' ') ? "\"" + path + "\"" : path;
 }
 
 }   // namespace

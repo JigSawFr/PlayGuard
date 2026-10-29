@@ -14,7 +14,7 @@ std::string csv_field(std::string s, bool numeric)
     // (OWASP: = + - @, tab and carriage return). A numeric cell is written as
     // is only when it is an integer (as in JSON and XLSX), else it is text.
     const bool number = numeric && (s.empty() || is_integer(s));
-    if (!number && !s.empty() && std::string("=+-@\t\r").find(s[0]) != std::string::npos) s.insert(0, "'");
+    if (!number && !s.empty() && std::string_view("=+-@\t\r").contains(s[0])) s.insert(0, "'");
     if (s.find_first_of(",\"\r\n") == std::string::npos && (s.empty() || (s.front() != ' ' && s.back() != ' ')))
         return s;
     std::string out = "\"";

@@ -147,8 +147,7 @@ std::vector<Part> atmosphere_crashes(std::time_t now, int days, size_t limit)
         while (const dirent* e = readdir(d)) {
             const std::string name = e->d_name;
             const size_t sep = name.find('_');
-            if (sep == std::string::npos || sep == 0 || sep > 12 || name.size() < 4 ||
-                name.compare(name.size() - 4, 4, ".log") != 0 ||
+            if (sep == std::string::npos || sep == 0 || sep > 12 || !name.ends_with(".log") ||
                 !std::all_of(name.begin(), name.begin() + sep, [](char c) { return c >= '0' && c <= '9'; }))
                 continue;
             const long long t = std::stoll(name.substr(0, sep));
@@ -185,7 +184,7 @@ std::vector<Part> gist_files(const std::vector<Part>& parts, size_t max_bytes, b
         if (text::starts_with(name, "logs/")) name.erase(0, 5);
         std::replace(name.begin(), name.end(), '/', '_');
         const std::string file =
-            std::to_string(i + 1) + "-" + (name.find('.') == std::string::npos ? std::string("report.txt") : name);
+            std::to_string(i + 1) + "-" + (name.contains('.') ? name : std::string("report.txt"));
         const std::string content = parts[i].content.empty() ? std::string("(empty)\n") : parts[i].content;
         if (total + content.size() <= max_bytes) {
             out.push_back({ file, content });

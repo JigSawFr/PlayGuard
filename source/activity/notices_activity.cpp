@@ -256,7 +256,7 @@ void NoticesActivity::rebuild()
     std::vector<std::pair<const char*, const char*>> icons;
     for (size_t i = 0; i < ids.size(); i++) {
         auto* cell = static_cast<aurore::DetailCell*>(box->getView(ids[i]));
-        const bool todo = std::find(todos.begin(), todos.end(), cell) != todos.end();
+        const bool todo = std::ranges::contains(todos, cell);
         icons.push_back({ ids[i].c_str(), todo ? "alert" : "info" });
     }
     cadran::List(box, box).apply(icons);   // the icons found in the box, not on screen yet

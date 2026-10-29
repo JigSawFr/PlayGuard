@@ -40,9 +40,7 @@ bool parse_id(const std::string& s, uint64_t* out)
 
 std::vector<uint64_t> wanted(std::vector<Played> games, const std::vector<uint64_t>& installed, size_t max)
 {
-    games.erase(std::remove_if(games.begin(), games.end(),
-                               [](const Played& g) { return !g.app_id || (!g.week_s && !g.last_played); }),
-                games.end());
+    std::erase_if(games, [](const Played& g) { return !g.app_id || (!g.week_s && !g.last_played); });
     // This week's first (the last time played may be unknown: the all-time
     // statistics not read), then the most recent; the week's play time
     // between two equally recent ones.

@@ -71,7 +71,7 @@ bool plausible_host(const std::string& h)
     if (h.empty() || h.size() > 253) return false;
     for (char c : h)
         if (!(std::isalnum((unsigned char)c) || c == '.' || c == '-' || c == ':' || c == '_')) return false;
-    return h.find("://") == std::string::npos;
+    return !h.contains("://");
 }
 }   // namespace
 
@@ -306,7 +306,7 @@ void ClockTab::enter_custom()
             return;
         }
         auto& servers = config::get().custom_servers;
-        servers.erase(std::remove(servers.begin(), servers.end(), host), servers.end());
+        std::erase(servers, host);
         servers.insert(servers.begin(), host);
         if (servers.size() > 10) servers.resize(10);
         this->set_server(host, find_region(host));

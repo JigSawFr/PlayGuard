@@ -5,6 +5,7 @@
 #include <cstdio>
 
 #include <aurore/cadran/util/text.hpp>
+#include <iterator>
 
 #include "util/date.hpp"
 
@@ -36,7 +37,7 @@ bool matches(const std::string& id, const std::string& key)
 
 int index_of(const std::string& id)
 {
-    for (int i = 0; i < (int)(sizeof(RANKS) / sizeof(RANKS[0])); i++)
+    for (int i = 0; i < (int)std::size(RANKS); i++)
         if (matches(id, RANKS[i])) return i;
     return -1;
 }
@@ -50,7 +51,7 @@ Group group_of(const std::string& id)
 int rank_of(const std::string& id)
 {
     const int i = index_of(id);
-    return i < 0 ? (int)(sizeof(RANKS) / sizeof(RANKS[0])) : i;
+    return i < 0 ? (int)std::size(RANKS) : i;
 }
 
 std::string tab_of(const std::string& id)
@@ -213,7 +214,7 @@ int Store::count_of(const std::vector<std::string>& ids) const
     int n = 0;
     for (const auto& s : this->slots)
         if (!s.dismissed && !s.acked && s.item.level == Level::Action &&
-            std::find(ids.begin(), ids.end(), s.item.id) != ids.end())
+            std::ranges::contains(ids, s.item.id))
             n++;
     return n;
 }
@@ -221,7 +222,7 @@ int Store::count_of(const std::vector<std::string>& ids) const
 std::string Store::first_of(const std::vector<std::string>& ids) const
 {
     for (const Item& item : this->sorted(false))
-        if (item.level == Level::Action && std::find(ids.begin(), ids.end(), item.id) != ids.end()) return item.id;
+        if (item.level == Level::Action && std::ranges::contains(ids, item.id)) return item.id;
     return "";
 }
 

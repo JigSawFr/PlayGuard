@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <iterator>
 #include <string>
 
 #include <aurore/cadran/ui/ui.hpp>
@@ -194,7 +195,7 @@ constexpr int about        = 11;  // version, help, credits
 constexpr int of(int n)
 {
     constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, history, console, preferences, about };
-    return n >= 0 && n < (int)(sizeof(positions) / sizeof(positions[0])) ? positions[n] : dashboard;
+    return n >= 0 && n < (int)std::size(positions) ? positions[n] : dashboard;
 }
 }   // namespace tab
 

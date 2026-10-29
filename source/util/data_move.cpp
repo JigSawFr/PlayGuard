@@ -92,7 +92,7 @@ size_t to_nand(const std::string& data_dir, const std::string& nand_dir)
             moves.push_back({ std::string("sync/") + f, std::string("sync/") + f });
     if (has("cache"))
         for (const std::string& n : paths::list_files(data_dir + "/cache", ".bin"))
-            if (n.compare(0, 9, "activity_") == 0) moves.push_back({ "cache/" + n, "cache/" + n });
+            if (n.starts_with("activity_")) moves.push_back({ "cache/" + n, "cache/" + n });
     size_t moved = 0;
     struct stat st;
     for (const auto& m : moves) {

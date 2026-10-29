@@ -143,7 +143,7 @@ Patches patches_state(const patches::Report& r)
                 return Patches::Missing;
             return Patches::Unknown;
         case patches::Status::FilesOnly: {
-            const auto has = [&r](const char* set) { return std::find(r.files.begin(), r.files.end(), set) != r.files.end(); };
+            const auto has = [&r](const char* set) { return std::ranges::contains(r.files, set); };
             // hekate's set patches both when it boots Atmosphère (fss0).
             return (has("fs") && has("loader")) || has("hekate") ? Patches::Ready : Patches::Missing;
         }

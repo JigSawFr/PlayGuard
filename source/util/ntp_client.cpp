@@ -65,7 +65,7 @@ Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, boo
         reply.error = "Stopped: PlayGuard is quitting";
         return true;
     };
-    if (host.empty() || host.find('\0') != std::string::npos) {
+    if (host.empty() || host.contains('\0')) {
         reply.kind = Error::BadHost;
         reply.error = "Enter an NTP hostname or IP address.";
         return reply;

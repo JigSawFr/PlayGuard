@@ -23,7 +23,7 @@ constexpr uint64_t kDeviceIdMask = 0x00FFFFFFFFFFFFFFull;
 
 bool is_cal0(const std::string& data)
 {
-    return data.size() >= kSerialOffset + kSerialSize && data.compare(0, 4, "CAL0") == 0;
+    return data.size() >= kSerialOffset + kSerialSize && data.starts_with("CAL0");
 }
 
 bool device_id_at(const std::string& data, size_t cert, uint64_t* out)
@@ -66,7 +66,7 @@ Found find(const std::string& root, bool device_id_valid, uint64_t device_id)
     std::string single_file;
     bool any = false;
     for (const std::string& name : paths::list_files(root + "/" + rel, ".bin")) {
-        if (name.find("PRODINFO") == std::string::npos) continue;
+        if (!name.contains("PRODINFO")) continue;
         std::string data;
         if (!paths::read_file(root + "/" + rel + "/" + name, data)) continue;
         const std::string serial = serial_of(data);

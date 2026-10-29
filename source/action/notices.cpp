@@ -79,7 +79,7 @@ bool shown_kind(const std::string& id)
 bool was_read(const std::string& key)
 {
     const auto& read = config::get().notices_read;
-    return std::find(read.begin(), read.end(), key) != read.end();
+    return std::ranges::contains(read, key);
 }
 
 // Ignored or counted, as config.json says today (30 days gone by, the PIN
@@ -211,9 +211,7 @@ void dismiss(const std::string& id)
     if (!s_store.dismiss(id)) return;
     auto& read = config::get().notices_read;
     // One key per entry: an older text of it goes.
-    read.erase(std::remove_if(read.begin(), read.end(),
-                              [&id](const std::string& k) { return text::starts_with(k, id + ":"); }),
-               read.end());
+    std::erase_if(read, [&id](const std::string& k) { return text::starts_with(k, id + ":"); });
     read.push_back(notice_logic::read_key(id, title, detail));
     if (read.size() > 48) read.erase(read.begin(), read.end() - 48);
     ui::save_config();

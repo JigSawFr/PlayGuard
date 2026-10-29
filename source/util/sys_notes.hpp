@@ -11,6 +11,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -26,7 +27,7 @@ enum class Which
     SysPatch,
 };
 constexpr Which ALL[] = { Which::Atmosphere, Which::Hekate, Which::Firmware, Which::PlayGuard, Which::SysPatch };
-constexpr size_t COUNT = sizeof(ALL) / sizeof(ALL[0]);
+constexpr size_t COUNT = std::size(ALL);
 
 // "atmosphere", "hekate", "firmware", "playguard", "syspatch" (the keys of
 // the cache and, but for PlayGuard, of sys_updates).

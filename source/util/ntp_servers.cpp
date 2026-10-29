@@ -63,16 +63,12 @@ std::string flag(std::string code)
     return out;
 }
 
-bool ends_with(const std::string& s, const std::string& end)
-{
-    return s.size() >= end.size() && s.compare(s.size() - end.size(), end.size(), end) == 0;
-}
 }   // namespace
 
 std::string host_emoji(const std::string& host)
 {
     static const std::string POOL = "pool.ntp.org";
-    if (host == POOL || ends_with(host, "." + POOL)) {
+    if (host == POOL || host.ends_with("." + POOL)) {
         const std::string zone = host.size() > POOL.size() ? host.substr(0, host.size() - POOL.size() - 1) : "";
         if (zone.empty() || (zone.size() == 1 && zone[0] >= '0' && zone[0] <= '9')) return "1f310";   // 🌐
         if (zone == "europe") return "1f1ea-1f1fa";                                                   // 🇪🇺
@@ -83,7 +79,7 @@ std::string host_emoji(const std::string& host)
     }
     // China's own servers, under .com.
     for (const char* cn : { "aliyun.com", "tencent.com" })
-        if (ends_with(host, std::string(".") + cn)) return flag("cn");
+        if (host.ends_with(std::string(".") + cn)) return flag("cn");
     // A country's domain: ntp.nict.jp, ntp.ntsc.ac.cn.
     const size_t dot = host.rfind('.');
     return dot == std::string::npos ? "" : flag(host.substr(dot + 1));

@@ -415,7 +415,7 @@ void post_publish(const std::string& sub, const std::string& payload, bool retai
         if (sub == "names") agent_ok(agent_client::push(AgentCmd_PushNames, payload), "names");
         else if (sub == "week") agent_ok(agent_client::push(AgentCmd_PushWeek, payload), "week");
         else if (sub == "games") agent_ok(agent_client::push(AgentCmd_PushGames, payload), "games");
-        else if (sub.compare(0, 9, "activity/") == 0) {
+        else if (sub.starts_with("activity/")) {
             s_agent_finals.push_back({ sub.substr(9), payload });
             agent_flush_finals();
         }

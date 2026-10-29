@@ -95,13 +95,13 @@ std::string heading_text(const std::vector<std::string>& lines, size_t i, bool* 
 bool image_only(const std::string& line)
 {
     const std::string t = text::trim_space(line);
-    return text::starts_with(t, "![") && t.back() == ')' && t.find("](") != std::string::npos;
+    return text::starts_with(t, "![") && t.back() == ')' && t.contains("](");
 }
 // " ([#12](https://…))" or " ([abc1234](https://…))" at the end of `line`
 // (a change's pull request or commit): where it starts, else npos.
 size_t trailing_reference(const std::string& line)
 {
-    if (line.size() < 8 || line.compare(line.size() - 2, 2, "))") != 0) return std::string::npos;
+    if (line.size() < 8 || !line.ends_with("))")) return std::string::npos;
     const size_t at = line.rfind(" ([");
     if (at == std::string::npos) return std::string::npos;
     const size_t close = line.find("](", at);
@@ -266,7 +266,7 @@ std::string supported_firmware(const std::string& notes)
     std::string best;
     for (const std::string& raw : text::lines(notes)) {
         const std::string line = text::lower_ascii(raw);
-        if (line.find("support") == std::string::npos) continue;
+        if (!line.contains("support")) continue;
         for (const char* lead : { "for ", "hos ", "firmware ", "supported: " }) {
             size_t at = 0;
             while ((at = line.find(lead, at)) != std::string::npos) {
@@ -436,17 +436,17 @@ bool parse_firmware_page(const std::string& wikitext, Release* out)
             list = "," + list + ",";
             for (size_t i = 0; i < list.size(); i++)
                 if (list[i] == ' ') list.erase(i--, 1);
-            out->pctl = list.find(",pctl,") != std::string::npos;
+            out->pctl = list.contains(",pctl,");
         }
         if (text::starts_with(t, "==")) {
             const std::string title = text::lower_ascii(t);
-            in_log = title.find("change-log") != std::string::npos || title.find("changelog") != std::string::npos;
+            in_log = title.contains("change-log") || title.contains("changelog");
             found = found || in_log;
             continue;
         }
         if (!in_log) continue;
         // "[https://… Official] ALL change-log:": where it comes from, not news.
-        if (l.find("change-log:") != std::string::npos && t.find("[http") != std::string::npos) continue;
+        if (l.contains("change-log:") && t.contains("[http")) continue;
         log.push_back(raw);
     }
     if (!found) return false;
