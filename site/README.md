@@ -7,7 +7,9 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   `/es-419/`, `/it/`, `/nl/`, `/pt/`, `/pt-br/`, `/ru/`, `/ja/`, `/ko/`,
   `/zh-hans/`, `/zh-hant/`. A first visit to the root from elsewhere goes to
   the browser's language when the site has it; the header's language menu changes it
-  (and is remembered). One dark look, Boréale's (the night, the aurora:
+  (and is remembered). Japanese, Korean and Chinese lines break where their
+  readers expect (`site.css`: between phrases, between words, no punctuation
+  opening a line). One dark look, Boréale's (the night, the aurora:
   [boreale/branding](https://github.com/JigSawFr/boreale/tree/main/branding)),
   as [Aurore's site](https://aurore.boreale.dev/) and
   [boreale.dev](https://boreale.dev/); the web simulator keeps its own theme.
@@ -45,9 +47,9 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   screen (a long `code` breaks). The header goes on two rows up to 1080px,
   where its links no longer fit beside the menus in every language.
 - **The home page**: install first (the download under it, with the
-  release's date), the three main features then the others, PlayGuard
-  beside Nintendo's app on what each needs, the questions each with its own
-  address (`#faq-<question>`, opened by a link to it). The screenshots open
+  release's date), the three main features then the others, the questions
+  each with its own address (`#faq-<question>`, opened by a link to it). The
+  screenshots open
   larger over the page (`site.js`: swipe or the arrows, down or Esc to
   close), the documentation's too: its tables of screenshots under their
   names become captioned figures (`screenshot_table()`), one per row on a
@@ -80,8 +82,8 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   (schema.org JSON-LD: the application and the questions on the home page,
   each page of the documentation as an article), a preview image in each
   language (the site's title over the console's dashboard), each page of the
-  documentation in Markdown next to it (`docs/<page>.md`, in English and in
-  `/fr/`), listed in [`llms.txt`](https://llmstxt.org) (`llms-full.txt`: the
+  documentation in Markdown next to it (`docs/<page>.md`, in each language
+  `docs/` has a folder for; Canadian French reads French's), listed in [`llms.txt`](https://llmstxt.org) (`llms-full.txt`: the
   whole documentation in one file), and `robots.txt`, `favicon.ico` and
   `apple-touch-icon.png` when the site is at its domain's root (a custom
   domain: they count nowhere else; browsers, bookmarks and link previews ask

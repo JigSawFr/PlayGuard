@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
+<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
 # 相容性
 
 支援的韌體、Atmosphère 和啟動器，emuMMC 和 sysMMC，以及 PlayGuard 與替代型 sysmodule 的比較。返回 [README](../../README.md)。
@@ -50,7 +50,7 @@ PlayGuard 只檢查 Atmosphère 是否在執行，不檢查它的版本：重要
 
 ### 主機會被封鎖嗎？
 
-PlayGuard 從不連線任天堂：連網時，它只會存取公用時間伺服器和 GitHub（更新，以及你傳送的報告）。導致主機被封鎖的，是自訂韌體或 emuMMC 連線到任天堂（[switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)，英文）。目前沒有因修改家長監護或時鐘而被封鎖的記錄；但這不是保證。
+PlayGuard 從不連線任天堂：連網時，它只會存取公用時間伺服器、GitHub（更新，以及你傳送的報告）和 switchbrew（最新韌體及其版本說明）。導致主機被封鎖的，是自訂韌體或 emuMMC 連線到任天堂（[switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)，英文）。目前沒有因修改家長監護或時鐘而被封鎖的記錄；但這不是保證。
 
 ### 沒有網際網路的主機
 
