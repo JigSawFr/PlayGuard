@@ -117,7 +117,8 @@ void write_file(const std::string& path, const unsigned char* data, size_t size)
 {
     if (paths::file_exists(path)) return;
     const size_t slash = path.find_last_of('/');
-    if (paths::ensure_dir(path.substr(0, slash))) paths::atomic_write(path, std::string((const char*)data, size));
+    // A sample file of the simulator: one that cannot be written is left out.
+    if (paths::ensure_dir(path.substr(0, slash))) (void)paths::atomic_write(path, std::string((const char*)data, size));
 }
 
 // PLAYGUARD_SIM_FORWARDERS: what PlayGuard remembers making (once), the
@@ -155,7 +156,7 @@ void seed(const std::string& sd_root)
         const size_t slash = path.find_last_of('/');
         if (!paths::ensure_dir(path.substr(0, slash))) continue;
         const std::vector<unsigned char> nro = make_nro(h);
-        paths::atomic_write(path, std::string(nro.begin(), nro.end()));
+        (void)paths::atomic_write(path, std::string(nro.begin(), nro.end()));
     }
     if (sim_env_flag("PLAYGUARD_SIM_FORWARDERS")) seed_sample(sd_root);
 }
