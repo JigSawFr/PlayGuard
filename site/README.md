@@ -30,8 +30,7 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   stars, a horizon over the footer); the features on tiles, their edge lit
   under the pointer, the three first showing their screen; the sections
   rising into view once; on a wide screen, the screens' gallery as one
-  large over a strip of the others; PlayGuard's column of the comparison
-  lit and the steps joined by a line; a short cross-fade from one page to
+  large over a strip of the others; the steps joined by a line; a short cross-fade from one page to
   the next where the browser can. Without script, or with less motion
   asked, everything stays in place.
 - **The screenshots in each language**: the console's screens as the
@@ -153,7 +152,8 @@ pages; no framework, nothing to install but that.
   language menu; on a phone, the gallery's dots, the way back to the top)
   and the fonts (Sora for the headings, Figtree for the text, JetBrains Mono
   for code and labels, their Latin letters; SIL Open Font License,
-  `fonts/OFL-*.txt`), served with the site so that no visitor's browser
+  `fonts/OFL-*.txt`; the language menu's 15 flags cut out of Twemoji's,
+  CC-BY 4.0, `fonts/LICENSE-twemoji-flags.txt`), served with the site so that no visitor's browser
   loads anything from Google Fonts or anyone else.
 - **The screenshots**: `tools/site_screenshots.mjs <simulator> <out-dir>
   [version]` (Node and Playwright) runs the web simulator in a headless

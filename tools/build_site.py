@@ -86,6 +86,19 @@ LANGUAGES = [
     ("zh-Hans", "zh-hans", "简体中文", "zh-Hans"),
     ("zh-Hant", "zh-hant", "繁體中文", "zh-Hant"),
 ]
+# Each language's flag in the language menu (fonts/twemoji-flags.woff2 draws
+# them the same everywhere, Windows included): the country of the console's
+# language, Mexico for Latin America's Spanish, Taiwan for Traditional Chinese.
+FLAGS = {"en-US": "US", "fr": "FR", "fr-CA": "CA", "de": "DE", "es": "ES", "es-419": "MX", "it": "IT", "nl": "NL",
+         "pt": "PT", "pt-BR": "BR", "ru": "RU", "ja": "JP", "ko": "KR", "zh-Hans": "CN", "zh-Hant": "TW"}
+
+
+def flag(lang):
+    """`lang`'s flag, two regional indicator letters, for the eyes only."""
+    emoji = "".join(chr(0x1F1E6 + ord(c) - ord("A")) for c in FLAGS[lang])
+    return f'<span class="flag" aria-hidden="true">{emoji}</span>'
+
+
 # Open Graph's name of each language.
 OG_LOCALES = {"en-US": "en_US", "fr": "fr_FR", "fr-CA": "fr_CA", "de": "de_DE", "es": "es_ES", "es-419": "es_LA",
               "it": "it_IT", "nl": "nl_NL", "pt": "pt_PT", "pt-BR": "pt_BR", "ru": "ru_RU", "ja": "ja_JP",
@@ -570,7 +583,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
     current = ' aria-current="true"'
     options = "\n".join(
         f'        <li><a href="{to_root}{f"{d}/" if d else ""}{path}" data-lang="{c}" lang="{hl}" hreflang="{hl}"'
-        f'{current if c == lang else ""}>{html.escape(n)}</a></li>'
+        f'{current if c == lang else ""}>{flag(c)}{html.escape(n)}</a></li>'
         for c, d, n, hl in LANGUAGES)
     language_name = next(n for c, _, n, _ in LANGUAGES if c == lang)
     # The aurora behind the home page's hero, and the page not found's.
@@ -641,7 +654,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
     </nav>
     <div class="settings">
       <button class="lang-button" type="button" popovertarget="languages" aria-label="{t('language')} · {html.escape(language_name)}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>
+        {flag(lang)}
         <span class="lang-name">{html.escape(language_name)}</span><span class="lang-code">{code.split("-")[0].upper()}</span>
         <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -721,11 +734,6 @@ def home_body(t, lang, to_root):
                 f'<h3>{t(f"f_{key}_title")}</h3><p>{t(f"f_{key}_text")}</p>{glimpse}</li>')
     featured = "\n".join(feature(k, FEATURED[k]) for k in FEATURES if k in FEATURED)
     others = "\n".join(feature(k) for k in FEATURES if k not in FEATURED)
-    # PlayGuard and Nintendo's app on what each needs: PlayGuard needs none of
-    # it but a custom firmware, which the app does not.
-    compare = "\n".join(
-        f'          <tr><th scope="row">{t(f"compare_{row}")}</th>{mark(t, pg)}{mark(t, not pg)}</tr>'
-        for row, pg in (("phone", True), ("account", True), ("internet", True), ("cfw", False)))
     version, date, _ = changelog_releases()[0]
     weight = simulator_size()
     size = f' <span class="size" data-bytes="{weight}"></span>' if weight else ""
@@ -777,19 +785,6 @@ def home_body(t, lang, to_root):
       <ul class="cards cards-small">
 {others}
       </ul>
-    </section>
-
-    <section id="compare" class="section">
-      <p class="eyebrow">{t('compare_eyebrow')}</p>
-      <h2>{t('compare_title')}</h2>
-      <div class="table compare">
-        <table>
-          <thead><tr><td></td><th scope="col">PlayGuard</th><th scope="col">{t('compare_app')}</th></tr></thead>
-          <tbody>
-{compare}
-          </tbody>
-        </table>
-      </div>
     </section>
 
     <section id="screens" class="section">
@@ -902,12 +897,6 @@ def simulator_size():
         with open(path, "rb") as f:
             total += len(gzip.compress(f.read(), 6))
     return total
-
-
-def mark(t, yes):
-    """A cell of the comparison: a tick or a cross, its word for a screen reader."""
-    return (f'<td class="{"yes" if yes else "no"}"><span aria-hidden="true">{"✓" if yes else "✕"}</span>'
-            f'<span class="sr">{t("yes" if yes else "no")}</span></td>')
 
 
 def locked_out_anchor(lang):
