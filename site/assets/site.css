@@ -783,6 +783,24 @@ pre.has-copy { position: relative; padding-right: 76px; }
   background: linear-gradient(to bottom, rgb(0 255 204 / 0.5), rgb(138 92 255 / 0.25));
 }
 
+/* In a row of cards, the icons, titles and texts start at the same height
+   (one card's title over two lines moves its row's texts down together),
+   where the browser has subgrid; the featured ones' screens too. */
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 861px) {
+    .cards > .card { grid-row: span 3; grid-template-rows: subgrid; row-gap: 10px; }
+    .cards-small > .card { row-gap: 8px; }
+    .cards > .card-featured { grid-row: span 4; }
+    .cards { row-gap: 16px; }
+  }
+  /* Two or three in a row, the icon beside the title: the titles and the
+     texts aligned the same way. */
+  @media (min-width: 601px) and (max-width: 860px) {
+    .cards > .card { grid-row: span 2; grid-template-rows: subgrid; row-gap: 4px; }
+    .cards > .card-featured { grid-row: span 3; }
+  }
+}
+
 /* No card left alone on its row: the five small ones three then two where
    five do not fit, the three featured ones two then one across. */
 @media (max-width: 1099px) and (min-width: 601px) {
