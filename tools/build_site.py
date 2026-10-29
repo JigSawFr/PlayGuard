@@ -1219,7 +1219,10 @@ def llms_txt(t, version, descriptions, full_docs=None):
     lines += ["## Optional", "",
               f"- [Changelog]({SITE_URL}changelog/): every release's changes (Atom feed: {SITE_URL}releases.atom)",
               f"- [Roadmap]({REPO_URL}/blob/main/ROADMAP.md)",
-              f"- [Recovery sysmodule]({REPO_URL}/blob/main/sysmodule/README.md)",
+              f"- [Home Assistant]({REPO_URL}/blob/main/docs/home-assistant.md): the optional link to an MQTT"
+              " broker and Home Assistant",
+              f"- [Optional sysmodules]({REPO_URL}/blob/main/sysmodule/README.md): the recovery sysmodule and the"
+              " remote link's agent",
               f"- [Contributing]({REPO_URL}/blob/main/CONTRIBUTING.md)"]
     if not full_docs:
         lines += [f"- [Every page of the documentation in one file]({SITE_URL}{lang_dir(t.lang)}llms-full.txt)"]

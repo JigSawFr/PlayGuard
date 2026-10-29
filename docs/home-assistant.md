@@ -78,7 +78,7 @@ Settings › Devices & services › MQTT: a device with the console's name,
 created by MQTT discovery (turn *Create the device in Home Assistant* off to
 handle the topics yourself). It is the console as Nintendo names it, its model
 (*Nintendo Switch – OLED Model*, HEG-001) and its system as its firmware
-(*23.0.1 · Atmosphère 1.10.1*); PlayGuard is where it comes from.
+(*23.0.1 · Atmosphère 1.12.1*); PlayGuard is where it comes from.
 
 | Kind | Entities |
 |---|---|
@@ -140,9 +140,17 @@ days) are also on the broker (`playguard/<id>/activity`, `…/week`,
 
 The [PlayGuard integration](https://github.com/JigSawFr/playguard-ha), a HACS
 custom repository, replaces the console's own MQTT device with the same
-entities and adds the game names, the week's play time, long-term statistics,
-actions and repairs. It needs [HACS](https://hacs.xyz/) and Home Assistant
-2026.10 or later.
+entities and adds: *Online*, *Agent running*, *Last seen*, *Play time this
+week*, *Play ends*, *Activity*, *Homebrews* and *Forwarders*; the game names;
+each account's play time today and this week; the play sessions as a
+calendar; the icon of the game being played; a *PlayGuard* update entity (the
+console's version against PlayGuard's latest release); long-term statistics;
+actions; an event entity for every order handled; triggers and conditions of
+its own in the automation editor; Assist (today's play time, extra time, no
+more play today, by voice or chat); ready-made blueprints; repairs; in 14
+languages. Its
+[README](https://github.com/JigSawFr/playguard-ha#readme) has them all. It
+needs [HACS](https://hacs.xyz/) and Home Assistant 2026.10 or later.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration)
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard)

@@ -86,7 +86,7 @@ Paramètres › Appareils et services › MQTT : un appareil au nom de la consol
 créé par la découverte MQTT (désactivez *Créer l'appareil dans Home
 Assistant* pour gérer les topics vous-même). C'est la console telle que
 Nintendo la nomme, son modèle (*Nintendo Switch – OLED Model*, HEG-001) et son
-système comme firmware (*23.0.1 · Atmosphère 1.10.1*) ; PlayGuard en est
+système comme firmware (*23.0.1 · Atmosphère 1.12.1*) ; PlayGuard en est
 l'origine.
 
 | Type | Entités |
@@ -154,9 +154,20 @@ modèles ou l'intégration ci-dessous.
 
 L'[intégration PlayGuard](https://github.com/JigSawFr/playguard-ha), un dépôt
 personnalisé HACS, remplace l'appareil MQTT de la console par les mêmes
-entités et ajoute les noms des jeux, le temps de jeu de la semaine, les
-statistiques à long terme, des actions et des corrections. Elle demande
-[HACS](https://hacs.xyz/) et Home Assistant 2026.10 ou plus récent.
+entités et ajoute : *En ligne*, *Agent actif*, *Vu pour la dernière fois*,
+*Temps de jeu cette semaine*, *Fin de partie prévue*, *Activité*, *Homebrews*
+et *Forwarders* ; les noms des jeux ; le temps de jeu de chaque compte
+aujourd'hui et cette semaine ; les parties dans un calendrier ; l'icône du jeu
+en cours ; une entité de mise à jour *PlayGuard* (la version de la console
+face à la dernière release de PlayGuard) ; les statistiques à long terme ; des
+actions ; une entité d'événement pour chaque ordre traité ; ses propres
+déclencheurs et conditions dans l'éditeur d'automatisations ; Assist (le temps
+de jeu du jour, du temps en plus, plus de jeu aujourd'hui, à la voix ou par
+écrit) ; des blueprints prêts à l'emploi ; des corrections ; en 14 langues.
+Son
+[README](https://github.com/JigSawFr/playguard-ha/blob/main/README.fr.md) les
+détaille. Elle demande [HACS](https://hacs.xyz/) et Home Assistant 2026.10 ou
+plus récent.
 
 [![Ouvrez votre instance Home Assistant et ouvrez un dépôt dans le Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration)
 [![Ouvrez votre instance Home Assistant et commencez à configurer une nouvelle intégration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard)

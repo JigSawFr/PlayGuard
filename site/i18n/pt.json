@@ -226,7 +226,7 @@
  "faq_offline_q": "É preciso Internet, uma conta Nintendo ou a aplicação móvel?",
  "faq_offline_a": "Não. Tudo se define na consola. O temporizador só precisa de que o relógio de rede tenha sido acertado uma vez: a partir de servidores de hora públicos ou, numa consola sem Internet, a partir do relógio da consola.",
  "faq_ban_q": "A consola pode ser banida?",
- "faq_ban_a": "O PlayGuard nunca contacta a Nintendo: online, só chega a servidores de hora públicos e ao GitHub. O que faz banir uma consola é um firmware personalizado que se liga à Nintendo. Nenhum ban ligado a alterações do controlo parental ou do relógio está documentado; não é uma garantia.",
+ "faq_ban_a": "O PlayGuard nunca contacta a Nintendo: online, só chega a servidores de hora públicos, ao GitHub e ao switchbrew. O que faz banir uma consola é um firmware personalizado que se liga à Nintendo. Nenhum ban ligado a alterações do controlo parental ou do relógio está documentado; não é uma garantia.",
  "faq_children_q": "Cada criança pode ter o seu próprio limite?",
  "faq_children_a": "Não: o temporizador da consola tem um único limite para toda a consola. Um sysmodule de substituição pode definir um por conta de utilizador, mas substitui o controlo parental da consola pelo seu.",
  "faq_sysmodule_q": "PlayGuard ou um sysmodule de substituição?",

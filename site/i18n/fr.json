@@ -226,7 +226,7 @@
  "faq_offline_q": "Faut-il Internet, un compte Nintendo ou l'application mobile ?",
  "faq_offline_a": "Non. Tout se règle sur la console. Le minuteur a seulement besoin que l'horloge réseau ait été réglée une fois : depuis des serveurs de temps publics, ou depuis l'horloge de la console sur une console sans Internet.",
  "faq_ban_q": "La console risque-t-elle d'être bannie ?",
- "faq_ban_a": "PlayGuard ne contacte jamais Nintendo : en ligne, il n'atteint que des serveurs de temps publics et GitHub. Ce qui fait bannir une console, c'est un firmware personnalisé qui se connecte à Nintendo. Aucun bannissement lié au contrôle parental ou à l'horloge n'est documenté ; ce n'est pas une garantie.",
+ "faq_ban_a": "PlayGuard ne contacte jamais Nintendo : en ligne, il n'atteint que des serveurs de temps publics, GitHub et switchbrew. Ce qui fait bannir une console, c'est un firmware personnalisé qui se connecte à Nintendo. Aucun bannissement lié au contrôle parental ou à l'horloge n'est documenté ; ce n'est pas une garantie.",
  "faq_children_q": "Chaque enfant peut-il avoir sa propre limite ?",
  "faq_children_a": "Non : le minuteur de la console a une seule limite pour toute la console. Un sysmodule de remplacement peut en fixer une par compte, mais il remplace le contrôle parental de la console par le sien.",
  "faq_sysmodule_q": "PlayGuard ou un sysmodule de remplacement ?",

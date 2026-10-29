@@ -21,7 +21,7 @@ Then a pull request with a conventional title and a scope (`fix(play-timer): …
 
 | Page | What it covers |
 |---|---|
-| [Build from source](docs/contributing/build.md) | Every `make` target and what it needs; the borealis submodule and the patches applied to it |
+| [Build from source](docs/contributing/build.md) | Every `make` target and what it needs; the Aurore submodule and how a change to it lands |
 | [The desktop simulator](docs/contributing/simulator.md) | `make desktop` against a simulated console, every `PLAYGUARD_SIM_*` variable, the same simulator in a browser |
 | [Tests and CI](docs/contributing/tests.md) | The host tests, the smoke scenarios and their reference screenshots, the text and resource checks, what CI runs for a pull request and what it leaves out |
 | [Code layout](docs/contributing/layout.md) | What each folder holds, and the Cadran look: colours, tokens, dialogs, the controller's keys |
@@ -31,7 +31,7 @@ Then a pull request with a conventional title and a scope (`fix(play-timer): …
 | [Testing on a console](docs/hardware-test.md) | What no simulator can show: the forwarders, the PIN gate and the homebrew menu's lock, to go through on a console |
 | [Host tests](tests/README.md) | Each suite and what it covers, the fuzz targets, the fakes they share |
 
-The references nearby: [`config.json`](docs/config.md), [how parental controls work](docs/parental-controls.md), [the companion app](docs/companion-app.md), the [recovery sysmodule](sysmodule/README.md), the [web simulator](web/README.md), the [website](site/README.md) and the [store entries](packaging/README.md).
+The references nearby: [`config.json`](docs/config.md), [themes](docs/themes.md), [how parental controls work](docs/parental-controls.md), [the companion app](docs/companion-app.md), the [optional sysmodules](sysmodule/README.md) (recovery and the remote link's agent), the remote link's [design](docs/sync-design.md) and [protocol](docs/sync-protocol.md) and its [Home Assistant guide](docs/home-assistant.md), the [web simulator](web/README.md), the [website](site/README.md) and the [store entries](packaging/README.md).
 
 ## Translating PlayGuard
 
