@@ -146,7 +146,7 @@ if (PLATFORM_SWITCH)
 endif ()
 
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 23)
 
 target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen extern/stb)
 if (NOT PLATFORM_SWITCH)

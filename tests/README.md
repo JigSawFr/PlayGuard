@@ -26,7 +26,7 @@ them even when one fails: each leaves its output in `build/host-tests/<suite>.lo
 and a `<suite>.ok` when it passed, and `make` fails at the end if any did. A
 suite is three variables in the Makefile (`<name>_SRC`, `<name>_FLAGS`, an
 optional `<name>_LIBS`); a new one is three lines there, next to the others.
-A C++ suite leaves out `<name>_FLAGS` when `TEST_CXXFLAGS` (C++20, `source/`
+A C++ suite leaves out `<name>_FLAGS` when `TEST_CXXFLAGS` (C++23, `source/`
 and Aurore's headers) is all it needs, so it is often one line. A C++ suite
 that needs C sources names them in `<name>_CSRC` (with `<name>_CFLAGS`): each
 is built by `$(CC)` and linked in, as clang++ refuses to build a `.c` file as
