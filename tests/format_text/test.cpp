@@ -1,14 +1,12 @@
-// Host tests for source/ui/play_text.cpp and Aurore's Cadran format_text.cpp,
-// translated by the real catalogs (resources/i18n/<lang>/playguard.json and
-// Aurore's cadran.json, read from the repository root `make test` runs in)
-// through ui/tr.hpp's stand-in for Aurore: limits ("No
-// limit", "0 min (no play)", "45 min", "2 h", "2 h 05"), the week's limits in
-// a few words, time played and left (rounded to the minute, at most a day),
-// play time over any length ("< 1 min", "52 h 30", "278 h"), a daily
-// average over days, months or years, the day names (in a title and inside
-// a sentence, French for the difference), the restriction
-// levels and ages, yes / no, "Unavailable", and the chevron of a line that
-// opens a screen. Every key the helpers ask for exists in the catalog.
+// Host tests for source/ui/play_text.cpp (over Aurore's Cadran
+// format_text.cpp, tested by Aurore), translated by the real catalogs
+// (resources/i18n/<lang>/playguard.json and Aurore's cadran.json, read from
+// the repository root `make test` runs in) through ui/tr.hpp's stand-in for
+// Aurore: limits ("No limit", "0 min (no play)", "45 min", "2 h", "2 h 05"),
+// the week's limits in a few words, time played and left (rounded to the
+// minute, at most a day), a daily average over days, months or years, and
+// the restriction levels and ages, in English and French. Every key the
+// helpers ask for exists in the catalog.
 #include "check.h"
 #include <cstdint>
 #include <fstream>
@@ -92,17 +90,6 @@ static void test_minutes()
     CHECK(ui::fmt_time_left(1440 * MIN) == "24\u00A0h" && ui::fmt_time_left(5000 * MIN) == "24\u00A0h");
     CHECK(ui::fmt_time_left(UINT64_MAX / 2) == "24\u00A0h");
 
-    // Play time, from seconds: "< 1 min" under a minute (not for none), no cap.
-    CHECK(ui::fmt_duration(0) == "0\u00A0min");
-    CHECK(ui::fmt_duration(1) == "< 1 min" && ui::fmt_duration(59) == "< 1 min");
-    CHECK(ui::fmt_duration(60) == "1\u00A0min" && ui::fmt_duration(89) == "1\u00A0min" && ui::fmt_duration(90) == "2\u00A0min");
-    CHECK(ui::fmt_duration(3600) == "1\u00A0h" && ui::fmt_duration(3600 + 5 * 60) == "1\u00A0h\u00A005");
-    CHECK(ui::fmt_duration(99 * 3600 + 59 * 60) == "99\u00A0h\u00A059");
-    // From 100 h, whole hours, rounded.
-    CHECK(ui::fmt_duration(152 * 3600 + 29 * 60) == "152\u00A0h" && ui::fmt_duration(152 * 3600 + 30 * 60) == "153\u00A0h");
-    CHECK(ui::fmt_duration(277 * 3600 + 58 * 60) == "278\u00A0h");
-    CHECK(ui::fmt_duration(100000ULL * 3600) == "100000\u00A0h");
-
     // A daily average over its days: days under two months, then months, then years.
     CHECK(ui::fmt_per_day_over(53 * 60, 45) == "53\u00A0min over 45 days");
     CHECK(ui::fmt_per_day_over(53 * 60, 59) == "53\u00A0min over 59 days");
@@ -135,27 +122,15 @@ static void test_days_summary()
 
 static void test_names()
 {
-    CHECK(ui::day_name(0) == "Sunday" && ui::day_name(1) == "Monday" && ui::day_name(6) == "Saturday");
-    CHECK(ui::day_name(-1) == "?" && ui::day_name(7) == "?");
-    CHECK(ui::day_name_in_text(3) == "Wednesday" && ui::day_name_in_text(7) == "?" && ui::day_name_in_text(-1) == "?");
-
     CHECK(ui::level_name(0) == "None" && ui::level_name(1) == "Custom" && ui::level_name(4) == "Teen");
     CHECK(ui::level_name(5) == "?" && ui::level_name(UINT32_MAX) == "?");
     CHECK(ui::age_text(0) == "No restriction" && ui::age_text(12) == "Up to 12 years");
-
-    CHECK(ui::yes_no(true) == "Yes" && ui::yes_no(false) == "No");
-    CHECK(ui::bool_text(true, true, "on", "off") == "on" && ui::bool_text(true, false, "on", "off") == "off");
-    CHECK(ui::bool_text(false, true, "on", "off") == "Unavailable");
-
-    CHECK(ui::opens() == "›" && ui::opens("") == "›" && ui::opens("12 changes") == "12 changes  ›");
 }
 
-// Another language: its own words, its own cases ("lundi" inside a sentence).
+// Another language: its own words.
 static void test_french()
 {
     REQUIRE(load("fr"));
-    CHECK(ui::day_name(1) == s_catalog["cadran/days/1"]);
-    CHECK(ui::day_name_in_text(1) == "lundi");
     CHECK(ui::fmt_limit(125) == "2\u00A0h\u00A005");
     CHECK(ui::fmt_per_day_over(53 * 60, 2199) == "53\u00A0min sur 6 ans");
     CHECK(ui::fmt_limit(PT_DAY_NOLIMIT) == s_catalog["playguard/common/no_limit"]);

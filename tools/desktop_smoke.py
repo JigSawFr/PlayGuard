@@ -159,6 +159,8 @@ the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
 build (PLAYGUARD_SIM_VERSION) unless set.
 """
+import ctypes
+import ctypes.util
 import glob
 import json
 import os
@@ -855,17 +857,55 @@ KEY_AFTER = 0.1
 SHOT_WAIT = 0.45
 
 
+class _Keys:
+    """Key presses through XTest (libXtst, which xdotool uses too): the press
+    and its release go together, the release with XTest's delay, which the X
+    server itself waits. Sent by xdotool with a sleep between them, a release
+    could come late on a busy machine, and a key the app sees held 250 ms is
+    repeated (Aurore's BUTTOM_REPEAT_TRIGGER): one Right moved the focus two
+    tiles on."""
+
+    def __init__(self):
+        self.x11 = ctypes.CDLL(ctypes.util.find_library("X11") or "libX11.so.6")
+        self.xtst = ctypes.CDLL(ctypes.util.find_library("Xtst") or "libXtst.so.6")
+        self.x11.XOpenDisplay.restype = ctypes.c_void_p
+        self.x11.XOpenDisplay.argtypes = [ctypes.c_char_p]
+        self.x11.XStringToKeysym.restype = ctypes.c_ulong
+        self.x11.XStringToKeysym.argtypes = [ctypes.c_char_p]
+        self.x11.XKeysymToKeycode.restype = ctypes.c_ubyte
+        self.x11.XKeysymToKeycode.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+        self.x11.XSync.argtypes = [ctypes.c_void_p, ctypes.c_int]
+        self.xtst.XTestFakeKeyEvent.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_int, ctypes.c_ulong]
+        self.display = self.x11.XOpenDisplay(env["DISPLAY"].encode())
+        if not self.display:
+            fail("cannot open the display " + env["DISPLAY"])
+
+    def press(self, name, hold):
+        code = self.x11.XKeysymToKeycode(self.display, self.x11.XStringToKeysym(name.encode()))
+        if not code:
+            fail(f"no key {name!r}")
+        self.xtst.XTestFakeKeyEvent(self.display, code, 1, 0)
+        self.xtst.XTestFakeKeyEvent(self.display, code, 0, round(hold * 1000))
+        self.x11.XSync(self.display, 0)   # back once the server has released it
+
+
+_keys = None
+
+
 def key(name, n=1, hold=0.02):
     """Presses `name` n times, each exactly once. A held Down / Up repeats
     (ScrollView scrolls a long text, then moves the focus again); with frames
     as slow as under software GL, even an 80 ms press could. So each press
     waits for the screen to settle (KEY_BEFORE: Aurore's animations last
     300 ms at most, timed by the clock, not by the frames) and is released
-    `hold` seconds later (20 ms by default), both sent by one xdotool process
-    so a busy runner cannot delay the release."""
+    `hold` seconds later (20 ms by default), timed by the X server (_Keys) so
+    a busy machine cannot hold it longer."""
+    global _keys
+    if _keys is None:
+        _keys = _Keys()
     for _ in range(n):
         time.sleep(KEY_BEFORE)
-        subprocess.run(["xdotool", "keydown", name, "sleep", str(hold), "keyup", name], env=env)
+        _keys.press(name, hold)
         time.sleep(KEY_AFTER)
 
 

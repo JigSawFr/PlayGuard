@@ -251,7 +251,6 @@ write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue
 write_queue_logic_LIBS  := -pthread
 worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
 worker_threads_LIBS  := -pthread
-guarded_SRC          := tests/guarded/test.cpp
 data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
 outside_change_logic_SRC   := source/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
@@ -273,7 +272,6 @@ forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
 forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
-markdown_SRC   := $(C)/util/safe_text.cpp $(C)/util/markdown.cpp tests/markdown/test.cpp
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
@@ -291,14 +289,12 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 # fmt header-only: the report's lines are formatted with it.
 diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
 diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY
-# The text helpers that only translate (PlayGuard's and Cadran's), over
+# PlayGuard's text helpers that only translate, over
 # Cadran's ui/tr.hpp stand-in for Aurore's getStr and fmt header-only (the
 # catalogs read by the test).
 format_text_SRC   := source/ui/play_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
 format_text_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DAURORE_CADRAN_HOST_I18N
-cadran_text_SRC   := $(C)/ui/cadran_text.cpp tests/cadran_text/test.cpp
 contrast_SRC      := tests/contrast/test.cpp
-cadran_text_FLAGS := $(format_text_FLAGS)
 forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp source/action/forwarders_text.cpp tests/forwarders_text/test.cpp
 forwarders_text_FLAGS := $(format_text_FLAGS)
 forwarders_text_CSRC   := source/core/calendar.c
@@ -426,7 +422,6 @@ FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefi
 FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(FUZZ_SAN) -Itests/fuzz -Isource -isystem library/aurore/library/include
 zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
-markdown_FUZZ      := $(filter-out tests/%,$(markdown_SRC)) tests/fuzz/markdown/fuzz.cpp
 changelog_FUZZ     := $(filter-out tests/%,$(changelog_SRC)) tests/fuzz/changelog/fuzz.cpp
 changelog_FUZZ_CSRC := $(CALENDAR_C)
 rescue_FUZZ        := $(filter-out tests/%,$(rescue_SRC)) tests/fuzz/rescue/fuzz.c
