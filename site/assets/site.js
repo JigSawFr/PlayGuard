@@ -519,13 +519,19 @@
     search.hidden = false;
   }
 
-  const language = document.getElementById('site-language');
-  language.addEventListener('change', () => {
-    store.set('pg-site-lang', language.selectedOptions[0].dataset.lang);
-    location.href = language.value + location.hash;
-  });
+  // The header's languages (a popover): the one chosen is kept, and the
+  // page opens at the same place in it.
+  const languages = [...document.querySelectorAll('#languages a')];
+  for (const link of languages) {
+    link.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      store.set('pg-site-lang', link.dataset.lang);
+      location.href = link.getAttribute('href') + location.hash;
+    });
+  }
 
-  const options = [...language.options].map((o) => [o.dataset.lang, o.value]);
+  const options = languages.map((a) => [a.dataset.lang, a.getAttribute('href')]);
   const find = (code) => options.find(([c]) => c.toLowerCase() === code.toLowerCase());
   // The visitor's language: the one chosen before, else the browser's when
   // the site has it (null: English).
@@ -568,4 +574,72 @@
   if (document.referrer && new URL(document.referrer).origin === location.origin) return;
   const target = visitor();
   if (target && target[0] !== 'en-US') location.replace(target[1] + location.hash);
+})();
+
+// Boréale's site switcher: the menu of the four sites opens under the name
+// beside its button, wherever the header is. The same block in boreale.dev's,
+// PlayGuard's, PlayShelf's and Aurore's site.js; boreale's is the reference.
+// Without popovers (an old browser), the name still leads home.
+(function () {
+  const menu = document.getElementById('sites');
+  const anchor = menu && menu.closest('.switcher');
+  if (!anchor || !menu.showPopover) return;
+  menu.addEventListener('beforetoggle', (event) => {
+    if (event.newState !== 'open') return;
+    const box = anchor.getBoundingClientRect();
+    const screen = document.documentElement.clientWidth;
+    const width = Math.min(400, screen - 24); // site.css's width
+    menu.style.top = `${box.bottom + window.scrollY + 6}px`;
+    menu.style.left = `${Math.max(12, Math.min(box.left, screen - width - 12)) + window.scrollX}px`;
+  });
+})();
+
+// The header's languages: their menu opens under its button, its right edge
+// on the button's.
+(function () {
+  const menu = document.getElementById('languages');
+  const button = document.querySelector('.lang-button');
+  if (!menu || !button || !menu.showPopover) return;
+  menu.addEventListener('beforetoggle', (event) => {
+    if (event.newState !== 'open') return;
+    const box = button.getBoundingClientRect();
+    const screen = document.documentElement.clientWidth;
+    menu.style.top = `${box.bottom + window.scrollY + 6}px`;
+    menu.style.right = `${Math.max(12, screen - box.right)}px`;
+    // The language in use in view, in a long list on a short screen.
+    requestAnimationFrame(() => menu.querySelector('[aria-current]')?.scrollIntoView({ block: 'nearest' }));
+  });
+})();
+
+// The documentation: once the header is scrolled away, a slim bar at the top
+// (the way home, the page's name, the search, the light reading); and the
+// light reading itself, kept as pg-reading (reading.js sets it before the
+// first paint).
+(function () {
+  const root = document.documentElement;
+  const toggles = [...document.querySelectorAll('.reading-toggle')];
+  const shown = () => toggles.forEach((b) => b.setAttribute('aria-pressed', String(root.dataset.reading === 'light')));
+  for (const b of toggles) {
+    b.addEventListener('click', () => {
+      const light = root.dataset.reading !== 'light';
+      if (light) root.dataset.reading = 'light'; else delete root.dataset.reading;
+      try { localStorage.setItem('pg-reading', light ? 'light' : 'night'); } catch { /* storage refused */ }
+      shown();
+    });
+  }
+  shown();
+
+  const bar = document.querySelector('.doc-bar');
+  const sky = document.querySelector('.sky');
+  if (!bar || !sky || !('IntersectionObserver' in window)) return;
+  bar.hidden = false;
+  new IntersectionObserver((entries) => {
+    bar.classList.toggle('on', !entries[entries.length - 1].isIntersecting);
+  }).observe(sky);
+  bar.querySelector('.doc-bar-search').addEventListener('click', () => {
+    const input = document.querySelector('.doc-search input');
+    if (!input) return;
+    window.scrollTo({ top: 0 });
+    input.focus();
+  });
 })();

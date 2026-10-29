@@ -11,6 +11,18 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   [boreale/branding](https://github.com/JigSawFr/boreale/tree/main/branding)),
   as [Aurore's site](https://aurore.boreale.dev/) and
   [boreale.dev](https://boreale.dev/); the web simulator keeps its own theme.
+- **The header**: the mark and name open the menu of Boréale's sites
+  (`switcher()`, a popover; its CSS and script are boreale.dev's "site
+  switcher" blocks, the marks boreale's, the versions boreale.dev's
+  `versions.json` read at the build), and a button opens the 15 languages
+  (a popover too). The footer has a Boréale column: the other sites, the
+  privacy and legal notice, `contact@boreale.dev`. The page not found
+  stands under the aurora, as the home page's hero.
+- **Reading the documentation**: once the header is scrolled away, a slim
+  bar at the top (the way home, the page's name, the search, the light
+  reading); *Light reading* puts the documentation's pages on a light
+  ground (kept as `pg-reading`, `reading.js` setting it before the first
+  paint); the search's field shows its key, `/`.
 - **The screenshots in each language**: the console's screens as the
   simulator shows them in that language (below), English where there are
   none (a local build); the console's dark ones, as the site is.

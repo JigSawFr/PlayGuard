@@ -40,6 +40,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import urllib.request
 from urllib.parse import urlsplit
 
 import markdown
@@ -48,6 +49,7 @@ REPO_URL = "https://github.com/JigSawFr/PlayGuard"
 # The site's address, for the links that must be absolute (the canonical
 # page, the other languages, the preview image, the sitemap, llms.txt).
 SITE_URL = os.environ.get("SITE_URL", "https://guard.boreale.dev/").rstrip("/") + "/"
+VERSIONS = {}  # the projects' latest releases, for the menu of Boréale's sites (main())
 # A pull request's preview: not for search engines (main's site is the one).
 NOINDEX = os.environ.get("SITE_NOINDEX") == "1"
 # The audience, counted by Umami Cloud (site/README.md): its tracker, served
@@ -124,6 +126,8 @@ ICONS = {
 def icon(name):
     return (f'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
             f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ICONS[name]}</svg>')
+
+SUN_ICON = ('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>')
 
 ROOT = "."
 APP_TEXTS = {}
@@ -358,6 +362,55 @@ def rewrite_links(body, source, lang, to_root, assets):
     return body
 
 
+# Boréale's sites, in the header's menu (switcher()): the same in each of
+# Boréale's sites (boreale/tools/build_site.py's the reference). boreale.dev
+# first, then the homebrew, then the libraries, each group under its title.
+SITES = [(None, [("boreale", "Boréale", "https://boreale.dev/")]),
+         ("sites_homebrew", [("playguard", "PlayGuard", "https://guard.boreale.dev/"),
+                             ("playshelf", "PlayShelf", "https://shelf.boreale.dev/")]),
+         ("sites_libraries", [("aurore", "Aurore", "https://aurore.boreale.dev/")])]
+
+
+def boreale_versions():
+    """The projects' latest releases as boreale.dev publishes them
+    (versions.json), for the menu; none when it cannot be read (offline, a
+    local build), and the menu shows no versions."""
+    try:
+        with urllib.request.urlopen("https://boreale.dev/versions.json", timeout=10) as r:
+            return {k: v for k, v in json.load(r).items() if isinstance(v, str)}
+    except (OSError, ValueError):
+        return {}
+
+
+def switcher(t, lang, to_root, home, here, name, versions):
+    """The header's name (`name`), a button that opens the menu of Boréale's
+    sites, `here` marked and leading to `home`, each in French where the page
+    is (the four sites have it), with its latest release (`versions`). A
+    popover: the browser closes it on Esc or a click elsewhere; site.css's
+    and site.js's "site switcher" blocks."""
+    label = t("sites_label")
+    french = lang.lower().startswith("fr")
+    groups = []
+    for title, sites in SITES:
+        items = []
+        for key, site, url in sites:
+            href = home if key == here else url + ("fr/" if french else "")
+            soon = f'<em class="soon">{t("sites_soon")}</em>' if key == "playshelf" else ""
+            version = f' <span class="sites-version">{html.escape(versions[key])}</span>' if key in versions else ""
+            current = ' aria-current="true"' if key == here else ""
+            items.append(f'<li><a href="{href}"{current}>'
+                         f'<img src="{to_root}assets/marks/{key}.svg" alt="" width="36" height="36">'
+                         f'<span><strong>{site}{version}</strong><small>{t(f"sites_{key}")}</small></span>{soon}</a></li>')
+        heading = f'<p class="sites-title">{t(title)}</p>' if title else ""
+        groups.append(f'        {heading}<ul>\n          ' + "\n          ".join(items) + '\n        </ul>')
+    title = next(site for _, sites in SITES for key, site, _ in sites if key == here)
+    return (f'<div class="switcher">\n'
+            f'      <button class="brand switch" type="button" popovertarget="sites" aria-label="{title} · {label}">'
+            f'{name}<svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>\n'
+            f'      <div id="sites" class="sites" popover aria-label="{label}">\n'
+            + "\n".join(groups) + '\n      </div>\n    </div>')
+
+
 def lang_dir(lang):
     folder = next(d for code, d, _, _ in LANGUAGES if code == lang)
     return f"{folder}/" if folder else ""
@@ -499,11 +552,29 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
         head.append(f'  <link rel="alternate" type="text/markdown" href="{markdown_url}">')
     if NOINDEX or not indexed:
         head.append('  <meta name="robots" content="noindex">')
+    # The languages, a menu under the header's button (a popover, as the
+    # menu of Boréale's sites): this page in each.
+    current = ' aria-current="true"'
     options = "\n".join(
-        f'        <option value="{to_root}{f"{d}/" if d else ""}{path}" data-lang="{c}" lang="{hl}"'
-        f'{" selected" if c == lang else ""}>{html.escape(n)}</option>'
+        f'        <li><a href="{to_root}{f"{d}/" if d else ""}{path}" data-lang="{c}" lang="{hl}" hreflang="{hl}"'
+        f'{current if c == lang else ""}>{html.escape(n)}</a></li>'
         for c, d, n, hl in LANGUAGES)
+    language_name = next(n for c, _, n, _ in LANGUAGES if c == lang)
+    # The aurora behind the home page's hero, and the page not found's.
+    aurora = bool(hero)
     home = f"{to_root}{lang_dir(lang)}"
+    # A page of the documentation: once the header is scrolled away, a slim
+    # bar at the top with the way home, the page's name, the search and the
+    # light reading (site.js).
+    doc_bar = ""
+    if '<div class="doc">' in body:
+        doc_bar = (f'  <div class="doc-bar" hidden><div class="doc-bar-inner">'
+                   f'<a class="doc-bar-home" href="{home}" aria-label="PlayGuard"><img src="{to_root}assets/mark.svg" alt="" width="24" height="24"><span>PlayGuard</span></a>'
+                   f'<span class="doc-bar-title">{html.escape(title)}</span>'
+                   f'<button class="doc-bar-search" type="button" aria-label="{t("search_placeholder")}">'
+                   f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
+                   f'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>'
+                   f'{reading_toggle(t)}</div></div>\n')
     full_title = full_title or ("PlayGuard" if not title else f"{title} · PlayGuard")
     head_extra = "\n".join(head)
     umami = "" if NOINDEX else (f'  <script src="{to_root}assets/umami.js" defer data-website-id="{UMAMI_WEBSITE}" '
@@ -537,14 +608,17 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
 {"".join(json_ld(d) for d in structured)}
+  <link rel="preload" href="{to_root}assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{to_root}assets/fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="{to_root}assets/reading.js"></script>
   <link rel="stylesheet" href="{to_root}assets/site.css">
 {umami}</head>
 <body class="{body_class}">
   <a class="skip" href="#main">{t('skip')}</a>
-  <div class="sky{' sky-home' if hero else ''}">
-  {'<canvas id="sky" aria-hidden="true"></canvas>' if hero else ''}
+{doc_bar}  <div class="sky{' sky-home' if aurora else ''}">
+  {'<canvas id="sky" aria-hidden="true"></canvas>' if aurora else ''}
   <header class="top">
-    <a class="brand" href="{home}"><img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span></a>
+    {switcher(t, lang, to_root, home, "playguard", f'<img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span>', VERSIONS)}
     <nav class="nav" aria-label="PlayGuard">
       <a href="{home}#features">{t('nav_features')}</a>
       <a href="{home}#install">{t('nav_install')}</a>
@@ -553,10 +627,14 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
       <a href="{REPO_URL}" class="nav-gh">GitHub</a>
     </nav>
     <div class="settings">
-      <span class="picker picker-lang"><span class="picker-face" aria-hidden="true">{code.split("-")[0].upper()}</span>
-      <select id="site-language" aria-label="{t('language')}">
+      <button class="lang-button" type="button" popovertarget="languages" aria-label="{t('language')} · {html.escape(language_name)}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>
+        <span class="lang-name">{html.escape(language_name)}</span><span class="lang-code">{code.split("-")[0].upper()}</span>
+        <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <ul id="languages" class="langs" popover aria-label="{t('language')}">
 {options}
-      </select></span>
+      </ul>
     </div>
   </header>
 {hero}  </div>
@@ -580,6 +658,14 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
           <ul><li><a href="{REPO_URL}">GitHub</a></li><li><a href="{home}changelog/">{t('footer_changelog')}</a></li>
             <li><a href="{SITE_URL}releases.atom">{t('releases_feed')}</a></li>
             <li><a href="{REPO_URL}/issues/new/choose">{t('report_bug')}</a></li></ul>
+        </div>
+        <div>
+          <h2>Boréale</h2>
+          <ul><li><a href="https://boreale.dev/{"fr/" if code.startswith("fr") else ""}">boreale.dev</a></li>
+            <li><a href="https://shelf.boreale.dev/{"fr/" if code.startswith("fr") else ""}">PlayShelf</a></li>
+            <li><a href="https://aurore.boreale.dev/{"fr/" if code.startswith("fr") else ""}">Aurore</a></li>
+            <li><a href="https://boreale.dev/{"fr/" if code.startswith("fr") else ""}legal/">{t('sites_legal')}</a></li>
+            <li><a href="mailto:contact@boreale.dev">contact@boreale.dev</a></li></ul>
         </div>
         <div>
           <h2>{t('support')}</h2>
@@ -638,6 +724,8 @@ def home_body(t, lang, to_root):
     home = f"{to_root}{lang_dir(lang)}"
     return f"""    <section class="hero">
       <div class="hero-text">
+        <p class="release-pill"><a href="{home}changelog/#v{version}">v{version}
+          · <time class="release-date" datetime="{date}">{date}</time></a></p>
         <p class="eyebrow">{t('hero_eyebrow')}</p>
         <h1>{hero_title(t)}</h1>
         <p class="sub">{t('hero_sub')}</p>
@@ -646,8 +734,7 @@ def home_body(t, lang, to_root):
           <a class="button primary" href="#install">{t('install_cta')}</a>
           <a class="button" href="{to_root}simulator/?lang={code}">{t('try')}{size}</a>
         </div>
-        <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a>
-          · <a href="{home}changelog/#v{version}"><time class="release-date" datetime="{date}">{date}</time></a></p>
+        <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a></p>
         <p class="source"><a href="{home}docs/troubleshooting/#{locked_out_anchor(lang)}">{t('locked_out_link')}</a></p>
       </div>
       <div class="hero-video">
@@ -813,12 +900,20 @@ def locked_out_anchor(lang):
     return ""
 
 
+def reading_toggle(t):
+    """The documentation on a light ground or on the night (site.js, kept as
+    pg-reading; reading.js sets it before the first paint)."""
+    return (f'<button class="reading-toggle" type="button" aria-pressed="false" aria-label="{t("reading_light")}">{SUN_ICON}'
+            f'<span>{t("reading_light")}</span></button>')
+
+
 def docs_search(t, lang, to_root):
     """The documentation's search box: site.js shows it, and searches docs/search.json."""
     return (f'      <div class="doc-search" hidden><input type="search" placeholder="{t("search_placeholder")}"'
             f' aria-label="{t("search_placeholder")}" aria-controls="doc-results" autocomplete="off"'
             f' autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search"'
             f' data-index="{to_root}{lang_dir(lang)}docs/search.json" data-none="{t("search_none")}">'
+            f'<kbd class="search-key" aria-hidden="true">/</kbd>'
             f'<ol id="doc-results" class="doc-results" hidden></ol></div>')
 
 
@@ -969,6 +1064,7 @@ def doc_body(t, lang, to_root, page_name, assets):
         description = description[:177].rsplit(" ", 1)[0] + "…"
     return title, translated, description, body, f"""    <div class="doc">
       <nav class="doc-nav" aria-label="{t('docs_title')}">
+        {reading_toggle(t)}
 {versions}
 {docs_search(t, lang, to_root) if DOCSET.prefix == "docs/" else ""}
 {docs_list(t, lang, to_root, page_name)}
@@ -1269,6 +1365,8 @@ def main():
     out = sys.argv[1]
     ROOT = sys.argv[2] if len(sys.argv) > 2 else "."
     version = "v" + read_json(".release-please-manifest.json")["."]
+    global VERSIONS
+    VERSIONS = {**boreale_versions(), "playguard": version[1:]}
     # The documentation in two versions: main's, and the latest release's
     # out of its tag, with what main has since (git's history: none in a
     # tarball or a shallow clone, and the site has main's alone).
@@ -1366,8 +1464,9 @@ def main():
         blocks.append(f'      <div class="not-found" data-lang="{lang}" lang="{html_lang}"{" hidden" if lang != "en-US" else ""}>'
                       f'<h1>{tl("not_found_title")}</h1><p>{tl("not_found_text")}</p>'
                       f'<p><a class="button primary" href="{base_url}{f"{folder}/" if folder else ""}">{tl("home")}</a></p></div>')
-    write(out, "404.html", page(t, "en-US", base_url, "", t("not_found_title"),
-                                '    <section class="section narrow">\n' + "\n".join(blocks) + "\n    </section>",
+    # Under the sky, as the home page's hero.
+    write(out, "404.html", page(t, "en-US", base_url, "", t("not_found_title"), "",
+                                hero='    <section class="lost">\n' + "\n".join(blocks) + "\n    </section>\n",
                                 body_class="not-found-page", indexed=False))
     # The site's own files, then what the pages use from the repository and
     # the screenshots of tools/site_screenshots.mjs.
