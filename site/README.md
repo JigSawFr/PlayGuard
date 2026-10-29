@@ -7,11 +7,13 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   `/es-419/`, `/it/`, `/nl/`, `/pt/`, `/pt-br/`, `/ru/`, `/ja/`, `/ko/`,
   `/zh-hans/`, `/zh-hant/`. A first visit to the root from elsewhere goes to
   the browser's language when the site has it; the header's list changes it
-  (and is remembered). The theme is *Auto* (the browser's), *Light* or *Dark*,
-  remembered as the web simulator remembers it (both read `pg-theme`).
+  (and is remembered). One dark look, Boréale's (the night, the aurora:
+  [boreale/branding](https://github.com/JigSawFr/boreale/tree/main/branding)),
+  as [Aurore's site](https://aurore.boreale.dev/) and
+  [boreale.dev](https://boreale.dev/); the web simulator keeps its own theme.
 - **The screenshots in each language**: the console's screens as the
   simulator shows them in that language (below), English where there are
-  none (a local build); under the site's dark theme, the console's dark one.
+  none (a local build); the console's dark ones, as the site is.
 - **On a phone** (an iPhone in Safari or Edge, the same WebKit): no field
   under 16px (iOS zooms into one), 44px to touch, the page beside the notch
   in landscape (`viewport-fit=cover`, `env(safe-area-inset-*)`), each page's
@@ -120,17 +122,16 @@ pages; no framework, nothing to install but that.
   the English one may be more recent, and links to it. GitHub's `> [!WARNING]` blocks become callouts, headings
   keep GitHub's anchors, a paragraph after `<!-- github-only -->` is left out
   (what the site shows otherwise: its screenshots are the page's language's,
-  their dark ones under the dark theme), links between the docs and to the README become the
+  their dark ones), links between the docs and to the README become the
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
-- `site/assets/` — `site.css` (the branding's navy, teal and amber, light and
-  dark), `site.js` (the language and theme menus; on a phone, the header
-  out of the way while scrolling down, the gallery's dots, the way back to
-  the top), `theme.js` (the theme, and the browser's bar in its colour,
-  before the first paint) and `fonts/sora.woff2`, the Sora headings' font
-  (SIL Open Font License, `fonts/OFL.txt`; its Latin letters, cut out of
-  google/fonts' `ofl/sora/Sora[wght].ttf`), served with the site so that no
-  visitor's browser loads anything from Google Fonts or anyone else.
+- `site/assets/` — `site.css` (Boréale's colours), `site.js` (the home
+  page's aurora, boreale.dev's own, still when less motion is asked; the
+  language menu; on a phone, the gallery's dots, the way back to the top)
+  and the fonts (Sora for the headings, Figtree for the text, JetBrains Mono
+  for code and labels, their Latin letters; SIL Open Font License,
+  `fonts/OFL-*.txt`), served with the site so that no visitor's browser
+  loads anything from Google Fonts or anyone else.
 - **The screenshots**: `tools/site_screenshots.mjs <simulator> <out-dir>
   [version]` (Node and Playwright) runs the web simulator in a headless
   Chromium and saves each screen of the home page's gallery in each language,
