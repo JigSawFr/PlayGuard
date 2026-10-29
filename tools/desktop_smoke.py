@@ -159,6 +159,7 @@ the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
 (PLAYGUARD_SIM_STILL_FOCUS) and the header's version badge on one development
 build (PLAYGUARD_SIM_VERSION) unless set.
 """
+import atexit
 import ctypes
 import ctypes.util
 import glob
@@ -876,9 +877,19 @@ class _Keys:
         self.x11.XKeysymToKeycode.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
         self.x11.XSync.argtypes = [ctypes.c_void_p, ctypes.c_int]
         self.xtst.XTestFakeKeyEvent.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_int, ctypes.c_ulong]
+        self.x11.XCloseDisplay.argtypes = [ctypes.c_void_p]
         self.display = self.x11.XOpenDisplay(env["DISPLAY"].encode())
         if not self.display:
             fail("cannot open the display " + env["DISPLAY"])
+        # Closed before the script ends: a client still connected kept
+        # xvfb-run's Xvfb alive for seconds, its display taken from the next
+        # scenario's.
+        atexit.register(self.close)
+
+    def close(self):
+        if self.display:
+            self.x11.XCloseDisplay(self.display)
+            self.display = None
 
     def press(self, name, hold):
         code = self.x11.XKeysymToKeycode(self.display, self.x11.XStringToKeysym(name.encode()))
