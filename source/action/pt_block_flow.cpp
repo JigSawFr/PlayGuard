@@ -68,7 +68,7 @@ void open()
     }
 
     std::array<std::string, 7> days;
-    for (int d = 0; d < 7; d++) days[d] = aurore::getStr(fmt::format("playguard/days_short/{}", d));
+    for (int d = 0; d < 7; d++) days[d] = ui::day_short(d);
     const auto changes = pt_block::diff(ref.block, now);
     std::string text;
     if (changes.empty()) {

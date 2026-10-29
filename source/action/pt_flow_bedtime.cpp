@@ -36,8 +36,8 @@ std::string bedtime_days_text(const PtState& pt)
     std::string text;
     for (const pt_logic::BedRun& r : runs) {
         if (!text.empty()) text += ", ";
-        text += aurore::getStr(fmt::format("playguard/days_short/{}", r.first));
-        if (r.last != r.first) text += "–" + aurore::getStr(fmt::format("playguard/days_short/{}", r.last));
+        text += ui::day_short(r.first);
+        if (r.last != r.first) text += "–" + ui::day_short(r.last);
         text += " " + (r.bed.on ? hm(r.bed.hour, r.bed.minute) : "playguard/common/off"_i18n);
     }
     return text;

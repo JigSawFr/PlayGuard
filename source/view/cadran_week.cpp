@@ -134,7 +134,7 @@ CadranWeekView::CadranWeekView()
         c.day = new aurore::Label();
         c.day->setFontSize(16);
         c.day->setSingleLine(true);
-        c.day->setText(aurore::getStr(fmt::format("playguard/days_short/{}", d)));
+        c.day->setText(ui::day_short(d));
         c.box->addView(c.day);
         c.down = new CadranIcon();
         c.down->setIcon("caret-down");

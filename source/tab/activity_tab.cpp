@@ -729,7 +729,7 @@ void ActivityTab::export_stats(std::shared_ptr<const PlayStats> data, int p, con
         text.first    = "playguard/activity/first"_i18n;
         text.last     = "playguard/activity/last"_i18n;
         text.day = [](int wday) {
-            return aurore::getStr("playguard/activity/columns/day", aurore::getStr(fmt::format("playguard/days_short/{}", wday)));
+            return aurore::getStr("playguard/activity/columns/day", ui::day_short(wday));
         };
         text.name = [](const GameStat& g) { return play_data::game_name(g); };
         text.time = [](uint64_t posix) { return ui::time_text(posix); };

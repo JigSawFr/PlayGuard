@@ -2,7 +2,6 @@
 #include "view/play_days.hpp"
 
 #include <algorithm>
-#include <fmt/format.h>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 
@@ -134,7 +133,7 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
         const std::string played = day_s[k] ? ui::fmt_duration(day_s[k]) : "—";
         c.value->setText(over ? "! " + played : played);
         c.value->setThemeColor("textColor", over ? "cadran/amber" : today ? "cadran/text" : "cadran/text3");
-        c.day->setText(aurore::getStr(fmt::format("playguard/days_short/{}", (int)day_wday[k])));
+        c.day->setText(ui::day_short(day_wday[k]));
         c.day->setThemeColor("textColor", today ? "cadran/text2" : "cadran/text3");
         c.mark->setAlpha(today ? 1.0f : 0.0f);
     }

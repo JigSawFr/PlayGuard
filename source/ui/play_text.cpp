@@ -89,4 +89,13 @@ std::string level_name(uint32_t level)
     return aurore::getStr(fmt::format("playguard/restrictions/levels/{}", level));
 }
 
+std::string day_short(int wday)
+{
+    // The keys as they are, without a format: a view draws them at every frame.
+    static constexpr const char* KEYS[7] = { "playguard/days_short/0", "playguard/days_short/1", "playguard/days_short/2",
+                                             "playguard/days_short/3", "playguard/days_short/4", "playguard/days_short/5",
+                                             "playguard/days_short/6" };
+    return wday >= 0 && wday < 7 ? aurore::getStr(KEYS[wday]) : std::string();
+}
+
 }   // namespace ui

@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <fmt/format.h>
 
 #include <aurore/cadran/ui/cadran_frame.hpp>
 #include <aurore/cadran/ui/cadran_kit.hpp>
@@ -62,7 +61,7 @@ void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float he
         const float top_y = y + r * (ROW_H + GAP);
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
         nvgFillColor(vg, this->a(d == this->today ? fill : nvgTransRGBA(ink, 170)));
-        nvgText(vg, x, top_y + ROW_H / 2, aurore::getStr(fmt::format("playguard/days_short/{}", d)).c_str(), nullptr);
+        nvgText(vg, x, top_y + ROW_H / 2, ui::day_short(d).c_str(), nullptr);
         for (int h = 0; h < 24; h++) {
             const uint32_t v = this->hour_s[d][h];
             // Nothing played: a faint square; else the stronger, the more.
@@ -78,10 +77,12 @@ void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float he
     const float hours_y = y + 7 * (ROW_H + GAP) + 2;
     nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
     nvgFillColor(vg, this->a(nvgTransRGBA(ink, 150)));
-    for (int h = 0; h <= 24; h += 6) {
+    static constexpr const char* HOURS[5] = { "00:00", "06:00", "12:00", "18:00", "24:00" };
+    for (int i = 0; i < 5; i++) {
+        const int   h  = i * 6;
         const float at = x + name_w + h * cell_w - (h == 24 ? GAP : 0);
         nvgTextAlign(vg, (h == 0 ? NVG_ALIGN_LEFT : h == 24 ? NVG_ALIGN_RIGHT : NVG_ALIGN_CENTER) | NVG_ALIGN_TOP);
-        nvgText(vg, at, hours_y, fmt::format("{:02d}:00", h % 24 == 0 && h ? 24 : h).c_str(), nullptr);
+        nvgText(vg, at, hours_y, HOURS[i], nullptr);
     }
 }
 

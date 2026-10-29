@@ -431,7 +431,7 @@ void PlayTimerTab::rerender()
     if (changed) {
         pending_text->setText((changed == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : aurore::getStr("playguard/play_timer/perday/unsaved_count", changed)) + " · " +
                               aurore::getStr("playguard/cadran/week/first_change",
-                                           aurore::getStr(fmt::format("playguard/days_short/{}", first)),
+                                           ui::day_short(first),
                                            limit_text(timer.day_min[first]), limit_text(this->pending[first])));
         pending_text->setThemeColor("textColor", "cadran/amber");
     } else {
