@@ -6,10 +6,18 @@ against a simulated console, to click through a change, try a state or show
 a screen without a build on the console.
 In the website's look (`site/assets/site.css`): its colours, its header in
 Boréale's night whatever the theme (the name opening the menu of Boréale's
-sites, the links to the website, the language and theme menus, a short face of
-them on a phone) and Sora for the name (`site/assets/fonts/sora.woff2`, with
-`branding/mark.svg` and the sites' marks of `site/assets/marks/`, copied by
-CMake).
+sites, the links to the website, the website's language menu, the theme's
+menu, a short face of them on a phone) and Sora for the name
+(`site/assets/fonts/sora.woff2`, with `branding/mark.svg` and the sites' marks
+of `site/assets/marks/`, copied by CMake). The language menu is the website's
+(`tools/build_site.py`, `site/assets/site.js`): a button with the page's flag
+and language (its flag and code on a phone, its flag alone under 380px), and
+under it the 15 languages in a popover, each with its flag, the page's marked
+(Esc or a click elsewhere closes it, the focus back on the button; ↓ on the
+button opens it at the language in use, the arrows, Home and End move through
+it). The flags are the website's `site/assets/fonts/twemoji-flags.woff2`
+(Twemoji's 15, CC-BY 4.0), copied by CMake next to the page with
+`LICENSE-twemoji-flags.txt`, so Windows shows them too.
 
 - **main**: <https://guard.boreale.dev/simulator/>, on PlayGuard's
   website ([`site/README.md`](../site/README.md)).
@@ -31,7 +39,8 @@ CMake).
 - **The language** is the browser's, if the console has it (`fr-CA` for a
   Canadian browser, `es-419` for a Mexican one, `zh-Hant` for Taiwan…; else
   English), unless the URL says `lang=` (`fr`, `de`, `zh-Hans`, …) or the
-  header's list picks another. The page is in the 15 languages of the
+  header's language menu picks another (each language a link to the page
+  with the same settings in it, which reloads it). The page is in the 15 languages of the
   console, and PlayGuard always starts in the page's.
 - **The theme** is *Dark* by default, as PlayGuard on a console. The
   header chooses *Auto* (the browser's) or *Light* instead (kept for the next
