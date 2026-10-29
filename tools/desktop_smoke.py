@@ -247,6 +247,11 @@ env.setdefault("TZ", "UTC")
 # And the focus highlight without its moving glow (ui/cadran_frame.cpp).
 env.setdefault("PLAYGUARD_SIM_STILL_FOCUS", "1")
 env["PLAYGUARD_SIM_FOCUS_LOG"] = "1"     # each line focused, by its words (go_to())
+# Aurore writes there, on every loop, its number and whether the screen has
+# settled (AURORE_SETTLE_FILE, a build with AURORE_DEV_TOOLS): pause() waits
+# for that instead of a fixed time.
+SETTLE = os.path.join(OUT, "settle.txt")
+env["AURORE_SETTLE_FILE"] = SETTLE
 # And one made-up development build, not this build's version and commit
 # (app.cpp): the header's version badge, and the update offers (1.1.0 below)
 # stay the same once this build is 1.1.0 or later.
@@ -849,9 +854,10 @@ def alive():
     return proc.poll() is None
 
 
-# The pauses around a press and before a screenshot. Aurore's longest
-# animation (a toast coming in) takes 300 ms, and a label starts scrolling
-# after 1.5 s focused: a screenshot comes 0.9 s after the last press, every
+# The longest pauses around a press and before a screenshot: pause() ends
+# them as soon as the screen has settled. Aurore's longest animation (a
+# toast coming in) takes 300 ms, and a label starts scrolling after 1.5 s
+# focused: a screenshot comes 0.9 s after the last press at most, every
 # animation over, no label moving yet.
 KEY_BEFORE = 0.35
 KEY_AFTER = 0.1
@@ -903,21 +909,52 @@ class _Keys:
 _keys = None
 
 
+def _settle():
+    """The app's loop number and whether its screen has settled, or None (no
+    file yet, a build without AURORE_DEV_TOOLS)."""
+    try:
+        with open(SETTLE) as f:
+            loop, ok = f.read().split()
+        return int(loop), ok == "1"
+    except (OSError, ValueError):
+        return None
+
+
+def pause(most):
+    """Waits for the screen to settle: a loop of the app's, begun after this
+    call, with no animation, no task, the input free and nothing to redraw
+    (Aurore's Application::isSettled()), `most` seconds at most, the fixed
+    pause this used to be. A screen that never settles (a label scrolling
+    after 1.5 s focused) gets that pause, no more; one that settles at once
+    no longer waits it out."""
+    end = time.time() + most
+    first = _settle()
+    if first is None:
+        time.sleep(most)
+        return
+    while time.time() < end:
+        now = _settle()
+        if now and now[0] > first[0] + 1 and now[1]:
+            return
+        time.sleep(0.01)
+
+
 def key(name, n=1, hold=0.02):
     """Presses `name` n times, each exactly once. A held Down / Up repeats
     (ScrollView scrolls a long text, then moves the focus again); with frames
     as slow as under software GL, even an 80 ms press could. So each press
-    waits for the screen to settle (KEY_BEFORE: Aurore's animations last
-    300 ms at most, timed by the clock, not by the frames) and is released
-    `hold` seconds later (20 ms by default), timed by the X server (_Keys) so
-    a busy machine cannot hold it longer."""
+    waits for the screen to settle (pause(), KEY_BEFORE at most: Aurore's
+    animations last 300 ms at most, timed by the clock, not by the frames)
+    and is released `hold` seconds later (20 ms by default), timed by the X
+    server (_Keys) so a busy machine cannot hold it longer; then for the
+    press to be taken in (pause(), KEY_AFTER at most)."""
     global _keys
     if _keys is None:
         _keys = _Keys()
     for _ in range(n):
-        time.sleep(KEY_BEFORE)
+        pause(KEY_BEFORE)
         _keys.press(name, hold)
-        time.sleep(KEY_AFTER)
+        pause(KEY_AFTER)
 
 
 def focused():
@@ -937,7 +974,7 @@ def go_to(label, direction="Down", most=25):
     """Presses `direction` until the line `label` has the focus (its words, in
     English), `most` times at most: a list or a sheet whose lines move keeps
     its tests right."""
-    time.sleep(KEY_BEFORE)     # the sheet just opened has its focus
+    pause(KEY_BEFORE)          # the sheet just opened has its focus
     for _ in range(most):
         if focused() == label:
             return
@@ -948,9 +985,9 @@ def go_to(label, direction="Down", most=25):
 
 def tap(x, y):
     """A touch at (x, y): the desktop build reads the left mouse button as one."""
-    time.sleep(KEY_BEFORE)
+    pause(KEY_BEFORE)
     subprocess.run(["xdotool", "mousemove", str(x), str(y), "mousedown", "1", "sleep", "0.05", "mouseup", "1"], env=env)
-    time.sleep(KEY_AFTER)
+    pause(KEY_AFTER)
 
 
 def screen(name):
@@ -982,13 +1019,13 @@ def key_to_end(name, most=50, hold=0.02):
 def button_x():
     """Ⓧ: the desktop build reads it from the middle mouse button (the
     keyboard has none), clicked over the title, where nothing takes the focus."""
-    time.sleep(KEY_BEFORE)
+    pause(KEY_BEFORE)
     subprocess.run(["xdotool", "mousemove", "640", "40", "mousedown", "2", "sleep", "0.05", "mouseup", "2"], env=env)
-    time.sleep(KEY_AFTER)
+    pause(KEY_AFTER)
 
 
 def shot(name):
-    time.sleep(SHOT_WAIT)
+    pause(SHOT_WAIT)
     subprocess.run(IM + ["import", "-window", "root", os.path.join(OUT, name + ".png")], env=env)
     if not alive():
         fail(f"app exited while showing {name}")
