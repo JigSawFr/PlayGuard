@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
+<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
 # Compatibilità
 
 Firmware, Atmosphère e launcher supportati, emuMMC e sysMMC, e come PlayGuard si confronta con un sysmodule sostitutivo. Torna al [README](../../README.md).
@@ -50,7 +50,7 @@ Ognuno ha il proprio filtro famiglia, e PlayGuard vede solo quello del sistema s
 
 ### La console rischia il ban?
 
-PlayGuard non contatta mai Nintendo: online raggiunge solo server dell'ora pubblici e GitHub (aggiornamenti, e i rapporti che invii). A far bannare le console è un firmware personalizzato o un'emuMMC che si collega a Nintendo ([FAQ di switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in inglese). Nessun ban legato a modifiche del filtro famiglia o dell'orologio è documentato; non è una garanzia.
+PlayGuard non contatta mai Nintendo: online raggiunge solo server dell'ora pubblici, GitHub (aggiornamenti, e i rapporti che invii) e switchbrew (il firmware più recente e le sue note di rilascio). A far bannare le console è un firmware personalizzato o un'emuMMC che si collega a Nintendo ([FAQ di switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in inglese). Nessun ban legato a modifiche del filtro famiglia o dell'orologio è documentato; non è una garanzia.
 
 ### Una console senza Internet
 

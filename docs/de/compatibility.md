@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
+<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
 # Kompatibilität
 
 Unterstützte Firmware, Atmosphère und Launcher, emuMMC und sysMMC, und wie PlayGuard sich mit einem Ersatz-Sysmodul vergleicht. Zurück zum [README](../../README.md).
@@ -50,7 +50,7 @@ Jede hat ihren eigenen Jugendschutz, und PlayGuard sieht nur den des Systems, au
 
 ### Kann die Konsole dadurch gesperrt werden?
 
-PlayGuard kontaktiert nie Nintendo: Online erreicht es nur öffentliche Zeitserver und GitHub (Updates und die Berichte, die du sendest). Gesperrt werden Konsolen, deren Custom Firmware oder emuMMC sich mit Nintendo verbindet ([switchbrew-FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), auf Englisch). Eine Sperre wegen Änderungen am Jugendschutz oder an der Uhr ist nicht dokumentiert; eine Garantie ist das nicht.
+PlayGuard kontaktiert nie Nintendo: Online erreicht es nur öffentliche Zeitserver, GitHub (Updates und die Berichte, die du sendest) und switchbrew (die neueste Firmware und ihre Versionshinweise). Gesperrt werden Konsolen, deren Custom Firmware oder emuMMC sich mit Nintendo verbindet ([switchbrew-FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), auf Englisch). Eine Sperre wegen Änderungen am Jugendschutz oder an der Uhr ist nicht dokumentiert; eine Garantie ist das nicht.
 
 ### Eine Konsole ohne Internet
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
+<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
 # Compatibilidade
 
 Firmware, Atmosphère e launchers suportados, emuMMC e sysMMC, e como o PlayGuard se compara com um sysmodule de substituição. Voltar ao [README](../../README.md).
@@ -50,7 +50,7 @@ Cada um tem o seu próprio controlo parental, e o PlayGuard só vê o do sistema
 
 ### A consola pode ser banida?
 
-O PlayGuard nunca contacta a Nintendo: online, só chega a servidores de hora públicos e ao GitHub (atualizações, e os relatórios que enviar). O que faz banir consolas é um firmware personalizado ou um emuMMC que se liga à Nintendo ([FAQ do switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), em inglês). Nenhum ban ligado a alterações do controlo parental ou do relógio está documentado; não é uma garantia.
+O PlayGuard nunca contacta a Nintendo: online, só chega a servidores de hora públicos, ao GitHub (atualizações, e os relatórios que enviar) e ao switchbrew (o firmware mais recente e as suas notas de versão). O que faz banir consolas é um firmware personalizado ou um emuMMC que se liga à Nintendo ([FAQ do switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), em inglês). Nenhum ban ligado a alterações do controlo parental ou do relógio está documentado; não é uma garantia.
 
 ### Uma consola sem Internet
 

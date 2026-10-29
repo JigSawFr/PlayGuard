@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
+<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
 # Compatibiliteit
 
 Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGuard zich verhoudt tot een vervangende sysmodule. Terug naar de [README](../../README.md).
@@ -50,7 +50,7 @@ Elk heeft zijn eigen ouderlijk toezicht, en PlayGuard ziet alleen dat van het sy
 
 ### Kan de console hierdoor een ban krijgen?
 
-PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers en GitHub (updates, en de rapporten die je verstuurt). Consoles krijgen een ban door custom firmware of een emuMMC die online gaat naar Nintendo ([FAQ van switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in het Engels). Er is geen ban gedocumenteerd die samenhangt met wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.
+PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers, GitHub (updates, en de rapporten die je verstuurt) en switchbrew (de nieuwste firmware en de release notes ervan). Consoles krijgen een ban door custom firmware of een emuMMC die online gaat naar Nintendo ([FAQ van switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in het Engels). Er is geen ban gedocumenteerd die samenhangt met wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.
 
 ### Een console zonder internet
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
+<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
 # 対応状況
 
 対応するファームウェア、Atmosphère、ランチャー、emuMMC と sysMMC、そして置き換え型の sysmodule との比較について説明します。トップページは [README](../../README.md)。
@@ -50,7 +50,7 @@ PlayGuard は Atmosphère が動いていることを確認しますが、その
 
 ### 本体が BAN される可能性は？
 
-PlayGuard は Nintendo に接続しません。オンラインでアクセスするのは、公開時刻サーバーと GitHub（アップデートと、送信したレポート）だけです。本体が BAN される原因は、カスタムファームウェアや emuMMC が Nintendo に接続することです（[switchbrew の FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)、英語）。みまもり設定や時計の変更による BAN は報告されていませんが、保証ではありません。
+PlayGuard は Nintendo に接続しません。オンラインでアクセスするのは、公開時刻サーバー、GitHub（アップデートと、送信したレポート）、switchbrew（最新のファームウェアとそのリリースノート）だけです。本体が BAN される原因は、カスタムファームウェアや emuMMC が Nintendo に接続することです（[switchbrew の FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)、英語）。みまもり設定や時計の変更による BAN は報告されていませんが、保証ではありません。
 
 ### インターネットのない本体
 

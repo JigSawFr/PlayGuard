@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 f5648921d1b6 -->
+<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
 # 호환성
 
 지원하는 펌웨어, Atmosphère, 런처, emuMMC와 sysMMC, 그리고 PlayGuard와 대체 sysmodule의 비교를 설명합니다. 처음으로 돌아가기: [README](../../README.md).
@@ -50,7 +50,7 @@ PlayGuard는 Atmosphère가 실행 중인지만 확인하고 버전은 확인하
 
 ### 본체가 BAN될 수 있나요?
 
-PlayGuard는 닌텐도에 절대 접속하지 않습니다. 온라인에서는 공개 시간 서버와 GitHub(업데이트, 그리고 사용자가 보내는 보고서)에만 접속합니다. 본체가 BAN되는 원인은 커스텀 펌웨어나 emuMMC가 온라인으로 닌텐도에 접속하는 것입니다([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), 영어). 자녀 보호 기능이나 시계 변경 때문에 BAN되었다는 기록은 없습니다. 다만 보장할 수는 없습니다.
+PlayGuard는 닌텐도에 절대 접속하지 않습니다. 온라인에서는 공개 시간 서버, GitHub(업데이트, 그리고 사용자가 보내는 보고서), switchbrew(최신 펌웨어와 그 릴리스 노트)에만 접속합니다. 본체가 BAN되는 원인은 커스텀 펌웨어나 emuMMC가 온라인으로 닌텐도에 접속하는 것입니다([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), 영어). 자녀 보호 기능이나 시계 변경 때문에 BAN되었다는 기록은 없습니다. 다만 보장할 수는 없습니다.
 
 ### 인터넷이 없는 본체
 
