@@ -3,7 +3,9 @@
 The desktop simulator (`make desktop`, `source/sim/`), compiled with
 [Emscripten](https://emscripten.org) for a browser: the real Aurore UI
 against a simulated console, to click through a change, try a state or show
-a screen without a build on the console.
+a screen without a build on the console. Its games are the desktop
+simulator's made-up ones, with their key art for icons and in the album
+([docs/contributing/simulator.md](../docs/contributing/simulator.md)).
 In the website's look (`site/assets/site.css`): its colours, its header in
 Boréale's night whatever the theme (the name opening the menu of Boréale's
 sites, the links to the website, the website's language menu, the theme's

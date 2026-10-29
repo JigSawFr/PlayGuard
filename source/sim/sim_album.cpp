@@ -1,10 +1,11 @@
 // Simulated core/album.h, and the album PLAYGUARD_SIM_FORWARDERS starts
 // with: four screenshots as the console writes them (1280 x 720, their
-// 320 x 180 thumbnail in their Exif data), drawn here from the made-up
-// homebrew's icons so the icon's square can be seen to move along them. Two
-// in Star Kart Racers the same minute, one in Island Builders, one on the
-// HOME menu (no game): today twice, yesterday, nine days ago, after the
-// console's clock as the album was first written.
+// 320 x 180 thumbnail in their Exif data). Two in Star Kart Racers the same
+// minute, one in Island Builders, each the game with its head-up display
+// (sim_shots.h, tools/sim_art.py), so the icon's square can be seen to move
+// along a real picture; one on the HOME menu (no game), its row of game
+// icons. Today twice, yesterday, nine days ago, after the console's clock as
+// the album was first written.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "core/album.h"
 
@@ -21,7 +22,8 @@
 #include "core/time_ops.h"
 #include "sim/sim_games.h"
 #include "sim/sim_homebrew.hpp"
-#include "sim/sim_homebrew_icons.h"
+#include "sim/sim_icons.h"
+#include "sim/sim_shots.h"
 #include "util/forwarder_icon.hpp"
 #include "util/paths.hpp"
 
@@ -33,22 +35,15 @@ struct Shot
     int                  days_back, hour, minute, second;   // before the console's day
     const char*          id;     // the name's end, after its time
     u64                  app_id;
-    const unsigned char* middle;
-    size_t               middle_size;
-    const unsigned char* sides;   // the icon left and right of it
-    size_t               sides_size;
-    unsigned char        top[3], bottom[3];   // the background, top to bottom
+    const unsigned char* game;   // the game's picture (sim_shots.h); none: the HOME menu
+    size_t               game_size;
 };
 
 const Shot SHOTS[] = {
-    { 0, 9, 12, 0, "57B4628D2267231D57E0FC1078C0596D", 0x0100A1B2C3D40000ULL, SIM_HB_ICON_ATLAS,
-      sizeof(SIM_HB_ICON_ATLAS), SIM_HB_ICON_PAINT, sizeof(SIM_HB_ICON_PAINT), { 0x1B, 0x2A, 0x5C }, { 0x3A, 0x8F, 0xC4 } },
-    { 0, 9, 12, 42, "57B4628D2267231D57E0FC1078C0596D", 0x0100A1B2C3D40000ULL, SIM_HB_ICON_PAINT,
-      sizeof(SIM_HB_ICON_PAINT), SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), { 0x4A, 0x1F, 0x6B }, { 0xD0, 0x6A, 0x8C } },
-    { 1, 17, 5, 0, "0E1D3C2B4A5968778695A4B3C2D1E0F0", 0x0100A1B2C3D41000ULL, SIM_HB_ICON_NOTES,
-      sizeof(SIM_HB_ICON_NOTES), SIM_HB_ICON_KEEPER, sizeof(SIM_HB_ICON_KEEPER), { 0x14, 0x4D, 0x3A }, { 0x8C, 0xC8, 0x6E } },
-    { 9, 9, 15, 0, "11223344556677889900AABBCCDDEEFF", 0, SIM_HB_ICON_KEEPER, sizeof(SIM_HB_ICON_KEEPER),
-      SIM_HB_ICON_NOTES, sizeof(SIM_HB_ICON_NOTES), { 0x30, 0x34, 0x3C }, { 0x8A, 0x90, 0x9C } },
+    { 0, 9, 12, 0, "57B4628D2267231D57E0FC1078C0596D", 0x0100A1B2C3D40000ULL, SIM_SHOT_0_1, sizeof(SIM_SHOT_0_1) },
+    { 0, 9, 12, 42, "57B4628D2267231D57E0FC1078C0596D", 0x0100A1B2C3D40000ULL, SIM_SHOT_0_2, sizeof(SIM_SHOT_0_2) },
+    { 1, 17, 5, 0, "0E1D3C2B4A5968778695A4B3C2D1E0F0", 0x0100A1B2C3D41000ULL, SIM_SHOT_1_1, sizeof(SIM_SHOT_1_1) },
+    { 9, 9, 15, 0, "11223344556677889900AABBCCDDEEFF", 0, nullptr, 0 },
 };
 
 constexpr int W = 1280, H = 720, TW = 320, TH = 180;
@@ -89,18 +84,29 @@ std::vector<unsigned char> jpeg(const std::vector<unsigned char>& rgb, int w, in
     return out;
 }
 
-// The screenshot: its background, an icon large in the middle, another
-// smaller at each side; then its thumbnail in its Exif data.
+// The screenshot: the game's picture as it is, or the HOME menu (its night
+// blue, a row of the first games' icons, the first one framed); then its
+// thumbnail in its Exif data.
 std::vector<unsigned char> picture(const Shot& s)
 {
     std::vector<unsigned char> rgb((size_t)W * H * 3);
-    for (int y = 0; y < H; y++)
-        for (int x = 0; x < W; x++)
-            for (int c = 0; c < 3; c++)
-                rgb[((size_t)y * W + x) * 3 + c] = (unsigned char)(s.top[c] + (s.bottom[c] - s.top[c]) * y / (H - 1));
-    draw(rgb, s.sides, s.sides_size, 40, 220, 280);
-    draw(rgb, s.sides, s.sides_size, W - 40 - 280, 220, 280);
-    draw(rgb, s.middle, s.middle_size, (W - 440) / 2, (H - 440) / 2, 440);
+    int w = 0, h = 0, comp = 0;
+    unsigned char* px = s.game ? stbi_load_from_memory(s.game, (int)s.game_size, &w, &h, &comp, 3) : nullptr;
+    if (px && w == W && h == H) {
+        std::memcpy(rgb.data(), px, rgb.size());
+    } else {
+        static const unsigned char top[3] = { 0x1E, 0x24, 0x30 }, bottom[3] = { 0x2C, 0x33, 0x42 };
+        for (int y = 0; y < H; y++)
+            for (int x = 0; x < W; x++)
+                for (int c = 0; c < 3; c++)
+                    rgb[((size_t)y * W + x) * 3 + c] = (unsigned char)(top[c] + (bottom[c] - top[c]) * y / (H - 1));
+        constexpr int side = 236, gap = 18, left = 60, row = 200;
+        for (int y = row - 8; y < row + side + 8; y++)
+            for (int x = left - 8; x < left + side + 8; x++)
+                for (int c = 0; c < 3; c++) rgb[((size_t)y * W + x) * 3 + c] = (unsigned char)(c == 0 ? 0x2E : c == 1 ? 0xC4 : 0xA6);
+        for (int i = 0; i < 5; i++) draw(rgb, SIM_ICONS[i], SIM_ICON_SIZES[i], left + i * (side + gap), row, side);
+    }
+    if (px) stbi_image_free(px);
     std::vector<unsigned char> small((size_t)TW * TH * 3);
     for (int y = 0; y < TH; y++)
         for (int x = 0; x < TW; x++)
