@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 
 #include "util/paths.hpp"
+#include "util/title_id.hpp"
 
 namespace sync_files
 {
@@ -201,9 +202,7 @@ std::string names_text(const std::vector<std::pair<uint64_t, std::string>>& name
     for (const auto& n : names) {
         const std::string name = one_line(n.second);
         if (name.empty()) continue;
-        char id[17];
-        std::snprintf(id, sizeof(id), "%016llX", (unsigned long long)n.first);
-        out += std::string(id) + "=" + name + "\n";
+        out += title_id::text(n.first) + "=" + name + "\n";
     }
     return out;
 }

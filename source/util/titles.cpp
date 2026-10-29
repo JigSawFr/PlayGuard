@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/titles.hpp"
+#include "util/title_id.hpp"
 
 #include <cstdio>
 
@@ -8,13 +9,6 @@ namespace titles
 
 namespace
 {
-std::string hex(uint64_t id)
-{
-    char out[17];
-    std::snprintf(out, sizeof(out), "%016llX", (unsigned long long)id);
-    return out;
-}
-
 // A name on one line: line breaks and control characters as spaces.
 std::string one_line(const std::string& s)
 {
@@ -64,14 +58,14 @@ bool note(Record& r, uint64_t id, SyncTitleKind k, const std::string& title_name
 std::string text(const Record& r)
 {
     std::string out = "# Written by PlayGuard: the titles that are not games, and their names.\n";
-    for (const auto& t : r) out += hex(t.first) + "=" + sync_title_kind_name(t.second.kind) + ":" + t.second.name + "\n";
+    for (const auto& t : r) out += title_id::text(t.first) + "=" + sync_title_kind_name(t.second.kind) + ":" + t.second.name + "\n";
     return out;
 }
 
 std::string agent_text(const Record& r)
 {
     std::string out = "# Written by PlayGuard: the titles that are not games (docs/sync-protocol.md).\n";
-    for (const auto& t : r) out += hex(t.first) + "=" + sync_title_kind_name(t.second.kind) + "\n";
+    for (const auto& t : r) out += title_id::text(t.first) + "=" + sync_title_kind_name(t.second.kind) + "\n";
     return out;
 }
 

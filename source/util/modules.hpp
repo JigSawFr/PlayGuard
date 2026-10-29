@@ -36,7 +36,6 @@ struct Module
 const std::vector<Module>& all();
 const Module& get(Id id);
 
-std::string tid_text(uint64_t tid);                               // "4200000000505247"
 std::string dir(const std::string& sd_root, const Module& m);     // <root>/atmosphere/contents/<tid>
 
 // The copy PlayGuard carries: <bundle_dir>/<name>/exefs.nsp and version.txt

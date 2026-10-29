@@ -7,6 +7,7 @@
 
 #include "action/play_data.hpp"
 #include "app.hpp"
+#include "util/title_id.hpp"
 
 using namespace aurore::literals;
 
@@ -122,7 +123,7 @@ std::string action_label(const GameFacts& g, u32 action, const GameContent* cont
         case GA_RESET_LAUNCH:  return "playguard/games/action/reset_launch"_i18n;
         case GA_VERIFY:        return "playguard/games/action/verify"_i18n;
         case GA_REMOVE_UPDATE: return aurore::getStr("playguard/games/action/remove_update", version_text(g, content ? content->version : g.patch_version));
-        case GA_REMOVE_ADDON:  return aurore::getStr("playguard/games/action/remove_addon", id_text(content ? content->id : 0));
+        case GA_REMOVE_ADDON:  return aurore::getStr("playguard/games/action/remove_addon", title_id::text(content ? content->id : 0));
         default:               return "playguard/games/action/remove"_i18n;
     }
 }
@@ -178,7 +179,7 @@ aurore::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, 
     block("playguard/games/cause"_i18n, cause_text(g, issue, current_hos));
     block("playguard/games/fix"_i18n, fix_text(g, issue, current_hos));
 
-    std::string footer = aurore::getStr("playguard/games/id", id_text(g.app_id));
+    std::string footer = aurore::getStr("playguard/games/id", title_id::text(g.app_id));
     if (g.display_version[0]) footer += " · " + aurore::getStr("playguard/games/version", std::string(g.display_version));
     if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + aurore::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
     if (app::dev_mode()) footer += "\n" + developer_text(g);
