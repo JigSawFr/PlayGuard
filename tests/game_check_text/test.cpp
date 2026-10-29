@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "action/game_check_text.hpp"
+#include "util/title_id.hpp"
 
 namespace
 {
@@ -110,8 +111,8 @@ static void test_firmware()
 static void test_ids()
 {
     using namespace game_check_text;
-    CHECK(id_text(0x0100ABCD12345000ULL) == "0100ABCD12345000");
-    CHECK(id_text(0x1A) == "000000000000001A" && id_text(0xFFFFFFFFFFFFFFFFULL) == "FFFFFFFFFFFFFFFF");
+    CHECK(title_id::text(0x0100ABCD12345000ULL) == "0100ABCD12345000");
+    CHECK(title_id::text(0x1A) == "000000000000001A" && title_id::text(0xFFFFFFFFFFFFFFFFULL) == "FFFFFFFFFFFFFFFF");
 
     GameFacts g = game();
     g.app_id = 0x0100000000010000ULL;

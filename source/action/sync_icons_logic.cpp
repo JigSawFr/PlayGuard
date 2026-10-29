@@ -2,24 +2,17 @@
 #include "action/sync_icons_logic.hpp"
 
 #include <algorithm>
-#include <cstdio>
 #include <cstdlib>
 #include <set>
 
 #include "sync/sync_icons.h"
+#include "util/title_id.hpp"
 
 namespace sync_icons_logic
 {
 
 namespace
 {
-std::string hex16(uint64_t v)
-{
-    char id[17];
-    std::snprintf(id, sizeof(id), "%016llX", (unsigned long long)v);
-    return id;
-}
-
 // 16 hex digits, either case; false for anything else.
 bool parse_id(const std::string& s, uint64_t* out)
 {
@@ -108,7 +101,7 @@ std::string text(const Sent& sent)
 {
     std::string out = "# Written by PlayGuard: the game icons it published (docs/sync-protocol.md).\n";
     out += "target=" + sent.target + "\n";
-    for (const auto& s : sent.icons) out += hex16(s.first) + "=" + std::to_string(s.second) + "\n";
+    for (const auto& s : sent.icons) out += title_id::text(s.first) + "=" + std::to_string(s.second) + "\n";
     return out;
 }
 
@@ -137,7 +130,7 @@ Sent parse(const std::string& text)
 
 std::string topic(uint64_t app_id)
 {
-    return "icon/" + hex16(app_id);
+    return "icon/" + title_id::text(app_id);
 }
 
 }   // namespace sync_icons_logic

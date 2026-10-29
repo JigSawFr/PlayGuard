@@ -24,7 +24,6 @@ using game_check_text::category_key;
 using game_check_text::console_code;
 using game_check_text::GROUPS;
 using game_check_text::history_label;
-using game_check_text::id_text;
 using game_check_text::issue_text_key;
 using game_check_text::MANY;
 using game_check_text::required_hos;

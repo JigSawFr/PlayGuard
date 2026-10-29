@@ -15,6 +15,7 @@
 #include "util/play_cache.hpp"
 #include "action/title_names.hpp"
 #include "util/system_titles.hpp"
+#include "util/title_id.hpp"
 
 namespace play_data
 {
@@ -108,7 +109,7 @@ void save(const Key& key, const PlayStats& stats)
 Key key_of(const PlayAccount* account)
 {
     if (!account) return "";
-    return fmt::format("{:016X}{:016X}", (unsigned long long)account->uid[0], (unsigned long long)account->uid[1]);
+    return title_id::text(account->uid[0]) + title_id::text(account->uid[1]);
 }
 
 std::shared_ptr<const PlayStats> latest(const Key& key)
@@ -220,7 +221,7 @@ std::string known_name(const GameStat& g)
 std::string game_name(const GameStat& g)
 {
     if (g.name[0]) return g.name;
-    const std::string id = fmt::format("{:016X}", (unsigned long long)g.app_id);
+    const std::string id = title_id::text(g.app_id);
     const std::string name = fallback_name(g.app_id, id);
     return name.empty() ? aurore::getStr("playguard/activity/deleted_game", id) : name;
 }

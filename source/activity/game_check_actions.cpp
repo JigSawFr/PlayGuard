@@ -32,6 +32,7 @@
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
 #include "ui/ui.hpp"
+#include "util/title_id.hpp"
 #include "view/game_tile.hpp"
 #include "view/segment_bar.hpp"
 #include "activity/game_check_parts.hpp"
@@ -147,7 +148,7 @@ void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
                   { "problem", "playguard/games/col_problem"_i18n, false } };
     for (const GameFacts& g : games) {
         const GameIssue issue = gamecheck_classify(&g, hos);
-        t.rows.push_back({ game_name(g), id_text(g.app_id), g.display_version, short_text(g, issue) });
+        t.rows.push_back({ game_name(g), title_id::text(g.app_id), g.display_version, short_text(g, issue) });
     }
     const std::string text = list_text(games);
     // Written off the UI thread, as the other exports; `done` back on it.
@@ -441,7 +442,7 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
             removal->failed.push_back(game);
             if (removal->strip) removal->strip->mark(at, CoverStrip::Mark::FAILED);
             if (removal->segments) removal->segments->set(at, SegmentBar::State::FAILED);
-            aurore::Logger::warning("games: {} not removed ({})", id_text(game.app_id), ui::rc_text(rc));
+            aurore::Logger::warning("games: {} not removed ({})", title_id::text(game.app_id), ui::rc_text(rc));
         }
         if (at + 1 < removal->games.size()) {
             this->remove_next(removal, at + 1);
@@ -540,7 +541,7 @@ void GameCheckActivity::remove_content(const GameFacts& g, const GameContent& c)
             return;
         }
         history_flow::record_event(update ? "remove_update" : "remove_addon", "",
-                                   update ? label : fmt::format("{} · {}", label, id_text(c.id)));
+                                   update ? label : fmt::format("{} · {}", label, title_id::text(c.id)));
         if (weak.expired()) {
             ui::notify(done);
             return;

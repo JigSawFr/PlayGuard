@@ -11,6 +11,7 @@
 
 #include "util/paths.hpp"
 #include "util/sha256.hpp"
+#include "util/title_id.hpp"
 
 namespace modules
 {
@@ -88,16 +89,9 @@ const Module& get(Id id)
     return all().front();
 }
 
-std::string tid_text(uint64_t tid)
-{
-    char text[17];
-    std::snprintf(text, sizeof(text), "%016llX", (unsigned long long)tid);
-    return text;
-}
-
 std::string dir(const std::string& sd_root, const Module& m)
 {
-    return join(sd_root, "atmosphere/contents/" + tid_text(m.tid));
+    return join(sd_root, "atmosphere/contents/" + title_id::text(m.tid));
 }
 
 Bundle bundled(const std::string& bundle_dir, const Module& m)
@@ -178,7 +172,7 @@ std::string toolbox_json(const Module& m)
 {
     // Read by the sysmodule managers (Hekate Toolbox, ovl-sysmodules):
     // the recovery module only acts at boot, so starting it now is pointless.
-    return std::string("{\n  \"name\": \"") + m.title + "\",\n  \"tid\": \"" + tid_text(m.tid) +
+    return std::string("{\n  \"name\": \"") + m.title + "\",\n  \"tid\": \"" + title_id::text(m.tid) +
            "\",\n  \"requires_reboot\": " + (m.resident ? "false" : "true") + "\n}\n";
 }
 

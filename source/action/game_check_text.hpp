@@ -50,8 +50,6 @@ u32 required_hos(const GameFacts& g);
 // a firmware too old, the rest their own.
 std::string fix_key(const GameFacts& g, GameIssue issue, u32 current_hos);
 
-// "0100ABCD12345000": a game's or a content's ID.
-std::string id_text(u64 id);
 // What the change history keeps: "Name (0100…)", the ID alone when unnamed.
 std::string history_label(const GameFacts& g);
 // A system result as the console shows it: "2016-0601".

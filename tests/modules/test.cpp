@@ -16,6 +16,7 @@
 #include "util/modules.hpp"
 #include "util/paths.hpp"
 #include "util/sha256.hpp"
+#include "util/title_id.hpp"
 
 using namespace modules;
 
@@ -69,7 +70,7 @@ static void test_table()
     CHECK(all().size() == 2);
     CHECK(get(Id::Rescue).tid == 0x4200000000505247ULL && !get(Id::Rescue).resident);
     CHECK(get(Id::Agent).resident && std::string(get(Id::Agent).name) == "agent");
-    CHECK(tid_text(0x4200000000505247ULL) == "4200000000505247");
+    CHECK(title_id::text(0x4200000000505247ULL) == "4200000000505247");
     CHECK(dir("/", get(Id::Rescue)) == "/atmosphere/contents/4200000000505247");
     CHECK(dir("sd", get(Id::Rescue)) == "sd/atmosphere/contents/4200000000505247");
     const std::string tb = toolbox_json(get(Id::Rescue));

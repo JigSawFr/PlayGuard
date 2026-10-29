@@ -44,6 +44,7 @@
 #include "util/paths.hpp"
 #include "util/profiles.hpp"
 #include "util/sync_files.hpp"
+#include "util/title_id.hpp"
 
 namespace sync_flow
 {
@@ -444,11 +445,6 @@ std::string date_before(const LocalTime& today, int back)
     return date_text(y, m, d);
 }
 
-std::string hex16(uint64_t v)
-{
-    return fmt::format("{:016X}", (unsigned long long)v);
-}
-
 // The state document, without its time stamp, to tell a change.
 std::string without_ts(const std::string& doc)
 {
@@ -555,7 +551,7 @@ std::string week_doc(const PlayStats& stats, const LocalTime& today, uint64_t ts
         }
         nlohmann::json min = nlohmann::json::array();
         for (int k = 6; k >= 0; k--) min.push_back(g.day_s[k] / 60);
-        nlohmann::json game = { { "app_id", hex16(g.app_id) }, { "min", min } };
+        nlohmann::json game = { { "app_id", title_id::text(g.app_id) }, { "min", min } };
         game["total_min"] = g.totals_ok ? nlohmann::json(g.total_s / 60) : nlohmann::json(nullptr);
         game["launches"] = g.totals_ok ? nlohmann::json(g.launches) : nlohmann::json(nullptr);
         games.push_back(game);
@@ -572,7 +568,7 @@ std::string week_doc(const PlayStats& stats, const LocalTime& today, uint64_t ts
             for (uint32_t i = 0; a.second && i < a.second->count; i++) s += a.second->games[i].day_s[k];
             min.push_back(s / 60);
         }
-        accounts.push_back({ { "uid", hex16(a.first.uid[0]) + hex16(a.first.uid[1]) }, { "min", min } });
+        accounts.push_back({ { "uid", title_id::text(a.first.uid[0]) + title_id::text(a.first.uid[1]) }, { "min", min } });
     }
     j["accounts"] = accounts;
     return j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);

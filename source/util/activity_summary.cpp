@@ -1,8 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/activity_summary.hpp"
+#include "util/title_id.hpp"
 
 #include <algorithm>
-#include <cstdio>
 
 namespace activity_summary
 {
@@ -209,8 +209,7 @@ table_export::Table export_table(const PlayStats& s, int period, const ExportTex
     sort_by_play(games, period, true);
     auto minutes = [](uint64_t seconds) { return std::to_string((seconds + 30) / 60); };
     for (const GameStat* g : games) {
-        char id[24];
-        std::snprintf(id, sizeof(id), "%016llX", (unsigned long long)g->app_id);
+        const std::string id = title_id::text(g->app_id);
         t.rows.push_back({
             text.name(*g),
             id,

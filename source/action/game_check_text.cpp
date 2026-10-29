@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/game_check_text.hpp"
+#include "util/title_id.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -65,16 +66,9 @@ std::string fix_key(const GameFacts& g, GameIssue issue, u32 current_hos)
     return issue_text_key(issue, "fix");
 }
 
-std::string id_text(u64 id)
-{
-    char buf[24];
-    std::snprintf(buf, sizeof(buf), "%016llX", (unsigned long long)id);
-    return buf;
-}
-
 std::string history_label(const GameFacts& g)
 {
-    return g.name[0] ? std::string(g.name) + " (" + id_text(g.app_id) + ")" : id_text(g.app_id);
+    return g.name[0] ? std::string(g.name) + " (" + title_id::text(g.app_id) + ")" : title_id::text(g.app_id);
 }
 
 std::string console_code(Result rc)
@@ -86,7 +80,7 @@ std::string console_code(Result rc)
 
 std::string game_name(const GameFacts& g, const std::function<std::string(const std::string& id)>& unnamed)
 {
-    return g.name[0] ? std::string(g.name) : unnamed(id_text(g.app_id));
+    return g.name[0] ? std::string(g.name) : unnamed(title_id::text(g.app_id));
 }
 
 Sorted sort_broken(const std::vector<GameFacts>& games, u32 hos, const Words& w)
@@ -123,7 +117,7 @@ std::map<u64, std::string> line_names(const std::vector<Broken>& broken, const W
         bool versions_differ = g.display_version[0] != '\0';
         for (const GameFacts* t : twins)
             if (t->app_id != g.app_id && !std::strcmp(t->display_version, g.display_version)) versions_differ = false;
-        out[g.app_id] = name + " · " + (versions_differ ? std::string(g.display_version) : id_text(g.app_id));
+        out[g.app_id] = name + " · " + (versions_differ ? std::string(g.display_version) : title_id::text(g.app_id));
     }
     return out;
 }
@@ -160,7 +154,7 @@ std::string list_text(const std::vector<GameFacts>& games, u32 hos, const Words&
     std::string text = w.list_title + "\n\n";
     for (const GameFacts& g : games) {
         const GameIssue issue = gamecheck_classify(&g, hos);
-        text += id_text(g.app_id) + "  " + game_name(g, w.unnamed) +
+        text += title_id::text(g.app_id) + "  " + game_name(g, w.unnamed) +
                 (g.display_version[0] ? " · " + w.version(g.display_version) : "") + " · " + w.problem(g, issue) + "\n";
     }
     return text;
