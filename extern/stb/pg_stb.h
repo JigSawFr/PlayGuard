@@ -1,7 +1,7 @@
 // pg_stb — stb_truetype and stb_image (JPEG only), static in pg_stb.c,
 // behind a few functions of PlayGuard's: the PIN gate's screen
 // (source/core/gate_screen.c) draws text and a homebrew's icon with them.
-// nanovg (borealis) builds its own copies with its own allocator, which
+// nanovg (Aurore) builds its own copies with its own allocator, which
 // these do not touch.
 #pragma once
 

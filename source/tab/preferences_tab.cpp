@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
 
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
@@ -12,7 +12,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -26,35 +26,35 @@ int index_of(const char* const (&list)[N], const std::string& value)
 
 std::string tab_name(const std::string& tab)
 {
-    return brls::getStr("playguard/tabs/" + tab);
+    return aurore::getStr("playguard/tabs/" + tab);
 }
 }   // namespace
 
 PreferencesTab::PreferencesTab()
     : TabBase("xml/tab/preferences.xml", false), list(this)
 {
-    language->registerClickAction([this](brls::View*) {
+    language->registerClickAction([this](aurore::View*) {
         ui::pick_language(this->refresher());
         return true;
     });
 
-    theme->registerClickAction([this](brls::View*) {
+    theme->registerClickAction([this](aurore::View*) {
         ui::pick_theme(this->refresher());
         return true;
     });
     // The colours: PlayGuard's, Aurore's presets or the user's theme files
     // (docs/themes.md), applied at once.
-    palette->registerClickAction([this](brls::View*) {
+    palette->registerClickAction([this](aurore::View*) {
         ui::pick_palette(this->refresher());
         return true;
     });
-    text_size->registerClickAction([this](brls::View*) {
+    text_size->registerClickAction([this](aurore::View*) {
         ui::pick_text_size(this->refresher());
         return true;
     });
-    effects->registerClickAction([this](brls::View*) {
+    effects->registerClickAction([this](aurore::View*) {
         std::vector<std::string> labels;
-        for (const char* e : config::EFFECTS) labels.push_back(brls::getStr(std::string("playguard/prefs/effects_values/") + e));
+        for (const char* e : config::EFFECTS) labels.push_back(aurore::getStr(std::string("playguard/prefs/effects_values/") + e));
         // Automatic as Text size's (full on the TV), full, and still.
         const std::vector<std::string> icons = { "tv", "sparkle", "pause" };
         static_assert(sizeof(config::EFFECTS) / sizeof(config::EFFECTS[0]) == 3, "an icon for each choice");
@@ -67,12 +67,12 @@ PreferencesTab::PreferencesTab()
     });
 
     // The main screen's sidebar: open, on its icons, or folding by itself.
-    rail->registerClickAction([this](brls::View*) {
+    rail->registerClickAction([this](aurore::View*) {
         ui::pick_rail(this->refresher());
         return true;
     });
 
-    start_tab->registerClickAction([this](brls::View*) {
+    start_tab->registerClickAction([this](aurore::View*) {
         std::vector<std::string> labels;
         for (const char* t : config::START_TABS) labels.push_back(tab_name(t));
         // Each tab's icon, as the sidebar draws it (ui/cadran_frame.cpp).
@@ -124,14 +124,14 @@ PreferencesTab::PreferencesTab()
         config::get().update_daily = on;
         ui::save_config();
     });
-    update_via->registerClickAction([this](brls::View*) {
+    update_via->registerClickAction([this](aurore::View*) {
         update_flow::choose_method(this->refresher());
         return true;
     });
     // The guide again (also at the top of About › Help & diagnostics).
     first_steps->setDetailText(ui::opens());
-    first_steps->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new OnboardingActivity());
+    first_steps->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new OnboardingActivity());
         return true;
     });
 
@@ -150,7 +150,7 @@ void PreferencesTab::refresh()
     theme->setDetailText(ui::theme_name(true));
     palette->setDetailText(ui::palette_name());
     text_size->setDetailText(ui::text_size_name(true));
-    effects->setDetailText(brls::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.look.effects)])));
+    effects->setDetailText(aurore::getStr("playguard/prefs/effects_values/" + std::string(config::EFFECTS[index_of(config::EFFECTS, cfg.look.effects)])));
     rail->setDetailText(ui::rail_name());
     start_tab->setDetailText(tab_name(config::START_TABS[index_of(config::START_TABS, cfg.start_tab)]));
     intro->setOn(cfg.intro, false);
@@ -165,7 +165,7 @@ void PreferencesTab::refresh()
     cadran::set_pill("");
 }
 
-brls::View* PreferencesTab::create()
+aurore::View* PreferencesTab::create()
 {
     return new PreferencesTab();
 }

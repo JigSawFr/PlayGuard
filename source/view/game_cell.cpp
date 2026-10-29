@@ -1,23 +1,23 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/game_cell.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/game_icons.hpp"
 
 GameCell::GameCell(bool with_icon)
 {
     if (!with_icon) return;
-    this->slot = new brls::Box();
+    this->slot = new aurore::Box();
     this->slot->setWidth(44);
     this->slot->setHeight(44);
     this->slot->setMarginRight(16);
     this->slot->setShrink(0);
-    this->icon = new brls::Image();
+    this->icon = new aurore::Image();
     this->icon->setWidth(44);
     this->icon->setHeight(44);
     this->icon->setCornerRadius(8);
-    this->icon->setScalingType(brls::ImageScalingType::FIT);
+    this->icon->setScalingType(aurore::ImageScalingType::FIT);
     // Until the icon arrives (or for a game without one): the placeholder.
     if (const int waiting = game_icons::placeholder()) {
         this->icon->innerSetImage(waiting);
@@ -35,8 +35,8 @@ void GameCell::set_badge(const char* icon_name, const char* color_key)
         this->badge = nullptr;
     }
     if (!icon_name) return;
-    this->badge = new brls::Box();
-    this->badge->setPositionType(brls::PositionType::ABSOLUTE);
+    this->badge = new aurore::Box();
+    this->badge->setPositionType(aurore::PositionType::ABSOLUTE);
     this->badge->setPositionRight(-6);
     this->badge->setPositionBottom(-6);
     this->badge->setWidth(22);
@@ -45,8 +45,8 @@ void GameCell::set_badge(const char* icon_name, const char* color_key)
     this->badge->setThemeColor("backgroundColor", "cadran/surf2");
     this->badge->setThemeColor("borderColor", color_key);
     this->badge->setBorderThickness(1.5f);
-    this->badge->setAlignItems(brls::AlignItems::CENTER);
-    this->badge->setJustifyContent(brls::JustifyContent::CENTER);
+    this->badge->setAlignItems(aurore::AlignItems::CENTER);
+    this->badge->setJustifyContent(aurore::JustifyContent::CENTER);
     this->badge->addView(cadran::kit::icon(icon_name, 13, color_key));
     this->slot->addView(this->badge);
 }
@@ -58,8 +58,8 @@ void GameCell::set_marks(const std::vector<Mark>& list)
         this->marks = nullptr;
     }
     if (list.empty()) return;
-    this->marks = new brls::Box(brls::Axis::ROW);
-    this->marks->setAlignItems(brls::AlignItems::CENTER);
+    this->marks = new aurore::Box(aurore::Axis::ROW);
+    this->marks->setAlignItems(aurore::AlignItems::CENTER);
     this->marks->setShrink(0);
     for (const Mark& m : list) {
         CadranIcon* view = cadran::kit::icon(m.icon, 22, m.color_key);
@@ -69,7 +69,7 @@ void GameCell::set_marks(const std::vector<Mark>& list)
     // Before the detail text, the cell's last view; without text, the
     // label goes, and its room with it.
     const bool text = !this->detail->getFullText().empty();
-    this->detail->setVisibility(text ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    this->detail->setVisibility(text ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
     if (text) this->marks->setMarginRight(12);
     this->addView(this->marks, this->getChildren().size() - 1);
 }

@@ -9,7 +9,7 @@
 // PlayGuard pushes and answers is logged ("sim agent: …") for the smoke test.
 // No broker: the simulated agent says it is online.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstring>
 
 #include "core/sim_env.h"
@@ -46,7 +46,7 @@ bool present()
     const bool up = module_running(modules::get(modules::Id::Agent).tid, nullptr) && kind() != "broken";
     if (!up && s_agent) {
         // The process ended: its session and its state with it.
-        brls::Logger::info("sim agent: stopped{}", s_open ? ", session lost" : "");
+        aurore::Logger::info("sim agent: stopped{}", s_open ? ", session lost" : "");
         s_open = false;
         delete s_agent;
         s_agent = nullptr;
@@ -77,7 +77,7 @@ void publish_pushed()
     for (int i = 0; i < AGENT_FINALS; i++)
         if (a.finals[i].fresh) {
             a.finals[i].fresh = false;
-            brls::Logger::info("sim agent: publish activity/{} ({} bytes)", a.finals[i].date, a.finals[i].len);
+            aurore::Logger::info("sim agent: publish activity/{} ({} bytes)", a.finals[i].date, a.finals[i].len);
         }
 }
 
@@ -118,7 +118,7 @@ bool open(AgentHelloReply* reply, Result* rc_out)
     if (kind() == "old") {
         // An agent of an older protocol: the reply, no session.
         std::snprintf(reply->version, sizeof(reply->version), "0.9.0-sim");
-        brls::Logger::info("sim agent: Hello -> refused (old agent)");
+        aurore::Logger::info("sim agent: Hello -> refused (old agent)");
         return true;
     }
     AgentHello hello;
@@ -134,7 +134,7 @@ bool open(AgentHelloReply* reply, Result* rc_out)
     const Result rc = call(AgentCmd_Hello, c);
     if (rc_out) *rc_out = rc;
     s_open = rc == 0 && reply->accepted;
-    brls::Logger::info("sim agent: Hello -> {}", s_open ? "accepted" : "refused");
+    aurore::Logger::info("sim agent: Hello -> {}", s_open ? "accepted" : "refused");
     if (s_open) hand_order();
     return rc == 0;
 }
@@ -144,7 +144,7 @@ void close()
     if (!s_open) return;
     s_open = false;
     if (s_agent) agent_session_closed(s_agent);
-    brls::Logger::info("sim agent: session closed");
+    aurore::Logger::info("sim agent: session closed");
 }
 
 bool connected()
@@ -169,7 +169,7 @@ static Result send_buffer(uint32_t cmd, const std::string& data)
     c.buf = data.data();
     c.buf_len = data.size();
     const Result rc = call(cmd, c);
-    brls::Logger::info("sim agent: push {} ({} bytes) -> {}", cmd, data.size(), rc);
+    aurore::Logger::info("sim agent: push {} ({} bytes) -> {}", cmd, data.size(), rc);
     return rc;
 }
 
@@ -199,7 +199,7 @@ Result order_result(const AgentResult& r)
     c.in = &r;
     c.in_len = sizeof(r);
     const Result rc = call(AgentCmd_OrderResult, c);
-    brls::Logger::info("sim agent: order {} -> {}", r.id, r.applied ? "applied" : sync_reason_name((SyncReason)r.reason));
+    aurore::Logger::info("sim agent: order {} -> {}", r.id, r.applied ? "applied" : sync_reason_name((SyncReason)r.reason));
     return rc;
 }
 
@@ -217,7 +217,7 @@ Result sync_now()
 
 Result reload()
 {
-    brls::Logger::info("sim agent: reload");
+    aurore::Logger::info("sim agent: reload");
     return plain(AgentCmd_ReloadConfig);
 }
 

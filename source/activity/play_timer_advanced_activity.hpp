@@ -5,11 +5,11 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "util/pctl_ops_c.hpp"
 
-class PlayTimerAdvancedActivity : public brls::Activity
+class PlayTimerAdvancedActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/play_timer_advanced.xml");
@@ -21,10 +21,10 @@ class PlayTimerAdvancedActivity : public brls::Activity
 
     void refresh();
 
-    BRLS_BIND(brls::BooleanCell, show,   "pa_show");
-    BRLS_BIND(brls::Label,       note,   "pa_note");
-    BRLS_BIND(brls::BooleanCell, alarm,  "pa_alarm");
-    BRLS_BIND(brls::DetailCell,  pause,  "pa_pause");
-    BRLS_BIND(brls::DetailCell,  resume, "pa_resume");
-    BRLS_BIND(brls::DetailCell,  diag,   "pa_diag");
+    AURORE_BIND(aurore::BooleanCell, show,   "pa_show");
+    AURORE_BIND(aurore::Label,       note,   "pa_note");
+    AURORE_BIND(aurore::BooleanCell, alarm,  "pa_alarm");
+    AURORE_BIND(aurore::DetailCell,  pause,  "pa_pause");
+    AURORE_BIND(aurore::DetailCell,  resume, "pa_resume");
+    AURORE_BIND(aurore::DetailCell,  diag,   "pa_diag");
 };

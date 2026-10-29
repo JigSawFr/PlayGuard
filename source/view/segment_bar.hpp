@@ -5,10 +5,10 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <vector>
 
-class SegmentBar : public brls::View
+class SegmentBar : public aurore::View
 {
   public:
     enum class State { WAITING, DONE, FAILED };
@@ -16,13 +16,13 @@ class SegmentBar : public brls::View
     explicit SegmentBar(size_t count);
     void set(size_t index, State state);
 
-    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-              brls::FrameContext* ctx) override;
+    void draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+              aurore::FrameContext* ctx) override;
 
     // Up to this many games, a removal shows its segments; past it, the bar.
     static constexpr size_t MAX = 20;
 
   private:
     std::vector<State> states;
-    std::vector<brls::Time> since;   // when each segment changed (µs)
+    std::vector<aurore::Time> since;   // when each segment changed (µs)
 };

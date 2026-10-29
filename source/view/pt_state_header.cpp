@@ -6,7 +6,7 @@
 #include "action/timer_health.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 PtStateHeader::PtStateHeader()
 {
@@ -37,7 +37,7 @@ void PtStateHeader::show(const PtState& pt)
     ui::set_visible(health, stalled);
 }
 
-brls::View* PtStateHeader::create()
+aurore::View* PtStateHeader::create()
 {
     return new PtStateHeader();
 }

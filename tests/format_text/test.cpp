@@ -1,7 +1,7 @@
 // Host tests for source/ui/play_text.cpp and Aurore's Cadran format_text.cpp,
 // translated by the real catalogs (resources/i18n/<lang>/playguard.json and
 // Aurore's cadran.json, read from the repository root `make test` runs in)
-// through ui/tr.hpp's stand-in for borealis: limits ("No
+// through ui/tr.hpp's stand-in for Aurore: limits ("No
 // limit", "0 min (no play)", "45 min", "2 h", "2 h 05"), the week's limits in
 // a few words, time played and left (rounded to the minute, at most a day),
 // play time over any length ("< 1 min", "52 h 30", "278 h"), a daily
@@ -13,11 +13,11 @@
 #include <cstdint>
 #include <fstream>
 #include <map>
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 #include <set>
 #include <string>
 
-#include <borealis/cadran/ui/tr.hpp>
+#include <aurore/cadran/ui/tr.hpp>
 
 #include "ui/play_text.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -47,11 +47,11 @@ static bool load(const std::string& lang)
     return !s_catalog.empty();
 }
 
-namespace brls
+namespace aurore
 {
 namespace internal
 {
-// As borealis: a key the catalog lacks reads as itself.
+// As Aurore: a key the catalog lacks reads as itself.
 std::string getRawStr(std::string name)
 {
     const auto it = s_catalog.find(name);
@@ -68,7 +68,7 @@ std::string operator""_i18n(const char* str, size_t len)
     return internal::getRawStr(std::string(str, len));
 }
 }   // namespace literals
-}   // namespace brls
+}   // namespace aurore
 
 static void test_minutes()
 {

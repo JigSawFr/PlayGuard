@@ -7,14 +7,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 #include <vector>
 
 #include "util/pctl_ops_c.hpp"
 #include "view/play_days.hpp"
 
-class GameActivity : public brls::Activity
+class GameActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/game.xml");
@@ -38,17 +38,17 @@ class GameActivity : public brls::Activity
     bool every_account;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);   // guards the accounts' read
 
-    BRLS_BIND(brls::Image,      icon,     "ga_icon");
-    BRLS_BIND(brls::Label,      name,     "ga_name");
-    BRLS_BIND(PlayDaysView,     days,     "ga_days");
-    BRLS_BIND(brls::DetailCell, today,    "ga_today");
-    BRLS_BIND(brls::DetailCell, week,     "ga_week");
-    BRLS_BIND(brls::DetailCell, total,    "ga_total");
-    BRLS_BIND(brls::DetailCell, launches, "ga_launches");
-    BRLS_BIND(brls::DetailCell, first,    "ga_first");
-    BRLS_BIND(brls::DetailCell, last,     "ga_last");
-    BRLS_BIND(brls::DetailCell, rating,   "ga_rating");
-    BRLS_BIND(brls::Header,     accounts_header, "ga_accounts_header");
-    BRLS_BIND(brls::Box,        accounts, "ga_accounts");
-    BRLS_BIND(brls::Label,      accounts_note, "ga_accounts_note");
+    AURORE_BIND(aurore::Image,      icon,     "ga_icon");
+    AURORE_BIND(aurore::Label,      name,     "ga_name");
+    AURORE_BIND(PlayDaysView,     days,     "ga_days");
+    AURORE_BIND(aurore::DetailCell, today,    "ga_today");
+    AURORE_BIND(aurore::DetailCell, week,     "ga_week");
+    AURORE_BIND(aurore::DetailCell, total,    "ga_total");
+    AURORE_BIND(aurore::DetailCell, launches, "ga_launches");
+    AURORE_BIND(aurore::DetailCell, first,    "ga_first");
+    AURORE_BIND(aurore::DetailCell, last,     "ga_last");
+    AURORE_BIND(aurore::DetailCell, rating,   "ga_rating");
+    AURORE_BIND(aurore::Header,     accounts_header, "ga_accounts_header");
+    AURORE_BIND(aurore::Box,        accounts, "ga_accounts");
+    AURORE_BIND(aurore::Label,      accounts_note, "ga_accounts_note");
 };

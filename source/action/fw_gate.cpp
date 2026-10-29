@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/fw_gate.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
@@ -75,12 +75,12 @@ void on_main_screen()
     if (!needed()) return;
     if (!s_remembered) {
         ui::claim_start_screen("the firmware screen");   // first: nothing asked before it
-        brls::sync([]() { brls::Application::pushActivity(new FirmwareGateActivity()); });
+        aurore::sync([]() { aurore::Application::pushActivity(new FirmwareGateActivity()); });
         return;
     }
     update_flow::check_once([](const update_flow::Offer& o) {
         if (o.result.verdict != update::Verdict::UpdateSupports) return;
-        ui::notify(brls::getStr("playguard/fw_gate/update_toast", o.result.latest.version, firmware()));
+        ui::notify(aurore::getStr("playguard/fw_gate/update_toast", o.result.latest.version, firmware()));
     });
 }
 

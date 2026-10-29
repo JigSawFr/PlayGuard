@@ -8,12 +8,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <string>
 
-#include <borealis/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
 
-class PtRing : public brls::Box
+class PtRing : public aurore::Box
 {
   public:
     PtRing();
@@ -42,15 +42,15 @@ class PtRing : public brls::Box
     void setCaptionSize(float size);
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
-              brls::Style style, brls::FrameContext* ctx) override;
+              aurore::Style style, aurore::FrameContext* ctx) override;
     void onThemeChanged() override;
 
-    static brls::View* create();
+    static aurore::View* create();
 
   private:
     float used = -1.0f;
     float extra = 0.0f;
-    brls::Animatable shown;   // the arc as drawn, on its way to `used`
+    aurore::Animatable shown;   // the arc as drawn, on its way to `used`
     // The figure's width at most: what the ring's inside leaves at its height,
     // less a margin (from the ring's size, as set).
     void fit();
@@ -59,7 +59,7 @@ class PtRing : public brls::Box
     bool pulse_fast = false;
     bool tip = false;
     CadranDigits* value  = nullptr;
-    brls::Label* caption = nullptr;
+    aurore::Label* caption = nullptr;
     // The arc's colours, looked up when the theme changes rather than at
     // each frame (each lookup builds a key).
     void take_colours();

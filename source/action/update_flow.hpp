@@ -7,7 +7,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <functional>
 #include <string>
 #include <vector>
@@ -43,7 +43,7 @@ void check_once(std::function<void(const Offer&)> done);
 // At start-up: checks when Check for updates every day is on (at most once a
 // day) or when the last check found a newer version; the update screen comes
 // up on `main` once nothing else is in front of it, unless postponed.
-void at_start(brls::Activity* main);
+void at_start(aurore::Activity* main);
 // A newer release is known (the last check's) and not postponed: its screen
 // comes at start-up (agent_update leaves its own offer for later then).
 bool pending_at_start();

@@ -1,5 +1,5 @@
 // stb_truetype and stb_image (JPEG only), static, behind pg_stb.h (public
-// domain: their authors' terms at the end of each header, in borealis'
+// domain: their authors' terms at the end of each header, in Aurore's
 // nanovg folder, which this includes).
 #include "pg_stb.h"
 
@@ -17,14 +17,14 @@
 #endif
 #define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <borealis/extern/nanovg/stb_truetype.h>
+#include <aurore/extern/nanovg/stb_truetype.h>
 #define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_JPEG
 #define STBI_NO_STDIO
 #define STBI_NO_LINEAR
 #define STBI_NO_HDR
-#include <borealis/extern/nanovg/stb_image.h>
+#include <aurore/extern/nanovg/stb_image.h>
 // (Not popped: the declarations it leaves unused are warned of at the end
 // of this file.)
 

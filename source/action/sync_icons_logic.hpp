@@ -1,6 +1,6 @@
 // sync_icons_logic — which games' icons the remote link publishes
 // (docs/sync-protocol.md, `icon/<app id>`) and what is left to send or clear,
-// without borealis, the console or the network (action/sync_icons does
+// without Aurore, the console or the network (action/sync_icons does
 // those). Every game installed or played, each sent once: what was sent, and
 // to which broker and console, is kept in nand/<system>/sync/icons.txt so a
 // new run sends only what changed.

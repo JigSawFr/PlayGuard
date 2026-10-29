@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/rollback_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstdio>
 
 #include "action/dev_build_flow.hpp"
@@ -16,7 +16,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/rollback.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace rollback_flow
 {
@@ -33,9 +33,9 @@ std::string back_file() { return paths::data_dir() + "/went_back.json"; }
 void log_migration(bool warning, const std::string& line)
 {
     if (warning)
-        brls::Logger::warning("rollback: {}", line);
+        aurore::Logger::warning("rollback: {}", line);
     else
-        brls::Logger::info("rollback: {}", line);
+        aurore::Logger::info("rollback: {}", line);
 }
 
 // The swap, the running build's name kept for the one now previous. romfs:/
@@ -78,19 +78,19 @@ bool at_start()
 
     std::string previous;
     if (!rollback::read_label(label_file(), &previous)) previous = "the previous build";
-    // Plain ASCII, in English: borealis (and the translations) are not up yet.
+    // Plain ASCII, in English: Aurore (and the translations) are not up yet.
     const std::string text = "\n  PlayGuard " + running_label() +
                              "\n\n  Its last start did not finish (it may have crashed).\n\n  (A)  Go back to " +
                              previous + "\n  (B)  Start " + running_label() + "\n";
-    brls::Logger::info("rollback: offered (crashed)");
+    aurore::Logger::info("rollback: offered (crashed)");
     if (!platform_boot_choice(text.c_str())) return false;
 
     // Going back replaces PlayGuard, as Install another build does: the
     // PIN whenever one is set. The system's PIN screen, not PlayGuard's
-    // (which may be what crashed); config and borealis are not needed.
+    // (which may be what crashed); config and Aurore are not needed.
     const Result pin = pctl_ask_pin();
     if (!rollback::go_back_allowed(R_SUCCEEDED(pin), pin == NXM_RC_NO_PIN)) {
-        brls::Logger::info("rollback: not gone back, the PIN not entered (0x{:08X})", (unsigned)pin);
+        aurore::Logger::info("rollback: not gone back, the PIN not entered (0x{:08X})", (unsigned)pin);
         // Left with B: said plainly; another failure with its code.
         const std::string why =
             pin == NXM_RC_CANCELLED ? std::string() : " (" + fmt::format("0x{:08X}", (unsigned)pin) + ")";
@@ -105,7 +105,7 @@ bool at_start()
         platform_boot_choice(("\n  Could not go back: " + err + "\n\n  (A) / (B)  Start PlayGuard\n").c_str());
         return false;
     }
-    brls::Logger::info("rollback: back to {}", previous);
+    aurore::Logger::info("rollback: back to {}", previous);
     if (launcher::can_launch() && launcher::launch_nro(dev_build_flow::nro_sd_path())) return true;
     platform_boot_choice(("\n  " + previous + " is back in place.\n  Close PlayGuard and start it again.\n\n  (A) / (B)  Close\n").c_str());
     return true;
@@ -117,8 +117,8 @@ void started()
     if (rollback::read_check(check_file(), &check) && !check.label.empty()) {
         std::string previous;
         if (!rollback::read_label(label_file(), &previous)) previous = "?";
-        notices::set("installed", notices::Level::Info, brls::getStr("playguard/notices/installed", check.label),
-                     brls::getStr("playguard/notices/installed_detail", previous));
+        notices::set("installed", notices::Level::Info, aurore::getStr("playguard/notices/installed", check.label),
+                     aurore::getStr("playguard/notices/installed_detail", previous));
     }
     std::remove(check_file().c_str());
 }
@@ -131,7 +131,7 @@ void note_went_back()
     const std::string from = back.label.empty() ? "?" : back.label;
     notices::set("went_back", back.starts ? notices::Level::Action : notices::Level::Info,
                  "playguard/notices/went_back"_i18n,
-                 brls::getStr(back.starts ? "playguard/notices/went_back_crash" : "playguard/notices/went_back_detail",
+                 aurore::getStr(back.starts ? "playguard/notices/went_back_crash" : "playguard/notices/went_back_detail",
                               from, running_label()),
                  back.starts ? "cadran/notices/send_report"_i18n : "", []() {
                      notices::clear("went_back");
@@ -169,14 +169,14 @@ void go_back_now()
     std::string label, err;
     if (!previous(&label)) return;
     if (!swap(dev_build_flow::nro_file(), &err, false)) {
-        ui::error(brls::getStr("playguard/dev_build/back_failed", err));
+        ui::error(aurore::getStr("playguard/dev_build/back_failed", err));
         return;
     }
     if (launcher::can_launch() && launcher::launch_nro(dev_build_flow::nro_sd_path())) {
-        brls::Application::quit();   // hbloader starts it as soon as this one exits
+        aurore::Application::quit();   // hbloader starts it as soon as this one exits
         return;
     }
-    ui::info(brls::getStr("playguard/dev_build/done_manual", label));
+    ui::info(aurore::getStr("playguard/dev_build/done_manual", label));
 }
 
 }   // namespace rollback_flow

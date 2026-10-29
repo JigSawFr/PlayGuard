@@ -2,12 +2,12 @@
 #include "action/backup_flow.hpp"
 
 #include <algorithm>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 #include <memory>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_text.hpp>
+#include <aurore/cadran/ui/cadran_text.hpp>
 
 #include "action/backup_logic.hpp"
 #include "action/forwarder_flow.hpp"
@@ -21,7 +21,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/pt_block.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace backup_flow
 {
@@ -35,12 +35,12 @@ std::string days_text(const std::array<uint16_t, 7>& days)
     for (int d = 1; d < 7; d++) uniform &= days[d] == days[0];
     if (uniform)
         return days[0] == PT_DAY_NOLIMIT ? "playguard/common/no_limit"_i18n
-                                         : brls::getStr("playguard/play_timer/state/every_day", ui::fmt_limit(days[0]));
+                                         : aurore::getStr("playguard/play_timer/state/every_day", ui::fmt_limit(days[0]));
     std::string out;
     for (int i = 1; i <= 7; i++) {
         const int d = i % 7;
         if (!out.empty()) out += " · ";
-        out += brls::getStr(fmt::format("playguard/days_short/{}", d)) + " " + ui::fmt_limit(days[d]);
+        out += aurore::getStr(fmt::format("playguard/days_short/{}", d)) + " " + ui::fmt_limit(days[d]);
     }
     return out;
 }
@@ -95,10 +95,10 @@ std::string summary(const backup::Snapshot& s, backup::RestoreTally* tally)
 
     // Nothing to write: a statement, not the restore question.
     const std::string created = s.created.empty() ? "?" : s.created;
-    std::string out = brls::getStr(tally->nothing_to_write() ? "playguard/backup/backed_up_on" : "playguard/backup/restore_body",
+    std::string out = aurore::getStr(tally->nothing_to_write() ? "playguard/backup/backed_up_on" : "playguard/backup/restore_body",
                                    created) + "\n";
     out += "\n" + (rows.empty() ? "playguard/backup/nothing_differs"_i18n : cadran_text::table(rows));
-    if (tally->same > 0 && !rows.empty()) out += "\n\n" + (tally->same == 1 ? "playguard/backup/same_count_one"_i18n : brls::getStr("playguard/backup/same_count", tally->same));
+    if (tally->same > 0 && !rows.empty()) out += "\n\n" + (tally->same == 1 ? "playguard/backup/same_count_one"_i18n : aurore::getStr("playguard/backup/same_count", tally->same));
     // The PIN is not in the backup (after "Delete all", there is none).
     if (st.pin_length_ok && st.pin_length == 0) out += "\n\n" + "playguard/backup/no_pin_note"_i18n;
     // The bedtime is kept in the backup's raw block, but not written back:
@@ -156,7 +156,7 @@ void write_all(const backup::Snapshot& s, bool did_unlock, std::function<void()>
     if (tally.any_written()) history_flow::record_event("restore", "", s.created);
 
     pt_flow::finish_write(tally.first, did_unlock, "playguard/backup/restored"_i18n,
-                          brls::getStr("playguard/backup/restore_err", tally.failed_list()), refresh);
+                          aurore::getStr("playguard/backup/restore_err", tally.failed_list()), refresh);
 }
 
 // The backup's forwarders that are not on the HOME menu now: offered to be
@@ -169,7 +169,7 @@ void offer_forwarders(const backup::Snapshot& s)
     const bool relock = s.hbmenu_locked && !hbmenu_lock::locked();
     const auto tell_lock = [relock]() {
         if (relock)
-            brls::sync([]() {
+            aurore::sync([]() {
                 ui::notice("lock", ui::Check::Info, "playguard/backup/forwarders_lock_title"_i18n,
                            "playguard/backup/forwarders_lock"_i18n);
             });
@@ -177,8 +177,8 @@ void offer_forwarders(const backup::Snapshot& s)
     if (missing.empty()) return tell_lock();
     std::string names;
     for (const auto& m : missing) names += (names.empty() ? "" : ", ") + m.name;
-    brls::sync([missing, names, tell_lock]() {
-        ui::confirm(brls::getStr("playguard/backup/forwarders_body", (int)missing.size(), names),
+    aurore::sync([missing, names, tell_lock]() {
+        ui::confirm(aurore::getStr("playguard/backup/forwarders_body", (int)missing.size(), names),
                     "playguard/backup/forwarders_put_back"_i18n,
                     [missing, tell_lock]() { forwarder_flow::put_back_all(missing, [tell_lock](bool) { tell_lock(); }); },
                     [tell_lock]() { tell_lock(); });
@@ -265,7 +265,7 @@ void save_now()
     std::string err;
     const std::string path = save_snapshot(&err);
     if (path.empty()) ui::error("playguard/backup/save_err"_i18n, err);
-    else ui::notify(brls::getStr("playguard/backup/saved", path));
+    else ui::notify(aurore::getStr("playguard/backup/saved", path));
 }
 
 void choose_and_restore(std::function<void()> refresh)
@@ -285,7 +285,7 @@ void choose_and_restore(std::function<void()> refresh)
         backup::Snapshot s;
         const bool ok = backup::load(name, s);
         loaded->emplace_back(ok, s);
-        if (!ok) labels.push_back(brls::getStr("playguard/backup/unreadable", name));
+        if (!ok) labels.push_back(aurore::getStr("playguard/backup/unreadable", name));
         else labels.push_back(backup_logic::list_label(name, s));
     }
     ui::pick("playguard/backup/pick_title"_i18n, labels, 0, [loaded, refresh](int index) {
@@ -300,12 +300,12 @@ void backup_then(std::function<void()> next)
     std::string err;
     const std::string path = save_snapshot(&err);
     if (!path.empty()) {
-        ui::notify(brls::getStr("playguard/backup/saved", path));
+        ui::notify(aurore::getStr("playguard/backup/saved", path));
         next();
         return;
     }
-    brls::sync([err, next]() {
-        ui::confirm_danger(brls::getStr("playguard/backup/before_delete_err", err),
+    aurore::sync([err, next]() {
+        ui::confirm_danger(aurore::getStr("playguard/backup/before_delete_err", err),
                            "playguard/backup/delete_anyway"_i18n, next);
     });
 }

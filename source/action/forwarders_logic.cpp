@@ -5,7 +5,7 @@
 #include <cerrno>
 #include <cstdio>
 
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "core/calendar.h"
 

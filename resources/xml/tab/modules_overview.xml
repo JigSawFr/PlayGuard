@@ -4,7 +4,7 @@
      with its state (Ⓐ opens its tab). Filled by
      source/activity/modules_activity.cpp. -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -13,23 +13,23 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <brls:Label id="md_intro" text="@i18n/playguard/modules/intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
-            <brls:Header title="@i18n/playguard/modules/section" marginBottom="8"/>
-            <brls:DetailCell id="md_rescue" title="@i18n/playguard/modules/rescue/tab"/>
-            <brls:DetailCell id="md_agent" title="@i18n/playguard/modules/agent/title"/>
+            <aurore:Label id="md_intro" text="@i18n/playguard/modules/intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/modules/section" marginBottom="8"/>
+            <aurore:DetailCell id="md_rescue" title="@i18n/playguard/modules/rescue/tab"/>
+            <aurore:DetailCell id="md_agent" title="@i18n/playguard/modules/agent/title"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/timer_health.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <chrono>
 
 #include "action/session_pause.hpp"
@@ -42,7 +42,7 @@ bool observe(const PtState& pt)
     const bool was = s_state.stalled;
     const bool stalled = timer_health_logic::step(s_state, should, should ? (uint64_t)pt.remaining_ns : 0, should ? pt.day_min[wd] : 0,
                                                   now_ms, app::in_focus(), stall_ms());
-    if (stalled != was) brls::Logger::info("timer health: {}", stalled ? "not counting" : "counting");
+    if (stalled != was) aurore::Logger::info("timer health: {}", stalled ? "not counting" : "counting");
     return stalled;
 }
 

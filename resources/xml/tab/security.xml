@@ -5,7 +5,7 @@
      PlayGuard, the temporary unlock / relock, the companion app, delete
      everything. -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -14,46 +14,46 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <brls:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
-            <brls:Header title="@i18n/playguard/security/section_status" marginBottom="8"/>
-            <brls:DetailCell id="sc_pin" focusable="false" title="@i18n/playguard/security/pin"/>
-            <brls:DetailCell id="sc_restrictions" focusable="false" title="@i18n/playguard/security/restrictions"/>
-            <brls:DetailCell id="sc_temp" focusable="false" title="@i18n/playguard/cadran/today/pc_title"/>
-            <brls:DetailCell id="sc_hbmenu" focusable="false" title="@i18n/playguard/hbmenu/section"/>
-            <brls:Header id="sc_actions_header" title="@i18n/playguard/security/section_actions" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="sc_set_pin" title="@i18n/playguard/security/set_pin"/>
-            <brls:DetailCell id="sc_pin_lock" title="@i18n/playguard/pin_lock/title"/>
-            <brls:BooleanCell id="sc_pin_ask_again"/>
-            <brls:BooleanCell id="sc_pin_pauses"/>
-            <brls:DetailCell id="sc_hbmenu_lock" title="@i18n/playguard/hbmenu/cell"/>
-            <brls:DetailCell id="sc_show_pin" title="@i18n/playguard/security/show_pin"/>
-            <brls:DetailCell id="sc_unlock" title="@i18n/playguard/security/unlock"/>
-            <brls:BooleanCell id="sc_auto_relock"/>
-            <brls:Label id="sc_pin_lock_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header title="@i18n/playguard/pairing/section" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="pr_active" focusable="false" title="@i18n/playguard/pairing/active"/>
-            <brls:DetailCell id="pr_updated" focusable="false" title="@i18n/playguard/pairing/updated"/>
-            <brls:DetailCell id="pr_decode" title="@i18n/playguard/pairing/decode"/>
-            <brls:DetailCell id="pr_unlink" title="@i18n/playguard/pairing/unlink"/>
-            <brls:Label id="pr_note" text="@i18n/playguard/pairing/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header id="sc_danger_header" title="@i18n/playguard/security/section_danger" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="sc_delete" title="@i18n/playguard/security/delete"/>
-            <brls:Header title="@i18n/playguard/modules/locked_out" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="sc_rescue" title="@i18n/playguard/modules/rescue/short_title"/>
-            <brls:Label id="sc_rescue_about" text="@i18n/playguard/modules/rescue/about" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
+            <aurore:Header title="@i18n/playguard/security/section_status" marginBottom="8"/>
+            <aurore:DetailCell id="sc_pin" focusable="false" title="@i18n/playguard/security/pin"/>
+            <aurore:DetailCell id="sc_restrictions" focusable="false" title="@i18n/playguard/security/restrictions"/>
+            <aurore:DetailCell id="sc_temp" focusable="false" title="@i18n/playguard/cadran/today/pc_title"/>
+            <aurore:DetailCell id="sc_hbmenu" focusable="false" title="@i18n/playguard/hbmenu/section"/>
+            <aurore:Header id="sc_actions_header" title="@i18n/playguard/security/section_actions" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="sc_set_pin" title="@i18n/playguard/security/set_pin"/>
+            <aurore:DetailCell id="sc_pin_lock" title="@i18n/playguard/pin_lock/title"/>
+            <aurore:BooleanCell id="sc_pin_ask_again"/>
+            <aurore:BooleanCell id="sc_pin_pauses"/>
+            <aurore:DetailCell id="sc_hbmenu_lock" title="@i18n/playguard/hbmenu/cell"/>
+            <aurore:DetailCell id="sc_show_pin" title="@i18n/playguard/security/show_pin"/>
+            <aurore:DetailCell id="sc_unlock" title="@i18n/playguard/security/unlock"/>
+            <aurore:BooleanCell id="sc_auto_relock"/>
+            <aurore:Label id="sc_pin_lock_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/pairing/section" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="pr_active" focusable="false" title="@i18n/playguard/pairing/active"/>
+            <aurore:DetailCell id="pr_updated" focusable="false" title="@i18n/playguard/pairing/updated"/>
+            <aurore:DetailCell id="pr_decode" title="@i18n/playguard/pairing/decode"/>
+            <aurore:DetailCell id="pr_unlink" title="@i18n/playguard/pairing/unlink"/>
+            <aurore:Label id="pr_note" text="@i18n/playguard/pairing/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header id="sc_danger_header" title="@i18n/playguard/security/section_danger" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="sc_delete" title="@i18n/playguard/security/delete"/>
+            <aurore:Header title="@i18n/playguard/modules/locked_out" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="sc_rescue" title="@i18n/playguard/modules/rescue/short_title"/>
+            <aurore:Label id="sc_rescue_about" text="@i18n/playguard/modules/rescue/about" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

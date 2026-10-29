@@ -44,7 +44,7 @@ bool fetching(sys_notes::Which which);
 
 // After the daily update check: the four lists again, without the
 // firmware's pages (one request each). Blocking: from a background task.
-// Returns the fresh cache to keep(), through brls::sync.
+// Returns the fresh cache to keep(), through aurore::sync.
 sys_notes::Cache fetch_lists();
 // Keeps `fresh` (merged into what was kept, once that is read) and saves it
 // (encoded off the UI thread).

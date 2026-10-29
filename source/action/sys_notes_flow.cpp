@@ -1,12 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/sys_notes_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 #include <memory>
 #include <utility>
 
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "action/sys_update_flow.hpp"
 #include "activity/sys_notes_activity.hpp"
@@ -18,7 +18,7 @@
 #include "util/sys_updates.hpp"
 #include "util/update.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 using sys_notes::Which;
 
 namespace sys_notes_flow
@@ -55,7 +55,7 @@ void save()
         std::string err;
         // Only saves a fetch on the next opening: a write that fails is just logged.
         if (!paths::ensure_dir(paths::cache_dir()) || !paths::atomic_write(cache_file(), text, &err))
-            brls::Logger::warning("release notes: cannot keep them ({})", err);
+            aurore::Logger::warning("release notes: cannot keep them ({})", err);
     }, "sys_notes");
 }
 
@@ -93,7 +93,7 @@ void load()
         std::string text;
         if (paths::read_file(file, text) && !sys_notes::decode(text, read.get())) *read = {};
         if (ui::quitting()) return;
-        brls::sync([read]() { on_loaded(std::move(*read)); });
+        aurore::sync([read]() { on_loaded(std::move(*read)); });
     });
 }
 
@@ -141,7 +141,7 @@ bool fetching(Which which)
 
 void open(Which which)
 {
-    brls::Logger::info("release notes: {} opened", sys_notes::key(which));
+    aurore::Logger::info("release notes: {} opened", sys_notes::key(which));
     SysNotesActivity::show(which);
     refresh(which, false);
 }
@@ -173,10 +173,10 @@ void refresh(Which which, bool force)
         std::string error;
         const bool ok = sys_notes::fetch(which, mine, true, &fresh, &error);
         if (ui::quitting()) return;
-        brls::sync([which, ok, fresh, error]() {
+        aurore::sync([which, ok, fresh, error]() {
             s_fetching[index(which)] = false;
-            if (!error.empty()) brls::Logger::info("release notes: {}", error);
-            brls::Logger::info("release notes: {} {}", sys_notes::key(which), ok ? "fetched" : "not fetched");
+            if (!error.empty()) aurore::Logger::info("release notes: {}", error);
+            aurore::Logger::info("release notes: {} {}", sys_notes::key(which), ok ? "fetched" : "not fetched");
             if (ok) {
                 sys_notes::List dated = fresh;
                 dated.fetched = ui::today_date();
@@ -196,7 +196,7 @@ sys_notes::Cache fetch_lists()
         std::string error;
         sys_notes::List l;
         if (sys_notes::fetch(w, "", false, &l, &error)) fresh.of(w) = l;
-        else if (!error.empty()) brls::Logger::info("release notes: {}", error);
+        else if (!error.empty()) aurore::Logger::info("release notes: {}", error);
     }
     return fresh;
 }
@@ -224,7 +224,7 @@ void keep(const sys_notes::Cache& fresh)
     }
     if (!any) return;
     save();
-    brls::Logger::info("release notes: lists kept");
+    aurore::Logger::info("release notes: lists kept");
 }
 
 Status status(Which which)
@@ -245,7 +245,7 @@ std::string status_text(Which which, bool* newer)
     if (which == Which::PlayGuard) {
         const std::string newest = latest(which);
         *newer = !newest.empty() && !mine.empty() && update::compare_versions(newest, mine) > 0;
-        text = *newer ? brls::getStr("playguard/tools/available", mine, newest) : mine;
+        text = *newer ? aurore::getStr("playguard/tools/available", mine, newest) : mine;
     } else {
         text = sys_update_flow::with_latest(sys_notes::key(which), mine, newer);
     }
@@ -254,7 +254,7 @@ std::string status_text(Which which, bool* newer)
     // it is read, the Console tab is refreshed).
     load();
     const size_t behind = sys_notes::newer_count(s_cache.of(which), mine);
-    return behind > 1 ? brls::getStr("playguard/sys_notes/behind", text, (int)behind) : text;
+    return behind > 1 ? aurore::getStr("playguard/sys_notes/behind", text, (int)behind) : text;
 }
 
 std::string firmware_advice()
@@ -272,9 +272,9 @@ std::string firmware_advice()
         std::string version;
         const sys_notes::Need need = sys_notes::need_for(s_cache.of(w), mine, fw, &version);
         if (need == sys_notes::Need::Wait) {
-            lines.push_back(brls::getStr("playguard/sys_notes/advice_wait", sys_notes::product(w), version, fw));
+            lines.push_back(aurore::getStr("playguard/sys_notes/advice_wait", sys_notes::product(w), version, fw));
         } else if (need == sys_notes::Need::Update) {
-            lines.push_back(brls::getStr("playguard/sys_notes/advice_update", fw, sys_notes::product(w), version));
+            lines.push_back(aurore::getStr("playguard/sys_notes/advice_update", fw, sys_notes::product(w), version));
         }
     }
     return text::join(lines, "\n");

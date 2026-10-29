@@ -7,9 +7,10 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <iterator>
 
-#include <borealis/cadran/util/text.hpp>
-#include <borealis/cadran/util/utf8.hpp>
+#include <aurore/cadran/util/text.hpp>
+#include <aurore/cadran/util/utf8.hpp>
 
 namespace nro
 {
@@ -111,7 +112,7 @@ bool read(const std::string& path, Info& out)
         if (got == sizeof(asset) && std::memcmp(asset, "ASET", 4) == 0) {
             const uint64_t end = std::max(u64_at(asset + 8) + u64_at(asset + 0x10), u64_at(asset + 0x18) + u64_at(asset + 0x20));
             if (end <= ASSET_SIZE + ICON_MAX + NACP_SIZE + 0x1000) {
-                std::vector<uint8_t> section(asset, asset + sizeof(asset));
+                std::vector<uint8_t> section(std::begin(asset), std::end(asset));
                 section.resize((size_t)std::max<uint64_t>(end, ASSET_SIZE));
                 const size_t more = section.size() - ASSET_SIZE;
                 section.resize(ASSET_SIZE + std::fread(section.data() + ASSET_SIZE, 1, more, f));

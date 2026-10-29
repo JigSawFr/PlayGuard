@@ -5,11 +5,11 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/game_check_text.hpp"
 #include "action/game_verify_flow.hpp"
@@ -49,22 +49,22 @@ std::string action_label(const GameFacts& g, u32 action, const GameContent* cont
 std::string view_label(bool grid);
 // The details: the icon, the name and the problem, then why and what to do
 // in two blocks read from the left, the ID and version underneath.
-brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon);
+aurore::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon);
 std::vector<unsigned char> icon_of(u64 app_id);
 // The Cadran look: a section's games in a card while they are a list (the
 // covers stand on the page), its buttons rounded as the boards' are.
-void card_look(brls::Box* list, bool grid);
-void round_button(brls::Button* button);
+void card_look(aurore::Box* list, bool grid);
+void round_button(aurore::Button* button);
 
-// A game of the list: its name and problem, with borealis' check mark in
+// A game of the list: its name and problem, with Aurore's check mark in
 // front and the name in the value colour while it is picked (Ⓨ), as a
 // RadioCell draws its choice.
-class IssueCell : public brls::DetailCell
+class IssueCell : public aurore::DetailCell
 {
   public:
     IssueCell()
     {
-        this->check = new brls::CheckBox();
+        this->check = new aurore::CheckBox();
         this->check->setMarginRight(16);
         this->addView(this->check, 0);
         ui::set_visible(this->check, false);
@@ -73,22 +73,22 @@ class IssueCell : public brls::DetailCell
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->title->setThemeColor("textColor", on ? "brls/list/listItem_value_color" : "cadran/text");
+        this->title->setThemeColor("textColor", on ? "aurore/list/listItem_value_color" : "cadran/text");
     }
 
   private:
-    brls::CheckBox* check;
+    aurore::CheckBox* check;
 };
 
-// The same game as a cover: its icon, name and problem, borealis' check
+// The same game as a cover: its icon, name and problem, Aurore's check
 // mark over the icon while it is picked.
 class IssueTile : public GameTile
 {
   public:
     IssueTile()
     {
-        this->check = new brls::CheckBox();
-        this->check->setPositionType(brls::PositionType::ABSOLUTE);
+        this->check = new aurore::CheckBox();
+        this->check->setPositionType(aurore::PositionType::ABSOLUTE);
         this->check->setPositionTop(14);
         this->check->setPositionRight(14);
         this->addView(this->check);
@@ -98,12 +98,12 @@ class IssueTile : public GameTile
     void set_selected(bool on)
     {
         ui::set_visible(this->check, on);
-        this->set_name_color(on ? "brls/list/listItem_value_color" : "cadran/text");
+        this->set_name_color(on ? "aurore/list/listItem_value_color" : "cadran/text");
     }
 
     u64 app_id = 0;
 
   private:
-    brls::CheckBox* check;
+    aurore::CheckBox* check;
 };
 }   // namespace game_check_parts

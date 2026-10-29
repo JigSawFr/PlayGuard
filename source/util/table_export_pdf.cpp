@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 
-#include <borealis/cadran/util/utf8.hpp>
+#include <aurore/cadran/util/utf8.hpp>
 
 namespace table_export
 {

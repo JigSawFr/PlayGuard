@@ -7,7 +7,7 @@
      optional sysmodules, then compatibility,
      storage, the serial number and the game patches. -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -16,43 +16,43 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
             <!-- A on each: its release notes (activity/sys_notes_activity.hpp). -->
-            <brls:Header title="@i18n/playguard/tools/section_system" marginBottom="8"/>
-            <brls:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>
-            <brls:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
-            <brls:DetailCell id="cn_hekate" title="hekate"/>
-            <brls:DetailCell id="cn_syspatch" title="sys-patch"/>
+            <aurore:Header title="@i18n/playguard/tools/section_system" marginBottom="8"/>
+            <aurore:DetailCell id="cn_fw" title="@i18n/playguard/tools/firmware"/>
+            <aurore:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
+            <aurore:DetailCell id="cn_hekate" title="hekate"/>
+            <aurore:DetailCell id="cn_syspatch" title="sys-patch"/>
             <!-- Tiles: the screens of their own (the network clock, the
                  installed games, homebrew on the HOME menu:
                  activity/forwarders_activity.hpp). -->
-            <brls:Header title="@i18n/playguard/tools/section_tools" marginBottom="8"/>
-            <brls:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
-            <brls:DetailCell id="cn_games" title="@i18n/playguard/tiles/games"/>
-            <brls:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
+            <aurore:Header title="@i18n/playguard/tools/section_tools" marginBottom="8"/>
+            <aurore:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
+            <aurore:DetailCell id="cn_games" title="@i18n/playguard/tiles/games"/>
+            <aurore:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
             <!-- A second row: the remote link (MQTT, Home Assistant:
                  activity/sync_activity.hpp) and the optional sysmodules
                  (activity/modules_activity.hpp). -->
-            <brls:DetailCell id="cn_remote" title="@i18n/playguard/sync/title"/>
-            <brls:DetailCell id="cn_modules" title="@i18n/playguard/modules/open"/>
-            <brls:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>
-            <brls:DetailCell id="cn_storage" focusable="false" title="@i18n/playguard/tools/storage"/>
-            <brls:DetailCell id="cn_blank" focusable="false" title="@i18n/playguard/tools/blank"/>
-            <brls:DetailCell id="cn_serial" title="@i18n/playguard/tools/serial"/>
-            <brls:DetailCell id="cn_patches" title="@i18n/playguard/tools/patches"/>
+            <aurore:DetailCell id="cn_remote" title="@i18n/playguard/sync/title"/>
+            <aurore:DetailCell id="cn_modules" title="@i18n/playguard/modules/open"/>
+            <aurore:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>
+            <aurore:DetailCell id="cn_storage" focusable="false" title="@i18n/playguard/tools/storage"/>
+            <aurore:DetailCell id="cn_blank" focusable="false" title="@i18n/playguard/tools/blank"/>
+            <aurore:DetailCell id="cn_serial" title="@i18n/playguard/tools/serial"/>
+            <aurore:DetailCell id="cn_patches" title="@i18n/playguard/tools/patches"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

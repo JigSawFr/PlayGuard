@@ -5,7 +5,7 @@
      countdown) while it is on, and the diagnostic in developer mode.
      Filled by source/activity/play_timer_advanced_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -17,25 +17,25 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
-            <brls:BooleanCell id="pa_show"/>
-            <brls:Label id="pa_note" text="@i18n/playguard/play_timer/advanced_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:BooleanCell id="pa_alarm" marginTop="16"/>
-            <brls:DetailCell id="pa_pause" title="@i18n/playguard/play_timer/pause"/>
-            <brls:DetailCell id="pa_resume" title="@i18n/playguard/play_timer/resume"/>
-            <brls:DetailCell id="pa_diag" title="@i18n/playguard/play_timer/diag" marginTop="16"/>
+            <aurore:BooleanCell id="pa_show"/>
+            <aurore:Label id="pa_note" text="@i18n/playguard/play_timer/advanced_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:BooleanCell id="pa_alarm" marginTop="16"/>
+            <aurore:DetailCell id="pa_pause" title="@i18n/playguard/play_timer/pause"/>
+            <aurore:DetailCell id="pa_resume" title="@i18n/playguard/play_timer/resume"/>
+            <aurore:DetailCell id="pa_diag" title="@i18n/playguard/play_timer/diag" marginTop="16"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

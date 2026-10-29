@@ -3,13 +3,13 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-class MainActivity : public brls::Activity
+class MainActivity : public aurore::Activity
 {
   public:
     // activity/main.xml.
-    brls::View* createContentView() override;
+    aurore::View* createContentView() override;
 
     void onContentAvailable() override;
     void onResume() override;
@@ -31,12 +31,12 @@ class MainActivity : public brls::Activity
   private:
     // Midnight while the app is open: what start-up does for a new day
     // (extra time from the day before) is done then too.
-    brls::RepeatingTimer day_timer;
+    aurore::RepeatingTimer day_timer;
     std::string day;
 
     // The notification bell: Y opens its list, the footer says how many
     // entries are to do; the state behind it read again every minute.
-    brls::RepeatingTimer notice_timer;
+    aurore::RepeatingTimer notice_timer;
     int notice_listener = 0;
     void update_notice_hint();
 };

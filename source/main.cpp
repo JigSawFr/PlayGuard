@@ -1,10 +1,10 @@
-// PlayGuard — borealis entry point: loads the preferences, registers the
+// PlayGuard — Aurore entry point: loads the preferences, registers the
 // custom XML views, probes the pctl service and shows the tabbed main screen
 // (or the init-error screen).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  This program is free software under the GNU
 // General Public License v3 or later; it comes with NO WARRANTY. See the
 // LICENSE file or <https://www.gnu.org/licenses/gpl-3.0.html> for details.
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -20,11 +20,11 @@
 #include <emscripten.h>
 #endif
 
-#include <borealis/cadran/ui/cut_text.hpp>
-#include <borealis/cadran/view/cadran_digits.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
-#include <borealis/cadran/view/loading_bar.hpp>
-#include <borealis/cadran/view/scroll_view.hpp>
+#include <aurore/cadran/ui/cut_text.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/view/loading_bar.hpp>
+#include <aurore/cadran/view/scroll_view.hpp>
 
 #include "action/frame_stats_flow.hpp"
 #include "action/fw_gate.hpp"
@@ -78,7 +78,7 @@
 #include "view/pt_ring.hpp"
 #include "view/pt_state_header.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -105,7 +105,7 @@ std::string backtrace_here()
 // (util/crash_report.hpp), then PlayGuard ends as a crash, so Atmosphère's
 // report shows where it was thrown (the stack is not unwound yet). Left to
 // std::terminate, it would abort(), which hbloader takes as a normal exit:
-// back in hbmenu, borealis' task thread, still running, crashed hbmenu
+// back in hbmenu, Aurore's task thread, still running, crashed hbmenu
 // instead.
 [[noreturn]] void on_terminate()
 {
@@ -138,7 +138,7 @@ std::string build_name()
 // Every line logged, also in this run's session file (util/session_log.hpp).
 void keep_log_lines()
 {
-    brls::Logger::getLogEvent()->subscribe([](brls::Logger::TimePoint when, brls::LogLevel level, std::string text) {
+    aurore::Logger::getLogEvent()->subscribe([](aurore::Logger::TimePoint when, aurore::LogLevel level, std::string text) {
         static const char LEVELS[] = "EWIDV";
         const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(when.time_since_epoch()).count() % 1000;
         const unsigned l = (unsigned)level;
@@ -158,7 +158,7 @@ void start_session()
     const std::string header = fmt::format("=== PlayGuard session ===\nstarted : {}\nbuild   : {}\n\n", when, build_name());
     const std::string name = session_log::start(paths::sessions_dir(), now, header);
     crash_report::prepare(paths::crashes_dir(), build_name(), "", name);
-    if (name.empty()) brls::Logger::warning("logs: no session file in {}", paths::sessions_dir());
+    if (name.empty()) aurore::Logger::warning("logs: no session file in {}", paths::sessions_dir());
 
     session_log::Unfinished before;
     if (session_log::unfinished(paths::sessions_dir(), name, &before)) {
@@ -168,7 +168,7 @@ void start_session()
             now, ("the run of " + before.name + " did not end: a crash PlayGuard did not catch, closed from the HOME "
                   "menu while it hung, or the console turned off").c_str(),
             details.c_str(), false);
-        brls::Logger::warning("logs: the last run ({}) did not end; {}", before.name,
+        aurore::Logger::warning("logs: the last run ({}) did not end; {}", before.name,
                               *crash ? std::string("see logs/crashes/") + crash : std::string("no crash file written"));
     }
 }
@@ -188,32 +188,32 @@ std::string system_line(const SysInfo& si)
 }
 
 // The start-up after the loading screen, one step per frame so the loading
-// screen moves along (brls::sync runs a task after the frame is drawn, and
+// screen moves along (aurore::sync runs a task after the frame is drawn, and
 // one queued from a task waits for the next frame). It took a moment on the
 // console (the service probe, the SD-card reads, the main screen's build),
 // and the screen stayed black for it. Each step is timed for the diagnostic
 // report (util/startup.h).
 
 // The last step: `first` built and shown over the loading screen, which stays
-// under it (borealis' Application::clear() is private). It holds the focus
+// under it (Aurore's Application::clear() is private). It holds the focus
 // the first screen hands back, so nothing focused is ever freed under the
 // stack (ui::replace_screen pops a lock or recovery screen).
-void show_first(brls::Activity* first)
+void show_first(aurore::Activity* first)
 {
-    brls::Application::pushActivity(first, brls::TransitionAnimation::NONE);
+    aurore::Application::pushActivity(first, aurore::TransitionAnimation::NONE);
     pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
     frame_stats_flow::apply();  // Help & diagnostics › Developer › Frame statistics, when on
     log_prune_flow::run();  // the reports and crashes past the limits of About › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);
     rollback_flow::started();   // this build starts: nothing to go back from
-    brls::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
+    aurore::Logger::info("start-up: first screen ready after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_FirstScreen));
 }
 
 // The first screen once the intro is over: checked once a frame.
-void after_intro(LoadingActivity* loading, brls::Activity* first)
+void after_intro(LoadingActivity* loading, aurore::Activity* first)
 {
     if (loading->inIntro()) {
-        brls::sync([loading, first]() { after_intro(loading, first); });
+        aurore::sync([loading, first]() { after_intro(loading, first); });
         return;
     }
     startup_mark(StartupStep_Intro);
@@ -222,7 +222,7 @@ void after_intro(LoadingActivity* loading, brls::Activity* first)
 
 // Which first screen, once the console is probed: the recovery report, the
 // lock screen or the main screen. Constructed only: show_first builds it.
-brls::Activity* choose_first()
+aurore::Activity* choose_first()
 {
     // Untested firmware: read-only (or the remembered choice) before any tab is built.
     fw_gate::prepare();
@@ -271,32 +271,32 @@ brls::Activity* choose_first()
 void start(LoadingActivity* loading)
 {
     startup_mark(StartupStep_LoadingDrawn);
-    brls::Logger::info("start-up: loading screen drawn after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_LoadingDrawn));
+    aurore::Logger::info("start-up: loading screen drawn after {} ms", startup_elapsed_ms(StartupStep_Main, StartupStep_LoadingDrawn));
     if (config::get().intro) {
         loading->startIntro();
-        brls::Logger::info("start-up: intro, {} ms at least", LoadingActivity::INTRO_US / 1000);
+        aurore::Logger::info("start-up: intro, {} ms at least", LoadingActivity::INTRO_US / 1000);
     }
     const bool probed = app::init();
     startup_mark(StartupStep_Probed);
     if (!probed) {
-        brls::Logger::error("pctl probe failed (0x{:08X}) — showing InitErrorActivity", app::pctl_init_result());
+        aurore::Logger::error("pctl probe failed (0x{:08X}) — showing InitErrorActivity", app::pctl_init_result());
         show_first(new InitErrorActivity());
         return;
     }
     loading->show(LoadingActivity::Step::Settings);
-    brls::sync([loading]() {
-        brls::Activity* first = choose_first();
+    aurore::sync([loading]() {
+        aurore::Activity* first = choose_first();
         startup_mark(StartupStep_Settings);
         loading->show(LoadingActivity::Step::Screen);
 #ifndef __SWITCH__
         // Desktop simulation, for a screenshot of the loading screen.
         if (sim_env_flag("PLAYGUARD_SIM_HOLD_LOADING")) {
-            brls::Logger::info("start-up: held on the loading screen (PLAYGUARD_SIM_HOLD_LOADING)");
+            aurore::Logger::info("start-up: held on the loading screen (PLAYGUARD_SIM_HOLD_LOADING)");
             delete first;
             return;
         }
 #endif
-        brls::sync([loading, first]() { after_intro(loading, first); });
+        aurore::sync([loading, first]() { after_intro(loading, first); });
     });
 }
 
@@ -314,7 +314,7 @@ void select_nand_and_log_system()
                                                              : nand::Storage::Unknown));
     migration_flow::for_system();
     const std::string system = system_line(si);
-    brls::Logger::info("start-up: {}, {}", build_name(), system);
+    aurore::Logger::info("start-up: {}, {}", build_name(), system);
     crash_report::prepare(paths::crashes_dir(), build_name(), system, session_log::current_name());
 }
 
@@ -323,28 +323,28 @@ void select_nand_and_log_system()
 // settings come with Aurore).
 void register_views()
 {
-    brls::Application::registerXMLView("ScrollView",      ScrollView::create);
-    brls::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
-    brls::Application::registerXMLView("PtRing",          PtRing::create);
-    brls::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
-    brls::Application::registerXMLView("PlayHoursView",   PlayHoursView::create);
-    brls::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
-    brls::Application::registerXMLView("DashboardTab",    DashboardTab::create);
-    brls::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
-    brls::Application::registerXMLView("ActivityTab",     ActivityTab::create);
-    brls::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
-    brls::Application::registerXMLView("SecurityTab",     SecurityTab::create);
-    brls::Application::registerXMLView("HistoryTab",      HistoryTab::create);
-    brls::Application::registerXMLView("ConsoleTab",      ConsoleTab::create);
-    brls::Application::registerXMLView("PreferencesTab",  PreferencesTab::create);
-    brls::Application::registerXMLView("AboutTab",        AboutTab::create);
+    aurore::Application::registerXMLView("ScrollView",      ScrollView::create);
+    aurore::Application::registerXMLView("PtStateHeader",   PtStateHeader::create);
+    aurore::Application::registerXMLView("PtRing",          PtRing::create);
+    aurore::Application::registerXMLView("PlayDaysView",    PlayDaysView::create);
+    aurore::Application::registerXMLView("PlayHoursView",   PlayHoursView::create);
+    aurore::Application::registerXMLView("MadeInFrance",    MadeInFrance::create);
+    aurore::Application::registerXMLView("DashboardTab",    DashboardTab::create);
+    aurore::Application::registerXMLView("PlayTimerTab",    PlayTimerTab::create);
+    aurore::Application::registerXMLView("ActivityTab",     ActivityTab::create);
+    aurore::Application::registerXMLView("RestrictionsTab", RestrictionsTab::create);
+    aurore::Application::registerXMLView("SecurityTab",     SecurityTab::create);
+    aurore::Application::registerXMLView("HistoryTab",      HistoryTab::create);
+    aurore::Application::registerXMLView("ConsoleTab",      ConsoleTab::create);
+    aurore::Application::registerXMLView("PreferencesTab",  PreferencesTab::create);
+    aurore::Application::registerXMLView("AboutTab",        AboutTab::create);
 
-    brls::Application::registerXMLView("LoadingMark",     LoadingMark::create);
-    brls::Application::registerXMLView("LoadingDial",     LoadingDial::create);
-    brls::Application::registerXMLView("LoadingBar",      LoadingBar::create);
-    brls::Application::registerXMLView("CadranIcon",      CadranIcon::create);
-    brls::Application::registerXMLView("CadranDigits",    CadranDigits::create);
-    brls::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
+    aurore::Application::registerXMLView("LoadingMark",     LoadingMark::create);
+    aurore::Application::registerXMLView("LoadingDial",     LoadingDial::create);
+    aurore::Application::registerXMLView("LoadingBar",      LoadingBar::create);
+    aurore::Application::registerXMLView("CadranIcon",      CadranIcon::create);
+    aurore::Application::registerXMLView("CadranDigits",    CadranDigits::create);
+    aurore::Application::registerXMLView("CadranWeekView",  CadranWeekView::create);
 
     NoticeBell::install();   // the bell goes in the header's row at the right
 }
@@ -369,13 +369,13 @@ void shut_down()
     frame_stats_flow::stop();
     app::shutdown();
     http::cleanup();
-    brls::Logger::info("quit: after {} s", session_log::uptime_s());
+    aurore::Logger::info("quit: after {} s", session_log::uptime_s());
     session_log::end("clean exit");
 }
 
 #ifndef __SWITCH__
 FILE* s_stats = nullptr;   // PLAYGUARD_SIM_STATS's file, when asked (main())
-brls::Time s_stats_last = 0;
+aurore::Time s_stats_last = 0;
 #endif
 
 void close_stats()
@@ -389,7 +389,7 @@ void close_stats()
 // One frame; false once PlayGuard quits.
 bool run_frame()
 {
-    if (!brls::Application::mainLoop()) return false;
+    if (!aurore::Application::mainLoop()) return false;
     // The lines the session file waits for, written off the UI thread
     // once they waited long enough (util/session_log.hpp).
     if (session_log::due()) ui::write_later("session log", []() { session_log::flush(); }, "session_log");
@@ -398,8 +398,8 @@ bool run_frame()
 #ifndef __SWITCH__
     if (s_stats) {
         int draws = 0, fill = 0, stroke = 0, text = 0;
-        nvgDebugGetStats(brls::Application::getNVGContext(), &draws, &fill, &stroke, &text);
-        const brls::Time now = brls::getCPUTimeUsec();
+        nvgDebugGetStats(aurore::Application::getNVGContext(), &draws, &fill, &stroke, &text);
+        const aurore::Time now = aurore::getCPUTimeUsec();
         std::fprintf(s_stats, "%lld %lld %d %d %d %d\n", (long long)now, (long long)(now - s_stats_last), draws, fill,
                      stroke, text);
         s_stats_last = now;
@@ -443,7 +443,7 @@ int main(int argc, char* argv[])
     // What ui/ and view/ ask of the screens above them, before any opens.
     install_screen_hooks();
 
-    // Preferences first: their language replaces the console's once borealis
+    // Preferences first: their language replaces the console's once Aurore
     // has read it (Aurore's Cadran, in Application::init()).
     config::load();
     startup_mark(StartupStep_Preferences);
@@ -455,9 +455,9 @@ int main(int argc, char* argv[])
     });
     config::set_saved_hook(sync_files::export_nro_state);
 
-    if (!brls::Application::init()) {
-        brls::Logger::error("Unable to init borealis Application");
-        session_log::end("exit: borealis could not start");
+    if (!aurore::Application::init()) {
+        aurore::Logger::error("Unable to init Aurore Application");
+        session_log::end("exit: Aurore could not start");
         return EXIT_FAILURE;
     }
     startup_mark(StartupStep_Borealis);
@@ -470,17 +470,17 @@ int main(int argc, char* argv[])
     // their font and theme, the palettes after the design boards, the text
     // size, the footer's hints, the header's version badge and settings, and
     // every screen's look (in createWindow()).
-    brls::Application::createWindow("playguard/title"_i18n);
+    aurore::Application::createWindow("playguard/title"_i18n);
     startup_mark(StartupStep_Window);
 
     // No cross-fade when a screen opens or closes: on the console's LCD the
-    // two screens blended for 200 ms read as ghosting. 2 ms, not 0: borealis
+    // two screens blended for 200 ms read as ghosting. 2 ms, not 0: Aurore
     // still runs (and ends) its animations, in whole milliseconds, and a
     // picker's takes half of it.
-    brls::getStyle().addMetric("brls/animations/show", 2.0f);
+    aurore::getStyle().addMetric("aurore/animations/show", 2.0f);
 
     // We own the quit path (B on the sidebar / error screen).
-    brls::Application::setGlobalQuit(false);
+    aurore::Application::setGlobalQuit(false);
 
     register_views();
 
@@ -488,14 +488,14 @@ int main(int argc, char* argv[])
     // (no fade: a frame at alpha 0 is a black one). The rest of the start-up
     // runs from the end of that first frame.
     auto* loading = new LoadingActivity();
-    brls::Application::pushActivity(loading, brls::TransitionAnimation::NONE);
-    brls::sync([loading]() { start(loading); });
+    aurore::Application::pushActivity(loading, aurore::TransitionAnimation::NONE);
+    aurore::sync([loading]() { start(loading); });
 
     // Game icons kept between runs, next to the play data cache.
     playstats_set_icon_dir((paths::cache_dir() + "/icons").c_str());
-    // borealis joins its task thread before mainLoop() returns: a play-data
+    // Aurore joins its task thread before mainLoop() returns: a play-data
     // or icon read running there stops now, not after every game is read.
-    brls::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
+    aurore::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
 
 #ifndef __SWITCH__
     // Desktop measurement (PLAYGUARD_SIM_STATS=<file>, tools/perf_frames.sh):
@@ -510,9 +510,9 @@ int main(int argc, char* argv[])
             s_stats = fdopen(fd, "w");
             if (!s_stats) close(fd);
         }
-        brls::Application::setLimitedFPS(0);
+        aurore::Application::setLimitedFPS(0);
     }
-    s_stats_last = brls::getCPUTimeUsec();
+    s_stats_last = aurore::getCPUTimeUsec();
 #endif
 #ifdef __EMSCRIPTEN__
     // In a browser a frame must hand the thread back to the page (web/README.md):

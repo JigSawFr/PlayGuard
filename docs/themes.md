@@ -96,7 +96,7 @@ accent = #3ddc97
 - **`@include other.inc`**: the lines of another file of the folder, at that
   place (name it `.inc`, so that it is not listed as a palette of its own).
 
-Every key PlayGuard draws with is a theme key: Aurore's (`brls/…`), Cadran's,
+Every key PlayGuard draws with is a theme key: Aurore's (`aurore/…`), Cadran's,
 the look PlayGuard shares with PlayShelf (`cadran/…`), and PlayGuard's own
 (`playguard/…`). Aurore's [theme guide](https://github.com/JigSawFr/Aurore/blob/main/docs/themes.md)
 lists the first two with what each one colours, and what each palette key
@@ -113,7 +113,7 @@ sets.
 | `playguard/ring/tip` | The point of light at the end of the play timer's ring |
 | `playguard/badge/ink` | The "!" on the coral disc of a game that stays (*Console › Check the installed games*, removals) |
 
-The loading screen's background and text are the theme's (`brls/background`,
+The loading screen's background and text are the theme's (`aurore/background`,
 `cadran/text2`), as on every screen, and so is its background picture.
 
 ### Readable text
@@ -305,7 +305,7 @@ background_dim = 0.6
 logo = logo-light.png
 # Over the picture, a little darker than the palette makes them
 cadran/text3 = #574d66
-brls/header/subtitle = #574d66
+aurore/header/subtitle = #574d66
 
 [dark]
 background = #1b1838

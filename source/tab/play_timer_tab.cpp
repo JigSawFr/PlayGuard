@@ -6,8 +6,8 @@
 #include <fmt/format.h>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/console_lock.hpp"
 #include "action/outside_watch.hpp"
@@ -24,7 +24,7 @@
 #include "util/perf.hpp"
 #include "util/profiles.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -58,7 +58,7 @@ std::string range(const uint16_t* v, std::initializer_list<int> days)
     }
     if (lo == PT_DAY_NOLIMIT) return "playguard/cadran/week/no_limit"_i18n;
     if (lo == hi && !none) return ui::fmt_limit(lo);
-    return brls::getStr("playguard/play_timer/profile_range", ui::fmt_limit(lo),
+    return aurore::getStr("playguard/play_timer/profile_range", ui::fmt_limit(lo),
                         none ? "playguard/cadran/week/no_limit"_i18n : ui::fmt_limit(hi));
 }
 
@@ -68,8 +68,8 @@ std::string summary_of(const uint16_t* v)
     bool same = true;
     for (int d = 1; d < 7; d++) same = same && v[d] == v[0];
     if (same) return v[0] == PT_DAY_NOLIMIT ? "playguard/play_timer/perday/pick_no_limit"_i18n
-                                            : brls::getStr("playguard/cadran/week/every_day", ui::fmt_limit(v[0]));
-    return brls::getStr("playguard/cadran/week/summary", range(v, { 1, 2, 3, 4, 5 }), range(v, { 6, 0 }));
+                                            : aurore::getStr("playguard/cadran/week/every_day", ui::fmt_limit(v[0]));
+    return aurore::getStr("playguard/cadran/week/summary", range(v, { 1, 2, 3, 4, 5 }), range(v, { 6, 0 }));
 }
 
 std::string limit_text(uint16_t minutes)
@@ -82,7 +82,7 @@ PlayTimerTab::PlayTimerTab()
     : TabBase("xml/tab/play_timer.xml"), list(this)
 {
     namespace kit = cadran::kit;
-    static_cast<brls::Box*>(this->getView("pt_week_card"))->addView(brls::View::createFromXMLResource("view/cadran_week_card.xml"));
+    static_cast<aurore::Box*>(this->getView("pt_week_card"))->addView(aurore::View::createFromXMLResource("view/cadran_week_card.xml"));
     // The keys and the bars' key on two lines when the text is larger.
     kit::wrap(this->getView("cpt_keys_idle"));
     kit::wrap(this->getView("pt_chips"));
@@ -105,7 +105,7 @@ PlayTimerTab::PlayTimerTab()
         this->rerender();
     });
     week_editor->set_on_pick([this](int day) {
-        pt_flow::pick_limit(brls::getStr("playguard/play_timer/perday/pick_title", ui::day_name(day)), this->pending[day],
+        pt_flow::pick_limit(aurore::getStr("playguard/play_timer/perday/pick_title", ui::day_name(day)), this->pending[day],
                             [this, day](uint16_t minutes) {
                                 this->pending[day] = minutes;
                                 this->rerender();
@@ -118,45 +118,45 @@ PlayTimerTab::PlayTimerTab()
     });
     week_editor->set_on_focus([this](int day) { this->show_played_key(day); });
     week_editor->set_on_mode([this](bool editing) {
-        keys_idle->setVisibility(editing ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
-        keys_edit->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        keys_idle->setVisibility(editing ? aurore::Visibility::GONE : aurore::Visibility::VISIBLE);
+        keys_edit->setVisibility(editing ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
     });
     // The footer has no room for a sixth hint while a day is edited (+ Save,
     // the bell, language and theme, B, A): Ⓧ still reads the console again
     // (it does every 5 s anyway), out of sight; on the week it opens the
     // day's picker, which the keys under the week say.
-    this->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
+    this->registerAction("playguard/hints/refresh"_i18n, aurore::BUTTON_X, [this](aurore::View*) {
         this->refresh();
         return true;
     }, true);
-    save_button->registerClickAction([this](brls::View*) {
+    save_button->registerClickAction([this](aurore::View*) {
         this->save();
         return true;
     });
-    discard_button->registerClickAction([this](brls::View*) {
+    discard_button->registerClickAction([this](aurore::View*) {
         this->discard();
         return true;
     });
 
     // The chips.
-    profile_chip->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new ProfilesActivity());
+    profile_chip->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new ProfilesActivity());
         return true;
     });
-    uniform_chip->registerClickAction([this](brls::View*) {
+    uniform_chip->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         pt_flow::choose_uniform_limit(this->pt, this->refresher());
         return true;
     });
-    bed_chip->registerClickAction([this](brls::View*) {
+    bed_chip->registerClickAction([this](aurore::View*) {
         pt_flow::choose_bedtime(this->pt, this->refresher());
         return true;
     });
-    time_up_chip->registerClickAction([this](brls::View*) {
+    time_up_chip->registerClickAction([this](aurore::View*) {
         pt_flow::choose_time_up(this->pt, this->refresher());
         return true;
     });
-    remove_cell->registerClickAction([this](brls::View*) {
+    remove_cell->registerClickAction([this](aurore::View*) {
         if (!ui::refuse_read_only()) this->remove_limit();
         return true;
     });
@@ -170,7 +170,7 @@ PlayTimerTab::PlayTimerTab()
 
     // Extra time and no more play today are Today's: a line to it.
     ui::set_detail(today, ui::opens("playguard/tabs/dashboard"_i18n));
-    today->registerClickAction([](brls::View* view) {
+    today->registerClickAction([](aurore::View* view) {
         ui::go_to_tab(view, ui::tab::dashboard);
         return true;
     });
@@ -178,7 +178,7 @@ PlayTimerTab::PlayTimerTab()
     // when it is turned off.
     this->mark(console_lock_cell.getView(), { "console_lock_long" });
     console_lock_note->setSingleLine(false);
-    console_lock_cell->registerClickAction([this](brls::View*) {
+    console_lock_cell->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         PtState fresh;   // read again: the tab's is up to 5 s old
         pctl_play_timer_query(&fresh);
@@ -196,19 +196,19 @@ PlayTimerTab::PlayTimerTab()
         return true;
     });
     ui::set_detail(split, ui::opens());
-    split->registerClickAction([](brls::View*) {
+    split->registerClickAction([](aurore::View*) {
         if (ui::refuse_read_only()) return true;
-        brls::Application::pushActivity(PlayTimerPerDayActivity::week_split());
+        aurore::Application::pushActivity(PlayTimerPerDayActivity::week_split());
         return true;
     });
-    bedtime_reset->registerClickAction([this](brls::View*) {
+    bedtime_reset->registerClickAction([this](aurore::View*) {
         pt_flow::choose_bedtime_end(this->pt, this->refresher());
         return true;
     });
 
     // The extra-time settings: PlayGuard's own, kept with the actions they shape.
     ui::guard_switch(extra_auto);
-    extra_amounts->registerClickAction([this](brls::View*) {
+    extra_amounts->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         std::vector<std::string> labels;
         for (const auto& set : config::EXTRA_SETS) labels.push_back(amounts_text(set));
@@ -224,8 +224,8 @@ PlayTimerTab::PlayTimerTab()
         ui::save_config();
     });
     ui::set_detail(advanced, ui::opens());
-    advanced->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new PlayTimerAdvancedActivity());
+    advanced->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new PlayTimerAdvancedActivity());
         return true;
     });
 }
@@ -250,30 +250,30 @@ void PlayTimerTab::refresh()
     const bool writable = fw_ok && !app::read_only();
 
     ui::set_visible(fw_note.getView(), !fw_ok);
-    for (brls::View* v : { (brls::View*)limit_header.getView(), (brls::View*)split.getView(),
-                           (brls::View*)today.getView(), (brls::View*)limit_note.getView(),
-                           (brls::View*)lock_header.getView(), (brls::View*)console_lock_cell.getView(),
-                           (brls::View*)console_lock_note.getView() })
+    for (aurore::View* v : { (aurore::View*)limit_header.getView(), (aurore::View*)split.getView(),
+                           (aurore::View*)today.getView(), (aurore::View*)limit_note.getView(),
+                           (aurore::View*)lock_header.getView(), (aurore::View*)console_lock_cell.getView(),
+                           (aurore::View*)console_lock_note.getView() })
         ui::set_visible(v, fw_ok);
     // When the time is up: only with something set (pt_configured), the
     // only time the choice means anything.
     ui::set_visible(time_up_chip.getView(), fw_ok && this->pt.valid && pt_configured(this->pt.block));
     const int wd = ui::today_weekday();
     // Read-only: the actions that write stay in sight, greyed (A says why).
-    for (brls::DetailCell* c : { (brls::DetailCell*)split.getView(), (brls::DetailCell*)console_lock_cell.getView(),
-                                 (brls::DetailCell*)bedtime_reset.getView(),
-                                 (brls::DetailCell*)extra_amounts.getView(), (brls::DetailCell*)extra_auto.getView() })
+    for (aurore::DetailCell* c : { (aurore::DetailCell*)split.getView(), (aurore::DetailCell*)console_lock_cell.getView(),
+                                 (aurore::DetailCell*)bedtime_reset.getView(),
+                                 (aurore::DetailCell*)extra_amounts.getView(), (aurore::DetailCell*)extra_auto.getView() })
         ui::show_writable(c, writable);
     const bool locked = console_lock::active();
     ui::set_detail(console_lock_cell, locked ? "playguard/common/on"_i18n : "playguard/common/off"_i18n);
     console_lock_cell->detail->setThemeColor("textColor", locked ? "cadran/amber" : "cadran/text2");
     ui::set_text(console_lock_note, locked ? "playguard/console_lock/note_on"_i18n : "playguard/console_lock/note_off"_i18n);
-    for (brls::View* v : { (brls::View*)bedtime_header.getView(), (brls::View*)bedtime_reset.getView(),
-                           (brls::View*)bedtime_note.getView() })
+    for (aurore::View* v : { (aurore::View*)bedtime_header.getView(), (aurore::View*)bedtime_reset.getView(),
+                           (aurore::View*)bedtime_note.getView() })
         ui::set_visible(v, fw_ok);
-    for (brls::View* v : { (brls::View*)extra_header.getView(), (brls::View*)extra_amounts.getView(),
-                           (brls::View*)extra_auto.getView(), (brls::View*)advanced.getView(),
-                           (brls::View*)remove_cell.getView() })
+    for (aurore::View* v : { (aurore::View*)extra_header.getView(), (aurore::View*)extra_amounts.getView(),
+                           (aurore::View*)extra_auto.getView(), (aurore::View*)advanced.getView(),
+                           (aurore::View*)remove_cell.getView() })
         ui::set_visible(v, fw_ok);
     ui::show_writable(remove_cell, writable, "cadran/coral", "cadran/text2");
     const auto& cfg = config::get();
@@ -393,11 +393,11 @@ void PlayTimerTab::show_played_key(int day)
         const std::string played = ui::fmt_played((uint16_t)std::min<uint32_t>(this->played_min[day], 24 * 60));
         // A day after today: what was played on it last week, said so.
         const std::string name = CadranWeekView::last_week(day)
-                                     ? brls::getStr("playguard/cadran/week/last_week_day", ui::day_name(day))
+                                     ? aurore::getStr("playguard/cadran/week/last_week_day", ui::day_name(day))
                                      : ui::day_name(day);
         text = this->pending[day] == PT_DAY_NOLIMIT
-                   ? brls::getStr("playguard/cadran/week/played_day_free", name, played)
-                   : brls::getStr("playguard/cadran/week/played_day", name, played, ui::fmt_played(this->pending[day]));
+                   ? aurore::getStr("playguard/cadran/week/played_day_free", name, played)
+                   : aurore::getStr("playguard/cadran/week/played_day", name, played, ui::fmt_played(this->pending[day]));
     }
     ui::set_text(played_text, text);
 }
@@ -416,8 +416,8 @@ void PlayTimerTab::rerender()
     const size_t count = current.empty() ? profiles::count() : 0;
     const std::string saved = !current.empty() ? current
                               : count == 1 ? "playguard/play_timer/profiles_count_one"_i18n
-                              : count ? brls::getStr("playguard/play_timer/profiles_count", (int)count) : "";
-    if (!profile.empty()) profile_name->setText(brls::getStr("playguard/cadran/week/profile", profile));
+                              : count ? aurore::getStr("playguard/play_timer/profiles_count", (int)count) : "";
+    if (!profile.empty()) profile_name->setText(aurore::getStr("playguard/cadran/week/profile", profile));
     else if (!saved.empty() && !this->changes()) profile_name->setText("playguard/play_timer/profiles"_i18n + " · " + saved);
     else profile_name->setText("playguard/play_timer/profiles"_i18n);
 
@@ -429,9 +429,9 @@ void PlayTimerTab::rerender()
             if (first < 0) first = d;
         }
     if (changed) {
-        pending_text->setText((changed == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : brls::getStr("playguard/play_timer/perday/unsaved_count", changed)) + " · " +
-                              brls::getStr("playguard/cadran/week/first_change",
-                                           brls::getStr(fmt::format("playguard/days_short/{}", first)),
+        pending_text->setText((changed == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : aurore::getStr("playguard/play_timer/perday/unsaved_count", changed)) + " · " +
+                              aurore::getStr("playguard/cadran/week/first_change",
+                                           aurore::getStr(fmt::format("playguard/days_short/{}", first)),
                                            limit_text(timer.day_min[first]), limit_text(this->pending[first])));
         pending_text->setThemeColor("textColor", "cadran/amber");
     } else {
@@ -443,16 +443,16 @@ void PlayTimerTab::rerender()
     }
     ui::set_visible(this->getView("pt_pending_row"), changed > 0 || !pt_flow::bonus_text().empty());
     this->show_played_key(this->week_editor->focused_day());   // a day over its limit may no longer be
-    pending_dot->setVisibility(changed ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    pending_dot->setVisibility(changed ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
     // The buttons go with the changes; the focus they had to the week.
-    brls::View* focus = brls::Application::getCurrentFocus();
+    aurore::View* focus = aurore::Application::getCurrentFocus();
     if (!changed && (focus == save_button.getView() || focus == discard_button.getView()))
-        brls::Application::giveFocus(week_editor.getView());
+        aurore::Application::giveFocus(week_editor.getView());
     ui::set_visible(save_button.getView(), changed > 0);
     ui::set_visible(discard_button.getView(), changed > 0);
     // + saves from anywhere on the tab while there is something to save.
     if (changed && !this->save_action) {
-        this->save_action = this->registerAction("", brls::BUTTON_START, [this](brls::View*) {
+        this->save_action = this->registerAction("", aurore::BUTTON_START, [this](aurore::View*) {
             this->save();
             return true;
         });
@@ -460,8 +460,8 @@ void PlayTimerTab::rerender()
         this->unregisterAction(this->save_action);
         this->save_action = 0;
     }
-    if (changed) this->updateActionHint(brls::BUTTON_START, brls::getStr("playguard/play_timer/perday/save_hint", changed));
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    if (changed) this->updateActionHint(aurore::BUTTON_START, aurore::getStr("playguard/play_timer/perday/save_hint", changed));
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
 
     // Bedtime: the time and when play is allowed again, every day.
     PtBedtime same;
@@ -483,8 +483,8 @@ void PlayTimerTab::rerender()
     week_editor->show_bedtimes(beds);
     bed_value->setText(start);
     bed_end->setText(end);
-    bed_arrow->setVisibility(end.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
-    bed_end->setVisibility(end.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+    bed_arrow->setVisibility(end.empty() ? aurore::Visibility::GONE : aurore::Visibility::VISIBLE);
+    bed_end->setVisibility(end.empty() ? aurore::Visibility::GONE : aurore::Visibility::VISIBLE);
     time_up_value->setText(pt_flow::time_up_text(timer));
 }
 
@@ -499,7 +499,7 @@ void PlayTimerTab::remove_limit()
                            }, nullptr, true);
 }
 
-brls::View* PlayTimerTab::create()
+aurore::View* PlayTimerTab::create()
 {
     return new PlayTimerTab();
 }

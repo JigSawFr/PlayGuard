@@ -5,13 +5,13 @@
 #include <cstdlib>
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/effects.hpp>
-#include <borealis/cadran/ui/motion.hpp>
+#include <aurore/cadran/ui/effects.hpp>
+#include <aurore/cadran/ui/motion.hpp>
 
 #include "action/pt_logic.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -30,14 +30,14 @@ constexpr int   STEP       = 15;
 }   // namespace
 
 // A day: tells the view when it takes or loses the focus.
-class CadranWeekView::Column : public brls::Box
+class CadranWeekView::Column : public aurore::Box
 {
   public:
     Column(CadranWeekView* week, int weekday)
-        : brls::Box(brls::Axis::COLUMN), owner(week), day(weekday) {}
+        : aurore::Box(aurore::Axis::COLUMN), owner(week), day(weekday) {}
     void onFocusGained() override
     {
-        brls::Box::onFocusGained();
+        aurore::Box::onFocusGained();
         this->owner->focused = this->day;
         // Reached any other way than left / right while editing (the stick
         // from elsewhere, back from a dialog): not editing.
@@ -47,7 +47,7 @@ class CadranWeekView::Column : public brls::Box
     }
     void onFocusLost() override
     {
-        brls::Box::onFocusLost();
+        aurore::Box::onFocusLost();
         if (this->owner->focused == this->day) this->owner->focused = -1;
         this->owner->render();
         if (this->owner->on_focus) this->owner->on_focus(this->owner->focused);
@@ -66,9 +66,9 @@ constexpr int ORDER[7] = { 1, 2, 3, 4, 5, 6, 0 };
 
 CadranWeekView::CadranWeekView()
 {
-    this->setAxis(brls::Axis::ROW);
-    this->setAlignItems(brls::AlignItems::FLEX_END);
-    this->setJustifyContent(brls::JustifyContent::SPACE_BETWEEN);
+    this->setAxis(aurore::Axis::ROW);
+    this->setAlignItems(aurore::AlignItems::FLEX_END);
+    this->setJustifyContent(aurore::JustifyContent::SPACE_BETWEEN);
     this->setHeight(COL_HEIGHT);
     this->setFocusable(false);
 
@@ -79,8 +79,8 @@ CadranWeekView::CadranWeekView()
         c.box->setGrow(1.0f);
         c.box->setWidth(0);
         c.box->setHeight(COL_HEIGHT);
-        c.box->setAlignItems(brls::AlignItems::CENTER);
-        c.box->setJustifyContent(brls::JustifyContent::FLEX_END);
+        c.box->setAlignItems(aurore::AlignItems::CENTER);
+        c.box->setJustifyContent(aurore::JustifyContent::FLEX_END);
         c.box->setPadding(10, 6, 8, 6);
         c.box->setCornerRadius(18);
         c.box->setFocusable(true);
@@ -95,8 +95,8 @@ CadranWeekView::CadranWeekView()
         c.up->setThemeColor("color", "cadran/teal");
         c.up->setMarginBottom(4);
         c.box->addView(c.up);
-        auto* value_row = new brls::Box(brls::Axis::ROW);
-        value_row->setAlignItems(brls::AlignItems::CENTER);
+        auto* value_row = new aurore::Box(aurore::Axis::ROW);
+        value_row->setAlignItems(aurore::AlignItems::CENTER);
         value_row->setMarginBottom(8);
         c.over = new CadranIcon();
         c.over->setIcon("alert");
@@ -104,37 +104,37 @@ CadranWeekView::CadranWeekView()
         c.over->setHeight(16);
         c.over->setThemeColor("color", "cadran/coral");
         c.over->setMarginRight(5);
-        c.over->setVisibility(brls::Visibility::GONE);
+        c.over->setVisibility(aurore::Visibility::GONE);
         value_row->addView(c.over);
         c.value = new CadranDigits();
         c.value->setFontSize(20);
         value_row->addView(c.value);
         c.box->addView(value_row);
-        c.bar = new brls::Box();
+        c.bar = new aurore::Box();
         c.bar->setWidth(56);
         c.bar->setHeight(BAR_MIN);
         c.bar->setCornerRadius(12);
         c.bar->setMarginBottom(8);
-        c.bar->setAxis(brls::Axis::COLUMN);
-        c.bar->setJustifyContent(brls::JustifyContent::FLEX_END);
-        c.bar->setAlignItems(brls::AlignItems::STRETCH);
-        c.fill = new brls::Box(brls::Axis::COLUMN);
+        c.bar->setAxis(aurore::Axis::COLUMN);
+        c.bar->setJustifyContent(aurore::JustifyContent::FLEX_END);
+        c.bar->setAlignItems(aurore::AlignItems::STRETCH);
+        c.fill = new aurore::Box(aurore::Axis::COLUMN);
         c.fill->setCornerRadius(12);
         c.fill->setHeight(0);
-        c.fill->setJustifyContent(brls::JustifyContent::FLEX_END);
-        c.fill->setAlignItems(brls::AlignItems::STRETCH);
-        c.fill->setVisibility(brls::Visibility::GONE);
-        c.within = new brls::Box();
+        c.fill->setJustifyContent(aurore::JustifyContent::FLEX_END);
+        c.fill->setAlignItems(aurore::AlignItems::STRETCH);
+        c.fill->setVisibility(aurore::Visibility::GONE);
+        c.within = new aurore::Box();
         c.within->setCornerRadius(12);
         c.within->setHeight(0);
-        c.within->setVisibility(brls::Visibility::GONE);
+        c.within->setVisibility(aurore::Visibility::GONE);
         c.fill->addView(c.within);
         c.bar->addView(c.fill);
         c.box->addView(c.bar);
-        c.day = new brls::Label();
+        c.day = new aurore::Label();
         c.day->setFontSize(16);
         c.day->setSingleLine(true);
-        c.day->setText(brls::getStr(fmt::format("playguard/days_short/{}", d)));
+        c.day->setText(aurore::getStr(fmt::format("playguard/days_short/{}", d)));
         c.box->addView(c.day);
         c.down = new CadranIcon();
         c.down->setIcon("caret-down");
@@ -143,11 +143,11 @@ CadranWeekView::CadranWeekView()
         c.down->setThemeColor("color", "cadran/teal");
         c.down->setMarginTop(4);
         c.box->addView(c.down);
-        c.bed = new brls::Box(brls::Axis::ROW);
-        c.bed->setAlignItems(brls::AlignItems::CENTER);
+        c.bed = new aurore::Box(aurore::Axis::ROW);
+        c.bed->setAlignItems(aurore::AlignItems::CENTER);
         c.bed->setHeight(BED_HEIGHT - 4);
         c.bed->setMarginTop(4);
-        c.bed->setVisibility(brls::Visibility::GONE);
+        c.bed->setVisibility(aurore::Visibility::GONE);
         CadranIcon* moon = new CadranIcon();
         moon->setIcon("moon");
         moon->setWidth(13);
@@ -155,7 +155,7 @@ CadranWeekView::CadranWeekView()
         moon->setThemeColor("color", "cadran/text3");
         moon->setMarginRight(4);
         c.bed->addView(moon);
-        c.bed_time = new brls::Label();
+        c.bed_time = new aurore::Label();
         c.bed_time->setFontSize(14);
         c.bed_time->setSingleLine(true);
         c.bed_time->setThemeColor("textColor", "cadran/text2");
@@ -165,53 +165,53 @@ CadranWeekView::CadranWeekView()
         // A starts and ends the edit; editing, the stick and the shoulders
         // edit the day (their hints are on the screen, under the week), and
         // B ends it. Not editing, they do what they do anywhere else.
-        c.box->registerAction("playguard/cadran/week/edit"_i18n, brls::BUTTON_A, [this](brls::View*) {
+        c.box->registerAction("playguard/cadran/week/edit"_i18n, aurore::BUTTON_A, [this](aurore::View*) {
             if (!this->edit && this->can_edit && !this->can_edit()) return true;
             this->set_edit(!this->edit);
             return true;
         });
         // X: told by the keys under the week, not in the footer (+ Save and
         // the global hints already fill it while a day is edited).
-        c.box->registerAction("playguard/cadran/week/pick"_i18n, brls::BUTTON_X, [this, d](brls::View*) {
+        c.box->registerAction("playguard/cadran/week/pick"_i18n, aurore::BUTTON_X, [this, d](aurore::View*) {
             if (this->can_edit && !this->can_edit()) return true;
             if (this->on_pick) this->on_pick(d);
             return true;
         }, true);
-        c.box->registerAction("", brls::BUTTON_B, [this](brls::View*) {
+        c.box->registerAction("", aurore::BUTTON_B, [this](aurore::View*) {
             if (!this->edit) return false;
             this->set_edit(false);
             return true;
         }, true);
-        c.box->registerAction("", brls::BUTTON_NAV_UP, [this, d](brls::View*) {
+        c.box->registerAction("", aurore::BUTTON_NAV_UP, [this, d](aurore::View*) {
             if (!this->edit) return false;
             this->nudge(d, STEP);
             return true;
         }, true, true);
-        c.box->registerAction("", brls::BUTTON_NAV_DOWN, [this, d](brls::View*) {
+        c.box->registerAction("", aurore::BUTTON_NAV_DOWN, [this, d](aurore::View*) {
             if (!this->edit) return false;
             this->nudge(d, -STEP);
             return true;
         }, true, true);
-        c.box->registerAction("", brls::BUTTON_NAV_LEFT, [this, d](brls::View*) { return this->step(d, -1); }, true, true);
-        c.box->registerAction("", brls::BUTTON_NAV_RIGHT, [this, d](brls::View*) { return this->step(d, 1); }, true, true);
-        c.box->registerAction("", brls::BUTTON_LB, [this, d](brls::View*) {
+        c.box->registerAction("", aurore::BUTTON_NAV_LEFT, [this, d](aurore::View*) { return this->step(d, -1); }, true, true);
+        c.box->registerAction("", aurore::BUTTON_NAV_RIGHT, [this, d](aurore::View*) { return this->step(d, 1); }, true, true);
+        c.box->registerAction("", aurore::BUTTON_LB, [this, d](aurore::View*) {
             if (!this->edit) return false;
             if (this->on_copy) this->on_copy(d, false);
             return true;
         }, true);
-        c.box->registerAction("", brls::BUTTON_RB, [this, d](brls::View*) {
+        c.box->registerAction("", aurore::BUTTON_RB, [this, d](aurore::View*) {
             if (!this->edit) return false;
             if (this->on_copy) this->on_copy(d, true);
             return true;
         }, true);
-        c.box->registerAction("", brls::BUTTON_Y, [this, d](brls::View*) {
+        c.box->registerAction("", aurore::BUTTON_Y, [this, d](aurore::View*) {
             if (!this->edit) return false;
             if (this->on_change) this->on_change(d, PT_DAY_NOLIMIT);
             return true;
         }, true);
-        c.box->addGestureRecognizer(new brls::TapGestureRecognizer([this, d](brls::TapGestureStatus status, brls::Sound* sound) {
-            if (status.state != brls::GestureState::END) return;
-            *sound = brls::SOUND_CLICK;
+        c.box->addGestureRecognizer(new aurore::TapGestureRecognizer([this, d](aurore::TapGestureStatus status, aurore::Sound* sound) {
+            if (status.state != aurore::GestureState::END) return;
+            *sound = aurore::SOUND_CLICK;
             this->tap(d, status.position.y);
         }));
         this->addView(c.box);
@@ -223,11 +223,11 @@ void CadranWeekView::tap(int day, float y)
     Column* box = this->cols[day].box;
     if (!this->edit || this->focused != day) {
         if (this->can_edit && !this->can_edit()) {
-            brls::Application::giveFocus(box);
+            aurore::Application::giveFocus(box);
             return;
         }
         this->moving = this->edit;   // from another day being edited: the edit goes on
-        brls::Application::giveFocus(box);
+        aurore::Application::giveFocus(box);
         this->moving = false;
         this->set_edit(true);
         return;
@@ -246,16 +246,16 @@ void CadranWeekView::set_edit(bool on)
     // changes are saved with + or Save, not by it.
     for (int d = 0; d < 7; d++)
         this->cols[d].box->updateActionHint(
-            brls::BUTTON_A, on ? brls::getStr("playguard/cadran/week/done_day", brls::getStr(fmt::format("cadran/days_lower/{}", d)))
+            aurore::BUTTON_A, on ? aurore::getStr("playguard/cadran/week/done_day", aurore::getStr(fmt::format("cadran/days_lower/{}", d)))
                                : "playguard/cadran/week/edit"_i18n);
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
     this->render();
     if (this->on_mode) this->on_mode(on);
 }
 
 void CadranWeekView::focus_day(int day)
 {
-    if (day >= 0 && day <= 6) brls::Application::giveFocus(this->cols[day].box);
+    if (day >= 0 && day <= 6) aurore::Application::giveFocus(this->cols[day].box);
 }
 
 bool CadranWeekView::step(int day, int direction)
@@ -266,7 +266,7 @@ bool CadranWeekView::step(int day, int direction)
     const int next = at + direction;
     if (next < 0 || next > 6) return true;   // the edit stays in the week
     this->moving = true;
-    brls::Application::giveFocus(this->cols[ORDER[next]].box);
+    aurore::Application::giveFocus(this->cols[ORDER[next]].box);
     this->moving = false;
     return true;
 }
@@ -277,7 +277,7 @@ void CadranWeekView::nudge(int day, int delta)
     const uint16_t cur = this->days[day];
     const int v = cur == PT_DAY_NOLIMIT ? (delta > 0 ? 0 : 1440) : (int)cur;
     // Held: 15 min a press, then whole hours, as the minutes prompt.
-    this->on_change(day, (uint16_t)pt_logic::held_step(this->held, v, delta, brls::getCPUTimeUsec()));
+    this->on_change(day, (uint16_t)pt_logic::held_step(this->held, v, delta, aurore::getCPUTimeUsec()));
 }
 
 void CadranWeekView::show(const uint16_t shown[7], const uint16_t saved[7])
@@ -307,7 +307,7 @@ void CadranWeekView::show_bedtimes(const std::string texts[7])
         Col& c = this->cols[d];
         c.box->setHeight(height);
         c.bed_time->setText(texts[d]);
-        c.bed->setVisibility(any ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        c.bed->setVisibility(any ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
     }
 }
 
@@ -320,13 +320,13 @@ void CadranWeekView::set_on_focus(std::function<void(int)> f) { this->on_focus =
 
 void CadranWeekView::onThemeChanged()
 {
-    brls::Box::onThemeChanged();
+    aurore::Box::onThemeChanged();
     if (this->bars_set) this->render();
 }
 
 void CadranWeekView::render()
 {
-    brls::Theme theme = brls::Application::getTheme();
+    aurore::Theme theme = aurore::Application::getTheme();
     const int today = ui::today_weekday();
     uint16_t top = 180;
     for (int d = 0; d < 7; d++)
@@ -344,7 +344,7 @@ void CadranWeekView::render()
         // saved in amber, its bar ringed in amber too.
         c.value->setThemeColor("textColor", is_focused ? "cadran/teal" : changed ? "cadran/amber" : over ? "cadran/coral" : "cadran/text");
         // Not the colour alone: a triangle before it too (the key shows one).
-        c.over->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        c.over->setVisibility(over ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
         const float bar = !this->valid || m == PT_DAY_NOLIMIT ? BAR_MIN : std::max(BAR_MIN, BAR_MAX * (float)m / (float)top);
         target[d] = bar;   // laid out below, on its way there
         c.bar->setThemeColor("backgroundColor", is_focused ? "cadran/teal_fill" : d == today ? "cadran/bar_today" : "cadran/bar");
@@ -374,20 +374,20 @@ void CadranWeekView::render()
             c.fill->setBackgroundColor(over ? past : played_color);
             this->bars[d].within_share = within;
             c.within->setBackgroundColor(played_color);
-            c.within->setVisibility(over ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+            c.within->setVisibility(over ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
         }
-        c.fill->setVisibility(fills ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        c.fill->setVisibility(fills ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
         c.day->setThemeColor("textColor", d == today ? "cadran/teal" : "cadran/text3");
         // The day being edited on the soft teal, its arrows shown.
         const bool editing = is_focused && this->edit;
         c.box->setThemeColor("backgroundColor", editing ? "cadran/teal_soft" : is_focused ? "cadran/surf2" : "cadran/none");
-        c.up->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
-        c.down->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::INVISIBLE);
+        c.up->setVisibility(editing ? aurore::Visibility::VISIBLE : aurore::Visibility::INVISIBLE);
+        c.down->setVisibility(editing ? aurore::Visibility::VISIBLE : aurore::Visibility::INVISIBLE);
     }
     // The bars whose height changed start moving: one after the other,
     // outward from the focused day, when several do (a copy); at once when
     // one does, or the first time, or with the motion off.
-    const brls::Time now = motion::now();
+    const aurore::Time now = motion::now();
     const auto place = [](int d) { return (d + 6) % 7; };   // Monday first
     int changed = 0;
     for (int d = 0; d < 7; d++) changed += target[d] != this->bars[d].to ? 1 : 0;
@@ -402,7 +402,7 @@ void CadranWeekView::render()
         b.from = this->bar_now(d);   // from where it is drawn now
         b.to   = target[d];
         const int gap = changed > 1 && this->focused >= 0 ? std::abs(place(d) - place(this->focused)) : 0;
-        b.since = now + (brls::Time)gap * BAR_STAGGER_MS * 1000;
+        b.since = now + (aurore::Time)gap * BAR_STAGGER_MS * 1000;
     }
     this->bars_set = true;
     this->layout_bars();
@@ -429,13 +429,13 @@ void CadranWeekView::layout_bars()
     }
 }
 
-void CadranWeekView::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-                          brls::FrameContext* ctx)
+void CadranWeekView::draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+                          aurore::FrameContext* ctx)
 {
     bool on_the_move = false;
     for (const BarMove& b : this->bars) on_the_move = on_the_move || b.since != 0;
     if (on_the_move) this->layout_bars();
-    brls::Box::draw(vg, x, y, width, height, style, ctx);
+    aurore::Box::draw(vg, x, y, width, height, style, ctx);
 }
 
 bool CadranWeekView::last_week(int day)
@@ -445,4 +445,4 @@ bool CadranWeekView::last_week(int day)
     return place(day) > place(ui::today_weekday());
 }
 
-brls::View* CadranWeekView::create() { return new CadranWeekView(); }
+aurore::View* CadranWeekView::create() { return new CadranWeekView(); }

@@ -5,16 +5,16 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <functional>
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/guarded.hpp>
+#include <aurore/cadran/ui/guarded.hpp>
 
 class TabBadge;
 
-class TabBase : public brls::Box
+class TabBase : public aurore::Box
 {
   public:
     // `refreshes`: X reads the tab again. Off for a tab that shows only
@@ -37,21 +37,21 @@ class TabBase : public brls::Box
 
     // Entered from the sidebar for the first time: the first row marked with
     // something to do (mark), else the first row.
-    brls::View* getDefaultFocus() override;
-    void        onChildFocusGained(brls::View* directChild, brls::View* focusedView) override;
+    aurore::View* getDefaultFocus() override;
+    void        onChildFocusGained(aurore::View* directChild, aurore::View* focusedView) override;
 
   protected:
     virtual void refresh() = 0;
 
     // Goes with the tab: what finishes later (a flow's callback after the
-    // network or a dialog, a background task's brls::sync) checks it, by
+    // network or a dialog, a background task's aurore::sync) checks it, by
     // ui::guarded, as a tab replaced by another is freed meanwhile.
     ui::Alive alive = ui::make_alive();
     // refresh(), once a flow is over: nothing if the tab is gone by then.
     std::function<void()> refresher() { return ui::guarded(this->alive, [this]() { this->refresh(); }); }
 
     // This tab is the one on screen. A tab replaced by another is freed a
-    // little later (borealis' free queue): until then, its timer and its
+    // little later (Aurore's free queue): until then, its timer and its
     // listeners must not refresh it, or what it sets for the whole screen
     // (the header's pill) would cover the new tab's.
     bool shown() const;
@@ -67,17 +67,17 @@ class TabBase : public brls::Box
     // as the sidebar has by the tab's name, and on a row with no value of its
     // own, what it is for in a few words ("Easy to guess"). Marked in the
     // order of the tab.
-    void mark(brls::Box* row, std::vector<std::string> ids);
+    void mark(aurore::Box* row, std::vector<std::string> ids);
 
   private:
-    brls::RepeatingTimer auto_timer;
+    aurore::RepeatingTimer auto_timer;
     std::string screen;   // "tab/overview": how the frame statistics name this tab
 
     struct Mark
     {
-        brls::Box*               row;
+        aurore::Box*               row;
         TabBadge*                badge;
-        brls::Label*             reason;   // what the badge is for, on a row with no value of its own
+        aurore::Label*             reason;   // what the badge is for, on a row with no value of its own
         std::vector<std::string> ids;
     };
     std::vector<Mark> marks;

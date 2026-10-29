@@ -1,5 +1,5 @@
 // game_check_text — the rules behind what Console › Check the installed games
-// says of a game, without borealis: the section order, the i18n key of each
+// says of a game, without Aurore: the section order, the i18n key of each
 // problem and section, which problems are warnings rather than failures,
 // the firmware a game asks for, which fix text applies, and the IDs and
 // console codes as the screen writes them; then the list itself: the games

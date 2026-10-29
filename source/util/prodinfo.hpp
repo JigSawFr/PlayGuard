@@ -6,7 +6,7 @@
 // number is at 0x250 in it; the device certificate (ECC at 0x480, else RSA at
 // 0x3FC0) names the console, compared with spl's DeviceId: an SD card moved
 // between consoles holds the backups of each.
-// Plain C++ (no borealis), so the host tests can run it on a fake SD card.
+// Plain C++ (no Aurore), so the host tests can run it on a fake SD card.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

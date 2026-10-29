@@ -7,7 +7,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "tab/tab_base.hpp"
 
@@ -15,7 +15,7 @@ class SecurityTab : public TabBase
 {
   public:
     SecurityTab();
-    static brls::View* create();
+    static aurore::View* create();
     void willAppear(bool resetState = false) override;
 
   protected:
@@ -30,27 +30,27 @@ class SecurityTab : public TabBase
     // Set or change the PIN (the system PIN screen), recorded in the history.
     void change_pin();
 
-    BRLS_BIND(brls::DetailCell, pin,            "sc_pin");
-    BRLS_BIND(brls::DetailCell, restrictions,   "sc_restrictions");
-    BRLS_BIND(brls::DetailCell, temp,           "sc_temp");
-    BRLS_BIND(brls::DetailCell, hbmenu,         "sc_hbmenu");
-    BRLS_BIND(brls::DetailCell, hbmenu_lock,    "sc_hbmenu_lock");
-    BRLS_BIND(brls::Header,     actions_header, "sc_actions_header");
-    BRLS_BIND(brls::DetailCell, set_pin,        "sc_set_pin");
-    BRLS_BIND(brls::DetailCell, pin_lock_cell,  "sc_pin_lock");
-    BRLS_BIND(brls::Label,      pin_lock_note,  "sc_pin_lock_note");
-    BRLS_BIND(brls::DetailCell, show_pin,       "sc_show_pin");
-    BRLS_BIND(brls::DetailCell, unlock,         "sc_unlock");
-    BRLS_BIND(brls::BooleanCell, auto_relock,   "sc_auto_relock");
-    BRLS_BIND(brls::BooleanCell, pin_ask_again, "sc_pin_ask_again");
-    BRLS_BIND(brls::BooleanCell, pin_pauses,    "sc_pin_pauses");
-    BRLS_BIND(brls::DetailCell, pr_active,      "pr_active");
-    BRLS_BIND(brls::DetailCell, pr_updated,     "pr_updated");
-    BRLS_BIND(brls::DetailCell, pr_decode,      "pr_decode");
-    BRLS_BIND(brls::DetailCell, pr_unlink,      "pr_unlink");
-    BRLS_BIND(brls::Label,      pr_note,        "pr_note");
-    BRLS_BIND(brls::Header,     danger_header,  "sc_danger_header");
-    BRLS_BIND(brls::DetailCell, del,            "sc_delete");
-    BRLS_BIND(brls::DetailCell, rescue,         "sc_rescue");
-    BRLS_BIND(brls::Label,      rescue_about,   "sc_rescue_about");
+    AURORE_BIND(aurore::DetailCell, pin,            "sc_pin");
+    AURORE_BIND(aurore::DetailCell, restrictions,   "sc_restrictions");
+    AURORE_BIND(aurore::DetailCell, temp,           "sc_temp");
+    AURORE_BIND(aurore::DetailCell, hbmenu,         "sc_hbmenu");
+    AURORE_BIND(aurore::DetailCell, hbmenu_lock,    "sc_hbmenu_lock");
+    AURORE_BIND(aurore::Header,     actions_header, "sc_actions_header");
+    AURORE_BIND(aurore::DetailCell, set_pin,        "sc_set_pin");
+    AURORE_BIND(aurore::DetailCell, pin_lock_cell,  "sc_pin_lock");
+    AURORE_BIND(aurore::Label,      pin_lock_note,  "sc_pin_lock_note");
+    AURORE_BIND(aurore::DetailCell, show_pin,       "sc_show_pin");
+    AURORE_BIND(aurore::DetailCell, unlock,         "sc_unlock");
+    AURORE_BIND(aurore::BooleanCell, auto_relock,   "sc_auto_relock");
+    AURORE_BIND(aurore::BooleanCell, pin_ask_again, "sc_pin_ask_again");
+    AURORE_BIND(aurore::BooleanCell, pin_pauses,    "sc_pin_pauses");
+    AURORE_BIND(aurore::DetailCell, pr_active,      "pr_active");
+    AURORE_BIND(aurore::DetailCell, pr_updated,     "pr_updated");
+    AURORE_BIND(aurore::DetailCell, pr_decode,      "pr_decode");
+    AURORE_BIND(aurore::DetailCell, pr_unlink,      "pr_unlink");
+    AURORE_BIND(aurore::Label,      pr_note,        "pr_note");
+    AURORE_BIND(aurore::Header,     danger_header,  "sc_danger_header");
+    AURORE_BIND(aurore::DetailCell, del,            "sc_delete");
+    AURORE_BIND(aurore::DetailCell, rescue,         "sc_rescue");
+    AURORE_BIND(aurore::Label,      rescue_about,   "sc_rescue_about");
 };

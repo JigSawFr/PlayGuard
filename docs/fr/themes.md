@@ -101,7 +101,7 @@ accent = #3ddc97
   endroit (nommez-le `.inc`, pour qu'il n'apparaisse pas comme une palette).
 
 Chaque couleur de PlayGuard est une clé de thème : celles d'Aurore
-(`brls/…`), celles de Cadran, l'apparence que PlayGuard partage avec PlayShelf
+(`aurore/…`), celles de Cadran, l'apparence que PlayGuard partage avec PlayShelf
 (`cadran/…`), et celles de PlayGuard (`playguard/…`). Le [guide des thèmes](https://github.com/JigSawFr/Aurore/blob/main/docs/themes.md)
 d'Aurore (en anglais) liste les deux premières avec ce que chacune colore, et
 ce que fixe chaque clé de la palette.
@@ -118,7 +118,7 @@ ce que fixe chaque clé de la palette.
 | `playguard/badge/ink` | Le « ! » sur le disque corail d'un jeu qui reste (*Console › Vérifier les jeux installés*, suppressions) |
 
 Le fond et le texte de l'écran de chargement sont ceux du thème
-(`brls/background`, `cadran/text2`), comme sur chaque écran, et son image de
+(`aurore/background`, `cadran/text2`), comme sur chaque écran, et son image de
 fond aussi.
 
 ### Un texte lisible
@@ -314,7 +314,7 @@ background_dim = 0.6
 logo = logo-light.png
 # Over the picture, a little darker than the palette makes them
 cadran/text3 = #574d66
-brls/header/subtitle = #574d66
+aurore/header/subtitle = #574d66
 
 [dark]
 background = #1b1838

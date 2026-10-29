@@ -11,13 +11,13 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 #include <vector>
 
 #include "action/notices.hpp"
 
-class NoticesActivity : public brls::Activity
+class NoticesActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/notices.xml");
@@ -35,13 +35,13 @@ class NoticesActivity : public brls::Activity
     bool stale = false;   // changed under a dialog: rebuilt once back on top
     bool console_open = false;   // the console's entries shown, not only their line
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
-    brls::Box* content = nullptr;
+    aurore::Box* content = nullptr;
 
     void rebuild();
     // rebuild()'s cells: the console's entries folded into one line, and an entry.
-    brls::DetailCell* console_line(const std::vector<notices::Entry>& all);
-    brls::DetailCell* entry_cell(const notices::Entry& e, bool todo);
-    brls::DetailCell* ignored_cell(const notices::Entry& e);
+    aurore::DetailCell* console_line(const std::vector<notices::Entry>& all);
+    aurore::DetailCell* entry_cell(const notices::Entry& e, bool todo);
+    aurore::DetailCell* ignored_cell(const notices::Entry& e);
 
-    BRLS_BIND(brls::Box, root, "nt_root");
+    AURORE_BIND(aurore::Box, root, "nt_root");
 };

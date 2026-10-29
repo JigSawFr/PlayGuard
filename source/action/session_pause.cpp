@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/session_pause.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
@@ -45,7 +45,7 @@ void shown(bool unlocked)
 {
     ui::note_paused(unlocked);
     ui::note_unlocked(true, unlocked);
-    brls::sync([]() { ui::refresh_shown_tab(); });
+    aurore::sync([]() { ui::refresh_shown_tab(); });
 }
 
 void pause()
@@ -57,11 +57,11 @@ void pause()
     if (R_FAILED(pctl_lock_state(&pin_length, &unlocked)) || pin_length == 0 || unlocked) return;
     const Result rc = pt_flow::unlock_temporarily();
     if (R_FAILED(rc)) {
-        brls::Logger::error("session pause: the unlock failed ({:#x})", (unsigned)rc);
+        aurore::Logger::error("session pause: the unlock failed ({:#x})", (unsigned)rc);
         s_failed = true;
         return;
     }
-    brls::Logger::info("session pause: parental controls paused while PlayGuard is open");
+    aurore::Logger::info("session pause: parental controls paused while PlayGuard is open");
     s_active = true;
     shown(true);
 }
@@ -73,10 +73,10 @@ void resume()
     const Result rc = pctl_relock();
     if (R_FAILED(rc)) {
         // Still recorded (relock_pending): the next start locks again.
-        brls::Logger::error("session pause: locking again failed ({:#x})", (unsigned)rc);
+        aurore::Logger::error("session pause: locking again failed ({:#x})", (unsigned)rc);
         return;
     }
-    brls::Logger::info("session pause: parental controls back on");
+    aurore::Logger::info("session pause: parental controls back on");
     pt_flow::set_relock_pending(false);
     if (!s_quitting) shown(false);
 }
@@ -91,7 +91,7 @@ void apply()
 
 void install()
 {
-    brls::Application::getWindowFocusChangedEvent()->subscribe([](bool focused) {
+    aurore::Application::getWindowFocusChangedEvent()->subscribe([](bool focused) {
         s_focused = focused;
         // Left: at once, before anything can start behind it.
         if (!focused) {
@@ -100,7 +100,7 @@ void install()
         }
         // Back: after the lock screen, if any, has opened (pin_lock::watch_focus,
         // subscribed before this one, waits a frame too).
-        brls::sync([]() { apply(); });
+        aurore::sync([]() { apply(); });
     });
 }
 
@@ -108,7 +108,7 @@ void pin_entered()
 {
     s_failed = false;
     s_stopped = false;
-    brls::sync([]() { apply(); });
+    aurore::sync([]() { apply(); });
 }
 
 void setting_changed()
@@ -142,7 +142,7 @@ void adopt()
 {
     stop();
     pt_flow::set_relock_pending(false);
-    brls::Logger::info("session pause: the unlock kept, as a remote order asked");
+    aurore::Logger::info("session pause: the unlock kept, as a remote order asked");
 }
 
 void end()
@@ -160,7 +160,7 @@ Hold::Hold()
 Hold::~Hold()
 {
     s_holds--;
-    brls::sync([]() { apply(); });
+    aurore::sync([]() { apply(); });
 }
 
 }   // namespace session_pause

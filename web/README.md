@@ -1,7 +1,7 @@
 # The web simulator
 
 The desktop simulator (`make desktop`, `source/sim/`), compiled with
-[Emscripten](https://emscripten.org) for a browser: the real borealis UI
+[Emscripten](https://emscripten.org) for a browser: the real Aurore UI
 against a simulated console, to click through a change, try a state or show
 a screen without a build on the console.
 In the website's look (`site/assets/site.css`): its colours, its header in
@@ -161,7 +161,7 @@ it). The flags are the website's `site/assets/fonts/twemoji-flags.woff2`
 builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8000>.
 
 - `CMakeLists.txt`, under `emcmake` (`PLAYGUARD_WEB`): the desktop build on
-  borealis' SDL2 platform with OpenGL ES 3, which Emscripten maps to WebGL 2;
+  Aurore's SDL2 platform with OpenGL ES 3, which Emscripten maps to WebGL 2;
   SDL2 and zlib from Emscripten's ports; no libcurl; the resources packaged at
   `/app/resources` and `web/samples/` at `/app/samples` (`playguard.data`); a
   pool of 16 threads started with the page (a thread asked for later waits
@@ -175,9 +175,9 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   display refresh.
 - Aurore, our borealis fork (patch 0090): no SDL haptic in a browser;
   a window fixed at the console's 1280×720 (the page scales the canvas);
-  `brls_web_button()`, which the page calls to press a button; the CJK font
-  below as borealis' fallback when it is there at start-up.
-- **Japanese, Korean and Chinese**: a browser has no system font for borealis
+  `aurore_web_button()`, which the page calls to press a button; the CJK font
+  below as Aurore's fallback when it is there at start-up.
+- **Japanese, Korean and Chinese**: a browser has no system font for Aurore
   to fall back on, and PlayGuard's Latin font has no han, kana or hangul. The
   web build cuts the characters those four languages' catalogs use
   (PlayGuard's and Aurore's, for the theme names) out of Noto Sans CJK
@@ -242,7 +242,7 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   still running after 5 minutes is stopped and fails: about a minute in all
   on a CI runner. `WEB_SMOKE_ONLY=tour,keep` runs some of them. Its screens
   (`shots/`) and the time each start took (`shots/timings.json`, in the
-  run's summary) go with the site; each is taken once borealis lets go of
+  run's summary) go with the site; each is taken once Aurore lets go of
   the input (`playguard_web_busy()`, `source/sim/web_page.cpp`), not while a
   screen is still opening.
 - **The screens against main's** (CI, pull requests only): each screen is

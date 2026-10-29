@@ -1,9 +1,9 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/console_tab.hpp"
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/view/tab_badge.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/view/tab_badge.hpp>
 
 #include "action/fw_gate.hpp"
 #include "action/sys_notes_flow.hpp"
@@ -23,36 +23,36 @@
 #include "util/paths.hpp"
 #include "view/row_icon.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 ConsoleTab::ConsoleTab()
     : TabBase("xml/tab/console.xml"), list(this)
 {
-    clock->registerClickAction([](brls::View*) {
+    clock->registerClickAction([](aurore::View*) {
         ClockTab::open_screen();
         return true;
     });
-    games->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new GameCheckActivity());
+    games->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new GameCheckActivity());
         return true;
     });
-    forwarders->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new ForwardersActivity());
+    forwarders->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new ForwardersActivity());
         return true;
     });
-    remote->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new SyncActivity());
+    remote->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new SyncActivity());
         return true;
     });
-    modules_cell->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new ModulesActivity());
+    modules_cell->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new ModulesActivity());
         return true;
     });
 
     // The real serial number, whole, and where it comes from: a press away
     // (the row masks its middle).
     serial_info = RowIcon::on_row(serial.getView(), RowIcon::Kind::Info);
-    serial->registerClickAction([this](brls::View*) {
+    serial->registerClickAction([this](aurore::View*) {
         SysInfo si;
         sysinfo_get(&si);
         ui::info(ui::real_serial(si).note);
@@ -60,7 +60,7 @@ ConsoleTab::ConsoleTab()
     });
 
     // The release notes of each (installed and newer versions).
-    const std::pair<brls::DetailCell*, sys_notes::Which> notes_cells[] = {
+    const std::pair<aurore::DetailCell*, sys_notes::Which> notes_cells[] = {
         { fw.getView(), sys_notes::Which::Firmware },
         { ams.getView(), sys_notes::Which::Atmosphere },
         { hekate.getView(), sys_notes::Which::Hekate },
@@ -68,7 +68,7 @@ ConsoleTab::ConsoleTab()
     };
     for (const auto& n : notes_cells) {
         const sys_notes::Which which = n.second;
-        n.first->registerAction("playguard/sys_notes/hint"_i18n, brls::BUTTON_A, [which](brls::View*) {
+        n.first->registerAction("playguard/sys_notes/hint"_i18n, aurore::BUTTON_A, [which](aurore::View*) {
             sys_notes_flow::open(which);
             return true;
         });
@@ -83,14 +83,14 @@ ConsoleTab::ConsoleTab()
     // The other system's parental controls: an info icon on the row, the text a
     // press away (a paragraph under it took half the screen).
     storage_info = RowIcon::on_row(storage.getView(), RowIcon::Kind::Info);
-    storage->registerClickAction([this](brls::View*) {
+    storage->registerClickAction([this](aurore::View*) {
         if (!this->storage_note.empty()) ui::info(this->storage_note);
         return true;
     });
     // A warning icon for the serial number not blanked on emuMMC, on the row that
     // says so.
     blank_warn = RowIcon::on_row(blank.getView(), RowIcon::Kind::Warning);
-    blank->registerClickAction([](brls::View*) {
+    blank->registerClickAction([](aurore::View*) {
         ui::info("playguard/tools/serial_note_emummc"_i18n);
         return true;
     });
@@ -98,7 +98,7 @@ ConsoleTab::ConsoleTab()
     // What the game patches found: an icon (a warning when something needs a
     // look), the text by A.
     patches_icon = RowIcon::on_row(game_patches.getView(), RowIcon::Kind::Info);
-    game_patches->registerClickAction([this](brls::View*) {
+    game_patches->registerClickAction([this](aurore::View*) {
         // sigpatch files beside sys-patch: what was found and, in the same
         // question, whether to set them aside (action/sigpatch_flow.hpp).
         if (!sigpatch_flow::offered()) {
@@ -110,42 +110,42 @@ ConsoleTab::ConsoleTab()
     });
 
     // On a firmware newer than the checked one, the firmware screen again.
-    compat->registerClickAction([](brls::View*) {
-        if (fw_gate::needed()) brls::Application::pushActivity(new FirmwareGateActivity());
+    compat->registerClickAction([](aurore::View*) {
+        if (fw_gate::needed()) aurore::Application::pushActivity(new FirmwareGateActivity());
         else ui::info("playguard/tools/compat_ok_info"_i18n);
         return true;
     });
     // What the console runs, as tiles above the rest (first in the XML).
-    if (brls::Box* tiles = this->list.tiles(
+    if (aurore::Box* tiles = this->list.tiles(
             { { "cn_fw", "chip" }, { "cn_ams", "bolt" }, { "cn_hekate", "flag" }, { "cn_syspatch", "shield" } }, true))
         tiles->setMarginBottom(20);
     // A newer firmware Atmosphère or hekate does not support yet: a warning
     // in the firmware tile's corner, the advice in its release notes (A).
     fw_warn = new RowIcon(RowIcon::Kind::Warning);
-    if (brls::Box* head = this->list.head("cn_fw")) {
-        auto* push = new brls::Box();
+    if (aurore::Box* head = this->list.head("cn_fw")) {
+        auto* push = new aurore::Box();
         push->setGrow(1.0f);
         head->addView(push);
         head->addView(fw_warn);
     }
     // The screens of their own as tiles under them, each one's count of
     // things to do (mark()) in its corner rather than under its title.
-    if (brls::Box* tools = this->list.tiles({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" } }, false)) {
+    if (aurore::Box* tools = this->list.tiles({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" } }, false)) {
         tools->setMarginBottom(20);
         for (const char* tile : { "cn_clock", "cn_games" }) {
-            auto* cell = (brls::DetailCell*)this->getView(tile);
+            auto* cell = (aurore::DetailCell*)this->getView(tile);
             TabBadge* badge = TabBadge::on_row(cell);
-            brls::Box* head = this->list.head(tile);
+            aurore::Box* head = this->list.head(tile);
             if (!badge || !head) continue;
             cell->removeView(badge, false);
-            auto* push = new brls::Box();
+            auto* push = new aurore::Box();
             push->setGrow(1.0f);
             head->addView(push);
             head->addView(badge);
         }
     }
     // The remote link and the optional sysmodules: a second row of them.
-    if (brls::Box* more = this->list.tiles({ { "cn_remote", "server" }, { "cn_modules", "tools" } }, false))
+    if (aurore::Box* more = this->list.tiles({ { "cn_remote", "server" }, { "cn_modules", "tools" } }, false))
         more->setMarginBottom(20);
     this->list.apply({ { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
                        { "cn_serial", "tag" }, { "cn_patches", "shield" } });
@@ -164,7 +164,7 @@ void ConsoleTab::refresh()
     for (const auto& m : modules::all())
         installed += paths::file_exists(modules::dir(paths::sd_root(), m) + "/exefs.nsp") ? 1 : 0;
     modules_cell->setDetailText(installed == 1 ? "playguard/modules/count_one"_i18n
-                                : installed ? brls::getStr("playguard/modules/count", installed)
+                                : installed ? aurore::getStr("playguard/modules/count", installed)
                                             : "playguard/modules/state/none"_i18n);
     SysInfo si;
     sysinfo_get(&si);
@@ -172,14 +172,14 @@ void ConsoleTab::refresh()
     // the newest, or a warning when the last update check found a newer one
     // (sys_update_flow), named under it with how many releases behind, in
     // amber.
-    const auto version_tile = [this](brls::DetailCell* cell, const char* tile_id, sys_notes::Which which) {
+    const auto version_tile = [this](aurore::DetailCell* cell, const char* tile_id, sys_notes::Which which) {
         const sys_notes_flow::Status s = sys_notes_flow::status(which);
         cell->setDetailText(s.installed.empty() ? "cadran/common/unavailable"_i18n : s.installed);
         cell->detail->setThemeColor("textColor", s.installed.empty() ? "cadran/text2" : "cadran/text");
         std::string note;
         if (s.newer) {
-            note = brls::getStr("playguard/tools/tile_newer", s.latest);
-            if (s.behind > 1) note += " · " + brls::getStr("playguard/tools/tile_behind", (int)s.behind);
+            note = aurore::getStr("playguard/tools/tile_newer", s.latest);
+            if (s.behind > 1) note += " · " + aurore::getStr("playguard/tools/tile_behind", (int)s.behind);
         }
         const bool current = !s.newer && !s.installed.empty() && !s.latest.empty();
         this->list.state(tile_id, s.newer ? "cadran/amber_fill" : current ? "cadran/teal_fill" : nullptr);
@@ -236,7 +236,7 @@ void ConsoleTab::refresh()
     cadran::set_pill("");
 }
 
-brls::View* ConsoleTab::create()
+aurore::View* ConsoleTab::create()
 {
     return new ConsoleTab();
 }

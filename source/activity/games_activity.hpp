@@ -10,17 +10,17 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 #include <vector>
 
-#include <borealis/cadran/view/scroll_view.hpp>
+#include <aurore/cadran/view/scroll_view.hpp>
 
 #include "util/pctl_ops_c.hpp"
 #include "view/game_cell.hpp"
 #include "view/game_tile.hpp"
 
-class GamesActivity : public brls::Activity
+class GamesActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/games.xml");
@@ -38,7 +38,7 @@ class GamesActivity : public brls::Activity
     struct Entry
     {
         u64 app_id;
-        brls::View* view;
+        aurore::View* view;
         GameCell* cell;   // list
         GameTile* tile;   // grid
         bool iconed;
@@ -52,7 +52,7 @@ class GamesActivity : public brls::Activity
     // The games built: the first ROWS_SHOWN, every one after "Show every
     // game" (APPLET_ROWS_MAX in applet mode).
     size_t cap() const;
-    brls::Box* next_row();
+    aurore::Box* next_row();
     void add_entry(size_t i);
     void add_more();
     void fill(Entry& e, const GameStat& g) const;
@@ -74,25 +74,25 @@ class GamesActivity : public brls::Activity
     std::shared_ptr<const PlayStats> data;
     std::vector<const GameStat*> rows;   // the games of the period, most played first (into `data`)
     std::vector<Entry> entries;          // on screen, in the same order
-    brls::View* more = nullptr;          // "Show every game", after them, when rows are left out
-    brls::Box* grid_row = nullptr;       // the grid's row being filled
+    aurore::View* more = nullptr;          // "Show every game", after them, when rows are left out
+    aurore::Box* grid_row = nullptr;       // the grid's row being filled
     size_t selected = 0;
     int listener = 0;                    // play_data::listen id
     bool stale = false;                  // a read ended under a game's screen or a dialog
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
-    BRLS_BIND(brls::Image,      icon,           "gs_icon");
-    BRLS_BIND(brls::Label,      name,           "gs_name");
-    BRLS_BIND(brls::Label,      period_caption, "gs_period_caption");
-    BRLS_BIND(brls::Label,      period_value,   "gs_period");
-    BRLS_BIND(brls::Label,      total,          "gs_total");
-    BRLS_BIND(brls::Label,      launches,       "gs_launches");
-    BRLS_BIND(brls::Label,      last,           "gs_last");
-    BRLS_BIND(brls::DetailCell, view_cell,      "gs_view");
-    BRLS_BIND(brls::DetailCell, period_cell,    "gs_period_cell");
-    BRLS_BIND(brls::Box,        content,        "gs_content");
-    BRLS_BIND(brls::Box,        progress,       "gs_progress");
-    BRLS_BIND(brls::Box,        list,           "gs_list");
-    BRLS_BIND(brls::Label,      capped,         "gs_capped");
-    BRLS_BIND(brls::Label,      status,         "gs_status");
+    AURORE_BIND(aurore::Image,      icon,           "gs_icon");
+    AURORE_BIND(aurore::Label,      name,           "gs_name");
+    AURORE_BIND(aurore::Label,      period_caption, "gs_period_caption");
+    AURORE_BIND(aurore::Label,      period_value,   "gs_period");
+    AURORE_BIND(aurore::Label,      total,          "gs_total");
+    AURORE_BIND(aurore::Label,      launches,       "gs_launches");
+    AURORE_BIND(aurore::Label,      last,           "gs_last");
+    AURORE_BIND(aurore::DetailCell, view_cell,      "gs_view");
+    AURORE_BIND(aurore::DetailCell, period_cell,    "gs_period_cell");
+    AURORE_BIND(aurore::Box,        content,        "gs_content");
+    AURORE_BIND(aurore::Box,        progress,       "gs_progress");
+    AURORE_BIND(aurore::Box,        list,           "gs_list");
+    AURORE_BIND(aurore::Label,      capped,         "gs_capped");
+    AURORE_BIND(aurore::Label,      status,         "gs_status");
 };

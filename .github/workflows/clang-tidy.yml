@@ -86,7 +86,7 @@ jobs:
           echo "clang-tidy $(clang-tidy --version | sed -n 's/.*version \([0-9.]*\).*/\1/p')"
       - name: Compile commands (clang, no precompiled header)
         run: |
-          CC=clang CXX=clang++ cmake -B build-tidy -S . -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release \
+          CC=clang CXX=clang++ cmake -B build-tidy -S . -DAURORE_PLATFORM=DESKTOP -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON > configure.log 2>&1 \
             || { cat configure.log; exit 1; }
       # The files to check, one a line in files.txt: a pull request's changed

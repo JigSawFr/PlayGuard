@@ -5,8 +5,8 @@
 
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/motion.hpp>
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/ui/motion.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
@@ -17,44 +17,44 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
-void DashboardTab::build_outside_card(brls::Box* column, int at)
+void DashboardTab::build_outside_card(aurore::Box* column, int at)
 {
     namespace kit = cadran::kit;
     // What changed outside PlayGuard, as one card above the ring: its title,
     // the changes one under the other, Ⓐ to dismiss it.
     auto* card = kit::card(true, false);
-    card->setAxis(brls::Axis::ROW);
-    card->setAlignItems(brls::AlignItems::FLEX_START);
+    card->setAxis(aurore::Axis::ROW);
+    card->setAlignItems(aurore::AlignItems::FLEX_START);
     card->setThemeColor("backgroundColor", "cadran/amber_surf");
     card->setThemeColor("borderColor", "cadran/amber_line");
     card->setPadding(18, 24, 18, 20);
     card->setMarginBottom(16);
-    card->setVisibility(brls::Visibility::GONE);
+    card->setVisibility(aurore::Visibility::GONE);
     CadranIcon* icon = kit::icon("alert", 22, "cadran/amber");
     icon->setMarginTop(1);
     icon->setMarginRight(14);
     icon->setShrink(0);
     card->addView(icon);
-    auto* text = new brls::Box(brls::Axis::COLUMN);
+    auto* text = new aurore::Box(aurore::Axis::COLUMN);
     text->setGrow(1.0f);
     text->setWidth(0);
     text->addView(kit::label("playguard/notices/outside"_i18n, 18, "cadran/amber"));
-    this->outside_lines = new brls::Box(brls::Axis::COLUMN);
+    this->outside_lines = new aurore::Box(aurore::Axis::COLUMN);
     this->outside_lines->setMarginTop(6);
     text->addView(this->outside_lines);
     // Ⓐ and what it does, as on the network clock's card.
-    auto* hint = new brls::Box(brls::Axis::ROW);
-    hint->setAlignItems(brls::AlignItems::CENTER);
+    auto* hint = new aurore::Box(aurore::Axis::ROW);
+    hint->setAlignItems(aurore::AlignItems::CENTER);
     hint->setMarginTop(10);
-    brls::Box* key = kit::key("A", 22);
+    aurore::Box* key = kit::key("A", 22);
     key->setMarginRight(8);
     hint->addView(key);
     hint->addView(kit::label("playguard/dashboard/outside_dismiss"_i18n, 15, "cadran/text2"));
     text->addView(hint);
     card->addView(text);
-    card->registerClickAction([this](brls::View*) {
+    card->registerClickAction([this](aurore::View*) {
         outside_watch::dismiss();
         this->refresh();
         return true;
@@ -63,20 +63,20 @@ void DashboardTab::build_outside_card(brls::Box* column, int at)
     this->outside_card = card;
 }
 
-void DashboardTab::build_steps_card(brls::Box* column, int at)
+void DashboardTab::build_steps_card(aurore::Box* column, int at)
 {
     namespace kit = cadran::kit;
     auto* card = kit::card(false, false);
     card->setPadding(16, 16, 10, 16);
     card->setMarginBottom(16);
-    card->setVisibility(brls::Visibility::GONE);
-    auto* head = new brls::Box(brls::Axis::ROW);
-    head->setAlignItems(brls::AlignItems::CENTER);
+    card->setVisibility(aurore::Visibility::GONE);
+    auto* head = new aurore::Box(aurore::Axis::ROW);
+    head->setAlignItems(aurore::AlignItems::CENTER);
     head->setPadding(0, 8, 6, 8);
     CadranIcon* icon = kit::icon("sparkle", 22, "cadran/teal");
     icon->setMarginRight(12);
     head->addView(icon);
-    brls::Label* title = kit::label("playguard/onboarding/title"_i18n, 18);
+    aurore::Label* title = kit::label("playguard/onboarding/title"_i18n, 18);
     title->setGrow(1.0f);
     head->addView(title);
     this->steps_count = kit::label("", 15, "cadran/text3");
@@ -88,8 +88,8 @@ void DashboardTab::build_steps_card(brls::Box* column, int at)
                              "playguard/onboarding/step_clock" };
     for (int i = 0; i < 3; i++) {
         Step& s = this->steps[i];
-        s.row = new brls::Box(brls::Axis::ROW);
-        s.row->setAlignItems(brls::AlignItems::CENTER);
+        s.row = new aurore::Box(aurore::Axis::ROW);
+        s.row->setAlignItems(aurore::AlignItems::CENTER);
         s.row->setPadding(10, 8, 10, 8);
         s.row->setFocusable(true);
         s.row->setHideHighlightBackground(true);
@@ -97,7 +97,7 @@ void DashboardTab::build_steps_card(brls::Box* column, int at)
         s.done = kit::icon("check", 20, "cadran/teal");
         s.done->setMarginRight(12);
         s.row->addView(s.done);
-        s.todo = new brls::Box();
+        s.todo = new aurore::Box();
         s.todo->setWidth(20);
         s.todo->setHeight(20);
         s.todo->setCornerRadius(10);
@@ -105,7 +105,7 @@ void DashboardTab::build_steps_card(brls::Box* column, int at)
         s.todo->setBorderThickness(2);
         s.todo->setMarginRight(12);
         s.row->addView(s.todo);
-        brls::Label* text = kit::label(brls::getStr(words[i]), 17);
+        aurore::Label* text = kit::label(aurore::getStr(words[i]), 17);
         text->setGrow(1.0f);
         text->setWidth(0);
         s.row->addView(text);
@@ -115,16 +115,16 @@ void DashboardTab::build_steps_card(brls::Box* column, int at)
         s.row->addView(s.state);
         card->addView(s.row);
     }
-    steps[0].row->registerClickAction([this](brls::View*) {
+    steps[0].row->registerClickAction([this](aurore::View*) {
         console_actions::set_pin("first_steps", this->refresher());
         return true;
     });
-    steps[1].row->registerClickAction([this](brls::View*) {
+    steps[1].row->registerClickAction([this](aurore::View*) {
         if (!this->pt.fw_supported) ui::error("", NXM_RC_FW_UNSUPPORTED);
         else pt_flow::choose_uniform_limit(this->pt, this->refresher());
         return true;
     });
-    steps[2].row->registerClickAction([this](brls::View*) {
+    steps[2].row->registerClickAction([this](aurore::View*) {
         if (this->clock_inaccurate) clock_flow::guided(this->refresher());
         else ui::info("playguard/clock/guided_fine"_i18n);
         return true;
@@ -178,7 +178,7 @@ void DashboardTab::show_steps_card(bool has_pin)
         s.state->setThemeColor("textColor", done[i] ? "cadran/teal" : "cadran/amber");
     }
     this->steps_read = true;
-    ui::set_text(this->steps_count, brls::getStr("playguard/cadran/today/steps_count", count, 3));
+    ui::set_text(this->steps_count, aurore::getStr("playguard/cadran/today/steps_count", count, 3));
 }
 
 void DashboardTab::show_outside_card(const std::vector<std::string>& lines)
@@ -194,10 +194,10 @@ void DashboardTab::show_outside_card(const std::vector<std::string>& lines)
         while (from < text.size()) {
             size_t to = text.find('\n', from);
             if (to == std::string::npos) to = text.size();
-            auto* row = new brls::Box(brls::Axis::ROW);
-            row->setAlignItems(brls::AlignItems::FLEX_START);
+            auto* row = new aurore::Box(aurore::Axis::ROW);
+            row->setAlignItems(aurore::AlignItems::FLEX_START);
             row->setMarginTop(4);
-            auto* dot = new brls::Rectangle();
+            auto* dot = new aurore::Rectangle();
             dot->setThemeColor("color", "cadran/amber_fill");
             dot->setWidth(6);
             dot->setHeight(6);
@@ -206,7 +206,7 @@ void DashboardTab::show_outside_card(const std::vector<std::string>& lines)
             dot->setMarginRight(10);
             dot->setShrink(0);
             row->addView(dot);
-            brls::Label* label = kit::label(text.substr(from, to - from), 16, "cadran/text2");
+            aurore::Label* label = kit::label(text.substr(from, to - from), 16, "cadran/text2");
             label->setGrow(1.0f);
             label->setWidth(0);
             row->addView(label);
@@ -231,17 +231,17 @@ void DashboardTab::show_low(bool unlocked)
         low = up || (timer.remaining_valid && timer.remaining_ns > 0 && timer.remaining_ns <= QUARTER_NS);
     }
     // Lit anew: one breath of the chip, so the eye finds it.
-    if (low && !this->low_lit && !this->amount_chips.empty() && chips->getVisibility() == brls::Visibility::VISIBLE &&
-        this->amount_chips[0]->getVisibility() == brls::Visibility::VISIBLE)
+    if (low && !this->low_lit && !this->amount_chips.empty() && chips->getVisibility() == aurore::Visibility::VISIBLE &&
+        this->amount_chips[0]->getVisibility() == aurore::Visibility::VISIBLE)
         motion::breathe(this->amount_chips[0], 0.5f, 800);
     this->low_lit = low;
     for (size_t i = 0; i < this->amount_chips.size(); i++) {
-        brls::Box* chip = this->amount_chips[i];
+        aurore::Box* chip = this->amount_chips[i];
         const bool lit = low && i == 0;
         chip->setThemeColor("backgroundColor", lit ? "cadran/teal_soft" : "cadran/surf2");
         chip->setThemeColor("borderColor", lit ? "cadran/teal_fill" : "cadran/line");
         chip->setBorderThickness(lit ? 2 : 1);
-        for (brls::View* v : chip->getChildren())
+        for (aurore::View* v : chip->getChildren())
             if (auto* digits = dynamic_cast<CadranDigits*>(v)) digits->setThemeColor("textColor", lit ? "cadran/teal" : "cadran/text");
     }
 }
@@ -270,14 +270,14 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
             // The time kept with the word before it: "again at / 06:00" never
             // breaks there (Aurore, patch 0010).
             const std::string at = fmt::format("{:02d}:{:02d}", timer.bedtime_reset_hour, timer.bedtime_reset_minute);
-            sub = brls::getStr("playguard/cadran/today/bed_sub", at);
+            sub = aurore::getStr("playguard/cadran/today/bed_sub", at);
             const size_t pos = sub.find(" " + at);
             if (pos != std::string::npos) sub.replace(pos, 1, "\u00A0");
         } else if (timer.bedtime_enabled) {
             // No morning time from the console: in how long the alarm rings.
             const LocalTime now = ui::local_now();
             const int in = (timer.bedtime_hour * 60 + timer.bedtime_minute) - (now.hour * 60 + now.minute);
-            if (in > 0) sub = brls::getStr("playguard/cadran/today/bed_in", ui::fmt_limit((uint16_t)in));
+            if (in > 0) sub = aurore::getStr("playguard/cadran/today/bed_in", ui::fmt_limit((uint16_t)in));
         }
         bed_sub->setText(sub);
     } else {

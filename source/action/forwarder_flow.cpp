@@ -3,11 +3,11 @@
 
 #include <algorithm>
 #include <ctime>
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "action/hbmenu_lock.hpp"
 #include "action/history_flow.hpp"
@@ -32,7 +32,7 @@
 
 #include "action/forwarder_flow_shared.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace forwarder_flow
 {
@@ -47,7 +47,7 @@ std::vector<forwarders_logic::Row> rows()
     std::vector<ForwarderRecord> records(FORWARDER_MAX);
     u32 count = 0;
     const Result rc = forwarder_list(records.data(), FORWARDER_MAX, &count);
-    if (R_FAILED(rc)) brls::Logger::warning("forwarders: HOME menu not read ({})", ui::rc_text(rc, false));
+    if (R_FAILED(rc)) aurore::Logger::warning("forwarders: HOME menu not read ({})", ui::rc_text(rc, false));
     std::vector<forwarders_logic::Installed> installed;
     for (u32 i = 0; i < count; i++)
         installed.push_back({ records[i].id, records[i].name, records[i].author, records[i].version });
@@ -84,7 +84,7 @@ std::string self_nro()
 bool loader_present()
 {
 #ifdef __SWITCH__
-    return paths::file_exists(BRLS_ASSET("forwarder/main")) && paths::file_exists(BRLS_ASSET("forwarder/main.npdm"));
+    return paths::file_exists(AURORE_ASSET("forwarder/main")) && paths::file_exists(AURORE_ASSET("forwarder/main.npdm"));
 #else
     return true;
 #endif
@@ -98,7 +98,7 @@ std::string loader_id()
     if (!read) {
         read = true;
         std::string main, npdm;
-        if (paths::read_file(BRLS_ASSET("forwarder/main"), main) && paths::read_file(BRLS_ASSET("forwarder/main.npdm"), npdm)) {
+        if (paths::read_file(AURORE_ASSET("forwarder/main"), main) && paths::read_file(AURORE_ASSET("forwarder/main.npdm"), npdm)) {
             Sha256 hash;
             hash.update(main.data(), main.size());
             hash.update(npdm.data(), npdm.size());
@@ -125,36 +125,36 @@ void confirm_preview(const std::vector<uint8_t>& icon, const std::string& name, 
                      const std::string& body, std::function<void()> yes, std::function<void()> no)
 {
     namespace kit = cadran::kit;
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
+    auto* box = new aurore::Box(aurore::Axis::COLUMN);
+    box->setAlignItems(aurore::AlignItems::STRETCH);
     box->setPadding(28, 36, 22, 36);
-    auto* tile = new brls::Box(brls::Axis::ROW);
-    tile->setAlignItems(brls::AlignItems::CENTER);
+    auto* tile = new aurore::Box(aurore::Axis::ROW);
+    tile->setAlignItems(aurore::AlignItems::CENTER);
     tile->setThemeColor("backgroundColor", "cadran/surf2");
     tile->setCornerRadius(18);
     tile->setPadding(14, 18, 14, 14);
     if (!icon.empty()) {
-        auto* image = new brls::Image();
+        auto* image = new aurore::Image();
         image->setWidth(96);
         image->setHeight(96);
         image->setCornerRadius(14);
-        image->setScalingType(brls::ImageScalingType::FIT);
+        image->setScalingType(aurore::ImageScalingType::FIT);
         image->setImageFromMem(const_cast<unsigned char*>(icon.data()), (int)icon.size());
         image->setMarginRight(18);
         image->setShrink(0);
         tile->addView(image);
     }
-    auto* words = new brls::Box(brls::Axis::COLUMN);
+    auto* words = new aurore::Box(aurore::Axis::COLUMN);
     words->setGrow(1.0f);
     words->setWidth(0);
     words->addView(kit::label(name, 22, "cadran/text"));
     if (!author.empty()) words->addView(kit::label(author, 16, "cadran/text3"));
-    brls::Label* as = kit::label("playguard/forwarders/preview_note"_i18n, 14, "cadran/text3");
+    aurore::Label* as = kit::label("playguard/forwarders/preview_note"_i18n, 14, "cadran/text3");
     as->setMarginTop(6);
     words->addView(as);
     tile->addView(words);
     box->addView(tile);
-    brls::Label* text = kit::label(body, 18, "cadran/text2");
+    aurore::Label* text = kit::label(body, 18, "cadran/text2");
     text->setMarginTop(16);
     box->addView(text);
     auto* dialog = ui::box_dialog(box);
@@ -173,11 +173,11 @@ std::string patches_problem()
         case forwarders_logic::Patches::Ready:
             // sigpatch files beside sys-patch: a cause GBAtemp gives of
             // forwarders that do not start (patches::mixed).
-            return patches::mixed(report) ? brls::getStr("playguard/forwarders/patches_mixed", text::join(report.files, ", "))
+            return patches::mixed(report) ? aurore::getStr("playguard/forwarders/patches_mixed", text::join(report.files, ", "))
                                           : "";
         case forwarders_logic::Patches::Unknown: return "playguard/forwarders/patches_unknown"_i18n;
         case forwarders_logic::Patches::Incomplete:
-            return brls::getStr("playguard/forwarders/patches_incomplete",
+            return aurore::getStr("playguard/forwarders/patches_incomplete",
                                 report.log_version.empty() ? std::string("?") : report.log_version,
                                 forwarders_logic::patch_gaps(report));
         case forwarders_logic::Patches::Missing: break;
@@ -246,9 +246,9 @@ void create_checked(const std::string& sd_path, std::function<void(bool)> done, 
             if (done) done(false);
             return;
         }
-        std::string body = brls::getStr("playguard/forwarders/confirm_add", name, shown);
-        if (pin) body += "\n\n" + brls::getStr("playguard/forwarders/pin_confirm", name);
-        brls::sync([icon, name, author, body, sdmc, pin, done]() {
+        std::string body = aurore::getStr("playguard/forwarders/confirm_add", name, shown);
+        if (pin) body += "\n\n" + aurore::getStr("playguard/forwarders/pin_confirm", name);
+        aurore::sync([icon, name, author, body, sdmc, pin, done]() {
             confirm_preview(icon, name, author, body,
                             [sdmc, name, author, pin, done]() {
                                 forwarders::Made m;
@@ -258,7 +258,7 @@ void create_checked(const std::string& sd_path, std::function<void(bool)> done, 
                                 m.author = author;
                                 m.pin = pin;
                                 const bool ok = pin ? install(m, false, "protect_forwarder",
-                                                              brls::getStr("playguard/forwarders/pin_added", name))
+                                                              aurore::getStr("playguard/forwarders/pin_added", name))
                                                     : install(m, false);
                                 if (done) done(ok);
                             },
@@ -301,12 +301,12 @@ void put_back(const forwarders::Made& m, bool reinstall, std::function<void(bool
     bool ok;
     if (reinstall) {
         ok = install(m, m.nro == self_nro(), m.pin ? "protect_forwarder" : "add_forwarder",
-                     brls::getStr("playguard/forwarders/put_back", m.name));
+                     aurore::getStr("playguard/forwarders/put_back", m.name));
     } else {
         std::string err;
         ok = forwarders::save(m, &err);
         write_rules();
-        if (ok) ui::notify(brls::getStr("playguard/forwarders/put_back", m.name), ui::Toast::Done);
+        if (ok) ui::notify(aurore::getStr("playguard/forwarders/put_back", m.name), ui::Toast::Done);
         else ui::error("playguard/forwarders/delete_err"_i18n, err);
     }
     if (done) done(ok);
@@ -325,7 +325,7 @@ void create_self_checked(std::function<void(bool)> done)
         if (done) done(false);
         return;
     }
-    ui::confirm(brls::getStr("playguard/forwarders/confirm_self", nro::sd_path(sdmc)), "playguard/forwarders/add"_i18n,
+    ui::confirm(aurore::getStr("playguard/forwarders/confirm_self", nro::sd_path(sdmc)), "playguard/forwarders/add"_i18n,
                 [sdmc, done]() {
                     forwarders::Made m;
                     m.nro = sdmc;
@@ -372,7 +372,7 @@ void set_options(const forwarders_logic::Row& row, const Options& o, std::functi
     m.screenshots = o.screenshots;
     m.video = o.video;
     const bool ok = install(m, row.self || m.nro == self_nro(), nullptr,
-                            brls::getStr("playguard/forwarders/options_set", m.name));
+                            aurore::getStr("playguard/forwarders/options_set", m.name));
     if (ok) {
         const std::string what = options_label(o);
         history_flow::record_event("forwarder_options", "",
@@ -400,7 +400,7 @@ void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)
             }
             m.pin = false;
             const bool ok =
-                install(m, false, "unprotect_forwarder", brls::getStr("playguard/forwarders/pin_removed", name));
+                install(m, false, "unprotect_forwarder", aurore::getStr("playguard/forwarders/pin_removed", name));
             if (done) done(ok);
         }, [done]() {
             if (done) done(false);
@@ -415,11 +415,11 @@ void set_pin(const forwarders_logic::Row& row, bool on, std::function<void(bool)
         return;
     }
     const std::string name = row.name;
-    ui::confirm(brls::getStr("playguard/forwarders/pin_confirm", name), "playguard/forwarders/action_pin_on"_i18n,
+    ui::confirm(aurore::getStr("playguard/forwarders/pin_confirm", name), "playguard/forwarders/action_pin_on"_i18n,
                 [m, name, done]() mutable {
                     m.pin = true;
                     const bool ok =
-                        install(m, false, "protect_forwarder", brls::getStr("playguard/forwarders/pin_added", name));
+                        install(m, false, "protect_forwarder", aurore::getStr("playguard/forwarders/pin_added", name));
                     if (done) done(ok);
                 },
                 [done]() {
@@ -441,10 +441,10 @@ void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)
         const Result rc = forwarder_remove(r.id);
         if (R_SUCCEEDED(rc)) {
             std::string err;
-            if (!forwarders::forget(r.id, &err)) brls::Logger::warning("forwarders: not forgotten ({})", err);
+            if (!forwarders::forget(r.id, &err)) aurore::Logger::warning("forwarders: not forgotten ({})", err);
             history_flow::record_event("remove_forwarder", "", history_label(r.name, r.id));
         }
-        ui::notify_result(rc, brls::getStr("playguard/forwarders/deleted", r.name), "playguard/forwarders/delete_err"_i18n);
+        ui::notify_result(rc, aurore::getStr("playguard/forwarders/deleted", r.name), "playguard/forwarders/delete_err"_i18n);
         if (done) done(R_SUCCEEDED(rc));
     };
     const auto stop = []() {};   // left as it was: the list too
@@ -454,14 +454,14 @@ void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)
         guard_way_back(r, "playguard/common/delete"_i18n, go, stop);
         return;
     }
-    ui::confirm(brls::getStr("playguard/forwarders/delete_body", r.name), "playguard/common/delete"_i18n, go, stop, true);
+    ui::confirm(aurore::getStr("playguard/forwarders/delete_body", r.name), "playguard/common/delete"_i18n, go, stop, true);
 }
 
 void forget(const forwarders_logic::Row& row, std::function<void(bool)> done)
 {
     std::string err;
     const bool ok = forwarders::forget(row.id, &err);
-    if (ok) ui::notify(brls::getStr("playguard/forwarders/forgotten", row.name), ui::Toast::Done);
+    if (ok) ui::notify(aurore::getStr("playguard/forwarders/forgotten", row.name), ui::Toast::Done);
     else ui::error("playguard/forwarders/delete_err"_i18n, err);
     if (done) done(ok);
 }
@@ -490,7 +490,7 @@ void protect_all(std::function<void(bool)> done)
     }
     std::string names;
     for (const auto& r : todo) names += (names.empty() ? "" : ", ") + r.name;
-    ui::confirm(brls::getStr("playguard/forwarders/protect_all_confirm", names), "playguard/forwarders/protect_all"_i18n,
+    ui::confirm(aurore::getStr("playguard/forwarders/protect_all_confirm", names), "playguard/forwarders/protect_all"_i18n,
                 [todo, done]() {
                     install_many(todo, true, "protect_forwarder", "playguard/forwarders/protected_n", done);
                 },
@@ -526,7 +526,7 @@ void refresh(std::function<void(bool)> done)
     std::string names;
     for (const auto& r : todo) names += (names.empty() ? "" : ", ") + r.name;
     patches_first([todo, names, done]() {
-        ui::confirm(brls::getStr("playguard/forwarders/refresh_confirm", names), "playguard/forwarders/remake"_i18n,
+        ui::confirm(aurore::getStr("playguard/forwarders/refresh_confirm", names), "playguard/forwarders/remake"_i18n,
                     [todo, done]() { install_many(todo, false, "add_forwarder", "playguard/forwarders/reinstalled_n", done); },
                     [done]() {
                         if (done) done(false);
@@ -542,7 +542,7 @@ void reinstall_all(std::function<void(bool)> done)
         return;
     }
     patches_first([todo, done]() {
-        ui::confirm(brls::getStr("playguard/forwarders/reinstall_all_confirm", (int)todo.size()),
+        ui::confirm(aurore::getStr("playguard/forwarders/reinstall_all_confirm", (int)todo.size()),
                     "playguard/forwarders/reinstall_all"_i18n,
                     [todo, done]() { install_many(todo, false, "add_forwarder", "playguard/forwarders/reinstalled_n", done); },
                     [done]() {
@@ -561,7 +561,7 @@ void set_icon(const forwarders_logic::Row& row, const std::string& shot, int x, 
     m.icon = shot;
     m.icon_x = shot.empty() ? forwarders::ICON_X_MIDDLE : std::clamp(x, 0, 100);
     const bool ok = install(m, row.self || m.nro == self_nro(), "add_forwarder",
-                            brls::getStr("playguard/forwarders/icon_set", row.name));
+                            aurore::getStr("playguard/forwarders/icon_set", row.name));
     if (done) done(ok);
 }
 
@@ -587,7 +587,7 @@ void put_back_all(const std::vector<forwarders::Made>& made, std::function<void(
     for (const forwarders::Made& m : made)
         jobs.push_back({ m, m.nro == self_nro(), m.pin ? "protect_forwarder" : "add_forwarder" });
     install_batch(std::move(jobs), [done](int ok, int) {
-        if (ok > 0) ui::notify(brls::getStr("playguard/forwarders/reinstalled_n", ok), ui::Toast::Done);
+        if (ok > 0) ui::notify(aurore::getStr("playguard/forwarders/reinstalled_n", ok), ui::Toast::Done);
         if (done) done(ok > 0);
     });
 }

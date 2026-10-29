@@ -22,15 +22,15 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <functional>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/view/loading_bar.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/view/loading_bar.hpp>
 
 #include "action/game_verify_flow.hpp"
 #include "view/cover_strip.hpp"
@@ -38,7 +38,7 @@
 
 #include "util/pctl_ops_c.hpp"
 
-class GameCheckActivity : public brls::Activity
+class GameCheckActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/game_check.xml");
@@ -51,15 +51,15 @@ class GameCheckActivity : public brls::Activity
     // A section of the list: its title (with its count), what to do, its games.
     struct Group
     {
-        brls::Box*    box   = nullptr;
-        brls::Header* title = nullptr;
-        brls::Label*  note  = nullptr;
-        brls::Box*    list  = nullptr;      // the cells, or the rows of covers
-        std::vector<brls::View*> tiles;     // as covers: in order, along the rows
-        brls::Button* save       = nullptr;   // Reinstall only: save the list
-        brls::Button* send       = nullptr;   // Reinstall only: send the list to a gist
-        brls::Button* remove_all = nullptr;   // Reinstall only: remove them all
-        brls::Button* verify_all = nullptr;   // To check only: check them all
+        aurore::Box*    box   = nullptr;
+        aurore::Header* title = nullptr;
+        aurore::Label*  note  = nullptr;
+        aurore::Box*    list  = nullptr;      // the cells, or the rows of covers
+        std::vector<aurore::View*> tiles;     // as covers: in order, along the rows
+        aurore::Button* save       = nullptr;   // Reinstall only: save the list
+        aurore::Button* send       = nullptr;   // Reinstall only: send the list to a gist
+        aurore::Button* remove_all = nullptr;   // Reinstall only: remove them all
+        aurore::Button* verify_all = nullptr;   // To check only: check them all
         std::vector<GameFacts> games;         // as shown
     };
 
@@ -80,19 +80,19 @@ class GameCheckActivity : public brls::Activity
     bool focused   = false;   // the first game got the focus once
     // The cell given the focus while the games are being checked, until the
     // user moves it: it follows the first game as the list grows above it.
-    brls::View* auto_focus = nullptr;
+    aurore::View* auto_focus = nullptr;
     std::string timing;       // where the last check spent its time (developer mode)
     Pending pending;
     Group groups[GC_CAT_COUNT];
     bool removing = false;              // remove_games() under way
     std::set<u64> selected;             // the games picked with Ⓨ
-    brls::DetailCell* selection = nullptr;   // above the sections, once a game is picked: A for what to do
+    aurore::DetailCell* selection = nullptr;   // above the sections, once a game is picked: A for what to do
     // In the sections' place when no game has a problem: how many look fine,
     // when they were checked, and Check again (the focus).
     // While a check runs, the covers leafed through and a bar in place of
     // the check mark, and no Check again: the strip holds the focus.
     cadran::kit::Empty all_clear;
-    brls::Box* check_again = nullptr;
+    aurore::Box* check_again = nullptr;
     CoverStrip* covers = nullptr;
     LoadingBar* covers_bar = nullptr;
     void card_layout();   // the card as the check is under way or not
@@ -111,13 +111,13 @@ class GameCheckActivity : public brls::Activity
     void set_view_hint();   // Ⓡ says what it switches to
     // Ⓡ registered, or not while no game is listed (nothing to show as covers).
     void show_view_action(bool shown);
-    brls::ActionIdentifier view_action = 0;
-    // The views of the games are deleted when rebuilt, and borealis keeps a
+    aurore::ActionIdentifier view_action = 0;
+    // The views of the games are deleted when rebuilt, and Aurore keeps a
     // pointer to the one with the focus: the focus waits on the status line
     // meanwhile (focusable only then), and leaves it in show().
     void park_focus();
     u64 focused_game() const;            // the game whose cell or cover has the focus (0: none)
-    brls::View* game_view(u64 id) const;   // its cell or cover (nullptr: not shown)
+    aurore::View* game_view(u64 id) const;   // its cell or cover (nullptr: not shown)
     // A section's games as covers: rebuilt when their number changes (the
     // up and down routes go with it), else updated in place.
     void show_tiles(Group& group, size_t count);
@@ -136,7 +136,7 @@ class GameCheckActivity : public brls::Activity
     // The check under way: in the card when it shows, else on the status line.
     void checking_text(const std::string& text);
     void show();
-    brls::View* first_game() const;
+    aurore::View* first_game() const;
     // Whether `game`, checked again, changes the list (not its status line).
     bool changes_list(const GameFacts& game) const;
     void open(const GameFacts& game, GameIssue issue, u32 current_hos);
@@ -171,8 +171,8 @@ class GameCheckActivity : public brls::Activity
     static void report_verified(GameCheckActivity* self, const std::weak_ptr<bool>& weak,
                                 const std::vector<game_verify_flow::Verified>& results, size_t total);
 
-    BRLS_BIND(brls::Label,  note,   "gc_note");
-    BRLS_BIND(brls::Label,  status, "gc_status");
-    BRLS_BIND(brls::Box,    list,   "gc_list");
-    BRLS_BIND(brls::Label,  hint,   "gc_hint");
+    AURORE_BIND(aurore::Label,  note,   "gc_note");
+    AURORE_BIND(aurore::Label,  status, "gc_status");
+    AURORE_BIND(aurore::Box,    list,   "gc_list");
+    AURORE_BIND(aurore::Label,  hint,   "gc_hint");
 };

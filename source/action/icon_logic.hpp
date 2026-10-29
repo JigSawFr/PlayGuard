@@ -1,4 +1,4 @@
-// icon_logic — the games' icons without borealis (action/game_icons): the bytes
+// icon_logic — the games' icons without Aurore (action/game_icons): the bytes
 // kept as an LRU of a fixed number of games (the control data's JPEG, up to
 // 128 KiB each, read again from ns when evicted), and the decoded image
 // shrunk to the size it is drawn at (a 256 x 256 icon shown at 44 px).

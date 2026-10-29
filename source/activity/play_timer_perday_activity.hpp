@@ -11,7 +11,7 @@
 #pragma once
 
 #include <array>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <functional>
 #include <string>
 
@@ -20,7 +20,7 @@
 
 class CadranWeekView;
 
-class PlayTimerPerDayActivity : public brls::Activity
+class PlayTimerPerDayActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/play_timer_perday.xml");
@@ -51,7 +51,7 @@ class PlayTimerPerDayActivity : public brls::Activity
                            PT_DAY_NOLIMIT, PT_DAY_NOLIMIT, PT_DAY_NOLIMIT };
 
     // The week as on the Play timer (view/cadran_week_card.xml).
-    brls::View*     cadran_card = nullptr;
+    aurore::View*     cadran_card = nullptr;
     CadranWeekView* cadran_week = nullptr;
 
     // onContentAvailable()'s actions: the cells', then the screen's buttons.
@@ -65,11 +65,11 @@ class PlayTimerPerDayActivity : public brls::Activity
     void fill_days(std::initializer_list<int> days, const std::string& title, std::function<void()> then = nullptr);
     void save();
 
-    BRLS_BIND(PtStateHeader,    state_header, "pt_state_header");
-    BRLS_BIND(brls::Label,      unavailable,  "pt_unavailable");
-    BRLS_BIND(brls::DetailCell, pt_weekdays,  "pt_weekdays");
-    BRLS_BIND(brls::DetailCell, pt_weekend,   "pt_weekend");
-    BRLS_BIND(brls::DetailCell, pt_copy_today,"pt_copy_today");
-    BRLS_BIND(brls::DetailCell, pt_revert,    "pt_revert");
-    BRLS_BIND(brls::DetailCell, pt_save,      "pt_save");
+    AURORE_BIND(PtStateHeader,    state_header, "pt_state_header");
+    AURORE_BIND(aurore::Label,      unavailable,  "pt_unavailable");
+    AURORE_BIND(aurore::DetailCell, pt_weekdays,  "pt_weekdays");
+    AURORE_BIND(aurore::DetailCell, pt_weekend,   "pt_weekend");
+    AURORE_BIND(aurore::DetailCell, pt_copy_today,"pt_copy_today");
+    AURORE_BIND(aurore::DetailCell, pt_revert,    "pt_revert");
+    AURORE_BIND(aurore::DetailCell, pt_save,      "pt_save");
 };

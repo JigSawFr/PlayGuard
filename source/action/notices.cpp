@@ -2,13 +2,13 @@
 #include "action/notices.hpp"
 
 #include <algorithm>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <chrono>
 #include <cstdio>
 #include <map>
 #include <sys/statvfs.h>
 
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "action/backup_flow.hpp"
 #include "action/clock_flow.hpp"
@@ -32,7 +32,7 @@
 #include "util/log_files.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace notices
 {
@@ -62,7 +62,7 @@ void changed()
 
 std::string open_label(const char* tab)
 {
-    return brls::getStr("playguard/notices/open_tab", brls::getStr(std::string("playguard/tabs/") + tab));
+    return aurore::getStr("playguard/notices/open_tab", aurore::getStr(std::string("playguard/tabs/") + tab));
 }
 
 // Preferences › Notifications: whether the kind of entry `id` is shown.
@@ -234,7 +234,7 @@ void acknowledge(const std::string& id)
     acked.push_back(notice_logic::ack_key(id, s_prints[id], ui::today_date()));
     if (acked.size() > 16) acked.erase(acked.begin(), acked.end() - 16);
     ui::save_config();
-    brls::Logger::info("notices: {} ignored", id);
+    aurore::Logger::info("notices: {} ignored", id);
     changed();
 }
 
@@ -243,7 +243,7 @@ void reactivate(const std::string& id)
     if (!s_store.unack(id)) return;
     notice_logic::ack_forget(config::get().notices_acked, id);
     ui::save_config();
-    brls::Logger::info("notices: {} counted again", id);
+    aurore::Logger::info("notices: {} counted again", id);
     changed();
 }
 
@@ -306,7 +306,7 @@ std::string reason_of(const std::vector<std::string>& ids)
 {
     const std::string id = s_store.first_of(ids);
     if (id.empty()) return "";
-    return brls::getStr("playguard/notices/short/" + id);
+    return aurore::getStr("playguard/notices/short/" + id);
 }
 
 int listen(std::function<void()> fn)
@@ -339,7 +339,7 @@ void note_security(const PctlStatus& s, bool writable)
     // Nothing set up yet: no PIN, so nothing is protected.
     toggle(s.pin_length_ok && s.pin_length == 0, "pin_missing", Level::Action, "playguard/notices/pin_missing"_i18n,
            "playguard/notices/pin_missing_detail"_i18n, "playguard/onboarding/open"_i18n,
-           []() { brls::Application::pushActivity(new OnboardingActivity()); });
+           []() { aurore::Application::pushActivity(new OnboardingActivity()); });
 
     // Unlocked temporarily: no limit at all until locked again. Not
     // PlayGuard's own pause while the parent is in it (it ends as it is left).
@@ -367,7 +367,7 @@ void note_security(const PctlStatus& s, bool writable)
 
     // The console lock on for a week or more.
     toggle(notice_logic::console_lock_long(cfg.console_lock, cfg.console_lock_since, ui::today_date()),
-           "console_lock_long", Level::Info, brls::getStr("playguard/notices/console_lock_long", cfg.console_lock_since),
+           "console_lock_long", Level::Info, aurore::getStr("playguard/notices/console_lock_long", cfg.console_lock_since),
            "playguard/notices/console_lock_long_detail"_i18n, open_label("play_timer"),
            []() { open_tab(ui::tab::play_timer, "pt_console_lock"); });
 }
@@ -383,7 +383,7 @@ void note_timer(const PtState& pt, Result accuracy_rc, bool accurate, bool writa
     const bool raised = pt_flow::restore_lowers();
     toggle(pt_flow::restore_pending(pt), "extra_restore", raised ? Level::Action : Level::Info, pt_flow::restore_label(),
            raised ? "playguard/notices/extra_restore_detail"_i18n
-                  : brls::getStr("playguard/notices/stop_restore_detail", "playguard/dashboard/stop_title"_i18n),
+                  : aurore::getStr("playguard/notices/stop_restore_detail", "playguard/dashboard/stop_title"_i18n),
            "playguard/dashboard/extra_restore"_i18n, []() {
                pt_flow::offer_extra_time_restore([]() {
                    sweep();
@@ -449,7 +449,7 @@ void note_storage()
     const std::vector<std::string>& backups = backup_flow::names();
     const std::string last = backups.empty() ? "" : notice_logic::backup_date(backups.front());
     toggle(notice_logic::backup_due(backups, ui::today_date()), "backup", Level::Info,
-           backups.empty() ? "playguard/notices/backup_none"_i18n : brls::getStr("playguard/notices/backup_old", last),
+           backups.empty() ? "playguard/notices/backup_none"_i18n : aurore::getStr("playguard/notices/backup_old", last),
            "playguard/notices/backup_detail"_i18n, "playguard/notices/backup_now"_i18n, []() {
                backup_flow::save_now();
                sweep();
@@ -460,7 +460,7 @@ void note_storage()
     const bool free_known = sd_free_kept(&free_b);   // before the text below, which shows it
     toggle_or_resolve(free_known, notice_logic::sd_space_low(free_known, free_b), "sd_space", Level::Action,
                       "playguard/notices/sd_space"_i18n,
-                      brls::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
+                      aurore::getStr("playguard/notices/sd_space_detail", (int)(free_b >> 20)));
 }
 
 // Who plays and how much: an account never seen before, the week's summary,
@@ -479,18 +479,18 @@ void note_play_data(const PtState& pt)
     const auto& cfg = config::get();
     const activity_summary::Summary week = activity_summary::summarize(*stats, activity_summary::Week);
     if (notice_logic::week_due(week.known, week.total_s, cfg.summary_seen, ui::today_date())) {
-        std::string detail = brls::getStr("playguard/notices/week_detail", ui::fmt_duration(week.per_day_s));
+        std::string detail = aurore::getStr("playguard/notices/week_detail", ui::fmt_duration(week.per_day_s));
         // Against the 7 days before, as on Activity.
         using activity_summary::Trend;
         const auto trend = activity_summary::week_trend(*stats);
         if (trend.known)
-            detail += " " + (trend.trend == Trend::More   ? brls::getStr("playguard/notices/week_more", ui::fmt_limit(trend.amount_min))
-                             : trend.trend == Trend::Less ? brls::getStr("playguard/notices/week_less", ui::fmt_limit(trend.amount_min))
+            detail += " " + (trend.trend == Trend::More   ? aurore::getStr("playguard/notices/week_more", ui::fmt_limit(trend.amount_min))
+                             : trend.trend == Trend::Less ? aurore::getStr("playguard/notices/week_less", ui::fmt_limit(trend.amount_min))
                                                           : "playguard/notices/week_same"_i18n);
         if (week.top >= 0 && stats->games[week.top].name[0])
-            detail += "\n" + brls::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
+            detail += "\n" + aurore::getStr("playguard/notices/week_top", std::string(stats->games[week.top].name),
                                           ui::fmt_duration(week.top_s));
-        set("week", Level::Info, brls::getStr("playguard/notices/week", ui::fmt_duration(week.total_s)), detail,
+        set("week", Level::Info, aurore::getStr("playguard/notices/week", ui::fmt_duration(week.total_s)), detail,
             open_label("activity"), []() {
                 config::get().summary_seen = ui::today_date();
                 ui::save_config();
@@ -503,7 +503,7 @@ void note_play_data(const PtState& pt)
     // The console only warning at the limit, and the limit passed on
     // several of the last 7 days.
     const int over = notice_logic::over_limit_days(pt, *stats);
-    toggle(over >= 2, "over_limit", Level::Info, brls::getStr("playguard/notices/over_limit", over),
+    toggle(over >= 2, "over_limit", Level::Info, aurore::getStr("playguard/notices/over_limit", over),
            "playguard/notices/over_limit_detail"_i18n, open_label("play_timer"),
            []() { open_tab(ui::tab::play_timer); });
 }
@@ -579,7 +579,7 @@ void note_write(const char* what, bool ok, const std::string& error)
     }
     const std::string file = std::string(what) == "config" ? "config.json" : std::string(what) + ".json";
     set(id, Level::Action, "playguard/notices/sd_write"_i18n,
-        brls::getStr("playguard/notices/sd_write_detail", file) + (error.empty() ? "" : " (" + error + ")"));
+        aurore::getStr("playguard/notices/sd_write_detail", file) + (error.empty() ? "" : " (" + error + ")"));
 }
 
 void sd_written()

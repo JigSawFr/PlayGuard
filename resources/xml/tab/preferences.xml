@@ -10,7 +10,7 @@
      change history and backups have their tab, Help & diagnostics is in
      About. -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -19,39 +19,39 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <brls:Header title="@i18n/playguard/prefs/section_app" marginBottom="8"/>
-            <brls:DetailCell id="pf_language" title="@i18n/cadran/tools/language"/>
-            <brls:DetailCell id="pf_theme" title="@i18n/cadran/tools/theme"/>
-            <brls:DetailCell id="pf_text_size" title="@i18n/playguard/tiles/text_size"/>
-            <brls:DetailCell id="pf_start_tab" title="@i18n/playguard/tiles/start_tab"/>
-            <brls:DetailCell id="pf_palette" title="@i18n/cadran/tools/palette"/>
-            <brls:DetailCell id="pf_effects" title="@i18n/playguard/prefs/effects"/>
-            <brls:DetailCell id="pf_rail" title="@i18n/cadran/prefs/rail"/>
-            <brls:BooleanCell id="pf_intro"/>
-            <brls:Header title="@i18n/playguard/prefs/section_notices" marginTop="24" marginBottom="8"/>
-            <brls:BooleanCell id="pf_notices_system"/>
-            <brls:BooleanCell id="pf_notices_summary"/>
-            <brls:BooleanCell id="pf_notices_reminders"/>
-            <brls:BooleanCell id="pf_notices_ack_remind"/>
-            <brls:BooleanCell id="pf_support_reminder"/>
-            <brls:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
-            <brls:BooleanCell id="pf_update_daily"/>
-            <brls:DetailCell id="pf_update_via" title="@i18n/playguard/tools/update_via"/>
-            <brls:Header title="@i18n/playguard/tools/section_start" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="pf_first_steps" title="@i18n/playguard/onboarding/open"/>
+            <aurore:Header title="@i18n/playguard/prefs/section_app" marginBottom="8"/>
+            <aurore:DetailCell id="pf_language" title="@i18n/cadran/tools/language"/>
+            <aurore:DetailCell id="pf_theme" title="@i18n/cadran/tools/theme"/>
+            <aurore:DetailCell id="pf_text_size" title="@i18n/playguard/tiles/text_size"/>
+            <aurore:DetailCell id="pf_start_tab" title="@i18n/playguard/tiles/start_tab"/>
+            <aurore:DetailCell id="pf_palette" title="@i18n/cadran/tools/palette"/>
+            <aurore:DetailCell id="pf_effects" title="@i18n/playguard/prefs/effects"/>
+            <aurore:DetailCell id="pf_rail" title="@i18n/cadran/prefs/rail"/>
+            <aurore:BooleanCell id="pf_intro"/>
+            <aurore:Header title="@i18n/playguard/prefs/section_notices" marginTop="24" marginBottom="8"/>
+            <aurore:BooleanCell id="pf_notices_system"/>
+            <aurore:BooleanCell id="pf_notices_summary"/>
+            <aurore:BooleanCell id="pf_notices_reminders"/>
+            <aurore:BooleanCell id="pf_notices_ack_remind"/>
+            <aurore:BooleanCell id="pf_support_reminder"/>
+            <aurore:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
+            <aurore:BooleanCell id="pf_update_daily"/>
+            <aurore:DetailCell id="pf_update_via" title="@i18n/playguard/tools/update_via"/>
+            <aurore:Header title="@i18n/playguard/tools/section_start" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="pf_first_steps" title="@i18n/playguard/onboarding/open"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

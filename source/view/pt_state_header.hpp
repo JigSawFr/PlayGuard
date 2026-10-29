@@ -5,20 +5,20 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "util/pctl_ops_c.hpp"
 
-class PtStateHeader : public brls::Box
+class PtStateHeader : public aurore::Box
 {
   public:
     PtStateHeader();
 
     void show(const PtState& pt);      // renders a state its screen read
 
-    static brls::View* create();
+    static aurore::View* create();
 
   private:
-    BRLS_BIND(brls::Label, alert,   "pt_alert");
-    BRLS_BIND(brls::Label, health,  "pt_health");
+    AURORE_BIND(aurore::Label, alert,   "pt_alert");
+    AURORE_BIND(aurore::Label, health,  "pt_health");
 };

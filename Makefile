@@ -47,7 +47,7 @@ SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 # Run inside the tree, the zip file last.
 ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindepth 1 | LC_ALL=C sort | TZ=UTC zip -X -@
 CMAKE_ARGS ?=
-JSON_HPP := library/aurore/library/include/borealis/extern/nlohmann/json.hpp
+JSON_HPP := library/aurore/library/include/aurore/extern/nlohmann/json.hpp
 # The remote link's console-free C (source/sync/), shared by its host tests.
 SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
@@ -56,12 +56,12 @@ SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_
 
 .PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue agent dist-agent gate-preview FORCE
 
-RENDERER := $(if $(GL),-DUSE_DEKO3D=OFF,-DUSE_DEKO3D=ON)
+RENDERER := $(if $(GL),-DAURORE_GRAPHICS=GL3,-DAURORE_GRAPHICS=DEKO3D)
 
 # The optional sysmodules first: the .nro carries them in its romfs, so
 # Console › Optional modules can install them (CMakeLists.txt, cmake/bundle_sysmodules.cmake).
 all: rescue agent
-	@cmake -B $(BUILD) -S . -DPLATFORM_SWITCH=ON $(RENDERER) $(CMAKE_ARGS)
+	@cmake -B $(BUILD) -S . -DAURORE_PLATFORM=SWITCH $(RENDERER) $(CMAKE_ARGS)
 	@cmake --build $(BUILD) --target $(TARGET).nro -j $(JOBS)
 	@cp $(BUILD)/$(TARGET).nro  $(TARGET).nro
 	@cp $(BUILD)/$(TARGET).nacp $(TARGET).nacp
@@ -127,7 +127,7 @@ dist-agent: agent
 	@cd out-agent && $(ZIP_TREE) ../playguard-agent.zip
 
 desktop:
-	@cmake -B $(DESKTOP) -S . -DPLATFORM_DESKTOP=ON -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
+	@cmake -B $(DESKTOP) -S . -DAURORE_PLATFORM=DESKTOP -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
 	@cmake --build $(DESKTOP) -j $(JOBS)
 
 # The web simulator (web/README.md). cmake found by the shell: emsdk_env.sh
@@ -191,7 +191,7 @@ playstats_LIBS  := -lz
 
 # C++: the UI-free helpers and flow logic (source/util, source/action), by
 # default with TEST_CXXFLAGS (a <name>_FLAGS only where a suite differs).
-# borealis' headers (nlohmann/json) as system headers: their warnings are not
+# Aurore's headers (nlohmann/json) as system headers: their warnings are not
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 # util/date stands on core/calendar.c: a suite that links it builds that C
 # file too (its <name>_CSRC, without having to say so).
@@ -264,9 +264,9 @@ update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cp
 config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
 profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
 forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_library.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
-forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
-forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
+forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
 forwarder_rules_logic_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/util/date.cpp source/util/gate_tally.cpp source/action/forwarders_logic.cpp source/action/forwarder_rules_logic.cpp tests/forwarder_rules_logic/test.cpp
 forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
@@ -292,10 +292,10 @@ activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summar
 diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
 diagnostics_logic_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY
 # The text helpers that only translate (PlayGuard's and Cadran's), over
-# Cadran's ui/tr.hpp stand-in for borealis' getStr and fmt header-only (the
+# Cadran's ui/tr.hpp stand-in for Aurore's getStr and fmt header-only (the
 # catalogs read by the test).
 format_text_SRC   := source/ui/play_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
-format_text_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DBRLS_CADRAN_HOST_I18N
+format_text_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DAURORE_CADRAN_HOST_I18N
 cadran_text_SRC   := $(C)/ui/cadran_text.cpp tests/cadran_text/test.cpp
 contrast_SRC      := tests/contrast/test.cpp
 cadran_text_FLAGS := $(format_text_FLAGS)
@@ -309,9 +309,9 @@ i18n_threads_SRC   := library/aurore/library/lib/core/i18n.cpp library/aurore/li
                       tests/i18n_threads/test.cpp
 i18n_threads_FLAGS := -std=c++20 -isystem library/aurore/library/include \
                       -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
-                      $(addprefix -isystem library/aurore/library/,include/borealis/extern include/borealis/extern/nanovg \
-                        include/borealis/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga) \
-                      -DBRLS_RESOURCES='"./"'
+                      $(addprefix -isystem library/aurore/library/,include/aurore/extern include/aurore/extern/nanovg \
+                        include/aurore/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga) \
+                      -DAURORE_RESOURCES='"./"'
 i18n_threads_LIBS  := -pthread
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_CSRC   := source/core/gamecheck_rules.c
@@ -335,8 +335,8 @@ sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c
 # Atomic coverage counters: the suite runs the same code from several threads
 # at once, and gcov's plain counters then come out wrong (negative ones, that
 # gcovr refuses).
-sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
-sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic -isystem library/aurore/library/include/borealis/extern/nanovg -isystem extern/stb
+sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
+sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 sim_backend_LIBS   := -pthread -lm
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
@@ -403,7 +403,7 @@ $(TEST_OKS): $(TESTOUT)/%.ok: $(TESTOUT)/%
 	@$< $($*_ARGS) > $<.log 2>&1; r=$$?; cat $<.log; if [ $$r -eq 0 ]; then touch $@; else echo "$*: exit status $$r" >&2; exit $$r; fi
 
 test:
-	@test -f $(JSON_HPP) || { echo "borealis is missing (nlohmann/json for the tests): run git submodule update --init"; exit 1; }
+	@test -f $(JSON_HPP) || { echo "Aurore is missing (nlohmann/json for the tests): run git submodule update --init"; exit 1; }
 	@rm -f $(TEST_OKS)
 	@$(MAKE) --no-print-directory -k $(if $(findstring -j,$(MAKEFLAGS)),,-j$(JOBS)) -Otarget $(TEST_OKS)
 
@@ -462,7 +462,7 @@ $(FUZZ_RUNS): $(FUZZOUT)/%.run: $(FUZZOUT)/%
 		if [ $$r -ne 0 ]; then echo "$*: the fuzzer stopped with status $$r: $$(ls $<-* 2>/dev/null | head -n 1)" >&2; exit $$r; fi
 
 fuzz:
-	@test -f $(JSON_HPP) || { echo "borealis is missing (nlohmann/json for the config target): run git submodule update --init"; exit 1; }
+	@test -f $(JSON_HPP) || { echo "Aurore is missing (nlohmann/json for the config target): run git submodule update --init"; exit 1; }
 	@$(MAKE) --no-print-directory -k $(if $(findstring -j,$(MAKEFLAGS)),,-j$(JOBS)) -Otarget $(FUZZ_RUNS)
 
 check: test

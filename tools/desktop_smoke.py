@@ -5,7 +5,7 @@ Starts build-desktop/playguard on an X display (Xvfb), opens every tab, the
 per-day editor (a day's picker and the stepper of an
 exact duration), the time-up choice, a bedtime alarm change, the settings
 backup and the change history (filtered, then not), and fails if the app
-dies on the way (borealis throws on unknown XML attributes, missing views,
+dies on the way (Aurore throws on unknown XML attributes, missing views,
 …). Screenshots of each screen are written to the output folder.
 
 The "games" scenario is the rest of that tour, in a run of its own so CI can
@@ -846,7 +846,7 @@ def alive():
     return proc.poll() is None
 
 
-# The pauses around a press and before a screenshot. borealis' longest
+# The pauses around a press and before a screenshot. Aurore's longest
 # animation (a toast coming in) takes 300 ms, and a label starts scrolling
 # after 1.5 s focused: a screenshot comes 0.9 s after the last press, every
 # animation over, no label moving yet.
@@ -859,7 +859,7 @@ def key(name, n=1, hold=0.02):
     """Presses `name` n times, each exactly once. A held Down / Up repeats
     (ScrollView scrolls a long text, then moves the focus again); with frames
     as slow as under software GL, even an 80 ms press could. So each press
-    waits for the screen to settle (KEY_BEFORE: borealis' animations last
+    waits for the screen to settle (KEY_BEFORE: Aurore's animations last
     300 ms at most, timed by the clock, not by the frames) and is released
     `hold` seconds later (20 ms by default), both sent by one xdotool process
     so a busy runner cannot delay the release."""
@@ -2235,7 +2235,7 @@ if OUTSIDE:
     shot("03_notices")
     key("Down", 3)             # the weak PIN, the last to do: X ignores it, once confirmed
     button_x()
-    # Right twice: after the mouse's Ⓧ, borealis takes the first key press
+    # Right twice: after the mouse's Ⓧ, Aurore takes the first key press
     # only to show the focus again.
     key("Right", 2)            # Ignore
     key("Return")
@@ -2245,7 +2245,7 @@ if OUTSIDE:
     if "pin_weak:4:" not in open(config_file).read():
         fail("the weak PIN ignored is not in config.json (notices_acked)")
     # The rebuilt list has the focus on its first entry, but after the mouse's
-    # Ⓧ borealis does not scroll to it: the list stays where it was, clamped
+    # Ⓧ Aurore does not scroll to it: the list stays where it was, clamped
     # to its end on whichever frame the new layout landed, a fraction of a
     # pixel apart from one run to the next. Down to the end (past the last
     # entry, a press does nothing) scrolls it from the settled layout.

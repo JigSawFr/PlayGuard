@@ -24,18 +24,18 @@ void SegmentBar::set(size_t index, State state)
 {
     if (index >= this->states.size() || this->states[index] == state) return;
     this->states[index] = state;
-    this->since[index] = brls::getCPUTimeUsec();
+    this->since[index] = aurore::getCPUTimeUsec();
 }
 
-void SegmentBar::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-                      brls::FrameContext* ctx)
+void SegmentBar::draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+                      aurore::FrameContext* ctx)
 {
     (void)style;
     (void)ctx;
     const size_t n = this->states.size();
     if (!n) return;
-    brls::Theme theme = brls::Application::getTheme();
-    const brls::Time now = brls::getCPUTimeUsec();
+    aurore::Theme theme = aurore::Application::getTheme();
+    const aurore::Time now = aurore::getCPUTimeUsec();
     const float w = (width - GAP * (float)(n - 1)) / (float)n;
     const float radius = std::min(height, w) / 2.0f;
     for (size_t i = 0; i < n; i++) {

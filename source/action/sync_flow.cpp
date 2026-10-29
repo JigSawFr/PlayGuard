@@ -3,8 +3,8 @@
 
 #include <algorithm>
 #include <atomic>
-#include <borealis.hpp>
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 #include <chrono>
 #include <condition_variable>
 #include <cstring>
@@ -17,7 +17,7 @@
 #include <thread>
 #include <vector>
 
-#include <borealis/cadran/ui/hooks.hpp>
+#include <aurore/cadran/ui/hooks.hpp>
 
 #include "action/game_scan.hpp"
 #include "action/ha_update_flow.hpp"
@@ -79,7 +79,7 @@ std::string without_broker(std::string text, const char* host)
 }
 
 // What the UI thread and the worker share. The worker never calls into
-// borealis but brls::sync() and the logger; the UI never calls the engine.
+// Aurore but aurore::sync() and the logger; the UI never calls the engine.
 struct Shared
 {
     std::mutex m;
@@ -168,7 +168,7 @@ bool host_order(void* ctx, uint32_t id, const SyncIntent* intent, const char* en
         std::lock_guard<std::mutex> lk(sh->m);
         sh->orders.push_back(o);
     }
-    brls::sync([]() { pump(); });
+    aurore::sync([]() { pump(); });
     return false;   // answered from the UI thread (sync_engine_order_done)
 }
 
@@ -194,7 +194,7 @@ void host_conf_changed(void* ctx, const SyncConf* conf)
         sh->saved = *conf;
         sh->conf_saved = true;
     }
-    brls::sync([]() { pump(); });
+    aurore::sync([]() { pump(); });
 }
 
 void host_integration(void* ctx, const char* doc, size_t len)
@@ -205,7 +205,7 @@ void host_integration(void* ctx, const char* doc, size_t len)
         sh->integration.assign(doc, len);
         sh->integration_got = true;
     }
-    brls::sync([]() { pump(); });
+    aurore::sync([]() { pump(); });
 }
 
 bool host_read_only(void* ctx)
@@ -225,7 +225,7 @@ void host_log(void* ctx, const char* line)
 {
     auto* sh = (Shared*)ctx;
     std::lock_guard<std::mutex> lk(sh->m);
-    brls::Logger::info("sync: {}", without_broker(line, sh->conf.host));
+    aurore::Logger::info("sync: {}", without_broker(line, sh->conf.host));
     sh->log.push_back(ui::now_hms() + "  " + line);
     while (sh->log.size() > LOG_LINES) sh->log.pop_front();
 }
@@ -332,7 +332,7 @@ std::shared_ptr<Shared> s_shared;
 std::thread s_worker;
 SyncConf s_conf{};
 bool s_started = false;
-brls::RepeatingTimer* s_timer = nullptr;
+aurore::RepeatingTimer* s_timer = nullptr;
 int s_listen = 0;
 bool s_dirty = true;
 Clock::time_point s_last_state{}, s_last_fetch{};
@@ -393,7 +393,7 @@ void agent_lost();
 bool agent_ok(Result rc, const char* what)
 {
     if (R_SUCCEEDED(rc)) return true;
-    brls::Logger::warning("sync: agent {}: 0x{:08X}", what, (unsigned)rc);
+    aurore::Logger::warning("sync: agent {}: 0x{:08X}", what, (unsigned)rc);
     if (!agent_client::connected()) agent_lost();
     return false;
 }
@@ -928,7 +928,7 @@ SyncOutcome export_report()
     std::string error;
     if (diagnostic::save(report, &error).empty()) {
         out.reason = SyncReason_Busy;
-        brls::Logger::warning("sync: report not saved: {}", error);
+        aurore::Logger::warning("sync: report not saved: {}", error);
         return out;
     }
     out.applied = true;
@@ -952,7 +952,7 @@ void finish_order(const sync_orders::Order& o, const SyncOutcome& out, uint32_t 
     sync_orders::tell(o, out);
     if (out.applied && out.changed && ui::hooks::get().refresh_shown) ui::hooks::get().refresh_shown();
     s_order_running = false;
-    brls::sync([]() { next_order(); });
+    aurore::sync([]() { next_order(); });
 }
 
 // The lock screen (Security › Protect PlayGuard with the PIN › To open PlayGuard) is up and
@@ -1007,7 +1007,7 @@ void pump()
         const SyncConf c = s_conf;
         ui::write_later("sync.conf", [c]() {
             std::string error;
-            if (!sync_files::save(c, &error)) brls::Logger::warning("sync: sync.conf not saved: {}", error);
+            if (!sync_files::save(c, &error)) aurore::Logger::warning("sync: sync.conf not saved: {}", error);
         }, "sync.conf");
     }
     for (auto& o : orders) s_queue.push_back(std::move(o));
@@ -1045,7 +1045,7 @@ void agent_tick()
             o.entity.assign(a.entity, strnlen(a.entity, sizeof(a.entity)));
             o.payload.assign(a.payload, strnlen(a.payload, sizeof(a.payload)));
             o.retained = a.retained;
-            brls::Logger::info("sync: order {} from the agent: {}={}", o.id, o.entity, o.payload);
+            aurore::Logger::info("sync: order {} from the agent: {}={}", o.id, o.entity, o.payload);
             s_queue.push_back(o);
         }
     }
@@ -1098,7 +1098,7 @@ void launch()
     try {
         s_worker = std::thread(worker, sh, s_conf, app::version());
     } catch (const std::system_error& e) {
-        brls::Logger::error("sync: no thread for the remote link ({})", e.what());
+        aurore::Logger::error("sync: no thread for the remote link ({})", e.what());
         return;
     }
     s_shared = sh;
@@ -1110,7 +1110,7 @@ void launch()
     s_week_sent.clear();
     s_state_body.clear();
     s_read_only_sent = app::read_only() ? 1 : 0;
-    brls::Logger::info("sync: remote link started (port {}{})", s_conf.port, s_conf.tls ? ", TLS" : "");
+    aurore::Logger::info("sync: remote link started (port {}{})", s_conf.port, s_conf.tls ? ", TLS" : "");
     on_play_data();
 }
 
@@ -1135,7 +1135,7 @@ void halt()
         if (ended) {
             s_worker.join();
         } else {
-            brls::Logger::warning("sync: the remote link's worker did not end in time; left running");
+            aurore::Logger::warning("sync: the remote link's worker did not end in time; left running");
             (void)new std::thread(std::move(s_worker));
         }
     }
@@ -1160,7 +1160,7 @@ void agent_leave()
 void agent_lost()
 {
     if (!s_agent) return;
-    brls::Logger::warning("sync: the agent went away");
+    aurore::Logger::warning("sync: the agent went away");
     agent_leave();
     s_last_probe = {};   // the next second: PlayGuard's own session, or the agent again
 }
@@ -1177,7 +1177,7 @@ void agent_adopt()
         if (agent_ok(agent_client::records(&r), "records") && r.valid &&
             sync_files::records_into(r.records, config::get())) {
             ui::save_config();
-            brls::Logger::info("sync: the agent's records adopted");
+            aurore::Logger::info("sync: the agent's records adopted");
         }
     } else {
         agent_ok(agent_client::reload(), "reload");
@@ -1192,7 +1192,7 @@ void agent_adopt()
                                (int)t.minute);
         sync_orders::import(ev, when);
     }
-    if (!events.empty()) brls::Logger::info("sync: {} change(s) of the agent in the history", events.size());
+    if (!events.empty()) aurore::Logger::info("sync: {} change(s) of the agent in the history", events.size());
 }
 
 // The agent runs: its session is the link, PlayGuard's own stops. True when
@@ -1204,7 +1204,7 @@ bool agent_join()
     AgentHelloReply r{};
     Result rc = 0;
     if (!agent_client::open(&r, &rc)) {
-        brls::Logger::warning("sync: the agent did not answer (0x{:08X})", (unsigned)rc);
+        aurore::Logger::warning("sync: the agent did not answer (0x{:08X})", (unsigned)rc);
         return false;
     }
     s_hello = r;
@@ -1214,7 +1214,7 @@ bool agent_join()
         // Another protocol: the agent keeps the link to itself (Console ›
         // Optional modules updates it).
         s_agent_refused = true;
-        brls::Logger::warning("sync: the agent {} speaks protocol {}, PlayGuard {}", s_hello.version, r.protocol,
+        aurore::Logger::warning("sync: the agent {} speaks protocol {}, PlayGuard {}", s_hello.version, r.protocol,
                               AGENT_PROTOCOL);
         return true;
     }
@@ -1232,7 +1232,7 @@ bool agent_join()
     s_state_body.clear();
     s_read_only_sent = app::read_only() ? 1 : 0;
     s_profiles_known = false;
-    brls::Logger::info("sync: the agent {} holds the link", s_hello.version);
+    aurore::Logger::info("sync: the agent {} holds the link", s_hello.version);
     agent_adopt();
     if (s_agent) agent_ok(agent_client::sync_now(), "sync now");
     if (s_agent) on_play_data();
@@ -1270,7 +1270,7 @@ void start()
     if (s_started) return;
     s_started = true;
     s_conf = sync_files::load();
-    s_timer = new brls::RepeatingTimer();
+    s_timer = new aurore::RepeatingTimer();
     s_timer->setCallback([]() { tick(); });
     s_timer->start(1000);
     s_listen = play_data::listen([]() { on_play_data(); });
@@ -1345,7 +1345,7 @@ void wait_offline(int left, std::function<void()> then)
 {
     AgentStatus st;
     if (left > 0 && s_agent && agent_ok(agent_client::status(&st), "status") && st.link.state == SyncLink_Online) {
-        brls::delay(AGENT_POLL_MS, [left, then]() { wait_offline(left - 1, then); });
+        aurore::delay(AGENT_POLL_MS, [left, then]() { wait_offline(left - 1, then); });
         return;
     }
     agent_leave();
@@ -1356,7 +1356,7 @@ void wait_offline(int left, std::function<void()> then)
 void wait_agent(int left)
 {
     if (left > 0 && !agent_client::available()) {
-        brls::delay(AGENT_POLL_MS, [left]() { wait_agent(left - 1); });
+        aurore::delay(AGENT_POLL_MS, [left]() { wait_agent(left - 1); });
         return;
     }
     reload();

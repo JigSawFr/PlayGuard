@@ -1,12 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/build_cell.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/dev_build_flow.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -26,7 +26,7 @@ BuildTag type_tag(const std::string& type)
     std::string text = type;
     for (const Known& k : KNOWN)
         if (type == k.type) {
-            text = brls::getStr(k.key);
+            text = aurore::getStr(k.key);
             color = k.color;
         }
     static const char* const colors[] = { "cadran/teal", "cadran/amber", "cadran/blue", "cadran/violet", "cadran/coral", "cadran/text3" };
@@ -34,24 +34,24 @@ BuildTag type_tag(const std::string& type)
 }
 // A pill of the boards tinted with an ink: its fill and its border are
 // that ink, faint, looked up again when the theme changes.
-class TagPill : public brls::Box
+class TagPill : public aurore::Box
 {
   public:
     explicit TagPill(const char* ink)
-        : brls::Box(brls::Axis::ROW), key(ink)
+        : aurore::Box(aurore::Axis::ROW), key(ink)
     {
         this->tint();
     }
     void onThemeChanged() override
     {
         this->tint();
-        brls::Box::onThemeChanged();
+        aurore::Box::onThemeChanged();
     }
 
   private:
     void tint()
     {
-        const NVGcolor ink = brls::Application::getTheme()[this->key];
+        const NVGcolor ink = aurore::Application::getTheme()[this->key];
         this->setBackgroundColor(nvgTransRGBA(ink, 30));
         this->setBorderColor(nvgTransRGBA(ink, 90));
     }
@@ -86,7 +86,7 @@ std::vector<BuildTag> build_tags(const dev_builds::Build& b, bool newer)
 std::string build_title(const dev_builds::Build& b)
 {
     switch (b.kind) {
-        case dev_builds::Kind::Release: return brls::getStr("playguard/dev_build/release", b.version);
+        case dev_builds::Kind::Release: return aurore::getStr("playguard/dev_build/release", b.version);
         case dev_builds::Kind::PullRequest:
         case dev_builds::Kind::Main:
         case dev_builds::Kind::Commit: return dev_build_flow::subject(b);
@@ -94,12 +94,12 @@ std::string build_title(const dev_builds::Build& b)
     return b.commit;
 }
 
-brls::Box* tag_view(const BuildTag& tag, float font_size)
+aurore::Box* tag_view(const BuildTag& tag, float font_size)
 {
     // A pill of the boards, tinted with its ink.
     const float height = font_size + 10;
     auto* box = new TagPill(tag.color);
-    box->setAlignItems(brls::AlignItems::CENTER);
+    box->setAlignItems(aurore::AlignItems::CENTER);
     box->setHeight(height);
     box->setBorderThickness(1);
     box->setCornerRadius(height / 2);
@@ -116,7 +116,7 @@ brls::Box* tag_view(const BuildTag& tag, float font_size)
         box->addView(glyph);
     }
     if (tag.text.empty()) return box;
-    auto* l = new brls::Label();
+    auto* l = new aurore::Label();
     l->setSingleLine(true);
     l->setFontSize(font_size);
     l->setThemeColor("textColor", tag.color);
@@ -128,49 +128,49 @@ brls::Box* tag_view(const BuildTag& tag, float font_size)
 BuildCell::BuildCell()
 {
     // A list cell's separator and focus (RecyclerCell, as DetailCell), two lines high.
-    this->setAxis(brls::Axis::ROW);
-    this->setHeight(brls::View::AUTO);
+    this->setAxis(aurore::Axis::ROW);
+    this->setHeight(aurore::View::AUTO);
     this->setFocusable(true);
-    this->setAlignItems(brls::AlignItems::CENTER);
-    const float indent = brls::getStyle()["brls/listitem/descriptionIndent"];
+    this->setAlignItems(aurore::AlignItems::CENTER);
+    const float indent = aurore::getStyle()["aurore/listitem/descriptionIndent"];
     this->setPadding(10, indent, 10, indent);
 
-    auto* left = new brls::Box(brls::Axis::COLUMN);
+    auto* left = new aurore::Box(aurore::Axis::COLUMN);
     left->setGrow(1.0f);
     left->setShrink(1.0f);
     left->setMarginRight(indent);
     // The title, then its marks (installed, new) right after it.
-    auto* head = new brls::Box(brls::Axis::ROW);
-    head->setAlignItems(brls::AlignItems::CENTER);
-    this->title = new brls::Label();
+    auto* head = new aurore::Box(aurore::Axis::ROW);
+    head->setAlignItems(aurore::AlignItems::CENTER);
+    this->title = new aurore::Label();
     this->title->setSingleLine(true);
     this->title->setFontSize(21);
     this->title->setShrink(1.0f);
     this->title->setMarginRight(10);
     head->addView(this->title);
-    this->marks = new brls::Box(brls::Axis::ROW);
+    this->marks = new aurore::Box(aurore::Axis::ROW);
     this->marks->setShrink(0.0f);
     head->addView(this->marks);
     left->addView(head);
-    this->tags = new brls::Box(brls::Axis::ROW);
+    this->tags = new aurore::Box(aurore::Axis::ROW);
     this->tags->setMarginTop(6);
     left->addView(this->tags);
     this->addView(left);
 
-    auto* right = new brls::Box(brls::Axis::COLUMN);
-    right->setAlignItems(brls::AlignItems::FLEX_END);
+    auto* right = new aurore::Box(aurore::Axis::COLUMN);
+    right->setAlignItems(aurore::AlignItems::FLEX_END);
     right->setShrink(0.0f);
-    this->age = new brls::Label();
+    this->age = new aurore::Label();
     this->age->setSingleLine(true);
     this->age->setFontSize(18);
     this->age->setThemeColor("textColor", "cadran/text2");
-    this->age->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+    this->age->setHorizontalAlign(aurore::HorizontalAlign::RIGHT);
     right->addView(this->age);
-    this->commit = new brls::Label();
+    this->commit = new aurore::Label();
     this->commit->setSingleLine(true);
     this->commit->setFontSize(18);
     this->commit->setThemeColor("textColor", "cadran/text3");
-    this->commit->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+    this->commit->setHorizontalAlign(aurore::HorizontalAlign::RIGHT);
     this->commit->setMarginTop(4);
     right->addView(this->commit);
     this->addView(right);
@@ -184,7 +184,7 @@ void BuildCell::set(const dev_builds::Build& b, bool newer)
     // An icon alone (installed, new) marks the title; the words go below it,
     // and a release with none leaves no empty line.
     for (const BuildTag& t : build_tags(b, newer)) (t.text.empty() ? this->marks : this->tags)->addView(tag_view(t));
-    this->tags->setVisibility(this->tags->getChildren().empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+    this->tags->setVisibility(this->tags->getChildren().empty() ? aurore::Visibility::GONE : aurore::Visibility::VISIBLE);
     this->age->setText(dev_build_flow::age_text(b.date));
     // A release: its date; anything else: its commit.
     this->commit->setText(b.kind == dev_builds::Kind::Release ? b.date.substr(0, 10) : b.commit);

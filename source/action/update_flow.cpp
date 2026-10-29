@@ -14,7 +14,7 @@
 #include "util/date.hpp"
 #include "util/launcher.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace update_flow
 {
@@ -68,13 +68,13 @@ void show_result(const Offer& o)
             UpdateActivity::show(o);
             break;
         case update::Verdict::UpToDate:
-            ui::info(brls::getStr("playguard/update/up_to_date", app::version()));
+            ui::info(aurore::getStr("playguard/update/up_to_date", app::version()));
             break;
         case update::Verdict::NoRelease:
-            ui::info(brls::getStr("playguard/update/no_release", app::version()));
+            ui::info(aurore::getStr("playguard/update/no_release", app::version()));
             break;
         default:
-            ui::error(brls::getStr("playguard/update/failed", o.result.error));
+            ui::error(aurore::getStr("playguard/update/failed", o.result.error));
             break;
     }
 }
@@ -87,8 +87,8 @@ void note_latest(const std::string& latest)
         notices::clear("update");
         return;
     }
-    notices::set("update", notices::Level::Info, brls::getStr("playguard/update/headline", latest),
-                 brls::getStr("playguard/update/running", app::version()), "playguard/update/update"_i18n,
+    notices::set("update", notices::Level::Info, aurore::getStr("playguard/update/headline", latest),
+                 aurore::getStr("playguard/update/running", app::version()), "playguard/update/update"_i18n,
                  []() { update_now(); });
 }
 
@@ -119,9 +119,9 @@ void run_check(std::function<void(const Offer&)> done)
             std::string err;
             o.has_release = dev_builds::fetch_release(&o.release, &err) &&
                             update::compare_versions(o.release.version, o.result.latest.version) == 0;
-            if (!o.has_release && !err.empty()) brls::Logger::warning("update: no release details ({})", err);
+            if (!o.has_release && !err.empty()) aurore::Logger::warning("update: no release details ({})", err);
         }
-        brls::sync([o]() {
+        aurore::sync([o]() {
             s_check_running = false;
             s_offer = o;
             s_checked = o.result.verdict != update::Verdict::Unknown;
@@ -135,7 +135,7 @@ void run_check(std::function<void(const Offer&)> done)
 
 // Shows the start-up screen once `main` is on top, waiting for what is in
 // front of it to close.
-void show_when_free(brls::Activity* main, const Offer& o, int steps_left)
+void show_when_free(aurore::Activity* main, const Offer& o, int steps_left)
 {
     if (ui::on_top(main)) {
         // Not after another screen of its own this start (First steps): the next.
@@ -143,12 +143,12 @@ void show_when_free(brls::Activity* main, const Offer& o, int steps_left)
         return;
     }
     if (steps_left <= 0) return;   // still busy: the next start-up
-    brls::delay(WAIT_STEP_MS, [main, o, steps_left]() { show_when_free(main, o, steps_left - 1); });
+    aurore::delay(WAIT_STEP_MS, [main, o, steps_left]() { show_when_free(main, o, steps_left - 1); });
 }
 
 void install_in_place(const dev_builds::Build& b)
 {
-    ui::confirm(brls::getStr("playguard/update/inplace_body", b.version), "playguard/update/inplace_confirm"_i18n,
+    ui::confirm(aurore::getStr("playguard/update/inplace_body", b.version), "playguard/update/inplace_confirm"_i18n,
                 [b]() { dev_build_flow::install_now(b); });
 }
 
@@ -166,11 +166,11 @@ void update_in_place()
         dev_builds::Build b;
         std::string err;
         const bool ok = dev_builds::fetch_release(&b, &err);
-        brls::sync([ok, b, err]() {
+        aurore::sync([ok, b, err]() {
             s_checking = false;
-            if (!ok) ui::error(brls::getStr("playguard/update/failed", err));
+            if (!ok) ui::error(aurore::getStr("playguard/update/failed", err));
             else if (update::compare_versions(b.version, app::version()) <= 0)
-                ui::info(brls::getStr("playguard/update/up_to_date", app::version()));
+                ui::info(aurore::getStr("playguard/update/up_to_date", app::version()));
             else install_in_place(b);
         });
     });
@@ -179,10 +179,10 @@ void update_in_place()
 void hand_over(const launcher::Target& target, const std::string& manual)
 {
     const std::string name = store_name(target.store);
-    ui::confirm(brls::getStr("playguard/update/open_body", name), brls::getStr("playguard/update/open_confirm", name),
+    ui::confirm(aurore::getStr("playguard/update/open_body", name), aurore::getStr("playguard/update/open_confirm", name),
                 [target, manual]() {
                     if (!pin_lock::before_handing_over(hbmenu_lock::locked())) return;
-                    if (launcher::launch(target)) brls::Application::quit();
+                    if (launcher::launch(target)) aurore::Application::quit();
                     else ui::info(manual);
                 });
 }
@@ -195,7 +195,7 @@ void hand_over(const launcher::Target& target, const std::string& manual)
 void open_store()
 {
     const launcher::Target target = launcher::find(config::get().update_via);
-    const std::string manual = brls::getStr("playguard/update/manual_body", std::string(app::repo_url()) + "/releases");
+    const std::string manual = aurore::getStr("playguard/update/manual_body", std::string(app::repo_url()) + "/releases");
     if (target.store == launcher::Store::None || !launcher::can_launch()) {
         ui::info(manual);
         return;
@@ -209,15 +209,15 @@ void open_store()
     ui::in_background("store version", [target, manual, latest]() {
         std::string err;
         const std::string listed = launcher::store_version(&err);
-        brls::sync([target, manual, latest, listed, err]() {
+        aurore::sync([target, manual, latest, listed, err]() {
             s_checking = false;
             // Not known (offline, not listed yet): the store, as asked.
             if (listed.empty() || update::compare_versions(listed, latest) >= 0) {
-                if (listed.empty()) brls::Logger::warning("update: the store's version unknown ({})", err);
+                if (listed.empty()) aurore::Logger::warning("update: the store's version unknown ({})", err);
                 hand_over(target, manual);
                 return;
             }
-            ui::confirm(brls::getStr("playguard/update/store_behind", store_name(launcher::Store::AppStore), listed, latest),
+            ui::confirm(aurore::getStr("playguard/update/store_behind", store_name(launcher::Store::AppStore), listed, latest),
                         "playguard/update/store_behind_confirm"_i18n, []() { update_in_place(); });
         });
     });
@@ -239,13 +239,13 @@ void check_once(std::function<void(const Offer&)> done)
 {
     if (s_checked && !s_check_running) {
         // Next frame, as after a request.
-        brls::sync([done]() { done(s_offer); });
+        aurore::sync([done]() { done(s_offer); });
         return;
     }
     run_check(std::move(done));
 }
 
-void at_start(brls::Activity* main)
+void at_start(aurore::Activity* main)
 {
     const auto& cfg = config::get();
     const std::string today = ui::today_date();
@@ -282,8 +282,8 @@ void choose_method(std::function<void()> then, bool first)
     const std::string recommended = launcher::installed_by_store() ? "auto" : METHODS[0];
     std::vector<std::string> labels;
     for (const std::string& m : METHODS) {
-        std::string label = brls::getStr("playguard/tools/update_via_values/" + m);
-        if (first && m == recommended) label = brls::getStr("playguard/update/recommended", label);
+        std::string label = aurore::getStr("playguard/tools/update_via_values/" + m);
+        if (first && m == recommended) label = aurore::getStr("playguard/update/recommended", label);
         labels.push_back(label);
     }
     int selected = 0;
@@ -301,21 +301,21 @@ std::string method_text()
 {
     const std::string& via = config::get().update_via;
     return via.empty() ? "playguard/tools/update_via_values/unset"_i18n
-                       : brls::getStr("playguard/tools/update_via_values/" + via);
+                       : aurore::getStr("playguard/tools/update_via_values/" + via);
 }
 
 void postpone(const std::string& version, std::function<void()> done)
 {
     static const int DAYS[] = { 1, 7, update::SNOOZE_MAX_DAYS };
     const std::vector<std::string> labels = { "playguard/update/later_day"_i18n, "playguard/update/later_week"_i18n,
-                                              brls::getStr("playguard/update/later_days", update::SNOOZE_MAX_DAYS) };
+                                              aurore::getStr("playguard/update/later_days", update::SNOOZE_MAX_DAYS) };
     ui::pick("playguard/update/later_title"_i18n, labels, 0, [version, done](int i) {
         const std::string until = date::add_days(ui::today_date(), DAYS[i]);
         if (until.empty()) return;   // no date on the console clock: nothing to count from
         auto& cfg = config::get();
         cfg.update_snooze_version = version;
         cfg.update_snooze_until   = until;
-        ui::save_config(brls::getStr("playguard/update/later_done", until));
+        ui::save_config(aurore::getStr("playguard/update/later_done", until));
         if (done) done();
     }, false);
 }
@@ -324,14 +324,14 @@ std::string status_text(const update::Result& r, const std::string& firmware)
 {
     switch (r.verdict) {
         case update::Verdict::UpdateSupports:
-            return brls::getStr("playguard/fw_gate/status_supports", r.latest.version, firmware);
+            return aurore::getStr("playguard/fw_gate/status_supports", r.latest.version, firmware);
         case update::Verdict::UpdateNoSupport:
-            return brls::getStr("playguard/fw_gate/status_no_support", r.latest.version, firmware);
+            return aurore::getStr("playguard/fw_gate/status_no_support", r.latest.version, firmware);
         case update::Verdict::UpToDate:
         case update::Verdict::NoRelease:
-            return brls::getStr("playguard/fw_gate/status_latest", app::version());
+            return aurore::getStr("playguard/fw_gate/status_latest", app::version());
         default:
-            return brls::getStr("playguard/fw_gate/status_unknown", r.error);
+            return aurore::getStr("playguard/fw_gate/status_unknown", r.error);
     }
 }
 
@@ -342,7 +342,7 @@ std::string update_label()
     if (via == "inplace") return "playguard/update/update_now"_i18n;
     const launcher::Target target = launcher::find(via);
     if (target.store == launcher::Store::None || !launcher::can_launch()) return "playguard/update/update_manual"_i18n;
-    return brls::getStr("playguard/update/update_with", store_name(target.store));
+    return aurore::getStr("playguard/update/update_with", store_name(target.store));
 }
 
 }   // namespace update_flow

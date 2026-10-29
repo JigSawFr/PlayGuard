@@ -6,9 +6,9 @@
 #include <cstdlib>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/nintendo_dns.hpp"
 #include "action/offline_clock_logic.hpp"
@@ -20,7 +20,7 @@
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -28,7 +28,7 @@ constexpr auto SNAPSHOT_EVERY = std::chrono::seconds(10);
 
 std::string region_label(const std::string& id)
 {
-    return brls::getStr("playguard/clock/region_names/" + id);
+    return aurore::getStr("playguard/clock/region_names/" + id);
 }
 
 // A server's icon in the pickers: its flag or globe from the Twemoji set of
@@ -37,7 +37,7 @@ std::string region_label(const std::string& id)
 std::string host_icon(const std::string& host)
 {
     const std::string hex = ntp::host_emoji(host);
-    if (hex.empty() || !paths::file_exists(std::string(BRLS_ASSET("img/emoji/")) + hex + ".png")) return "server";
+    if (hex.empty() || !paths::file_exists(std::string(AURORE_ASSET("img/emoji/")) + hex + ".png")) return "server";
     return "img/emoji/" + hex + ".png";
 }
 
@@ -95,22 +95,22 @@ ClockTab::ClockTab()
     this->region_id = find_region(this->server);
 
     // A state of System Settings, which an application cannot open: say where it is.
-    autosync->registerClickAction([](brls::View*) {
+    autosync->registerClickAction([](aurore::View*) {
         ui::info("playguard/clock/auto_how"_i18n);
         return true;
     });
-    region->registerClickAction([this](brls::View*) { this->choose_region(); return true; });
-    server_cell->registerClickAction([this](brls::View*) { this->choose_server(); return true; });
-    custom->registerClickAction([this](brls::View*) { this->enter_custom(); return true; });
-    measure_cell->registerClickAction([this](brls::View*) { this->measure(); return true; });
-    apply_cell->registerClickAction([this](brls::View*) {
+    region->registerClickAction([this](aurore::View*) { this->choose_region(); return true; });
+    server_cell->registerClickAction([this](aurore::View*) { this->choose_server(); return true; });
+    custom->registerClickAction([this](aurore::View*) { this->enter_custom(); return true; });
+    measure_cell->registerClickAction([this](aurore::View*) { this->measure(); return true; });
+    apply_cell->registerClickAction([this](aurore::View*) {
         if (!ui::refuse_read_only()) this->apply();
         return true;
     });
     // A long title and no value: the title gets the whole width (an empty
     // detail label still reserves its space).
-    copy_cell->detail->setVisibility(brls::Visibility::GONE);
-    copy_cell->registerClickAction([this](brls::View*) {
+    copy_cell->detail->setVisibility(aurore::Visibility::GONE);
+    copy_cell->registerClickAction([this](aurore::View*) {
         if (!ui::refuse_read_only()) this->copy();
         return true;
     });
@@ -118,18 +118,18 @@ ClockTab::ClockTab()
     // Clocks tick and a measurement expires: keep the screen current.
     this->enable_auto_refresh(1000);
     // Ⓧ reads the clocks again at once (the timer moves them forward between reads).
-    this->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
+    this->registerAction("playguard/hints/refresh"_i18n, aurore::BUTTON_X, [this](aurore::View*) {
         this->snap_ok = false;
         this->refresh();
         return true;
     });
     // Both clocks large, side by side.
-    if (brls::Box* column = this->list.content()) {
-        auto* row = new brls::Box(brls::Axis::ROW);
-        row->setAlignItems(brls::AlignItems::STRETCH);
+    if (aurore::Box* column = this->list.content()) {
+        auto* row = new aurore::Box(aurore::Axis::ROW);
+        row->setAlignItems(aurore::AlignItems::STRETCH);
         row->setMarginBottom(12);
 
-        brls::Box* console = kit::top_card(true);
+        aurore::Box* console = kit::top_card(true);
         console->setMarginRight(12);
         console->addView(kit::kicker("gamepad", "playguard/cadran/clock/console"_i18n));
         this->user_time = new CadranDigits();
@@ -147,10 +147,10 @@ ClockTab::ClockTab()
         this->network_time->setFontSize(46);
         this->network_time->setMarginTop(10);
         this->network_card->addView(this->network_time);
-        auto* state = new brls::Box(brls::Axis::ROW);
-        state->setAlignItems(brls::AlignItems::CENTER);
+        auto* state = new aurore::Box(aurore::Axis::ROW);
+        state->setAlignItems(aurore::AlignItems::CENTER);
         state->setMarginTop(4);
-        this->network_dot = new brls::Rectangle();
+        this->network_dot = new aurore::Rectangle();
         this->network_dot->setThemeColor("color", "cadran/teal_fill");
         this->network_dot->setWidth(9);
         this->network_dot->setHeight(9);
@@ -211,9 +211,9 @@ void ClockTab::refresh()
         } else {
             // Counts down every second (the tab refreshes itself each second).
             // "1 min 45 s": "1:45" read like the hours:minutes typed elsewhere.
-            const std::string span = left >= 60 ? brls::getStr("playguard/common/min_sec", (int)(left / 60), (int)(left % 60))
-                                                : brls::getStr("playguard/common/sec", (int)left);
-            ui::set_detail(apply_cell, brls::getStr("playguard/clock/valid_for", span));
+            const std::string span = left >= 60 ? aurore::getStr("playguard/common/min_sec", (int)(left / 60), (int)(left % 60))
+                                                : aurore::getStr("playguard/common/sec", (int)left);
+            ui::set_detail(apply_cell, aurore::getStr("playguard/clock/valid_for", span));
         }
     }
     // Measuring only reads: also in read-only mode, where setting is greyed.
@@ -329,7 +329,7 @@ void ClockTab::measure()
     // A spinner says it is working, the text with whom; Cancel (or B) drops
     // the late answer.
     auto cancelled = std::make_shared<bool>(false);
-    auto* progress = new brls::Dialog(cadran::wait_body(brls::getStr("playguard/clock/measuring", this->server)));
+    auto* progress = new aurore::Dialog(cadran::wait_body(aurore::getStr("playguard/clock/measuring", this->server)));
     ui::add_cancel(progress, [cancelled, idle = ui::guarded(this->alive, [this]() { this->busy = false; })]() {
         *cancelled = true;
         idle();
@@ -346,7 +346,7 @@ void ClockTab::measure()
         // On the screen, the outcome in one line (the details are the dialog's).
         if (m.ok) {
             const std::string offset = m.offset_known ? clock_flow::offset_text(m.offset) : "cadran/common/unavailable"_i18n;
-            this->show_result(brls::getStr("playguard/clock/last_result", offset, (int)this->answered(m), (int)m.lines.size()));
+            this->show_result(aurore::getStr("playguard/clock/last_result", offset, (int)this->answered(m), (int)m.lines.size()));
         } else {
             this->show_result(m.report, this->offline);
         }
@@ -357,7 +357,7 @@ void ClockTab::measure()
         ui::set_visible(warning.getView(), !warn.empty());
         this->refresh();   // shows "Set the network clock"
         progress->close([show = ui::guarded(this->alive, [this, m, warn]() { this->show_measurement(m, warn); })]() {
-            brls::sync(show);
+            aurore::sync(show);
         });
     }));
 }
@@ -374,28 +374,28 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     const bool on_time = m.ok && m.offset_known && m.offset >= -1 && m.offset <= 1;
     const char* tone = !m.ok ? "cadran/amber" : on_time ? "cadran/teal" : m.offset_known ? "cadran/amber" : "cadran/text2";
 
-    auto* body = new brls::Box(brls::Axis::COLUMN);
-    body->setAlignItems(brls::AlignItems::STRETCH);
+    auto* body = new aurore::Box(aurore::Axis::COLUMN);
+    body->setAlignItems(aurore::AlignItems::STRETCH);
     body->setPadding(30, 40, 22, 40);
 
     // The answer first, large: how far off the network clock is.
-    auto* head = new brls::Box(brls::Axis::ROW);
-    head->setAlignItems(brls::AlignItems::CENTER);
-    brls::Box* badge = !m.ok    ? cadran::dialog_badge("alert", "cadran/amber", "cadran/amber_surf")
+    auto* head = new aurore::Box(aurore::Axis::ROW);
+    head->setAlignItems(aurore::AlignItems::CENTER);
+    aurore::Box* badge = !m.ok    ? cadran::dialog_badge("alert", "cadran/amber", "cadran/amber_surf")
                        : on_time ? cadran::dialog_badge("check", "cadran/teal", "cadran/teal_soft")
                                  : cadran::dialog_badge("timer", tone, m.offset_known ? "cadran/amber_surf" : "cadran/surf2");
     badge->setMarginRight(18);
     head->addView(badge);
-    auto* words = new brls::Box(brls::Axis::COLUMN);
+    auto* words = new aurore::Box(aurore::Axis::COLUMN);
     words->setGrow(1.0f);
     words->setWidth(0);
-    brls::Label* kicker = kit::label("", kit::TEXT_KICKER, "cadran/text2");
+    aurore::Label* kicker = kit::label("", kit::TEXT_KICKER, "cadran/text2");
     kit::set_kicker(kicker, "playguard/clock/dialog_kicker"_i18n);
     words->addView(kicker);
     std::string headline = !m.ok            ? "playguard/clock/dialog_none"_i18n
                            : m.offset_known ? clock_flow::offset_text(m.offset)
                                             : "cadran/common/unavailable"_i18n;
-    brls::Label* title = kit::display(headline, m.ok ? 34 : kit::TEXT_TITLE, tone);
+    aurore::Label* title = kit::display(headline, m.ok ? 34 : kit::TEXT_TITLE, tone);
     title->setMarginTop(4);
     words->addView(title);
     head->addView(words);
@@ -404,14 +404,14 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     // A rounded panel of rows: a key, a value (and, quieter, what follows it).
     auto panel = [&](const std::string& name) {
         if (!name.empty()) {
-            brls::Label* label = kit::label("", kit::TEXT_KICKER, "cadran/text2");
+            aurore::Label* label = kit::label("", kit::TEXT_KICKER, "cadran/text2");
             kit::set_kicker(label, name);
             label->setMarginTop(20);
             label->setMarginBottom(8);
             body->addView(label);
         }
-        auto* table = new brls::Box(brls::Axis::COLUMN);
-        table->setAlignItems(brls::AlignItems::STRETCH);
+        auto* table = new aurore::Box(aurore::Axis::COLUMN);
+        table->setAlignItems(aurore::AlignItems::STRETCH);
         table->setThemeColor("backgroundColor", "cadran/surf2");
         table->setCornerRadius(kit::RADIUS_ROW);
         table->setPadding(6, 20, 6, 20);
@@ -419,15 +419,15 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
         body->addView(table);
         return table;
     };
-    auto row = [&](brls::Box* table, const char* mark, const std::string& key, const std::string& value,
+    auto row = [&](aurore::Box* table, const char* mark, const std::string& key, const std::string& value,
                    const char* value_key, const std::string& extra) {
         if (!table->getChildren().empty()) {
-            brls::View* above = table->getChildren().back();
+            aurore::View* above = table->getChildren().back();
             above->setLineBottom(1);
             above->setThemeColor("lineColor", "cadran/line");
         }
-        auto* line = new brls::Box(brls::Axis::ROW);
-        line->setAlignItems(brls::AlignItems::CENTER);
+        auto* line = new aurore::Box(aurore::Axis::ROW);
+        line->setAlignItems(aurore::AlignItems::CENTER);
         line->setPaddingTop(9);
         line->setPaddingBottom(9);
         if (mark) {
@@ -435,19 +435,19 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
             dot->setMarginRight(12);
             line->addView(dot);
         }
-        brls::Label* k = kit::label(key, kit::TEXT_BODY, "cadran/text2");
+        aurore::Label* k = kit::label(key, kit::TEXT_BODY, "cadran/text2");
         k->setGrow(1.0f);
         k->setWidth(0);
         k->setMarginRight(16);
         line->addView(k);
-        brls::Label* v = kit::label(value, kit::TEXT_BODY, value_key);
-        v->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+        aurore::Label* v = kit::label(value, kit::TEXT_BODY, value_key);
+        v->setHorizontalAlign(aurore::HorizontalAlign::RIGHT);
         v->setShrink(0);
         line->addView(v);
         if (!extra.empty()) {
-            brls::Label* e = kit::label(extra, kit::TEXT_META, "cadran/text3");
+            aurore::Label* e = kit::label(extra, kit::TEXT_META, "cadran/text3");
             e->setMinWidth(64);
-            e->setHorizontalAlign(brls::HorizontalAlign::RIGHT);
+            e->setHorizontalAlign(aurore::HorizontalAlign::RIGHT);
             e->setMarginLeft(12);
             e->setShrink(0);
             line->addView(e);
@@ -463,14 +463,14 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
 
     if (m.ok) {
         // The two times side by side: what the servers say, what the network clock says.
-        brls::Box* compare = panel("");
+        aurore::Box* compare = panel("");
         row(compare, nullptr, "playguard/clock/dialog_servers_time"_i18n, when(m.unix_seconds), "cadran/text", "");
         if (m.offset_known)
             row(compare, nullptr, "playguard/clock/dialog_network_time"_i18n, when(m.network_seconds),
                 on_time ? "cadran/text" : "cadran/amber", "");
     }
     // Each server asked: its time, or why it did not answer.
-    brls::Box* servers = panel(brls::getStr("playguard/clock/dialog_asked", (int)this->answered(m), (int)m.lines.size()));
+    aurore::Box* servers = panel(aurore::getStr("playguard/clock/dialog_asked", (int)this->answered(m), (int)m.lines.size()));
     for (const auto& l : m.lines) {
         if (l.ok) row(servers, "cadran/teal", l.host, when(l.unix_seconds), "cadran/text", l.offset);
         else row(servers, "cadran/amber", l.host, l.error, "cadran/amber", "");
@@ -481,8 +481,8 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     std::string notes = warn;
     if (!m.ok) notes = this->offline ? "playguard/clock/offline_hint"_i18n : "";
     if (!notes.empty()) {
-        auto* card = new brls::Box(brls::Axis::ROW);
-        card->setAlignItems(brls::AlignItems::FLEX_START);
+        auto* card = new aurore::Box(aurore::Axis::ROW);
+        card->setAlignItems(aurore::AlignItems::FLEX_START);
         card->setThemeColor("backgroundColor", "cadran/amber_surf");
         card->setThemeColor("borderColor", "cadran/amber_line");
         card->setBorderThickness(1);
@@ -494,7 +494,7 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
         icon->setMarginRight(12);
         icon->setShrink(0);
         card->addView(icon);
-        brls::Label* label = kit::label(notes, 17, "cadran/amber");
+        aurore::Label* label = kit::label(notes, 17, "cadran/amber");
         label->setGrow(1.0f);
         label->setWidth(0);
         card->addView(label);
@@ -503,7 +503,7 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
     // How long the result can be used to set the clock.
     const bool can_set = m.ok && !this->autosync_off && !app::read_only();
     if (can_set) {
-        brls::Label* note = kit::label(brls::getStr("playguard/clock/dialog_valid", (int)(clock_flow::LIFETIME_S / 60)),
+        aurore::Label* note = kit::label(aurore::getStr("playguard/clock/dialog_valid", (int)(clock_flow::LIFETIME_S / 60)),
                                        kit::TEXT_META, "cadran/text3");
         note->setMarginTop(14);
         body->addView(note);
@@ -514,13 +514,13 @@ void ClockTab::show_measurement(const clock_flow::Measurement& m, const std::str
         // On time: closing is the answer, setting stays offered.
         dialog->addButton(on_time ? "hints/ok"_i18n : "hints/cancel"_i18n, []() {});
         dialog->addButton(on_time ? "playguard/clock/dialog_set_anyway"_i18n : "playguard/clock/apply_confirm"_i18n,
-                          [apply = ui::guarded(this->alive, [this]() { this->apply(); })]() { brls::sync(apply); });
+                          [apply = ui::guarded(this->alive, [this]() { this->apply(); })]() { aurore::sync(apply); });
         dialog->setCancelable(true);
         cadran::style_dialog(dialog, on_time ? cadran::Emphasis::NONE : cadran::Emphasis::PRIMARY);
     } else if (!m.ok && this->offline && !app::read_only()) {
         dialog->addButton("hints/cancel"_i18n, []() {});
         dialog->addButton("playguard/clock/guided_copy"_i18n,
-                          [copy = ui::guarded(this->alive, [this]() { this->copy(); })]() { brls::sync(copy); });
+                          [copy = ui::guarded(this->alive, [this]() { this->copy(); })]() { aurore::sync(copy); });
         dialog->setCancelable(true);
         cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     } else {

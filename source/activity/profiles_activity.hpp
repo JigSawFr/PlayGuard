@@ -6,13 +6,13 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <string>
 
 #include "util/pctl_ops_c.hpp"
 #include "util/profiles.hpp"
 
-class ProfilesActivity : public brls::Activity
+class ProfilesActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/profiles.xml");
@@ -24,7 +24,7 @@ class ProfilesActivity : public brls::Activity
     PtState live = {};
     // A profile saved from the limits editor pushed above this screen: the
     // list is rebuilt once this screen is back on top. Rebuilding sooner
-    // would delete the cell borealis gives the focus back to on its return.
+    // would delete the cell Aurore gives the focus back to on its return.
     bool relist_pending = false;
     std::string relist_focus;
 
@@ -45,11 +45,11 @@ class ProfilesActivity : public brls::Activity
     // Writes `p`, says how it went, lists again with it focused.
     bool store(const profiles::Profile& p, const std::string& ok_text);
 
-    BRLS_BIND(brls::Box,        list,      "pf_list");
-    BRLS_BIND(brls::Label,      empty,     "pf_empty");
-    BRLS_BIND(brls::Label,      hint,      "pf_hint");
-    BRLS_BIND(brls::DetailCell, save_cell, "pf_save");
-    BRLS_BIND(brls::DetailCell, new_cell,  "pf_new");
-    BRLS_BIND(brls::DetailCell, schedule,  "pf_schedule");
-    BRLS_BIND(brls::Label,      schedule_note, "pf_schedule_note");
+    AURORE_BIND(aurore::Box,        list,      "pf_list");
+    AURORE_BIND(aurore::Label,      empty,     "pf_empty");
+    AURORE_BIND(aurore::Label,      hint,      "pf_hint");
+    AURORE_BIND(aurore::DetailCell, save_cell, "pf_save");
+    AURORE_BIND(aurore::DetailCell, new_cell,  "pf_new");
+    AURORE_BIND(aurore::DetailCell, schedule,  "pf_schedule");
+    AURORE_BIND(aurore::Label,      schedule_note, "pf_schedule_note");
 };

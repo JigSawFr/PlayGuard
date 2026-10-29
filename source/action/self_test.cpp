@@ -1,9 +1,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/self_test.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_logic.hpp"
@@ -19,7 +19,7 @@
 #include "util/nro.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 using self_test_logic::Item;
 using Res = self_test_logic::Result;   // not libnx's Result
 
@@ -104,7 +104,7 @@ void forwarders_part(std::vector<Item>& out)
     if (!made) out.push_back({ S, Res::Skip, "No forwarder made by PlayGuard" });
     // The gate on the card: the one this PlayGuard carries.
     std::string bundled, on_card;
-    if (!paths::read_file(BRLS_ASSET("gate/gate.nro"), bundled) || bundled.empty())
+    if (!paths::read_file(AURORE_ASSET("gate/gate.nro"), bundled) || bundled.empty())
         out.push_back({ S, Res::Skip, "This build carries no gate (PlayGuard is the gate)" });
     else if (!paths::read_file(paths::data_dir() + "/" + GATE_NRO_NAME, on_card))
         out.push_back({ S, Res::Skip, "No gate on the SD card yet (written once a forwarder is protected)" });
@@ -162,7 +162,7 @@ void open()
     std::string err;
     const std::string path = paths::data_dir() + "/" + REPORT_NAME;
     const bool written = paths::ensure_dir(paths::data_dir()) && paths::atomic_write(path, md, &err);
-    if (!written) brls::Logger::warning("self-test: {} not written ({})", REPORT_NAME, err);
+    if (!written) aurore::Logger::warning("self-test: {} not written ({})", REPORT_NAME, err);
     std::vector<ui::CheckLine> lines;
     std::string section;
     for (const Item& i : items) {
@@ -174,15 +174,15 @@ void open()
                           i.text });
     }
     const self_test_logic::Tally t = self_test_logic::tally(items);
-    const std::string note = written ? brls::getStr("playguard/dev/self_test_written", "config/playguard/" + std::string(REPORT_NAME))
-                                     : brls::getStr("playguard/dev/self_test_not_written", err);
+    const std::string note = written ? aurore::getStr("playguard/dev/self_test_written", "config/playguard/" + std::string(REPORT_NAME))
+                                     : aurore::getStr("playguard/dev/self_test_not_written", err);
     auto* dialog = ui::box_dialog(ui::checklist_body("playguard/dev/self_test"_i18n, lines, note,
-                                                       brls::getStr("playguard/dev/self_test_tally", t.pass, t.warn, t.fail, t.skip)));
+                                                       aurore::getStr("playguard/dev/self_test_tally", t.pass, t.warn, t.fail, t.skip)));
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->setCancelable(true);
     cadran::style_dialog(dialog, cadran::Emphasis::NONE);
     dialog->open();
-    brls::Logger::info("self-test: {} passed, {} to know, {} failed, {} not checked", t.pass, t.warn, t.fail, t.skip);
+    aurore::Logger::info("self-test: {} passed, {} to know, {} failed, {} not checked", t.pass, t.warn, t.fail, t.skip);
 }
 
 }   // namespace self_test

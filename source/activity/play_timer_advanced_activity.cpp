@@ -7,7 +7,7 @@
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 void PlayTimerAdvancedActivity::onContentAvailable()
 {
@@ -27,19 +27,19 @@ void PlayTimerAdvancedActivity::onContentAvailable()
         this->alarm->setOn(!on, false);
         pt_flow::set_alarm(on, "", [this]() { this->refresh(); });
     });
-    pause->registerClickAction([this](brls::View*) {
+    pause->registerClickAction([this](aurore::View*) {
         pt_flow::set_countdown(false, [this]() { this->refresh(); });
         return true;
     });
-    resume->registerClickAction([this](brls::View*) {
+    resume->registerClickAction([this](aurore::View*) {
         pt_flow::set_countdown(true, [this]() { this->refresh(); });
         return true;
     });
-    diag->registerClickAction([](brls::View*) {
+    diag->registerClickAction([](aurore::View*) {
         std::string err;
         const std::string path = diagnostic::save(diagnostic::current_report(), &err);
         if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
-        else ui::notify(brls::getStr("playguard/toast/diag_saved", path));
+        else ui::notify(aurore::getStr("playguard/toast/diag_saved", path));
         return true;
     });
     this->refresh();
@@ -51,7 +51,7 @@ void PlayTimerAdvancedActivity::refresh()
     const bool shown    = config::get().advanced;
     const bool writable = this->pt.fw_supported && !app::read_only();
     show->setOn(shown, false);
-    for (brls::View* v : { (brls::View*)alarm.getView(), (brls::View*)pause.getView(), (brls::View*)resume.getView() })
+    for (aurore::View* v : { (aurore::View*)alarm.getView(), (aurore::View*)pause.getView(), (aurore::View*)resume.getView() })
         ui::set_visible(v, shown);
     ui::set_visible(diag.getView(), app::dev_mode());
     if (this->pt.alarm_disabled_valid) alarm->setOn(!this->pt.alarm_disabled, false);

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <utility>
 
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 namespace forwarder_library
 {

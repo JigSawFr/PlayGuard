@@ -7,12 +7,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstdint>
 
 #include "util/pctl_ops_c.hpp"
 
-class PlayHoursView : public brls::View
+class PlayHoursView : public aurore::View
 {
   public:
     PlayHoursView();
@@ -20,9 +20,9 @@ class PlayHoursView : public brls::View
     void show(const PlayStats& stats);   // hours not read: every square empty
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
-              brls::Style style, brls::FrameContext* ctx) override;
+              aurore::Style style, aurore::FrameContext* ctx) override;
 
-    static brls::View* create();
+    static aurore::View* create();
 
   private:
     uint32_t hour_s[7][24] = {};   // by weekday, 0 = Sunday

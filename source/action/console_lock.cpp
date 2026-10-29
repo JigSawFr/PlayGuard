@@ -2,7 +2,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/console_lock.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/console_lock_logic.hpp"
 #include "action/history_flow.hpp"
@@ -10,7 +10,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace console_lock
 {

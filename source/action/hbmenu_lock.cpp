@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/hbmenu_lock.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cerrno>
 #include <cstdio>
 #include <fcntl.h>
@@ -9,9 +9,9 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/view/qr_view.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/view/qr_view.hpp>
 
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_logic.hpp"
@@ -32,7 +32,7 @@
 
 #include "action/hbmenu_lock_shared.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace hbmenu_lock
 {
@@ -86,7 +86,7 @@ std::string missing(const forwarders_logic::LockCheck& c)
     if (!c.patches) add("playguard/hbmenu/need_patches"_i18n);
     if (!c.self) add("playguard/hbmenu/need_self"_i18n);
     if (c.menus.empty()) add("playguard/hbmenu/need_menu"_i18n);
-    else if (c.verified.empty()) add(brls::getStr("playguard/hbmenu/need_verified", joined(c.menus)));
+    else if (c.verified.empty()) add(aurore::getStr("playguard/hbmenu/need_verified", joined(c.menus)));
     return out;
 }
 
@@ -97,7 +97,7 @@ void tell_refusals(const std::vector<forwarders_logic::Refusals>& refusals)
     if (refusals.empty()) return;
     std::string detail;
     for (const auto& r : refusals)
-        detail += (detail.empty() ? "" : "\n") + brls::getStr("playguard/hbmenu/refusals_line", r.name,
+        detail += (detail.empty() ? "" : "\n") + aurore::getStr("playguard/hbmenu/refusals_line", r.name,
                                                               cadran::kit::long_date(r.day), r.count);
     notices::set("gate_refusals", notices::Level::Info, "playguard/hbmenu/refusals"_i18n, detail,
                  s_open ? "playguard/hbmenu/open"_i18n : "", s_open);
@@ -115,7 +115,7 @@ bool apply(const std::string& text, HblLockOp op, std::string& out)
     size_t n = 0;
     if (text.size() > HBL_LOCK_MAX_FILE ||
         !hbl_lock_apply(text.data(), text.size(), op, &buf[0], buf.size(), &n)) {
-        brls::Logger::error("hbmenu lock: {} is too large ({} bytes)", HBL_LOCK_CONFIG_PATH, text.size());
+        aurore::Logger::error("hbmenu lock: {} is too large ({} bytes)", HBL_LOCK_CONFIG_PATH, text.size());
         return false;
     }
     out.assign(buf.data(), n);
@@ -138,7 +138,7 @@ void write_state()
         !hbl_lock_state_format_unknown(text, sizeof(text)))
         return;
     if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(path, text, &error))
-        brls::Logger::warning("hbmenu lock: {} not written: {}", HBL_LOCK_STATE_NAME, error);
+        aurore::Logger::warning("hbmenu lock: {} not written: {}", HBL_LOCK_STATE_NAME, error);
 }
 
 bool write_config(const std::string& text, std::string* error)
@@ -159,10 +159,10 @@ void take_report(const std::function<void()>& open)
     std::remove((path + ".tmp").c_str());
     HblLockReport r;
     if (!hbl_lock_report_parse(text.c_str(), text.size(), &r)) {
-        brls::Logger::warning("hbmenu lock: the sysmodule's report is unreadable");
+        aurore::Logger::warning("hbmenu lock: the sysmodule's report is unreadable");
         return;
     }
-    brls::Logger::info("hbmenu lock: lifted at boot by the sysmodule ({}, {})",
+    aurore::Logger::info("hbmenu lock: lifted at boot by the sysmodule ({}, {})",
                        r.reason == HblLockReason_Atmosphere ? "Atmosphère updated" : "rescue", r.ok ? "ok" : "failed");
     if (!r.ok) {
         notices::set("hbmenu_lifted", notices::Level::Action, "playguard/hbmenu/lift_failed"_i18n,
@@ -173,7 +173,7 @@ void take_report(const std::function<void()>& open)
                                r.reason == HblLockReason_Atmosphere ? "Atmosphère " + std::string(r.from) + " → " + r.to
                                                                     : std::string(RESCUE_REQUEST_NAME));
     const std::string detail = r.reason == HblLockReason_Atmosphere
-        ? brls::getStr("playguard/hbmenu/lifted_atmosphere", r.from, r.to)
+        ? aurore::getStr("playguard/hbmenu/lifted_atmosphere", r.from, r.to)
         : "playguard/hbmenu/lifted_rescue"_i18n;
     notices::set("hbmenu_lifted", notices::Level::Info, "playguard/hbmenu/lifted"_i18n, detail,
                  "playguard/hbmenu/open"_i18n, open);
@@ -206,7 +206,7 @@ void apply_lock(std::function<void(bool)> finish)
     if (!before.empty() && !hbl_lock_locked(before.data(), before.size())) {
         std::string berr;
         if (!paths::ensure_dir(paths::data_dir()) || !paths::atomic_write(in_data(HBL_LOCK_BACKUP_NAME), before, &berr))
-            brls::Logger::warning("hbmenu lock: the backup was not written: {}", berr);
+            aurore::Logger::warning("hbmenu lock: the backup was not written: {}", berr);
     }
     if (!write_config(after, &error)) {
         ui::error("playguard/hbmenu/lock_err"_i18n, error);
@@ -216,10 +216,10 @@ void apply_lock(std::function<void(bool)> finish)
     notices::clear("hbmenu_lifted");
     notices::clear("hbmenu_removed");
     history_flow::record_event("lock_hbmenu");
-    brls::Logger::info("hbmenu lock: locked");
+    aurore::Logger::info("hbmenu lock: locked");
     // Said by the rescue sheet's title: how to undo it without the
     // console, while it is fresh.
-    brls::sync([]() { rescue_sheet(true); });
+    aurore::sync([]() { rescue_sheet(true); });
     finish(true);
 }
 
@@ -229,7 +229,7 @@ void confirm_lock(std::function<void(bool)> finish)
     const forwarders_logic::LockCheck c = check();
     if (!c.ready()) return setup(finish);
     ui::hold_confirm(ui::checklist_body("playguard/hbmenu/confirm_title"_i18n, check_lines(c),
-                                        brls::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH),
+                                        aurore::getStr("playguard/hbmenu/escape", HBL_LOCK_CONFIG_PATH),
                                         "playguard/hbmenu/confirm_sub"_i18n),
                      "playguard/hbmenu/lock"_i18n, [finish]() { apply_lock(finish); }, [finish]() { finish(false); });
 }
@@ -244,7 +244,7 @@ std::vector<SetupStep> setup_steps(const forwarders_logic::LockCheck& c)
         { SetupStep::Self, "playguard/hbmenu/step_self"_i18n, c.self },
         { SetupStep::Menu, "playguard/hbmenu/step_menu"_i18n, !c.menus.empty() },
         { SetupStep::Verify, c.menus.empty() ? "playguard/hbmenu/step_verify"_i18n
-                                             : brls::getStr("playguard/hbmenu/step_verify_named", joined(c.menus)),
+                                             : aurore::getStr("playguard/hbmenu/step_verify_named", joined(c.menus)),
           !c.verified.empty() },
     };
 }
@@ -270,8 +270,8 @@ void run_step(SetupStep::Kind kind, std::function<void(bool)> done)
             if (c.menus.empty())
                 ui::notice("home", ui::Check::Warn, "playguard/hbmenu/step_menu"_i18n, "playguard/hbmenu/need_menu"_i18n);
             else
-                ui::notice("home", ui::Check::Info, brls::getStr("playguard/hbmenu/verify_title", joined(c.menus)),
-                           brls::getStr("playguard/hbmenu/verify_how", joined(c.menus)));
+                ui::notice("home", ui::Check::Info, aurore::getStr("playguard/hbmenu/verify_title", joined(c.menus)),
+                           aurore::getStr("playguard/hbmenu/verify_how", joined(c.menus)));
             return;
         }
     }
@@ -298,22 +298,22 @@ void setup(std::function<void(bool)> done)
     const SetupStep::Kind kind = steps[(size_t)next].kind;
     auto* dialog = ui::box_dialog(ui::checklist_body("playguard/hbmenu/setup_title"_i18n, lines,
                                                        "playguard/hbmenu/setup_note"_i18n,
-                                                       brls::getStr("playguard/hbmenu/setup_progress", next + 1,
+                                                       aurore::getStr("playguard/hbmenu/setup_progress", next + 1,
                                                                     (int)steps.size() + 1)));
     dialog->addButton("hints/cancel"_i18n, [finish]() { finish(false); });
     dialog->addButton("playguard/hbmenu/setup_next"_i18n, [kind, done, finish]() {
-        brls::sync([kind, done, finish]() {
+        aurore::sync([kind, done, finish]() {
             run_step(kind, [kind, done, finish](bool changed) {
                 // A step made (a forwarder): the list again, and the next step.
                 finish(changed);
                 if (changed && (kind == SetupStep::Self || kind == SetupStep::Menu))
-                    brls::sync([done]() { setup(done); });
+                    aurore::sync([done]() { setup(done); });
             });
         });
     });
     ui::on_cancel(dialog, [finish]() { finish(false); });
     cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
-    if (brls::View* go = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(go);
+    if (aurore::View* go = dialog->getView("aurore/dialog/button2")) dialog->setLastFocusedView(go);
     dialog->open();
 }
 
@@ -333,13 +333,13 @@ void lock(std::function<void(bool)> done)
     std::vector<ui::Choice> choices;
     choices.push_back({ "playguard/hbmenu/protect_then_lock"_i18n, [finish]() {
                            forwarder_flow::protect_all([finish](bool) {
-                               brls::sync([finish]() { confirm_lock(finish); });
+                               aurore::sync([finish]() { confirm_lock(finish); });
                            });
                        },
                        "lock" });
     choices.push_back({ "playguard/hbmenu/lock_anyway"_i18n, [finish]() { confirm_lock(finish); }, "alert", "", "",
                         ui::Choice::Tone::WARN });
-    ui::pick_actions(brls::getStr("playguard/hbmenu/unprotected", names), choices);
+    ui::pick_actions(aurore::getStr("playguard/hbmenu/unprotected", names), choices);
 }
 
 void unlock(std::function<void(bool)> done)
@@ -361,7 +361,7 @@ void unlock(std::function<void(bool)> done)
     std::remove(in_data(HBL_LOCK_STATE_NAME).c_str());
     notices::clear("hbmenu_route");
     history_flow::record_event("unlock_hbmenu");
-    brls::Logger::info("hbmenu lock: unlocked");
+    aurore::Logger::info("hbmenu lock: unlocked");
     ui::notify("playguard/hbmenu/unlocked_done"_i18n, ui::Toast::Done);
     finish(true);
 }
@@ -377,7 +377,7 @@ void forwarder_notices()
     if (old.empty()) notices::clear("gate_remake");
     else
         notices::set("gate_remake", notices::Level::Action, "playguard/forwarders/remake_title"_i18n,
-                     brls::getStr("playguard/forwarders/remake_detail", old), "playguard/forwarders/remake"_i18n,
+                     aurore::getStr("playguard/forwarders/remake_detail", old), "playguard/forwarders/remake"_i18n,
                      []() { forwarder_flow::remake([](bool) {}); });
     // Built with an older loader than this build's (or before it was kept):
     // made again from the bell (or Console › Forwarders).
@@ -386,7 +386,7 @@ void forwarder_notices()
     if (stale.empty()) notices::clear("forwarder_loader");
     else
         notices::set("forwarder_loader", notices::Level::Action, "playguard/forwarders/refresh_title"_i18n,
-                     brls::getStr("playguard/forwarders/refresh_detail", stale), "playguard/forwarders/remake"_i18n,
+                     aurore::getStr("playguard/forwarders/refresh_detail", stale), "playguard/forwarders/remake"_i18n,
                      []() { forwarder_flow::refresh([](bool) {}); });
 }
 
@@ -434,7 +434,7 @@ void at_start(std::function<void()> open)
         if (forwarders::find(r.id, &m)) {
             m.gone = true;
             std::string err;
-            if (!forwarders::save(m, &err)) brls::Logger::warning("forwarders: not remembered ({})", err);
+            if (!forwarders::save(m, &err)) aurore::Logger::warning("forwarders: not remembered ({})", err);
         }
         history_flow::record_event("forwarder_gone", "", r.name + " (" + forwarders::hex_id(r.id) + ")");
     }
@@ -443,7 +443,7 @@ void at_start(std::function<void()> open)
     for (const auto& r : rows)
         if (r.paused_until)
             paused += (paused.empty() ? "" : "\n") +
-                      brls::getStr("playguard/forwarders/paused_line", r.name, forwarder_flow::until_label(r.paused_until));
+                      aurore::getStr("playguard/forwarders/paused_line", r.name, forwarder_flow::until_label(r.paused_until));
     if (paused.empty()) notices::clear("gate_paused");
     else
         notices::set("gate_paused", notices::Level::Info, "playguard/forwarders/paused_title"_i18n, paused,
@@ -452,7 +452,7 @@ void at_start(std::function<void()> open)
     if (gone.empty()) notices::clear("forwarder_gone");
     else
         notices::set("forwarder_gone", notices::Level::Info, "playguard/hbmenu/gone"_i18n,
-                     brls::getStr("playguard/hbmenu/gone_detail", joined(gone)), "playguard/hbmenu/open"_i18n, open);
+                     aurore::getStr("playguard/hbmenu/gone_detail", joined(gone)), "playguard/hbmenu/open"_i18n, open);
 
     if (!is_locked) {
         notices::clear("hbmenu_route");

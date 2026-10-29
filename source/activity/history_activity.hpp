@@ -7,14 +7,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/history_logic.hpp"
 #include "util/history.hpp"
 
-class HistoryActivity : public brls::Activity
+class HistoryActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/history.xml");
@@ -36,12 +36,12 @@ class HistoryActivity : public brls::Activity
     cadran::kit::Empty          empty_card;   // Cadran: in hi_empty's place
     // The lines of hi_list, kept here: the list's children are not only them
     // (a screen rising into place puts a mover first among them, ui/motion.cpp).
-    std::vector<brls::Box*>     slots;
+    std::vector<aurore::Box*>     slots;
 
-    BRLS_BIND(brls::Label,      note,   "hi_note");
-    BRLS_BIND(brls::DetailCell, filter_cell, "hi_filter");
-    BRLS_BIND(brls::DetailCell, export_cell, "hi_export");
-    BRLS_BIND(brls::DetailCell, week_cell, "hi_week");
-    BRLS_BIND(brls::Box,        list,   "hi_list");
-    BRLS_BIND(brls::Label,      empty,  "hi_empty");
+    AURORE_BIND(aurore::Label,      note,   "hi_note");
+    AURORE_BIND(aurore::DetailCell, filter_cell, "hi_filter");
+    AURORE_BIND(aurore::DetailCell, export_cell, "hi_export");
+    AURORE_BIND(aurore::DetailCell, week_cell, "hi_week");
+    AURORE_BIND(aurore::Box,        list,   "hi_list");
+    AURORE_BIND(aurore::Label,      empty,  "hi_empty");
 };

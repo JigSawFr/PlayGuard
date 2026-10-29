@@ -8,7 +8,7 @@
      (how many look fine, when they were checked, Check again). The sections
      and the card are built by source/activity/game_check_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -20,24 +20,24 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             id="gc_root"
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
-            <brls:Label id="gc_note" text="@i18n/playguard/games/note" fontSize="16" marginBottom="8" textColor="@theme/cadran/text3"/>
-            <brls:Label id="gc_status" text="@i18n/playguard/games/searching" fontSize="16" marginBottom="6"/>
-            <brls:Box id="gc_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="gc_hint" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
+            <aurore:Label id="gc_note" text="@i18n/playguard/games/note" fontSize="16" marginBottom="8" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="gc_status" text="@i18n/playguard/games/searching" fontSize="16" marginBottom="6"/>
+            <aurore:Box id="gc_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <aurore:Label id="gc_hint" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

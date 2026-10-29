@@ -7,10 +7,10 @@
 #include <map>
 #include <memory>
 
-#include <borealis/cadran/ui/action_sheet.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/ui/action_sheet.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "action/forwarder_flow.hpp"
 #include "action/icon_logic.hpp"
@@ -22,7 +22,7 @@
 #include "util/forwarder_library.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace icon_sheet
 {
@@ -61,16 +61,16 @@ struct Choice
     std::string game;          // the game it was taken in ("" unknown)
     bool        no_game = false;   // taken outside a game (the HOME menu, an applet)
     Pixels      small;         // its thumbnail (the .nro's own: its icon)
-    brls::Image* image = nullptr;
-    brls::Box*   cell = nullptr;
+    aurore::Image* image = nullptr;
+    aurore::Box*   cell = nullptr;
 };
 
 // `image` shows the `px`-square pixels `rgba`, in a texture of its own
 // (updated in place when it has one of that size already).
-void show_pixels(brls::Image* image, const std::vector<uint8_t>& rgba, int px)
+void show_pixels(aurore::Image* image, const std::vector<uint8_t>& rgba, int px)
 {
     if (!image || rgba.size() != (size_t)px * px * 4) return;
-    image->setScalingType(brls::ImageScalingType::FIT);
+    image->setScalingType(aurore::ImageScalingType::FIT);
     image->setImageFromRGBA(rgba.data(), px, px);
 }
 
@@ -78,7 +78,7 @@ void show_pixels(brls::Image* image, const std::vector<uint8_t>& rgba, int px)
 std::vector<uint8_t> asset_bytes(const std::string& path)
 {
     std::string bytes;
-    if (!paths::read_file(std::string(BRLS_ASSET("")) + path, bytes)) return {};
+    if (!paths::read_file(std::string(AURORE_ASSET("")) + path, bytes)) return {};
     return std::vector<uint8_t>(bytes.begin(), bytes.end());
 }
 
@@ -98,12 +98,12 @@ std::string day_word(const forwarders_logic::ShotTime& t, bool caption)
     return caption ? ymd : kit::long_date(ymd);
 }
 
-class Sheet : public brls::Box
+class Sheet : public aurore::Box
 {
   public:
     Sheet(const forwarders_logic::Row& forwarder, std::vector<std::string> shots,
           std::function<void(const std::string&, int)> on_done)
-        : brls::Box(brls::Axis::COLUMN), row(forwarder), done(std::move(on_done))
+        : aurore::Box(aurore::Axis::COLUMN), row(forwarder), done(std::move(on_done))
     {
         // Its .nro's own first, then PlayGuard's library (the one its name
         // suggests first), then the screenshots; the one in use focused.
@@ -136,73 +136,73 @@ class Sheet : public brls::Box
         this->in_use = !forwarder.custom_icon ? 0 : this->focus ? this->focus : this->choices.size();
 
         this->setId("cadran_sheet");
-        this->setThemeColor("backgroundColor", "brls/backdrop");
-        this->setAlignItems(brls::AlignItems::STRETCH);
+        this->setThemeColor("backgroundColor", "aurore/backdrop");
+        this->setAlignItems(aurore::AlignItems::STRETCH);
         this->addView(ui::sheet_outside(0, true));
 
-        auto* panel = new brls::Box(brls::Axis::COLUMN);
+        auto* panel = new aurore::Box(aurore::Axis::COLUMN);
         panel->setWidth(PANEL_W);
         panel->setHeight(PANEL_H);
         panel->setCornerRadius(cadran::PICKER_CORNER);
         panel->setThemeColor("backgroundColor", "cadran/surf");
         panel->setThemeColor("borderColor", "cadran/line");
         panel->setBorderThickness(1);
-        panel->setAlignItems(brls::AlignItems::STRETCH);
+        panel->setAlignItems(aurore::AlignItems::STRETCH);
         panel->addView(this->header());
 
-        auto* body = new brls::Box(brls::Axis::ROW);
+        auto* body = new aurore::Box(aurore::Axis::ROW);
         body->setGrow(1);
-        body->setAlignItems(brls::AlignItems::STRETCH);
+        body->setAlignItems(aurore::AlignItems::STRETCH);
         body->addView(this->grid());
         body->addView(this->preview());
         panel->addView(body);
 
-        auto* line = new brls::Box(brls::Axis::ROW);
-        line->setJustifyContent(brls::JustifyContent::CENTER);
+        auto* line = new aurore::Box(aurore::Axis::ROW);
+        line->setJustifyContent(aurore::JustifyContent::CENTER);
         line->setShrink(0);
         line->addView(ui::sheet_outside(0, true));
         line->addView(panel);
         line->addView(ui::sheet_outside(0, true));
         this->addView(line);
         this->addView(ui::sheet_outside(20, false));   // the gap above the hints
-        this->addView(new brls::BottomBar());
+        this->addView(new aurore::BottomBar());
 
-        this->registerAction("hints/back"_i18n, brls::BUTTON_B, [](brls::View*) {
+        this->registerAction("hints/back"_i18n, aurore::BUTTON_B, [](aurore::View*) {
             ui::close_sheet(nullptr);
             return true;
-        }, false, false, brls::SOUND_BACK);
-        this->registerAction("playguard/forwarders/icon_own"_i18n, brls::BUTTON_Y, [this](brls::View*) {
+        }, false, false, aurore::SOUND_BACK);
+        this->registerAction("playguard/forwarders/icon_own"_i18n, aurore::BUTTON_Y, [this](aurore::View*) {
             this->choose(0);
             return true;
         });
-        this->registerAction("playguard/forwarders/icon_jump"_i18n, brls::BUTTON_X, [this](brls::View*) {
+        this->registerAction("playguard/forwarders/icon_jump"_i18n, aurore::BUTTON_X, [this](aurore::View*) {
             this->jump();
             return true;
         });
-        this->registerAction("playguard/forwarders/icon_move"_i18n, brls::BUTTON_RB, [this](brls::View*) {
+        this->registerAction("playguard/forwarders/icon_move"_i18n, aurore::BUTTON_RB, [this](aurore::View*) {
             this->move(1);
             return true;
         }, false, true);
-        this->registerAction("playguard/forwarders/icon_move"_i18n, brls::BUTTON_LB, [this](brls::View*) {
+        this->registerAction("playguard/forwarders/icon_move"_i18n, aurore::BUTTON_LB, [this](aurore::View*) {
             this->move(-1);
             return true;
         }, true, true);
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
         // The desktop build: the keyboard has no X, Y, L or R; its x, y, q
         // and e.
-        this->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_X), [this](brls::View*) {
+        this->registerAction(aurore::AuroreKeyCombination(aurore::AURORE_KBD_KEY_X), [this](aurore::View*) {
             this->jump();
             return true;
         });
-        this->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [this](brls::View*) {
+        this->registerAction(aurore::AuroreKeyCombination(aurore::AURORE_KBD_KEY_Y), [this](aurore::View*) {
             this->choose(0);
             return true;
         });
-        this->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Q), [this](brls::View*) {
+        this->registerAction(aurore::AuroreKeyCombination(aurore::AURORE_KBD_KEY_Q), [this](aurore::View*) {
             this->move(-1);
             return true;
         });
-        this->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_E), [this](brls::View*) {
+        this->registerAction(aurore::AuroreKeyCombination(aurore::AURORE_KBD_KEY_E), [this](aurore::View*) {
             this->move(1);
             return true;
         });
@@ -213,10 +213,10 @@ class Sheet : public brls::Box
 
     bool isTranslucent() override { return true; }
 
-    brls::View* getDefaultFocus() override
+    aurore::View* getDefaultFocus() override
     {
         if (this->focus < this->choices.size() && this->choices[this->focus].cell) return this->choices[this->focus].cell;
-        return brls::Box::getDefaultFocus();
+        return aurore::Box::getDefaultFocus();
     }
 
   private:
@@ -234,56 +234,56 @@ class Sheet : public brls::Box
     Pixels      full;
     bool        reading_full = false;
 
-    brls::Image* now = nullptr;
-    brls::Image* after = nullptr;
-    brls::Label* title = nullptr;
-    brls::Label* when = nullptr;
-    brls::Box*   frame_row = nullptr;
-    std::vector<brls::Box*> frame_dots;
+    aurore::Image* now = nullptr;
+    aurore::Image* after = nullptr;
+    aurore::Label* title = nullptr;
+    aurore::Label* when = nullptr;
+    aurore::Box*   frame_row = nullptr;
+    std::vector<aurore::Box*> frame_dots;
 
-    brls::Box* header()
+    aurore::Box* header()
     {
-        auto* head = new brls::Box(brls::Axis::COLUMN);
+        auto* head = new aurore::Box(aurore::Axis::COLUMN);
         head->setPadding(20, 36, 18, 36);
         head->setThemeColor("lineColor", "cadran/line");
         head->setLineBottom(1);
         head->setShrink(0);
-        brls::Label* name = kit::label("playguard/forwarders/icon_title"_i18n, 22, "cadran/text");
+        aurore::Label* name = kit::label("playguard/forwarders/icon_title"_i18n, 22, "cadran/text");
         name->setSingleLine(true);
         head->addView(name);
-        brls::Label* sub = kit::label(this->row.name, kit::TEXT_META, "cadran/text2");
+        aurore::Label* sub = kit::label(this->row.name, kit::TEXT_META, "cadran/text2");
         sub->setSingleLine(true);
         sub->setMarginTop(5);
         head->addView(sub);
         return head;
     }
 
-    brls::View* grid()
+    aurore::View* grid()
     {
-        auto* frame = new brls::ScrollingFrame();
+        auto* frame = new aurore::ScrollingFrame();
         frame->setWidth(GRID_PAD * 2 + COLUMNS * (TILE + 2 * CELL_PAD) + (COLUMNS - 1) * CELL_GAP);
         frame->setShrink(0);
-        frame->setScrollingBehavior(brls::ScrollingBehavior::CENTERED);
-        auto* column = new brls::Box(brls::Axis::COLUMN);
+        frame->setScrollingBehavior(aurore::ScrollingBehavior::CENTERED);
+        auto* column = new aurore::Box(aurore::Axis::COLUMN);
         column->setPadding(GRID_PAD, GRID_PAD, GRID_PAD, GRID_PAD);
         // Two parts, each its title then its lines of cells: its .nro's own
         // and the library, then the album (or what to do when it is empty).
         std::vector<std::vector<size_t>> lines;
         auto part = [this, column, &lines](const std::string& heading, size_t from, size_t to) {
-            auto* kicker = new brls::Label();
+            auto* kicker = new aurore::Label();
             kit::set_kicker(kicker, heading);
             kicker->setSingleLine(true);
             kicker->setMargins(lines.empty() ? 0 : 22, 0, 10, CELL_PAD);
             column->addView(kicker);
-            brls::Box* line = nullptr;
+            aurore::Box* line = nullptr;
             for (size_t i = from; i < to; i++) {
                 if ((i - from) % COLUMNS == 0) {
-                    line = new brls::Box(brls::Axis::ROW);
+                    line = new aurore::Box(aurore::Axis::ROW);
                     if (i > from) line->setMarginTop(CELL_GAP);
                     column->addView(line);
                     lines.emplace_back();
                 }
-                brls::Box* cell = this->cell(i);
+                aurore::Box* cell = this->cell(i);
                 if ((i - from) % COLUMNS) cell->setMarginLeft(CELL_GAP);
                 line->addView(cell);
                 lines.back().push_back(i);
@@ -292,7 +292,7 @@ class Sheet : public brls::Box
         part("playguard/forwarders/icon_library"_i18n, 0, this->album_from);
         part("playguard/forwarders/icon_album"_i18n, this->album_from, this->choices.size());
         if (this->album_from == this->choices.size()) {
-            brls::Label* none = kit::label("playguard/forwarders/icon_none"_i18n, kit::TEXT_META, "cadran/text3");
+            aurore::Label* none = kit::label("playguard/forwarders/icon_none"_i18n, kit::TEXT_META, "cadran/text3");
             none->setMarginLeft(CELL_PAD);
             none->setMaxWidth(COLUMNS * (TILE + 2 * CELL_PAD));
             column->addView(none);
@@ -301,12 +301,12 @@ class Sheet : public brls::Box
         // last cell.
         for (size_t l = 0; l < lines.size(); l++) {
             for (size_t c = 0; c < lines[l].size(); c++) {
-                brls::Box* cell = this->choices[lines[l][c]].cell;
+                aurore::Box* cell = this->choices[lines[l][c]].cell;
                 if (l > 0)
-                    cell->setCustomNavigationRoute(brls::FocusDirection::UP,
+                    cell->setCustomNavigationRoute(aurore::FocusDirection::UP,
                                                    this->choices[lines[l - 1][std::min(c, lines[l - 1].size() - 1)]].cell);
                 if (l + 1 < lines.size())
-                    cell->setCustomNavigationRoute(brls::FocusDirection::DOWN,
+                    cell->setCustomNavigationRoute(aurore::FocusDirection::DOWN,
                                                    this->choices[lines[l + 1][std::min(c, lines[l + 1].size() - 1)]].cell);
             }
         }
@@ -318,22 +318,22 @@ class Sheet : public brls::Box
     void jump()
     {
         const size_t to = this->focus < this->album_from && this->album_from < this->choices.size() ? this->album_from : 0;
-        if (to != this->focus && this->choices[to].cell) brls::Application::giveFocus(this->choices[to].cell);
+        if (to != this->focus && this->choices[to].cell) aurore::Application::giveFocus(this->choices[to].cell);
     }
 
-    brls::Box* cell(size_t index)
+    aurore::Box* cell(size_t index)
     {
         Choice& c = this->choices[index];
-        auto* cell = new brls::Box(brls::Axis::COLUMN);
-        cell->setAlignItems(brls::AlignItems::CENTER);
+        auto* cell = new aurore::Box(aurore::Axis::COLUMN);
+        cell->setAlignItems(aurore::AlignItems::CENTER);
         cell->setPadding(CELL_PAD, CELL_PAD, CELL_PAD, CELL_PAD);
         cell->setCornerRadius(16);
         cell->setHighlightCornerRadius(18);
         cell->setFocusable(true);
-        auto* slot = new brls::Box();
+        auto* slot = new aurore::Box();
         slot->setWidth(TILE);
         slot->setHeight(TILE);
-        auto* image = new brls::Image();
+        auto* image = new aurore::Image();
         image->setWidth(TILE);
         image->setHeight(TILE);
         image->setCornerRadius(kit::RADIUS_ICON + 4);
@@ -341,31 +341,31 @@ class Sheet : public brls::Box
         slot->addView(image);
         // The one the HOME menu shows: its check on its corner.
         if (index == this->in_use) {
-            auto* badge = new brls::Box();
-            badge->setPositionType(brls::PositionType::ABSOLUTE);
+            auto* badge = new aurore::Box();
+            badge->setPositionType(aurore::PositionType::ABSOLUTE);
             badge->setPositionTop(TILE - 30);
             badge->setPositionLeft(TILE - 30);
             badge->setWidth(26);
             badge->setHeight(26);
             badge->setCornerRadius(13);
             badge->setThemeColor("backgroundColor", "cadran/teal");
-            badge->setJustifyContent(brls::JustifyContent::CENTER);
-            badge->setAlignItems(brls::AlignItems::CENTER);
+            badge->setJustifyContent(aurore::JustifyContent::CENTER);
+            badge->setAlignItems(aurore::AlignItems::CENTER);
             badge->addView(kit::icon("check", 16, "cadran/surf"));
             slot->addView(badge);
         }
         cell->addView(slot);
-        brls::Label* caption = kit::label(this->caption(c), 14, index == this->in_use ? "cadran/teal" : "cadran/text2");
+        aurore::Label* caption = kit::label(this->caption(c), 14, index == this->in_use ? "cadran/teal" : "cadran/text2");
         caption->setSingleLine(true);
         caption->setMaxWidth(TILE);
         caption->setMarginTop(6);
         cell->addView(caption);
-        cell->getFocusEvent()->subscribe([this, index](brls::View*) { this->select(index); });
-        cell->registerClickAction([this, index](brls::View*) {
+        cell->getFocusEvent()->subscribe([this, index](aurore::View*) { this->select(index); });
+        cell->registerClickAction([this, index](aurore::View*) {
             this->choose(index);
             return true;
         });
-        cell->addGestureRecognizer(new brls::TapGestureRecognizer(cell));
+        cell->addGestureRecognizer(new aurore::TapGestureRecognizer(cell));
         c.image = image;
         c.cell = cell;
         return cell;
@@ -374,39 +374,39 @@ class Sheet : public brls::Box
     std::string caption(const Choice& c) const
     {
         if (c.shot.empty()) return "playguard/forwarders/icon_own"_i18n;
-        if (!c.lib.empty()) return brls::getStr("playguard/forwarders/icon_lib/" + c.lib);
+        if (!c.lib.empty()) return aurore::getStr("playguard/forwarders/icon_lib/" + c.lib);
         forwarders_logic::ShotTime t;
         if (!forwarders_logic::shot_time(c.shot, t)) return forwarders_logic::file_title(c.shot);
         return day_word(t, true);
     }
 
     // Beside the grid: now, then after; the game and when; the frame's place.
-    brls::Box* preview()
+    aurore::Box* preview()
     {
-        auto* side = new brls::Box(brls::Axis::COLUMN);
+        auto* side = new aurore::Box(aurore::Axis::COLUMN);
         side->setGrow(1);
         side->setWidth(0);
         side->setPadding(26, 32, 24, 28);
         side->setThemeColor("lineColor", "cadran/line");
         side->setLineLeft(1);
-        auto* kicker = new brls::Label();
+        auto* kicker = new aurore::Label();
         kit::set_kicker(kicker, "playguard/forwarders/icon_preview"_i18n);
         kicker->setSingleLine(true);
         side->addView(kicker);
 
-        auto* pair = new brls::Box(brls::Axis::ROW);
-        pair->setAlignItems(brls::AlignItems::FLEX_END);
+        auto* pair = new aurore::Box(aurore::Axis::ROW);
+        pair->setAlignItems(aurore::AlignItems::FLEX_END);
         pair->setMarginTop(18);
-        auto figure = [](float px, const std::string& label, brls::Image** out) {
-            auto* box = new brls::Box(brls::Axis::COLUMN);
-            box->setAlignItems(brls::AlignItems::CENTER);
-            auto* image = new brls::Image();
+        auto figure = [](float px, const std::string& label, aurore::Image** out) {
+            auto* box = new aurore::Box(aurore::Axis::COLUMN);
+            box->setAlignItems(aurore::AlignItems::CENTER);
+            auto* image = new aurore::Image();
             image->setWidth(px);
             image->setHeight(px);
             image->setCornerRadius(px * 0.14f);
             image->setThemeColor("backgroundColor", "cadran/well");
             box->addView(image);
-            brls::Label* l = kit::label(label, 14, "cadran/text3");
+            aurore::Label* l = kit::label(label, 14, "cadran/text3");
             l->setSingleLine(true);
             l->setMarginTop(8);
             box->addView(l);
@@ -430,15 +430,15 @@ class Sheet : public brls::Box
         side->addView(this->when);
 
         // Where the square sits along the screenshot: five places, L and R.
-        this->frame_row = new brls::Box(brls::Axis::ROW);
-        this->frame_row->setAlignItems(brls::AlignItems::CENTER);
+        this->frame_row = new aurore::Box(aurore::Axis::ROW);
+        this->frame_row->setAlignItems(aurore::AlignItems::CENTER);
         this->frame_row->setMarginTop(18);
-        brls::Box* l = kit::key("L", 24);
+        aurore::Box* l = kit::key("L", 24);
         l->setMarginRight(10);
-        l->addGestureRecognizer(new brls::TapGestureRecognizer(l, [this]() { this->move(-1); }));
+        l->addGestureRecognizer(new aurore::TapGestureRecognizer(l, [this]() { this->move(-1); }));
         this->frame_row->addView(l);
         for (int i = 0; i < 5; i++) {
-            auto* dot = new brls::Box();
+            auto* dot = new aurore::Box();
             dot->setWidth(10);
             dot->setHeight(10);
             dot->setCornerRadius(5);
@@ -446,10 +446,10 @@ class Sheet : public brls::Box
             this->frame_dots.push_back(dot);
             this->frame_row->addView(dot);
         }
-        brls::Box* r = kit::key("R", 24);
-        r->addGestureRecognizer(new brls::TapGestureRecognizer(r, [this]() { this->move(1); }));
+        aurore::Box* r = kit::key("R", 24);
+        r->addGestureRecognizer(new aurore::TapGestureRecognizer(r, [this]() { this->move(1); }));
         this->frame_row->addView(r);
-        brls::Label* hint = kit::label("playguard/forwarders/icon_move"_i18n, kit::TEXT_META, "cadran/text3");
+        aurore::Label* hint = kit::label("playguard/forwarders/icon_move"_i18n, kit::TEXT_META, "cadran/text3");
         hint->setSingleLine(true);
         hint->setMarginLeft(12);
         this->frame_row->addView(hint);
@@ -466,7 +466,7 @@ class Sheet : public brls::Box
             this->title->setText("playguard/forwarders/icon_own"_i18n);
             this->when->setText("playguard/forwarders/icon_own_note"_i18n);
         } else if (!c.lib.empty()) {
-            this->title->setText(brls::getStr("playguard/forwarders/icon_lib/" + c.lib));
+            this->title->setText(aurore::getStr("playguard/forwarders/icon_lib/" + c.lib));
             this->when->setText(c.lib == this->suggested ? "playguard/forwarders/icon_suggested"_i18n
                                                          : "playguard/forwarders/icon_lib_note"_i18n);
         } else {
@@ -477,12 +477,12 @@ class Sheet : public brls::Box
             if (forwarders_logic::shot_time(c.shot, t)) {
                 const std::string at = c.seconds ? fmt::format("{:02}:{:02}:{:02}", t.hour, t.minute, t.second)
                                                  : fmt::format("{:02}:{:02}", t.hour, t.minute);
-                this->when->setText(brls::getStr("playguard/forwarders/icon_when", day_word(t, false), at));
+                this->when->setText(aurore::getStr("playguard/forwarders/icon_when", day_word(t, false), at));
             } else {
                 this->when->setText(forwarders_logic::file_title(c.shot));
             }
         }
-        this->frame_row->setVisibility(c.shot.empty() || !c.lib.empty() ? brls::Visibility::INVISIBLE : brls::Visibility::VISIBLE);
+        this->frame_row->setVisibility(c.shot.empty() || !c.lib.empty() ? aurore::Visibility::INVISIBLE : aurore::Visibility::VISIBLE);
         for (size_t i = 0; i < this->frame_dots.size(); i++)
             this->frame_dots[i]->setThemeColor("backgroundColor", (int)i == (c.x + 12) / 25 ? "cadran/teal" : "cadran/line");
         this->draw_after();
@@ -558,7 +558,7 @@ class Sheet : public brls::Box
         const size_t album = this->album_from;
         std::vector<std::string> library;
         for (size_t i = 1; i < album; i++) library.push_back(this->choices[i].lib);
-        brls::async([this, weak, shots, r, album, library]() {
+        aurore::async([this, weak, shots, r, album, library]() {
             Pixels own;
             own.rgba = forwarder_icon::rgba_of(forwarder_flow::own_icon(r), own.w, own.h);
             auto icons = std::make_shared<std::vector<Pixels>>();
@@ -592,7 +592,7 @@ class Sheet : public brls::Box
                 }
                 games->push_back({ names[it->second], false });
             }
-            brls::sync([this, weak, own, icons, mark, games]() {
+            aurore::sync([this, weak, own, icons, mark, games]() {
                 if (weak.expired()) return;
                 this->shield = mark;
                 this->choices[0].small = own;
@@ -610,7 +610,7 @@ class Sheet : public brls::Box
             for (size_t i = album; i < shots.size(); i++) {
                 if (weak.expired()) return;
                 Pixels p = small_of(shots[i]);
-                brls::sync([this, weak, i, p]() {
+                aurore::sync([this, weak, i, p]() {
                     if (weak.expired()) return;
                     this->choices[i].small = p;
                     this->draw_cell(i);
@@ -646,10 +646,10 @@ class Sheet : public brls::Box
         if (this->reading_full) return;
         this->reading_full = true;
         std::weak_ptr<bool> weak = this->alive;
-        brls::async([this, weak, shot]() {
+        aurore::async([this, weak, shot]() {
             Pixels p;
             p.rgba = forwarder_icon::rgba_of(forwarder_flow::shot_bytes(shot), p.w, p.h);
-            brls::sync([this, weak, shot, p]() {
+            aurore::sync([this, weak, shot, p]() {
                 if (weak.expired()) return;
                 this->reading_full = false;
                 if (shot != this->full_shot) {
@@ -668,8 +668,8 @@ class Sheet : public brls::Box
 void open(const forwarders_logic::Row& row, std::vector<std::string> shots,
           std::function<void(const std::string& shot, int x)> done)
 {
-    brls::Application::pushActivity(new brls::Activity(new Sheet(row, std::move(shots), std::move(done))),
-                                    brls::TransitionAnimation::FADE);
+    aurore::Application::pushActivity(new aurore::Activity(new Sheet(row, std::move(shots), std::move(done))),
+                                    aurore::TransitionAnimation::FADE);
 }
 
 }   // namespace icon_sheet

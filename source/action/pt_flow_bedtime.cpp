@@ -3,16 +3,16 @@
 #include "action/pt_flow.hpp"
 
 #include <array>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/history_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace pt_flow
 {
@@ -24,7 +24,7 @@ static std::string hm(int hour, int minute)
 
 static std::string bed_text(const PtBedtime& b)
 {
-    return b.on ? brls::getStr("playguard/play_timer/bedtime_summary", hm(b.hour, b.minute), hm(b.end_hour, b.end_minute))
+    return b.on ? aurore::getStr("playguard/play_timer/bedtime_summary", hm(b.hour, b.minute), hm(b.end_hour, b.end_minute))
                 : "playguard/common/off"_i18n;
 }
 
@@ -36,8 +36,8 @@ std::string bedtime_days_text(const PtState& pt)
     std::string text;
     for (const pt_logic::BedRun& r : runs) {
         if (!text.empty()) text += ", ";
-        text += brls::getStr(fmt::format("playguard/days_short/{}", r.first));
-        if (r.last != r.first) text += "–" + brls::getStr(fmt::format("playguard/days_short/{}", r.last));
+        text += aurore::getStr(fmt::format("playguard/days_short/{}", r.first));
+        if (r.last != r.first) text += "–" + aurore::getStr(fmt::format("playguard/days_short/{}", r.last));
         text += " " + (r.bed.on ? hm(r.bed.hour, r.bed.minute) : "playguard/common/off"_i18n);
     }
     return text;
@@ -124,7 +124,7 @@ static std::vector<DaySet> day_sets()
                                  { pt_logic::WEEKEND, "playguard/play_timer/bedtime_weekend"_i18n } };
     for (int i = 0; i < 7; i++) {
         const int d = (i + 1) % 7;   // Monday first
-        sets.push_back({ (uint8_t)(1u << d), brls::getStr(fmt::format("cadran/days/{}", d)) });
+        sets.push_back({ (uint8_t)(1u << d), aurore::getStr(fmt::format("cadran/days/{}", d)) });
     }
     return sets;
 }
@@ -139,12 +139,12 @@ static void choose_bedtime_days(const PtState& pt, uint8_t days, const std::stri
         pt_logic::bedtime_days(copy, days, t >= 0, (uint8_t)(t >= 0 ? t / 60 : 0), (uint8_t)(t >= 0 ? t % 60 : 0), bed.data());
         int first = 0;
         while (!(days & (1u << first))) first++;
-        const std::string body = t < 0 ? brls::getStr("playguard/play_timer/bedtime_days_confirm_off", name)
-                                       : brls::getStr("playguard/play_timer/bedtime_days_confirm", name, hm(t / 60, t % 60),
+        const std::string body = t < 0 ? aurore::getStr("playguard/play_timer/bedtime_days_confirm_off", name)
+                                       : aurore::getStr("playguard/play_timer/bedtime_days_confirm", name, hm(t / 60, t % 60),
                                                       hm(bed[first].end_hour, bed[first].end_minute));
         apply_bedtime(bed, body, refresh);
     };
-    cadran::prompt_time(brls::getStr("playguard/play_timer/bedtime_days_title", name), alarm_times(),
+    cadran::prompt_time(aurore::getStr("playguard/play_timer/bedtime_days_title", name), alarm_times(),
                         start_time(pt, days), { "playguard/common/off"_i18n, [apply]() { apply(-1); } }, {}, apply);
 }
 
@@ -175,7 +175,7 @@ void choose_bedtime(const PtState& pt, std::function<void()> refresh)
         std::array<PtBedtime, 7> bed;
         pt_logic::bedtime_every_day(copy, t >= 0, (uint8_t)(t >= 0 ? t / 60 : 0), (uint8_t)(t >= 0 ? t % 60 : 0), bed.data());
         const std::string body = t < 0 ? "playguard/play_timer/bedtime_confirm_off"_i18n
-                                       : brls::getStr("playguard/play_timer/bedtime_confirm", hm(t / 60, t % 60),
+                                       : aurore::getStr("playguard/play_timer/bedtime_confirm", hm(t / 60, t % 60),
                                                       hm(bed[0].end_hour, bed[0].end_minute));
         apply_bedtime(bed, body, refresh);
     };
@@ -201,7 +201,7 @@ void choose_bedtime_end(const PtState& pt, std::function<void()> refresh)
     cadran::prompt_time("playguard/play_timer/bedtime_end_title"_i18n, times, initial, {}, {}, [copy, refresh](int t) {
         std::array<PtBedtime, 7> bed;
         pt_logic::bedtime_end_every_day(copy, (uint8_t)(t / 60), (uint8_t)(t % 60), bed.data());
-        apply_bedtime(bed, brls::getStr("playguard/play_timer/bedtime_end_confirm", hm(t / 60, t % 60)), refresh);
+        apply_bedtime(bed, aurore::getStr("playguard/play_timer/bedtime_end_confirm", hm(t / 60, t % 60)), refresh);
     });
 }
 

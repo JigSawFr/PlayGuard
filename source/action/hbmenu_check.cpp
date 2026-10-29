@@ -3,7 +3,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/hbmenu_lock.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cerrno>
 #include <cstdio>
 #include <fcntl.h>
@@ -11,9 +11,9 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/view/qr_view.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/view/qr_view.hpp>
 
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_logic.hpp"
@@ -34,7 +34,7 @@
 
 #include "action/hbmenu_lock_shared.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace hbmenu_lock
 {
@@ -113,16 +113,16 @@ std::vector<ui::CheckLine> check_lines(const forwarders_logic::LockCheck& c, boo
                     c.patches ? "playguard/hbmenu/line_patches"_i18n : "playguard/hbmenu/need_patches"_i18n });
     out.push_back({ c.self ? Check::Ok : Check::Bad, c.self ? "playguard/hbmenu/line_self"_i18n : "playguard/hbmenu/need_self"_i18n });
     if (!c.verified.empty())
-        out.push_back({ Check::Ok, brls::getStr("playguard/hbmenu/line_menu", joined(c.verified)) });
+        out.push_back({ Check::Ok, aurore::getStr("playguard/hbmenu/line_menu", joined(c.verified)) });
     else if (!c.menus.empty())
-        out.push_back({ Check::Bad, brls::getStr("playguard/hbmenu/need_verified", joined(c.menus)) });
+        out.push_back({ Check::Bad, aurore::getStr("playguard/hbmenu/need_verified", joined(c.menus)) });
     else
         out.push_back({ Check::Bad, "playguard/hbmenu/need_menu"_i18n });
     out.push_back({ Check::Header, "playguard/hbmenu/sec_open"_i18n });
     if (open_now) out.push_back({ Check::Warn, "playguard/hbmenu/line_open_now"_i18n });
     if (c.open_doors.empty()) out.push_back({ Check::Ok, "playguard/hbmenu/line_no_doors"_i18n });
-    else out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/open_doors", joined(c.open_doors)) });
-    if (!c.sd_writers.empty()) out.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/sd_writers", joined(c.sd_writers)) });
+    else out.push_back({ Check::Warn, aurore::getStr("playguard/hbmenu/open_doors", joined(c.open_doors)) });
+    if (!c.sd_writers.empty()) out.push_back({ Check::Warn, aurore::getStr("playguard/hbmenu/sd_writers", joined(c.sd_writers)) });
     if (ulaunch_present()) out.push_back({ Check::Warn, "playguard/hbmenu/ulaunch"_i18n });
     const std::string other = other_system();
     if (!other.empty()) out.push_back({ Check::Warn, other });
@@ -204,10 +204,10 @@ std::string module_text(const State& st)
     if (st.module == "none") return "playguard/hbmenu/check_none"_i18n;
     if (st.module == "current") return "playguard/hbmenu/check_current"_i18n;
     const std::string how = update_offered(st) ? "playguard/hbmenu/module_how_update"_i18n
-                                               : brls::getStr("playguard/hbmenu/module_how_zip", app::version());
+                                               : aurore::getStr("playguard/hbmenu/module_how_zip", app::version());
     return st.module_version.empty()
-        ? brls::getStr("playguard/hbmenu/check_outdated_unknown", app::version(), how)
-        : brls::getStr("playguard/hbmenu/check_outdated", st.module_version, app::version(), how);
+        ? aurore::getStr("playguard/hbmenu/check_outdated_unknown", app::version(), how)
+        : aurore::getStr("playguard/hbmenu/check_outdated", st.module_version, app::version(), how);
 }
 
 }   // namespace
@@ -223,37 +223,37 @@ void show_check(std::function<void(bool)> done)
     // What Atmosphère will read, then the checks, then the system's.
     lines.push_back({ Check::Header, "playguard/hbmenu/sec_reads"_i18n });
     lines.push_back({ st.lock_block ? Check::Ok : Check::Info,
-                      brls::getStr("playguard/hbmenu/check_file", HBL_LOCK_CONFIG_PATH,
+                      aurore::getStr("playguard/hbmenu/check_file", HBL_LOCK_CONFIG_PATH,
                                    !st.file ? "playguard/hbmenu/check_none"_i18n
                                    : st.lock_block ? "playguard/hbmenu/state_locked"_i18n
                                                    : "playguard/hbmenu/state_open"_i18n) });
-    lines.push_back({ st.album ? Check::Info : Check::Ok, brls::getStr("playguard/hbmenu/check_album", yes_no(st.album)) });
-    lines.push_back({ st.any_app ? Check::Info : Check::Ok, brls::getStr("playguard/hbmenu/check_r", yes_no(st.any_app)) });
+    lines.push_back({ st.album ? Check::Info : Check::Ok, aurore::getStr("playguard/hbmenu/check_album", yes_no(st.album)) });
+    lines.push_back({ st.any_app ? Check::Info : Check::Ok, aurore::getStr("playguard/hbmenu/check_r", yes_no(st.any_app)) });
     for (const ui::CheckLine& l : check_lines(st.c, !st.lock_block)) lines.push_back(l);
     lines.push_back({ Check::Header, "playguard/hbmenu/sec_system"_i18n });
     const std::string ams = st.ams.empty() ? unknown : st.ams;
     // The version it was locked under, only while it is.
     lines.push_back({ Check::Info, st.lock_block && !st.locked_on.empty()
-                                       ? brls::getStr("playguard/hbmenu/check_ams", ams, st.locked_on)
-                                       : brls::getStr("playguard/hbmenu/check_ams_plain", ams) });
+                                       ? aurore::getStr("playguard/hbmenu/check_ams", ams, st.locked_on)
+                                       : aurore::getStr("playguard/hbmenu/check_ams_plain", ams) });
     lines.push_back({ st.module == "outdated" ? Check::Warn : Check::Info,
-                      brls::getStr("playguard/hbmenu/check_module", module_text(st)) });
+                      aurore::getStr("playguard/hbmenu/check_module", module_text(st)) });
     const auto finish = [done](bool changed) {
         if (done) done(changed);
     };
     auto* dialog = ui::box_dialog(ui::checklist_body("playguard/hbmenu/check"_i18n, lines));
     // The rescue sheet and OK; alone above them, the way to the lock while it
     // is not locked, else an outdated module's update.
-    dialog->addButton("playguard/hbmenu/rescue"_i18n, []() { brls::sync([]() { show_rescue(); }); });
+    dialog->addButton("playguard/hbmenu/rescue"_i18n, []() { aurore::sync([]() { show_rescue(); }); });
     dialog->addButton("hints/ok"_i18n, []() {});
     if (lock_offered(st))
-        dialog->addButton("playguard/hbmenu/lock"_i18n, [finish]() { brls::sync([finish]() { lock(finish); }); });
+        dialog->addButton("playguard/hbmenu/lock"_i18n, [finish]() { aurore::sync([finish]() { lock(finish); }); });
     else if (update_offered(st))
         dialog->addButton("playguard/hbmenu/module_update"_i18n,
-                          [finish]() { brls::sync([finish]() { rescue::update_now(finish); }); });
+                          [finish]() { aurore::sync([finish]() { rescue::update_now(finish); }); });
     dialog->setCancelable(true);
     cadran::style_dialog(dialog, cadran::Emphasis::NONE);
-    if (brls::View* ok = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(ok);
+    if (aurore::View* ok = dialog->getView("aurore/dialog/button2")) dialog->setLastFocusedView(ok);
     dialog->open();
 }
 

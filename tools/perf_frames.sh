@@ -20,7 +20,7 @@
 # Software GL rasterises on the CPU, so these figures weigh fills (pixels)
 # far more than the console's GPU does; compare screens with each other,
 # do not read them as console milliseconds. Needs xvfb-run, xdotool,
-# ImageMagick and dbus (dbus-run-session: borealis asks the session bus for
+# ImageMagick and dbus (dbus-run-session: Aurore asks the session bus for
 # a screensaver inhibitor and aborts without one).
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

@@ -10,7 +10,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 #include <vector>
 
@@ -19,7 +19,7 @@
 
 class GameCell;
 
-class ForwardersActivity : public brls::Activity
+class ForwardersActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/forwarders.xml");
@@ -32,9 +32,9 @@ class ForwardersActivity : public brls::Activity
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
 
     // The list again: the focus on `keep`, else on the forwarder `focus_id`.
-    void rebuild(uint64_t focus_id = 0, brls::View* keep = nullptr);
+    void rebuild(uint64_t focus_id = 0, aurore::View* keep = nullptr);
     // The same, now (rebuild waits for the dialogs over the screen to close).
-    void build(uint64_t focus_id = 0, brls::View* keep = nullptr);
+    void build(uint64_t focus_id = 0, aurore::View* keep = nullptr);
     // A on the card: what it says, each a press away.
     void fixes();
     // Deleted, then ZR a few seconds to put it back.
@@ -42,7 +42,7 @@ class ForwardersActivity : public brls::Activity
     // ZR for a few seconds runs `undo` (as the change history's).
     void offer_undo(std::function<void()> undo);
     void withdraw_undo();
-    brls::ActionIdentifier undo_action = 0;
+    aurore::ActionIdentifier undo_action = 0;
     size_t                 undo_timer = 0;
     void show_patches();
     void show_self();
@@ -74,21 +74,21 @@ class ForwardersActivity : public brls::Activity
     // After a change: the list again, the focus on `id` when it is there.
     std::function<void(bool)> then_rebuild(uint64_t id = 0);
 
-    BRLS_BIND(brls::Label,      note,      "fw_note");
-    BRLS_BIND(brls::Label,      warning,   "fw_patches");
-    BRLS_BIND(brls::Box,        summary,   "fw_summary");
-    BRLS_BIND(brls::Box,        list,      "fw_list");
-    BRLS_BIND(brls::Label,      empty,     "fw_empty");
-    BRLS_BIND(brls::DetailCell, self_cell, "fw_self");
-    BRLS_BIND(brls::DetailCell, other,     "fw_other");
-    BRLS_BIND(brls::Label,      game_note, "fw_game_note");
-    BRLS_BIND(brls::Header,     lock_header, "fw_lock_header");
-    BRLS_BIND(brls::DetailCell, lock_cell, "fw_lock");
-    BRLS_BIND(brls::Label,      lock_note, "fw_lock_note");
-    BRLS_BIND(brls::DetailCell, reinstall, "fw_reinstall");
-    BRLS_BIND(brls::DetailCell, protect_all, "fw_protect_all");
-    BRLS_BIND(brls::DetailCell, lock_check, "fw_lock_check");
-    BRLS_BIND(brls::DetailCell, pause_cell, "fw_pause");
-    BRLS_BIND(brls::DetailCell, wait_cell, "fw_wait");
-    BRLS_BIND(brls::DetailCell, week_cell, "fw_week");
+    AURORE_BIND(aurore::Label,      note,      "fw_note");
+    AURORE_BIND(aurore::Label,      warning,   "fw_patches");
+    AURORE_BIND(aurore::Box,        summary,   "fw_summary");
+    AURORE_BIND(aurore::Box,        list,      "fw_list");
+    AURORE_BIND(aurore::Label,      empty,     "fw_empty");
+    AURORE_BIND(aurore::DetailCell, self_cell, "fw_self");
+    AURORE_BIND(aurore::DetailCell, other,     "fw_other");
+    AURORE_BIND(aurore::Label,      game_note, "fw_game_note");
+    AURORE_BIND(aurore::Header,     lock_header, "fw_lock_header");
+    AURORE_BIND(aurore::DetailCell, lock_cell, "fw_lock");
+    AURORE_BIND(aurore::Label,      lock_note, "fw_lock_note");
+    AURORE_BIND(aurore::DetailCell, reinstall, "fw_reinstall");
+    AURORE_BIND(aurore::DetailCell, protect_all, "fw_protect_all");
+    AURORE_BIND(aurore::DetailCell, lock_check, "fw_lock_check");
+    AURORE_BIND(aurore::DetailCell, pause_cell, "fw_pause");
+    AURORE_BIND(aurore::DetailCell, wait_cell, "fw_wait");
+    AURORE_BIND(aurore::DetailCell, week_cell, "fw_week");
 };

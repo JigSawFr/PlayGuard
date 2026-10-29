@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/rating_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 #include <vector>
 
@@ -11,7 +11,7 @@
 #include "action/rating_logic.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace rating_flow
 {
@@ -60,7 +60,7 @@ void show_blocked(const PctlStatus& st, int age)
     const rating_logic::Blocked b = rating_logic::blocked_games(cache->games, st.rating_org, (uint8_t)age);
     const std::string org = pctl_rating_org_name(st.rating_org);
     if (b.games.empty()) {
-        ui::info(age ? brls::getStr("playguard/restrictions/blocked_none", org, age)
+        ui::info(age ? aurore::getStr("playguard/restrictions/blocked_none", org, age)
                      : "playguard/restrictions/blocked_no_age"_i18n);
         return;
     }
@@ -69,7 +69,7 @@ void show_blocked(const PctlStatus& st, int age)
         names.push_back(game_check_text::game_name(*g, play_data::unnamed));
         ratings.push_back(game_rating(st, *g));
     }
-    ui::pick(brls::getStr("playguard/restrictions/blocked_title", org, age), names, 0, [](int) {}, false, ratings);
+    ui::pick(aurore::getStr("playguard/restrictions/blocked_title", org, age), names, 0, [](int) {}, false, ratings);
 }
 
 }   // namespace rating_flow

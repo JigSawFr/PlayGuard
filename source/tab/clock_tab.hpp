@@ -12,8 +12,8 @@
 #include <memory>
 #include <string>
 
-#include <borealis/cadran/ui/cadran_list.hpp>
-#include <borealis/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
 
 #include "action/clock_flow.hpp"
 #include "tab/tab_base.hpp"
@@ -31,12 +31,12 @@ class ClockTab : public TabBase
 
   private:
     cadran::List list;
-    brls::Box*    network_card = nullptr;
+    aurore::Box*    network_card = nullptr;
     CadranDigits* user_time = nullptr;
     CadranDigits* network_time = nullptr;
-    brls::Label*  user_date = nullptr;
-    brls::Label*  network_state = nullptr;
-    brls::Rectangle* network_dot = nullptr;
+    aurore::Label*  user_date = nullptr;
+    aurore::Label*  network_state = nullptr;
+    aurore::Rectangle* network_dot = nullptr;
     bool busy = false;
     bool autosync_off = false;   // "Synchronise Clock via Internet" read as off
     bool offline = false;        // the last measurement: no server answered
@@ -70,18 +70,18 @@ class ClockTab : public TabBase
     // (`known` false: not read).
     void show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate);
 
-    BRLS_BIND(brls::DetailCell, autosync, "ck_auto");
-    BRLS_BIND(brls::DetailCell, zone,     "ck_zone");
-    BRLS_BIND(brls::Label,      why,      "ck_why");
-    BRLS_BIND(brls::DetailCell, region,   "ck_region");
-    BRLS_BIND(brls::DetailCell, server_cell, "ck_server");
-    BRLS_BIND(brls::DetailCell, custom,   "ck_custom");
-    BRLS_BIND(brls::DetailCell, measure_cell, "ck_measure");
-    BRLS_BIND(brls::Label,      result,   "ck_result");
-    BRLS_BIND(brls::Label,      result_title, "ck_result_title");
-    BRLS_BIND(brls::Box,        result_card,  "ck_result_card");
-    BRLS_BIND(brls::Label,      warning,  "ck_warning");
-    BRLS_BIND(brls::DetailCell, apply_cell, "ck_apply");
-    BRLS_BIND(brls::DetailCell, copy_cell, "ck_copy");
-    BRLS_BIND(brls::BooleanCell, check_at_start, "ck_check_at_start");
+    AURORE_BIND(aurore::DetailCell, autosync, "ck_auto");
+    AURORE_BIND(aurore::DetailCell, zone,     "ck_zone");
+    AURORE_BIND(aurore::Label,      why,      "ck_why");
+    AURORE_BIND(aurore::DetailCell, region,   "ck_region");
+    AURORE_BIND(aurore::DetailCell, server_cell, "ck_server");
+    AURORE_BIND(aurore::DetailCell, custom,   "ck_custom");
+    AURORE_BIND(aurore::DetailCell, measure_cell, "ck_measure");
+    AURORE_BIND(aurore::Label,      result,   "ck_result");
+    AURORE_BIND(aurore::Label,      result_title, "ck_result_title");
+    AURORE_BIND(aurore::Box,        result_card,  "ck_result_card");
+    AURORE_BIND(aurore::Label,      warning,  "ck_warning");
+    AURORE_BIND(aurore::DetailCell, apply_cell, "ck_apply");
+    AURORE_BIND(aurore::DetailCell, copy_cell, "ck_copy");
+    AURORE_BIND(aurore::BooleanCell, check_at_start, "ck_check_at_start");
 };

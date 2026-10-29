@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/pin_lock.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <chrono>
 #include <vector>
 
@@ -11,7 +11,7 @@
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace pin_lock
 {
@@ -73,7 +73,7 @@ void install()
 
 void watch_focus(std::function<void()> lock)
 {
-    brls::Application::getWindowFocusChangedEvent()->subscribe([lock](bool focused) {
+    aurore::Application::getWindowFocusChangedEvent()->subscribe([lock](bool focused) {
         const auto now = std::chrono::steady_clock::now();
         if (!focused) {
             if (!s_away) s_away_since = now;
@@ -84,7 +84,7 @@ void watch_focus(std::function<void()> lock)
         s_away = false;
         const auto since = s_away_since;
         // After this frame: a PIN screen that took the focus has returned by then.
-        brls::sync([lock, since, now]() {
+        aurore::sync([lock, since, now]() {
             if (pin_lock_logic::lock_again(config::get().pin_lock, since, now, s_pin_at, config::get().pin_ask_again))
                 lock();
         });
@@ -110,7 +110,7 @@ bool ask()
 {
     const Result rc = pctl_ask_pin();
     s_last_rc = rc;
-    brls::Logger::info("pctl_ask_pin returned 0x{:08X}", (unsigned)rc);
+    aurore::Logger::info("pctl_ask_pin returned 0x{:08X}", (unsigned)rc);
     if (R_SUCCEEDED(rc)) {
         s_pin_at = std::chrono::steady_clock::now();
         session_pause::pin_entered();
@@ -151,21 +151,21 @@ bool before_show_pin()
 std::string refusal_text()
 {
     if (R_SUCCEEDED(s_last_rc) || NXM_IS_APP_RESULT(s_last_rc)) return ui::rc_text(NXM_RC_NOT_CONFIRMED);
-    return brls::getStr("playguard/error/code_hint", fmt::format("0x{:08X}", (unsigned)s_last_rc),
+    return aurore::getStr("playguard/error/code_hint", fmt::format("0x{:08X}", (unsigned)s_last_rc),
                         "playguard/error/not_confirmed"_i18n);
 }
 
 std::string mode_text()
 {
-    return brls::getStr(std::string("playguard/pin_lock/modes/") + MODES[rank(config::get().pin_lock)]);
+    return aurore::getStr(std::string("playguard/pin_lock/modes/") + MODES[rank(config::get().pin_lock)]);
 }
 
 std::string note_text()
 {
     const int mode = rank(config::get().pin_lock);
-    std::string text = brls::getStr(std::string("playguard/pin_lock/notes/") + MODES[mode]);
+    std::string text = aurore::getStr(std::string("playguard/pin_lock/notes/") + MODES[mode]);
     if (mode > 0)
-        text += " " + (config::get().pin_ask_again ? brls::getStr(std::string("playguard/pin_lock/again_on/") + MODES[mode])
+        text += " " + (config::get().pin_ask_again ? aurore::getStr(std::string("playguard/pin_lock/again_on/") + MODES[mode])
                                                    : "playguard/pin_lock/again_off"_i18n);
     return text;
 }
@@ -173,7 +173,7 @@ std::string note_text()
 void choose(std::function<void()> done)
 {
     std::vector<std::string> labels;
-    for (const char* m : MODES) labels.push_back(brls::getStr(std::string("playguard/pin_lock/modes/") + m));
+    for (const char* m : MODES) labels.push_back(aurore::getStr(std::string("playguard/pin_lock/modes/") + m));
     ui::pick("playguard/pin_lock/title"_i18n, labels, rank(config::get().pin_lock), [done, labels](int index) {
         const std::string from = config::get().pin_lock, to = MODES[index];
         if (to == from) return;
@@ -190,7 +190,7 @@ void choose(std::function<void()> done)
             return;
         }
         config::get().pin_lock = to;
-        ui::save_config(brls::getStr("playguard/pin_lock/set", labels[index]));
+        ui::save_config(aurore::getStr("playguard/pin_lock/set", labels[index]));
         if (done) done();
     });
 }

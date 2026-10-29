@@ -18,11 +18,11 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/rescue.hpp"
 
-class RescueActivity : public brls::Activity
+class RescueActivity : public aurore::Activity
 {
   public:
     RescueActivity(RescueReport report, bool confirmed, bool old_module = false);
@@ -40,10 +40,10 @@ class RescueActivity : public brls::Activity
     void refresh();
     void proceed();
 
-    BRLS_BIND(brls::Label,      outcome,   "rc_outcome");
-    BRLS_BIND(brls::Label,      note,      "rc_note");
-    BRLS_BIND(brls::Header,     actions_header, "rc_actions_header");
-    BRLS_BIND(brls::DetailCell, reset_pin, "rc_reset_pin");
-    BRLS_BIND(brls::DetailCell, del,       "rc_delete");
-    BRLS_BIND(brls::DetailCell, cont,      "rc_continue");
+    AURORE_BIND(aurore::Label,      outcome,   "rc_outcome");
+    AURORE_BIND(aurore::Label,      note,      "rc_note");
+    AURORE_BIND(aurore::Header,     actions_header, "rc_actions_header");
+    AURORE_BIND(aurore::DetailCell, reset_pin, "rc_reset_pin");
+    AURORE_BIND(aurore::DetailCell, del,       "rc_delete");
+    AURORE_BIND(aurore::DetailCell, cont,      "rc_continue");
 };

@@ -5,9 +5,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-class RowIcon : public brls::View
+class RowIcon : public aurore::View
 {
   public:
     enum class Kind { Info, Warning };
@@ -17,11 +17,11 @@ class RowIcon : public brls::View
     void set_shown(bool shown);
     void set_kind(Kind kind);
 
-    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-              brls::FrameContext* ctx) override;
+    void draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+              aurore::FrameContext* ctx) override;
 
     // The row's, added the first time it is asked for: after its value.
-    static RowIcon* on_row(brls::Box* row, Kind kind);
+    static RowIcon* on_row(aurore::Box* row, Kind kind);
 
   private:
     Kind kind;

@@ -3,7 +3,7 @@
 
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/self_test.hpp"
 #include "action/cleanup_flow.hpp"
@@ -31,22 +31,22 @@
 #include "util/pt_log.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
 // The limits of the reports and crash files kept (config logs_keep*).
 std::string logs_keep_text(int n)
 {
-    return n == 0 ? "playguard/tools/logs_keep_all"_i18n : brls::getStr("playguard/tools/logs_keep_n", n);
+    return n == 0 ? "playguard/tools/logs_keep_all"_i18n : aurore::getStr("playguard/tools/logs_keep_n", n);
 }
 std::string logs_days_text(int n)
 {
-    return n == 0 ? "playguard/tools/logs_days_never"_i18n : brls::getStr("playguard/tools/logs_days_n", n);
+    return n == 0 ? "playguard/tools/logs_days_never"_i18n : aurore::getStr("playguard/tools/logs_days_n", n);
 }
 std::string logs_mb_text(int n)
 {
-    return n == 0 ? "playguard/common/no_limit"_i18n : brls::getStr("playguard/dev/size_mb", n);
+    return n == 0 ? "playguard/common/no_limit"_i18n : aurore::getStr("playguard/dev/size_mb", n);
 }
 
 // A picker over `values` for `field`; the limits apply at once.
@@ -75,48 +75,48 @@ HelpTab::HelpTab()
     export_note->setSingleLine(false);
 
     // A tile: no "›" under its title (the tile is the way in).
-    first_steps->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new OnboardingActivity());
+    first_steps->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new OnboardingActivity());
         return true;
     });
-    export_note->setText(brls::getStr("playguard/tools/export_note", paths::logs_dir()));
+    export_note->setText(aurore::getStr("playguard/tools/export_note", paths::logs_dir()));
 
-    export_cell->registerClickAction([](brls::View*) {
+    export_cell->registerClickAction([](aurore::View*) {
         std::string err;
         std::string path = diagnostic::save(diagnostic::current_report(), &err);
         if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
-        else ui::notify(brls::getStr("playguard/toast/diag_saved", path));
+        else ui::notify(aurore::getStr("playguard/toast/diag_saved", path));
         return true;
     });
 
     // Only reads and the network: also offered in read-only mode.
     upload_note->setSingleLine(false);
-    upload->registerClickAction([](brls::View*) {
+    upload->registerClickAction([](aurore::View*) {
         upload_flow::choose();
         return true;
     });
     // The account a report goes with: signing out takes it off the console.
     // Shown once signed in (Send a report online signs in without developer
     // mode), and to a developer, whose builds need it.
-    github->registerClickAction([this](brls::View*) {
+    github->registerClickAction([this](aurore::View*) {
         github_login_flow::open(this->refresher());
         return true;
     });
 
     // Only the SD card: also offered in read-only mode.
     logs_note->setSingleLine(false);
-    logs_note->setText(brls::getStr("playguard/tools/logs_note", paths::logs_dir()));
-    logs_keep->registerClickAction([this](brls::View*) {
+    logs_note->setText(aurore::getStr("playguard/tools/logs_note", paths::logs_dir()));
+    logs_keep->registerClickAction([this](aurore::View*) {
         pick_limit("playguard/tools/logs_keep"_i18n, config::LOGS_KEEP, config::get().logs_keep, logs_keep_text,
                    this->refresher());
         return true;
     });
-    logs_keep_days->registerClickAction([this](brls::View*) {
+    logs_keep_days->registerClickAction([this](aurore::View*) {
         pick_limit("playguard/tools/logs_keep_days"_i18n, config::LOGS_KEEP_DAYS, config::get().logs_keep_days,
                    logs_days_text, this->refresher());
         return true;
     });
-    logs_keep_mb->registerClickAction([this](brls::View*) {
+    logs_keep_mb->registerClickAction([this](aurore::View*) {
         pick_limit("playguard/tools/logs_keep_mb"_i18n, config::LOGS_KEEP_MB, config::get().logs_keep_mb, logs_mb_text,
                    this->refresher());
         return true;
@@ -151,7 +151,7 @@ HelpTab::HelpTab()
         };
         // Untested firmware: same warning as "Continue at my own risk".
         if (fw_gate::needed())
-            ui::confirm_danger(brls::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
+            ui::confirm_danger(aurore::getStr("playguard/fw_gate/risk_body", fw_gate::firmware()),
                                "playguard/fw_gate/risk_confirm"_i18n, allow);
         else
             ui::confirm("playguard/dev/read_only_off_body"_i18n, "playguard/dev/read_only_off_confirm"_i18n, allow);
@@ -160,13 +160,13 @@ HelpTab::HelpTab()
         config::get().pt_log = on;
         ui::save_config();
         pt_log_flow::apply();
-        if (on) ui::notify(brls::getStr("playguard/dev/pt_log_on", pt_log::path()));
+        if (on) ui::notify(aurore::getStr("playguard/dev/pt_log_on", pt_log::path()));
     });
     dev_frame_stats->init("playguard/dev/frame_stats"_i18n, config::get().frame_stats, [this](bool on) {
         config::get().frame_stats = on;
         ui::save_config();
         frame_stats_flow::apply();
-        if (on) ui::notify(brls::getStr("playguard/dev/frame_stats_on", frame_stats::path()));
+        if (on) ui::notify(aurore::getStr("playguard/dev/frame_stats_on", frame_stats::path()));
         this->update_frame_stats();
     });
     dev_frame_stats_last->setSingleLine(false);
@@ -177,43 +177,43 @@ HelpTab::HelpTab()
     });
     this->stats_timer.setPeriod(1000);
     this->stats_timer.setCallback([this]() { this->update_frame_stats(); });
-    dev_clear_cache->registerClickAction([](brls::View*) {
+    dev_clear_cache->registerClickAction([](aurore::View*) {
         cleanup_flow::clear_cache();
         return true;
     });
-    dev_clear_logs->registerClickAction([](brls::View*) {
+    dev_clear_logs->registerClickAction([](aurore::View*) {
         cleanup_flow::clear_logs();
         return true;
     });
-    dev_report->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new DiagnosticActivity());
+    dev_report->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new DiagnosticActivity());
         return true;
     });
     // What PlayGuard checks on this console by itself, for docs/hardware-test.md.
-    dev_self_test->registerClickAction([](brls::View*) {
+    dev_self_test->registerClickAction([](aurore::View*) {
         self_test::open();
         return true;
     });
-    dev_pt_block->registerClickAction([](brls::View*) {
+    dev_pt_block->registerClickAction([](aurore::View*) {
         pt_block_flow::open();
         return true;
     });
-    dev_build->registerClickAction([](brls::View*) {
+    dev_build->registerClickAction([](aurore::View*) {
         dev_build_flow::open();
         return true;
     });
-    dev_gate->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new FirmwareGateActivity());
+    dev_gate->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new FirmwareGateActivity());
         return true;
     });
-    dev_forget->registerClickAction([](brls::View*) {
+    dev_forget->registerClickAction([](aurore::View*) {
         ui::confirm("playguard/dev/forget_body"_i18n, "playguard/dev/forget_confirm"_i18n, []() {
             fw_gate::forget();
             ui::notify("playguard/dev/forgotten"_i18n);
         }, nullptr, true);
         return true;
     });
-    dev_migrations->registerClickAction([](brls::View*) {
+    dev_migrations->registerClickAction([](aurore::View*) {
         migration_flow::replay();
         return true;
     });

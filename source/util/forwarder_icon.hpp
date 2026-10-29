@@ -2,7 +2,7 @@
 // 256 x 256 JPEG, and an .nro may carry another size, a PNG, or none. As
 // sphaira does, an icon that is not one is decoded, scaled to 256 x 256 and
 // written as a JPEG; none at all, a stand-in is drawn. Images read by
-// borealis' stb_image (nanovg), written by extern/stb/stb_image_write. Plain
+// Aurore's stb_image (nanovg), written by extern/stb/stb_image_write. Plain
 // C++ (no UI) for the host tests (tests/forwarders).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once

@@ -7,7 +7,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "tab/tab_base.hpp"
 
@@ -15,27 +15,27 @@ class PreferencesTab : public TabBase
 {
   public:
     PreferencesTab();
-    static brls::View* create();
+    static aurore::View* create();
 
   protected:
     void refresh() override;
 
   private:
     cadran::List list;
-    BRLS_BIND(brls::DetailCell,  language,      "pf_language");
-    BRLS_BIND(brls::DetailCell,  theme,         "pf_theme");
-    BRLS_BIND(brls::DetailCell,  palette,       "pf_palette");
-    BRLS_BIND(brls::DetailCell,  start_tab,     "pf_start_tab");
-    BRLS_BIND(brls::DetailCell,  text_size,     "pf_text_size");
-    BRLS_BIND(brls::DetailCell,  effects,       "pf_effects");
-    BRLS_BIND(brls::DetailCell,  rail,          "pf_rail");
-    BRLS_BIND(brls::BooleanCell, intro,         "pf_intro");
-    BRLS_BIND(brls::BooleanCell, support_reminder, "pf_support_reminder");
-    BRLS_BIND(brls::BooleanCell, notices_system, "pf_notices_system");
-    BRLS_BIND(brls::BooleanCell, notices_summary, "pf_notices_summary");
-    BRLS_BIND(brls::BooleanCell, notices_reminders, "pf_notices_reminders");
-    BRLS_BIND(brls::BooleanCell, notices_ack_remind, "pf_notices_ack_remind");
-    BRLS_BIND(brls::BooleanCell, update_daily,   "pf_update_daily");
-    BRLS_BIND(brls::DetailCell,  update_via,     "pf_update_via");
-    BRLS_BIND(brls::DetailCell,  first_steps,    "pf_first_steps");
+    AURORE_BIND(aurore::DetailCell,  language,      "pf_language");
+    AURORE_BIND(aurore::DetailCell,  theme,         "pf_theme");
+    AURORE_BIND(aurore::DetailCell,  palette,       "pf_palette");
+    AURORE_BIND(aurore::DetailCell,  start_tab,     "pf_start_tab");
+    AURORE_BIND(aurore::DetailCell,  text_size,     "pf_text_size");
+    AURORE_BIND(aurore::DetailCell,  effects,       "pf_effects");
+    AURORE_BIND(aurore::DetailCell,  rail,          "pf_rail");
+    AURORE_BIND(aurore::BooleanCell, intro,         "pf_intro");
+    AURORE_BIND(aurore::BooleanCell, support_reminder, "pf_support_reminder");
+    AURORE_BIND(aurore::BooleanCell, notices_system, "pf_notices_system");
+    AURORE_BIND(aurore::BooleanCell, notices_summary, "pf_notices_summary");
+    AURORE_BIND(aurore::BooleanCell, notices_reminders, "pf_notices_reminders");
+    AURORE_BIND(aurore::BooleanCell, notices_ack_remind, "pf_notices_ack_remind");
+    AURORE_BIND(aurore::BooleanCell, update_daily,   "pf_update_daily");
+    AURORE_BIND(aurore::DetailCell,  update_via,     "pf_update_via");
+    AURORE_BIND(aurore::DetailCell,  first_steps,    "pf_first_steps");
 };

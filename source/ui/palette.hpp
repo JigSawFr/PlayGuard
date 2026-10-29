@@ -11,7 +11,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis/cadran/ui/cadran_palette.hpp>
+#include <aurore/cadran/ui/cadran_palette.hpp>
 
 namespace playguard::palette
 {

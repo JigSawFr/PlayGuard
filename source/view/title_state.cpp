@@ -1,14 +1,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/title_state.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/console_actions.hpp"
 #include "action/fw_gate.hpp"
 #include "ui/app_hooks.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace TitleState
 {
@@ -37,11 +37,11 @@ static void open_read_only()
     }
     // Else the developer switch turned it on: Help & diagnostics, on that switch.
     if (!hooks.make_help_tab) return;
-    brls::View* help = hooks.make_help_tab();
+    aurore::View* help = hooks.make_help_tab();
     ui::open_screen(help, "playguard/prefs/help"_i18n);
-    brls::sync([help]() {
-        brls::View* cell = help->getView("hp_dev_read_only");
-        if (cell && cell->getVisibility() == brls::Visibility::VISIBLE) brls::Application::giveFocus(cell);
+    aurore::sync([help]() {
+        aurore::View* cell = help->getView("hp_dev_read_only");
+        if (cell && cell->getVisibility() == aurore::Visibility::VISIBLE) aurore::Application::giveFocus(cell);
     });
 }
 

@@ -18,14 +18,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <vector>
 
-#include <borealis/cadran/view/loading_bar.hpp>
+#include <aurore/cadran/view/loading_bar.hpp>
 
 #include "util/sys_notes.hpp"
 
-class SysNotesActivity : public brls::Activity
+class SysNotesActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/sys_notes.xml");
@@ -51,29 +51,29 @@ class SysNotesActivity : public brls::Activity
     void next_tab(int step);
     void show_page();
     void set_loading(bool on);
-    brls::View* focus_target();
+    aurore::View* focus_target();
 
     sys_notes::Which    which;
     std::vector<size_t> shown;        // tabs(): indexes into the list kept
     size_t              tab = 0;      // the chosen one, in `shown`
     bool                tab_chosen = false;
     std::string         page;         // the chosen one's page
-    brls::Box*          mark = nullptr;   // installed or new, in the header after the version
+    aurore::Box*          mark = nullptr;   // installed or new, in the header after the version
 
-    BRLS_BIND(brls::Box,    loading_box,  "sn_loading");
-    BRLS_BIND(LoadingBar,   loading_bar,  "sn_loading_bar");
-    BRLS_BIND(brls::Label,  loading_text, "sn_loading_text");
-    BRLS_BIND(brls::Box,    tabs,         "sn_tabs");
-    BRLS_BIND(brls::Label,  tab_l,        "sn_tab_l");
-    BRLS_BIND(brls::Label,  tab_r,        "sn_tab_r");
-    BRLS_BIND(brls::Box,    tab_list,     "sn_tab_list");
-    BRLS_BIND(brls::Label,  advice,       "sn_advice");
-    BRLS_BIND(brls::Box,    tags,         "sn_tags");
-    BRLS_BIND(brls::Header, header,       "sn_header");
-    BRLS_BIND(brls::Label,  language,     "sn_language");
-    BRLS_BIND(brls::Box,    notes,        "sn_notes");
-    BRLS_BIND(brls::Label,  empty,        "sn_empty");
-    BRLS_BIND(brls::Label,  more,         "sn_more");
-    BRLS_BIND(brls::Button, online,       "sn_online");
-    BRLS_BIND(brls::Label,  checked,      "sn_checked");
+    AURORE_BIND(aurore::Box,    loading_box,  "sn_loading");
+    AURORE_BIND(LoadingBar,   loading_bar,  "sn_loading_bar");
+    AURORE_BIND(aurore::Label,  loading_text, "sn_loading_text");
+    AURORE_BIND(aurore::Box,    tabs,         "sn_tabs");
+    AURORE_BIND(aurore::Label,  tab_l,        "sn_tab_l");
+    AURORE_BIND(aurore::Label,  tab_r,        "sn_tab_r");
+    AURORE_BIND(aurore::Box,    tab_list,     "sn_tab_list");
+    AURORE_BIND(aurore::Label,  advice,       "sn_advice");
+    AURORE_BIND(aurore::Box,    tags,         "sn_tags");
+    AURORE_BIND(aurore::Header, header,       "sn_header");
+    AURORE_BIND(aurore::Label,  language,     "sn_language");
+    AURORE_BIND(aurore::Box,    notes,        "sn_notes");
+    AURORE_BIND(aurore::Label,  empty,        "sn_empty");
+    AURORE_BIND(aurore::Label,  more,         "sn_more");
+    AURORE_BIND(aurore::Button, online,       "sn_online");
+    AURORE_BIND(aurore::Label,  checked,      "sn_checked");
 };

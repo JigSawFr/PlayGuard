@@ -1,18 +1,18 @@
 // Host tests for source/action/forwarders_text.cpp, translated by the real
 // catalogs (en-US, then French for the day names) through ui/tr.hpp's
-// stand-in for borealis: a forwarder's state alone, its state with its rules
+// stand-in for Aurore: a forwarder's state alone, its state with its rules
 // (in a word in the list, every one in Details; paused first; to make
 // again; a protected menu seen working), the list's text and icons, a
 // rule's days and hours (two spans). Every key asked for exists.
 #include "check.h"
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 #include <cstdio>
 #include <fstream>
 #include <map>
 #include <set>
 #include <string>
 
-#include <borealis/cadran/ui/tr.hpp>
+#include <aurore/cadran/ui/tr.hpp>
 
 #include "action/forwarders_text.hpp"
 
@@ -45,11 +45,11 @@ static bool load(const std::string& lang)
     return !s_catalog.empty();
 }
 
-namespace brls
+namespace aurore
 {
 namespace internal
 {
-// As borealis: a key the catalog lacks reads as itself.
+// As Aurore: a key the catalog lacks reads as itself.
 std::string getRawStr(std::string name)
 {
     const auto it = s_catalog.find(name);
@@ -66,7 +66,7 @@ std::string operator""_i18n(const char* str, size_t len)
     return internal::getRawStr(std::string(str, len));
 }
 }   // namespace literals
-}   // namespace brls
+}   // namespace aurore
 
 static std::string tr(const char* key)
 {

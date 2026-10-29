@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/play_data.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstdlib>
 #include <fmt/format.h>
 #include <functional>
@@ -97,7 +97,7 @@ void save(const Key& key, const PlayStats& stats)
     std::string error;
     if (!paths::ensure_dir(paths::nand_cache_dir()) ||
         !paths::atomic_write(cache_file(key), play_cache::encode(stats), &error)) {
-        brls::Logger::warning("play_data: cache not saved: {}", error);
+        aurore::Logger::warning("play_data: cache not saved: {}", error);
         return;
     }
     std::lock_guard<std::mutex> lock(s_saved_lock);
@@ -140,17 +140,17 @@ void fetch(const PlayAccount* account)
     // The last read (this run's, or the SD card's): the names it holds are
     // not read from each game again.
     const std::shared_ptr<const PlayStats> known = e.stats;
-    brls::async([key, one, who, known]() {
+    aurore::async([key, one, who, known]() {
         auto data = std::make_shared<PlayStats>();
         playstats_remember(known.get());
         playstats_fetch_for(data.get(), one ? &who : nullptr);
         // Quitting: cut short, so neither kept nor shown.
         if (playstats_cancelled()) return;
-        if (data->approximate) brls::Logger::info("play_data: only the newest part of the log was read (clock set back?)");
+        if (data->approximate) aurore::Logger::info("play_data: only the newest part of the log was read (clock set back?)");
         // Kept for the next run from here, off the UI thread: a slow SD card
         // must not hold a frame (one file per account, one read at a time).
         save(key, *data);
-        brls::sync([key, data]() {
+        aurore::sync([key, data]() {
             title_names::learn(*data);   // the forwarders' names, kept for when they are gone
             Entry& done = s_entries[key];
             done.busy    = false;
@@ -183,7 +183,7 @@ void unlisten(int id)
 std::string system_name(u64 app_id)
 {
     const char* key = system_titles::key(app_id);
-    return key ? brls::getStr("playguard/system_titles/" + std::string(key)) : "";
+    return key ? aurore::getStr("playguard/system_titles/" + std::string(key)) : "";
 }
 
 namespace
@@ -199,7 +199,7 @@ std::string fallback_name(u64 app_id, const std::string& id)
     if (!kept.empty()) return kept;
     const SyncTitleKind kind = title_names::kind(app_id);
     if (kind == SyncTitle_PlayGuard) return "PlayGuard";   // its own forwarder
-    if (kind == SyncTitle_Homebrew) return brls::getStr("playguard/games/homebrew_unnamed", id);
+    if (kind == SyncTitle_Homebrew) return aurore::getStr("playguard/games/homebrew_unnamed", id);
     return "";
 }
 }   // namespace
@@ -207,7 +207,7 @@ std::string fallback_name(u64 app_id, const std::string& id)
 std::string unnamed(const std::string& id)
 {
     const std::string name = fallback_name(std::strtoull(id.c_str(), nullptr, 16), id);
-    return name.empty() ? brls::getStr("playguard/games/unnamed", id) : name;
+    return name.empty() ? aurore::getStr("playguard/games/unnamed", id) : name;
 }
 
 std::string known_name(const GameStat& g)
@@ -222,7 +222,7 @@ std::string game_name(const GameStat& g)
     if (g.name[0]) return g.name;
     const std::string id = fmt::format("{:016X}", (unsigned long long)g.app_id);
     const std::string name = fallback_name(g.app_id, id);
-    return name.empty() ? brls::getStr("playguard/activity/deleted_game", id) : name;
+    return name.empty() ? aurore::getStr("playguard/activity/deleted_game", id) : name;
 }
 
 const std::vector<PlayAccount>& accounts()
@@ -235,7 +235,7 @@ const std::vector<PlayAccount>& accounts()
         Result rc = 0;
         const size_t n = playstats_accounts(buf, PLAYSTATS_MAX_ACCOUNTS, &rc);
         list.assign(buf, buf + n);
-        if (R_FAILED(rc)) brls::Logger::info("play_data: accounts not listed (0x{:08X})", (unsigned)rc);
+        if (R_FAILED(rc)) aurore::Logger::info("play_data: accounts not listed (0x{:08X})", (unsigned)rc);
     }
     return list;
 }

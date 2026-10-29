@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/outside_watch.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 
 #include "action/history_flow.hpp"
@@ -11,7 +11,7 @@
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace outside_watch
 {
@@ -39,7 +39,7 @@ void save()
     ui::write_later("watch", [text]() {
         std::string err;
         if (!paths::ensure_dir(paths::nand_dir()) || !paths::atomic_write(file(), text, &err))
-            brls::Logger::warning("watch: not saved ({})", err);
+            aurore::Logger::warning("watch: not saved ({})", err);
     }, "watch");
 }
 
@@ -107,7 +107,7 @@ void observe(const PtState& pt)
         history_flow::record_values("outside_limits", history_flow::days_values(f.limits_before),
                                     history_flow::days_values(f.limits_after));
     if (f.reset || f.clock || f.limits)
-        brls::Logger::info("watch: changed outside PlayGuard:{}{}{}", f.reset ? " play time reset" : "",
+        aurore::Logger::info("watch: changed outside PlayGuard:{}{}{}", f.reset ? " play time reset" : "",
                            f.clock ? " clock" : "", f.limits ? " limits" : "");
 }
 
@@ -124,7 +124,7 @@ std::vector<std::string> notice_lines()
     std::vector<std::string> out;
     if (!s_rec.notice || s_rec.notice_date != ui::today_date()) return out;
     if (s_rec.notice & outside_change_logic::NOTICE_RESET)
-        out.push_back(brls::getStr("playguard/dashboard/outside_reset", s_rec.reset_at.empty() ? "?" : s_rec.reset_at));
+        out.push_back(aurore::getStr("playguard/dashboard/outside_reset", s_rec.reset_at.empty() ? "?" : s_rec.reset_at));
     if (s_rec.notice & outside_change_logic::NOTICE_CLOCK) out.push_back("playguard/dashboard/outside_clock"_i18n);
     if (s_rec.notice & outside_change_logic::NOTICE_LIMITS) out.push_back("playguard/dashboard/outside_limits"_i18n);
     return out;
@@ -149,7 +149,7 @@ void observe_accounts()
     if (changed) save();
     // Once each in the change history, with the name the HOME menu shows.
     for (const std::string& id : added) history_flow::record_event("new_account", "", nickname_of(id));
-    if (!added.empty()) brls::Logger::info("watch: {} new user account(s)", added.size());
+    if (!added.empty()) aurore::Logger::info("watch: {} new user account(s)", added.size());
 }
 
 std::vector<std::string> new_account_lines()
@@ -157,7 +157,7 @@ std::vector<std::string> new_account_lines()
     observe_accounts();
     std::vector<std::string> out;
     for (const auto& a : outside_change_logic::new_accounts(s_rec, account_ids(), ui::today_date()))
-        out.push_back(brls::getStr("playguard/activity/account_new", a.second, nickname_of(a.first)));
+        out.push_back(aurore::getStr("playguard/activity/account_new", a.second, nickname_of(a.first)));
     return out;
 }
 
