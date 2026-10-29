@@ -40,6 +40,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import urllib.request
 from urllib.parse import urlsplit
 
 import markdown
@@ -48,6 +49,7 @@ REPO_URL = "https://github.com/JigSawFr/PlayGuard"
 # The site's address, for the links that must be absolute (the canonical
 # page, the other languages, the preview image, the sitemap, llms.txt).
 SITE_URL = os.environ.get("SITE_URL", "https://guard.boreale.dev/").rstrip("/") + "/"
+VERSIONS = {}  # the projects' latest releases, for the menu of Boréale's sites (main())
 # A pull request's preview: not for search engines (main's site is the one).
 NOINDEX = os.environ.get("SITE_NOINDEX") == "1"
 # The audience, counted by Umami Cloud (site/README.md): its tracker, served
@@ -358,6 +360,55 @@ def rewrite_links(body, source, lang, to_root, assets):
     return body
 
 
+# Boréale's sites, in the header's menu (switcher()): the same in each of
+# Boréale's sites (boreale/tools/build_site.py's the reference). boreale.dev
+# first, then the homebrew, then the libraries, each group under its title.
+SITES = [(None, [("boreale", "Boréale", "https://boreale.dev/")]),
+         ("sites_homebrew", [("playguard", "PlayGuard", "https://guard.boreale.dev/"),
+                             ("playshelf", "PlayShelf", "https://shelf.boreale.dev/")]),
+         ("sites_libraries", [("aurore", "Aurore", "https://aurore.boreale.dev/")])]
+
+
+def boreale_versions():
+    """The projects' latest releases as boreale.dev publishes them
+    (versions.json), for the menu; none when it cannot be read (offline, a
+    local build), and the menu shows no versions."""
+    try:
+        with urllib.request.urlopen("https://boreale.dev/versions.json", timeout=10) as r:
+            return {k: v for k, v in json.load(r).items() if isinstance(v, str)}
+    except (OSError, ValueError):
+        return {}
+
+
+def switcher(t, lang, to_root, home, here, name, versions):
+    """The header's name (`name`), a button that opens the menu of Boréale's
+    sites, `here` marked and leading to `home`, each in French where the page
+    is (the four sites have it), with its latest release (`versions`). A
+    popover: the browser closes it on Esc or a click elsewhere; site.css's
+    and site.js's "site switcher" blocks."""
+    label = t("sites_label")
+    french = lang.lower().startswith("fr")
+    groups = []
+    for title, sites in SITES:
+        items = []
+        for key, site, url in sites:
+            href = home if key == here else url + ("fr/" if french else "")
+            soon = f'<em class="soon">{t("sites_soon")}</em>' if key == "playshelf" else ""
+            version = f' <span class="sites-version">{html.escape(versions[key])}</span>' if key in versions else ""
+            current = ' aria-current="true"' if key == here else ""
+            items.append(f'<li><a href="{href}"{current}>'
+                         f'<img src="{to_root}assets/marks/{key}.svg" alt="" width="36" height="36">'
+                         f'<span><strong>{site}{version}</strong><small>{t(f"sites_{key}")}</small></span>{soon}</a></li>')
+        heading = f'<p class="sites-title">{t(title)}</p>' if title else ""
+        groups.append(f'        {heading}<ul>\n          ' + "\n          ".join(items) + '\n        </ul>')
+    title = next(site for _, sites in SITES for key, site, _ in sites if key == here)
+    return (f'<div class="switcher">\n'
+            f'      <button class="brand switch" type="button" popovertarget="sites" aria-label="{title} · {label}">'
+            f'{name}<svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>\n'
+            f'      <div id="sites" class="sites" popover aria-label="{label}">\n'
+            + "\n".join(groups) + '\n      </div>\n    </div>')
+
+
 def lang_dir(lang):
     folder = next(d for code, d, _, _ in LANGUAGES if code == lang)
     return f"{folder}/" if folder else ""
@@ -544,7 +595,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <div class="sky{' sky-home' if hero else ''}">
   {'<canvas id="sky" aria-hidden="true"></canvas>' if hero else ''}
   <header class="top">
-    <a class="brand" href="{home}"><img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span></a>
+    {switcher(t, lang, to_root, home, "playguard", f'<img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span>', VERSIONS)}
     <nav class="nav" aria-label="PlayGuard">
       <a href="{home}#features">{t('nav_features')}</a>
       <a href="{home}#install">{t('nav_install')}</a>
@@ -580,6 +631,14 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
           <ul><li><a href="{REPO_URL}">GitHub</a></li><li><a href="{home}changelog/">{t('footer_changelog')}</a></li>
             <li><a href="{SITE_URL}releases.atom">{t('releases_feed')}</a></li>
             <li><a href="{REPO_URL}/issues/new/choose">{t('report_bug')}</a></li></ul>
+        </div>
+        <div>
+          <h2>Boréale</h2>
+          <ul><li><a href="https://boreale.dev/{"fr/" if code.startswith("fr") else ""}">boreale.dev</a></li>
+            <li><a href="https://shelf.boreale.dev/{"fr/" if code.startswith("fr") else ""}">PlayShelf</a></li>
+            <li><a href="https://aurore.boreale.dev/{"fr/" if code.startswith("fr") else ""}">Aurore</a></li>
+            <li><a href="https://boreale.dev/{"fr/" if code.startswith("fr") else ""}legal/">{t('sites_legal')}</a></li>
+            <li><a href="mailto:contact@boreale.dev">contact@boreale.dev</a></li></ul>
         </div>
         <div>
           <h2>{t('support')}</h2>
@@ -1269,6 +1328,8 @@ def main():
     out = sys.argv[1]
     ROOT = sys.argv[2] if len(sys.argv) > 2 else "."
     version = "v" + read_json(".release-please-manifest.json")["."]
+    global VERSIONS
+    VERSIONS = {**boreale_versions(), "playguard": version[1:]}
     # The documentation in two versions: main's, and the latest release's
     # out of its tag, with what main has since (git's history: none in a
     # tarball or a shallow clone, and the site has main's alone).
