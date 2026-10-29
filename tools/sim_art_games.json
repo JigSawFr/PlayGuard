@@ -1,0 +1,19 @@
+{
+ "_comment": "The pictures of the simulator's made-up games (source/sim/sim_games.c), drawn by tools/sim_art.py: `name` as SIM_GAMES has it, `art` the scene (tools/sim_art_scenes.py's SCENES), `hues` its two colours (0 to 1), `logo` the name its icon writes when it is not the name itself. Each game's icon is SIM_ICON_<n>, n its place here. `shots`: the moments of it (1, 2…) the album's screenshots show (source/sim/sim_album.cpp), as SIM_SHOT_<n>_<moment>. A game left out has no icon (sim_games.c: -1).",
+ "games": [
+  {"name": "Star Kart Racers", "art": "kart", "hues": [0.98, 0.13], "shots": [1, 2]},
+  {"name": "Island Builders", "art": "village", "hues": [0.50, 0.10], "shots": [1]},
+  {"name": "Pixel Quest Deluxe", "art": "tactics", "hues": [0.75, 0.15]},
+  {"name": "Dragon Valley Legends", "art": "dungeon", "hues": [0.04, 0.11]},
+  {"name": "Puzzle Garden", "art": "garden", "hues": [0.80, 0.35]},
+  {"name": "Sky Kingdom", "art": "sky", "hues": [0.56, 0.12]},
+  {"name": "Garden Defenders", "art": "farm", "hues": [0.28, 0.08]},
+  {"name": "Hedgehog Rush", "art": "critters", "hues": [0.58, 0.95]},
+  {"name": "Robot Factory", "art": "kitchen", "hues": [0.10, 0.52]},
+  {"name": "Ocean Explorer", "art": "lighthouse", "hues": [0.55, 0.62]},
+  {"name": "Castle Siege", "art": "paper", "hues": [0.02, 0.62]},
+  {"name": "Moon Racer", "art": "space", "hues": [0.70, 0.88]},
+  {"name": "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™", "logo": "Forest Tales: Legends of the Ancient Grove", "art": "caves", "hues": [0.36, 0.15]},
+  {"name": "Star Pilots", "art": "arena", "hues": [0.68, 0.92]}
+ ]
+}

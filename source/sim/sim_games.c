@@ -13,6 +13,7 @@
 
 #include "../core/sim_env.h"
 #include "../core/time_ops.h"
+#include "sim_homebrew_icons.h"
 #include "sim_icons.h"
 #include "sim_state.h"
 
@@ -21,25 +22,25 @@
 
 const SimGame SIM_GAMES[] = {
     //  id                      name                     age icon  total_min launches today week days_ago prev_week nobody
-    { 0x0100A1B2C3D40000ULL, "Star Kart Racers",          3, 0, PLAYED(3650, 300, 45, 310, 0, 190, 50), true, false, GC_OK },
-    { 0x0100A1B2C3D41000ULL, "Island Builders",           7, 1, PLAYED(2980, 160, 20, 140, 0, 160, 0),  true, false, GC_OK },
-    { 0x0100A1B2C3D42000ULL, "Pixel Quest Deluxe",       12, 2, PLAYED(1210,  45,  0,  95, 2,  95, 0),  true, false, GC_OK },
-    { 0x0100A1B2C3D43000ULL, "Dragon Valley Legends",    16, 3, PLAYED(6100, 120,  0,   0, 12,  0, 0),  true, false, GC_OK },
-    { 0x0100A1B2C3D44000ULL, "Puzzle Garden",             3, 4, PLAYED( 380,  52,  0,  30, 5,  35, 0),  true, false, GC_OK },
-    { 0x0100A1B2C3D4A000ULL, "Sky Kingdom",               7, 0, NOT_PLAYED,                             true, true,  GC_OK },
+    { 0x0100A1B2C3D40000ULL, "Star Kart Racers",          3,  0, PLAYED(3650, 300, 45, 310, 0, 190, 50), true, false, GC_OK },
+    { 0x0100A1B2C3D41000ULL, "Island Builders",           7,  1, PLAYED(2980, 160, 20, 140, 0, 160, 0),  true, false, GC_OK },
+    { 0x0100A1B2C3D42000ULL, "Pixel Quest Deluxe",       12,  2, PLAYED(1210,  45,  0,  95, 2,  95, 0),  true, false, GC_OK },
+    { 0x0100A1B2C3D43000ULL, "Dragon Valley Legends",    16,  3, PLAYED(6100, 120,  0,   0, 12,  0, 0),  true, false, GC_OK },
+    { 0x0100A1B2C3D44000ULL, "Puzzle Garden",             3,  4, PLAYED( 380,  52,  0,  30, 5,  35, 0),  true, false, GC_OK },
+    { 0x0100A1B2C3D4A000ULL, "Sky Kingdom",               7,  5, NOT_PLAYED,                             true, true,  GC_OK },
     { 0x0100A1B2C3D45000ULL, "",                         -1, -1, PLAYED(   0,   0, 15,  15, 0,   0, 0), false, false, GC_OK },
     // Then little played and left aside for months.
     { 0x0100A1B2C3D46000ULL, "Space Farm Tales",         -1, -1, PLAYED(  95,   4,  0,   0, 75,  0, 0), true, false, GC_NO_CONTROL },
-    { 0x0100A1B2C3D47000ULL, "Garden Defenders",          7, 2, NOT_PLAYED, true, false, GC_NO_BASE },
-    { 0x0100A1B2C3D48000ULL, "Hedgehog Rush",             7, 3, NOT_PLAYED, true, false, GC_ARCHIVED },
-    { 0x0100A1B2C3D49000ULL, "Robot Factory",            12, 4, NOT_PLAYED, true, false, GC_FIRMWARE_TOO_OLD },
-    { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",            3, 1, NOT_PLAYED, true, false, GC_FILES_MISSING },
-    { 0x0100A1B2C3D4C000ULL, "Castle Siege",             16, 2, NOT_PLAYED, true, false, GC_TICKET_MISSING },
-    { 0x0100A1B2C3D4D000ULL, "Moon Racer",                3, 3, NOT_PLAYED, true, false, GC_LAUNCH_VERSION },
+    { 0x0100A1B2C3D47000ULL, "Garden Defenders",          7,  6, NOT_PLAYED, true, false, GC_NO_BASE },
+    { 0x0100A1B2C3D48000ULL, "Hedgehog Rush",             7,  7, NOT_PLAYED, true, false, GC_ARCHIVED },
+    { 0x0100A1B2C3D49000ULL, "Robot Factory",            12,  8, NOT_PLAYED, true, false, GC_FIRMWARE_TOO_OLD },
+    { 0x0100A1B2C3D4B000ULL, "Ocean Explorer",            3,  9, NOT_PLAYED, true, false, GC_FILES_MISSING },
+    { 0x0100A1B2C3D4C000ULL, "Castle Siege",             16, 10, NOT_PLAYED, true, false, GC_TICKET_MISSING },
+    { 0x0100A1B2C3D4D000ULL, "Moon Racer",                3, 11, NOT_PLAYED, true, false, GC_LAUNCH_VERSION },
     // The longest name, for the screens that cut it; its data corrupt.
     { 0x0100A1B2C3D4E000ULL, "Forest Tales: Legends of the Ancient Grove for Nintendo Switch™",
-                                                         12, 4, NOT_PLAYED, true, false, GC_NEEDS_VERIFY },
-    { 0x0100A1B2C3D4F000ULL, "Star Pilots",              18, 0, NOT_PLAYED, true, false, GC_KEY_TOO_NEW },
+                                                         12, 12, NOT_PLAYED, true, false, GC_NEEDS_VERIFY },
+    { 0x0100A1B2C3D4F000ULL, "Star Pilots",              18, 13, NOT_PLAYED, true, false, GC_KEY_TOO_NEW },
 };
 const size_t SIM_GAME_COUNT = sizeof(SIM_GAMES) / sizeof(SIM_GAMES[0]);
 
@@ -147,15 +148,18 @@ unsigned char *sim_game_icon(u64 id, size_t *size)
 {
     *size = 0;
     // A forwarder's: the icon it was installed with in this run, else one of
-    // the made-up ones (sim_forwarder.cpp).
+    // the made-up homebrew's (sim_forwarder.cpp), not a game's.
     if ((id >> 56) == 0x05) {
         unsigned char *own = sim_forwarder_icon(id, size);
         if (own) return own;
-        const size_t k = (size_t)(id >> 12) % (sizeof(SIM_ICONS) / sizeof(SIM_ICONS[0]));
-        unsigned char *jpeg = (unsigned char *)malloc(SIM_ICON_SIZES[k]);
+        static const unsigned char *const HB[] = { SIM_HB_ICON_PAINT, SIM_HB_ICON_ATLAS, SIM_HB_ICON_NOTES, SIM_HB_ICON_KEEPER };
+        static const size_t HB_SIZES[] = { sizeof(SIM_HB_ICON_PAINT), sizeof(SIM_HB_ICON_ATLAS), sizeof(SIM_HB_ICON_NOTES),
+                                           sizeof(SIM_HB_ICON_KEEPER) };
+        const size_t k = (size_t)(id >> 12) % (sizeof(HB) / sizeof(HB[0]));
+        unsigned char *jpeg = (unsigned char *)malloc(HB_SIZES[k]);
         if (!jpeg) return NULL;
-        memcpy(jpeg, SIM_ICONS[k], SIM_ICON_SIZES[k]);
-        *size = SIM_ICON_SIZES[k];
+        memcpy(jpeg, HB[k], HB_SIZES[k]);
+        *size = HB_SIZES[k];
         return jpeg;
     }
     const SimGame *g = sim_game(id);
