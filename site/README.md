@@ -6,7 +6,7 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   English at the root, the others in `/fr/`, `/fr-ca/`, `/de/`, `/es/`,
   `/es-419/`, `/it/`, `/nl/`, `/pt/`, `/pt-br/`, `/ru/`, `/ja/`, `/ko/`,
   `/zh-hans/`, `/zh-hant/`. A first visit to the root from elsewhere goes to
-  the browser's language when the site has it; the header's list changes it
+  the browser's language when the site has it; the header's language menu changes it
   (and is remembered). One dark look, Boréale's (the night, the aurora:
   [boreale/branding](https://github.com/JigSawFr/boreale/tree/main/branding)),
   as [Aurore's site](https://aurore.boreale.dev/) and
@@ -14,9 +14,11 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
 - **The header**: the mark and name open the menu of Boréale's sites
   (`switcher()`, a popover; its CSS and script are boreale.dev's "site
   switcher" blocks, the marks boreale's, the versions boreale.dev's
-  `versions.json` read at the build), and a button opens the 15 languages
-  (a popover too). The footer has a Boréale column: the other sites, the
-  privacy and legal notice, `contact@boreale.dev`. The page not found
+  `versions.json` read at the build; each site in the page's language, the
+  four sites sharing the 15 folders), and a button opens the 15 languages,
+  each with its flag (a popover too). The footer has a Boréale column: the
+  other sites and the privacy and legal notice in the page's language,
+  `contact@boreale.dev`. The page not found
   stands under the aurora, as the home page's hero.
 - **Reading the documentation**: once the header is scrolled away, a slim
   bar at the top (the way home, the page's name, the search, the light

@@ -990,10 +990,10 @@ function homeLink() {
   $('nav-install').href = `${home}#install`;
   $('nav-docs').href = `${home}docs/getting-started/`;
   $('language-face').textContent = language.split('-')[0].toUpperCase();
-  // Boréale's other sites, in French where the page is (the four have it).
-  const french = language.startsWith('fr');
+  // Boréale's other sites in the page's language (the four share the 15
+  // folders, the website's: English at the root).
   for (const link of document.querySelectorAll('#sites [data-site]')) {
-    link.href = link.dataset.site + (french ? 'fr/' : '');
+    link.href = link.dataset.site + (language === 'en-US' ? '' : `${language.toLowerCase()}/`);
   }
   $('sites-button').setAttribute('aria-label', `PlayGuard · ${t('sites_label')}`);
 }
