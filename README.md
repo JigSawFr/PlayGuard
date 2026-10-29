@@ -105,7 +105,7 @@ AI coding assistants help with development; every change is reviewed, unit-teste
 <br>
 
 - A fork of [Pctl Manager](https://github.com/tailiang2008) by Taylor; fw 22.5 fixes and NTP sync from [anbingxi/NX-Pctl-Manager](https://github.com/anbingxi/NX-Pctl-Manager/tree/diag/fw22-5-readonly).
-- Built with [borealis](https://github.com/xfangfang/borealis) (Apache 2.0, through [Aurore](https://github.com/JigSawFr/Aurore), our fork), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) and the [Sora](https://github.com/sora-xor/sora-font) typeface (OFL 1.1).
+- Built with [borealis](https://github.com/xfangfang/borealis) (Apache 2.0, through [Aurore](https://github.com/JigSawFr/Aurore), our fork), [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT), [Twemoji](https://github.com/jdecked/twemoji) (CC-BY 4.0) and the [Sora](https://github.com/sora-xor/sora-font) typeface (OFL 1.1); off the console, the simulators and desktop builds draw their text in [Inter](https://rsms.me/inter/) and their buttons with [PromptFont](https://shinmera.com/promptfont) (both OFL 1.1, through Aurore).
 - Command reference from [switchbrew](https://switchbrew.org/wiki/Parental_Control_services).
 - The installed games check and its repairs follow [Goldleaf](https://github.com/XorTroll/Goldleaf) and [sphaira](https://github.com/ITotalJustice/sphaira) (GPLv3), with the ns and es command numbers of [libnx-ext](https://github.com/XorTroll/libnx-ext) (MIT).
 - The NRO forwarders are built as sphaira builds them, their program sphaira's hbl, after [nx-hbloader](https://github.com/switchbrew/nx-hbloader) (ISC).
