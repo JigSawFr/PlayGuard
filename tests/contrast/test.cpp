@@ -1,8 +1,6 @@
-// Host tests for the boards' palettes (ui/cadran_palette.hpp): every ink at
-// 4.5:1 or more on each surface it is drawn on, a translucent one blended
-// first over the background, in both themes (WCAG 1.4.3); the focus ring
-// and its glow at 3:1 or more on the background (WCAG 1.4.11). PlayGuard's
-// own keys (ui/palette.hpp): each pair it keeps readable, in both themes.
+// Host tests for PlayGuard's own colour keys (ui/palette.hpp): each pair it
+// keeps readable, a translucent one blended first over the background, in
+// both themes (WCAG 1.4.3). Cadran's palettes are Aurore's own tests'.
 #include "check.h"
 #include <cmath>
 #include <cstdio>
@@ -50,31 +48,6 @@ bool at_least(const char* theme, const char* what, Rgba ink, Rgba surface, const
     return false;
 }
 
-void check(const char* theme, const Palette& p)
-{
-    // The text and the inks, on the background, a card and the second surface.
-    const struct { const char* name; Rgba ink; } inks[] = {
-        { "text", p.text },   { "text2", p.text2 }, { "text3", p.text3 }, { "teal", p.teal },
-        { "amber", p.amber }, { "coral", p.coral }, { "blue", p.blue },   { "violet", p.violet },
-    };
-    const struct { const char* name; Rgba surface; } surfaces[] = { { "bg", p.bg }, { "surf", p.surf }, { "surf2", p.surf2 } };
-    for (const auto& i : inks)
-        for (const auto& s : surfaces) {
-            char what[48];
-            std::snprintf(what, sizeof(what), "%s on %s", i.name, s.name);
-            CHECK(at_least(theme, what, i.ink, s.surface, p, 4.5));
-        }
-    // Where the palettes put an ink on a fill of their own.
-    CHECK(at_least(theme, "amber on amber_surf", p.amber, p.amber_surf, p, 4.5));
-    CHECK(at_least(theme, "pill_ok_ink on pill_ok", p.pill_ok_ink, p.pill_ok, p, 4.5));
-    CHECK(at_least(theme, "teal on rail_active", p.teal, p.rail_active, p, 4.5));
-    CHECK(at_least(theme, "key_fg on key_bg", p.key_fg, p.key_bg, p, 4.5));
-    CHECK(at_least(theme, "navy on teal_fill", cadran::palette::NAVY, p.teal_fill, p, 4.5));   // a confirmation's label
-    CHECK(at_least(theme, "navy on coral_fill", cadran::palette::NAVY, p.coral_fill, p, 4.5));
-    // The focus ring, both ends of its pulse.
-    CHECK(at_least(theme, "hl1 on bg", p.hl1, p.bg, p, 3.0));
-    CHECK(at_least(theme, "hl2 on bg", p.hl2, p.bg, p, 3.0));
-}
 // A key's colour in a theme: PlayGuard's own, else Cadran's.
 bool lookup(const char* name, bool dark, Rgba* out)
 {
@@ -112,9 +85,7 @@ int main()
     // The arithmetic first: black on white is 21:1, a colour on itself 1:1.
     CHECK(std::fabs(ratio({ 0, 0, 0, 255 }, { 255, 255, 255, 255 }) - 21.0) < 0.01);
     CHECK(std::fabs(ratio({ 0x12, 0x34, 0x56, 255 }, { 0x12, 0x34, 0x56, 255 }) - 1.0) < 1e-9);
-    check("dark", cadran::palette::DARK);
-    check("light", cadran::palette::LIGHT);
     check_playguard("dark", true);
     check_playguard("light", false);
-    return CHECK_DONE("palette contrast assertions passed");
+    return CHECK_DONE("PlayGuard's colour contrast assertions passed");
 }

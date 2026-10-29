@@ -564,7 +564,7 @@ jobs:
             echo "::group::$sc"
             start=$SECONDS
             if [ "$sc" = cuttext ]; then cmd="tools/cut_text_check.py $out $LANGUAGES"; else cmd="tools/desktop_smoke.py $out $arg"; fi
-            if xvfb-run -s "-screen 0 1280x720x24" python3 $cmd; then result=ok; else result=fail; failed="$failed $sc"; fi
+            if xvfb-run -a -s "-screen 0 1280x720x24" python3 $cmd; then result=ok; else result=fail; failed="$failed $sc"; fi
             screens=$(ls "$out"/*.png 2>/dev/null | grep -vc contact-sheet || true)
             printf '%s\t%s\t%s\t%s\n' "$sc" "$result" "$((SECONDS - start))" "$screens" >> smoke-results.tsv
             echo "::endgroup::"
