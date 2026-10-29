@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <aurore.hpp>
-#include <fmt/format.h>
 #include <memory>
 #include <vector>
 
@@ -40,7 +39,7 @@ std::string days_text(const std::array<uint16_t, 7>& days)
     for (int i = 1; i <= 7; i++) {
         const int d = i % 7;
         if (!out.empty()) out += " · ";
-        out += aurore::getStr(fmt::format("playguard/days_short/{}", d)) + " " + ui::fmt_limit(days[d]);
+        out += ui::day_short(d) + " " + ui::fmt_limit(days[d]);
     }
     return out;
 }

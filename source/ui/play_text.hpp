@@ -23,5 +23,6 @@ std::string fmt_time_left(uint64_t ns);         // remaining time, rounded to mi
 std::string fmt_per_day_over(uint64_t per_day_s, int days);
 std::string age_text(int age);                 // a restriction age: "None" for 0, else "12+"
 std::string level_name(uint32_t level);         // localised restriction level, "?" beyond 4
+std::string day_short(int wday);                // a weekday's short name, 0 Sunday to 6 Saturday; "" beyond
 
 }   // namespace ui
