@@ -226,7 +226,7 @@
  "faq_offline_q": "Servono Internet, un account Nintendo o l'app?",
  "faq_offline_a": "No. Tutto si imposta sulla console. Il timer ha solo bisogno che l'orologio di rete sia stato impostato una volta: da server dell'ora pubblici o, su una console senza Internet, dall'orologio della console.",
  "faq_ban_q": "La console rischia il ban?",
- "faq_ban_a": "PlayGuard non contatta mai Nintendo: online raggiunge solo server dell'ora pubblici e GitHub. A far bannare una console è un firmware personalizzato che si collega a Nintendo. Nessun ban legato a modifiche del filtro famiglia o dell'orologio è documentato; non è una garanzia.",
+ "faq_ban_a": "PlayGuard non contatta mai Nintendo: online raggiunge solo server dell'ora pubblici, GitHub e switchbrew. A far bannare una console è un firmware personalizzato che si collega a Nintendo. Nessun ban legato a modifiche del filtro famiglia o dell'orologio è documentato; non è una garanzia.",
  "faq_children_q": "Ogni bambino può avere il proprio limite?",
  "faq_children_a": "No: il timer della console ha un solo limite per tutta la console. Un sysmodule sostitutivo può impostarne uno per account utente, ma sostituisce il filtro famiglia della console con il proprio.",
  "faq_sysmodule_q": "PlayGuard o un sysmodule sostitutivo?",
