@@ -106,7 +106,7 @@ const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "r
 
 bool listed(const std::vector<std::string>& list, const std::string& s)
 {
-    return std::find(list.begin(), list.end(), s) != list.end();
+    return std::ranges::contains(list, s);
 }
 }   // namespace
 

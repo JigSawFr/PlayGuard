@@ -25,7 +25,7 @@ TabBase::TabBase(const std::string& xml_res, bool refreshes)
     this->inflateFromXMLRes(xml_res);
     // "xml/tab/overview.xml" -> "tab/overview"
     this->screen = xml_res.substr(xml_res.rfind("xml/") == 0 ? 4 : 0);
-    if (this->screen.size() > 4 && this->screen.compare(this->screen.size() - 4, 4, ".xml") == 0)
+    if (this->screen.size() > 4 && this->screen.ends_with(".xml"))
         this->screen.resize(this->screen.size() - 4);
     if (refreshes)
         this->registerAction("playguard/hints/refresh"_i18n, aurore::BUTTON_X, [this](aurore::View*) {

@@ -60,7 +60,7 @@ std::string since_text(uint64_t then_ms)
     if (!time_local_now(&posix, nullptr) || !posix) return "";
     std::string text = ui::time_text(posix - ago_s);   // "2026-10-08 14:03:12"
     const std::string today = ui::today_date() + " ";
-    if (text.size() >= today.size() + 5 && text.compare(0, today.size(), today) == 0)
+    if (text.size() >= today.size() + 5 && text.starts_with(today))
         text = text.substr(today.size(), 5);
     return text;
 }

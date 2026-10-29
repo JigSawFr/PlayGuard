@@ -170,7 +170,7 @@ bool save(const Profile& p, std::string* error)
 bool remove(const std::string& file)
 {
     g_cache_valid = false;
-    return !file.empty() && file.find('/') == std::string::npos && std::remove(path_of(file).c_str()) == 0;
+    return !file.empty() && !file.contains('/') && std::remove(path_of(file).c_str()) == 0;
 }
 
 bool find_same_file(const std::string& name, const std::string& except_file, Profile* out)

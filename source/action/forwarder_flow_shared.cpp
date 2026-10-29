@@ -48,7 +48,7 @@ bool nro_exists(const std::string& sdmc)
 // space (libnx splits the argv there), as sphaira writes it.
 std::string argv_of(const std::string& sdmc)
 {
-    return sdmc.find(' ') == std::string::npos ? sdmc : "\"" + sdmc + "\"";
+    return sdmc.contains(' ') ? "\"" + sdmc + "\"" : sdmc;
 }
 
 // The detail the history keeps: the name, and the program ID.
@@ -140,9 +140,9 @@ void tidy_gates()
     for (const forwarders::Made& m : forwarders::list())
         if (m.pin) used.push_back(m.gate);
     for (const std::string& f : paths::list_files(paths::data_dir(), ".nro")) {
-        if (f.rfind("gate-", 0) != 0) continue;
+        if (!f.starts_with("gate-")) continue;
         const std::string sdmc = nro::sdmc_path(paths::data_dir() + "/" + f);
-        if (std::find(used.begin(), used.end(), sdmc) != used.end()) continue;
+        if (std::ranges::contains(used, sdmc)) continue;
         if (std::remove((paths::data_dir() + "/" + f).c_str()) == 0) aurore::Logger::info("forwarders: {} no longer used", f);
     }
 }

@@ -275,7 +275,7 @@ std::vector<std::string> list_files(const std::string& dir, const std::string& s
     if (!d) return names;
     while (dirent* e = readdir(d)) {
         std::string n = e->d_name;
-        if (n.size() > suffix.size() && n.compare(n.size() - suffix.size(), suffix.size(), suffix) == 0)
+        if (n.size() > suffix.size() && n.ends_with(suffix))
             names.push_back(n);
     }
     closedir(d);

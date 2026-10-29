@@ -34,8 +34,8 @@ std::string kind()
 {
     std::string nsp;
     paths::read_file(modules::dir(paths::sd_root(), modules::get(modules::Id::Agent)) + "/exefs.nsp", nsp);
-    if (nsp.find("old agent") != std::string::npos) return "old";
-    if (nsp.find("broken agent") != std::string::npos) return "broken";
+    if (nsp.contains("old agent")) return "old";
+    if (nsp.contains("broken agent")) return "broken";
     return "";
 }
 

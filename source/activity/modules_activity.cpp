@@ -2,6 +2,7 @@
 #include "activity/modules_activity.hpp"
 
 #include <fmt/format.h>
+#include <iterator>
 #include <memory>
 
 #include <aurore/cadran/ui/cadran_frame.hpp>
@@ -326,7 +327,7 @@ void dress_rail(aurore::View* tab_frame)
     list->setPadding(6, 8, 10, 16);
     size_t position = 0;
     for (aurore::View* v : list->getChildren()) {
-        const char* name = position < sizeof(ICONS) / sizeof(ICONS[0]) ? ICONS[position] : "";
+        const char* name = position < std::size(ICONS) ? ICONS[position] : "";
         position++;
         auto* item = dynamic_cast<aurore::SidebarItem*>(v);
         if (!item) continue;   // a separator

@@ -19,7 +19,7 @@ Tally parse(const std::string& text)
     for (auto d = days->begin(); d != days->end(); ++d) {
         if (!date::parse_valid(d.key()) || !d->is_object()) continue;
         for (auto f = d->begin(); f != d->end(); ++f) {
-            if (!f->is_object() || f.key().rfind("sdmc:/", 0) != 0) continue;
+            if (!f->is_object() || !f.key().starts_with("sdmc:/")) continue;
             Count c;
             c.opened = (int)std::max<int64_t>(0, json_util::integer_or(*f, "opened"));
             c.refused = (int)std::max<int64_t>(0, json_util::integer_or(*f, "refused"));
@@ -42,7 +42,7 @@ std::string text(const Tally& t)
 
 void add(Tally& t, const std::string& day, const std::string& nro, GateResult r)
 {
-    if (!date::parse_valid(day) || nro.rfind("sdmc:/", 0) != 0) return;
+    if (!date::parse_valid(day) || !nro.starts_with("sdmc:/")) return;
     Count& c = t[day][nro];
     if (r == GateResult_Pin || r == GateResult_Free) c.opened++;
     else if (r == GateResult_Refused) c.refused++;
@@ -52,11 +52,10 @@ void add(Tally& t, const std::string& day, const std::string& nro, GateResult r)
 void trim(Tally& t, const std::string& today)
 {
     const std::string first = date::add_days(today, -(KEEP_DAYS - 1));
-    for (auto it = t.begin(); it != t.end();) {
-        // "YYYY-MM-DD" sorts as the days do.
-        if (!date::parse_valid(it->first) || first.empty() || it->first < first || it->first > today) it = t.erase(it);
-        else ++it;
-    }
+    // "YYYY-MM-DD" sorts as the days do.
+    std::erase_if(t, [&](const auto& day) {
+        return !date::parse_valid(day.first) || first.empty() || day.first < first || day.first > today;
+    });
 }
 
 std::vector<Week> week(const Tally& t, const std::string& today)

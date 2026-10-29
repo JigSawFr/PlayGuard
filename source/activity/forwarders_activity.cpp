@@ -93,7 +93,7 @@ aurore::Box* legend(const std::vector<std::string>& used)
     box->setAlignItems(aurore::AlignItems::CENTER);
     box->setMargins(8, 8, 0, 10);
     for (const auto& [icon, key] : MARKS) {
-        if (std::find(used.begin(), used.end(), icon) == used.end()) continue;
+        if (!std::ranges::contains(used, icon)) continue;
         auto* item = new aurore::Box(aurore::Axis::ROW);
         item->setAlignItems(aurore::AlignItems::CENTER);
         item->setMarginRight(22);
@@ -320,7 +320,7 @@ void ForwardersActivity::show_lock()
     const auto add = [&routes](const std::string& n) { routes += (routes.empty() ? "" : ", ") + n; };
     if (c.self) add("PlayGuard");
     for (const std::string& m : c.menus) {
-        const bool seen = std::find(c.verified.begin(), c.verified.end(), m) != c.verified.end();
+        const bool seen = std::ranges::contains(c.verified, m);
         add(seen ? m : aurore::getStr("playguard/hbmenu/summary_untried", m));
     }
     const bool both = c.self && !c.verified.empty();

@@ -123,7 +123,7 @@ bool parse(const std::string& name, const char* prefix, std::string* stamp)
     const size_t p = std::strlen(prefix);
     if (name.compare(0, p, prefix) != 0 || name.size() < p + 1 + 15 + 4 || name[p] != '_') return false;
     const size_t at = p + 1, end = at + 15;
-    if (!is_stamp(name, at) || name.compare(name.size() - 4, 4, extension(prefix)) != 0) return false;
+    if (!is_stamp(name, at) || !name.ends_with(extension(prefix))) return false;
     const size_t rest = name.size() - 4 - end;   // "" or "_<n>"
     if (rest == 1 || (rest > 1 && (name[end] != '_' || !digits(name, end + 1, rest - 1)))) return false;
     if (stamp) *stamp = name.substr(at, 15);
@@ -202,7 +202,7 @@ size_t migrate(const std::string& logs_dir)
     const std::vector<std::string> names = paths::list_files(logs_dir, "");
     const auto has = [&names](const std::string& n) { return std::binary_search(names.begin(), names.end(), n); };
     for (const std::string& n : names) {
-        if (n.size() <= 4 || n.compare(n.size() - 4, 4, ".txt") != 0) continue;
+        if (n.size() <= 4 || !n.ends_with(".txt")) continue;
         // diagnostic::save's names before the folders: "20261009_141203[_n].txt".
         if (!is_stamp(n, 0)) continue;
         const std::string rest = n.substr(15, n.size() - 15 - 4);
