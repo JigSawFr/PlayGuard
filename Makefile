@@ -195,7 +195,7 @@ playstats_LIBS  := -lz
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 # util/date stands on core/calendar.c: a suite that links it builds that C
 # file too (its <name>_CSRC, without having to say so).
-TEST_CXXFLAGS   := -std=c++20 -Isource -isystem library/aurore/library/include
+TEST_CXXFLAGS   := -std=c++23 -Isource -isystem library/aurore/library/include
 CALENDAR_C      := source/core/calendar.c
 # Aurore's Cadran (library/aurore): the look's helpers PlayGuard tests here.
 C := library/aurore/library/lib/cadran
@@ -223,7 +223,7 @@ sys_updates_CFLAGS := -std=gnu11 -Isource/core
 # The network half twice from one test: -D__SWITCH__ for the console's path
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
-sys_updates_net_FLAGS := -std=c++20 -Isource -Isource/core -Itests/sysinfo -D__SWITCH__
+sys_updates_net_FLAGS := -std=c++23 -Isource -Isource/core -Itests/sysinfo -D__SWITCH__
 sys_updates_net_CSRC  := source/core/console_info_pure.c
 sys_updates_net_CFLAGS := -std=gnu11 -Isource/core
 sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
@@ -303,7 +303,7 @@ forwarders_text_CFLAGS := -std=gnu11 -Isource/core
 # the language changes: built from the submodule as it is.
 i18n_threads_SRC   := library/aurore/library/lib/core/i18n.cpp library/aurore/library/lib/core/util.cpp \
                       tests/i18n_threads/test.cpp
-i18n_threads_FLAGS := -std=c++20 -isystem library/aurore/library/include \
+i18n_threads_FLAGS := -std=c++23 -isystem library/aurore/library/include \
                       -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
                       $(addprefix -isystem library/aurore/library/,include/aurore/extern include/aurore/extern/nanovg \
                         include/aurore/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga) \
@@ -440,7 +440,7 @@ $(FUZZOUT):
 # Rebuilt when the Makefile changes too (the flags above).
 $(FUZZ_PROGRAMS): $(FUZZOUT)/%: $$($$*_FUZZ) $$($$*_FUZZ_CSRC) tests/fuzz/fuzz.h $(TEST_HEADERS) Makefile | $(FUZZOUT)
 	$(if $($*_FUZZ_CSRC),$(FUZZ_CC) -std=gnu11 $(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) -c $($*_FUZZ_CSRC) -o $@.c.o)
-	$(if $(filter %.c,$(lastword $($*_FUZZ))),$(FUZZ_CC) -std=gnu11 -Isource/core,$(FUZZ_CXX) -std=c++20) \
+	$(if $(filter %.c,$(lastword $($*_FUZZ))),$(FUZZ_CC) -std=gnu11 -Isource/core,$(FUZZ_CXX) -std=c++23) \
 		$(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) $($*_FUZZ) $(if $($*_FUZZ_CSRC),$@.c.o) $($*_FUZZ_LIBS) -o $@
 
 # A run: its output in <name>.log, its final figures on the terminal (tagged
