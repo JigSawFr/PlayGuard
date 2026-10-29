@@ -152,7 +152,8 @@ void seed_album(const std::string& sd_root)
         const std::string dir = sd_root + "/Nintendo/Album/" + n.substr(0, 4) + "/" + n.substr(4, 2) + "/" + n.substr(6, 2);
         if (!paths::ensure_dir(dir)) continue;
         const std::vector<unsigned char> b = picture(s);
-        if (!b.empty()) paths::atomic_write(dir + "/" + n, std::string(b.begin(), b.end()));
+        // The simulator's sample pictures: one that cannot be written is left out.
+        if (!b.empty()) (void)paths::atomic_write(dir + "/" + n, std::string(b.begin(), b.end()));
     }
 }
 

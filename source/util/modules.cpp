@@ -215,9 +215,11 @@ bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool 
         return fail(error, "cannot put the module in place");
     }
     if (!keep_backup) std::remove(old.c_str());
-    paths::atomic_write(d + "/toolbox.json", toolbox_json(m));
-    paths::atomic_write(d + "/version.txt",
-                        "version=" + b.version + "\ncommit=" + b.commit + "\nsha256=" + b.sha256 + "\n");
+    // The module is in place: what the sysmodule managers and the next update
+    // read about it follows, its failure not undoing the install.
+    (void)paths::atomic_write(d + "/toolbox.json", toolbox_json(m));
+    (void)paths::atomic_write(d + "/version.txt",
+                              "version=" + b.version + "\ncommit=" + b.commit + "\nsha256=" + b.sha256 + "\n");
     if (first && !set_at_boot(sd_root, m, true, error)) return false;
     return true;
 }

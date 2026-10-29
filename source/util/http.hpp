@@ -22,8 +22,8 @@ using Headers = std::vector<std::string>;
 // *status gets the HTTP status when the server answered (a 404 tells
 // "nothing there" from a network failure). Blocking: call it from aurore::async.
 // Requests on several threads run side by side.
-bool get(const std::string& url, std::string* body, std::string* error,
-         size_t max_bytes = 64 * 1024, long timeout_s = 10, const Headers& headers = {}, long* status = nullptr);
+[[nodiscard]] bool get(const std::string& url, std::string* body, std::string* error,
+                       size_t max_bytes = 64 * 1024, long timeout_s = 10, const Headers& headers = {}, long* status = nullptr);
 
 // POSTs `data` as `content_type` (no redirects followed). Same failures as
 // get(); *status gets the HTTP status when the server answered (a 2xx other
@@ -36,8 +36,8 @@ bool post(const std::string& url, const std::string& data, const char* content_t
 // signed download link can then be fetched without the headers (a token)
 // sent to `url`. False when it does not redirect; *status gets the HTTP
 // status when the server answered (as for get()).
-bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers = {},
-              long* status = nullptr);
+[[nodiscard]] bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers = {},
+                            long* status = nullptr);
 
 // GETs `url` (redirects followed) into the file `path`, created or
 // truncated. Fails beyond `max_bytes`, or when nothing arrives for 30 s;
@@ -52,9 +52,9 @@ bool redirect(const std::string& url, std::string* target, std::string* error, c
 // it held.
 // `cancel` (when given) set by another thread stops the transfer within a
 // second ("cancelled").
-bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
-              long timeout_s = 600, std::function<void(uint64_t done, uint64_t total)> progress = nullptr,
-              uint64_t resume_from = 0, const std::atomic<bool>* cancel = nullptr);
+[[nodiscard]] bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
+                            long timeout_s = 600, std::function<void(uint64_t done, uint64_t total)> progress = nullptr,
+                            uint64_t resume_from = 0, const std::atomic<bool>* cancel = nullptr);
 
 // At exit: a request still running stops at its next progress tick (about a
 // second), and a new one fails at once, so the threads they run on can end

@@ -24,8 +24,8 @@ void write(const std::string& dir, const char* name, std::string text)
     const std::string file = dir + "/" + name;
     auto job = [dir, file, text]() {
         paths::ensure_dir(dir);
-        std::string err;
-        paths::atomic_write(file, text, &err);
+        // Written again at the next change: a failed write is not reported.
+        (void)paths::atomic_write(file, text);
     };
     if (s_writer) s_writer(file, job);
     else job();

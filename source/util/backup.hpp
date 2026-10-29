@@ -95,7 +95,7 @@ bool from_json(const std::string& text, Snapshot& out);
 
 // Writes a new file in paths::backups_dir(). Returns its path, or "" and a
 // short English reason in *error.
-std::string save(const Snapshot& s, std::string* error = nullptr);
+[[nodiscard]] std::string save(const Snapshot& s, std::string* error = nullptr);
 
 // File names (not paths) in paths::backups_dir(), newest first.
 std::vector<std::string> list();
