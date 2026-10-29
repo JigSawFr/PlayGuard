@@ -23,6 +23,17 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   reading); *Light reading* puts the documentation's pages on a light
   ground (kept as `pg-reading`, `reading.js` setting it before the first
   paint); the search's field shows its key, `/`.
+- **The home page's showcase** (site.css's and site.js's "showcase"
+  blocks, the same on the four sites): the tour on a console of our own
+  (`.device`, its sides `DEVICE_GRIPS`), leaning towards the text on a
+  wide screen; the night going on down the page (veils of aurora, faint
+  stars, a horizon over the footer); the features on tiles, their edge lit
+  under the pointer, the three first showing their screen; the sections
+  rising into view once; on a wide screen, the screens' gallery as one
+  large over a strip of the others; PlayGuard's column of the comparison
+  lit and the steps joined by a line; a short cross-fade from one page to
+  the next where the browser can. Without script, or with less motion
+  asked, everything stays in place.
 - **The screenshots in each language**: the console's screens as the
   simulator shows them in that language (below), English where there are
   none (a local build); the console's dark ones, as the site is.
