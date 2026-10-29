@@ -854,8 +854,8 @@ def alive():
     return proc.poll() is None
 
 
-# The longest pauses around a press and before a screenshot: pause() ends
-# them as soon as the screen has settled. Aurore's longest animation (a
+# The pauses around a press (the longest: pause() ends them as soon as the
+# screen has settled) and before a screenshot (all of it, shot()). Aurore's longest animation (a
 # toast coming in) takes 300 ms, and a label starts scrolling after 1.5 s
 # focused: a screenshot comes 0.9 s after the last press at most, every
 # animation over, no label moving yet.
@@ -1025,7 +1025,11 @@ def button_x():
 
 
 def shot(name):
-    pause(SHOT_WAIT)
+    # The old fixed pause before a screenshot, whatever pause() says: a view
+    # drawing itself on the clock without asking for a frame (a fade in a
+    # section's title) is out of Aurore's sight. The presses before it are
+    # where the time is won.
+    time.sleep(KEY_AFTER + SHOT_WAIT)
     subprocess.run(IM + ["import", "-window", "root", os.path.join(OUT, name + ".png")], env=env)
     if not alive():
         fail(f"app exited while showing {name}")
