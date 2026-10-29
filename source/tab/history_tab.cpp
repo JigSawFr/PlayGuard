@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
 
 #include "action/backup_flow.hpp"
 #include "action/history_flow.hpp"
@@ -14,13 +14,13 @@
 #include "util/config.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
 std::string keep_text(int keep)
 {
-    return keep == 0 ? "playguard/tools/backup_keep_all"_i18n : brls::getStr("playguard/tools/backup_keep_n", keep);
+    return keep == 0 ? "playguard/tools/backup_keep_all"_i18n : aurore::getStr("playguard/tools/backup_keep_n", keep);
 }
 }   // namespace
 
@@ -30,23 +30,23 @@ HistoryTab::HistoryTab()
     // The bell's "no backup for 30 days" is fixed here.
     this->mark(backup_save.getView(), { "backup" });
     backup_note->setSingleLine(false);
-    history->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new HistoryActivity());
+    history->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new HistoryActivity());
         return true;
     });
     // Saving a backup only writes to the SD card: also offered in read-only mode.
-    backup_note->setText(brls::getStr("playguard/tools/backup_note", paths::backups_dir()));
-    backup_save->registerClickAction([this](brls::View*) {
+    backup_note->setText(aurore::getStr("playguard/tools/backup_note", paths::backups_dir()));
+    backup_save->registerClickAction([this](aurore::View*) {
         backup_flow::save_now();
         this->refresh();
         return true;
     });
-    backup_restore->registerClickAction([this](brls::View*) {
+    backup_restore->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         backup_flow::choose_and_restore(this->refresher());
         return true;
     });
-    backup_keep->registerClickAction([this](brls::View*) {
+    backup_keep->registerClickAction([this](aurore::View*) {
         std::vector<std::string> labels;
         int selected = 0;
         for (size_t i = 0; i < sizeof(config::BACKUP_KEEP) / sizeof(config::BACKUP_KEEP[0]); i++) {
@@ -71,7 +71,7 @@ void HistoryTab::refresh()
     const size_t n = history_flow::count();
     ui::set_detail(changes, std::to_string(n));
     history->setDetailText(ui::opens(n == 1 ? "playguard/history/count_one"_i18n
-                                         : n ? brls::getStr("playguard/history/count", (int)n) : ""));
+                                         : n ? aurore::getStr("playguard/history/count", (int)n) : ""));
 
     // The newest backup's day, with a warning once one is due (none yet, or
     // none for 30 days: the bell's "backup" entry), a check otherwise.
@@ -82,14 +82,14 @@ void HistoryTab::refresh()
     this->list.state("hs_last_backup", due ? "cadran/amber_fill" : "cadran/teal_fill");
 
     backup_keep->setDetailText(keep_text(config::get().backup_keep));
-    backup_restore->setDetailText(backups.empty() ? "" : brls::getStr("playguard/tools/backup_count", (int)backups.size()));
+    backup_restore->setDetailText(backups.empty() ? "" : aurore::getStr("playguard/tools/backup_count", (int)backups.size()));
     // Read-only: restoring would write; it stays in sight, greyed.
     ui::show_writable(backup_restore, !app::read_only());
     this->list.sync();
     cadran::set_pill("");
 }
 
-brls::View* HistoryTab::create()
+aurore::View* HistoryTab::create()
 {
     return new HistoryTab();
 }

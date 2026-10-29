@@ -4,7 +4,7 @@
      below, save the current limits or make a new profile. The
      list is rebuilt by source/activity/profiles_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -16,28 +16,28 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
-            <brls:Header title="@i18n/playguard/play_timer/profiles_section_saved" marginBottom="8"/>
-            <brls:Box id="pf_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="pf_empty" text="@i18n/playguard/play_timer/profile_none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Label id="pf_hint" text="@i18n/playguard/play_timer/profiles_hint" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header title="@i18n/playguard/play_timer/profiles_section_new" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="pf_save" title="@i18n/playguard/play_timer/profile_save"/>
-            <brls:DetailCell id="pf_new" title="@i18n/playguard/play_timer/profile_new"/>
-            <brls:DetailCell id="pf_schedule" title="@i18n/playguard/schedule/cell"/>
-            <brls:Label id="pf_schedule_note" text="@i18n/playguard/schedule/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/play_timer/profiles_section_saved" marginBottom="8"/>
+            <aurore:Box id="pf_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <aurore:Label id="pf_empty" text="@i18n/playguard/play_timer/profile_none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="pf_hint" text="@i18n/playguard/play_timer/profiles_hint" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/play_timer/profiles_section_new" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="pf_save" title="@i18n/playguard/play_timer/profile_save"/>
+            <aurore:DetailCell id="pf_new" title="@i18n/playguard/play_timer/profile_new"/>
+            <aurore:DetailCell id="pf_schedule" title="@i18n/playguard/schedule/cell"/>
+            <aurore:Label id="pf_schedule_note" text="@i18n/playguard/schedule/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

@@ -3,25 +3,25 @@
 
 #include <algorithm>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/profile_flow.hpp"
 #include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 void ProfilesActivity::onContentAvailable()
 {
     cadran::kit::empty_around(empty, "calendar");
     hint->setSingleLine(false);
-    save_cell->registerClickAction([this](brls::View*) {
+    save_cell->registerClickAction([this](aurore::View*) {
         this->save_current();
         return true;
     });
-    new_cell->registerClickAction([this](brls::View*) {
+    new_cell->registerClickAction([this](aurore::View*) {
         this->create();
         return true;
     });
@@ -31,7 +31,7 @@ void ProfilesActivity::onContentAvailable()
     // select, from an automation); one set by an earlier version can still
     // be changed or ended.
     schedule_note->setSingleLine(false);
-    schedule->registerClickAction([this](brls::View*) {
+    schedule->registerClickAction([this](aurore::View*) {
         if (schedule_flow::summary().empty()) {
             ui::info("playguard/schedule/soon_note"_i18n);
             return true;
@@ -41,7 +41,7 @@ void ProfilesActivity::onContentAvailable()
             pctl_play_timer_query(&this->live);
             this->rebuild();
             this->show_schedule();
-            brls::Application::giveFocus(schedule);
+            aurore::Application::giveFocus(schedule);
         });
         return true;
     });
@@ -69,25 +69,25 @@ void ProfilesActivity::show_schedule()
 void ProfilesActivity::rebuild(const std::string& focus_file)
 {
     // Move the focus to a cell that survives before deleting the old list,
-    // so borealis never holds a pointer to a deleted cell.
-    brls::Application::giveFocus(save_cell);
-    brls::Box* rows = cadran::List::rows_in(list);   // a card in the Cadran look
+    // so Aurore never holds a pointer to a deleted cell.
+    aurore::Application::giveFocus(save_cell);
+    aurore::Box* rows = cadran::List::rows_in(list);   // a card in the Cadran look
     rows->clearViews();
 
     const auto all = profiles::list();
     const std::string current = this->live.valid ? profiles::match(this->live.day_min) : "";
-    brls::View* focus = nullptr;
+    aurore::View* focus = nullptr;
     for (const auto& p : all) {
-        auto* cell = new brls::DetailCell();
+        auto* cell = new aurore::DetailCell();
         cell->setText(p.name);
         const std::string summary = ui::days_summary(p.days.data());
         if (p.name == current) {
-            cell->setDetailText(brls::getStr("playguard/play_timer/profile_current", summary));
+            cell->setDetailText(aurore::getStr("playguard/play_timer/profile_current", summary));
             cell->detail->setThemeColor("textColor", "cadran/teal");
         } else {
             cell->setDetailText(summary);
         }
-        cell->registerClickAction([this, p](brls::View*) {
+        cell->registerClickAction([this, p](aurore::View*) {
             this->actions(p);
             return true;
         });
@@ -97,7 +97,7 @@ void ProfilesActivity::rebuild(const std::string& focus_file)
     }
     ui::set_visible(empty.getView(), all.empty());
     ui::set_visible(hint.getView(), !all.empty());
-    brls::Application::giveFocus(focus ? focus : (brls::View*)save_cell.getView());
+    aurore::Application::giveFocus(focus ? focus : (aurore::View*)save_cell.getView());
 }
 
 void ProfilesActivity::actions(const profiles::Profile& p)
@@ -143,7 +143,7 @@ bool ProfilesActivity::store(const profiles::Profile& p, const std::string& ok_t
         this->relist_focus   = focus;
         return true;
     }
-    brls::sync([this, focus]() { this->rebuild(focus); });
+    aurore::sync([this, focus]() { this->rebuild(focus); });
     return true;
 }
 
@@ -151,20 +151,20 @@ void ProfilesActivity::onResume()
 {
     if (!this->relist_pending) return;
     this->relist_pending = false;
-    // Next frame: borealis first gives the focus back to the cell that opened
+    // Next frame: Aurore first gives the focus back to the cell that opened
     // the editor, which rebuild() then moves away before deleting it.
     const std::string focus = this->relist_focus;
-    brls::sync([this, focus]() { this->rebuild(focus); });
+    aurore::sync([this, focus]() { this->rebuild(focus); });
 }
 
 void ProfilesActivity::edit_limits(const profiles::Profile& p)
 {
-    brls::Application::pushActivity(new PlayTimerPerDayActivity(
-        brls::getStr("playguard/play_timer/profile_edit_title", p.name), p.days,
+    aurore::Application::pushActivity(new PlayTimerPerDayActivity(
+        aurore::getStr("playguard/play_timer/profile_edit_title", p.name), p.days,
         [this, p](const PlayTimerPerDayActivity::Days& days) {
             profiles::Profile edited = p;
             edited.days = days;
-            return this->store(edited, brls::getStr("playguard/play_timer/profile_saved", p.name));
+            return this->store(edited, aurore::getStr("playguard/play_timer/profile_saved", p.name));
         }));
 }
 
@@ -174,23 +174,23 @@ void ProfilesActivity::rename(const profiles::Profile& p)
         if (name == p.name) return;
         profiles::Profile renamed = p;
         renamed.name = name;
-        this->store(renamed, brls::getStr("playguard/play_timer/profile_renamed", name));
+        this->store(renamed, aurore::getStr("playguard/play_timer/profile_renamed", name));
     });
 }
 
 void ProfilesActivity::remove(const profiles::Profile& p)
 {
     const std::string name = p.name, file = p.file;
-    ui::confirm_danger(brls::getStr("playguard/play_timer/profile_delete_body", name), "playguard/common/delete"_i18n,
+    ui::confirm_danger(aurore::getStr("playguard/play_timer/profile_delete_body", name), "playguard/common/delete"_i18n,
                        [this, name, file]() {
                            // Before the error's dialog opens (both on the next
                            // frame): rebuilt under it, the list would delete
                            // the cell the dialog gives the focus back to.
-                           brls::sync([this]() { this->rebuild(); });
+                           aurore::sync([this]() { this->rebuild(); });
                            if (profiles::remove(file))
-                               ui::notify(brls::getStr("playguard/play_timer/profile_deleted", name));
+                               ui::notify(aurore::getStr("playguard/play_timer/profile_deleted", name));
                            else
-                               ui::error(brls::getStr("playguard/play_timer/profile_delete_err", name));
+                               ui::error(aurore::getStr("playguard/play_timer/profile_delete_err", name));
                        });
 }
 
@@ -205,7 +205,7 @@ void ProfilesActivity::ask_name(const std::string& initial, const std::string& e
         if (profiles::find_same_file(name, except_file, &existing)) {
             // FAT ignores case (and the file name drops accents): this would
             // overwrite another profile.
-            ui::confirm(brls::getStr("playguard/play_timer/profile_replace", existing.name),
+            ui::confirm(aurore::getStr("playguard/play_timer/profile_replace", existing.name),
                         "playguard/play_timer/profile_replace_confirm"_i18n, [done, name]() { done(name); }, nullptr, true);
             return;
         }
@@ -226,7 +226,7 @@ void ProfilesActivity::save_current()
         profiles::Profile p;
         p.name = name;
         p.days = days;
-        this->store(p, brls::getStr("playguard/play_timer/profile_saved", name));
+        this->store(p, aurore::getStr("playguard/play_timer/profile_saved", name));
     });
 }
 
@@ -237,13 +237,13 @@ void ProfilesActivity::create()
     std::array<uint16_t, 7> days;
     for (int i = 0; i < 7; i++) days[i] = this->live.valid ? this->live.day_min[i] : PT_DAY_NOLIMIT;
     this->ask_name("", "", [this, days](std::string name) {
-        brls::Application::pushActivity(new PlayTimerPerDayActivity(
-            brls::getStr("playguard/play_timer/profile_edit_title", name), days,
+        aurore::Application::pushActivity(new PlayTimerPerDayActivity(
+            aurore::getStr("playguard/play_timer/profile_edit_title", name), days,
             [this, name](const PlayTimerPerDayActivity::Days& edited) {
                 profiles::Profile p;
                 p.name = name;
                 p.days = edited;
-                return this->store(p, brls::getStr("playguard/play_timer/profile_saved", name));
+                return this->store(p, aurore::getStr("playguard/play_timer/profile_saved", name));
             }));
     });
 }

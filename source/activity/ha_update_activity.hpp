@@ -5,9 +5,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-class HaUpdateActivity : public brls::Activity
+class HaUpdateActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/ha_update.xml");
@@ -15,10 +15,10 @@ class HaUpdateActivity : public brls::Activity
     void onContentAvailable() override;
 
   private:
-    BRLS_BIND(brls::Header, header,  "hu_header");
-    BRLS_BIND(brls::Label,  body,    "hu_body");
-    BRLS_BIND(brls::Box,    qr,      "hu_qr");
-    BRLS_BIND(brls::Header, changes, "hu_changes");
-    BRLS_BIND(brls::Box,    notes,   "hu_notes");
-    BRLS_BIND(brls::Label,  note,    "hu_note");
+    AURORE_BIND(aurore::Header, header,  "hu_header");
+    AURORE_BIND(aurore::Label,  body,    "hu_body");
+    AURORE_BIND(aurore::Box,    qr,      "hu_qr");
+    AURORE_BIND(aurore::Header, changes, "hu_changes");
+    AURORE_BIND(aurore::Box,    notes,   "hu_notes");
+    AURORE_BIND(aurore::Label,  note,    "hu_note");
 };

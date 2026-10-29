@@ -39,7 +39,7 @@ FAILURE_LOGGED = "0x0000C88E"
 
 def languages():
     # Aurore's ui::LANGUAGES, which config::LANGUAGES names.
-    prefs = os.path.join(ROOT, "library", "aurore", "library", "include", "borealis", "cadran", "ui", "prefs.hpp")
+    prefs = os.path.join(ROOT, "library", "aurore", "library", "include", "aurore", "cadran", "ui", "prefs.hpp")
     with open(prefs, encoding="utf-8") as f:
         m = re.search(r"LANGUAGES\[\]\s*=\s*\{([^}]*)\}", f.read())
     return [l for l in re.findall(r'"([^"]+)"', m.group(1)) if l != "system"]

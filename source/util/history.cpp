@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/history.hpp"
 
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 #include <climits>
 #include <cstdio>
 

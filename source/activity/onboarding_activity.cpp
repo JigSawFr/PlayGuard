@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/onboarding_activity.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
@@ -15,7 +15,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "view/funding.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 bool OnboardingActivity::wanted_at_start()
 {
@@ -40,29 +40,29 @@ void OnboardingActivity::onContentAvailable()
         config::get().onboarding_at_start = on;
         ui::save_config();
     });
-    unlink->registerClickAction([this](brls::View*) {
+    unlink->registerClickAction([this](aurore::View*) {
         console_actions::unlink("first_steps", [this]() { this->refresh(); });
         return true;
     });
     alarm->setDetailText("playguard/dashboard/alarm_off"_i18n);   // the title says why
     alarm->detail->setThemeColor("textColor", "cadran/amber");
-    alarm->registerClickAction([this](brls::View*) {
+    alarm->registerClickAction([this](aurore::View*) {
         pt_flow::turn_alarm_on("first_steps", [this]() { this->refresh(); });
         return true;
     });
 
     // The PIN tab's own choice: the PIN is the console's, this keeps a child out
     // of PlayGuard itself.
-    protect->registerClickAction([this](brls::View*) {
+    protect->registerClickAction([this](aurore::View*) {
         pin_lock::choose([this]() { this->refresh(); });
         return true;
     });
 
-    pin->registerClickAction([this](brls::View*) {
+    pin->registerClickAction([this](aurore::View*) {
         console_actions::set_pin("first_steps", [this]() { this->refresh(); });
         return true;
     });
-    limit->registerClickAction([this](brls::View*) {
+    limit->registerClickAction([this](aurore::View*) {
         PtState pt;
         pctl_play_timer_query(&pt);
         if (!pt.fw_supported) {
@@ -72,18 +72,18 @@ void OnboardingActivity::onContentAvailable()
         pt_flow::choose_uniform_limit(pt, [this]() { this->refresh(); });
         return true;
     });
-    clock->registerClickAction([this](brls::View*) {
+    clock->registerClickAction([this](aurore::View*) {
         if (this->clock_inaccurate) clock_flow::guided([this]() { this->refresh(); });
         else ui::info("playguard/clock/guided_fine"_i18n);
         return true;
     });
-    close->registerClickAction([](brls::View*) {
-        brls::Application::popActivity();
+    close->registerClickAction([](aurore::View*) {
+        aurore::Application::popActivity();
         return true;
     });
     // Not a step: below Close, for whoever wants it.
     support->setDetailText("GitHub Sponsors · Ko-fi");
-    support->registerClickAction([](brls::View*) {
+    support->registerClickAction([](aurore::View*) {
         funding::open_dialog();
         return true;
     });
@@ -92,7 +92,7 @@ void OnboardingActivity::onContentAvailable()
 
 void OnboardingActivity::willAppear(bool resetState)
 {
-    brls::Activity::willAppear(resetState);
+    aurore::Activity::willAppear(resetState);
     this->refresh();
 }
 
@@ -138,12 +138,12 @@ void OnboardingActivity::refresh()
 
     // Then, while the timer runs with its alarm off: nothing says time is up.
     const bool alarm_off = pt_flow::alarm_off(pt);
-    alarm->setText(brls::getStr("playguard/onboarding/step_alarm", paired ? 5 : 4));
+    alarm->setText(aurore::getStr("playguard/onboarding/step_alarm", paired ? 5 : 4));
     ui::set_visible(alarm.getView(), alarm_off);
 
     // Last, once a PIN is set: Protect PlayGuard with the PIN (any mode but "Never").
     const bool protected_ = config::get().pin_lock != "off";
-    protect->setText(brls::getStr("playguard/onboarding/step_protect", 4 + (paired ? 1 : 0) + (alarm_off ? 1 : 0)));
+    protect->setText(aurore::getStr("playguard/onboarding/step_protect", 4 + (paired ? 1 : 0) + (alarm_off ? 1 : 0)));
     protect->setDetailText(protected_ ? pin_lock::mode_text() : todo);
     protect->detail->setThemeColor("textColor", protected_ ? "cadran/teal" : "cadran/amber");
     ui::set_visible(protect.getView(), has_pin);

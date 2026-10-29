@@ -10,7 +10,7 @@
 #include "ui/ui.hpp"
 #include "util/activity_summary.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 GameActivity::GameActivity(GameStat shown, std::shared_ptr<const PlayStats> play_stats, std::vector<unsigned char> cover,
                            bool all_accounts)
@@ -46,7 +46,7 @@ void GameActivity::onContentAvailable()
         rated = rating_flow::game_rating(st, *facts);
         const int age = st.safety_level_ok ? rating_flow::level_age(st, st.safety_level) : -1;
         if (!rated.empty() && age > 0 && rating_logic::blocked(*facts, st.rating_org, (uint8_t)age))
-            rated = brls::getStr("playguard/activity/rating_blocked", rated);
+            rated = aurore::getStr("playguard/activity/rating_blocked", rated);
     }
     rating->setDetailText(rated);
     ui::set_visible(rating.getView(), !rated.empty());
@@ -65,7 +65,7 @@ void GameActivity::onContentAvailable()
         Result rc = 0;
         found->resize(playstats_by_account(app_id, found->data(), found->size(), &rc));
         if (ui::quitting()) return;
-        brls::sync(ui::guarded(weak, [this, found, rc]() { this->show_accounts(*found, rc); }));
+        aurore::sync(ui::guarded(weak, [this, found, rc]() { this->show_accounts(*found, rc); }));
     });
 }
 
@@ -73,10 +73,10 @@ void GameActivity::show_accounts(const std::vector<AccountPlay>& by_account, Res
 {
     const GameStat& g = this->game;
     for (const AccountPlay& a : by_account) {
-        auto* cell = new brls::DetailCell();
+        auto* cell = new aurore::DetailCell();
         cell->setFocusable(false);
         cell->setText(a.nickname[0] ? std::string(a.nickname) : "?");
-        cell->setDetailText(brls::getStr("playguard/activity/account_value", ui::fmt_duration(a.total_s), (int)a.launches));
+        cell->setDetailText(aurore::getStr("playguard/activity/account_value", ui::fmt_duration(a.total_s), (int)a.launches));
         accounts->addView(cell);
     }
     // The game's own total less the accounts': time with no account chosen
@@ -86,7 +86,7 @@ void GameActivity::show_accounts(const std::vector<AccountPlay>& by_account, Res
     const bool comparable = this->every_account && g.totals_ok && R_SUCCEEDED(rc);
     const uint64_t nobody = comparable ? activity_summary::unattributed_s(g.total_s, by_account.data(), by_account.size()) : 0;
     if (nobody) {
-        auto* cell = new brls::DetailCell();
+        auto* cell = new aurore::DetailCell();
         cell->setFocusable(false);
         cell->setText("playguard/activity/account_nobody"_i18n);
         cell->setDetailText(ui::fmt_duration(nobody));

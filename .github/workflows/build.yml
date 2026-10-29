@@ -338,7 +338,7 @@ jobs:
 
   # Builds the UI on Linux against the simulated backend (once, with the
   # shared ccache), for the shards below: the program and its resources go
-  # to them as a short-lived artifact (BRLS_RESOURCES_DIR is this build
+  # to them as a short-lived artifact (AURORE_RESOURCES_ROOT is this build
   # folder, the same path on every runner).
   desktop-build:
     needs: [ changes ]
@@ -786,7 +786,7 @@ jobs:
           keep() {
             mkdir -p "$1/dksh"
             cp playguard.zip playguard-rescue.zip playguard-agent.zip build/playguard.nro build/playguard.nacp "$1/"
-            cp build/borealis_library/dksh/*.dksh "$1/dksh/"
+            cp build/aurore/dksh/*.dksh "$1/dksh/"
             (cd build/resources && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$1/resources.sha256"
           }
           # The second build starts from a clean tree (make clean: no object,

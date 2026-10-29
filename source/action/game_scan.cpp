@@ -2,7 +2,7 @@
 #include "action/game_scan.hpp"
 
 #include <atomic>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -42,7 +42,7 @@ void store(game_cache::Cache cache, bool keep_verified)
     ui::write_later("games cache", [encoded = std::move(encoded)]() {
         std::string error;
         if (!paths::ensure_dir(paths::nand_cache_dir()) || !paths::atomic_write(cache_file(), encoded, &error))
-            brls::Logger::warning("games cache: not saved ({})", error);
+            aurore::Logger::warning("games cache: not saved ({})", error);
     }, "games");
 }
 
@@ -114,7 +114,7 @@ void at_start(u32 hos, std::function<void(const game_cache::Cache&)> done)
         const Result rc = gamecheck_records(records.data(), GAMECHECK_MAX, &count, &truncated);
         if (ui::quitting()) return;
         if (R_FAILED(rc)) {
-            brls::sync([]() { finished(); });
+            aurore::sync([]() { finished(); });
             return;
         }
         records.resize(count);
@@ -138,8 +138,8 @@ void at_start(u32 hos, std::function<void(const game_cache::Cache&)> done)
         if (ui::quitting()) return;
         store(*cache, true);
         if (ui::quitting()) return;
-        brls::sync([cache, done]() {
-            brls::Logger::info("games: start-up check done ({} games)", cache->games.size());
+        aurore::sync([cache, done]() {
+            aurore::Logger::info("games: start-up check done ({} games)", cache->games.size());
             done(*cache);
             finished();
         });

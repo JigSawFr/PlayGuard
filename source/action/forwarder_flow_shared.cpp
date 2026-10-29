@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <cstdio>
 #include <memory>
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/forwarder_flow.hpp"
 #include "action/game_icons.hpp"
@@ -26,7 +26,7 @@
 #include "util/perf.hpp"
 #include "util/sha256.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace forwarder_flow::detail
 {
@@ -69,7 +69,7 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
         info.icon = forwarder_icon::normalize(info.icon);
         if (info.icon.empty()) {
             std::string icon;
-            if (paths::read_file(BRLS_ASSET("img/app_icon.jpg"), icon))
+            if (paths::read_file(AURORE_ASSET("img/app_icon.jpg"), icon))
                 info.icon = forwarder_icon::normalize(std::vector<uint8_t>(icon.begin(), icon.end()));
         }
         // Its version, as the HOME menu's data management shows it.
@@ -81,7 +81,7 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
         return nro::icon_usable(info.icon);
     }
     if (!read) {
-        error = brls::getStr("playguard/forwarders/nro_unreadable", path.empty() ? sdmc : path);
+        error = aurore::getStr("playguard/forwarders/nro_unreadable", path.empty() ? sdmc : path);
         return false;
     }
     // As sphaira does: another size or a PNG made a 256 x 256 JPEG, and so
@@ -90,11 +90,11 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
     info.icon = forwarder_icon::normalize(info.icon);
     if (info.icon.empty()) {
         std::string png;
-        if (paths::read_file(BRLS_ASSET("img/emoji/1f3ae.png"), png))
+        if (paths::read_file(AURORE_ASSET("img/emoji/1f3ae.png"), png))
             info.icon = forwarder_icon::placeholder(std::vector<uint8_t>(png.begin(), png.end()));
     }
     if (!nro::icon_usable(info.icon)) {
-        error = brls::getStr("playguard/forwarders/no_icon", path);
+        error = aurore::getStr("playguard/forwarders/no_icon", path);
         return false;
     }
     return true;
@@ -105,7 +105,7 @@ Gate gate_nro()
 {
     Gate g;
     std::string bundled;
-    if (paths::read_file(BRLS_ASSET("gate/gate.nro"), bundled) && !bundled.empty()) {
+    if (paths::read_file(AURORE_ASSET("gate/gate.nro"), bundled) && !bundled.empty()) {
         Sha256 h;
         h.update(bundled.data(), bundled.size());
         g.sha256 = h.digest();
@@ -124,10 +124,10 @@ Gate gate_nro()
         if (put(pinned, &err)) {
             g.path = nro::sdmc_path(pinned);
             g.pinned = true;
-            if (!put(plain, &err)) brls::Logger::warning("forwarders: {} not written ({})", GATE_NRO_NAME, err);
+            if (!put(plain, &err)) aurore::Logger::warning("forwarders: {} not written ({})", GATE_NRO_NAME, err);
             return g;
         }
-        brls::Logger::warning("forwarders: the gate not written ({}): PlayGuard is the gate", err);
+        aurore::Logger::warning("forwarders: the gate not written ({}): PlayGuard is the gate", err);
     }
     g.path = self_nro();
     return g;
@@ -143,7 +143,7 @@ void tidy_gates()
         if (f.rfind("gate-", 0) != 0) continue;
         const std::string sdmc = nro::sdmc_path(paths::data_dir() + "/" + f);
         if (std::find(used.begin(), used.end(), sdmc) != used.end()) continue;
-        if (std::remove((paths::data_dir() + "/" + f).c_str()) == 0) brls::Logger::info("forwarders: {} no longer used", f);
+        if (std::remove((paths::data_dir() + "/" + f).c_str()) == 0) aurore::Logger::info("forwarders: {} no longer used", f);
     }
 }
 
@@ -177,7 +177,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         std::vector<uint8_t> icon;
         if (forwarder_library::is_ref(m.icon)) {
             const std::string id = forwarder_library::id_of(m.icon);
-            if (!id.empty() && paths::read_file(std::string(BRLS_ASSET("")) + forwarder_library::asset_of(id), bytes))
+            if (!id.empty() && paths::read_file(std::string(AURORE_ASSET("")) + forwarder_library::asset_of(id), bytes))
                 icon = forwarder_icon::normalize(std::vector<uint8_t>(bytes.begin(), bytes.end()));
         } else {
             const std::string p = nro::sd_path(m.icon);
@@ -185,12 +185,12 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
                 icon = forwarder_icon::from_screenshot(std::vector<uint8_t>(bytes.begin(), bytes.end()), m.icon_x);
         }
         if (nro::icon_usable(icon)) info.icon = icon;
-        else brls::Logger::warning("forwarders: {} unreadable, the .nro's icon instead", m.icon);
+        else aurore::Logger::warning("forwarders: {} unreadable, the .nro's icon instead", m.icon);
     }
     // Protected: the badge over it, on the HOME menu as in the list.
     if (m.pin) {
         std::string badge;
-        if (paths::read_file(std::string(BRLS_ASSET("")) + forwarder_library::BADGE, badge)) {
+        if (paths::read_file(std::string(AURORE_ASSET("")) + forwarder_library::BADGE, badge)) {
             const std::vector<uint8_t> icon =
                 forwarder_icon::with_badge(info.icon, std::vector<uint8_t>(badge.begin(), badge.end()));
             if (nro::icon_usable(icon)) info.icon = icon;
@@ -235,20 +235,20 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
         made.gone = false;   // on the HOME menu again
         game_icons::forget(id);   // its icon as built now in the lists, not the one read before
         std::string werr;
-        if (!forwarders::save(made, &werr)) brls::Logger::warning("forwarders: not remembered ({})", werr);
+        if (!forwarders::save(made, &werr)) aurore::Logger::warning("forwarders: not remembered ({})", werr);
         // A homebrew from now on, by this name, even once deleted.
         const u64 made_id = id;
         const std::string made_name = made.name;
         const bool own = self;
-        brls::sync([made_id, made_name, own]() { title_names::learn_forwarder(made_id, made_name, own); });
+        aurore::sync([made_id, made_name, own]() { title_names::learn_forwarder(made_id, made_name, own); });
         if (kind) history_flow::record_event(kind, "", history_label(made.name, id));
         write_rules();
         hbmenu_lock::forwarder_notices();   // made again: off the bell
     } else {
-        brls::Logger::warning("forwarders: {} not installed ({})", made.nro, ui::rc_text(rc, false));
+        aurore::Logger::warning("forwarders: {} not installed ({})", made.nro, ui::rc_text(rc, false));
     }
     if (!quiet || R_FAILED(rc))
-        ui::notify_result(rc, done_text.empty() ? brls::getStr("playguard/forwarders/added", made.name) : done_text,
+        ui::notify_result(rc, done_text.empty() ? aurore::getStr("playguard/forwarders/added", made.name) : done_text,
                           "playguard/forwarders/add_err"_i18n);
     return R_SUCCEEDED(rc);
 }
@@ -264,7 +264,7 @@ struct Batch
     int made = 0, failed = 0;
     bool cancel = false;
     bool open = false;   // its dialog on screen
-    brls::Dialog* dialog = nullptr;
+    aurore::Dialog* dialog = nullptr;
     cadran::Progress body;
 };
 
@@ -284,11 +284,11 @@ void batch_next(std::shared_ptr<Batch> batch, size_t at)
         return;
     }
     if (batch->dialog) {
-        batch->body.heading->setText(brls::getStr("playguard/forwarders/batch_title", (int)at + 1, (int)total));
+        batch->body.heading->setText(aurore::getStr("playguard/forwarders/batch_title", (int)at + 1, (int)total));
         batch->body.title->setText(batch->jobs[at].made.name);
-        std::string detail = batch->made ? brls::getStr("playguard/forwarders/batch_made", batch->made) : "";
+        std::string detail = batch->made ? aurore::getStr("playguard/forwarders/batch_made", batch->made) : "";
         if (batch->failed)
-            detail += (detail.empty() ? "" : " · ") + brls::getStr("playguard/forwarders/batch_failed", batch->failed);
+            detail += (detail.empty() ? "" : " · ") + aurore::getStr("playguard/forwarders/batch_failed", batch->failed);
         batch->body.show((float)at / (float)total, detail);
         if (batch->failed) batch->body.detail->setThemeColor("textColor", "cadran/coral");
     }
@@ -302,8 +302,8 @@ void batch_next(std::shared_ptr<Batch> batch, size_t at)
         }
         batch_next(batch, at + 1);
     };
-    if (at || !batch->dialog) brls::sync(step);
-    else brls::delay(OPEN_MS, step);
+    if (at || !batch->dialog) aurore::sync(step);
+    else aurore::delay(OPEN_MS, step);
 }
 }   // namespace
 
@@ -327,7 +327,7 @@ void install_batch(std::vector<Job> jobs, std::function<void(int made, int total
     if (batch->jobs.size() > 1) {
         batch->body = cadran::progress_body("", "");
         ui::set_visible(batch->body.image, false);
-        batch->dialog = new brls::Dialog(batch->body.box);
+        batch->dialog = new aurore::Dialog(batch->body.box);
         ui::add_cancel(batch->dialog, [batch]() {
             batch->cancel = true;
             batch->open = false;   // the dialog closes itself
@@ -350,7 +350,7 @@ void install_many(const std::vector<forwarders_logic::Row>& rows, bool pin, cons
         jobs.push_back({ m, r.self || m.nro == self_nro(), kind });
     }
     install_batch(std::move(jobs), [done_text, done](int made, int) {
-        if (made > 0) ui::notify(brls::getStr(done_text, made), ui::Toast::Done);
+        if (made > 0) ui::notify(aurore::getStr(done_text, made), ui::Toast::Done);
         if (done) done(made > 0);
     });
 }
@@ -389,12 +389,12 @@ void guard_way_back(const forwarders_logic::Row& row, const std::string& what, s
         case forwarders_logic::Guard::Allowed: return go();
         case forwarders_logic::Guard::Refused:
             ui::notice("lock", ui::Check::Warn, "playguard/hbmenu/guard_title"_i18n,
-                       brls::getStr(row.self ? "playguard/hbmenu/guard_self" : "playguard/hbmenu/guard_last", row.name));
+                       aurore::getStr(row.self ? "playguard/hbmenu/guard_self" : "playguard/hbmenu/guard_last", row.name));
             return stop();
         case forwarders_logic::Guard::Confirm: {
             std::string others;
             for (const std::string& n : forwarders_logic::other_menus(all, row)) others += (others.empty() ? "" : ", ") + n;
-            ui::confirm(brls::getStr("playguard/hbmenu/guard_confirm", row.name, others), what, go, stop, true);
+            ui::confirm(aurore::getStr("playguard/hbmenu/guard_confirm", row.name, others), what, go, stop, true);
             return;
         }
     }

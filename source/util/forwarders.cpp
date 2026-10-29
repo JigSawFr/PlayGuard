@@ -1,10 +1,10 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/forwarders.hpp"
 
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 #include <cstdio>
 
-#include <borealis/cadran/util/utf8.hpp>
+#include <aurore/cadran/util/utf8.hpp>
 
 #include "util/json_util.hpp"
 #include "util/paths.hpp"

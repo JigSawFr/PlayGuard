@@ -1,8 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/history_activity.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/export_flow.hpp"
 #include "action/forwarder_flow.hpp"
@@ -12,7 +12,7 @@
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -20,18 +20,18 @@ using history_logic::Filter;
 
 // One line of the list: a day's title (shown when the line starts a day)
 // over the change.
-brls::Header* day_of_slot(brls::View* slot) { return (brls::Header*)((brls::Box*)slot)->getChildren()[0]; }
-brls::DetailCell* cell_of_slot(brls::View* slot) { return (brls::DetailCell*)((brls::Box*)slot)->getChildren()[1]; }
+aurore::Header* day_of_slot(aurore::View* slot) { return (aurore::Header*)((aurore::Box*)slot)->getChildren()[0]; }
+aurore::DetailCell* cell_of_slot(aurore::View* slot) { return (aurore::DetailCell*)((aurore::Box*)slot)->getChildren()[1]; }
 
-brls::Box* new_slot()
+aurore::Box* new_slot()
 {
-    auto* slot = new brls::Box(brls::Axis::COLUMN);
-    slot->setAlignItems(brls::AlignItems::STRETCH);
-    auto* day = new brls::Header();
+    auto* slot = new aurore::Box(aurore::Axis::COLUMN);
+    slot->setAlignItems(aurore::AlignItems::STRETCH);
+    auto* day = new aurore::Header();
     day->setMarginTop(12);
     day->setMarginBottom(4);
     slot->addView(day);
-    auto* cell = new brls::DetailCell();
+    auto* cell = new aurore::DetailCell();
     cell->detail->setThemeColor("textColor", "cadran/text2");
     slot->addView(cell);
     // Each change a card of its own, under its day.
@@ -45,25 +45,25 @@ void HistoryActivity::onContentAvailable()
 {
     note->setSingleLine(false);
     empty->setSingleLine(false);
-    note->setText(brls::getStr("playguard/history/note", (int)history::MAX_ENTRIES, paths::history_file()));
-    filter_cell->registerClickAction([this](brls::View*) {
+    note->setText(aurore::getStr("playguard/history/note", (int)history::MAX_ENTRIES, paths::history_file()));
+    filter_cell->registerClickAction([this](aurore::View*) {
         this->choose_filter();
         return true;
     });
-    export_cell->registerClickAction([this](brls::View*) {
+    export_cell->registerClickAction([this](aurore::View*) {
         this->export_shown();
         return true;
     });
     // The forwarders' gate: its week, once it has tried something.
     week_cell->setDetailText(ui::opens());
-    week_cell->registerClickAction([](brls::View*) {
+    week_cell->registerClickAction([](aurore::View*) {
         forwarder_flow::show_week();
         return true;
     });
     ui::set_visible(week_cell.getView(), forwarder_flow::has_week());
     this->empty_card = cadran::kit::empty("history");
     this->empty_card.box->setMarginTop(16);
-    if (auto* root = dynamic_cast<brls::Box*>(empty->getParent())) root->addView(this->empty_card.box);
+    if (auto* root = dynamic_cast<aurore::Box*>(empty->getParent())) root->addView(this->empty_card.box);
     this->rebuild();
 }
 
@@ -100,16 +100,16 @@ void HistoryActivity::rebuild()
     this->shown.clear();
     for (const history::Entry& e : this->all)
         if (history_logic::matches(e, this->filter)) this->shown.push_back(e);
-    filter_cell->setDetailText(brls::getStr("playguard/history/shown_count", history_flow::filter_label(this->filter),
+    filter_cell->setDetailText(aurore::getStr("playguard/history/shown_count", history_flow::filter_label(this->filter),
                                             (int)this->shown.size()));
 
     // The slots are reused in place: one of them has the focus when this runs
-    // after a change, and borealis would keep a pointer to a deleted cell.
+    // after a change, and Aurore would keep a pointer to a deleted cell.
     // There are only ever as many as the most shown at once (up to
     // history::MAX_ENTRIES); those past what is shown are hidden. Filled out
     // of the screen's layout, laid out once (ui::batch_layout).
     // A hidden line must not keep the focus: it goes to the filter.
-    brls::View* focus = brls::Application::getCurrentFocus();
+    aurore::View* focus = aurore::Application::getCurrentFocus();
     bool focus_hidden = false;
     ui::batch_layout(list, [&]() {
         std::string day;
@@ -118,11 +118,11 @@ void HistoryActivity::rebuild()
                 slots.push_back(new_slot());
                 list->addView(slots.back());
             }
-            brls::View* slot = slots[i];
+            aurore::View* slot = slots[i];
             const history::Entry e = this->shown[i];
             // A day's title over its first change.
             const std::string this_day = history_logic::day_key(e);
-            brls::Header* header = day_of_slot(slot);
+            aurore::Header* header = day_of_slot(slot);
             const bool starts_day = i == 0 || this_day != day;
             if (starts_day) {
                 const std::string title = history_flow::day_title(this_day);
@@ -131,12 +131,12 @@ void HistoryActivity::rebuild()
             ui::set_visible(header, starts_day);
             day = this_day;
 
-            brls::DetailCell* cell = cell_of_slot(slot);
+            aurore::DetailCell* cell = cell_of_slot(slot);
             cell->setText(history_flow::title(e));
             cell->setDetailText(history_flow::time_of(e));
             // A change the console refused stands out.
             cell->detail->setThemeColor("textColor", e.result.empty() ? "cadran/text2" : "cadran/amber");
-            cell->registerClickAction([this, e](brls::View*) {
+            cell->registerClickAction([this, e](aurore::View*) {
                 history_flow::open(e, [this]() { this->rebuild(); });
                 return true;
             });
@@ -158,6 +158,6 @@ void HistoryActivity::rebuild()
         ui::set_visible(empty.getView(), this->shown.empty());
         empty->setText(this->filter == Filter::All ? "playguard/history/none"_i18n : "playguard/history/none_shown"_i18n);
     }
-    if (focus_hidden) brls::Application::giveFocus(filter_cell.getView());
-    brls::Logger::info("history list: {} of {} changes", this->shown.size(), this->all.size());
+    if (focus_hidden) aurore::Application::giveFocus(filter_cell.getView());
+    aurore::Logger::info("history list: {} of {} changes", this->shown.size(), this->all.size());
 }

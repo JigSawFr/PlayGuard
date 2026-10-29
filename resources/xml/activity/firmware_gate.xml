@@ -4,7 +4,7 @@
      is made. The update cell appears once a newer release is found. B
      continues read-only. Filled by source/activity/firmware_gate_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -16,30 +16,30 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
-            <brls:Label id="fg_headline" text="" fontSize="26" marginBottom="12"/>
-            <brls:Label id="fg_body" text="" marginBottom="16"/>
-            <brls:Label id="fg_status" text="@i18n/playguard/fw_gate/status_checking" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
-            <brls:DetailCell id="fg_update"/>
-            <brls:Header title="@i18n/playguard/fw_gate/section_continue" marginTop="16" marginBottom="8"/>
-            <brls:DetailCell id="fg_read_only" title="@i18n/playguard/fw_gate/read_only"/>
-            <brls:DetailCell id="fg_probe" title="@i18n/playguard/fw_gate/probe"/>
-            <brls:DetailCell id="fg_risk" title="@i18n/playguard/fw_gate/risk"/>
-            <brls:BooleanCell id="fg_remember"/>
-            <brls:Label id="fg_note" text="@i18n/playguard/fw_gate/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:DetailCell id="fg_quit" title="@i18n/playguard/common/quit" marginTop="16"/>
+            <aurore:Label id="fg_headline" text="" fontSize="26" marginBottom="12"/>
+            <aurore:Label id="fg_body" text="" marginBottom="16"/>
+            <aurore:Label id="fg_status" text="@i18n/playguard/fw_gate/status_checking" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="fg_update"/>
+            <aurore:Header title="@i18n/playguard/fw_gate/section_continue" marginTop="16" marginBottom="8"/>
+            <aurore:DetailCell id="fg_read_only" title="@i18n/playguard/fw_gate/read_only"/>
+            <aurore:DetailCell id="fg_probe" title="@i18n/playguard/fw_gate/probe"/>
+            <aurore:DetailCell id="fg_risk" title="@i18n/playguard/fw_gate/risk"/>
+            <aurore:BooleanCell id="fg_remember"/>
+            <aurore:Label id="fg_note" text="@i18n/playguard/fw_gate/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="fg_quit" title="@i18n/playguard/common/quit" marginTop="16"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

@@ -84,7 +84,7 @@ void playstats_remember(const PlayStats *known);
 void playstats_set_icon_dir(const char *dir);
 
 // The app is quitting: a fetch or an icon read in progress stops at its next
-// step (borealis joins the thread they run on), and returns partial data.
+// step (Aurore joins the thread they run on), and returns partial data.
 void playstats_cancel(void);
 bool playstats_cancelled(void);
 

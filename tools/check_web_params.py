@@ -134,7 +134,7 @@ def main():
 
     # The console's languages (Aurore's ui::LANGUAGES, which config::LANGUAGES
     # names): one catalog each, all in the page's `lang` entry.
-    prefs_hpp = os.path.join("library", "aurore", "library", "include", "borealis", "cadran", "ui", "prefs.hpp")
+    prefs_hpp = os.path.join("library", "aurore", "library", "include", "aurore", "cadran", "ui", "prefs.hpp")
     with open(os.path.join(root, prefs_hpp), encoding="utf-8") as f:
         m = re.search(r"LANGUAGES\[\]\s*=\s*\{([^}]*)\}", f.read())
     languages = [l for l in re.findall(r'"([^"]+)"', m.group(1)) if l != "system"] if m else []

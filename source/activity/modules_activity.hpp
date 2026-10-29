@@ -10,11 +10,11 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "util/modules.hpp"
 
-class ModulesActivity : public brls::Activity
+class ModulesActivity : public aurore::Activity
 {
   public:
     // The tab opened first: the overview, or a module's.
@@ -35,5 +35,5 @@ class ModulesActivity : public brls::Activity
   private:
     Tab start;
 
-    BRLS_BIND(brls::TabFrame, tabs, "md_tabs");
+    AURORE_BIND(aurore::TabFrame, tabs, "md_tabs");
 };

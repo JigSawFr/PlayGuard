@@ -8,14 +8,14 @@
 #pragma once
 
 #include <atomic>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/game_check_text.hpp"
 #include "core/gamecheck.h"
@@ -29,7 +29,7 @@ struct State
 {
     std::atomic<bool> cancel{ false };
     bool open = true;   // the dialog is on screen (main thread only)
-    brls::Dialog* dialog = nullptr;
+    aurore::Dialog* dialog = nullptr;
     // Its heading "Checking the data", with the game's place in a batch;
     // its title the game's name.
     cadran::Progress body;

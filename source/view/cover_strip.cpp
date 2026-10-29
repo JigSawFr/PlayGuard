@@ -17,7 +17,7 @@ constexpr float GONE_US = 350000.0f;   // a removed cover floating away, in µs 
 // corner of a cover at (left, top, w): a game that stays.
 void failed_badge(NVGcontext* vg, float left, float top, float w, float alpha)
 {
-    NVGcolor coral = brls::Application::getTheme()["cadran/coral"];
+    NVGcolor coral = aurore::Application::getTheme()["cadran/coral"];
     coral.a *= alpha;
     const float r = std::max(9.0f, w * 0.13f);
     const float cx = left + w - r * 0.55f, cy = top + r * 0.55f;
@@ -25,7 +25,7 @@ void failed_badge(NVGcontext* vg, float left, float top, float w, float alpha)
     nvgCircle(vg, cx, cy, r);
     nvgFillColor(vg, coral);
     nvgFill(vg);
-    NVGcolor ink = brls::Application::getTheme()["playguard/badge/ink"];
+    NVGcolor ink = aurore::Application::getTheme()["playguard/badge/ink"];
     ink.a *= alpha;
     nvgBeginPath(vg);
     nvgRoundedRect(vg, cx - r * 0.11f, cy - r * 0.55f, r * 0.22f, r * 0.68f, r * 0.11f);
@@ -49,7 +49,7 @@ CoverStrip::CoverStrip()
 
 CoverStrip::~CoverStrip()
 {
-    NVGcontext* vg = brls::Application::getNVGContext();
+    NVGcontext* vg = aurore::Application::getNVGContext();
     for (const auto& [game, tex] : this->owned) nvgDeleteImage(vg, tex);
 }
 
@@ -66,14 +66,14 @@ void CoverStrip::mark(size_t index, Mark what)
 {
     if (index >= this->marks.size()) return;
     this->marks[index] = what;
-    this->marked_at[index] = brls::getCPUTimeUsec();
+    this->marked_at[index] = aurore::getCPUTimeUsec();
 }
 
 void CoverStrip::set_done(u32 done)
 {
     const float target = (float)std::min<size_t>(done, this->ids.empty() ? 0 : this->ids.size() - 1);
     if (target == this->to) return;
-    const brls::Time now = brls::getCPUTimeUsec();
+    const aurore::Time now = aurore::getCPUTimeUsec();
     this->from = this->at(now);
     this->to = target;
     this->since = now;
@@ -88,7 +88,7 @@ std::vector<u64> CoverStrip::wanted() const
     return out;
 }
 
-float CoverStrip::at(brls::Time now) const
+float CoverStrip::at(aurore::Time now) const
 {
     if (!this->since) return this->to;
     const float t = std::min(1.0f, (float)(now - this->since) / EASE_US);
@@ -106,14 +106,14 @@ int CoverStrip::texture(u64 game)
     return game_icons::placeholder();
 }
 
-void CoverStrip::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-                      brls::FrameContext* ctx)
+void CoverStrip::draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+                      aurore::FrameContext* ctx)
 {
     (void)style;
     (void)ctx;
     if (this->ids.empty()) return;
-    brls::Theme theme = brls::Application::getTheme();
-    const brls::Time now = brls::getCPUTimeUsec();
+    aurore::Theme theme = aurore::Application::getTheme();
+    const aurore::Time now = aurore::getCPUTimeUsec();
     const float pos = this->at(now);
     const float size = height;   // the cover in the middle, square
     const float mid = x + width / 2;

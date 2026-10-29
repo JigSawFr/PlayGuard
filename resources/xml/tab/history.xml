@@ -4,7 +4,7 @@
      backups, with a line saying so (what was played is Activity's), then
      where they stand as tiles (in Preferences before). -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -13,29 +13,29 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <brls:Label id="hs_intro" text="@i18n/playguard/history/tab_intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
-            <brls:DetailCell id="hs_changes" focusable="false" title="@i18n/playguard/history/tile_changes"/>
-            <brls:DetailCell id="hs_last_backup" focusable="false" title="@i18n/playguard/backup/tile_last"/>
-            <brls:Header title="@i18n/playguard/history/title" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="hs_history" title="@i18n/playguard/history/open"/>
-            <brls:Header title="@i18n/playguard/tools/section_backup" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="hs_backup_save" title="@i18n/playguard/tools/backup_save"/>
-            <brls:DetailCell id="hs_backup_restore" title="@i18n/playguard/tools/backup_restore"/>
-            <brls:DetailCell id="hs_backup_keep" title="@i18n/playguard/tools/backup_keep"/>
-            <brls:Label id="hs_backup_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="hs_intro" text="@i18n/playguard/history/tab_intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="hs_changes" focusable="false" title="@i18n/playguard/history/tile_changes"/>
+            <aurore:DetailCell id="hs_last_backup" focusable="false" title="@i18n/playguard/backup/tile_last"/>
+            <aurore:Header title="@i18n/playguard/history/title" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="hs_history" title="@i18n/playguard/history/open"/>
+            <aurore:Header title="@i18n/playguard/tools/section_backup" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="hs_backup_save" title="@i18n/playguard/tools/backup_save"/>
+            <aurore:DetailCell id="hs_backup_restore" title="@i18n/playguard/tools/backup_restore"/>
+            <aurore:DetailCell id="hs_backup_keep" title="@i18n/playguard/tools/backup_keep"/>
+            <aurore:Label id="hs_backup_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

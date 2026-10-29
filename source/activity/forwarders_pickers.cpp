@@ -2,13 +2,13 @@
 #include "activity/forwarders_pickers.hpp"
 
 #include <algorithm>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 #include <vector>
 
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 using forwarders_logic::Row;
 
 namespace forwarders_pickers
@@ -22,12 +22,12 @@ void span(const std::string& title, int from_hour, int to_hour, std::weak_ptr<bo
     for (int h = 0; h < 24; h++) starts.push_back(fmt::format("{:02}:00", h));
     for (int h = 1; h <= 24; h++) ends.push_back(fmt::format("{:02}:00", h));
     const std::string from_title = title.empty() ? "playguard/forwarders/hours_from"_i18n
-                                                 : brls::getStr("playguard/forwarders/hours_from_of", title);
+                                                 : aurore::getStr("playguard/forwarders/hours_from_of", title);
     const std::string to_title = title.empty() ? "playguard/forwarders/hours_to"_i18n
-                                               : brls::getStr("playguard/forwarders/hours_to_of", title);
+                                               : aurore::getStr("playguard/forwarders/hours_to_of", title);
     ui::pick(from_title, starts, from_hour, [weak, ends, to_title, to_hour, done](int from) {
         if (weak.expired() || from < 0 || from > 23) return;
-        brls::sync([weak, ends, to_title, to_hour, from, done]() {
+        aurore::sync([weak, ends, to_title, to_hour, from, done]() {
             ui::pick(to_title, ends, to_hour, [weak, from, done](int to) {
                 if (weak.expired() || to < 0 || to > 23) return;
                 const int end = (to + 1) * 60, start = from * 60;
@@ -69,10 +69,10 @@ void hours(const Row& row, bool closed, std::weak_ptr<bool> alive, std::function
             const bool had = r.free2_days != 0;
             const int wd_from = had ? r.free_from / 60 : 16, wd_to = had ? std::max(0, r.free_to / 60 - 1) : 18;
             const int we_from = had ? r.free2_from / 60 : 9, we_to = had ? std::max(0, r.free2_to / 60 - 1) : 19;
-            brls::sync([weak, wd_from, wd_to, we_from, we_to, set]() {
+            aurore::sync([weak, wd_from, wd_to, we_from, we_to, set]() {
                 span("playguard/forwarders/hours_weekdays"_i18n, wd_from, wd_to, weak,
                      [weak, we_from, we_to, set](int from, int to) {
-                    brls::sync([weak, from, to, we_from, we_to, set]() {
+                    aurore::sync([weak, from, to, we_from, we_to, set]() {
                         if (weak.expired()) return;
                         span("playguard/forwarders/hours_weekend"_i18n, we_from, we_to, weak,
                              [weak, from, to, set](int from2, int to2) {
@@ -85,7 +85,7 @@ void hours(const Row& row, bool closed, std::weak_ptr<bool> alive, std::function
             return;
         }
         const int days = DAYS[index];
-        brls::sync([weak, days, from_now, to_now, set]() {
+        aurore::sync([weak, days, from_now, to_now, set]() {
             span("", from_now, to_now, weak, [weak, days, set](int from, int to) {
                 if (weak.expired()) return;
                 set({ days, from, to });
@@ -109,7 +109,7 @@ void pause(std::weak_ptr<bool> alive, std::function<void()> done)
     ui::pick("playguard/forwarders/pause_cell"_i18n, names, current, [weak, done](int index) {
         if (weak.expired() || index < 0 || index > 4) return;
         forwarder_flow::set_pause_rule(TRIES[index], MINUTES[index], [weak, done](bool) {
-            brls::sync([weak, done]() {
+            aurore::sync([weak, done]() {
                 if (!weak.expired()) done();
             });
         });
@@ -131,7 +131,7 @@ void wait(std::weak_ptr<bool> alive, std::function<void()> done)
     ui::pick("playguard/forwarders/wait_cell"_i18n, names, current, [weak, done](int index) {
         if (weak.expired() || index < 0 || index > 4) return;
         forwarder_flow::set_launch_wait(MS[index], [weak, done](bool) {
-            brls::sync([weak, done]() {
+            aurore::sync([weak, done]() {
                 if (!weak.expired()) done();
             });
         });

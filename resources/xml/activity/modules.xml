@@ -5,13 +5,13 @@
      (the recovery module, the remote-link agent), so each is a press away.
      The tabs are added by source/activity/modules_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear"
     footerHidden="false">
 
-    <brls:TabFrame
+    <aurore:TabFrame
         id="md_tabs"
         title="@i18n/playguard/modules/title"
         icon="@res/img/app_icon.jpg"/>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

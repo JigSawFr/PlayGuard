@@ -5,8 +5,8 @@
 #include <cmath>
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "ui/ui.hpp"
 
@@ -22,12 +22,12 @@ constexpr int   ORDER[7] = { 1, 2, 3, 4, 5, 6, 0 };   // Monday first
 PlayHoursView::PlayHoursView()
 {
     this->setFocusable(false);
-    this->font = brls::Application::getDefaultFont();
+    this->font = aurore::Application::getDefaultFont();
     // The rows, then the hours under them.
     this->setHeight(std::ceil(7 * (ROW_H + GAP) + TEXT * this->scale() * 1.6f));
 }
 
-float PlayHoursView::scale() const { return brls::Label::getFontScale(); }
+float PlayHoursView::scale() const { return aurore::Label::getFontScale(); }
 
 void PlayHoursView::show(const PlayStats& s)
 {
@@ -44,15 +44,15 @@ void PlayHoursView::show(const PlayStats& s)
     this->setHeight(std::ceil(7 * (ROW_H + GAP) + TEXT * this->scale() * 1.6f));
 }
 
-void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-                         brls::FrameContext* ctx)
+void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+                         aurore::FrameContext* ctx)
 {
     (void)style;
     (void)ctx;
     (void)height;
     const float s = this->scale();
     const NVGcolor ink = cadran::kit::color("cadran/text");
-    const NVGcolor fill = brls::Application::getTheme()["cadran/teal"];
+    const NVGcolor fill = aurore::Application::getTheme()["cadran/teal"];
     const float name_w = NAME_W * s;
     const float cell_w = (width - name_w) / 24.0f;
     nvgFontFaceId(vg, this->font);
@@ -62,7 +62,7 @@ void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float he
         const float top_y = y + r * (ROW_H + GAP);
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
         nvgFillColor(vg, this->a(d == this->today ? fill : nvgTransRGBA(ink, 170)));
-        nvgText(vg, x, top_y + ROW_H / 2, brls::getStr(fmt::format("playguard/days_short/{}", d)).c_str(), nullptr);
+        nvgText(vg, x, top_y + ROW_H / 2, aurore::getStr(fmt::format("playguard/days_short/{}", d)).c_str(), nullptr);
         for (int h = 0; h < 24; h++) {
             const uint32_t v = this->hour_s[d][h];
             // Nothing played: a faint square; else the stronger, the more.
@@ -85,4 +85,4 @@ void PlayHoursView::draw(NVGcontext* vg, float x, float y, float width, float he
     }
 }
 
-brls::View* PlayHoursView::create() { return new PlayHoursView(); }
+aurore::View* PlayHoursView::create() { return new PlayHoursView(); }

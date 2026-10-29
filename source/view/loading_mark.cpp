@@ -36,7 +36,7 @@ int icon_texture(NVGcontext* vg)
     static int texture = -1;
     if (texture < 0) {
         std::string bytes;
-        texture = paths::read_file(BRLS_ASSET("img/app_icon.jpg"), bytes) && !bytes.empty()
+        texture = paths::read_file(AURORE_ASSET("img/app_icon.jpg"), bytes) && !bytes.empty()
                       ? nvgCreateImageMem(vg, NVG_IMAGE_GENERATE_MIPMAPS, (unsigned char*)bytes.data(), (int)bytes.size())
                       : 0;
     }
@@ -58,25 +58,25 @@ void LoadingMark::takeThemePictures()
 {
     // The slot's picture only when the theme gives one (Theme::image hands
     // back PlayGuard's own otherwise, which this view draws its own way).
-    const brls::ThemeVariant variant = brls::Application::getPlatform()->getThemeVariant();
-    const brls::ThemePictures pictures = brls::Theme::getPictures(variant);
+    const aurore::ThemeVariant variant = aurore::Application::getPlatform()->getThemeVariant();
+    const aurore::ThemePictures pictures = aurore::Theme::getPictures(variant);
     const auto given = pictures.images.find(ART_SLOT);
     this->art = nullptr;
     if (given != pictures.images.end()) {
-        std::shared_ptr<brls::ThemeImage> image = brls::Theme::image(ART_SLOT);
+        std::shared_ptr<aurore::ThemeImage> image = aurore::Theme::image(ART_SLOT);
         if (image && image->path == given->second) this->art = image;
     }
-    this->logo = brls::Theme::logo();
+    this->logo = aurore::Theme::logo();
 }
 
 void LoadingMark::onThemeChanged()
 {
-    brls::View::onThemeChanged();
+    aurore::View::onThemeChanged();
     this->takeThemePictures();
 }
 
 void LoadingMark::draw(NVGcontext* vg, float x, float y, float width, float height,
-                       brls::Style style, brls::FrameContext* ctx)
+                       aurore::Style style, aurore::FrameContext* ctx)
 {
     (void)style;
     (void)ctx;
@@ -87,7 +87,7 @@ void LoadingMark::draw(NVGcontext* vg, float x, float y, float width, float heig
     // from its teal to its violet while the app starts.
     float violet = 0.35f;
     if (!this->still) {
-        const double t = (double)brls::getCPUTimeUsec() / 1e6;
+        const double t = (double)aurore::getCPUTimeUsec() / 1e6;
         violet = 0.5f - 0.5f * std::cos((float)std::fmod(t / BREATH_S, 1.0) * 2.0f * PI);
     }
     const struct { NVGcolor colour; float share; } glows[] = { { AURORA_TEAL, 1.0f - violet }, { AURORA_VIOLET, violet } };
@@ -102,14 +102,14 @@ void LoadingMark::draw(NVGcontext* vg, float x, float y, float width, float heig
 
     // The theme's picture, whole in the square: its loading picture (the
     // icon while it loads), else its logo; the icon when neither is ready.
-    const brls::ThemeImage* picture = nullptr;
-    if (this->art && this->art->state != brls::ThemeImage::State::FAILED) {
+    const aurore::ThemeImage* picture = nullptr;
+    if (this->art && this->art->state != aurore::ThemeImage::State::FAILED) {
         if (this->art->ready()) picture = this->art.get();
     } else if (this->logo && this->logo->ready()) {
         picture = this->logo.get();
     }
     if (picture) {
-        picture->draw(vg, cx - size / 2.0f, cy - size / 2.0f, size, size, brls::BackgroundFit::CONTAIN);
+        picture->draw(vg, cx - size / 2.0f, cy - size / 2.0f, size, size, aurore::BackgroundFit::CONTAIN);
         return;
     }
 
@@ -122,7 +122,7 @@ void LoadingMark::draw(NVGcontext* vg, float x, float y, float width, float heig
     nvgFill(vg);
 }
 
-brls::View* LoadingMark::create()
+aurore::View* LoadingMark::create()
 {
     return new LoadingMark();
 }

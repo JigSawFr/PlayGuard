@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/ha_update_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/notices.hpp"
 #include "activity/ha_update_activity.hpp"
@@ -12,7 +12,7 @@
 #include "util/sys_updates.hpp"
 #include "util/update.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace ha_update_flow
 {
@@ -51,8 +51,8 @@ void note()
         notices::clear(NOTICE);
         return;
     }
-    notices::set(NOTICE, notices::Level::Info, brls::getStr("playguard/notices/ha_integration", latest),
-                 brls::getStr("playguard/notices/ha_integration_detail", s_info.version), "playguard/notices/whats_new"_i18n,
+    notices::set(NOTICE, notices::Level::Info, aurore::getStr("playguard/notices/ha_integration", latest),
+                 aurore::getStr("playguard/notices/ha_integration_detail", s_info.version), "playguard/notices/whats_new"_i18n,
                  []() { open(); });
 }
 
@@ -73,9 +73,9 @@ void check()
             changelog::release_notes(kept, latest).empty())
             fetched = sys_updates::fetch_integration_changelog(latest, &md, &error);
         if (ui::quitting()) return;
-        brls::sync([installed, latest, md, fetched, error]() {
+        aurore::sync([installed, latest, md, fetched, error]() {
             s_checking = false;
-            if (!error.empty()) brls::Logger::info("ha integration: update check: {}", error);
+            if (!error.empty()) aurore::Logger::info("ha integration: update check: {}", error);
             if (latest.empty()) return;   // what the last check found stays
             auto& cfg = config::get();
             cfg.ha_latest = latest;
@@ -87,13 +87,13 @@ void check()
                     paths::ensure_dir(paths::cache_dir());
                     std::string err;
                     if (!paths::atomic_write(file, md, &err))
-                        brls::Logger::warning("ha integration: changelog not kept: {}", err);
+                        aurore::Logger::warning("ha integration: changelog not kept: {}", err);
                 }, file);
             }
             if (update::compare_versions(latest, installed) > 0)
-                brls::Logger::info("ha integration: {} installed, {} available", installed, latest);
+                aurore::Logger::info("ha integration: {} installed, {} available", installed, latest);
             else
-                brls::Logger::info("ha integration: {} installed, up to date", installed);
+                aurore::Logger::info("ha integration: {} installed, up to date", installed);
             note();
         });
     });
@@ -105,8 +105,8 @@ void apply(const std::string& doc)
     const std::string before = s_info.version;
     s_doc = doc;
     s_info = sync_files::parse_integration(doc);
-    if (s_info.version.empty()) brls::Logger::info("ha integration: none");
-    else brls::Logger::info("ha integration: {} (Home Assistant {})", s_info.version, s_info.homeassistant);
+    if (s_info.version.empty()) aurore::Logger::info("ha integration: none");
+    else aurore::Logger::info("ha integration: {} (Home Assistant {})", s_info.version, s_info.homeassistant);
     note();
     if (!s_info.version.empty() && s_info.version != before && due()) check();
 }
@@ -163,7 +163,7 @@ std::string newer()
 
 void open()
 {
-    brls::Application::pushActivity(new HaUpdateActivity());
+    aurore::Application::pushActivity(new HaUpdateActivity());
 }
 
 std::vector<changelog::Line> changes()

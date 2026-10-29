@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <borealis/cadran/util/markdown.hpp>
+#include <aurore/cadran/util/markdown.hpp>
 
 #include "util/sys_notes.hpp"
 

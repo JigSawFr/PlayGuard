@@ -1,20 +1,20 @@
 // ui — PlayGuard's own dialogs: a duration chosen with the stick and the PIN
-// shown, in Aurore's Cadran look (borealis/cadran/ui/ui.hpp has the rest).
+// shown, in Aurore's Cadran look (Aurore/cadran/ui/ui.hpp has the rest).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
 #include <algorithm>
 #include <memory>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/view/cadran_digits.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "action/pt_logic.hpp"
 #include "ui/play_text.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -26,11 +26,11 @@ void stick_minutes(const std::string& header, uint16_t initial, std::function<vo
 {
     namespace kit = cadran::kit;
     auto minutes = std::make_shared<int>(std::min<int>(initial, 24 * 60));
-    auto* body = new brls::Box(brls::Axis::COLUMN);
-    body->setAlignItems(brls::AlignItems::CENTER);
+    auto* body = new aurore::Box(aurore::Axis::COLUMN);
+    body->setAlignItems(aurore::AlignItems::CENTER);
     body->setPadding(30, 40, 22, 40);
-    brls::Label* title = kit::display(header, kit::TEXT_TITLE);
-    title->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    aurore::Label* title = kit::display(header, kit::TEXT_TITLE);
+    title->setHorizontalAlign(aurore::HorizontalAlign::CENTER);
     body->addView(title);
     CadranIcon* up = kit::icon("caret-up", 30, "cadran/teal");
     up->setMarginTop(18);
@@ -44,43 +44,43 @@ void stick_minutes(const std::string& header, uint16_t initial, std::function<vo
     CadranIcon* down = kit::icon("caret-down", 30, "cadran/teal");
     body->addView(down);
     // The keys, as the week's: the arrows 15 min, L and R 5 min.
-    auto* keys = new brls::Box(brls::Axis::ROW);
-    keys->setAlignItems(brls::AlignItems::CENTER);
+    auto* keys = new aurore::Box(aurore::Axis::ROW);
+    keys->setAlignItems(aurore::AlignItems::CENTER);
     keys->setMarginTop(16);
     const auto key = [](const char* letter) {
-        brls::Box* bubble = kit::key(letter);
+        aurore::Box* bubble = kit::key(letter);
         bubble->setMarginRight(4);
         return bubble;
     };
     keys->addView(kit::icon("caret-up", 18, "cadran/text3"));
     keys->addView(kit::icon("caret-down", 18, "cadran/text3"));
-    brls::Label* quarter = kit::label(ui::fmt_played(15), 16, "cadran/text3");
+    aurore::Label* quarter = kit::label(ui::fmt_played(15), 16, "cadran/text3");
     quarter->setMarginLeft(6);
     quarter->setMarginRight(22);
     keys->addView(quarter);
     keys->addView(key("L"));
     keys->addView(key("R"));
-    brls::Label* five = kit::label(ui::fmt_played(5), 16, "cadran/text3");
+    aurore::Label* five = kit::label(ui::fmt_played(5), 16, "cadran/text3");
     five->setMarginLeft(4);
     keys->addView(five);
     body->addView(keys);
 
-    auto* dialog = new brls::Dialog(body);
+    auto* dialog = new aurore::Dialog(body);
     const auto step = [minutes, value](int delta) {
         *minutes = std::max(0, std::min(24 * 60, *minutes + delta));
         value->setText(ui::fmt_played((uint16_t)*minutes));
     };
-    brls::View* frame = dialog->getAppletFrame();
+    aurore::View* frame = dialog->getAppletFrame();
     // An arrow held: 15 min at a time, then whole hours (pt_logic::held_step).
     auto held = std::make_shared<pt_logic::Held>();
-    for (const auto& [button, delta] : { std::pair<brls::ControllerButton, int>{ brls::BUTTON_NAV_UP, 15 },
-                                         { brls::BUTTON_NAV_DOWN, -15 }, { brls::BUTTON_RB, 5 }, { brls::BUTTON_LB, -5 } })
-        frame->registerAction("", button, [step, held, minutes, delta = delta](brls::View*) {
-            step(pt_logic::held_step(*held, *minutes, delta, brls::getCPUTimeUsec()) - *minutes);
+    for (const auto& [button, delta] : { std::pair<aurore::ControllerButton, int>{ aurore::BUTTON_NAV_UP, 15 },
+                                         { aurore::BUTTON_NAV_DOWN, -15 }, { aurore::BUTTON_RB, 5 }, { aurore::BUTTON_LB, -5 } })
+        frame->registerAction("", button, [step, held, minutes, delta = delta](aurore::View*) {
+            step(pt_logic::held_step(*held, *minutes, delta, aurore::getCPUTimeUsec()) - *minutes);
             return true;
-        }, true, true, brls::SOUND_FOCUS_CHANGE);
-    up->addGestureRecognizer(new brls::TapGestureRecognizer(up, [step]() { step(15); }));
-    down->addGestureRecognizer(new brls::TapGestureRecognizer(down, [step]() { step(-15); }));
+        }, true, true, aurore::SOUND_FOCUS_CHANGE);
+    up->addGestureRecognizer(new aurore::TapGestureRecognizer(up, [step]() { step(15); }));
+    down->addGestureRecognizer(new aurore::TapGestureRecognizer(down, [step]() { step(-15); }));
     dialog->addButton("hints/cancel"_i18n, []() {});
     dialog->addButton("hints/ok"_i18n, [minutes, on_value]() {
         if (on_value) on_value((uint16_t)*minutes);
@@ -88,7 +88,7 @@ void stick_minutes(const std::string& header, uint16_t initial, std::function<vo
     dialog->setCancelable(true);
     cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     // A value is set, then confirmed: A right after the arrows is OK, not Cancel.
-    if (brls::View* ok = dialog->getView("brls/dialog/button2")) dialog->setLastFocusedView(ok);
+    if (aurore::View* ok = dialog->getView("aurore/dialog/button2")) dialog->setLastFocusedView(ok);
     dialog->open();
 }
 
@@ -116,7 +116,7 @@ bool show_pin_dialog(std::function<void()> on_close)
 {
     char pin[16];
     Result rc = pctl_get_pin(pin, sizeof(pin));
-    brls::Logger::info("pctl_get_pin returned 0x{:08X}", (unsigned)rc);
+    aurore::Logger::info("pctl_get_pin returned 0x{:08X}", (unsigned)rc);
     if (R_FAILED(rc)) {
         notify_result(rc, "", "playguard/security/show_pin_err"_i18n);
         return false;
@@ -130,8 +130,8 @@ bool show_pin_dialog(std::function<void()> on_close)
     wipe(pin, sizeof(pin));
 
     // The digits in the display face, large, under what they are.
-    brls::Label* digits = cadran::kit::display(spaced, 56);
-    digits->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    aurore::Label* digits = cadran::kit::display(spaced, 56);
+    digits->setHorizontalAlign(aurore::HorizontalAlign::CENTER);
     digits->setMarginBottom(8);
     wipe(&spaced[0], spaced.size());
 

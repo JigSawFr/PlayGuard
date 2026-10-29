@@ -8,7 +8,7 @@
      from its forwarder. The list is rebuilt by
      source/activity/forwarders_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -20,38 +20,38 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
-            <brls:Label id="fw_note" text="@i18n/playguard/forwarders/intro" fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
-            <brls:Label id="fw_patches" text="" fontSize="20" marginBottom="10" visibility="gone" textColor="@theme/cadran/amber"/>
-            <brls:Box id="fw_summary" width="auto" height="auto" axis="column" alignItems="stretch" marginTop="6" marginBottom="6"/>
-            <brls:Header title="@i18n/playguard/forwarders/section_list" marginTop="14" marginBottom="8"/>
-            <brls:Box id="fw_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="fw_empty" text="@i18n/playguard/forwarders/none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header title="@i18n/playguard/forwarders/section_add" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="fw_self" title="PlayGuard"/>
-            <brls:DetailCell id="fw_other" title="@i18n/playguard/forwarders/other"/>
-            <brls:DetailCell id="fw_reinstall" title="@i18n/playguard/forwarders/reinstall_all"/>
-            <brls:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header id="fw_lock_header" title="@i18n/playguard/hbmenu/section" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="fw_lock" title="@i18n/playguard/hbmenu/cell"/>
-            <brls:DetailCell id="fw_protect_all" title="@i18n/playguard/forwarders/protect_all"/>
-            <brls:DetailCell id="fw_pause" title="@i18n/playguard/forwarders/pause_cell"/>
-            <brls:DetailCell id="fw_wait" title="@i18n/playguard/forwarders/wait_cell"/>
-            <brls:DetailCell id="fw_week" title="@i18n/playguard/forwarders/week_cell"/>
-            <brls:DetailCell id="fw_lock_check" title="@i18n/playguard/hbmenu/check"/>
-            <brls:Label id="fw_lock_note" text="@i18n/playguard/hbmenu/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="fw_note" text="@i18n/playguard/forwarders/intro" fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="fw_patches" text="" fontSize="20" marginBottom="10" visibility="gone" textColor="@theme/cadran/amber"/>
+            <aurore:Box id="fw_summary" width="auto" height="auto" axis="column" alignItems="stretch" marginTop="6" marginBottom="6"/>
+            <aurore:Header title="@i18n/playguard/forwarders/section_list" marginTop="14" marginBottom="8"/>
+            <aurore:Box id="fw_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <aurore:Label id="fw_empty" text="@i18n/playguard/forwarders/none" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/forwarders/section_add" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="fw_self" title="PlayGuard"/>
+            <aurore:DetailCell id="fw_other" title="@i18n/playguard/forwarders/other"/>
+            <aurore:DetailCell id="fw_reinstall" title="@i18n/playguard/forwarders/reinstall_all"/>
+            <aurore:Label id="fw_game_note" text="@i18n/playguard/forwarders/game_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header id="fw_lock_header" title="@i18n/playguard/hbmenu/section" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="fw_lock" title="@i18n/playguard/hbmenu/cell"/>
+            <aurore:DetailCell id="fw_protect_all" title="@i18n/playguard/forwarders/protect_all"/>
+            <aurore:DetailCell id="fw_pause" title="@i18n/playguard/forwarders/pause_cell"/>
+            <aurore:DetailCell id="fw_wait" title="@i18n/playguard/forwarders/wait_cell"/>
+            <aurore:DetailCell id="fw_week" title="@i18n/playguard/forwarders/week_cell"/>
+            <aurore:DetailCell id="fw_lock_check" title="@i18n/playguard/hbmenu/check"/>
+            <aurore:Label id="fw_lock_note" text="@i18n/playguard/hbmenu/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

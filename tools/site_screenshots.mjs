@@ -150,7 +150,7 @@ async function run(lang, theme, { tab, screens }) {
       // (above the footer, whose clock always does), else it is pressed
       // again, after 8 s (pressed again too soon, the focus would go one
       // further); and each
-      // waits for a still screen (an editor that opens a picker, borealis'
+      // waits for a still screen (an editor that opens a picker, Aurore's
       // animations), or it could land in the middle.
       for (const key of keys) {
         const before = await still(page);

@@ -4,13 +4,13 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/ui/cadran_text.hpp>
-#include <borealis/cadran/util/text.hpp>
-#include <borealis/cadran/view/footer_hints.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_text.hpp>
+#include <aurore/cadran/util/text.hpp>
+#include <aurore/cadran/view/footer_hints.hpp>
 
 #include "action/data_notice.hpp"
 #include "action/history_logic.hpp"
@@ -24,7 +24,7 @@
 #include "util/config.hpp"
 #include "util/date.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace history_flow
 {
@@ -49,7 +49,7 @@ std::string value_text(const std::string& kind, const std::vector<int>& v)
         if (kind == "countdown") return v[0] ? "playguard/history/counting"_i18n : "playguard/history/paused"_i18n;
     }
     if (kind == "custom" && v.size() == 3)
-        return brls::getStr("playguard/history/custom_value", ui::age_text(v[0]), ui::yes_no(v[1] != 0), ui::yes_no(v[2] != 0));
+        return aurore::getStr("playguard/history/custom_value", ui::age_text(v[0]), ui::yes_no(v[1] != 0), ui::yes_no(v[2] != 0));
     return "";
 }
 
@@ -57,15 +57,15 @@ std::string kind_label(const std::string& kind)
 {
     // A kind this version does not know (written by a newer one): said as
     // such, with its name for a bug report.
-    if (!history_logic::known_kind(kind)) return brls::getStr("playguard/history/unknown_kind", kind);
-    return brls::getStr("playguard/history/kinds/" + kind);
+    if (!history_logic::known_kind(kind)) return aurore::getStr("playguard/history/unknown_kind", kind);
+    return aurore::getStr("playguard/history/kinds/" + kind);
 }
 
 std::string source_label(const history::Entry& e)
 {
-    if (e.source == "profile") return brls::getStr("playguard/history/sources/profile", e.detail);
-    if (e.source == "remote_profile") return brls::getStr("playguard/history/sources/remote_profile", e.detail);
-    if (history_logic::known_source(e.source)) return brls::getStr("playguard/history/sources/" + e.source);
+    if (e.source == "profile") return aurore::getStr("playguard/history/sources/profile", e.detail);
+    if (e.source == "remote_profile") return aurore::getStr("playguard/history/sources/remote_profile", e.detail);
+    if (history_logic::known_source(e.source)) return aurore::getStr("playguard/history/sources/" + e.source);
     return "";
 }
 
@@ -146,7 +146,7 @@ static void store(history::Entry e)
         std::string err;
         bool put_aside = false;
         const bool saved = history::append(e, &err, &put_aside);
-        if (!saved) brls::Logger::warning("history: not saved ({})", err);
+        if (!saved) aurore::Logger::warning("history: not saved ({})", err);
         // A damaged file put aside: the history starts again with this entry.
         if (put_aside) s_count = saved ? 1 : 0;
         else if (saved) {
@@ -154,8 +154,8 @@ static void store(history::Entry e)
             while (n >= 0 && !s_count.compare_exchange_weak(n, std::min<long>(n + 1, (long)history::MAX_ENTRIES))) {
             }
         }
-        brls::sync([saved, err]() { notices::note_write("history", saved, err); });
-        if (put_aside) brls::sync([]() { data_notice::history_put_aside(); });
+        aurore::sync([saved, err]() { notices::note_write("history", saved, err); });
+        if (put_aside) aurore::sync([]() { data_notice::history_put_aside(); });
     });
     sync_flow::changed();   // the remote link publishes the new state
     // Developer › Record the play timer: a line marking the change.
@@ -216,7 +216,7 @@ void record_failure(const char* kind, Result rc, std::vector<int> before, std::v
     e.before = std::move(before);
     e.after  = std::move(after);
     e.result = fmt::format("0x{:08X}", (unsigned)rc);
-    brls::Logger::warning("history: {} refused ({})", e.kind, e.result);
+    aurore::Logger::warning("history: {} refused ({})", e.kind, e.result);
     store(e);
 }
 
@@ -260,23 +260,23 @@ static std::string plain_title(const history::Entry& e)
     const std::vector<int> days = history_logic::changed_days(e);
     if (days.size() == 1) {
         const int d = days[0];
-        return brls::getStr("playguard/history/title_day_change", kind_label(e.kind), ui::day_name_in_text(d),
+        return aurore::getStr("playguard/history/title_day_change", kind_label(e.kind), ui::day_name_in_text(d),
                             ui::fmt_limit((uint16_t)e.before[d]), ui::fmt_limit((uint16_t)e.after[d]));
     }
     const std::string before = value_text(e.kind, e.before), after = value_text(e.kind, e.after);
     if (!before.empty() && !after.empty())
-        return brls::getStr("playguard/history/title_change", kind_label(e.kind), before, after);
+        return aurore::getStr("playguard/history/title_change", kind_label(e.kind), before, after);
     // A detail that is the change itself (a bedtime "21:00 → 22:00"), not a
     // profile's name.
     if (!e.detail.empty() && (e.source.empty() || e.source == "remote"))
-        return brls::getStr("playguard/common/line", kind_label(e.kind), e.detail);
+        return aurore::getStr("playguard/common/line", kind_label(e.kind), e.detail);
     return kind_label(e.kind);
 }
 
 std::string title(const history::Entry& e)
 {
     const std::string t = plain_title(e);
-    return e.result.empty() ? t : brls::getStr("playguard/history/failed_title", t);
+    return e.result.empty() ? t : aurore::getStr("playguard/history/failed_title", t);
 }
 
 std::string details(const history::Entry& e)
@@ -290,7 +290,7 @@ std::string details(const history::Entry& e)
     if (!after.empty()) rows.push_back({ "playguard/history/after"_i18n, after });
     if (!e.version.empty())
         rows.push_back({ "playguard/history/version"_i18n,
-                         e.dev ? brls::getStr("playguard/history/version_dev", e.version) : e.version });
+                         e.dev ? aurore::getStr("playguard/history/version_dev", e.version) : e.version });
     // A development build: which one, to find the change it was made with.
     if (!e.commit.empty()) rows.push_back({ "playguard/history/commit"_i18n, e.commit });
     if (e.pr > 0) rows.push_back({ "playguard/history/pr"_i18n, "#" + std::to_string(e.pr) });
@@ -301,11 +301,11 @@ std::string details(const history::Entry& e)
     if (!days.empty()) {
         out += "\n\n" + "playguard/history/days_changed"_i18n;
         for (int d : days)
-            out += "\n" + brls::getStr("playguard/history/day_change", ui::day_name(d), ui::fmt_limit((uint16_t)e.before[d]),
+            out += "\n" + aurore::getStr("playguard/history/day_change", ui::day_name(d), ui::fmt_limit((uint16_t)e.before[d]),
                                         ui::fmt_limit((uint16_t)e.after[d]));
     }
     if (!e.result.empty())
-        out += "\n\n" + brls::getStr("playguard/history/failed_note", ui::rc_text(result_of(e), false));
+        out += "\n\n" + aurore::getStr("playguard/history/failed_note", ui::rc_text(result_of(e), false));
     if (!history_logic::known_kind(e.kind)) out += "\n\n" + "playguard/history/unknown_note"_i18n;
     return out;
 }
@@ -331,7 +331,7 @@ std::string day_title(const std::string& day)
 
 std::string filter_label(history_logic::Filter f)
 {
-    return brls::getStr(fmt::format("playguard/history/filters/{}", (int)f));
+    return aurore::getStr(fmt::format("playguard/history/filters/{}", (int)f));
 }
 
 table_export::Table table(const std::vector<history::Entry>& entries)
@@ -360,8 +360,8 @@ table_export::Table table(const std::vector<history::Entry>& entries)
         const std::string detail = e.source == "profile" ? "" : e.detail;
         t.rows.push_back({ e.when, kind_label(e.kind), from, detail, value_text(e.kind, e.before), value_text(e.kind, e.after),
                            e.result.empty() ? "playguard/history/columns/done"_i18n
-                                            : brls::getStr("playguard/history/columns/refused", e.result),
-                           e.kind, e.dev ? brls::getStr("playguard/history/version_dev", e.version) : e.version, e.commit,
+                                            : aurore::getStr("playguard/history/columns/refused", e.result),
+                           e.kind, e.dev ? aurore::getStr("playguard/history/version_dev", e.version) : e.version, e.commit,
                            e.pr > 0 ? "#" + std::to_string(e.pr) : "" });
     }
     return t;
@@ -391,8 +391,8 @@ void open(const history::Entry& e, std::function<void()> refresh)
         break;
     }
     if (history_logic::changed_since(e, now))
-        body += "\n\n" + brls::getStr("playguard/history/changed_since", value_text(e.kind, now));
-    body += "\n\n" + brls::getStr("playguard/history/undo_body", value_text(e.kind, e.before));
+        body += "\n\n" + aurore::getStr("playguard/history/changed_since", value_text(e.kind, now));
+    body += "\n\n" + aurore::getStr("playguard/history/undo_body", value_text(e.kind, e.before));
 
     if (e.kind == "limits") {
         // Through the play-timer gate, with the week as it will be drawn.
@@ -436,26 +436,26 @@ void open(const history::Entry& e, std::function<void()> refresh)
 namespace
 {
 // The ZR action offer_undo put on the main screen, until it times out.
-brls::View*            s_undo_view   = nullptr;
-brls::ActionIdentifier s_undo_action = 0;
+aurore::View*            s_undo_view   = nullptr;
+aurore::ActionIdentifier s_undo_action = 0;
 size_t                 s_undo_timer  = 0;
 
 void withdraw_undo()
 {
     if (!s_undo_view) return;
-    brls::cancelDelay(s_undo_timer);
+    aurore::cancelDelay(s_undo_timer);
     s_undo_view->unregisterAction(s_undo_action);
     s_undo_view = nullptr;
     FooterHints::set_timed("", 0, 0);
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
 }
 }   // namespace
 
 void offer_undo(std::function<void()> refresh)
 {
     constexpr long OFFER_MS = 8000;
-    brls::Activity* main = ui::main_screen();
-    if (!main || brls::Application::getActivitiesStack().back() != main) return;
+    aurore::Activity* main = ui::main_screen();
+    if (!main || aurore::Application::getActivitiesStack().back() != main) return;
     withdraw_undo();
     // The change just recorded (a write records it before it ends), when it
     // can be put back; not an undo itself, and nothing when the write
@@ -464,16 +464,16 @@ void offer_undo(std::function<void()> refresh)
     if (!history::undoable(s_last) || s_last.source == "undo") return;
     const history::Entry change = s_last;
     s_undo_view = main->getContentView();
-    s_undo_action = s_undo_view->registerAction("playguard/history/undo_hint"_i18n, brls::BUTTON_RT, [change, refresh](brls::View*) {
+    s_undo_action = s_undo_view->registerAction("playguard/history/undo_hint"_i18n, aurore::BUTTON_RT, [change, refresh](aurore::View*) {
         withdraw_undo();
         open(change, refresh);
         return true;
     });
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
     // The footer shows how long the offer stands (a line draining under it).
-    FooterHints::set_timed("playguard/history/undo_hint"_i18n, brls::getCPUTimeUsec() + (brls::Time)OFFER_MS * 1000,
-                           (brls::Time)OFFER_MS * 1000);
-    s_undo_timer = brls::delay(OFFER_MS, []() { withdraw_undo(); });
+    FooterHints::set_timed("playguard/history/undo_hint"_i18n, aurore::getCPUTimeUsec() + (aurore::Time)OFFER_MS * 1000,
+                           (aurore::Time)OFFER_MS * 1000);
+    s_undo_timer = aurore::delay(OFFER_MS, []() { withdraw_undo(); });
 }
 
 }   // namespace history_flow

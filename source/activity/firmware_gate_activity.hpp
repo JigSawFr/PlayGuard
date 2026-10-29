@@ -5,12 +5,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 
 #include "action/fw_gate.hpp"
 
-class FirmwareGateActivity : public brls::Activity
+class FirmwareGateActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/firmware_gate.xml");
@@ -23,14 +23,14 @@ class FirmwareGateActivity : public brls::Activity
 
     void choose(fw_gate::Choice choice);
 
-    BRLS_BIND(brls::Label,       headline,   "fg_headline");
-    BRLS_BIND(brls::Label,       body,       "fg_body");
-    BRLS_BIND(brls::Label,       status,     "fg_status");
-    BRLS_BIND(brls::DetailCell,  update,     "fg_update");
-    BRLS_BIND(brls::DetailCell,  read_only,  "fg_read_only");
-    BRLS_BIND(brls::DetailCell,  probe,      "fg_probe");
-    BRLS_BIND(brls::DetailCell,  risk,       "fg_risk");
-    BRLS_BIND(brls::BooleanCell, remember,   "fg_remember");
-    BRLS_BIND(brls::Label,       note,       "fg_note");
-    BRLS_BIND(brls::DetailCell,  quit,       "fg_quit");
+    AURORE_BIND(aurore::Label,       headline,   "fg_headline");
+    AURORE_BIND(aurore::Label,       body,       "fg_body");
+    AURORE_BIND(aurore::Label,       status,     "fg_status");
+    AURORE_BIND(aurore::DetailCell,  update,     "fg_update");
+    AURORE_BIND(aurore::DetailCell,  read_only,  "fg_read_only");
+    AURORE_BIND(aurore::DetailCell,  probe,      "fg_probe");
+    AURORE_BIND(aurore::DetailCell,  risk,       "fg_risk");
+    AURORE_BIND(aurore::BooleanCell, remember,   "fg_remember");
+    AURORE_BIND(aurore::Label,       note,       "fg_note");
+    AURORE_BIND(aurore::DetailCell,  quit,       "fg_quit");
 };

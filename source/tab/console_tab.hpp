@@ -6,7 +6,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "tab/tab_base.hpp"
 
@@ -16,7 +16,7 @@ class ConsoleTab : public TabBase
 {
   public:
     ConsoleTab();
-    static brls::View* create();
+    static aurore::View* create();
 
   protected:
     void refresh() override;
@@ -31,18 +31,18 @@ class ConsoleTab : public TabBase
     RowIcon*    patches_icon = nullptr;
     RowIcon*    fw_warn      = nullptr;    // a newer firmware not supported yet (its notes say why)
 
-    BRLS_BIND(brls::DetailCell,  clock,        "cn_clock");
-    BRLS_BIND(brls::DetailCell,  games,        "cn_games");
-    BRLS_BIND(brls::DetailCell,  forwarders,   "cn_forwarders");
-    BRLS_BIND(brls::DetailCell,  remote,       "cn_remote");
-    BRLS_BIND(brls::DetailCell,  modules_cell, "cn_modules");
-    BRLS_BIND(brls::DetailCell,  fw,           "cn_fw");
-    BRLS_BIND(brls::DetailCell,  ams,          "cn_ams");
-    BRLS_BIND(brls::DetailCell,  hekate,       "cn_hekate");
-    BRLS_BIND(brls::DetailCell,  syspatch,     "cn_syspatch");
-    BRLS_BIND(brls::DetailCell,  compat,       "cn_compat");
-    BRLS_BIND(brls::DetailCell,  storage,      "cn_storage");
-    BRLS_BIND(brls::DetailCell,  blank,        "cn_blank");
-    BRLS_BIND(brls::DetailCell,  serial,       "cn_serial");
-    BRLS_BIND(brls::DetailCell,  game_patches, "cn_patches");
+    AURORE_BIND(aurore::DetailCell,  clock,        "cn_clock");
+    AURORE_BIND(aurore::DetailCell,  games,        "cn_games");
+    AURORE_BIND(aurore::DetailCell,  forwarders,   "cn_forwarders");
+    AURORE_BIND(aurore::DetailCell,  remote,       "cn_remote");
+    AURORE_BIND(aurore::DetailCell,  modules_cell, "cn_modules");
+    AURORE_BIND(aurore::DetailCell,  fw,           "cn_fw");
+    AURORE_BIND(aurore::DetailCell,  ams,          "cn_ams");
+    AURORE_BIND(aurore::DetailCell,  hekate,       "cn_hekate");
+    AURORE_BIND(aurore::DetailCell,  syspatch,     "cn_syspatch");
+    AURORE_BIND(aurore::DetailCell,  compat,       "cn_compat");
+    AURORE_BIND(aurore::DetailCell,  storage,      "cn_storage");
+    AURORE_BIND(aurore::DetailCell,  blank,        "cn_blank");
+    AURORE_BIND(aurore::DetailCell,  serial,       "cn_serial");
+    AURORE_BIND(aurore::DetailCell,  game_patches, "cn_patches");
 };

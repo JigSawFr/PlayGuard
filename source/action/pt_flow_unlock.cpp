@@ -4,7 +4,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "action/pt_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/history_flow.hpp"
 #include "action/pt_flow_internal.hpp"
@@ -14,7 +14,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace pt_flow
 {
@@ -94,10 +94,10 @@ void lock_at_exit_if_asked()
     if (!s_lock_at_exit) return;
     const Result rc = pctl_relock();
     if (R_FAILED(rc)) {
-        brls::Logger::error("lock at exit: failed ({:#x}), locked again at the next start", (unsigned)rc);
+        aurore::Logger::error("lock at exit: failed ({:#x}), locked again at the next start", (unsigned)rc);
         return;
     }
-    brls::Logger::info("lock at exit: locked");
+    aurore::Logger::info("lock at exit: locked");
     history_flow::record_event("relock");
     set_relock_pending(false);
     platform_exit_to_home();

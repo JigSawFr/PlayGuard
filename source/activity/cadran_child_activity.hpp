@@ -8,16 +8,16 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-#include <borealis/cadran/view/cadran_digits.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "action/session_pause.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/pt_ring.hpp"
 
-class CadranChildActivity : public brls::Activity
+class CadranChildActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/cadran_child.xml");
@@ -25,18 +25,18 @@ class CadranChildActivity : public brls::Activity
     void onContentAvailable() override;
 
   private:
-    brls::RepeatingTimer timer;
+    aurore::RepeatingTimer timer;
     session_pause::Hold hold;   // the child's: play counts as usual while it is up
     bool was_counting = false;   // the last refresh saw the timer counting (the time up after it: one breath)
 
     void refresh();
 
-    BRLS_BIND(PtRing,       ring,     "child_ring");
-    BRLS_BIND(CadranDigits, bedtime,  "child_bedtime");
-    BRLS_BIND(brls::Box,    bed_chip, "child_bed_chip");
-    BRLS_BIND(CadranIcon,   bed_icon, "child_bed_icon");
-    BRLS_BIND(brls::Label,  time_up,  "child_time_up");
-    BRLS_BIND(brls::Box,    end_chip, "child_end_chip");
-    BRLS_BIND(CadranIcon,   end_icon, "child_end_icon");
-    BRLS_BIND(brls::Label,  end_text, "child_end");
+    AURORE_BIND(PtRing,       ring,     "child_ring");
+    AURORE_BIND(CadranDigits, bedtime,  "child_bedtime");
+    AURORE_BIND(aurore::Box,    bed_chip, "child_bed_chip");
+    AURORE_BIND(CadranIcon,   bed_icon, "child_bed_icon");
+    AURORE_BIND(aurore::Label,  time_up,  "child_time_up");
+    AURORE_BIND(aurore::Box,    end_chip, "child_end_chip");
+    AURORE_BIND(CadranIcon,   end_icon, "child_end_icon");
+    AURORE_BIND(aurore::Label,  end_text, "child_end");
 };

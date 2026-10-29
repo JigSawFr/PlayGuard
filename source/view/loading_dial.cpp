@@ -17,7 +17,7 @@ LoadingDial::LoadingDial()
 }
 
 void LoadingDial::draw(NVGcontext* vg, float x, float y, float width, float height,
-                       brls::Style style, brls::FrameContext* ctx)
+                       aurore::Style style, aurore::FrameContext* ctx)
 {
     (void)width;
     (void)height;
@@ -75,7 +75,7 @@ void LoadingDial::draw(NVGcontext* vg, float x, float y, float width, float heig
     nvgLineCap(vg, NVG_BUTT);
 }
 
-brls::View* LoadingDial::create()
+aurore::View* LoadingDial::create()
 {
     return new LoadingDial();
 }

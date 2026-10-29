@@ -2,7 +2,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/rescue.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstdio>
 #include <cstring>
 #include <sys/stat.h>
@@ -18,7 +18,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace rescue
 {
@@ -52,7 +52,7 @@ void new_nonce()
     if (platform_random(nonce, sizeof(nonce)) && rescue_nonce_format(nonce, text, sizeof(text)) &&
         paths::ensure_dir(paths::data_dir()) && paths::atomic_write(nonce_path(), text, &error))
         return;
-    brls::Logger::warning("rescue: {} could not be written: {}", RESCUE_NONCE_NAME, error);
+    aurore::Logger::warning("rescue: {} could not be written: {}", RESCUE_NONCE_NAME, error);
 }
 
 // Whether `proof` is the sysmodule's for `report`: its MAC made again with
@@ -65,7 +65,7 @@ bool proven(const RescueReport& report, const RescueProof& proof)
     uint8_t mac[RESCUE_MAC_SIZE];
     const Result rc = n ? pctl_pin_hmac(msg, n, mac) : NXM_RC_INVALID_ARGUMENT;
     const bool ok = R_SUCCEEDED(rc) && rescue_mac_equal(mac, proof.mac);
-    if (R_FAILED(rc)) brls::Logger::warning("rescue: the proof could not be checked (rc=0x{:08X})", (unsigned)rc);
+    if (R_FAILED(rc)) aurore::Logger::warning("rescue: the proof could not be checked (rc=0x{:08X})", (unsigned)rc);
     return ok;
 }
 
@@ -150,14 +150,14 @@ void note_version()
     }
     if (!bundled()) {
         const std::string detail = version.empty()
-            ? brls::getStr("playguard/notices/rescue_unknown", app::version())
-            : brls::getStr("playguard/notices/rescue_old_detail", version, app::version());
+            ? aurore::getStr("playguard/notices/rescue_unknown", app::version())
+            : aurore::getStr("playguard/notices/rescue_old_detail", version, app::version());
         notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail);
         return;
     }
     const std::string detail = version.empty()
-        ? brls::getStr("playguard/notices/rescue_unknown_update", app::version())
-        : brls::getStr("playguard/notices/rescue_old_update", version, app::version());
+        ? aurore::getStr("playguard/notices/rescue_unknown_update", app::version())
+        : aurore::getStr("playguard/notices/rescue_old_update", version, app::version());
     notices::set("rescue_old", notices::Level::Action, "playguard/notices/rescue_old"_i18n, detail,
                  "playguard/notices/rescue_update"_i18n, []() { update_now(); });
 }
@@ -173,7 +173,7 @@ void update_now(std::function<void(bool)> done)
 {
     std::string error;
     if (!update(&error)) {
-        ui::error(brls::getStr("playguard/notices/rescue_update_failed", error));
+        ui::error(aurore::getStr("playguard/notices/rescue_update_failed", error));
         if (done) done(false);
         return;
     }
@@ -201,18 +201,18 @@ bool update(std::string* error)
     // The module first, then the file naming it: should the module not be
     // written, the next start still reads the old revision and offers this again.
     if (!paths::atomic_write(dir + "exefs.nsp", nsp, error)) {
-        brls::Logger::error("rescue: the module could not be updated: {}", error ? *error : "");
+        aurore::Logger::error("rescue: the module could not be updated: {}", error ? *error : "");
         return false;
     }
     if (!paths::atomic_write(dir + "playguard-rescue.txt", app::version() + " " + revision() + "\n", error)) {
-        brls::Logger::error("rescue: playguard-rescue.txt could not be written: {}", error ? *error : "");
+        aurore::Logger::error("rescue: playguard-rescue.txt could not be written: {}", error ? *error : "");
         return false;
     }
     // Until the module removes it at the next boot (sysmodule/rescue/source/main.c).
     std::string ignore;
     if (!paths::atomic_write(restart_path(), "", &ignore))
-        brls::Logger::warning("rescue: {} could not be written: {}", RESCUE_RESTART_PATH, ignore);
-    brls::Logger::info("rescue: module updated to revision {} ({} bytes)", revision(), nsp.size());
+        aurore::Logger::warning("rescue: {} could not be written: {}", RESCUE_RESTART_PATH, ignore);
+    aurore::Logger::info("rescue: module updated to revision {} ({} bytes)", revision(), nsp.size());
     return true;
 }
 
@@ -244,14 +244,14 @@ std::optional<RescueReport> take(RescueProof* proof)
     if (!rescue_report_parse(text.c_str(), text.size(), &r)) {
         // The sysmodule may or may not have acted: the parent is told (once,
         // on the main screen) rather than left guessing.
-        brls::Logger::warning("rescue report present but unreadable");
+        aurore::Logger::warning("rescue report present but unreadable");
         data_notice::rescue_unreadable();
         return std::nullopt;
     }
     RescueProof p;
     rescue_proof_parse(text.c_str(), text.size(), &p);
     const bool answers = p.present && challenged && std::memcmp(p.nonce, expected, sizeof(expected)) == 0;
-    brls::Logger::info("rescue report: mode={} result={} rc=0x{:08X} proof={}", rescue_mode_name(r.mode),
+    aurore::Logger::info("rescue report: mode={} result={} rc=0x{:08X} proof={}", rescue_mode_name(r.mode),
                        rescue_result_name(r.result), (unsigned)r.rc,
                        answers ? "present" : p.present ? "for another challenge" : "none");
     if (!answers) p = RescueProof{};
@@ -279,7 +279,7 @@ bool confirmed(const RescueReport& report, const RescueProof& proof, bool* old_m
     // proof writes none, one from before the console's secret (core/rescue.h)
     // one that never checks, and doing RESCUE again gives the same.
     if (old_module) *old_module = !ok && state && needs_proof && !made_by_module && outdated();
-    brls::Logger::info("rescue report {} by the console ({} {}, rc=0x{:08X}, PIN {}, unlocked={})",
+    aurore::Logger::info("rescue report {} by the console ({} {}, rc=0x{:08X}, PIN {}, unlocked={})",
                        ok ? "confirmed" : "not confirmed", needs_proof ? "proof" : "sysmodule",
                        needs_proof ? (made_by_module ? "valid" : proof.present ? "invalid" : "missing")
                                    : (made_by_module ? "installed" : "missing"),

@@ -4,7 +4,7 @@
      At boot, Start / Stop now (the agent only), Remove. The title and the
      text are the module's, set by source/activity/modules_activity.cpp. -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -13,26 +13,26 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <brls:Header id="md_header" title=" " marginBottom="8"/>
-            <brls:Label id="md_about" text=" " fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
-            <brls:DetailCell id="md_status" title="@i18n/playguard/modules/status"/>
-            <brls:DetailCell id="md_action" title="@i18n/playguard/modules/install"/>
-            <brls:BooleanCell id="md_boot"/>
-            <brls:DetailCell id="md_run" title="@i18n/playguard/modules/start"/>
-            <brls:DetailCell id="md_remove" title="@i18n/playguard/modules/remove"/>
+            <aurore:Header id="md_header" title=" " marginBottom="8"/>
+            <aurore:Label id="md_about" text=" " fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="md_status" title="@i18n/playguard/modules/status"/>
+            <aurore:DetailCell id="md_action" title="@i18n/playguard/modules/install"/>
+            <aurore:BooleanCell id="md_boot"/>
+            <aurore:DetailCell id="md_run" title="@i18n/playguard/modules/start"/>
+            <aurore:DetailCell id="md_remove" title="@i18n/playguard/modules/remove"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

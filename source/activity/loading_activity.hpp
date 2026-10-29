@@ -3,7 +3,7 @@
 // service probe, the SD-card reads, the main screen's build) and left the
 // screen black until then. main.cpp runs the start-up one step per frame and
 // moves the progress bar along; the first real screen is then pushed over this
-// one, which stays at the bottom of the stack (borealis' Application::clear(),
+// one, which stays at the bottom of the stack (Aurore's Application::clear(),
 // to remove it, is private).
 // The intro (Preferences › Show the intro): the start-up takes
 // a fraction of a second, too short to see this screen, so it stays at least
@@ -15,11 +15,11 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-#include <borealis/cadran/view/loading_bar.hpp>
+#include <aurore/cadran/view/loading_bar.hpp>
 
-class LoadingActivity : public brls::Activity
+class LoadingActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/loading.xml");
@@ -41,7 +41,7 @@ class LoadingActivity : public brls::Activity
         Screen,     // building the first screen
     };
 
-    static constexpr brls::Time INTRO_US = 2000000;
+    static constexpr aurore::Time INTRO_US = 2000000;
 
     void onContentAvailable() override;
     // `step` is running: its text under the bar, and the bar at its share
@@ -53,11 +53,11 @@ class LoadingActivity : public brls::Activity
     bool inIntro() const;
 
   private:
-    BRLS_BIND(LoadingBar, bar, "loading_bar");
-    BRLS_BIND(brls::Label, step_text, "loading_step");
-    BRLS_BIND(brls::Rectangle, anchor, "loading_anchor");
-    BRLS_BIND(brls::Image, wordmark, "loading_wordmark");
-    BRLS_BIND(brls::Box, root, "loading_root");
+    AURORE_BIND(LoadingBar, bar, "loading_bar");
+    AURORE_BIND(aurore::Label, step_text, "loading_step");
+    AURORE_BIND(aurore::Rectangle, anchor, "loading_anchor");
+    AURORE_BIND(aurore::Image, wordmark, "loading_wordmark");
+    AURORE_BIND(aurore::Box, root, "loading_root");
 
     // The look of the theme in use: the background (none over a theme's
     // picture), the wordmark, the bar's colours.
@@ -71,9 +71,9 @@ class LoadingActivity : public brls::Activity
     Wordmark   shownWordmark = Wordmark::Dark;
     bool       transparent   = false;
     bool       following     = false;
-    brls::Event<brls::ThemeVariant>::Subscription themeChanged;
+    aurore::Event<aurore::ThemeVariant>::Subscription themeChanged;
 
     Mode       mode;
-    brls::Time introStart = 0;   // 0: no intro
+    aurore::Time introStart = 0;   // 0: no intro
     bool       skipped    = false;
 };

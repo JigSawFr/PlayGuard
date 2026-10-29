@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/notices.hpp"
 #include "action/notice_logic.hpp"
@@ -15,14 +15,14 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
 // What an entry says below its title.
-brls::Label* detail_label(const std::string& detail)
+aurore::Label* detail_label(const std::string& detail)
 {
-    auto* text = new brls::Label();
+    auto* text = new aurore::Label();
     text->setSingleLine(false);
     text->setFontSize(18);
     text->setThemeColor("textColor", "cadran/text3");
@@ -43,19 +43,19 @@ NoticesActivity::~NoticesActivity()
 
 void NoticesActivity::open()
 {
-    brls::Logger::info("notices: {} to do, {} for information, {} about the console to do", notices::action_count(),
+    aurore::Logger::info("notices: {} to do, {} for information, {} about the console to do", notices::action_count(),
                        notices::info_count(), notices::console_count());
     if (notices::list().empty() && notices::ignored().empty()) {
         ui::notify("playguard/notices/none"_i18n);
         return;
     }
-    brls::Application::pushActivity(new NoticesActivity());
+    aurore::Application::pushActivity(new NoticesActivity());
 }
 
 void NoticesActivity::onContentAvailable()
 {
     // Every entry for information put away at once.
-    this->getContentView()->registerAction("playguard/notices/read_all"_i18n, brls::BUTTON_Y, [](brls::View*) {
+    this->getContentView()->registerAction("playguard/notices/read_all"_i18n, aurore::BUTTON_Y, [](aurore::View*) {
         notices::dismiss_all();
         return true;
     });
@@ -69,7 +69,7 @@ void NoticesActivity::onContentAvailable()
     // as the dialog gives the focus back to a cell a rebuild deletes, and
     // closing would close the dialog instead.
     this->listener = notices::listen([this]() {
-        brls::sync(ui::guarded(this->alive, [this]() {
+        aurore::sync(ui::guarded(this->alive, [this]() {
             if (this->closing) return;
             if (ui::has_focus(this)) this->rebuild();
             else this->stale = true;
@@ -81,25 +81,25 @@ void NoticesActivity::onResume()
 {
     if (!this->stale) return;
     this->stale = false;
-    // Next frame: borealis first gives the focus back to the cell that
+    // Next frame: Aurore first gives the focus back to the cell that
     // opened the dialog, which rebuild() then moves away before deleting it.
-    brls::sync(ui::guarded(this->alive, [this]() { if (!this->closing) this->rebuild(); }));
+    aurore::sync(ui::guarded(this->alive, [this]() { if (!this->closing) this->rebuild(); }));
 }
 
 // The console's entries folded into one line, with their count: A opens them.
-brls::DetailCell* NoticesActivity::console_line(const std::vector<notices::Entry>& all)
+aurore::DetailCell* NoticesActivity::console_line(const std::vector<notices::Entry>& all)
 {
     int count = 0, todos = 0;
     for (const notices::Entry& c : all)
         if (c.item.group == notice_logic::Group::Console) count++, todos += c.item.level == notices::Level::Action;
-    auto* more = new brls::DetailCell();
-    more->setText(brls::getStr("playguard/notices/console_count", count));
+    auto* more = new aurore::DetailCell();
+    more->setText(aurore::getStr("playguard/notices/console_count", count));
     if (todos) more->title->setThemeColor("textColor", "cadran/amber");
     more->setDetailText(ui::opens("playguard/notices/console_show"_i18n));
-    more->registerClickAction([this](brls::View*) {
+    more->registerClickAction([this](aurore::View*) {
         // Next frame: the rebuild deletes this cell.
         this->console_open = true;
-        brls::sync(ui::guarded(this->alive, [this]() { if (!this->closing) this->rebuild(); }));
+        aurore::sync(ui::guarded(this->alive, [this]() { if (!this->closing) this->rebuild(); }));
         return true;
     });
     return more;
@@ -108,9 +108,9 @@ brls::DetailCell* NoticesActivity::console_line(const std::vector<notices::Entry
 // An entry: its title (amber when it is to do), and A for what fixes it, or
 // to mark it read. X marks one for information read, or ignores one to do
 // the parent may ignore (after a confirmation and the PIN).
-brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo)
+aurore::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo)
 {
-    auto* cell = new brls::DetailCell();
+    auto* cell = new aurore::DetailCell();
     cell->setText(e.item.title);
     if (todo) cell->title->setThemeColor("textColor", "cadran/amber");
     cell->detail->setThemeColor("textColor", "cadran/text2");
@@ -120,7 +120,7 @@ brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo
     cell->setDetailText(has_action ? e.action_label + "  ›" : todo ? "" : "playguard/notices/seen"_i18n);
     const std::string id = e.item.id;
     const auto action = e.action;
-    cell->registerClickAction([this, id, todo, has_action, action](brls::View*) {
+    cell->registerClickAction([this, id, todo, has_action, action](aurore::View*) {
         if (!has_action) {
             if (!todo) notices::dismiss(id);
             return true;
@@ -128,18 +128,18 @@ brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo
         // Information acted on is read.
         if (!todo) notices::dismiss(id);
         this->closing = true;
-        brls::Application::popActivity(brls::TransitionAnimation::FADE, [action]() { action(); });
+        aurore::Application::popActivity(aurore::TransitionAnimation::FADE, [action]() { action(); });
         return true;
     });
     if (!todo) {
-        cell->registerAction("playguard/notices/seen"_i18n, brls::BUTTON_X, [id](brls::View*) {
+        cell->registerAction("playguard/notices/seen"_i18n, aurore::BUTTON_X, [id](aurore::View*) {
             notices::dismiss(id);
             return true;
         });
     } else if (notice_logic::ackable(id)) {
         const std::string title = e.item.title;
-        cell->registerAction("playguard/notices/ignore"_i18n, brls::BUTTON_X, [id, title](brls::View*) {
-            const std::string body = brls::getStr(config::get().notices_ack_remind ? "playguard/notices/ignore_confirm"
+        cell->registerAction("playguard/notices/ignore"_i18n, aurore::BUTTON_X, [id, title](aurore::View*) {
+            const std::string body = aurore::getStr(config::get().notices_ack_remind ? "playguard/notices/ignore_confirm"
                                                                                    : "playguard/notices/ignore_confirm_kept",
                                                   title);
             ui::confirm(body, "playguard/notices/ignore"_i18n, [id]() {
@@ -158,14 +158,14 @@ brls::DetailCell* NoticesActivity::entry_cell(const notices::Entry& e, bool todo
 
 // An entry ignored: its title (not amber: no longer counted), and A to
 // count it again.
-brls::DetailCell* NoticesActivity::ignored_cell(const notices::Entry& e)
+aurore::DetailCell* NoticesActivity::ignored_cell(const notices::Entry& e)
 {
-    auto* cell = new brls::DetailCell();
+    auto* cell = new aurore::DetailCell();
     cell->setText(e.item.title);
     cell->detail->setThemeColor("textColor", "cadran/text2");
     cell->setDetailText("playguard/notices/reactivate"_i18n);
     const std::string id = e.item.id;
-    cell->registerClickAction([id](brls::View*) {
+    cell->registerClickAction([id](aurore::View*) {
         notices::reactivate(id);
         return true;
     });
@@ -179,17 +179,17 @@ void NoticesActivity::rebuild()
     if (all.empty() && ignored.empty()) {
         // Nothing left: back to the main screen, once.
         this->closing = true;
-        brls::Application::popActivity();
+        aurore::Application::popActivity();
         ui::notify("playguard/notices/none"_i18n);
         return;
     }
 
     // New cells in a new box, the focus moved to it, then the old box
-    // removed: borealis would keep a pointer to a deleted focused cell.
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
-    brls::View* first = nullptr;
-    brls::View* focus = nullptr;
+    // removed: Aurore would keep a pointer to a deleted focused cell.
+    auto* box = new aurore::Box(aurore::Axis::COLUMN);
+    box->setAlignItems(aurore::AlignItems::STRETCH);
+    aurore::View* first = nullptr;
+    aurore::View* focus = nullptr;
     bool parental = false;
     for (const notices::Entry& e : all) parental |= e.item.group == notice_logic::Group::Parental;
     // The console's entries: on one line until opened, unless they are all
@@ -199,13 +199,13 @@ void NoticesActivity::rebuild()
     // Each entry's icon, as Today's pills mark them: a warning for what is to
     // do (amber), an "i" for what is only said, so the colour is not alone.
     std::vector<std::string> ids;
-    std::vector<brls::DetailCell*> todos;
-    const auto mark = [&ids](brls::DetailCell* cell) {
+    std::vector<aurore::DetailCell*> todos;
+    const auto mark = [&ids](aurore::DetailCell* cell) {
         ids.push_back("notice_line_" + std::to_string(ids.size()));
         cell->setId(ids.back());
     };
     const auto header = [&](const std::string& title) {
-        auto* h = new brls::Header();
+        auto* h = new aurore::Header();
         h->setTitle(title);
         h->setMarginTop(first ? 24 : 0);
         h->setMarginBottom(8);
@@ -221,14 +221,14 @@ void NoticesActivity::rebuild()
                    : here == Info ? "playguard/notices/section_info"_i18n
                                   : "playguard/notices/section_console"_i18n);
             if (console && !console_shown) {
-                brls::DetailCell* more = this->console_line(all);
+                aurore::DetailCell* more = this->console_line(all);
                 box->addView(more);
                 if (!first) first = more;
                 break;
             }
         }
 
-        brls::DetailCell* cell = this->entry_cell(e, todo);
+        aurore::DetailCell* cell = this->entry_cell(e, todo);
         mark(cell);
         if (todo) todos.push_back(cell);
         box->addView(cell);
@@ -243,26 +243,26 @@ void NoticesActivity::rebuild()
     if (!ignored.empty()) {
         header("playguard/notices/section_ignored"_i18n);
         for (const notices::Entry& e : ignored) {
-            brls::DetailCell* cell = this->ignored_cell(e);
+            aurore::DetailCell* cell = this->ignored_cell(e);
             box->addView(cell);
             if (!first) first = cell;
             const std::string until = notices::ignored_until(e.item.id);
             box->addView(detail_label(until.empty() ? "playguard/notices/ignored_kept"_i18n
-                                                    : brls::getStr("playguard/notices/ignored_until", until)));
+                                                    : aurore::getStr("playguard/notices/ignored_until", until)));
         }
     }
 
     // The entries in cards, before they are shown.
     std::vector<std::pair<const char*, const char*>> icons;
     for (size_t i = 0; i < ids.size(); i++) {
-        auto* cell = static_cast<brls::DetailCell*>(box->getView(ids[i]));
+        auto* cell = static_cast<aurore::DetailCell*>(box->getView(ids[i]));
         const bool todo = std::find(todos.begin(), todos.end(), cell) != todos.end();
         icons.push_back({ ids[i].c_str(), todo ? "alert" : "info" });
     }
     cadran::List(box, box).apply(icons);   // the icons found in the box, not on screen yet
-    for (brls::DetailCell* cell : todos) cadran::List::recolor_icon(cell, nullptr, "cadran/amber", "cadran/amber_surf");
+    for (aurore::DetailCell* cell : todos) cadran::List::recolor_icon(cell, nullptr, "cadran/amber", "cadran/amber_surf");
     root->addView(box);
-    brls::Application::giveFocus(focus ? focus : first);
+    aurore::Application::giveFocus(focus ? focus : first);
     if (this->content) root->removeView(this->content);
     this->content = box;
 }

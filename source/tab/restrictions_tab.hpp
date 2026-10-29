@@ -11,9 +11,9 @@
 
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_list.hpp>
-#include <borealis/cadran/view/cadran_digits.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -22,7 +22,7 @@ class RestrictionsTab : public TabBase
 {
   public:
     RestrictionsTab();
-    static brls::View* create();
+    static aurore::View* create();
 
   protected:
     void refresh() override;
@@ -31,22 +31,22 @@ class RestrictionsTab : public TabBase
     struct Tile
     {
         uint32_t         level = 0;
-        brls::Box*       box   = nullptr;
-        brls::Box*       badge = nullptr;
+        aurore::Box*       box   = nullptr;
+        aurore::Box*       badge = nullptr;
         CadranDigits*    age   = nullptr;
-        brls::Label*     note  = nullptr;
+        aurore::Label*     note  = nullptr;
         // Each line: what it is about, then at the right its state: a
         // padlock when restricted (with a count where there is one), else
         // "Allowed" in words; "—" when unknown.
-        brls::Label*     sns       = nullptr;
-        brls::Label*     sns_state = nullptr;
+        aurore::Label*     sns       = nullptr;
+        aurore::Label*     sns_state = nullptr;
         CadranIcon*      sns_icon  = nullptr;
-        brls::Label*     comm       = nullptr;
-        brls::Label*     comm_state = nullptr;
+        aurore::Label*     comm       = nullptr;
+        aurore::Label*     comm_state = nullptr;
         CadranIcon*      comm_icon  = nullptr;
-        brls::Box*       games_row   = nullptr;   // the installed games it blocks (a game check made)
-        brls::Label*     games       = nullptr;
-        brls::Label*     games_state = nullptr;
+        aurore::Box*       games_row   = nullptr;   // the installed games it blocks (a game check made)
+        aurore::Label*     games       = nullptr;
+        aurore::Label*     games_state = nullptr;
         CadranIcon*      games_icon  = nullptr;
         bool             to_settings = false;   // A goes to Custom's settings
     };
@@ -76,14 +76,14 @@ class RestrictionsTab : public TabBase
     std::string settings_text(const PctlCustomSettings& s) const;
     void show_tiles(bool custom);
 
-    BRLS_BIND(brls::Header,      custom_header, "rs_custom_header");
-    BRLS_BIND(brls::DetailCell,  age,           "rs_age");
-    BRLS_BIND(brls::BooleanCell, sns,           "rs_sns");
-    BRLS_BIND(brls::BooleanCell, comm,          "rs_comm");
-    BRLS_BIND(brls::Label,       custom_note,   "rs_custom_note");
-    BRLS_BIND(brls::BooleanCell, vr,            "rs_vr");
-    BRLS_BIND(brls::DetailCell,  org,           "rs_org");
-    BRLS_BIND(brls::DetailCell,  blocked,       "rs_blocked");
-    BRLS_BIND(brls::Label,       blocked_note,  "rs_blocked_note");
-    BRLS_BIND(brls::Label,       note,          "rs_note");
+    AURORE_BIND(aurore::Header,      custom_header, "rs_custom_header");
+    AURORE_BIND(aurore::DetailCell,  age,           "rs_age");
+    AURORE_BIND(aurore::BooleanCell, sns,           "rs_sns");
+    AURORE_BIND(aurore::BooleanCell, comm,          "rs_comm");
+    AURORE_BIND(aurore::Label,       custom_note,   "rs_custom_note");
+    AURORE_BIND(aurore::BooleanCell, vr,            "rs_vr");
+    AURORE_BIND(aurore::DetailCell,  org,           "rs_org");
+    AURORE_BIND(aurore::DetailCell,  blocked,       "rs_blocked");
+    AURORE_BIND(aurore::Label,       blocked_note,  "rs_blocked_note");
+    AURORE_BIND(aurore::Label,       note,          "rs_note");
 };

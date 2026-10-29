@@ -21,9 +21,9 @@
 #include <memory>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
-#include <borealis/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
 
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -35,7 +35,7 @@ class ActivityTab : public TabBase
   public:
     ActivityTab();
     ~ActivityTab() override;
-    static brls::View* create();
+    static aurore::View* create();
 
     // Asks for a format, then writes every game of `data` (most played over
     // `period` first) to the exports folder; `account` says whose figures
@@ -52,22 +52,22 @@ class ActivityTab : public TabBase
     struct Card
     {
         uint64_t      app_id = 0;
-        brls::Box*    box    = nullptr;
-        brls::Image*  icon   = nullptr;
-        brls::Box*    icon_fallback = nullptr;
-        brls::Label*  name   = nullptr;
+        aurore::Box*    box    = nullptr;
+        aurore::Image*  icon   = nullptr;
+        aurore::Box*    icon_fallback = nullptr;
+        aurore::Label*  name   = nullptr;
         CadranDigits* today  = nullptr;
-        brls::Label*  rest   = nullptr;
-        brls::Box*    grew_row = nullptr; // the game played most more than the week before: ▲ and how much
-        brls::Label*  grew   = nullptr;
-        brls::Box*    bars[7] = {};
+        aurore::Label*  rest   = nullptr;
+        aurore::Box*    grew_row = nullptr; // the game played most more than the week before: ▲ and how much
+        aurore::Label*  grew   = nullptr;
+        aurore::Box*    bars[7] = {};
     };
     cadran::List list;
-    std::vector<brls::Box*> chips;   // every account, then each one
+    std::vector<aurore::Box*> chips;   // every account, then each one
     std::vector<Card> cards;
     // Nothing played over the period: why, and all time when it has some.
     cadran::kit::Empty empty;
-    brls::Box* see_all = nullptr;
+    aurore::Box* see_all = nullptr;
 
     // Shows this account (-1: every account), remembered for the next run
     // when Activity starts on the last one shown; its data read again when
@@ -114,41 +114,41 @@ class ActivityTab : public TabBase
     bool pt_read = false;
     std::chrono::steady_clock::time_point pt_at;
 
-    BRLS_BIND(PlayDaysView,     days,        "ac_days");
-    BRLS_BIND(brls::DetailCell, account_default, "ac_account_default");
-    BRLS_BIND(brls::Label,      new_account, "ac_new_account");
-    BRLS_BIND(brls::DetailCell, per_day,     "ac_per_day");
-    BRLS_BIND(brls::DetailCell, top,         "ac_top");
-    BRLS_BIND(brls::DetailCell, days_played, "ac_days_played");
-    BRLS_BIND(brls::DetailCell, busiest,     "ac_busiest");
-    BRLS_BIND(brls::DetailCell, session,     "ac_session");
-    BRLS_BIND(brls::Header,     hours_header, "ac_hours_header");
-    BRLS_BIND(PlayHoursView,    hours,       "ac_hours");
-    BRLS_BIND(brls::Label,      hours_legend, "ac_hours_legend");
-    BRLS_BIND(brls::DetailCell, sessions,    "ac_sessions");
-    BRLS_BIND(brls::DetailCell, longest,     "ac_longest");
-    BRLS_BIND(brls::DetailCell, busy_hours,  "ac_busy_hours");
-    BRLS_BIND(brls::DetailCell, late,        "ac_late");
-    BRLS_BIND(brls::DetailCell, games,       "ac_games");
-    BRLS_BIND(brls::Box,        progress,    "ac_progress");
-    BRLS_BIND(brls::Label,      capped,      "ac_capped");
-    BRLS_BIND(brls::Label,      status,      "ac_status");
-    BRLS_BIND(brls::Label,      note,        "ac_note");
-    BRLS_BIND(brls::Box,        accounts_row, "ac_accounts");
-    BRLS_BIND(brls::Box,        period_chip,  "ac_period");
-    BRLS_BIND(brls::Label,      period_label, "ac_period_label");
-    BRLS_BIND(brls::Box,        export_chip,  "ac_export");
-    BRLS_BIND(brls::Label,      games_title,  "ac_games_title");
-    BRLS_BIND(CadranDigits,     today_value,  "ac_today");
-    BRLS_BIND(brls::Label,      today_sub,    "ac_today_sub");
-    BRLS_BIND(CadranDigits,     week_value,   "ac_week");
-    BRLS_BIND(brls::Label,      week_sub,     "ac_week_sub");
-    BRLS_BIND(brls::Label,      week_trend,   "ac_week_trend");
-    BRLS_BIND(brls::Box,        week_trend_row, "ac_week_trend_row");
-    BRLS_BIND(CadranIcon,       week_trend_icon, "ac_week_trend_icon");
-    BRLS_BIND(brls::Box,        week_bars,    "ac_week_bars");
-    BRLS_BIND(CadranDigits,     total_value,  "ac_total");
-    BRLS_BIND(brls::Label,      total_sub,    "ac_total_sub");
-    BRLS_BIND(brls::Box,        games_grid,   "ac_cards");
-    BRLS_BIND(brls::Label,      games_note,   "ac_games_note");
+    AURORE_BIND(PlayDaysView,     days,        "ac_days");
+    AURORE_BIND(aurore::DetailCell, account_default, "ac_account_default");
+    AURORE_BIND(aurore::Label,      new_account, "ac_new_account");
+    AURORE_BIND(aurore::DetailCell, per_day,     "ac_per_day");
+    AURORE_BIND(aurore::DetailCell, top,         "ac_top");
+    AURORE_BIND(aurore::DetailCell, days_played, "ac_days_played");
+    AURORE_BIND(aurore::DetailCell, busiest,     "ac_busiest");
+    AURORE_BIND(aurore::DetailCell, session,     "ac_session");
+    AURORE_BIND(aurore::Header,     hours_header, "ac_hours_header");
+    AURORE_BIND(PlayHoursView,    hours,       "ac_hours");
+    AURORE_BIND(aurore::Label,      hours_legend, "ac_hours_legend");
+    AURORE_BIND(aurore::DetailCell, sessions,    "ac_sessions");
+    AURORE_BIND(aurore::DetailCell, longest,     "ac_longest");
+    AURORE_BIND(aurore::DetailCell, busy_hours,  "ac_busy_hours");
+    AURORE_BIND(aurore::DetailCell, late,        "ac_late");
+    AURORE_BIND(aurore::DetailCell, games,       "ac_games");
+    AURORE_BIND(aurore::Box,        progress,    "ac_progress");
+    AURORE_BIND(aurore::Label,      capped,      "ac_capped");
+    AURORE_BIND(aurore::Label,      status,      "ac_status");
+    AURORE_BIND(aurore::Label,      note,        "ac_note");
+    AURORE_BIND(aurore::Box,        accounts_row, "ac_accounts");
+    AURORE_BIND(aurore::Box,        period_chip,  "ac_period");
+    AURORE_BIND(aurore::Label,      period_label, "ac_period_label");
+    AURORE_BIND(aurore::Box,        export_chip,  "ac_export");
+    AURORE_BIND(aurore::Label,      games_title,  "ac_games_title");
+    AURORE_BIND(CadranDigits,     today_value,  "ac_today");
+    AURORE_BIND(aurore::Label,      today_sub,    "ac_today_sub");
+    AURORE_BIND(CadranDigits,     week_value,   "ac_week");
+    AURORE_BIND(aurore::Label,      week_sub,     "ac_week_sub");
+    AURORE_BIND(aurore::Label,      week_trend,   "ac_week_trend");
+    AURORE_BIND(aurore::Box,        week_trend_row, "ac_week_trend_row");
+    AURORE_BIND(CadranIcon,       week_trend_icon, "ac_week_trend_icon");
+    AURORE_BIND(aurore::Box,        week_bars,    "ac_week_bars");
+    AURORE_BIND(CadranDigits,     total_value,  "ac_total");
+    AURORE_BIND(aurore::Label,      total_sub,    "ac_total_sub");
+    AURORE_BIND(aurore::Box,        games_grid,   "ac_cards");
+    AURORE_BIND(aurore::Label,      games_note,   "ac_games_note");
 };

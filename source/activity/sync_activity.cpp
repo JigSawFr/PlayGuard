@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/ha_update_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -20,7 +20,7 @@
 
 #include "core/platform.h"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -29,13 +29,13 @@ const SyncMqttVersion VERSIONS[] = { SyncMqtt_Auto, SyncMqtt_V5, SyncMqtt_V311 }
 
 std::string policy_text(SyncPolicy p)
 {
-    return brls::getStr(std::string("playguard/sync/policies/") + sync_policy_name(p));
+    return aurore::getStr(std::string("playguard/sync/policies/") + sync_policy_name(p));
 }
 
 std::string version_text(SyncMqttVersion v)
 {
     static const char* const KEYS[] = { "auto", "v5", "v311" };
-    return brls::getStr(std::string("playguard/sync/mqtt_versions/") + KEYS[v <= SyncMqtt_V311 ? v : 0]);
+    return aurore::getStr(std::string("playguard/sync/mqtt_versions/") + KEYS[v <= SyncMqtt_V311 ? v : 0]);
 }
 
 template <size_t N>
@@ -103,7 +103,7 @@ void SyncActivity::onContentAvailable()
         if (!this->commit(next)) enabled->setOn(this->conf.enabled, false);
     });
 
-    host->registerClickAction([this](brls::View*) {
+    host->registerClickAction([this](aurore::View*) {
         ui::prompt_text("playguard/sync/host_prompt"_i18n, conf.host, SYNC_HOST_MAX - 1, [this](std::string text) {
             SyncConf next = this->conf;
             set_text(next.host, text);
@@ -112,7 +112,7 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    port->registerClickAction([this](brls::View*) {
+    port->registerClickAction([this](aurore::View*) {
         ui::prompt_text("playguard/sync/port_prompt"_i18n, std::to_string(conf.port), 5, [this](std::string text) {
             uint32_t value = 0;
             if (!sync_parse_uint(text.c_str(), 1, 65535, &value)) {
@@ -134,7 +134,7 @@ void SyncActivity::onContentAvailable()
         if (!this->commit(next)) tls->setOn(this->conf.tls, false);
     });
 
-    mqtt_version->registerClickAction([this](brls::View*) {
+    mqtt_version->registerClickAction([this](aurore::View*) {
         std::vector<std::string> labels;
         int selected = 0;
         for (size_t i = 0; i < 3; i++) {
@@ -149,7 +149,7 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    user->registerClickAction([this](brls::View*) {
+    user->registerClickAction([this](aurore::View*) {
         const std::vector<std::string> options = { "playguard/sync/user_enter"_i18n, "playguard/sync/user_anonymous"_i18n };
         ui::pick("playguard/sync/user"_i18n, options, 0, [this](int index) {
             if (index == 1) {
@@ -169,7 +169,7 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    password->registerClickAction([this](brls::View*) {
+    password->registerClickAction([this](aurore::View*) {
         const std::vector<std::string> options = { "playguard/sync/password_enter"_i18n, "playguard/sync/password_none"_i18n };
         ui::pick("playguard/sync/password"_i18n, options, 0, [this](int index) {
             if (index == 1) {
@@ -187,7 +187,7 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    name->registerClickAction([this](brls::View*) {
+    name->registerClickAction([this](aurore::View*) {
         ui::prompt_text("playguard/sync/name_prompt"_i18n, conf.console_name, SYNC_NAME_MAX - 1, [this](std::string text) {
             SyncConf next = this->conf;
             set_text(next.console_name, text);
@@ -196,7 +196,7 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    policy->registerClickAction([this](brls::View*) {
+    policy->registerClickAction([this](aurore::View*) {
         std::vector<std::string> labels;
         int selected = 0;
         for (size_t i = 0; i < 3; i++) {
@@ -238,7 +238,7 @@ void SyncActivity::onContentAvailable()
     // integration said which version Home Assistant runs: that version, and
     // its newer release's screen.
     this->refresh_ha_install();
-    ha_install->registerClickAction([this](brls::View*) {
+    ha_install->registerClickAction([this](aurore::View*) {
         if (!ha_update_flow::newer().empty()) {
             ha_update_flow::open();
             return true;
@@ -253,36 +253,36 @@ void SyncActivity::onContentAvailable()
     // each. The serial number is off by default and goes to the broker only,
     // never into a report; it is shown with the versions and hardware.
     for (const Published& p : this->published()) {
-        brls::BooleanCell* cell = p.cell;
+        aurore::BooleanCell* cell = p.cell;
         bool SyncConf::*flag = p.flag;
-        cell->init(brls::getStr(p.title), conf.*flag, [this, cell, flag](bool on) {
+        cell->init(aurore::getStr(p.title), conf.*flag, [this, cell, flag](bool on) {
             SyncConf next = this->conf;
             next.*flag = on;
             if (!this->commit(next)) cell->setOn(this->conf.*flag, false);
         });
     }
 
-    status->registerClickAction([this](brls::View*) {
+    status->registerClickAction([this](aurore::View*) {
         const sync_flow::Status st = sync_flow::status();
         std::string text = this->status_line;
         const SyncStatus& l = st.link;
         if (st.agent) {
-            text += "\n\n" + brls::getStr("playguard/sync/status_agent", st.agent_version);
+            text += "\n\n" + aurore::getStr("playguard/sync/status_agent", st.agent_version);
             if (st.agent_read_only) text += "\n" + "playguard/sync/status_agent_read_only"_i18n;
         }
         if (st.running) {
-            text += "\n\n" + brls::getStr("playguard/sync/status_counts", (int)l.publishes, (int)l.orders,
+            text += "\n\n" + aurore::getStr("playguard/sync/status_counts", (int)l.publishes, (int)l.orders,
                                           (int)l.rejected, (int)st.pending);
             if (l.protocol)
-                text += "\n" + brls::getStr("playguard/sync/status_protocol", l.protocol == MQTT_V5 ? "5.0" : "3.1.1");
-            if (l.last_result[0]) text += "\n" + brls::getStr("playguard/sync/status_last", l.last_result);
-            if (l.error[0]) text += "\n" + brls::getStr("playguard/sync/status_error", l.error);
+                text += "\n" + aurore::getStr("playguard/sync/status_protocol", l.protocol == MQTT_V5 ? "5.0" : "3.1.1");
+            if (l.last_result[0]) text += "\n" + aurore::getStr("playguard/sync/status_last", l.last_result);
+            if (l.error[0]) text += "\n" + aurore::getStr("playguard/sync/status_error", l.error);
         }
         ui::info(text);
         return true;
     });
 
-    sync_now->registerClickAction([](brls::View*) {
+    sync_now->registerClickAction([](aurore::View*) {
         if (!sync_flow::status().running) {
             ui::notify("playguard/sync/not_running"_i18n);
             return true;
@@ -292,7 +292,7 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    log->registerClickAction([](brls::View*) {
+    log->registerClickAction([](aurore::View*) {
         const auto lines = sync_flow::log_lines();
         std::string text;
         // The newest at the top; a dialog only holds so much.
@@ -301,12 +301,12 @@ void SyncActivity::onContentAvailable()
         return true;
     });
 
-    id->registerClickAction([this](brls::View*) {
+    id->registerClickAction([this](aurore::View*) {
         // This system's (an emuMMC is a device of its own: sync_conf_device_id).
         char device[SYNC_ID_LEN + 1];
         sync_conf_device_id(&conf, device);
         if (!device[0]) return true;
-        ui::info(brls::getStr("playguard/sync/id_body", device, fmt::format("{}/{}", conf.topic_prefix, device)));
+        ui::info(aurore::getStr("playguard/sync/id_body", device, fmt::format("{}/{}", conf.topic_prefix, device)));
         return true;
     });
 
@@ -335,7 +335,7 @@ bool SyncActivity::commit(SyncConf next)
     ui::write_later("sync.conf", [this, screen, next]() {
         std::string error;
         const bool saved = sync_files::save(next, &error);
-        brls::sync([this, screen, saved, error]() {
+        aurore::sync([this, screen, saved, error]() {
             const auto reread = ui::guarded(screen, [this]() {
                 this->conf = sync_files::load();
                 this->refresh();
@@ -355,7 +355,7 @@ bool SyncActivity::commit(SyncConf next)
 
 void SyncActivity::refresh()
 {
-    intro->setText(brls::getStr("playguard/sync/intro", sync_files::conf_file()));
+    intro->setText(aurore::getStr("playguard/sync/intro", sync_files::conf_file()));
     enabled->setOn(conf.enabled, false);
     host->setDetailText(or_none(conf.host));
     port->setDetailText(std::to_string(conf.port));
@@ -370,7 +370,7 @@ void SyncActivity::refresh()
     timer->setOn(conf.remote_timer_writes, false);
     discovery->setOn(conf.ha_discovery, false);
     for (const Published& p : this->published()) p.cell->setOn(conf.*p.flag, false);
-    serial->setVisibility(conf.publish_hardware ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    serial->setVisibility(conf.publish_hardware ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
     published_note->setText("playguard/sync/published_note"_i18n);
     char device[SYNC_ID_LEN + 1];
     sync_conf_device_id(&conf, device);
@@ -404,7 +404,7 @@ void SyncActivity::refresh_ha_install()
     }
     const std::string newer = ha_update_flow::newer();
     ha_install->setText("playguard/sync/ha_installed"_i18n);
-    ha_install->setDetailText(newer.empty() ? installed : brls::getStr("playguard/tools/available", installed, newer));
+    ha_install->setDetailText(newer.empty() ? installed : aurore::getStr("playguard/tools/available", installed, newer));
     ha_install->detail->setThemeColor("textColor", newer.empty() ? "cadran/text2" : "cadran/amber");
 }
 
@@ -417,10 +417,10 @@ void SyncActivity::refresh_status()
     if (!conf.enabled) {
         text = "playguard/sync/state_off"_i18n;
     } else if (!st.ready) {
-        text = brls::getStr("playguard/sync/state_incomplete", problem_text(conf));
+        text = aurore::getStr("playguard/sync/state_incomplete", problem_text(conf));
         color = "cadran/amber";
     } else if (st.agent_refused) {
-        text = brls::getStr("playguard/sync/state_agent_refused", st.agent_version);
+        text = aurore::getStr("playguard/sync/state_agent_refused", st.agent_version);
         color = "cadran/amber";
     } else if (!st.running) {
         text = "playguard/sync/state_stopped"_i18n;
@@ -430,19 +430,19 @@ void SyncActivity::refresh_status()
             case SyncLink_Online: {
                 const std::string since = since_text(st.link.online_since_ms);
                 text = since.empty() ? "playguard/sync/state_online"_i18n
-                                     : brls::getStr("playguard/sync/state_online_since", since);
+                                     : aurore::getStr("playguard/sync/state_online_since", since);
                 color = "cadran/teal";
                 break;
             }
             case SyncLink_Connecting: text = "playguard/sync/state_connecting"_i18n; break;
             case SyncLink_Waiting:
-                text = st.link.error[0] ? brls::getStr("playguard/sync/state_retry", st.link.error)
+                text = st.link.error[0] ? aurore::getStr("playguard/sync/state_retry", st.link.error)
                                         : "playguard/sync/state_waiting"_i18n;
                 color = "cadran/amber";
                 break;
             default: text = "playguard/sync/state_off"_i18n; break;
         }
-        if (st.agent) text = brls::getStr("playguard/sync/state_agent", text);
+        if (st.agent) text = aurore::getStr("playguard/sync/state_agent", text);
     }
     if (text == this->status_line) return;
     this->status_line = text;

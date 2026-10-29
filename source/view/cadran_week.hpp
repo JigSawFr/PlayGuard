@@ -11,17 +11,17 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstdint>
 #include <functional>
 #include <string>
 
-#include <borealis/cadran/view/cadran_digits.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "action/pt_logic.hpp"
 
-class CadranWeekView : public brls::Box
+class CadranWeekView : public aurore::Box
 {
   public:
     CadranWeekView();
@@ -52,12 +52,12 @@ class CadranWeekView : public brls::Box
     int  focused_day() const { return this->focused; }
 
     // The bars on their way to their new heights (ui/motion), then the week.
-    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-              brls::FrameContext* ctx) override;
+    void draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+              aurore::FrameContext* ctx) override;
     // The played parts' colours are mixed from the theme's: mixed again.
     void onThemeChanged() override;
 
-    static brls::View* create();
+    static aurore::View* create();
     // Whether `day` (0 = Sunday) comes after today in the week laid out from
     // Monday: what it shows played is last week's.
     static bool last_week(int day);
@@ -70,13 +70,13 @@ class CadranWeekView : public brls::Box
         CadranIcon*   up    = nullptr;
         CadranDigits* value = nullptr;
         CadranIcon*   over  = nullptr;   // a triangle before the value of a limit gone past (not the colour alone)
-        brls::Box*    bar   = nullptr;
-        brls::Box*    fill  = nullptr;   // the time played, from the bar's foot
-        brls::Box*    within = nullptr;  // in the fill, from its foot: the part within the limit, when past it
-        brls::Label*  day   = nullptr;
+        aurore::Box*    bar   = nullptr;
+        aurore::Box*    fill  = nullptr;   // the time played, from the bar's foot
+        aurore::Box*    within = nullptr;  // in the fill, from its foot: the part within the limit, when past it
+        aurore::Label*  day   = nullptr;
         CadranIcon*   down  = nullptr;
-        brls::Box*    bed   = nullptr;   // the bedtime: a moon and the time
-        brls::Label*  bed_time = nullptr;
+        aurore::Box*    bed   = nullptr;   // the bedtime: a moon and the time
+        aurore::Label*  bed_time = nullptr;
     };
     Col      cols[7];
     uint16_t days[7] = {};
@@ -103,7 +103,7 @@ class CadranWeekView : public brls::Box
     {
         float      from  = 0;   // the height left
         float      to    = 0;   // the height asked
-        brls::Time since = 0;   // when it started (µs); 0: there already
+        aurore::Time since = 0;   // when it started (µs); 0: there already
         float      fill_share   = 0;   // the time played, as a share of the bar (0: none drawn)
         float      within_share = 0;   // of it, the part within the limit (a limit gone past)
     };

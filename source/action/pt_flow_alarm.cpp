@@ -3,13 +3,13 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "action/pt_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/history_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace pt_flow
 {

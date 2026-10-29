@@ -9,9 +9,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-class OnboardingActivity : public brls::Activity
+class OnboardingActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/onboarding.xml");
@@ -28,16 +28,16 @@ class OnboardingActivity : public brls::Activity
 
     void refresh();
 
-    BRLS_BIND(brls::Label,      headline, "ob_headline");
-    BRLS_BIND(brls::DetailCell, pin,      "ob_pin");
-    BRLS_BIND(brls::DetailCell, limit,    "ob_limit");
-    BRLS_BIND(brls::DetailCell, clock,    "ob_clock");
-    BRLS_BIND(brls::DetailCell, unlink,   "ob_unlink");
-    BRLS_BIND(brls::DetailCell, alarm,    "ob_alarm");
-    BRLS_BIND(brls::DetailCell, protect,  "ob_protect");
-    BRLS_BIND(brls::Label,      note,     "ob_note");
-    BRLS_BIND(brls::Label,      storage_note, "ob_storage_note");
-    BRLS_BIND(brls::BooleanCell, at_start, "ob_at_start");
-    BRLS_BIND(brls::DetailCell, close,    "ob_close");
-    BRLS_BIND(brls::DetailCell, support,  "ob_support");
+    AURORE_BIND(aurore::Label,      headline, "ob_headline");
+    AURORE_BIND(aurore::DetailCell, pin,      "ob_pin");
+    AURORE_BIND(aurore::DetailCell, limit,    "ob_limit");
+    AURORE_BIND(aurore::DetailCell, clock,    "ob_clock");
+    AURORE_BIND(aurore::DetailCell, unlink,   "ob_unlink");
+    AURORE_BIND(aurore::DetailCell, alarm,    "ob_alarm");
+    AURORE_BIND(aurore::DetailCell, protect,  "ob_protect");
+    AURORE_BIND(aurore::Label,      note,     "ob_note");
+    AURORE_BIND(aurore::Label,      storage_note, "ob_storage_note");
+    AURORE_BIND(aurore::BooleanCell, at_start, "ob_at_start");
+    AURORE_BIND(aurore::DetailCell, close,    "ob_close");
+    AURORE_BIND(aurore::DetailCell, support,  "ob_support");
 };

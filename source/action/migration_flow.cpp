@@ -1,12 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/migration_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_text.hpp>
+#include <aurore/cadran/ui/cadran_text.hpp>
 
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -15,7 +15,7 @@
 #include "util/migrations.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace migration_flow
 {
@@ -27,9 +27,9 @@ migrations::Log log_to(const char* prefix)
 {
     return [prefix](bool warning, const std::string& line) {
         if (warning)
-            brls::Logger::warning("{}: {}", prefix, line);
+            aurore::Logger::warning("{}: {}", prefix, line);
         else
-            brls::Logger::info("{}: {}", prefix, line);
+            aurore::Logger::info("{}: {}", prefix, line);
     };
 }
 
@@ -93,9 +93,9 @@ void run_chosen(const std::vector<bool>& chosen)
         auto moved = std::make_shared<size_t>(0);
         const size_t ran = migrations::run(paths::migrations_file(), steps(chosen, moved), app::version(),
                                            log_to("dev tools"), true);
-        brls::Logger::info("dev tools: migrations run again: {} step(s), {} entries moved", ran, *moved);
-        brls::sync([ran, moved]() {
-            ui::info(brls::getStr("playguard/dev/migrations_done", std::to_string(ran), std::to_string(*moved)));
+        aurore::Logger::info("dev tools: migrations run again: {} step(s), {} entries moved", ran, *moved);
+        aurore::sync([ran, moved]() {
+            ui::info(aurore::getStr("playguard/dev/migrations_done", std::to_string(ran), std::to_string(*moved)));
         });
     });
 }
@@ -107,11 +107,11 @@ void choose(std::vector<bool> chosen, int focus)
     std::vector<std::string> labels, details;
     size_t count = 0;
     for (size_t i = 0; i < known().size(); i++) {
-        labels.push_back(brls::getStr(known()[i].title));
-        details.push_back(brls::getStr(known()[i].detail));
+        labels.push_back(aurore::getStr(known()[i].title));
+        details.push_back(aurore::getStr(known()[i].detail));
         if (chosen[i]) count++;
     }
-    labels.push_back(count ? brls::getStr("playguard/dev/migrations_run", std::to_string(count))
+    labels.push_back(count ? aurore::getStr("playguard/dev/migrations_run", std::to_string(count))
                            : "playguard/dev/migrations_run_none"_i18n);
     std::vector<bool> marks = chosen;
     marks.push_back(false);
@@ -130,7 +130,7 @@ void choose(std::vector<bool> chosen, int focus)
         cadran_text::Rows rows;
         for (size_t i = 0; i < chosen.size(); i++)
             if (chosen[i]) rows.push_back({ labels[i], details[i] });
-        ui::confirm(brls::getStr("playguard/dev/migrations_body", cadran_text::table(rows)), "playguard/dev/migrations_confirm"_i18n,
+        ui::confirm(aurore::getStr("playguard/dev/migrations_body", cadran_text::table(rows)), "playguard/dev/migrations_confirm"_i18n,
                     [chosen]() { run_chosen(chosen); });
     });
 }

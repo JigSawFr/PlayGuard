@@ -7,14 +7,14 @@
 #include <fmt/format.h>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/pt_flow.hpp"
 #include "ui/ui.hpp"
 #include "view/cadran_week.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 PlayTimerPerDayActivity::PlayTimerPerDayActivity(std::string title, const Days& days,
                                                  std::function<bool(const Days&)> on_save)
@@ -40,17 +40,17 @@ PlayTimerPerDayActivity* PlayTimerPerDayActivity::week_split()
 // The cells' actions: the week chart, the quick fills, copy today, discard, save.
 void PlayTimerPerDayActivity::bind_cells()
 {
-    pt_weekdays->registerClickAction([this](brls::View*) {
+    pt_weekdays->registerClickAction([this](aurore::View*) {
         this->fill_days({ 1, 2, 3, 4, 5 }, "playguard/play_timer/perday/weekdays"_i18n);
         return true;
     });
-    pt_weekend->registerClickAction([this](brls::View*) {
+    pt_weekend->registerClickAction([this](aurore::View*) {
         this->fill_days({ 0, 6 }, "playguard/play_timer/perday/weekend"_i18n);
         return true;
     });
     const int today = ui::today_weekday();
-    pt_copy_today->setText(brls::getStr("playguard/tiles/copy_today", ui::day_name_in_text(today)));
-    pt_copy_today->registerClickAction([this, today](brls::View*) {
+    pt_copy_today->setText(aurore::getStr("playguard/tiles/copy_today", ui::day_name_in_text(today)));
+    pt_copy_today->registerClickAction([this, today](aurore::View*) {
         if (!this->live.valid) {
             ui::notify("playguard/play_timer/perday/unavailable"_i18n);
             return true;
@@ -66,11 +66,11 @@ void PlayTimerPerDayActivity::bind_cells()
             ui::notify("playguard/play_timer/perday/already_same"_i18n);
             return true;
         }
-        ui::confirm(brls::getStr("playguard/play_timer/perday/copy_today_body", ui::day_name_in_text(today), ui::fmt_limit(v)),
+        ui::confirm(aurore::getStr("playguard/play_timer/perday/copy_today_body", ui::day_name_in_text(today), ui::fmt_limit(v)),
                     "playguard/play_timer/perday/copy_today_confirm"_i18n, copy);
         return true;
     });
-    pt_revert->registerClickAction([this](brls::View*) {
+    pt_revert->registerClickAction([this](aurore::View*) {
         if (!this->has_changes()) {
             ui::notify("playguard/play_timer/perday/nothing_to_discard"_i18n);
             return true;
@@ -82,7 +82,7 @@ void PlayTimerPerDayActivity::bind_cells()
                     }, nullptr, true);
         return true;
     });
-    pt_save->registerClickAction([this](brls::View*) {
+    pt_save->registerClickAction([this](aurore::View*) {
         this->save();
         return true;
     });
@@ -94,14 +94,14 @@ void PlayTimerPerDayActivity::bind_buttons()
 {
     // + saves from anywhere on the screen (the cell stays for the eye). Not Y:
     // Y deleted a profile elsewhere, and a button must not mean both.
-    this->getContentView()->registerAction("hints/save"_i18n, brls::BUTTON_START, [this](brls::View*) {
+    this->getContentView()->registerAction("hints/save"_i18n, aurore::BUTTON_START, [this](aurore::View*) {
         this->save();
         return true;
     });
 
     // B with unsaved edits asks before leaving.
     // X re-reads the system state; edits that are not saved yet are kept.
-    if (!this->profile_mode) this->getContentView()->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
+    if (!this->profile_mode) this->getContentView()->registerAction("playguard/hints/refresh"_i18n, aurore::BUTTON_X, [this](aurore::View*) {
         if (this->live.valid) {
             // A read that fails keeps the last one: the edits stay comparable
             // with it (B still asks before dropping them).
@@ -116,13 +116,13 @@ void PlayTimerPerDayActivity::bind_buttons()
         return true;
     });
 
-    this->getContentView()->registerAction("hints/back"_i18n, brls::BUTTON_B, [this](brls::View*) {
+    this->getContentView()->registerAction("hints/back"_i18n, aurore::BUTTON_B, [this](aurore::View*) {
         if (!this->has_changes()) {
-            brls::Application::popActivity();
+            aurore::Application::popActivity();
             return true;
         }
         ui::confirm("playguard/play_timer/perday/discard_body"_i18n, "playguard/play_timer/perday/discard_confirm"_i18n,
-                    []() { brls::sync([]() { brls::Application::popActivity(); }); }, nullptr, true);
+                    []() { aurore::sync([]() { aurore::Application::popActivity(); }); }, nullptr, true);
         return true;
     });
 }
@@ -137,7 +137,7 @@ void PlayTimerPerDayActivity::onContentAvailable()
     if (this->profile_mode) {
         // The console's state is not what this screen edits: no header.
         ui::set_visible(state_header.getView(), false);
-        if (auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView())) frame->setTitle(this->profile_title);
+        if (auto* frame = dynamic_cast<aurore::AppletFrame*>(this->getContentView())) frame->setTitle(this->profile_title);
     }
     this->reload_from_service();
     this->rerender();
@@ -147,11 +147,11 @@ void PlayTimerPerDayActivity::onContentAvailable()
     if (this->start_day >= 0) {
         this->cadran_week->focus_day(this->start_day);
         const int d = this->start_day;
-        brls::sync([this, d]() { this->edit_day(d); });
+        aurore::sync([this, d]() { this->edit_day(d); });
     } else if (this->start_split) {
-        brls::sync([this]() {
+        aurore::sync([this]() {
             this->fill_days({ 1, 2, 3, 4, 5 }, "playguard/play_timer/perday/weekdays"_i18n, [this]() {
-                brls::sync([this]() { this->fill_days({ 0, 6 }, "playguard/play_timer/perday/weekend"_i18n); });
+                aurore::sync([this]() { this->fill_days({ 0, 6 }, "playguard/play_timer/perday/weekend"_i18n); });
             });
         });
     }
@@ -162,12 +162,12 @@ void PlayTimerPerDayActivity::onContentAvailable()
 // timer's state keeps its warnings only.
 void PlayTimerPerDayActivity::build_week()
 {
-    this->cadran_card = brls::View::createFromXMLResource("view/cadran_week_card.xml");
-    static_cast<brls::Box*>(this->getContentView()->getView("pt_week_card"))->addView(this->cadran_card);
+    this->cadran_card = aurore::View::createFromXMLResource("view/cadran_week_card.xml");
+    static_cast<aurore::Box*>(this->getContentView()->getView("pt_week_card"))->addView(this->cadran_card);
 
     auto* w = dynamic_cast<CadranWeekView*>(this->cadran_card->getView("cpt_week"));
-    brls::View* keys_idle = this->cadran_card->getView("cpt_keys_idle");
-    brls::View* keys_edit = this->cadran_card->getView("cpt_keys_edit");
+    aurore::View* keys_idle = this->cadran_card->getView("cpt_keys_idle");
+    aurore::View* keys_edit = this->cadran_card->getView("cpt_keys_edit");
     this->cadran_week = w;
     w->set_can_edit([this]() {
         if (this->live.valid) return true;
@@ -185,8 +185,8 @@ void PlayTimerPerDayActivity::build_week()
         this->rerender();
     });
     w->set_on_mode([keys_idle, keys_edit](bool editing) {
-        keys_idle->setVisibility(editing ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
-        keys_edit->setVisibility(editing ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        keys_idle->setVisibility(editing ? aurore::Visibility::GONE : aurore::Visibility::VISIBLE);
+        keys_edit->setVisibility(editing ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
     });
 
     cadran::List list(this->getContentView(), true);
@@ -218,12 +218,12 @@ void PlayTimerPerDayActivity::rerender()
     if (this->live.valid) this->cadran_week->show(this->pending, this->live.day_min);
     int unsaved = 0;
     for (int d = 0; d < 7 && this->live.valid; d++) unsaved += this->pending[d] != this->live.day_min[d];
-    pt_save->setDetailText(unsaved ? (unsaved == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : brls::getStr("playguard/play_timer/perday/unsaved_count", unsaved)) : "");
+    pt_save->setDetailText(unsaved ? (unsaved == 1 ? "playguard/play_timer/perday/unsaved_count_one"_i18n : aurore::getStr("playguard/play_timer/perday/unsaved_count", unsaved)) : "");
     pt_save->detail->setThemeColor("textColor", unsaved ? "cadran/amber" : "cadran/text2");
     // The footer's + hint carries the count too: it is visible from any row.
-    this->getContentView()->updateActionHint(brls::BUTTON_START, unsaved ? brls::getStr("playguard/play_timer/perday/save_hint", unsaved)
+    this->getContentView()->updateActionHint(aurore::BUTTON_START, unsaved ? aurore::getStr("playguard/play_timer/perday/save_hint", unsaved)
                                                                      : "hints/save"_i18n);
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
 }
 
 void PlayTimerPerDayActivity::edit_day(int d)
@@ -232,7 +232,7 @@ void PlayTimerPerDayActivity::edit_day(int d)
         ui::notify("playguard/play_timer/perday/unavailable"_i18n);
         return;
     }
-    pt_flow::pick_limit(brls::getStr("playguard/play_timer/perday/pick_title", ui::day_name(d)), this->pending[d],
+    pt_flow::pick_limit(aurore::getStr("playguard/play_timer/perday/pick_title", ui::day_name(d)), this->pending[d],
                         [this, d](u16 v) {
                             this->pending[d] = v;
                             this->rerender();
@@ -265,7 +265,7 @@ void PlayTimerPerDayActivity::save()
         // Saved as it is, changed or not (a new profile starts unchanged).
         if (this->on_profile_save && this->on_profile_save(snapshot)) {
             for (int i = 0; i < 7; i++) this->live.day_min[i] = snapshot[i];
-            brls::sync([]() { brls::Application::popActivity(); });
+            aurore::sync([]() { aurore::Application::popActivity(); });
         }
         return;
     }

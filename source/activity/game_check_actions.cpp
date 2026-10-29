@@ -14,9 +14,9 @@
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/game_check_text.hpp"
 #include "action/game_icons.hpp"
@@ -36,7 +36,7 @@
 #include "view/segment_bar.hpp"
 #include "activity/game_check_parts.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 using namespace game_check_parts;
 
 void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current_hos)
@@ -50,7 +50,7 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
     }
     auto* box = details_view(game, issue, current_hos, icon_of(game.app_id));
     if (app::read_only() && gamecheck_actions(&game, issue) & ~GA_VERIFY) {
-        brls::Label* note_ro = cadran::kit::label("playguard/common/read_only_note"_i18n, 15.5f, "cadran/text3");
+        aurore::Label* note_ro = cadran::kit::label("playguard/common/read_only_note"_i18n, 15.5f, "cadran/text3");
         note_ro->setMarginTop(8);
         box->addView(note_ro);
     }
@@ -69,7 +69,7 @@ void GameCheckActivity::open(const GameFacts& game, GameIssue issue, u32 current
         dialog->addButton(fix_button(recommended), [this, g, recommended, update]() { this->run(g, recommended, update); });
         if (others) dialog->addButton("playguard/games/other_actions"_i18n, [this, g, others]() { this->choose(g, others); });
         cadran::style_dialog(dialog);
-        if (auto* fix = dynamic_cast<brls::Button*>(dialog->getView("brls/dialog/button1")))
+        if (auto* fix = dynamic_cast<aurore::Button*>(dialog->getView("aurore/dialog/button1")))
             cadran::style_button(fix, cadran::Emphasis::PRIMARY);
     } else {
         dialog->addButton("hints/ok"_i18n, []() {});
@@ -125,7 +125,7 @@ void GameCheckActivity::remove(const GameFacts& g, bool asked)
     auto now = [read_again, id = g.app_id, label, name]() {
         const Result rc = gamecheck_remove(id);
         if (R_SUCCEEDED(rc)) history_flow::record_event("remove_game", "", label);
-        ui::notify_result(rc, brls::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
+        ui::notify_result(rc, aurore::getStr("playguard/games/removed", name), "playguard/games/remove_err"_i18n);
         if (R_SUCCEEDED(rc)) read_again();
     };
     if (asked) now();
@@ -160,7 +160,7 @@ void GameCheckActivity::save_list(const std::vector<GameFacts>& games,
             path = table_export::save(t, table_export::Format::Json, paths::exports_dir(), "games_to_reinstall", &error);
             if (!path.empty() && !paths::atomic_write(path.substr(0, path.size() - 4) + "txt", text, &error)) path.clear();
         }
-        brls::sync([done, path, error]() { done(path, error); });
+        aurore::sync([done, path, error]() { done(path, error); });
     });
 }
 
@@ -180,7 +180,7 @@ struct GameCheckActivity::Removal
     u32 removed = 0;
     bool cancel = false;
     bool open = true;   // the dialog is on screen
-    brls::Dialog* dialog = nullptr;
+    aurore::Dialog* dialog = nullptr;
     // As the data check's: its heading the game's place in the batch, its
     // title the game's name, under the bar how many were removed and not,
     // its note what stays; a batch's covers leafed through above.
@@ -192,9 +192,9 @@ struct GameCheckActivity::Removal
 
 // A line of the removal's summary: `size` px in `color_key`, `top` px
 // below the one before.
-static brls::Label* line(const std::string& text, float size, const char* color_key, float top)
+static aurore::Label* line(const std::string& text, float size, const char* color_key, float top)
 {
-    brls::Label* label = cadran::kit::label(text, size, color_key);
+    aurore::Label* label = cadran::kit::label(text, size, color_key);
     label->setMarginTop(top);
     return label;
 }
@@ -202,7 +202,7 @@ static brls::Label* line(const std::string& text, float size, const char* color_
 void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
 {
     if (games.empty() || this->removing) return;
-    const std::string body = brls::getStr("playguard/games/remove_all_body", (int)games.size()) + "\n" +
+    const std::string body = aurore::getStr("playguard/games/remove_all_body", (int)games.size()) + "\n" +
                              game_check_text::name_lines(games, words());
     std::weak_ptr<bool> weak = this->alive;
     auto now = [this, weak, games]() {
@@ -225,7 +225,7 @@ void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
             removal->games = games;
             removal->path = path;
             const std::string file = path.substr(path.find_last_of('/') + 1);
-            removal->body = cadran::progress_body("", "", brls::getStr("playguard/games/remove_note", file));
+            removal->body = cadran::progress_body("", "", aurore::getStr("playguard/games/remove_note", file));
             if (games.size() > 1) {
                 std::vector<u64> ids;
                 for (const GameFacts& g : games) ids.push_back(g.app_id);
@@ -240,7 +240,7 @@ void GameCheckActivity::remove_games(std::vector<GameFacts> games, bool asked)
                 removal->body.box->addView(removal->segments, at);
                 ui::set_visible(removal->body.bar, false);
             }
-            removal->dialog = new brls::Dialog(removal->body.box);
+            removal->dialog = new aurore::Dialog(removal->body.box);
             ui::add_cancel(removal->dialog, [removal]() {
                 removal->cancel = true;
                 removal->open = false;   // the dialog closes itself
@@ -261,30 +261,30 @@ void GameCheckActivity::removal_summary(const Removal& r)
     // Laid out as the progress it follows (cadran::progress_body): the
     // heading small, the outcome as the title, then the games left and the
     // note.
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
+    auto* box = new aurore::Box(aurore::Axis::COLUMN);
+    box->setAlignItems(aurore::AlignItems::STRETCH);
     box->setPadding(26, 36, 20, 36);
     box->addView(line(r.cancel ? "playguard/games/remove_stopped"_i18n : "playguard/games/remove_finished"_i18n, 18,
                       "cadran/text3", 0));
     const std::string summary = r.removed == 1
-                                    ? brls::getStr("playguard/games/remove_summary_one", (int)r.games.size())
-                                    : brls::getStr("playguard/games/remove_summary", (int)r.removed, (int)r.games.size());
+                                    ? aurore::getStr("playguard/games/remove_summary_one", (int)r.games.size())
+                                    : aurore::getStr("playguard/games/remove_summary", (int)r.removed, (int)r.games.size());
     box->addView(line(summary, 22, "cadran/text", 6));
     if (r.freed)
-        box->addView(line(brls::getStr("playguard/games/remove_freed", game_verify_flow::size_text(r.freed)), 17,
+        box->addView(line(aurore::getStr("playguard/games/remove_freed", game_verify_flow::size_text(r.freed)), 17,
                           "cadran/teal", 4));
     if (!r.failed.empty()) {
-        box->addView(line(brls::getStr("playguard/games/remove_count_err", (int)r.failed.size()), 18, "cadran/coral", 18));
+        box->addView(line(aurore::getStr("playguard/games/remove_count_err", (int)r.failed.size()), 18, "cadran/coral", 18));
         // Their covers, ringed in coral, the first few.
-        auto* left = new brls::Box(brls::Axis::ROW);
-        left->setAlignItems(brls::AlignItems::CENTER);
+        auto* left = new aurore::Box(aurore::Axis::ROW);
+        left->setAlignItems(aurore::AlignItems::CENTER);
         left->setMarginTop(10);
         for (size_t i = 0; i < r.failed.size() && i < LEFT_SHOWN; i++) {
-            auto* cover = new brls::Image();
+            auto* cover = new aurore::Image();
             cover->setWidth(56);
             cover->setHeight(56);
             cover->setMarginRight(10);
-            cover->setScalingType(brls::ImageScalingType::FIT);
+            cover->setScalingType(aurore::ImageScalingType::FIT);
             cover->setCornerRadius(10);
             cover->setThemeColor("borderColor", "cadran/coral");
             cover->setBorderThickness(2);
@@ -307,14 +307,14 @@ void GameCheckActivity::removal_summary(const Removal& r)
         if (!names.empty() && names[0] == '\n') names.erase(0, 1);
         box->addView(line(names, 17, "cadran/text2", 10));
     }
-    box->addView(line(brls::getStr("playguard/games/remove_note", r.path), 15.5f, "cadran/text3", 18));
-    brls::Dialog* dialog = ui::box_dialog(box);
+    box->addView(line(aurore::getStr("playguard/games/remove_note", r.path), 15.5f, "cadran/text3", 18));
+    aurore::Dialog* dialog = ui::box_dialog(box);
     dialog->addButton("hints/ok"_i18n, []() {});
     // Then Try again, in teal: what is left to do (OK keeps the focus: it
     // removes games). Not in read-only mode.
     if (!r.failed.empty() && !app::read_only()) {
         std::weak_ptr<bool> weak = this->alive;
-        dialog->addButton(brls::getStr("playguard/games/remove_retry", (int)r.failed.size()),
+        dialog->addButton(aurore::getStr("playguard/games/remove_retry", (int)r.failed.size()),
                           [this, weak, failed = r.failed]() {
                               if (!weak.expired()) this->remove_games(failed, true);   // asked already
                           });
@@ -339,8 +339,8 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
         auto report = [this, weak, removal, total]() {
             if (removal->removed == total) {
                 ui::notify(removal->removed == 1
-                               ? brls::getStr("playguard/games/removed_all_one", removal->path)
-                               : brls::getStr("playguard/games/removed_all", (int)removal->removed, removal->path));
+                               ? aurore::getStr("playguard/games/removed_all_one", removal->path)
+                               : aurore::getStr("playguard/games/removed_all", (int)removal->removed, removal->path));
                 return;
             }
             if (!weak.expired()) this->removal_summary(*removal);
@@ -351,30 +351,30 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
             Removal& r = *removal;
             if (r.strip) ui::set_visible(r.strip, false);
             ui::set_visible(r.body.image, false);
-            auto* circle = new brls::Box(brls::Axis::ROW);
+            auto* circle = new aurore::Box(aurore::Axis::ROW);
             circle->setWidth(64);
             circle->setHeight(64);
             circle->setCornerRadius(32);
-            circle->setAlignSelf(brls::AlignSelf::CENTER);
+            circle->setAlignSelf(aurore::AlignSelf::CENTER);
             circle->setMarginBottom(16);
             circle->setThemeColor("backgroundColor", "cadran/teal_soft");
-            circle->setAlignItems(brls::AlignItems::CENTER);
-            circle->setJustifyContent(brls::JustifyContent::CENTER);
+            circle->setAlignItems(aurore::AlignItems::CENTER);
+            circle->setJustifyContent(aurore::JustifyContent::CENTER);
             circle->addView(cadran::kit::icon("check", 28, "cadran/teal"));
             r.body.box->addView(circle, 0);
             r.body.heading->setText("playguard/games/remove_finished"_i18n);
             r.body.title->setText(r.removed == 1 ? "playguard/games/removed_n_one"_i18n
-                                                 : brls::getStr("playguard/games/removed_n", (int)r.removed));
-            r.body.show(1.0f, r.freed ? brls::getStr("playguard/games/remove_freed", game_verify_flow::size_text(r.freed))
+                                                 : aurore::getStr("playguard/games/removed_n", (int)r.removed));
+            r.body.show(1.0f, r.freed ? aurore::getStr("playguard/games/remove_freed", game_verify_flow::size_text(r.freed))
                                       : "");
             r.body.detail->setThemeColor("textColor", "cadran/teal");
             // Nothing left to cancel: its button says OK.
-            if (auto* button = dynamic_cast<brls::Button*>(r.dialog->getView("brls/dialog/button1"))) {
+            if (auto* button = dynamic_cast<aurore::Button*>(r.dialog->getView("aurore/dialog/button1"))) {
                 button->setText("hints/ok"_i18n);
-                button->updateActionHint(brls::BUTTON_A, "hints/ok"_i18n);
+                button->updateActionHint(aurore::BUTTON_A, "hints/ok"_i18n);
             }
-            brls::Logger::info("removal: {} ({} freed)", r.body.title->getFullText(), r.freed);
-            brls::delay(DONE_MS, [removal]() {
+            aurore::Logger::info("removal: {} ({} freed)", r.body.title->getFullText(), r.freed);
+            aurore::delay(DONE_MS, [removal]() {
                 if (!removal->open) return;   // closed with B meanwhile
                 removal->open = false;
                 removal->dialog->close();
@@ -398,16 +398,16 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
     }
     ui::set_visible(removal->body.image, !removal->strip);
     removal->body.heading->setText(total == 1 ? "playguard/games/remove_title"_i18n
-                                              : brls::getStr("playguard/games/remove_title_n", (int)at + 1, (int)total));
+                                              : aurore::getStr("playguard/games/remove_title_n", (int)at + 1, (int)total));
     removal->body.title->setText(game_name(g));
     const u32 removed = removal->removed;
     const size_t failed = removal->failed.size();
     std::string detail = removed == 1 ? "playguard/games/remove_done_one"_i18n
-                         : removed    ? brls::getStr("playguard/games/remove_done", (int)removed)
+                         : removed    ? aurore::getStr("playguard/games/remove_done", (int)removed)
                                       : "";
     if (failed)
         detail += (detail.empty() ? "" : " · ") + (failed == 1 ? "playguard/games/remove_failed_one"_i18n
-                                                               : brls::getStr("playguard/games/remove_failed", (int)failed));
+                                                               : aurore::getStr("playguard/games/remove_failed", (int)failed));
     removal->body.show((float)at / (float)total, detail);
     if (failed) removal->body.detail->setThemeColor("textColor", "cadran/coral");
     // On the UI thread, as the PIN it may ask for: the first game once the
@@ -441,14 +441,14 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
             removal->failed.push_back(game);
             if (removal->strip) removal->strip->mark(at, CoverStrip::Mark::FAILED);
             if (removal->segments) removal->segments->set(at, SegmentBar::State::FAILED);
-            brls::Logger::warning("games: {} not removed ({})", id_text(game.app_id), ui::rc_text(rc));
+            aurore::Logger::warning("games: {} not removed ({})", id_text(game.app_id), ui::rc_text(rc));
         }
         if (at + 1 < removal->games.size()) {
             this->remove_next(removal, at + 1);
             return;
         }
         // The last one: its cover gone before the dialog says it is over.
-        brls::delay(STEP_MS, [this, weak, removal]() {
+        aurore::delay(STEP_MS, [this, weak, removal]() {
             if (!weak.expired()) this->remove_next(removal, removal->games.size());
             else if (removal->open) {
                 removal->open = false;
@@ -456,7 +456,7 @@ void GameCheckActivity::remove_next(std::shared_ptr<Removal> removal, size_t at)
             }
         });
     };
-    brls::delay(at ? STEP_MS : OPEN_MS, step);
+    aurore::delay(at ? STEP_MS : OPEN_MS, step);
 }
 
 void GameCheckActivity::toggle(u64 id)
@@ -469,7 +469,7 @@ std::string GameCheckActivity::selection_text() const
 {
     if (this->selected.empty()) return "playguard/games/select_many"_i18n;
     if (this->selected.size() == 1) return "playguard/games/selected_one"_i18n;
-    return brls::getStr("playguard/games/selected", (int)this->selected.size());
+    return aurore::getStr("playguard/games/selected", (int)this->selected.size());
 }
 
 std::vector<GameFacts> GameCheckActivity::selected_games() const
@@ -496,10 +496,10 @@ void GameCheckActivity::selection_menu()
     }
     std::vector<ui::Choice> choices;
     if (!to_verify.empty())
-        choices.push_back({ brls::getStr("playguard/games/selection/verify", (int)to_verify.size()),
+        choices.push_back({ aurore::getStr("playguard/games/selection/verify", (int)to_verify.size()),
                             [this, to_verify]() { this->verify(to_verify); }, "check" });
     if (!to_remove.empty() && !app::read_only())
-        choices.push_back({ brls::getStr("playguard/games/selection/remove", (int)to_remove.size()),
+        choices.push_back({ aurore::getStr("playguard/games/selection/remove", (int)to_remove.size()),
                             [this, to_remove]() { this->remove_games(to_remove); }, "trash", "", "",
                             ui::Choice::Tone::DANGER });
     for (GameCategory category : GROUPS) {
@@ -507,8 +507,8 @@ void GameCheckActivity::selection_menu()
         bool all = true;
         for (const GameFacts& g : group.games) all &= this->selected.count(g.app_id) != 0;
         if (group.games.empty() || all) continue;
-        choices.push_back({ brls::getStr("playguard/games/selection/select_group",
-                                         brls::getStr(std::string("playguard/games/groups/") + category_key(category),
+        choices.push_back({ aurore::getStr("playguard/games/selection/select_group",
+                                         aurore::getStr(std::string("playguard/games/groups/") + category_key(category),
                                                       (int)group.games.size())),
                             [this, category]() {
                                 for (const GameFacts& g : this->groups[category].games) this->selected.insert(g.app_id);
@@ -534,7 +534,7 @@ void GameCheckActivity::remove_content(const GameFacts& g, const GameContent& c)
     std::weak_ptr<bool> weak = this->alive;
     ui::confirm_danger(body, "playguard/games/remove"_i18n, [this, weak, id = g.app_id, c, update, label, name]() {
         const Result rc = gamecheck_remove_content(id, &c);
-        const std::string done = brls::getStr(update ? "playguard/games/update_removed" : "playguard/games/addon_removed", name);
+        const std::string done = aurore::getStr(update ? "playguard/games/update_removed" : "playguard/games/addon_removed", name);
         if (R_FAILED(rc)) {
             ui::notify_result(rc, done, "playguard/games/content_err"_i18n);
             return;
@@ -558,7 +558,7 @@ void GameCheckActivity::reset_launch(const GameFacts& g)
     const u32 installed = gamecheck_installed_version(&g);
     const std::string label = history_label(g), name = game_name(g);
     const Result rc = gamecheck_reset_launch_version(g.app_id, installed);
-    const std::string done = brls::getStr("playguard/games/launch_reset", name);
+    const std::string done = aurore::getStr("playguard/games/launch_reset", name);
     if (R_FAILED(rc)) {
         ui::notify_result(rc, done, "playguard/games/launch_err"_i18n);
         return;
@@ -585,10 +585,10 @@ void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak
         if (R_FAILED(v.rc)) {
             ui::error("playguard/games/verify_err"_i18n, v.rc);
         } else if (!v.corrupt) {
-            ui::info(brls::getStr("playguard/games/verify_ok", name));
+            ui::info(aurore::getStr("playguard/games/verify_ok", name));
         } else {
-            std::string body = brls::getStr("playguard/games/verify_bad", name);
-            if (v.found) body += "\n\n" + brls::getStr("playguard/games/verify_code", console_code(v.found));
+            std::string body = aurore::getStr("playguard/games/verify_bad", name);
+            if (v.found) body += "\n\n" + aurore::getStr("playguard/games/verify_code", console_code(v.found));
             if (app::read_only() || weak.expired()) ui::info(body);
             // One question: what removing does is said here, in coral.
             else ui::confirm_danger(body + "\n\n" + "playguard/games/remove_body"_i18n,
@@ -601,16 +601,16 @@ void GameCheckActivity::report_verified(GameCheckActivity* self, const std::weak
     // A batch: how many of each, the corrupt ones by name, and
     // removing them all at hand.
     const game_check_text::Tally t = game_check_text::tally(results);
-    std::string body = brls::getStr("playguard/games/verify_done", (int)results.size(), (int)total);
-    body += "\n\n" + brls::getStr("playguard/games/verify_count_bad", (int)t.corrupt.size()) +
+    std::string body = aurore::getStr("playguard/games/verify_done", (int)results.size(), (int)total);
+    body += "\n\n" + aurore::getStr("playguard/games/verify_count_bad", (int)t.corrupt.size()) +
             game_check_text::name_lines(t.corrupt, words());
-    body += "\n" + brls::getStr("playguard/games/verify_count_ok", (int)t.intact);
-    if (t.failed) body += "\n" + brls::getStr("playguard/games/verify_count_err", (int)t.failed);
+    body += "\n" + aurore::getStr("playguard/games/verify_count_ok", (int)t.intact);
+    if (t.failed) body += "\n" + aurore::getStr("playguard/games/verify_count_err", (int)t.failed);
     if (t.corrupt.empty() || app::read_only() || weak.expired()) ui::info(body);
     else
         ui::confirm_danger(body + "\n\n" + "playguard/games/remove_body"_i18n,
                            t.corrupt.size() == 1 ? "playguard/games/remove_corrupt_one"_i18n
-                                                 : brls::getStr("playguard/games/remove_corrupt", (int)t.corrupt.size()),
+                                                 : aurore::getStr("playguard/games/remove_corrupt", (int)t.corrupt.size()),
                            [self, weak, corrupt = t.corrupt]() {
                                if (!weak.expired()) self->remove_games(corrupt, true);   // closed while the question was open
                            });
@@ -641,7 +641,7 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
     state->dialog->open();
 
     // Minutes for a big game: a thread of its own, so the other reads on
-    // borealis' queue do not wait behind it. What each check found is kept
+    // Aurore's queue do not wait behind it. What each check found is kept
     // with its game as soon as it is known: a batch cancelled halfway keeps
     // what was checked.
     std::weak_ptr<bool> weak = this->alive;
@@ -649,7 +649,7 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
         auto results = std::make_shared<std::vector<Verified>>();
         for (size_t at = 0; at < games.size() && !state->cancel.load(); at++) {
             const GameFacts& g = games[at];
-            if (at) brls::sync([start, g, at]() { start(g, at); });
+            if (at) aurore::sync([start, g, at]() { start(g, at); });
             Verified v;
             v.game = g;
             v.rc = game_verify_flow::verify(state, g.app_id, &v.corrupt, &v.found);
@@ -658,13 +658,13 @@ void GameCheckActivity::verify(std::vector<GameFacts> games)
             if (R_FAILED(v.rc)) continue;
             u64 now = 0;
             time_local_now(&now, nullptr);
-            brls::sync(ui::guarded(weak, [this, v, now]() {
+            aurore::sync(ui::guarded(weak, [this, v, now]() {
                 if (game_cache::set_verified(&this->cache, v.game.app_id, v.corrupt ? GC_VERIFIED_CORRUPT : GC_VERIFIED_INTACT,
                                              (int64_t)now, v.found))
                     this->save();
             }));
         }
-        brls::sync([this, weak, state, results, total = games.size()]() {
+        aurore::sync([this, weak, state, results, total = games.size()]() {
             game_verify_flow::close(state, [this, weak, results, total]() { report_verified(this, weak, *results, total); });
             if (weak.expired()) return;
             this->verifying = false;

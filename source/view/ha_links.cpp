@@ -1,39 +1,39 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/ha_links.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/view/qr_view.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/view/qr_view.hpp>
 
 #include "app.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace ha_links
 {
 
 namespace
 {
-brls::Label* centered_label(const std::string& text, float font_size, const char* color)
+aurore::Label* centered_label(const std::string& text, float font_size, const char* color)
 {
-    auto* label = new brls::Label();
+    auto* label = new aurore::Label();
     label->setFontSize(font_size);
     label->setThemeColor("textColor", color);
-    label->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    label->setHorizontalAlign(aurore::HorizontalAlign::CENTER);
     label->setSingleLine(false);
-    label->setAlignSelf(brls::AlignSelf::STRETCH);   // wraps at the card's width
+    label->setAlignSelf(aurore::AlignSelf::STRETCH);   // wraps at the card's width
     label->setText(text);
     return label;
 }
 }   // namespace
 
-brls::Box* qr_card(const std::string& title, const std::string& url, const std::string& caption)
+aurore::Box* qr_card(const std::string& title, const std::string& url, const std::string& caption)
 {
-    auto* card = new brls::Box(brls::Axis::COLUMN);
-    card->setAlignItems(brls::AlignItems::CENTER);
+    auto* card = new aurore::Box(aurore::Axis::COLUMN);
+    card->setAlignItems(aurore::AlignItems::CENTER);
     card->setWidth(320);
     card->addView(new QrView(url, 220));
-    brls::Label* name = centered_label(title, cadran::kit::TEXT_LEAD, "cadran/text");
+    aurore::Label* name = centered_label(title, cadran::kit::TEXT_LEAD, "cadran/text");
     name->setMarginTop(6);
     card->addView(name);
     card->addView(centered_label(caption, cadran::kit::TEXT_NOTE, "cadran/text3"));
@@ -42,22 +42,22 @@ brls::Box* qr_card(const std::string& title, const std::string& url, const std::
 
 void show(const std::string& device)
 {
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::CENTER);
+    auto* box = new aurore::Box(aurore::Axis::COLUMN);
+    box->setAlignItems(aurore::AlignItems::CENTER);
     box->setPadding(24, 24, 12, 24);
     box->addView(centered_label("playguard/sync/ha_install_body"_i18n, cadran::kit::TEXT_LEAD, "cadran/text"));
-    auto* row = new brls::Box(brls::Axis::ROW);
-    row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
+    auto* row = new aurore::Box(aurore::Axis::ROW);
+    row->setJustifyContent(aurore::JustifyContent::SPACE_EVENLY);
     row->setMarginTop(14);
     row->addView(qr_card("playguard/sync/ha_hacs"_i18n, app::HA_HACS_URL, "playguard/sync/ha_hacs_caption"_i18n));
     row->addView(qr_card("playguard/sync/ha_add"_i18n, app::HA_ADD_URL,
                          device.empty() ? "playguard/sync/ha_add_caption_none"_i18n
-                                        : brls::getStr("playguard/sync/ha_add_caption", device)));
+                                        : aurore::getStr("playguard/sync/ha_add_caption", device)));
     box->addView(row);
-    auto* dialog = new brls::Dialog(box);
+    auto* dialog = new aurore::Dialog(box);
     dialog->addButton("hints/ok"_i18n, []() {});
     dialog->open();
-    brls::Logger::info("sync: Home Assistant integration links shown");
+    aurore::Logger::info("sync: Home Assistant integration links shown");
 }
 
 }   // namespace ha_links

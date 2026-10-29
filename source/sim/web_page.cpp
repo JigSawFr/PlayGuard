@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "core/pctl_ops.h"
 #include "core/sim_env.h"
@@ -27,33 +27,33 @@ extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_setenv(const char* name, const
     // PlayGuard (its focus event), which locks again, pauses, asks for the PIN.
     if (std::strcmp(name, "PLAYGUARD_SIM_BACKGROUND") == 0) {
         const bool focused = !sim_env_flag(name);
-        brls::sync([focused]() { brls::Application::getWindowFocusChangedEvent()->fire(focused); });
+        aurore::sync([focused]() { aurore::Application::getWindowFocusChangedEvent()->fire(focused); });
     }
     return 1;
 }
 
 // The CJK font, fetched by the page after PlayGuard started (it is only
 // waited for when the page is in Japanese, Korean or Chinese): added behind
-// the Latin one, as borealis does at start-up when it is there already.
+// the Latin one, as Aurore does at start-up when it is there already.
 extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_cjk_font(const char* path)
 {
-    if (!brls::Application::getNVGContext() || !path ||
-        brls::Application::getFont(brls::FONT_CHINESE_SIMPLIFIED) != brls::FONT_INVALID)
+    if (!aurore::Application::getNVGContext() || !path ||
+        aurore::Application::getFont(aurore::FONT_CHINESE_SIMPLIFIED) != aurore::FONT_INVALID)
         return 0;
-    if (!brls::Application::loadFontFromFile(brls::FONT_CHINESE_SIMPLIFIED, path))
+    if (!aurore::Application::loadFontFromFile(aurore::FONT_CHINESE_SIMPLIFIED, path))
         return 0;
-    brls::Application::addFontFallback(brls::FONT_REGULAR, brls::FONT_CHINESE_SIMPLIFIED);
-    brls::Logger::info("Using {} font: {}", brls::FONT_CHINESE_SIMPLIFIED, path);
+    aurore::Application::addFontFallback(aurore::FONT_REGULAR, aurore::FONT_CHINESE_SIMPLIFIED);
+    aurore::Logger::info("Using {} font: {}", aurore::FONT_CHINESE_SIMPLIFIED, path);
     return 1;
 }
 
-// The smoke test (tools/web_smoke.py) before a screenshot: 1 while borealis
+// The smoke test (tools/web_smoke.py) before a screenshot: 1 while Aurore
 // holds the input, a screen still opening or closing (the footer's hints
 // greyed until it lets go). On a busy runner, SwiftShader's frames can make
 // that last longer than the test's pause.
 extern "C" EMSCRIPTEN_KEEPALIVE int playguard_web_busy()
 {
-    return brls::Application::isInputBlocks() ? 1 : 0;
+    return aurore::Application::isInputBlocks() ? 1 : 0;
 }
 
 // What the simulated console does now, for the page's line under the screen

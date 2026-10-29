@@ -3,9 +3,9 @@
 
 #include <yoga/Yoga.h>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/motion.hpp>
-#include <borealis/cadran/view/tab_badge.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/motion.hpp>
+#include <aurore/cadran/view/tab_badge.hpp>
 
 #include "action/notices.hpp"
 #include "action/frame_stats_flow.hpp"
@@ -14,7 +14,7 @@
 #include "core/sim_env.h"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 // The tab last shown (tabs are deleted when another one is opened).
 static TabBase* s_shown = nullptr;
@@ -28,11 +28,11 @@ TabBase::TabBase(const std::string& xml_res, bool refreshes)
     if (this->screen.size() > 4 && this->screen.compare(this->screen.size() - 4, 4, ".xml") == 0)
         this->screen.resize(this->screen.size() - 4);
     if (refreshes)
-        this->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [this](brls::View*) {
+        this->registerAction("playguard/hints/refresh"_i18n, aurore::BUTTON_X, [this](aurore::View*) {
             this->refresh();
             return true;
         });
-    if (auto* note = dynamic_cast<brls::Label*>(this->getView("tab_ro_note"))) note->setSingleLine(false);
+    if (auto* note = dynamic_cast<aurore::Label*>(this->getView("tab_ro_note"))) note->setSingleLine(false);
 }
 
 TabBase::~TabBase()
@@ -41,7 +41,7 @@ TabBase::~TabBase()
     if (this->notice_listener) notices::unlisten(this->notice_listener);
 }
 
-void TabBase::mark(brls::Box* row, std::vector<std::string> ids)
+void TabBase::mark(aurore::Box* row, std::vector<std::string> ids)
 {
     TabBadge* badge = TabBadge::on_row(row);
     if (!badge) return;
@@ -50,8 +50,8 @@ void TabBase::mark(brls::Box* row, std::vector<std::string> ids)
     reason->setSingleLine(true);
     // Placed as its row places it: centred on a row's height, under the
     // title of a tile (a column), where its value starts (update_marks()).
-    reason->setHorizontalAlign(brls::HorizontalAlign::LEFT);
-    reason->setVisibility(brls::Visibility::GONE);
+    reason->setHorizontalAlign(aurore::HorizontalAlign::LEFT);
+    reason->setVisibility(aurore::Visibility::GONE);
     row->addView(reason, row->getChildren().size() - 1);
     this->marks.push_back({ row, badge, reason, std::move(ids) });
     if (!this->notice_listener) this->notice_listener = notices::listen([this]() { this->update_marks(); });
@@ -66,14 +66,14 @@ void TabBase::update_marks()
         // A row whose value is only its "›": the badge says the way in, and
         // what it is for takes the value's place.
         std::string reason;
-        if (auto* cell = dynamic_cast<brls::DetailCell*>(m.row))
+        if (auto* cell = dynamic_cast<aurore::DetailCell*>(m.row))
             if (cadran::kit::without_chevron(cell->detail->getFullText()).empty()) {
-                cell->detail->setVisibility(count > 0 ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+                cell->detail->setVisibility(count > 0 ? aurore::Visibility::GONE : aurore::Visibility::VISIBLE);
                 if (count > 0) reason = notices::reason_of(m.ids);
             }
         // On a tile (a column), where its value starts, under its title (its
         // line fitted by the tile: cadran::List::tiles()).
-        if (auto* cell = dynamic_cast<brls::DetailCell*>(m.row); cell && m.row->getAxis() == brls::Axis::COLUMN) {
+        if (auto* cell = dynamic_cast<aurore::DetailCell*>(m.row); cell && m.row->getAxis() == aurore::Axis::COLUMN) {
             const YGValue indent = YGNodeStyleGetMargin(cell->detail->getYGNode(), YGEdgeLeft);
             m.reason->setMarginLeft(indent.unit == YGUnitPoint ? indent.value : 0.0f);
         }
@@ -82,31 +82,31 @@ void TabBase::update_marks()
     }
 }
 
-brls::View* TabBase::getDefaultFocus()
+aurore::View* TabBase::getDefaultFocus()
 {
     // Only the first time: back from the sidebar later, the row left.
     if (!this->focused_once)
         for (const auto& m : this->marks)
-            if (m.row->getVisibility() == brls::Visibility::VISIBLE && notices::count_of(m.ids) > 0) return m.row;
-    return brls::Box::getDefaultFocus();
+            if (m.row->getVisibility() == aurore::Visibility::VISIBLE && notices::count_of(m.ids) > 0) return m.row;
+    return aurore::Box::getDefaultFocus();
 }
 
-void TabBase::onChildFocusGained(brls::View* directChild, brls::View* focusedView)
+void TabBase::onChildFocusGained(aurore::View* directChild, aurore::View* focusedView)
 {
-    brls::Box::onChildFocusGained(directChild, focusedView);
+    aurore::Box::onChildFocusGained(directChild, focusedView);
     this->focused_once = true;
 }
 
 void TabBase::update_ro_note()
 {
-    if (auto* note = dynamic_cast<brls::Label*>(this->getView("tab_ro_note"))) ui::set_visible(note, app::read_only());
+    if (auto* note = dynamic_cast<aurore::Label*>(this->getView("tab_ro_note"))) ui::set_visible(note, app::read_only());
 }
 
 void TabBase::willAppear(bool resetState)
 {
-    brls::Box::willAppear(resetState);
+    aurore::Box::willAppear(resetState);
     s_shown = this;
-    for (brls::View* v = this; v; v = v->hasParent() ? v->getParent() : nullptr)
+    for (aurore::View* v = this; v; v = v->hasParent() ? v->getParent() : nullptr)
         if (v->getId() == "main_tabs") s_main_screen = this->screen;
     frame_stats_flow::set_screen(this->screen);
     this->update_ro_note();

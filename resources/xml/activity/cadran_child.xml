@@ -5,10 +5,10 @@
      read from across the room, whatever the text size (its labels keep
      theirs). Filled by source/activity/cadran_child_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
-    <brls:Box
+    <aurore:Box
         id="child_root"
         title="@i18n/playguard/title"
         icon="@res/img/app_icon.jpg"
@@ -20,22 +20,22 @@
         justifyContent="center"
         grow="1.0">
 
-        <brls:Label text="@i18n/playguard/cadran/child/title" fontSize="34" textColor="@theme/cadran/text2" marginBottom="18"/>
+        <aurore:Label text="@i18n/playguard/cadran/child/title" fontSize="34" textColor="@theme/cadran/text2" marginBottom="18"/>
         <PtRing id="child_ring" width="350" height="350" marginBottom="20"/>
-        <brls:Box axis="row" alignItems="center" marginBottom="12">
-            <brls:Box id="child_end_chip" axis="row" alignItems="center" height="60" paddingLeft="26" paddingRight="26" cornerRadius="30" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="14">
+        <aurore:Box axis="row" alignItems="center" marginBottom="12">
+            <aurore:Box id="child_end_chip" axis="row" alignItems="center" height="60" paddingLeft="26" paddingRight="26" cornerRadius="30" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="14">
                 <CadranIcon id="child_end_icon" icon="timer" width="26" height="26" color="@theme/cadran/teal" marginRight="12"/>
-                <brls:Label id="child_end" text="" fontSize="25"/>
-            </brls:Box>
-            <brls:Box id="child_bed_chip" axis="row" alignItems="center" height="60" paddingLeft="26" paddingRight="26" cornerRadius="30" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+                <aurore:Label id="child_end" text="" fontSize="25"/>
+            </aurore:Box>
+            <aurore:Box id="child_bed_chip" axis="row" alignItems="center" height="60" paddingLeft="26" paddingRight="26" cornerRadius="30" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
                 <CadranIcon id="child_bed_icon" icon="moon" width="26" height="26" color="@theme/cadran/text2" marginRight="12"/>
-                <brls:Label text="@i18n/playguard/cadran/child/bed" fontSize="25" marginRight="10"/>
+                <aurore:Label text="@i18n/playguard/cadran/child/bed" fontSize="25" marginRight="10"/>
                 <CadranDigits id="child_bedtime" text="21:00" fontSize="25"/>
-            </brls:Box>
-        </brls:Box>
-        <brls:Label id="child_time_up" text="" fontSize="19" textColor="@theme/cadran/text2" marginBottom="8"/>
-        <brls:Label text="@i18n/playguard/cadran/child/enjoy" fontSize="21" textColor="@theme/cadran/text2"/>
+            </aurore:Box>
+        </aurore:Box>
+        <aurore:Label id="child_time_up" text="" fontSize="19" textColor="@theme/cadran/text2" marginBottom="8"/>
+        <aurore:Label text="@i18n/playguard/cadran/child/enjoy" fontSize="21" textColor="@theme/cadran/text2"/>
 
-    </brls:Box>
+    </aurore:Box>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

@@ -1,9 +1,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/forwarders_text.hpp"
 
-#include <borealis/cadran/ui/tr.hpp>
+#include <aurore/cadran/ui/tr.hpp>
 
-using namespace brls::literals;
+using namespace aurore::literals;
 using forwarders_logic::Row;
 using forwarders_logic::State;
 
@@ -17,16 +17,16 @@ std::string state_text_pin(const Row& r, const std::string& until, bool full)
 {
     std::string out = state_only(r) + " · ";
     // Paused after refused PINs: that first, it is what the child sees now.
-    if (r.paused_until) return out + brls::getStr("playguard/forwarders/state_paused", until);
+    if (r.paused_until) return out + aurore::getStr("playguard/forwarders/state_paused", until);
     // Made before it carried its rules: its free hours wait for it to be made again.
     const std::string remake = r.carried ? "" : " · " + "playguard/forwarders/state_remake"_i18n;
     const int rules = (r.free_days ? 1 : 0) + (r.closed_days ? 1 : 0) + (r.limit ? 1 : 0);
     if (!full && rules > 1) return out + "playguard/forwarders/state_pin_rules"_i18n + remake;
     out += !r.free_days ? "playguard/forwarders/state_pin"_i18n
-                        : brls::getStr("playguard/forwarders/state_pin_hours",
+                        : aurore::getStr("playguard/forwarders/state_pin_hours",
                                        hours_label(r.free_days, r.free_from, r.free_to, r.free2_days, r.free2_from, r.free2_to));
     if (r.closed_days)
-        out += " · " + brls::getStr("playguard/forwarders/state_closed", hours_label(r.closed_days, r.closed_from, r.closed_to));
+        out += " · " + aurore::getStr("playguard/forwarders/state_closed", hours_label(r.closed_days, r.closed_from, r.closed_to));
     if (r.limit) out += " · " + "playguard/forwarders/state_limit"_i18n;
     return out + remake;
 }
@@ -78,7 +78,7 @@ std::string list_text(const Row& r, const std::string& until)
     if (!r.pin) return state_only(r);
     std::string out = r.state == State::Ready ? "" : state_only(r);
     const auto add = [&out](const std::string& part) { out += (out.empty() ? "" : " · ") + part; };
-    if (r.paused_until) add(brls::getStr("playguard/forwarders/state_paused", until));
+    if (r.paused_until) add(aurore::getStr("playguard/forwarders/state_paused", until));
     else if (!r.carried) add("playguard/forwarders/state_remake"_i18n);
     return out;
 }

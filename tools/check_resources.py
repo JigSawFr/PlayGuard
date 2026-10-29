@@ -15,10 +15,10 @@
   strings for translators to keep up to date;
 - every history kind the code records (record_event("...")) is one
   history_logic names;
-- every XML layout is well formed (borealis' "brls:" prefix is not declared,
+- every XML layout is well formed (Aurore's "aurore:" prefix is not declared,
   so a non-namespace-aware parser is used);
-- brls:Label never carries padding attributes (borealis throws at runtime);
-- every BRLS_BIND(type, name, "id") names an id of the XML its class
+- aurore:Label never carries padding attributes (Aurore throws at runtime);
+- every AURORE_BIND(type, name, "id") names an id of the XML its class
   inflates (CONTENT_FROM_XML_RES, TabBase("xml/..."), inflateFromXMLRes,
   createFromXMLResource), or
   of a custom view that XML holds (<PtStateHeader/>): a missing one is a null
@@ -80,7 +80,7 @@ import xml.parsers.expat
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
 # Aurore's Cadran's preferences: the languages, themes, text sizes, effects.
-PREFS_HPP = "library/aurore/library/include/borealis/cadran/ui/prefs.hpp"
+PREFS_HPP = "library/aurore/library/include/aurore/cadran/ui/prefs.hpp"
 errors = []
 warnings = []
 # Names that read the same in every language.
@@ -224,8 +224,8 @@ for path in sorted(glob.glob(f"{ROOT}/resources/xml/**/*.xml", recursive=True)):
     parser = xml.parsers.expat.ParserCreate()
 
     def start(name, attrs, path=path):
-        if name == "brls:Label" and any(a.startswith("padding") for a in attrs):
-            errors.append(f"{path}: brls:Label does not support padding attributes")
+        if name == "aurore:Label" and any(a.startswith("padding") for a in attrs):
+            errors.append(f"{path}: aurore:Label does not support padding attributes")
         for value in attrs.values():
             if value.startswith("@i18n/playguard/"):
                 check_key(value[len("@i18n/"):], path)
@@ -381,12 +381,12 @@ for path, text in sorted(code_text.items()):
                             f"(SOURCES, and a key under playguard/history/sources/)")
 
 
-# BRLS_BIND ids against the XML each class inflates. A class's XML is named in
+# AURORE_BIND ids against the XML each class inflates. A class's XML is named in
 # its header (an activity's CONTENT_FROM_XML_RES("activity/x.xml"), under
 # resources/xml/) or in its .cpp (a tab's TabBase("xml/tab/x.xml"), a view's
 # inflateFromXMLRes("xml/view/x.xml"), under resources/; a Cadran tab's top,
 # createFromXMLResource("view/x.xml"), under resources/xml/). Each one, and each
-# BRLS_BIND, belongs to the class around it: the last "class X" before it, or
+# AURORE_BIND, belongs to the class around it: the last "class X" before it, or
 # the last "X::f(" a definition at the start of a line opens, whichever is
 # nearer; in the header or in its .cpp.
 xml_dir = f"{ROOT}/resources/xml"
@@ -413,7 +413,7 @@ for stem in pairs:
             name = owner_at(text, m.start())
             if name:
                 class_xml.setdefault(name, []).append(m.group(1) or m.group(2))
-        for m in re.finditer(r'BRLS_BIND\([^;]*?,\s*\w+\s*,\s*"([^"]+)"\s*\)', text):
+        for m in re.finditer(r'AURORE_BIND\([^;]*?,\s*\w+\s*,\s*"([^"]+)"\s*\)', text):
             name = owner_at(text, m.start())
             if name:
                 class_binds.setdefault(name, (path, []))[1].append(m.group(1))
@@ -469,7 +469,7 @@ for name, (path, binds) in sorted(class_binds.items()):
         ids |= ids_of(res, set())
     for i in binds:
         if i not in ids:
-            errors.append(f"{path}: BRLS_BIND id \"{i}\" is not in resources/xml/{' or '.join(inflated)}")
+            errors.append(f"{path}: AURORE_BIND id \"{i}\" is not in resources/xml/{' or '.join(inflated)}")
 
 # The lines a screen finds by id (getView, apply, tiles, banners, open_tab...):
 # each one an id some layout or the code still gives a view. A renamed line

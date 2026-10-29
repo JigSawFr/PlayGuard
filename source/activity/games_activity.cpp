@@ -6,8 +6,8 @@
 #include <limits>
 #include <string>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/game_icons.hpp"
 #include "action/games_logic.hpp"
@@ -18,7 +18,7 @@
 #include "util/config.hpp"
 #include "util/perf.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -39,7 +39,7 @@ constexpr size_t ICONS_AHEAD = 30;
 
 std::string period_label(int period)
 {
-    return brls::getStr(fmt::format("playguard/activity/periods/{}", period));
+    return aurore::getStr(fmt::format("playguard/activity/periods/{}", period));
 }
 }   // namespace
 
@@ -59,19 +59,19 @@ void GamesActivity::onContentAvailable()
     capped->setSingleLine(false);
     this->grid = config::get().games_grid;
     const PlayAccount* who = this->account();
-    if (auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView()); frame && who)
+    if (auto* frame = dynamic_cast<aurore::AppletFrame*>(this->getContentView()); frame && who)
         frame->setTitle("playguard/library/title"_i18n + " · " + (who->nickname[0] ? std::string(who->nickname) : "?"));
-    view_cell->registerClickAction([this](brls::View*) {
+    view_cell->registerClickAction([this](aurore::View*) {
         this->switch_view();
         return true;
     });
-    period_cell->registerClickAction([this](brls::View*) {
+    period_cell->registerClickAction([this](aurore::View*) {
         this->pick_period();
         return true;
     });
     // The game's figures in a card, the view and the period as two rows of
     // their own.
-    auto* head = static_cast<brls::Box*>(this->getView("gs_head"));
+    auto* head = static_cast<aurore::Box*>(this->getView("gs_head"));
     head->setLineBottom(0);
     head->setMargins(16, 60, 0, 60);
     head->setPadding(18, 24, 18, 24);
@@ -99,12 +99,12 @@ void GamesActivity::onContentAvailable()
 }
 
 // Back from a game's screen or a dialog: what was read meanwhile, next frame
-// (once borealis has put the focus back on the cell it came from).
+// (once Aurore has put the focus back on the cell it came from).
 void GamesActivity::onResume()
 {
     if (!this->stale) return;
     this->stale = false;
-    brls::sync(ui::guarded(this->alive, [this]() { this->rebuild(); }));
+    aurore::sync(ui::guarded(this->alive, [this]() { this->rebuild(); }));
 }
 
 const PlayAccount* GamesActivity::account() const
@@ -116,28 +116,28 @@ const PlayAccount* GamesActivity::account() const
 void GamesActivity::set_hints()
 {
     // Ⓨ says what it switches to.
-    brls::View* frame = this->getContentView();
-    frame->registerAction(brls::getStr(fmt::format("playguard/library/views/{}", this->grid ? 0 : 1)), brls::BUTTON_Y,
-                          [this](brls::View*) {
+    aurore::View* frame = this->getContentView();
+    frame->registerAction(aurore::getStr(fmt::format("playguard/library/views/{}", this->grid ? 0 : 1)), aurore::BUTTON_Y,
+                          [this](aurore::View*) {
                               this->switch_view();
                               return true;
                           });
-    frame->registerAction("playguard/activity/period"_i18n, brls::BUTTON_X, [this](brls::View*) {
+    frame->registerAction("playguard/activity/period"_i18n, aurore::BUTTON_X, [this](aurore::View*) {
         this->pick_period();
         return true;
     });
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     // The desktop build: the keyboard has no Ⓨ, so the Y key (smoke test). Not in
     // a browser, where the page presses Ⓨ itself for the Y key (web/README.md).
-    frame->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), [this](brls::View*) {
+    frame->registerAction(aurore::AuroreKeyCombination(aurore::AURORE_KBD_KEY_Y), [this](aurore::View*) {
         this->switch_view();
         return true;
     });
 #endif
-    view_cell->setDetailText(brls::getStr(fmt::format("playguard/library/views/{}", this->grid ? 1 : 0)));
+    view_cell->setDetailText(aurore::getStr(fmt::format("playguard/library/views/{}", this->grid ? 1 : 0)));
     period_cell->setDetailText(period_label(this->period));
     period_caption->setText(period_label(this->period));
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
 }
 
 void GamesActivity::switch_view()
@@ -148,7 +148,7 @@ void GamesActivity::switch_view()
     // Next frame: rebuilding deletes the cell whose action runs now, and the
     // hints register the frame's actions again, this one among them.
     const u64 focus_id = this->selected < this->entries.size() ? this->entries[this->selected].app_id : 0;
-    brls::sync(ui::guarded(this->alive, [this, focus_id]() {
+    aurore::sync(ui::guarded(this->alive, [this, focus_id]() {
         this->set_hints();
         this->build(focus_id);
     }));
@@ -195,7 +195,7 @@ void GamesActivity::rebuild()
     this->rows = std::move(now);
     if (same) {
         for (size_t i = 0; i < this->entries.size(); i++) this->fill(this->entries[i], *this->rows[i]);
-        if (auto* cell = dynamic_cast<brls::DetailCell*>(this->more)) cell->setDetailText(std::to_string(this->rows.size()));
+        if (auto* cell = dynamic_cast<aurore::DetailCell*>(this->more)) cell->setDetailText(std::to_string(this->rows.size()));
         if (auto* tile = dynamic_cast<GameTile*>(this->more)) tile->set_detail(std::to_string(this->rows.size()));
         this->select(std::min(this->selected, this->entries.size() - 1));
     } else {
@@ -210,15 +210,15 @@ void GamesActivity::build(u64 focus_id)
     perf::Timed timed("All games list");   // the diagnostic report's timings
     // The cells are about to be deleted: never leave the focus on one.
     bool focus_in_list = false;
-    for (brls::View* v = brls::Application::getCurrentFocus(); v && !focus_in_list; v = v->getParent())
+    for (aurore::View* v = aurore::Application::getCurrentFocus(); v && !focus_in_list; v = v->getParent())
         focus_in_list = v == list.getView();
-    if (focus_in_list) brls::Application::giveFocus(view_cell);
+    if (focus_in_list) aurore::Application::giveFocus(view_cell);
     list->clearViews();
     this->entries.clear();
     this->more = nullptr;
     this->grid_row = nullptr;
-    list->setAxis(brls::Axis::COLUMN);
-    list->setAlignItems(this->grid ? brls::AlignItems::CENTER : brls::AlignItems::STRETCH);
+    list->setAxis(aurore::Axis::COLUMN);
+    list->setAlignItems(this->grid ? aurore::AlignItems::CENTER : aurore::AlignItems::STRETCH);
 
     // Built out of the screen's layout, laid out once (ui::batch_layout).
     const size_t shown_n = std::min(this->rows.size(), this->cap());
@@ -229,25 +229,25 @@ void GamesActivity::build(u64 focus_id)
 
     // The grid: up and down to the same column (games_logic).
     if (this->grid) {
-        std::vector<brls::View*> cells;
+        std::vector<aurore::View*> cells;
         for (const Entry& e : this->entries) cells.push_back(e.view);
         if (this->more) cells.push_back(this->more);
         const int n = (int)cells.size();
         for (int i = 0; i < n; i++) {
             const int up = games_logic::grid_neighbour(i, n, COLUMNS, -1);
             const int down = games_logic::grid_neighbour(i, n, COLUMNS, 1);
-            if (up >= 0) cells[i]->setCustomNavigationRoute(brls::FocusDirection::UP, cells[up]);
-            else cells[i]->setCustomNavigationRoute(brls::FocusDirection::UP, view_cell.getView());
-            if (down >= 0) cells[i]->setCustomNavigationRoute(brls::FocusDirection::DOWN, cells[down]);
+            if (up >= 0) cells[i]->setCustomNavigationRoute(aurore::FocusDirection::UP, cells[up]);
+            else cells[i]->setCustomNavigationRoute(aurore::FocusDirection::UP, view_cell.getView());
+            if (down >= 0) cells[i]->setCustomNavigationRoute(aurore::FocusDirection::DOWN, cells[down]);
         }
     }
 
     // Applet mode: the games left out, and those the read itself could not
     // hold (PLAYSTATS_MAX).
     const size_t left_out = this->show_all ? this->rows.size() - shown_n : 0;
-    std::string cap_text = left_out ? brls::getStr("playguard/activity/applet_cap", (int)left_out) : std::string();
+    std::string cap_text = left_out ? aurore::getStr("playguard/activity/applet_cap", (int)left_out) : std::string();
     if (this->data && this->data->truncated)
-        cap_text += (cap_text.empty() ? "" : "\n") + brls::getStr("playguard/activity/truncated", PLAYSTATS_MAX);
+        cap_text += (cap_text.empty() ? "" : "\n") + aurore::getStr("playguard/activity/truncated", PLAYSTATS_MAX);
     capped->setText(cap_text);
     ui::set_visible(capped, !cap_text.empty());
 
@@ -264,15 +264,15 @@ void GamesActivity::build(u64 focus_id)
         // so the list scrolls to it.
         if (focus_in_list) {
             const u64 id = this->entries[focus].app_id;
-            brls::sync(ui::guarded(this->alive, [this, id]() {
+            aurore::sync(ui::guarded(this->alive, [this, id]() {
                 for (const Entry& e : this->entries)
-                    if (e.app_id == id) brls::Application::giveFocus(e.view);
+                    if (e.app_id == id) aurore::Application::giveFocus(e.view);
             }));
         }
     } else {
         this->show_selected(nullptr);
     }
-    brls::Logger::info("games list: {} of {} games ({})", shown_n, this->rows.size(), this->grid ? "grid" : "list");
+    aurore::Logger::info("games list: {} of {} games ({})", shown_n, this->rows.size(), this->grid ? "grid" : "list");
 }
 
 void GamesActivity::add_entry(size_t i)
@@ -290,7 +290,7 @@ void GamesActivity::add_entry(size_t i)
     }
     this->fill(e, g);
     const size_t index = this->entries.size();
-    e.view->getFocusEvent()->subscribe([this, index](brls::View*) { this->select(index); });
+    e.view->getFocusEvent()->subscribe([this, index](aurore::View*) { this->select(index); });
     this->entries.push_back(e);
 }
 
@@ -301,10 +301,10 @@ size_t GamesActivity::cap() const
 }
 
 // The grid's row the next cover goes in: a new one when the last is full.
-brls::Box* GamesActivity::next_row()
+aurore::Box* GamesActivity::next_row()
 {
     if (!this->grid_row || (int)this->grid_row->getChildren().size() >= COLUMNS) {
-        this->grid_row = new brls::Box(brls::Axis::ROW);
+        this->grid_row = new aurore::Box(aurore::Axis::ROW);
         this->grid_row->setWidth(COLUMNS * GameTile::WIDTH);
         list->addView(this->grid_row);
     }
@@ -314,10 +314,10 @@ brls::Box* GamesActivity::next_row()
 // "Show every game": a cell after the list, a cover after the grid's.
 void GamesActivity::add_more()
 {
-    auto on_click = [this](brls::View*) {
+    auto on_click = [this](aurore::View*) {
         // Next frame: rebuilding deletes this cell, whose action runs now.
         const size_t first_new = this->entries.size();
-        brls::sync(ui::guarded(this->alive, [this, first_new]() {
+        aurore::sync(ui::guarded(this->alive, [this, first_new]() {
             this->show_all = true;
             this->build(first_new < this->rows.size() ? this->rows[first_new]->app_id : 0);
         }));
@@ -331,7 +331,7 @@ void GamesActivity::add_more()
         this->next_row()->addView(tile);
         this->more = tile;
     } else {
-        auto* cell = new brls::DetailCell();
+        auto* cell = new aurore::DetailCell();
         cell->setText("playguard/activity/show_all"_i18n);
         cell->setDetailText(std::to_string(this->rows.size()));
         cell->registerClickAction(on_click);
@@ -353,11 +353,11 @@ void GamesActivity::fill(Entry& e, const GameStat& g) const
     const GameStat copy = g;
     const std::shared_ptr<const PlayStats> stats = this->data;
     const bool every = this->account_index < 0;
-    e.view->registerClickAction([copy, stats, every](brls::View*) {
+    e.view->registerClickAction([copy, stats, every](aurore::View*) {
         // Its own screen: the seven days as bars, the figures, each account.
         std::vector<unsigned char> bytes;
         if (const auto* b = game_icons::bytes(copy.app_id)) bytes = *b;
-        brls::Application::pushActivity(new GameActivity(copy, stats, std::move(bytes), every));
+        aurore::Application::pushActivity(new GameActivity(copy, stats, std::move(bytes), every));
         return true;
     });
 }
@@ -392,12 +392,12 @@ void GamesActivity::show_selected(const GameStat* g)
     bool owned = false;
     if (const int tex = game_icons::texture(g->app_id, owned)) {
         // As GameCell: the flag set once the old one is replaced.
-        icon->setScalingType(brls::ImageScalingType::FIT);
+        icon->setScalingType(aurore::ImageScalingType::FIT);
         icon->innerSetImage(tex);
         icon->setFreeTexture(owned);
     } else if (const int waiting = game_icons::placeholder()) {
         // Until it arrives, or for a game without one, as the covers.
-        icon->setScalingType(brls::ImageScalingType::CENTER);
+        icon->setScalingType(aurore::ImageScalingType::CENTER);
         icon->innerSetImage(waiting);
         icon->setFreeTexture(false);
     }
@@ -416,7 +416,7 @@ void GamesActivity::show_status()
     } else if (this->period == activity_summary::AllTime && R_FAILED(this->data->stats_rc)) {
         text = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(this->data->stats_rc);
     } else if (this->rows.empty()) {
-        text = brls::getStr(fmt::format("playguard/activity/none/{}", this->period));
+        text = aurore::getStr(fmt::format("playguard/activity/none/{}", this->period));
         error = false;
     }
     status->setText(text);

@@ -1,6 +1,6 @@
 // ui — time limits, play time, level and age names as text: PlayGuard's
 // formatting helpers that only translate (ui.hpp includes this header),
-// beside Aurore's (borealis/cadran/ui/format_text.hpp: durations, days,
+// beside Aurore's (Aurore/cadran/ui/format_text.hpp: durations, days,
 // short answers). Plain C++ over Cadran's ui/tr.hpp, so a host suite can run
 // them against a catalog of its own (tests/format_text).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <string>
 
-#include <borealis/cadran/ui/format_text.hpp>
+#include <aurore/cadran/ui/format_text.hpp>
 
 namespace ui
 {

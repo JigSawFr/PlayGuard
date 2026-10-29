@@ -4,7 +4,7 @@
 // history with it. Run at start-up, before config::load(), as the steps of
 // util/migrations.hpp (once each, not at every start); then the files of the
 // logs/ layout before its subfolders are moved into them (log_files::migrate).
-// Plain C++ (no borealis): host-tested (tests/log_files).
+// Plain C++ (no Aurore): host-tested (tests/log_files).
 //
 // A shim for the 1.0.x layout, which 1.1.0 (October 2026) left: run() and
 // to_nand() can go in the first release after April 2027, when an install

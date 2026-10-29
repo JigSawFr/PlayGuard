@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/outside_change_logic.hpp"
 
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 #include <cstddef>
 #include <cstring>
 

@@ -1,4 +1,4 @@
-// games_logic — the Games screen's layout without borealis: where the D-pad
+// games_logic — the Games screen's layout without Aurore: where the D-pad
 // goes in the grid of covers, and which games' icons to read around the one
 // selected. Plain C++ so the host tests can run it (tests/games_logic).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

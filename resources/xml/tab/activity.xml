@@ -7,7 +7,7 @@
      over the period, every game of the period on a screen of its own
      (activity/games.xml) and when the week was played. -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -16,99 +16,99 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <brls:Box id="ac_head" axis="column" alignItems="stretch">
-                <brls:Box axis="row" alignItems="center" marginBottom="14">
-                    <brls:Box id="ac_accounts" axis="row" alignItems="center" grow="1.0" width="0"/>
-                    <brls:Box id="ac_period" focusable="true" hideHighlightBackground="true" highlightCornerRadius="22" shrink="0" axis="row" alignItems="center" height="44" paddingLeft="18" paddingRight="18" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
-                        <brls:Label id="ac_period_label" text="" fontSize="16" marginRight="8" singleLine="true"/>
+            <aurore:Box id="ac_head" axis="column" alignItems="stretch">
+                <aurore:Box axis="row" alignItems="center" marginBottom="14">
+                    <aurore:Box id="ac_accounts" axis="row" alignItems="center" grow="1.0" width="0"/>
+                    <aurore:Box id="ac_period" focusable="true" hideHighlightBackground="true" highlightCornerRadius="22" shrink="0" axis="row" alignItems="center" height="44" paddingLeft="18" paddingRight="18" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" marginRight="10">
+                        <aurore:Label id="ac_period_label" text="" fontSize="16" marginRight="8" singleLine="true"/>
                         <CadranIcon icon="chevron-down" width="16" height="16"/>
-                    </brls:Box>
-                    <brls:Box id="ac_export" focusable="true" hideHighlightBackground="true" highlightCornerRadius="22" shrink="0" axis="row" alignItems="center" height="44" paddingLeft="18" paddingRight="18" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
+                    </aurore:Box>
+                    <aurore:Box id="ac_export" focusable="true" hideHighlightBackground="true" highlightCornerRadius="22" shrink="0" axis="row" alignItems="center" height="44" paddingLeft="18" paddingRight="18" cornerRadius="22" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1">
                         <CadranIcon icon="download" width="18" height="18" marginRight="10"/>
-                        <brls:Label text="@i18n/playguard/cadran/activity/export" fontSize="16" singleLine="true"/>
-                    </brls:Box>
-                </brls:Box>
+                        <aurore:Label text="@i18n/playguard/cadran/activity/export" fontSize="16" singleLine="true"/>
+                    </aurore:Box>
+                </aurore:Box>
 
-                <brls:Box axis="row" alignItems="stretch" marginBottom="14">
-                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
-                        <brls:Label text="@i18n/playguard/activity/today" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
+                <aurore:Box axis="row" alignItems="stretch" marginBottom="14">
+                    <aurore:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
+                        <aurore:Label text="@i18n/playguard/activity/today" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
                         <CadranDigits id="ac_today" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
-                        <brls:Label id="ac_today_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
-                    </brls:Box>
-                    <brls:Box axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
-                        <brls:Box axis="row" alignItems="flexEnd">
-                            <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0">
-                                <brls:Label text="@i18n/playguard/activity/week" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
+                        <aurore:Label id="ac_today_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
+                    </aurore:Box>
+                    <aurore:Box axis="column" alignItems="stretch" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24" marginRight="14">
+                        <aurore:Box axis="row" alignItems="flexEnd">
+                            <aurore:Box axis="column" alignItems="flexStart" grow="1.0" width="0">
+                                <aurore:Label text="@i18n/playguard/activity/week" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
                                 <CadranDigits id="ac_week" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
-                                <brls:Label id="ac_week_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
-                            </brls:Box>
-                            <brls:Box id="ac_week_bars" axis="row" alignItems="flexEnd" height="56" marginLeft="10" shrink="0">
-                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
-                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
-                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
-                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
-                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
-                                <brls:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
-                                <brls:Box width="8" height="3" cornerRadius="3"/>
-                            </brls:Box>
-                        </brls:Box>
+                                <aurore:Label id="ac_week_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
+                            </aurore:Box>
+                            <aurore:Box id="ac_week_bars" axis="row" alignItems="flexEnd" height="56" marginLeft="10" shrink="0">
+                                <aurore:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <aurore:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <aurore:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <aurore:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <aurore:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <aurore:Box width="8" height="3" cornerRadius="3" marginRight="3"/>
+                                <aurore:Box width="8" height="3" cornerRadius="3"/>
+                            </aurore:Box>
+                        </aurore:Box>
                         <!-- Against the 7 days before, the tile's whole width. -->
-                        <brls:Box id="ac_week_trend_row" axis="row" alignItems="center" marginTop="6" visibility="gone">
+                        <aurore:Box id="ac_week_trend_row" axis="row" alignItems="center" marginTop="6" visibility="gone">
                             <CadranIcon id="ac_week_trend_icon" icon="caret-up" width="14" height="14" marginRight="4"/>
-                            <brls:Label id="ac_week_trend" text="" fontSize="15" textColor="@theme/cadran/text3"/>
-                        </brls:Box>
-                    </brls:Box>
-                    <brls:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24">
-                        <brls:Label text="@i18n/playguard/activity/all_time" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
+                            <aurore:Label id="ac_week_trend" text="" fontSize="15" textColor="@theme/cadran/text3"/>
+                        </aurore:Box>
+                    </aurore:Box>
+                    <aurore:Box axis="column" alignItems="flexStart" grow="1.0" width="0" backgroundColor="@theme/cadran/surf" borderColor="@theme/cadran/line" borderThickness="1" cornerRadius="@style/cadran/radius/card" paddingTop="18" paddingBottom="18" paddingLeft="24" paddingRight="24">
+                        <aurore:Label text="@i18n/playguard/activity/all_time" fontSize="15" textColor="@theme/cadran/text2" singleLine="true"/>
                         <CadranDigits id="ac_total" text="—" fontSize="36" marginTop="6" marginBottom="6"/>
-                        <brls:Label id="ac_total_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
-                    </brls:Box>
-                </brls:Box>
+                        <aurore:Label id="ac_total_sub" text="" fontSize="15" textColor="@theme/cadran/text2" alignSelf="stretch"/>
+                    </aurore:Box>
+                </aurore:Box>
 
-                <brls:Label id="ac_games_title" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="10"/>
-                <brls:Label id="ac_games_note" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="6"/>
-                <brls:Box id="ac_cards" axis="column" alignItems="stretch"/>
-            </brls:Box>
+                <aurore:Label id="ac_games_title" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="10"/>
+                <aurore:Label id="ac_games_note" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="6"/>
+                <aurore:Box id="ac_cards" axis="column" alignItems="stretch"/>
+            </aurore:Box>
 
-            <brls:Header title="@i18n/playguard/activity/section_totals" marginBottom="8"/>
-            <brls:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
+            <aurore:Header title="@i18n/playguard/activity/section_totals" marginBottom="8"/>
+            <aurore:Label id="ac_new_account" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
             <PlayDaysView id="ac_days" width="auto" height="auto" marginTop="8" marginBottom="16"/>
-            <brls:Header title="@i18n/playguard/activity/section_summary" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="ac_per_day" focusable="false" title="@i18n/playguard/activity/summary/per_day"/>
-            <brls:DetailCell id="ac_top" focusable="false" title="@i18n/playguard/activity/summary/top"/>
-            <brls:DetailCell id="ac_days_played" focusable="false" title="@i18n/playguard/activity/summary/days_played"/>
-            <brls:DetailCell id="ac_busiest" focusable="false" title="@i18n/playguard/activity/summary/busiest"/>
-            <brls:DetailCell id="ac_session" focusable="false" title="@i18n/playguard/activity/summary/session"/>
-            <brls:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
-            <brls:DetailCell id="ac_account_default" title="@i18n/playguard/activity/account_default"/>
-            <brls:Box id="ac_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
-                <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
-                <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
-            </brls:Box>
-            <brls:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
-            <brls:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header id="ac_hours_header" title="@i18n/playguard/activity/section_hours" marginTop="24" marginBottom="8"/>
+            <aurore:Header title="@i18n/playguard/activity/section_summary" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="ac_per_day" focusable="false" title="@i18n/playguard/activity/summary/per_day"/>
+            <aurore:DetailCell id="ac_top" focusable="false" title="@i18n/playguard/activity/summary/top"/>
+            <aurore:DetailCell id="ac_days_played" focusable="false" title="@i18n/playguard/activity/summary/days_played"/>
+            <aurore:DetailCell id="ac_busiest" focusable="false" title="@i18n/playguard/activity/summary/busiest"/>
+            <aurore:DetailCell id="ac_session" focusable="false" title="@i18n/playguard/activity/summary/session"/>
+            <aurore:Header title="@i18n/playguard/activity/section_games" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="ac_games" title="@i18n/playguard/library/open"/>
+            <aurore:DetailCell id="ac_account_default" title="@i18n/playguard/activity/account_default"/>
+            <aurore:Box id="ac_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
+                <aurore:ProgressSpinner width="30" height="30" marginRight="14"/>
+                <aurore:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
+            </aurore:Box>
+            <aurore:Label id="ac_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
+            <aurore:Label id="ac_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header id="ac_hours_header" title="@i18n/playguard/activity/section_hours" marginTop="24" marginBottom="8"/>
             <PlayHoursView id="ac_hours" width="auto" marginTop="8" marginBottom="8"/>
-            <brls:Label id="ac_hours_legend" text="@i18n/playguard/activity/hours/legend" fontSize="18" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:DetailCell id="ac_sessions" focusable="false" title="@i18n/playguard/activity/hours/sessions"/>
-            <brls:DetailCell id="ac_longest" focusable="false" title="@i18n/playguard/activity/hours/longest"/>
-            <brls:DetailCell id="ac_busy_hours" focusable="false" title="@i18n/playguard/activity/hours/busy"/>
-            <brls:DetailCell id="ac_late" focusable="false" title="@i18n/playguard/activity/hours/late"/>
-            <brls:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="ac_hours_legend" text="@i18n/playguard/activity/hours/legend" fontSize="18" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="ac_sessions" focusable="false" title="@i18n/playguard/activity/hours/sessions"/>
+            <aurore:DetailCell id="ac_longest" focusable="false" title="@i18n/playguard/activity/hours/longest"/>
+            <aurore:DetailCell id="ac_busy_hours" focusable="false" title="@i18n/playguard/activity/hours/busy"/>
+            <aurore:DetailCell id="ac_late" focusable="false" title="@i18n/playguard/activity/hours/late"/>
+            <aurore:Label id="ac_note" text="@i18n/playguard/activity/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

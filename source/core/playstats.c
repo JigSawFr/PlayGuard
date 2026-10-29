@@ -39,7 +39,7 @@ static char s_icon_dir[sizeof(((IconStore *)0)->dir)];
 static IconStore s_icons;
 static bool s_icons_tried;
 
-// The names and the icons above are read on borealis' task thread
+// The names and the icons above are read on Aurore's task thread
 // (play_data, game_icons) and on the UI thread (a game's icon in a dialog,
 // playstats_icons): this keeps them whole between the two. Held only around
 // them, never across a service call, so the UI thread never waits on a read.

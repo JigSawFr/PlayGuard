@@ -2,7 +2,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "util/diagnostics.hpp"
 #include "util/paths.hpp"
@@ -14,7 +14,7 @@
 
 #include <fmt/format.h>
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace ui
 {
@@ -43,7 +43,7 @@ std::string compat_text(const SysInfo& info, const char** color)
             return "playguard/compat/ok"_i18n;
         case SysCompat_UntestedNewer:
             if (color) *color = "cadran/amber";
-            return brls::getStr("playguard/compat/untested", std::string(tested));
+            return aurore::getStr("playguard/compat/untested", std::string(tested));
         case SysCompat_PlayTimerUnsupported:
             if (color) *color = "cadran/amber";
             return "playguard/compat/too_old"_i18n;
@@ -95,7 +95,7 @@ std::string blank_text(const SysInfo& info, const char** color)
     if (color) *color = info.blank ? "cadran/teal" : (serial_warning(info) ? "cadran/amber" : "cadran/text2");
     if (!info.blank) return "cadran/common/no"_i18n;
     // With what the system sees instead.
-    return info.serial_valid && info.serial[0] ? brls::getStr("playguard/tools/blank_yes", std::string(info.serial))
+    return info.serial_valid && info.serial[0] ? aurore::getStr("playguard/tools/blank_yes", std::string(info.serial))
                                                : "cadran/common/yes"_i18n;
 }
 
@@ -110,7 +110,7 @@ const RealSerial& real_serial(const SysInfo& info)
         // Not blanked: the system gives the real one.
         if (info.serial_valid && info.serial[0]) {
             r.serial = info.serial;
-            r.note   = brls::getStr("playguard/tools/serial_how_system", r.serial);
+            r.note   = aurore::getStr("playguard/tools/serial_how_system", r.serial);
         } else {
             r.note = "playguard/tools/serial_how_unread"_i18n;
         }
@@ -121,10 +121,10 @@ const RealSerial& real_serial(const SysInfo& info)
     r.serial = f.serial;
     switch (f.source) {
         case prodinfo::Source::Matched:
-            r.note = brls::getStr("playguard/tools/serial_how_backup", r.serial, f.file);
+            r.note = aurore::getStr("playguard/tools/serial_how_backup", r.serial, f.file);
             break;
         case prodinfo::Source::Single:
-            r.note = brls::getStr("playguard/tools/serial_how_backup_single", r.serial, f.file);
+            r.note = aurore::getStr("playguard/tools/serial_how_backup_single", r.serial, f.file);
             break;
         case prodinfo::Source::Ambiguous: r.note = "playguard/tools/serial_how_ambiguous"_i18n; break;
         case prodinfo::Source::Others: r.note = "playguard/tools/serial_how_others"_i18n; break;
@@ -199,7 +199,7 @@ std::string patches_text(const patches::Report& report, const char** color)
             return "playguard/tools/patches_incomplete"_i18n;
         case patches::Status::FilesOnly:
             if (color) *color = "cadran/amber";
-            return brls::getStr("playguard/tools/patches_files", join_list(report.files));
+            return aurore::getStr("playguard/tools/patches_files", join_list(report.files));
         default:
             if (color) *color = "cadran/text2";
             return "playguard/tools/patches_none"_i18n;
@@ -215,25 +215,25 @@ std::string patches_note(const patches::Report& report, const SysInfo& info, boo
         case patches::Status::SysPatch:
             // sigpatch files beside it: two tools on the same checks, a
             // cause of forwarders that do not start (patches::mixed).
-            if (patches::mixed(report)) return brls::getStr("playguard/tools/patches_note_mixed", join_list(report.files));
+            if (patches::mixed(report)) return aurore::getStr("playguard/tools/patches_note_mixed", join_list(report.files));
             *warn = false;
             return report.files.empty() ? std::string()
-                                        : brls::getStr("playguard/tools/patches_note_redundant", join_list(report.files));
+                                        : aurore::getStr("playguard/tools/patches_note_redundant", join_list(report.files));
         case patches::Status::SysPatchIncomplete:
             switch (patches::issue(report)) {
                 case patches::Issue::NotAtBoot: return "playguard/tools/patches_note_not_at_boot"_i18n;
                 case patches::Issue::NoLog:     return "playguard/tools/patches_note_no_log"_i18n;
                 case patches::Issue::StaleLog:
-                    return brls::getStr("playguard/tools/patches_note_stale",
+                    return aurore::getStr("playguard/tools/patches_note_stale",
                                         report.log_fw.empty() ? std::string("?") : report.log_fw,
                                         std::string(report.log_emummc ? "emuMMC" : "sysMMC"));
                 case patches::Issue::Skipped:
-                    return brls::getStr("playguard/tools/patches_note_skipped",
+                    return aurore::getStr("playguard/tools/patches_note_skipped",
                                         std::string(info.emummc ? "patch_emummc" : "patch_sysmmc"));
                 case patches::Issue::NotPatched:
-                    return brls::getStr("playguard/tools/patches_note_unpatched", join_list(patches::unpatched(report))) +
+                    return aurore::getStr("playguard/tools/patches_note_unpatched", join_list(patches::unpatched(report))) +
                            (patches::mixed(report)
-                                ? "\n" + brls::getStr("playguard/tools/patches_note_mixed", join_list(report.files))
+                                ? "\n" + aurore::getStr("playguard/tools/patches_note_mixed", join_list(report.files))
                                 : std::string());
                 default: break;
             }

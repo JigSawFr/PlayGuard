@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/agent_update.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 #include <memory>
 
@@ -15,7 +15,7 @@
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace agent_update
 {
@@ -47,14 +47,14 @@ const modules::Module& agent()
 
 void record(const char* what)
 {
-    history_flow::record_event("module", "", brls::getStr(std::string("playguard/modules/done/") + what, agent().title));
+    history_flow::record_event("module", "", aurore::getStr(std::string("playguard/modules/done/") + what, agent().title));
 }
 
 void finish(std::shared_ptr<Run> r)
 {
     s_running = false;
     r->out.end = r->step;
-    brls::Logger::info("agent update: {}{}{}", modules::step_name(r->step), r->out.why.empty() ? "" : " — ",
+    aurore::Logger::info("agent update: {}{}{}", modules::step_name(r->step), r->out.why.empty() ? "" : " — ",
                        r->out.why);
     switch (r->step) {
         case modules::Step::Done: record(r->out.update ? "updated" : "installed"); break;
@@ -73,7 +73,7 @@ void go(std::shared_ptr<Run> r);
 
 void advance(std::shared_ptr<Run> r, bool ok)
 {
-    brls::Logger::info("agent update: {} {}", modules::step_name(r->step), ok ? "ok" : "failed");
+    aurore::Logger::info("agent update: {} {}", modules::step_name(r->step), ok ? "ok" : "failed");
     r->step = modules::next_step(r->step, ok, r->was_running);
     go(r);
 }
@@ -87,8 +87,8 @@ void check(std::shared_ptr<Run> r)
         const bool ok = reply.accepted;
         agent_client::close();
         reply.version[sizeof(reply.version) - 1] = '\0';
-        if (ok) brls::Logger::info("agent update: the agent {} answers", reply.version);
-        else r->out.why = brls::getStr("playguard/modules/agent/other_protocol", (int)reply.protocol);
+        if (ok) aurore::Logger::info("agent update: the agent {} answers", reply.version);
+        else r->out.why = aurore::getStr("playguard/modules/agent/other_protocol", (int)reply.protocol);
         advance(r, ok);
         return;
     }
@@ -97,7 +97,7 @@ void check(std::shared_ptr<Run> r)
         advance(r, false);
         return;
     }
-    brls::delay(CHECK_EVERY_MS, [r]() { check(r); });
+    aurore::delay(CHECK_EVERY_MS, [r]() { check(r); });
 }
 
 void go(std::shared_ptr<Run> r)
@@ -174,7 +174,7 @@ void run(const std::string& bundle_dir, std::function<void(const Outcome&)> done
     r->out.update = modules::state(paths::sd_root(), m).installed;
     r->was_running = r->out.update && module_running(m.tid, nullptr);
     r->step = modules::first_step(r->was_running);
-    brls::Logger::info("agent update: to {} ({}), {}", r->bundle.version, r->bundle.sha256.substr(0, 12),
+    aurore::Logger::info("agent update: to {} ({}), {}", r->bundle.version, r->bundle.sha256.substr(0, 12),
                        r->was_running ? "running" : "not running");
     // The link leaves the agent alone until the end.
     sync_flow::hold(true);
@@ -188,10 +188,10 @@ void tell(const Outcome& o)
             ui::notify(o.update ? "playguard/modules/agent/updated"_i18n : "playguard/modules/agent/installed"_i18n);
             break;
         case modules::Step::RolledBack:
-            ui::error(brls::getStr(o.update ? "playguard/modules/start_failed" : "playguard/modules/agent/install_undone",
+            ui::error(aurore::getStr(o.update ? "playguard/modules/start_failed" : "playguard/modules/agent/install_undone",
                                    o.why));
             break;
-        default: ui::error(brls::getStr("playguard/modules/agent/update_failed", o.why)); break;
+        default: ui::error(aurore::getStr("playguard/modules/agent/update_failed", o.why)); break;
     }
 }
 
@@ -200,12 +200,12 @@ namespace
 // The offer, once `main` is on top: tried every 2 s for a minute (What's new,
 // a question, the update screen in front of it first), then left for the
 // next start.
-void offer_when_free(brls::Activity* main, const std::string& bundle_dir, int tries_left)
+void offer_when_free(aurore::Activity* main, const std::string& bundle_dir, int tries_left)
 {
-    auto stack = brls::Application::getActivitiesStack();
+    auto stack = aurore::Application::getActivitiesStack();
     if (stack.empty() || stack.back() != main || s_running) {
         if (tries_left > 0)
-            brls::delay(FREE_STEP_MS, [main, bundle_dir, tries_left]() { offer_when_free(main, bundle_dir, tries_left - 1); });
+            aurore::delay(FREE_STEP_MS, [main, bundle_dir, tries_left]() { offer_when_free(main, bundle_dir, tries_left - 1); });
         return;
     }
     // A newer PlayGuard first (found meanwhile too): it carries a newer agent.
@@ -214,10 +214,10 @@ void offer_when_free(brls::Activity* main, const std::string& bundle_dir, int tr
     const modules::Bundle b = modules::bundled(bundle_dir, m);
     if (modules::offer(modules::state(paths::sd_root(), m), b) != modules::Offer::Update) return;
     if (config::get().agent_update_skipped == b.sha256) return;
-    std::string body = brls::getStr("playguard/modules/agent/offer_body", b.version);
+    std::string body = aurore::getStr("playguard/modules/agent/offer_body", b.version);
     if (sync_flow::status().agent_refused) body += "\n\n" + "playguard/modules/agent/offer_refused"_i18n;
     const std::string sha = b.sha256;
-    brls::Dialog* dialog = ui::dialog(body);
+    aurore::Dialog* dialog = ui::dialog(body);
     dialog->addButton("playguard/common/later"_i18n, [sha]() {
         // Not at start again for this build (Console › Optional modules
         // still offers it).
@@ -237,9 +237,9 @@ void offer_when_free(brls::Activity* main, const std::string& bundle_dir, int tr
 }
 }   // namespace
 
-void at_start(brls::Activity* main, const std::string& bundle_dir)
+void at_start(aurore::Activity* main, const std::string& bundle_dir)
 {
-    brls::delay(START_DELAY_MS, [main, bundle_dir]() { offer_when_free(main, bundle_dir, FREE_STEPS); });
+    aurore::delay(START_DELAY_MS, [main, bundle_dir]() { offer_when_free(main, bundle_dir, FREE_STEPS); });
 }
 
 }   // namespace agent_update

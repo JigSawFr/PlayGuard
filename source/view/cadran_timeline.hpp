@@ -3,14 +3,14 @@
 // it, each with its time and what it is under it ("16:40 time is up"); teal
 // up to the first of them (amber in the last 15 minutes), the line's grey
 // after. The times are in the display face, the words in the app's; both
-// follow the text size (brls::Label's scale), as the view's height does.
+// follow the text size (aurore::Label's scale), as the view's height does.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <string>
 
-class CadranTimeline : public brls::View
+class CadranTimeline : public aurore::View
 {
   public:
     CadranTimeline();
@@ -23,7 +23,7 @@ class CadranTimeline : public brls::View
               const std::string& bedtime_caption = "");
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
-              brls::Style style, brls::FrameContext* ctx) override;
+              aurore::Style style, aurore::FrameContext* ctx) override;
 
   private:
     int now = 0, time_up = -1, bedtime = -1;

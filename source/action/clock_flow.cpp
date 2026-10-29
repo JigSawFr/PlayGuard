@@ -2,7 +2,7 @@
 #include "action/clock_flow.hpp"
 
 #include <atomic>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 #include <memory>
 #include <optional>
@@ -10,7 +10,7 @@
 #include <thread>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/clock_logic.hpp"
 #include "action/history_flow.hpp"
@@ -22,7 +22,7 @@
 #include "util/ntp_servers.hpp"
 #include "util/pctl_ops_c.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace clock_flow
 {
@@ -31,7 +31,7 @@ namespace
 {
 std::string signed_seconds(int64_t s)
 {
-    return brls::getStr("playguard/clock/seconds", (s > 0 ? "+" : "") + std::to_string(s));
+    return aurore::getStr("playguard/clock/seconds", (s > 0 ? "+" : "") + std::to_string(s));
 }
 
 std::string ntp_error_text(const ntp::Reply& r)
@@ -107,8 +107,8 @@ void with_before_report(std::function<void(const std::string& before)> write)
     const std::string before = diagnostic::current_report();
     std::string err;
     if (diagnostic::save("=== Before network clock change ===\n" + before, &err).empty()) {
-        brls::sync([before, err, write]() {
-            ui::confirm(brls::getStr("playguard/clock/report_err_ask", err), "playguard/clock/apply_confirm"_i18n,
+        aurore::sync([before, err, write]() {
+            ui::confirm(aurore::getStr("playguard/clock/report_err_ask", err), "playguard/clock/apply_confirm"_i18n,
                         [before, write]() { write(before); });
         });
         return;
@@ -117,9 +117,9 @@ void with_before_report(std::function<void(const std::string& before)> write)
 }
 
 // A spinner and what is being asked; Cancel (or B) sets `cancelled`.
-brls::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atomic<bool>> cancelled)
+aurore::Dialog* progress_dialog(const std::string& text, std::shared_ptr<std::atomic<bool>> cancelled)
 {
-    auto* dialog = new brls::Dialog(cadran::wait_body(text));
+    auto* dialog = new aurore::Dialog(cadran::wait_body(text));
     ui::add_cancel(dialog, [cancelled]() { *cancelled = true; });
     return dialog;
 }
@@ -135,7 +135,7 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
 {
     std::vector<std::string> hosts = { server };
     for (auto& h : ntp::cross_check_servers(server)) hosts.push_back(h);
-    // In applet mode (opened from the album) borealis opens only two network
+    // In applet mode (opened from the album) Aurore opens only two network
     // sessions: a third query in parallel would wait for one anyway.
     SysInfo si;
     sysinfo_get(&si);
@@ -167,13 +167,13 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
             try {
                 workers.emplace_back([&replies, &hosts, i]() { replies[i] = ntp::fetch(hosts[i], 2500, 2, ui::quitting); });
             } catch (const std::system_error& e) {
-                brls::Logger::warning("NTP: no thread for {} ({}), querying it here", hosts[i], e.what());
+                aurore::Logger::warning("NTP: no thread for {} ({}), querying it here", hosts[i], e.what());
                 replies[i] = ntp::fetch(hosts[i], 2500, 2, ui::quitting);
             }
         }
         for (auto& w : workers) w.join();
         if (ui::quitting()) return;
-        brls::sync([hosts, replies, done]() {
+        aurore::sync([hosts, replies, done]() {
             // Bring every sample to the same instant, then take the median.
             const auto ref = std::chrono::steady_clock::now();
             TimeSnapshot s;
@@ -194,11 +194,11 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
                 if (r.ok) {
                     line.unix_seconds = (uint64_t)h.estimate;
                     line.offset = m.offset_known ? signed_seconds(h.offset) : "?";
-                    m.report += brls::getStr("playguard/clock/result_line_ok", hosts[i], ui::time_text((uint64_t)h.estimate), line.offset);
+                    m.report += aurore::getStr("playguard/clock/result_line_ok", hosts[i], ui::time_text((uint64_t)h.estimate), line.offset);
                 } else {
                     line.error = ntp_error_text(r);
-                    m.report += brls::getStr("playguard/clock/result_line_err", hosts[i], line.error);
-                    brls::Logger::info("NTP {}: {}", hosts[i], r.error);
+                    m.report += aurore::getStr("playguard/clock/result_line_err", hosts[i], line.error);
+                    aurore::Logger::info("NTP {}: {}", hosts[i], r.error);
                 }
                 m.lines.push_back(line);
                 m.report += "\n";
@@ -213,8 +213,8 @@ void measure(const std::string& server, std::function<void(const Measurement&)> 
             m.spread       = sum.spread;
             if (m.offset_known) m.offset = sum.offset;
             const std::string diff = m.offset_known ? signed_seconds(m.offset) : "?";
-            m.report += brls::getStr("playguard/clock/result_summary", ui::time_text(m.unix_seconds), diff);
-            if (m.spread > 5) m.warning = brls::getStr("playguard/clock/result_spread", (int)m.spread);
+            m.report += aurore::getStr("playguard/clock/result_summary", ui::time_text(m.unix_seconds), diff);
+            if (m.spread > 5) m.warning = aurore::getStr("playguard/clock/result_spread", (int)m.spread);
             done(m);
         });
     };
@@ -228,12 +228,12 @@ std::string offset_text(int64_t offset)
     if (offset >= -1 && offset <= 1) return "playguard/clock/on_time"_i18n;
     const uint64_t a = offset < 0 ? (uint64_t)(-(offset + 1)) + 1 : (uint64_t)offset;
     std::string span;
-    if (a >= 86400) span = brls::getStr("playguard/clock/days", (unsigned long long)(a / 86400));
-    else if (a >= 3600) span = brls::getStr("cadran/common/hours_minutes", (int)(a / 3600), fmt::format("{:02}", (int)(a % 3600 / 60)));
-    else if (a >= 60) span = brls::getStr("playguard/common/min_sec", (int)(a / 60), (int)(a % 60));
-    else span = brls::getStr("playguard/common/sec", (int)a);
+    if (a >= 86400) span = aurore::getStr("playguard/clock/days", (unsigned long long)(a / 86400));
+    else if (a >= 3600) span = aurore::getStr("cadran/common/hours_minutes", (int)(a / 3600), fmt::format("{:02}", (int)(a % 3600 / 60)));
+    else if (a >= 60) span = aurore::getStr("playguard/common/min_sec", (int)(a / 60), (int)(a % 60));
+    else span = aurore::getStr("playguard/common/sec", (int)a);
     // The servers ahead of the network clock: it is behind.
-    return brls::getStr(offset > 0 ? "playguard/clock/behind" : "playguard/clock/ahead", span);
+    return aurore::getStr(offset > 0 ? "playguard/clock/behind" : "playguard/clock/ahead", span);
 }
 
 int64_t seconds_left(const Measurement& m)
@@ -269,8 +269,8 @@ void apply(const Measurement& m, std::function<void(const std::string& message)>
     const uint64_t preview = projected_now(m);
     char utc[48];
     time_format_utc(preview, utc, sizeof(utc));
-    std::string body = brls::getStr("playguard/clock/confirm_apply", ui::time_text(preview), std::string(utc));
-    if (m.spread > 5) body += brls::getStr("playguard/clock/confirm_apply_spread", (int)m.spread);
+    std::string body = aurore::getStr("playguard/clock/confirm_apply", ui::time_text(preview), std::string(utc));
+    if (m.spread > 5) body += aurore::getStr("playguard/clock/confirm_apply_spread", (int)m.spread);
     // Measured on a console (docs/parental-controls.md): the play timer
     // starts the day over when the clock changes. Say so before, not after.
     body += "playguard/clock/confirm_apply_resets"_i18n;
@@ -293,7 +293,7 @@ void apply_console_clock(std::function<void(const std::string& message)> done)
             ui::error("playguard/clock/applied_err"_i18n, R_FAILED(s.service_rc) ? s.service_rc : s.user_rc);
             return;
         case offline_clock_logic::Offer::Implausible:
-            ui::info(brls::getStr("playguard/clock/copy_implausible", ui::time_text(s.user_time)));
+            ui::info(aurore::getStr("playguard/clock/copy_implausible", ui::time_text(s.user_time)));
             return;
         default:
             break;
@@ -303,7 +303,7 @@ void apply_console_clock(std::function<void(const std::string& message)> done)
     const auto notes = offline_clock_logic::notes(s);
     char utc[48];
     time_format_utc(s.user_time, utc, sizeof(utc));
-    std::string body = brls::getStr("playguard/clock/confirm_copy", ui::time_text(s.user_time), std::string(utc));
+    std::string body = aurore::getStr("playguard/clock/confirm_copy", ui::time_text(s.user_time), std::string(utc));
     body += "playguard/clock/confirm_copy_check"_i18n;
     if (notes.follows_network) body += "playguard/clock/confirm_copy_follows"_i18n;
     if (notes.turn_sync_on) body += "playguard/clock/confirm_copy_sync_after"_i18n;
@@ -328,16 +328,16 @@ void offer_console_clock(const Measurement& m, std::function<void()> done)
     time_clock_snapshot(&s);
     const auto offer = offline_clock_logic::offer(false, s);
     if (offer == offline_clock_logic::Offer::Implausible) {
-        ui::info(m.report + "\n\n" + brls::getStr("playguard/clock/copy_implausible", ui::time_text(s.user_time)));
+        ui::info(m.report + "\n\n" + aurore::getStr("playguard/clock/copy_implausible", ui::time_text(s.user_time)));
         return;
     }
     if (offer != offline_clock_logic::Offer::Copy) {
         ui::info(m.report);
         return;
     }
-    ui::confirm(m.report + "\n\n" + brls::getStr("playguard/clock/offline_guided", ui::time_text(s.user_time)),
+    ui::confirm(m.report + "\n\n" + aurore::getStr("playguard/clock/offline_guided", ui::time_text(s.user_time)),
                 "playguard/clock/guided_copy"_i18n, [done]() {
-        brls::sync([done]() { apply_console_clock([done](const std::string&) { if (done) done(); }); });
+        aurore::sync([done]() { apply_console_clock([done](const std::string&) { if (done) done(); }); });
     });
 }
 }   // namespace
@@ -346,16 +346,16 @@ void guided(std::function<void()> done)
 {
     if (ui::refuse_read_only()) return;
     const std::string server = current_server();
-    ui::confirm(brls::getStr("playguard/clock/guided_body", server), "playguard/clock/guided_measure"_i18n, [server, done]() {
-        brls::sync([server, done]() {
+    ui::confirm(aurore::getStr("playguard/clock/guided_body", server), "playguard/clock/guided_measure"_i18n, [server, done]() {
+        aurore::sync([server, done]() {
             auto cancelled = std::make_shared<std::atomic<bool>>(false);
-            auto* progress = progress_dialog(brls::getStr("playguard/clock/measuring", server), cancelled);
+            auto* progress = progress_dialog(aurore::getStr("playguard/clock/measuring", server), cancelled);
             progress->open();
             measure(server, [progress, cancelled, done](const Measurement& m) {
                 if (*cancelled) return;   // the dialog is already closed
                 *cancelled = true;
                 progress->close([m, done]() {
-                    brls::sync([m, done]() {
+                    aurore::sync([m, done]() {
                         if (!m.ok) {
                             offer_console_clock(m, done);
                             return;

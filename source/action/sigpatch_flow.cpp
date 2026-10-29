@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/sigpatch_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <ctime>
 
 #include "action/pin_lock.hpp"
@@ -10,7 +10,7 @@
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace sigpatch_flow
 {
@@ -34,7 +34,7 @@ void set_aside(std::function<void(bool)> done, const std::string& intro)
             if (f == "hekate") return true;
         return false;
     }();
-    std::string body = brls::getStr("playguard/sigpatch/confirm", "config/playguard/sigpatches-aside/" + when);
+    std::string body = aurore::getStr("playguard/sigpatch/confirm", "config/playguard/sigpatches-aside/" + when);
     if (hekate) body += "\n\n" + "playguard/sigpatch/hekate"_i18n;
     if (!intro.empty()) body = intro + "\n\n" + body;
     ui::confirm(body, "playguard/sigpatch/set_aside"_i18n,
@@ -48,11 +48,11 @@ void set_aside(std::function<void(bool)> done, const std::string& intro)
                     std::vector<std::string> moved;
                     std::string err;
                     const bool ok = patches::set_aside(paths::sd_root(), dest, &moved, &err);
-                    for (const std::string& m : moved) brls::Logger::info("sigpatches: {} moved to {}", m, dest);
+                    for (const std::string& m : moved) aurore::Logger::info("sigpatches: {} moved to {}", m, dest);
                     ui::reread_patch_report();
                     if (!ok) {
-                        brls::Logger::warning("sigpatches: {}", err);
-                        ui::error(brls::getStr("playguard/sigpatch/failed", err));
+                        aurore::Logger::warning("sigpatches: {}", err);
+                        ui::error(aurore::getStr("playguard/sigpatch/failed", err));
                     } else {
                         ui::info("playguard/sigpatch/done"_i18n);
                     }

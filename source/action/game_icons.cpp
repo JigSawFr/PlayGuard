@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/game_icons.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstdlib>
 #include <map>
 #include <memory>
@@ -71,7 +71,7 @@ Pixels decode(const unsigned char* bytes, size_t size)
 int upload(const Pixels& p)
 {
     if (p.rgba.empty()) return 0;
-    return nvgCreateImageRGBA(brls::Application::getNVGContext(), p.w, p.h, 0, p.rgba.data());
+    return nvgCreateImageRGBA(aurore::Application::getNVGContext(), p.w, p.h, 0, p.rgba.data());
 }
 
 void read_queued()
@@ -81,7 +81,7 @@ void read_queued()
     for (u64 id : s.queued) wanted->push_back(PlayIcon{ id, nullptr, 0 });
     s.queued.clear();
     s.busy = true;
-    brls::async([wanted]() {
+    aurore::async([wanted]() {
         playstats_icons(wanted->data(), wanted->size());
         auto decoded = std::make_shared<std::vector<Pixels>>();
         for (const PlayIcon& icon : *wanted) {
@@ -92,7 +92,7 @@ void read_queued()
             for (PlayIcon& icon : *wanted) std::free(icon.jpeg);
             return;
         }
-        brls::sync([wanted, decoded]() {
+        aurore::sync([wanted, decoded]() {
             s.busy = false;
             for (size_t i = 0; i < wanted->size(); i++) {
                 PlayIcon& icon = (*wanted)[i];
@@ -163,7 +163,7 @@ int placeholder()
     if (tried) return tex;
     tried = true;
     std::string png;
-    if (!paths::read_file(BRLS_ASSET("img/emoji/1f3ae.png"), png)) return 0;
+    if (!paths::read_file(AURORE_ASSET("img/emoji/1f3ae.png"), png)) return 0;
     int w = 0, h = 0, comp = 0;
     unsigned char* rgba = stbi_load_from_memory((const unsigned char*)png.data(), (int)png.size(), &w, &h, &comp, 4);
     if (!rgba) return 0;
@@ -181,7 +181,7 @@ int placeholder()
             q[3] = (unsigned char)(p[3] * 2 / 5);
         }
     stbi_image_free(rgba);
-    tex = nvgCreateImageRGBA(brls::Application::getNVGContext(), bw, bh, 0, out.data());
+    tex = nvgCreateImageRGBA(aurore::Application::getNVGContext(), bw, bh, 0, out.data());
     return tex;
 }
 

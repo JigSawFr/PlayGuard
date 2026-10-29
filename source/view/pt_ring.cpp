@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <yoga/Yoga.h>
 
-#include <borealis/cadran/ui/effects.hpp>
+#include <aurore/cadran/ui/effects.hpp>
 
 #include "core/sim_env.h"
 
@@ -23,7 +23,7 @@ constexpr float FIGURE_SHARE = 0.70f;
 
 void PtRing::take_colours()
 {
-    brls::Theme theme = brls::Application::getTheme();
+    aurore::Theme theme = aurore::Application::getTheme();
     this->track = theme["cadran/track"];
     this->teal  = theme["cadran/teal_fill"];
     this->amber = theme["cadran/amber_fill"];
@@ -34,16 +34,16 @@ void PtRing::take_colours()
 void PtRing::onThemeChanged()
 {
     this->take_colours();
-    brls::Box::onThemeChanged();
+    aurore::Box::onThemeChanged();
 }
 
 PtRing::PtRing()
 {
     this->take_colours();
 
-    this->setAxis(brls::Axis::COLUMN);
-    this->setJustifyContent(brls::JustifyContent::CENTER);
-    this->setAlignItems(brls::AlignItems::CENTER);
+    this->setAxis(aurore::Axis::COLUMN);
+    this->setJustifyContent(aurore::JustifyContent::CENTER);
+    this->setAlignItems(aurore::AlignItems::CENTER);
     this->setWidth(256);
     this->setHeight(256);
     this->setFocusable(false);
@@ -54,10 +54,10 @@ PtRing::PtRing()
     this->value->setText("—");
     this->addView(this->value);
 
-    this->caption = new brls::Label();
+    this->caption = new aurore::Label();
     this->caption->setFontSize(17);
     this->caption->setThemeColor("textColor", "cadran/text2");
-    this->caption->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    this->caption->setHorizontalAlign(aurore::HorizontalAlign::CENTER);
     this->caption->setMarginTop(2);
     this->addView(this->caption);
 }
@@ -76,7 +76,7 @@ void PtRing::setFraction(float fraction)
         const float from = known ? this->shown.getValue() : this->show_left ? 1.0f : 0.0f;
         this->shown.stop();
         this->shown.reset(from);
-        this->shown.addStep(fraction, known ? 450 : 650, known ? brls::EasingFunction::quadraticOut : brls::EasingFunction::cubicOut);
+        this->shown.addStep(fraction, known ? 450 : 650, known ? aurore::EasingFunction::quadraticOut : aurore::EasingFunction::cubicOut);
         this->shown.start();
     } else {
         this->shown.stop();
@@ -115,11 +115,11 @@ void PtRing::fit()
 void PtRing::setCaptionSize(float size) { this->caption->setFontSize(size); }
 
 void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
-                  brls::Style style, brls::FrameContext* ctx)
+                  aurore::Style style, aurore::FrameContext* ctx)
 {
     // PLAYGUARD_SIM_CADRAN_NORING=1 draws the labels alone (cost of the arcs).
     static const bool no_ring = sim_env_flag("PLAYGUARD_SIM_CADRAN_NORING");
-    if (no_ring) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
+    if (no_ring) { aurore::Box::draw(vg, x, y, width, height, style, ctx); return; }
     const float stroke = stroke_of(std::min(width, height));
     const float cx = x + width / 2.0f, cy = y + height / 2.0f;
     const float r = radius_of(std::min(width, height));
@@ -151,11 +151,11 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
             // nothing on screen may flicker), from full to a little over half,
             // and back.
             const unsigned period = this->pulse_fast ? 1000000u : 1400000u;
-            const double t = (double)(brls::getCPUTimeUsec() % period) / (double)period;
+            const double t = (double)(aurore::getCPUTimeUsec() % period) / (double)period;
             color.a *= 0.55f + 0.45f * (0.5f + 0.5f * (float)std::cos(t * 2.0 * NVG_PI));
         }
         const float arc = this->show_left ? 1.0f - f : f;
-        if (arc <= 0.0f) { brls::Box::draw(vg, x, y, width, height, style, ctx); return; }
+        if (arc <= 0.0f) { aurore::Box::draw(vg, x, y, width, height, style, ctx); return; }
         const float end = -NVG_PI / 2.0f + arc * 2.0f * NVG_PI;
         nvgBeginPath(vg);
         nvgArc(vg, cx, cy, r, -NVG_PI / 2.0f, end, NVG_CW);
@@ -182,7 +182,7 @@ void PtRing::draw(NVGcontext* vg, float x, float y, float width, float height,
         }
     }
 
-    brls::Box::draw(vg, x, y, width, height, style, ctx);   // the figure and its caption
+    aurore::Box::draw(vg, x, y, width, height, style, ctx);   // the figure and its caption
 }
 
-brls::View* PtRing::create() { return new PtRing(); }
+aurore::View* PtRing::create() { return new PtRing(); }

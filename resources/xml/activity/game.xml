@@ -5,7 +5,7 @@
      goes back; nothing to focus, the D-pad scrolls). Filled by
      source/activity/game_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -17,36 +17,36 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
-            <brls:Box axis="row" alignItems="center" marginBottom="16">
-                <brls:Image id="ga_icon" width="72" height="72" cornerRadius="@style/cadran/radius/icon" marginRight="20"/>
-                <brls:Label id="ga_name" text="" fontSize="28" grow="1.0"/>
-            </brls:Box>
-            <brls:Header title="@i18n/playguard/activity/week" marginBottom="8"/>
+            <aurore:Box axis="row" alignItems="center" marginBottom="16">
+                <aurore:Image id="ga_icon" width="72" height="72" cornerRadius="@style/cadran/radius/icon" marginRight="20"/>
+                <aurore:Label id="ga_name" text="" fontSize="28" grow="1.0"/>
+            </aurore:Box>
+            <aurore:Header title="@i18n/playguard/activity/week" marginBottom="8"/>
             <PlayDaysView id="ga_days" width="auto" height="auto" marginTop="8" marginBottom="16"/>
-            <brls:Header title="@i18n/playguard/activity/section_game_time" marginTop="8" marginBottom="8"/>
-            <brls:DetailCell id="ga_today" focusable="false" title="@i18n/playguard/activity/today"/>
-            <brls:DetailCell id="ga_week" focusable="false" title="@i18n/playguard/activity/week"/>
-            <brls:DetailCell id="ga_total" focusable="false" title="@i18n/playguard/activity/all_time"/>
-            <brls:DetailCell id="ga_launches" focusable="false" title="@i18n/playguard/activity/launches"/>
-            <brls:DetailCell id="ga_first" focusable="false" title="@i18n/playguard/activity/first"/>
-            <brls:DetailCell id="ga_last" focusable="false" title="@i18n/playguard/activity/last"/>
-            <brls:DetailCell id="ga_rating" focusable="false" title="@i18n/playguard/activity/rating"/>
-            <brls:Header id="ga_accounts_header" title="@i18n/playguard/activity/section_accounts" marginTop="24" marginBottom="8"/>
-            <brls:Box id="ga_accounts" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="ga_accounts_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/activity/section_game_time" marginTop="8" marginBottom="8"/>
+            <aurore:DetailCell id="ga_today" focusable="false" title="@i18n/playguard/activity/today"/>
+            <aurore:DetailCell id="ga_week" focusable="false" title="@i18n/playguard/activity/week"/>
+            <aurore:DetailCell id="ga_total" focusable="false" title="@i18n/playguard/activity/all_time"/>
+            <aurore:DetailCell id="ga_launches" focusable="false" title="@i18n/playguard/activity/launches"/>
+            <aurore:DetailCell id="ga_first" focusable="false" title="@i18n/playguard/activity/first"/>
+            <aurore:DetailCell id="ga_last" focusable="false" title="@i18n/playguard/activity/last"/>
+            <aurore:DetailCell id="ga_rating" focusable="false" title="@i18n/playguard/activity/rating"/>
+            <aurore:Header id="ga_accounts_header" title="@i18n/playguard/activity/section_accounts" marginTop="24" marginBottom="8"/>
+            <aurore:Box id="ga_accounts" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <aurore:Label id="ga_accounts_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

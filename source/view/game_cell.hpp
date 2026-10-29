@@ -4,10 +4,10 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <vector>
 
-class GameCell : public brls::DetailCell
+class GameCell : public aurore::DetailCell
 {
   public:
     explicit GameCell(bool with_icon);
@@ -34,8 +34,8 @@ class GameCell : public brls::DetailCell
     void set_marks(const std::vector<Mark>& marks);
 
   private:
-    brls::Image* icon = nullptr;
-    brls::Box*   slot = nullptr;    // the icon and its badge
-    brls::Box*   badge = nullptr;
-    brls::Box*   marks = nullptr;   // set_marks()'s row
+    aurore::Image* icon = nullptr;
+    aurore::Box*   slot = nullptr;    // the icon and its badge
+    aurore::Box*   badge = nullptr;
+    aurore::Box*   marks = nullptr;   // set_marks()'s row
 };

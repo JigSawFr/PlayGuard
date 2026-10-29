@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/title_names.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/forwarder_flow.hpp"
 #include "action/game_scan.hpp"
@@ -40,9 +40,9 @@ void save()
     const std::string file = record_file(), dir = sync_files::system_dir();
     ui::write_later("titles.txt", [file, text, dir, agent]() {
         std::string err;
-        if (!paths::atomic_write(file, text, &err)) brls::Logger::warning("titles: not saved ({})", err);
+        if (!paths::atomic_write(file, text, &err)) aurore::Logger::warning("titles: not saved ({})", err);
         paths::ensure_dir(dir);
-        if (!paths::atomic_write(dir + "/titles.txt", agent, &err)) brls::Logger::warning("titles: agent's copy not saved ({})", err);
+        if (!paths::atomic_write(dir + "/titles.txt", agent, &err)) aurore::Logger::warning("titles: agent's copy not saved ({})", err);
     }, "titles.txt");
 }
 }   // namespace

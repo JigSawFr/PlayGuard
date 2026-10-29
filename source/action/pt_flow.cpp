@@ -6,10 +6,10 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "action/pt_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/ui/cadran_text.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_text.hpp>
 
 #include "action/console_lock.hpp"
 #include "action/history_flow.hpp"
@@ -21,7 +21,7 @@
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace pt_flow
 {
@@ -60,7 +60,7 @@ void confirm_write(const std::string& body_in, const std::string& confirm_label,
     std::string body = body_in;
     const int played = pt_logic::suspend_warning_min(pt, ui::today_weekday(), new_days);
     if (played > 0 && platform_game_open(nullptr)) {
-        const std::string warning = brls::getStr("playguard/play_timer/suspend_warning", ui::fmt_limit((uint16_t)played)) +
+        const std::string warning = aurore::getStr("playguard/play_timer/suspend_warning", ui::fmt_limit((uint16_t)played)) +
                                     " " + "playguard/play_timer/unsaved"_i18n;
         body = body.empty() ? warning : body + "\n\n" + warning;
     }
@@ -212,14 +212,14 @@ void finish_write(Result rc, bool did_unlock, const std::string& ok_text,
 static void apply_uniform(uint16_t minutes, std::function<void()> refresh)
 {
     std::string body = minutes == 0 ? "playguard/play_timer/confirm_uniform_zero"_i18n
-                                    : brls::getStr("playguard/play_timer/confirm_uniform", ui::fmt_limit(minutes));
+                                    : aurore::getStr("playguard/play_timer/confirm_uniform", ui::fmt_limit(minutes));
     uint16_t new_days[7];
     for (auto& d : new_days) d = minutes;
     confirm_write(body, "playguard/play_timer/confirm_set"_i18n, [minutes, refresh](bool did_unlock) {
         uint16_t days[7];
         for (auto& d : days) d = minutes;
         Result rc = write_days(days, "uniform");
-        finish_write(rc, did_unlock, brls::getStr("playguard/play_timer/written_uniform", ui::fmt_limit(minutes)),
+        finish_write(rc, did_unlock, aurore::getStr("playguard/play_timer/written_uniform", ui::fmt_limit(minutes)),
                      "playguard/play_timer/write_err"_i18n, refresh);
     }, new_days);
 }

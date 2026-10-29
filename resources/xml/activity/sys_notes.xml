@@ -7,7 +7,7 @@
      version's tags, title, notes and its page as a QR code (See online), and
      when they were fetched (X fetches them again). Filled by sys_notes_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -18,46 +18,46 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
             <!-- While the notes are fetched: a bar and what is fetched, moved by
                  the code into the header, at its right. -->
-            <brls:Box id="sn_loading" width="340" height="auto" axis="column" alignItems="flexEnd"
+            <aurore:Box id="sn_loading" width="340" height="auto" axis="column" alignItems="flexEnd"
                 visibility="gone">
                 <LoadingBar id="sn_loading_bar" width="300" height="8" marginBottom="8"/>
-                <brls:Label id="sn_loading_text" text=" " fontSize="16" horizontalAlign="right"
+                <aurore:Label id="sn_loading_text" text=" " fontSize="16" horizontalAlign="right"
                     textColor="@theme/cadran/text3"/>
-            </brls:Box>
+            </aurore:Box>
             <!-- Between the L and R icons (set in the code); the tabs themselves
                  are made in the code, one per version. -->
-            <brls:Box id="sn_tabs" width="auto" height="auto" axis="row" alignItems="center" marginBottom="16">
-                <brls:Label id="sn_tab_l" text=" " fontSize="25.5" marginRight="12" textColor="@theme/cadran/text3"/>
-                <brls:Box id="sn_tab_list" width="auto" height="auto" axis="row" alignItems="center"/>
-                <brls:Label id="sn_tab_r" text=" " fontSize="25.5" textColor="@theme/cadran/text3"/>
-            </brls:Box>
-            <brls:Label id="sn_advice" text="" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
-            <brls:Box id="sn_tags" width="auto" height="auto" axis="row" marginBottom="10"/>
-            <brls:Header id="sn_header" marginBottom="8"/>
-            <brls:Label id="sn_language" text="@i18n/playguard/sys_notes/english" fontSize="18" marginBottom="12"
+            <aurore:Box id="sn_tabs" width="auto" height="auto" axis="row" alignItems="center" marginBottom="16">
+                <aurore:Label id="sn_tab_l" text=" " fontSize="25.5" marginRight="12" textColor="@theme/cadran/text3"/>
+                <aurore:Box id="sn_tab_list" width="auto" height="auto" axis="row" alignItems="center"/>
+                <aurore:Label id="sn_tab_r" text=" " fontSize="25.5" textColor="@theme/cadran/text3"/>
+            </aurore:Box>
+            <aurore:Label id="sn_advice" text="" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
+            <aurore:Box id="sn_tags" width="auto" height="auto" axis="row" marginBottom="10"/>
+            <aurore:Header id="sn_header" marginBottom="8"/>
+            <aurore:Label id="sn_language" text="@i18n/playguard/sys_notes/english" fontSize="18" marginBottom="12"
                 textColor="@theme/cadran/text3"/>
-            <brls:Box id="sn_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
-            <brls:Label id="sn_empty" text="" fontSize="20" marginTop="8" textColor="@theme/cadran/text3"/>
-            <brls:Label id="sn_more" text="" fontSize="18" marginTop="16" textColor="@theme/cadran/text3"/>
-            <brls:Box width="auto" height="auto" axis="row" marginTop="24">
-                <brls:Button id="sn_online" style="default" text="@i18n/playguard/sys_notes/online"/>
-            </brls:Box>
-            <brls:Label id="sn_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/cadran/text3"/>
+            <aurore:Box id="sn_notes" width="auto" height="auto" axis="column" alignItems="stretch"/>
+            <aurore:Label id="sn_empty" text="" fontSize="20" marginTop="8" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="sn_more" text="" fontSize="18" marginTop="16" textColor="@theme/cadran/text3"/>
+            <aurore:Box width="auto" height="auto" axis="row" marginTop="24">
+                <aurore:Button id="sn_online" style="default" text="@i18n/playguard/sys_notes/online"/>
+            </aurore:Box>
+            <aurore:Label id="sn_checked" text=" " fontSize="18" marginTop="16" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

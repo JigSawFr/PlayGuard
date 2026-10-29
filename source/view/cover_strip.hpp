@@ -9,15 +9,15 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <map>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "util/pctl_ops_c.hpp"
 
-class CoverStrip : public brls::View
+class CoverStrip : public aurore::View
 {
   public:
     CoverStrip();
@@ -35,19 +35,19 @@ class CoverStrip : public brls::View
     // game_icons::load.
     std::vector<u64> wanted() const;
 
-    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-              brls::FrameContext* ctx) override;
+    void draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+              aurore::FrameContext* ctx) override;
 
   private:
     int texture(u64 game);    // its icon, the placeholder, or 0
-    float at(brls::Time now) const;   // the position drawn (a game's index, fractional between two)
+    float at(aurore::Time now) const;   // the position drawn (a game's index, fractional between two)
 
     std::vector<u64> ids;
     std::vector<Mark> marks;            // by game, as `ids`
-    std::vector<brls::Time> marked_at;  // when each was marked (µs)
+    std::vector<aurore::Time> marked_at;  // when each was marked (µs)
     std::map<u64, int> owned;   // textures made for this strip, freed with it
     float from = 0, to = 0;     // the position eases from `from` to `to` ...
-    brls::Time since = 0;       // ... since then (µs)
+    aurore::Time since = 0;       // ... since then (µs)
 };
 
 // A dialog's strip (a batch's: the data checked, the games removed), on top

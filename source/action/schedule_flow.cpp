@@ -3,13 +3,13 @@
 
 #include <algorithm>
 #include <array>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <cstdlib>
 #include <fmt/format.h>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
 
 #include "action/profile_flow.hpp"
 #include "action/pt_flow.hpp"
@@ -19,7 +19,7 @@
 #include "util/config.hpp"
 #include "util/profiles.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace schedule_flow
 {
@@ -62,7 +62,7 @@ std::string day_text(const std::string& ymd)
     if (ymd.size() != 10) return ymd;
     const int month = std::atoi(ymd.substr(5, 2).c_str()), day = std::atoi(ymd.substr(8, 2).c_str());
     if (month < 1 || month > 12 || day < 1) return ymd;
-    return brls::getStr("playguard/schedule/date", day, brls::getStr(fmt::format("cadran/months/{}", month)));
+    return aurore::getStr("playguard/schedule/date", day, aurore::getStr(fmt::format("cadran/months/{}", month)));
 }
 
 bool find_profile(const std::string& file, profiles::Profile* out)
@@ -83,7 +83,7 @@ void apply(std::function<void()> after)
     const schedule_logic::Schedule s = load();
     profiles::Profile p;
     if (!find_profile(s.file, &p)) {
-        ui::info(brls::getStr("playguard/schedule/profile_gone", s.name));
+        ui::info(aurore::getStr("playguard/schedule/profile_gone", s.name));
         clear();
         return;
     }
@@ -99,7 +99,7 @@ void apply(std::function<void()> after)
     if (std::equal(p.days.begin(), p.days.end(), live.day_min)) {
         c.schedule_applied = true;
         ui::save_config();
-        ui::notify(brls::getStr("playguard/play_timer/profile_already", p.name));
+        ui::notify(aurore::getStr("playguard/play_timer/profile_already", p.name));
         if (after) after();
         return;
     }
@@ -120,7 +120,7 @@ void put_back(std::function<void()> after)
 {
     const schedule_logic::Schedule s = load();
     const std::array<uint16_t, 7> prev = s.prev;
-    pt_flow::confirm_write(brls::getStr("playguard/schedule/put_back_body", s.name), "playguard/play_timer/confirm_set"_i18n,
+    pt_flow::confirm_write(aurore::getStr("playguard/schedule/put_back_body", s.name), "playguard/play_timer/confirm_set"_i18n,
                            [prev, after](bool did_unlock) {
                                const Result rc = pt_flow::write_days(prev.data(), "schedule_end");
                                if (R_SUCCEEDED(rc)) clear();
@@ -131,9 +131,9 @@ void put_back(std::function<void()> after)
 
 void ask_apply(const schedule_logic::Schedule& s, std::function<void()> after)
 {
-    auto* dialog = ui::dialog(brls::getStr("playguard/schedule/apply_body", day_text(s.from), day_text(s.to), s.name, day_text(s.to)));
+    auto* dialog = ui::dialog(aurore::getStr("playguard/schedule/apply_body", day_text(s.from), day_text(s.to), s.name, day_text(s.to)));
     dialog->addButton("playguard/schedule/not_now"_i18n, []() {});
-    dialog->addButton("playguard/schedule/apply"_i18n, [after]() { brls::sync([after]() { apply(after); }); });
+    dialog->addButton("playguard/schedule/apply"_i18n, [after]() { aurore::sync([after]() { apply(after); }); });
     dialog->setCancelable(true);
     cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     dialog->open();
@@ -141,13 +141,13 @@ void ask_apply(const schedule_logic::Schedule& s, std::function<void()> after)
 
 void ask_put_back(const schedule_logic::Schedule& s, std::function<void()> after)
 {
-    auto* dialog = ui::dialog(brls::getStr("playguard/schedule/over_body", s.name, day_text(s.to), ui::days_summary(s.prev.data())));
+    auto* dialog = ui::dialog(aurore::getStr("playguard/schedule/over_body", s.name, day_text(s.to), ui::days_summary(s.prev.data())));
     dialog->addButton("playguard/schedule/keep"_i18n, [after]() {
         clear();
         ui::notify("playguard/schedule/removed"_i18n);
         if (after) after();
     });
-    dialog->addButton("playguard/schedule/put_back"_i18n, [after]() { brls::sync([after]() { put_back(after); }); });
+    dialog->addButton("playguard/schedule/put_back"_i18n, [after]() { aurore::sync([after]() { put_back(after); }); });
     dialog->setCancelable(true);
     cadran::style_dialog(dialog, cadran::Emphasis::PRIMARY);
     dialog->open();
@@ -175,7 +175,7 @@ void pick_period(const profiles::Profile& p, std::function<void()> after)
             c.schedule_applied = false;
             c.schedule_prev.clear();
             ui::save_config();
-            ui::notify(brls::getStr("playguard/schedule/saved", p.name, day_text(from), day_text(ends[(size_t)j])));
+            ui::notify(aurore::getStr("playguard/schedule/saved", p.name, day_text(from), day_text(ends[(size_t)j])));
             if (after) after();
             // Today already: asked now.
             if (schedule_logic::step(load(), ui::today_date()) == schedule_logic::Step::Apply) {
@@ -255,7 +255,7 @@ std::string summary()
 {
     const auto& c = config::get();
     if (c.schedule_from.empty()) return "";
-    return brls::getStr("playguard/schedule/value", c.schedule_name, day_text(c.schedule_from), day_text(c.schedule_to));
+    return aurore::getStr("playguard/schedule/value", c.schedule_name, day_text(c.schedule_from), day_text(c.schedule_to));
 }
 
 }   // namespace schedule_flow

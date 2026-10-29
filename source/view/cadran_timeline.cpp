@@ -6,7 +6,7 @@
 #include <fmt/format.h>
 #include <vector>
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -28,13 +28,13 @@ std::string clock_text(int minutes)
 CadranTimeline::CadranTimeline()
 {
     this->setFocusable(false);
-    this->digits_font = brls::Application::getFont("cadran/digits");
-    if (this->digits_font == brls::FONT_INVALID) this->digits_font = brls::Application::getDefaultFont();
-    this->text_font = brls::Application::getDefaultFont();
+    this->digits_font = aurore::Application::getFont("cadran/digits");
+    if (this->digits_font == aurore::FONT_INVALID) this->digits_font = aurore::Application::getDefaultFont();
+    this->text_font = aurore::Application::getDefaultFont();
     this->show(0, -1, -1, "", "");
 }
 
-float CadranTimeline::scale() const { return brls::Label::getFontScale(); }
+float CadranTimeline::scale() const { return aurore::Label::getFontScale(); }
 
 void CadranTimeline::show(int now_min, int time_up_min, int bedtime_min, const std::string& caption,
                           const std::string& bed_caption)
@@ -48,13 +48,13 @@ void CadranTimeline::show(int now_min, int time_up_min, int bedtime_min, const s
     this->setHeight(std::ceil(TRACK_Y + MARK_R + GAP + TIME_SIZE * this->scale() * 1.3f));
 }
 
-void CadranTimeline::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-                          brls::FrameContext* ctx)
+void CadranTimeline::draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+                          aurore::FrameContext* ctx)
 {
     (void)style;
     (void)ctx;
     (void)height;
-    brls::Theme theme = brls::Application::getTheme();
+    aurore::Theme theme = aurore::Application::getTheme();
     const NVGcolor line = theme["cadran/track"], ink = theme["cadran/text"], quiet = theme["cadran/text3"];
     const float s = this->scale();
 
@@ -118,7 +118,7 @@ void CadranTimeline::draw(NVGcontext* vg, float x, float y, float width, float h
         nvgCircle(vg, mx, cy, MARK_R);
         nvgFillColor(vg, this->a(m.bed ? theme["cadran/surf"] : next ? fill : quiet));
         nvgFill(vg);
-        nvgStrokeColor(vg, this->a(m.bed ? (next ? fill : ink) : theme["brls/background"]));
+        nvgStrokeColor(vg, this->a(m.bed ? (next ? fill : ink) : theme["aurore/background"]));
         nvgStrokeWidth(vg, 2);
         nvgStroke(vg);
 

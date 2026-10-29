@@ -277,7 +277,7 @@ NextStop next_stop(int now, int left, const PtBedtime& bed);
 bool counts_to_bed(const NextStop& n, int left, bool free);
 
 // A duration changed with an arrow held (the minutes prompt, the week): 15 min
-// a press, then whole hours once borealis repeats it for most of a second (a
+// a press, then whole hours once Aurore repeats it for most of a second (a
 // repeat every 100 ms, after 250 ms); `now_us`, the press's time. Kept between
 // presses in `held`. Returns the new value, 0 to 24 h.
 struct Held

@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/row_icon.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "ui/ui.hpp"
 
@@ -15,14 +15,14 @@ RowIcon::RowIcon(Kind shown)
     this->setFocusable(false);
     this->setWidth(SIZE);
     this->setHeight(SIZE);
-    this->setAlignSelf(brls::AlignSelf::CENTER);
+    this->setAlignSelf(aurore::AlignSelf::CENTER);
     this->setMarginLeft(12);
-    this->setVisibility(brls::Visibility::GONE);
+    this->setVisibility(aurore::Visibility::GONE);
 }
 
 void RowIcon::set_shown(bool shown)
 {
-    this->setVisibility(shown ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+    this->setVisibility(shown ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
 }
 
 void RowIcon::set_kind(Kind shown)
@@ -30,8 +30,8 @@ void RowIcon::set_kind(Kind shown)
     this->kind = shown;
 }
 
-void RowIcon::draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-                   brls::FrameContext* ctx)
+void RowIcon::draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+                   aurore::FrameContext* ctx)
 {
     (void)style;
     (void)ctx;
@@ -60,13 +60,13 @@ void RowIcon::draw(NVGcontext* vg, float x, float y, float width, float height, 
         text_y = y + height * 0.53f;
     }
     nvgFill(vg);
-    nvgFontFaceId(vg, brls::Application::getDefaultFont());
+    nvgFontFaceId(vg, aurore::Application::getDefaultFont());
     nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-    nvgFillColor(vg, brls::Application::getTheme()["brls/background"]);
+    nvgFillColor(vg, aurore::Application::getTheme()["aurore/background"]);
     nvgText(vg, cx, text_y, this->kind == Kind::Warning ? "!" : "i", nullptr);
 }
 
-RowIcon* RowIcon::on_row(brls::Box* row, Kind kind)
+RowIcon* RowIcon::on_row(aurore::Box* row, Kind kind)
 {
     if (!row) return nullptr;
     if (auto* icon = dynamic_cast<RowIcon*>(row->getView(ICON_ID))) return icon;

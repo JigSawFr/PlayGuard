@@ -9,27 +9,27 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
-#include <borealis/core/theme_image.hpp>
+#include <aurore.hpp>
+#include <aurore/core/theme_image.hpp>
 
 #include <memory>
 
-class LoadingMark : public brls::View
+class LoadingMark : public aurore::View
 {
   public:
     LoadingMark();
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
-              brls::Style style, brls::FrameContext* ctx) override;
+              aurore::Style style, aurore::FrameContext* ctx) override;
 
     void onThemeChanged() override;
 
-    static brls::View* create();
+    static aurore::View* create();
 
   private:
     bool still = false;   // desktop smoke test: the glow at rest
     // The theme's pictures for the variant in use: its loading picture,
     // its logo (nullptr without one).
-    std::shared_ptr<brls::ThemeImage> art, logo;
+    std::shared_ptr<aurore::ThemeImage> art, logo;
     void takeThemePictures();
 };

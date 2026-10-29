@@ -1,20 +1,20 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/sys_notes_activity.hpp"
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_modal.hpp>
-#include <borealis/cadran/ui/live_prefs.hpp>
-#include <borealis/cadran/util/markdown.hpp>
-#include <borealis/cadran/util/text.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
-#include <borealis/cadran/view/markdown_view.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_modal.hpp>
+#include <aurore/cadran/ui/live_prefs.hpp>
+#include <aurore/cadran/util/markdown.hpp>
+#include <aurore/cadran/util/text.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/view/markdown_view.hpp>
 
 #include "action/sys_notes_flow.hpp"
 #include "ui/ui.hpp"
 #include "view/build_cell.hpp"
 #include "view/release_notes.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 using sys_notes::Which;
 
 namespace
@@ -32,7 +32,7 @@ std::string title_of(Which which)
 void SysNotesActivity::show(Which which)
 {
     s_failed[(int)which] = false;
-    brls::Application::pushActivity(new SysNotesActivity(which));
+    aurore::Application::pushActivity(new SysNotesActivity(which));
 }
 
 void SysNotesActivity::changed(Which which)
@@ -67,19 +67,19 @@ SysNotesActivity::~SysNotesActivity()
 
 void SysNotesActivity::onContentAvailable()
 {
-    auto* applet = dynamic_cast<brls::AppletFrame*>(this->getContentView());
-    if (applet) applet->setTitle(brls::getStr("playguard/sys_notes/title", title_of(this->which)));
+    auto* applet = dynamic_cast<aurore::AppletFrame*>(this->getContentView());
+    if (applet) applet->setTitle(aurore::getStr("playguard/sys_notes/title", title_of(this->which)));
     // The bar in the header, at its right (as on Install another build), not
     // over the tabs.
-    if (brls::Box* top = applet ? applet->getHeader() : nullptr) {
-        if (brls::Box* parent = loading_box->getParent()) parent->removeView(loading_box.getView(), false);
-        loading_box->setAlignSelf(brls::AlignSelf::CENTER);
+    if (aurore::Box* top = applet ? applet->getHeader() : nullptr) {
+        if (aurore::Box* parent = loading_box->getParent()) parent->removeView(loading_box.getView(), false);
+        loading_box->setAlignSelf(aurore::AlignSelf::CENTER);
         loading_box->setMarginRight(16);
         top->addView(loading_box.getView(), 1);
     }
     // Installed (a check) or new (a sparkle) marks the version, right after it.
-    this->mark = new brls::Box(brls::Axis::ROW);
-    this->mark->setAlignSelf(brls::AlignSelf::CENTER);
+    this->mark = new aurore::Box(aurore::Axis::ROW);
+    this->mark->setAlignSelf(aurore::AlignSelf::CENTER);
     this->mark->setMarginLeft(12);
     header->addView(this->mark, 2);
     loading_text->setSingleLine(false);
@@ -90,8 +90,8 @@ void SysNotesActivity::onContentAvailable()
     checked->setSingleLine(false);
     // A button per tab, made once and reused (one of them may have the focus).
     for (size_t i = 0; i < 1 + sys_notes::MAX_NEWER; i++) {
-        auto* b = new brls::Button();
-        b->setStyle(&brls::BUTTONSTYLE_DEFAULT);
+        auto* b = new aurore::Button();
+        b->setStyle(&aurore::BUTTONSTYLE_DEFAULT);
         b->setMarginRight(12);
         b->setText(" ");
         // After the version, a check on the installed one's tab (fill()).
@@ -101,7 +101,7 @@ void SysNotesActivity::onContentAvailable()
         check->setHeight(18);
         check->setMarginLeft(8);
         b->addView(check);
-        b->registerClickAction([this, i](brls::View*) {
+        b->registerClickAction([this, i](aurore::View*) {
             this->show_tab(i);
             return true;
         });
@@ -111,44 +111,44 @@ void SysNotesActivity::onContentAvailable()
     // D-pad scroll them.
     notes->setFocusable(true);
     notes->setHideHighlight(true);
-    tab_l->setText(brls::Hint::getKeyIcon(brls::BUTTON_LB, true));
-    tab_r->setText(brls::Hint::getKeyIcon(brls::BUTTON_RB, true));
-    this->getContentView()->registerAction("", brls::BUTTON_RB, [this](brls::View*) {
+    tab_l->setText(aurore::Hint::getKeyIcon(aurore::BUTTON_LB, true));
+    tab_r->setText(aurore::Hint::getKeyIcon(aurore::BUTTON_RB, true));
+    this->getContentView()->registerAction("", aurore::BUTTON_RB, [this](aurore::View*) {
         this->next_tab(1);
         return true;
     }, true);
-    this->getContentView()->registerAction("", brls::BUTTON_LB, [this](brls::View*) {
+    this->getContentView()->registerAction("", aurore::BUTTON_LB, [this](aurore::View*) {
         this->next_tab(-1);
         return true;
     }, true);
     const Which w = this->which;
-    this->getContentView()->registerAction("playguard/hints/refresh"_i18n, brls::BUTTON_X, [w](brls::View*) {
+    this->getContentView()->registerAction("playguard/hints/refresh"_i18n, aurore::BUTTON_X, [w](aurore::View*) {
         sys_notes_flow::refresh(w, true);
         return true;
     });
     cadran::style_button(online.getView());   // a pill, as every button of the boards
-    online->registerClickAction([this](brls::View*) {
+    online->registerClickAction([this](aurore::View*) {
         this->show_page();
         return true;
     });
     this->set_loading(sys_notes_flow::fetching(w));
     this->fill();
-    if (brls::View* target = this->focus_target()) brls::Application::giveFocus(target);
+    if (aurore::View* target = this->focus_target()) aurore::Application::giveFocus(target);
 }
 
-brls::View* SysNotesActivity::focus_target()
+aurore::View* SysNotesActivity::focus_target()
 {
     // The chosen tab, else the notes, else See online.
-    if (tabs->getVisibility() == brls::Visibility::VISIBLE) return tab_list->getChildren()[this->tab];
-    if (notes->getVisibility() == brls::Visibility::VISIBLE) return notes.getView();
-    if (online->getVisibility() == brls::Visibility::VISIBLE) return online.getView();
+    if (tabs->getVisibility() == aurore::Visibility::VISIBLE) return tab_list->getChildren()[this->tab];
+    if (notes->getVisibility() == aurore::Visibility::VISIBLE) return notes.getView();
+    if (online->getVisibility() == aurore::Visibility::VISIBLE) return online.getView();
     return nullptr;
 }
 
 void SysNotesActivity::set_loading(bool on)
 {
     if (on) {
-        if (loading_box->getVisibility() != brls::Visibility::VISIBLE) loading_bar->reset();
+        if (loading_box->getVisibility() != aurore::Visibility::VISIBLE) loading_bar->reset();
         loading_text->setText("playguard/sys_notes/fetching"_i18n);
         ui::set_visible(loading_bar.getView(), true);
         // Steady: most of the way over ten seconds, the end left for the answer.
@@ -173,12 +173,12 @@ void SysNotesActivity::fill()
     // The tabs: the installed one has a check; one alone is no choice.
     auto& buttons = tab_list->getChildren();
     for (size_t i = 0; i < buttons.size(); i++) {
-        auto* b = (brls::Button*)buttons[i];
+        auto* b = (aurore::Button*)buttons[i];
         const bool here = i < this->shown.size();
         ui::set_visible(b, here);
         if (!here) continue;
         const sys_notes::Release& r = list.releases[this->shown[i]];
-        const brls::ButtonStyle* style = i == this->tab ? &brls::BUTTONSTYLE_PRIMARY : &brls::BUTTONSTYLE_DEFAULT;
+        const aurore::ButtonStyle* style = i == this->tab ? &aurore::BUTTONSTYLE_PRIMARY : &aurore::BUTTONSTYLE_DEFAULT;
         b->setText(r.version);
         b->setStyle(style);
         // The check in the tab's ink: dark on the chosen tab's teal.
@@ -186,12 +186,12 @@ void SysNotesActivity::fill()
         check->setThemeColor("color", style->enabledLabelColor);
         ui::set_visible(check, (int)this->shown[i] == installed_at);
     }
-    brls::View* focus = brls::Application::getCurrentFocus();
+    aurore::View* focus = aurore::Application::getCurrentFocus();
     const bool tabs_go = this->shown.size() < 2;
     // The tabs appearing (the first fetch, nothing kept before): the focus
     // goes to them from See online, or from the notes (PlayGuard's own, from
     // the app), where it waited.
-    const bool tabs_came = !tabs_go && tabs->getVisibility() != brls::Visibility::VISIBLE;
+    const bool tabs_came = !tabs_go && tabs->getVisibility() != aurore::Visibility::VISIBLE;
     ui::set_visible(tabs.getView(), !tabs_go);
 
     // The firmware: what updating to the newest one needs first.
@@ -207,7 +207,7 @@ void SysNotesActivity::fill()
     // highlights as cards, then the lists); the installed version's are in
     // the app too, for when GitHub's are not there (offline, not fetched yet).
     const bool own = this->which == Which::PlayGuard;
-    const char* accent = "brls/sidebar/active_item";
+    const char* accent = "aurore/sidebar/active_item";
     if (this->shown.empty()) {
         // Nothing kept: the list of releases online.
         this->page = this->which == Which::Firmware ? "https://switchbrew.org/wiki/System_Versions"
@@ -238,7 +238,7 @@ void SysNotesActivity::fill()
         else if (!mine.empty() && this->tab >= newer_from)
             mark->addView(tag_view({ "", "cadran/amber", "sparkle" }, 18));
         if (!r.supports.empty())
-            tags->addView(tag_view({ brls::getStr("playguard/sys_notes/tag_supports", r.supports), "cadran/text2" }, 18));
+            tags->addView(tag_view({ aurore::getStr("playguard/sys_notes/tag_supports", r.supports), "cadran/text2" }, 18));
         if (r.security) tags->addView(tag_view({ "playguard/sys_notes/tag_security"_i18n, "cadran/amber" }, 18));
         if (r.pctl) tags->addView(tag_view({ "playguard/sys_notes/tag_pctl"_i18n, "cadran/amber" }, 18));
         ui::set_visible(tags.getView(), !tags->getChildren().empty());
@@ -266,9 +266,9 @@ void SysNotesActivity::fill()
     // What the tabs leave out: newer versions in between, the installed one
     // when it is older than the list.
     std::string left_out;
-    if (hidden) left_out = brls::getStr("playguard/sys_notes/hidden", (int)hidden);
+    if (hidden) left_out = aurore::getStr("playguard/sys_notes/hidden", (int)hidden);
     if (!mine.empty() && installed_at < 0 && !list.releases.empty())
-        left_out += (left_out.empty() ? "" : "\n") + brls::getStr("playguard/sys_notes/installed_missing", mine);
+        left_out += (left_out.empty() ? "" : "\n") + aurore::getStr("playguard/sys_notes/installed_missing", mine);
     more->setText(left_out);
     ui::set_visible(more.getView(), !left_out.empty());
     ui::set_visible(online.getView(), !this->page.empty());
@@ -276,19 +276,19 @@ void SysNotesActivity::fill()
     // When they were fetched; offline, the notes kept.
     std::string when;
     if (!list.fetched.empty())
-        when = brls::getStr(s_failed[(int)this->which] ? "playguard/sys_notes/offline" : "playguard/sys_notes/fetched",
+        when = aurore::getStr(s_failed[(int)this->which] ? "playguard/sys_notes/offline" : "playguard/sys_notes/fetched",
                             list.fetched);
     else if (s_failed[(int)this->which] && !this->shown.empty())
         when = "playguard/sys_notes/failed"_i18n;
     checked->setText(when.empty() ? " " : when);
 
     // The focus follows the chosen tab, and is never left on a view that went.
-    brls::View* target = this->focus_target();
-    const bool focus_gone = !focus || focus->getVisibility() != brls::Visibility::VISIBLE ||
+    aurore::View* target = this->focus_target();
+    const bool focus_gone = !focus || focus->getVisibility() != aurore::Visibility::VISIBLE ||
                             (focus->getParent() == tab_list.getView() && tabs_go);
     if (target && (focus_gone || focus->getParent() == tab_list.getView() || (tabs_came && (focus == online.getView() || focus == notes.getView()))))
-        brls::Application::giveFocus(target);
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+        aurore::Application::giveFocus(target);
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
 }
 
 void SysNotesActivity::show_tab(size_t t)
@@ -304,11 +304,11 @@ void SysNotesActivity::next_tab(int step)
     const int n = (int)this->shown.size();
     if (n < 2) return;
     const int at = ((int)this->tab + step + n) % n;
-    brls::View* focus = brls::Application::getCurrentFocus();
+    aurore::View* focus = aurore::Application::getCurrentFocus();
     const bool on_tabs = focus && focus->getParent() == tab_list.getView();
     this->show_tab((size_t)at);
     // From the notes, the focus stays there (at their top).
-    if (!on_tabs && notes->getVisibility() == brls::Visibility::VISIBLE) brls::Application::giveFocus(notes.getView());
+    if (!on_tabs && notes->getVisibility() == aurore::Visibility::VISIBLE) aurore::Application::giveFocus(notes.getView());
 }
 
 void SysNotesActivity::show_page()

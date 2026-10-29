@@ -5,9 +5,9 @@
 #include <string>
 #include <utility>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/motion.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/motion.hpp>
 
 #include "action/frame_stats_flow.hpp"
 #include "action/pin_lock.hpp"
@@ -16,15 +16,15 @@
 #include "activity/main_activity.hpp"
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
-void keep_size(brls::View* view)
+void keep_size(aurore::View* view)
 {
-    if (auto* label = dynamic_cast<brls::Label*>(view)) label->setFontScaled(false);
-    if (auto* box = dynamic_cast<brls::Box*>(view))
-        for (brls::View* child : box->getChildren()) keep_size(child);
+    if (auto* label = dynamic_cast<aurore::Label*>(view)) label->setFontScaled(false);
+    if (auto* box = dynamic_cast<aurore::Box*>(view))
+        for (aurore::View* child : box->getChildren()) keep_size(child);
 }
 
 constexpr int LAST_MINUTES = 5;   // the end chip in amber, the ring beating
@@ -34,22 +34,22 @@ constexpr int BED_SOON     = 30;  // the bedtime chip in amber from then on
 void CadranChildActivity::onContentAvailable()
 {
     frame_stats_flow::set_screen("activity/cadran_child");
-    auto* frame = dynamic_cast<brls::AppletFrame*>(this->getContentView());
+    auto* frame = dynamic_cast<aurore::AppletFrame*>(this->getContentView());
     if (frame) frame->addView(cadran::make_glow(640.0f, 330.0f, 330.0f, "cadran/glow_strong"), 0);
     // The mark and the title; at the right, the parent's keys, small (the
     // footer keeps the child's own, alone).
     cadran::style_header(frame, nullptr, "", false, false);
-    if (brls::Box* header = frame ? frame->getHeader() : nullptr) {
-        auto* keys = new brls::Box(brls::Axis::ROW);
-        keys->setAlignItems(brls::AlignItems::CENTER);
+    if (aurore::Box* header = frame ? frame->getHeader() : nullptr) {
+        auto* keys = new aurore::Box(aurore::Axis::ROW);
+        keys->setAlignItems(aurore::AlignItems::CENTER);
         keys->setMarginRight(16);
         for (const auto& [letter, text] : { std::pair<const char*, std::string>{ "A", "playguard/cadran/child/back"_i18n },
                                             { "Y", "playguard/cadran/child/extra"_i18n } }) {
-            brls::Box* bubble = cadran::kit::key(letter);
+            aurore::Box* bubble = cadran::kit::key(letter);
             bubble->setMarginLeft(18);
             bubble->setMarginRight(8);
             keys->addView(bubble);
-            auto* label = new brls::Label();
+            auto* label = new aurore::Label();
             label->setText(text);
             label->setFontSize(15);
             label->setFontScaled(false);
@@ -66,31 +66,31 @@ void CadranChildActivity::onContentAvailable()
     ring->setValueSize(96);
     ring->setCaptionSize(22);
     // Already sized for the room: the larger text leaves it as it is.
-    if (brls::View* root = this->getView("child_root")) keep_size(root);
+    if (aurore::View* root = this->getView("child_root")) keep_size(root);
 
     // The screen itself takes the focus (highlight hidden): otherwise the
     // previous screen's focused button keeps its ring, drawn over this one.
-    if (brls::View* root = this->getView("child_root")) {
+    if (aurore::View* root = this->getView("child_root")) {
         root->setHideHighlight(true);
-        brls::Application::giveFocus(root);
+        aurore::Application::giveFocus(root);
         motion::reveal(root, 10.0f, 220);   // the ring and its chips rise into place
     }
     // Back to the parent's screens only with the PIN (none on the console: at once).
-    this->getContentView()->registerAction("playguard/cadran/child/back"_i18n, brls::BUTTON_A, [](brls::View*) {
+    this->getContentView()->registerAction("playguard/cadran/child/back"_i18n, aurore::BUTTON_A, [](aurore::View*) {
         if (!pin_lock::ask()) {
             ui::refuse(pin_lock::refusal_text());
             return true;
         }
-        brls::Application::popActivity();
+        aurore::Application::popActivity();
         return true;
     }, true);
-    this->getContentView()->registerAction("playguard/cadran/child/play"_i18n, brls::BUTTON_B, [](brls::View*) {
+    this->getContentView()->registerAction("playguard/cadran/child/play"_i18n, aurore::BUTTON_B, [](aurore::View*) {
         MainActivity::quit_or_relock();
         return true;
     });
     // Extra time from here, the parent by the child: the PIN, then the
     // amounts, and the child screen stays.
-    const auto extra = [this](brls::View*) {
+    const auto extra = [this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         PtState pt;
         pctl_play_timer_query(&pt);
@@ -106,10 +106,10 @@ void CadranChildActivity::onContentAvailable()
         pt_flow::add_extra_time(pt, [this]() { this->refresh(); });
         return true;
     };
-    this->getContentView()->registerAction("playguard/cadran/child/extra"_i18n, brls::BUTTON_Y, extra, true);
+    this->getContentView()->registerAction("playguard/cadran/child/extra"_i18n, aurore::BUTTON_Y, extra, true);
 #if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     // The desktop build: the keyboard has no Ⓨ, so the Y key (as the main screen).
-    this->getContentView()->registerAction(brls::BrlsKeyCombination(brls::BRLS_KBD_KEY_Y), extra);
+    this->getContentView()->registerAction(aurore::AuroreKeyCombination(aurore::AURORE_KBD_KEY_Y), extra);
 #endif
 
     this->refresh();
@@ -146,11 +146,11 @@ void CadranChildActivity::refresh()
         case pt_logic::RingState::TIME_UP:
             // Suspended, or past the limit with the console only warning.
             left = ui::fmt_played(0);
-            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_limit(st.limit)) + " · " + "playguard/cadran/today/time_up"_i18n;
+            caption = aurore::getStr("playguard/cadran/child/of", ui::fmt_limit(st.limit)) + " · " + "playguard/cadran/today/time_up"_i18n;
             break;
         case pt_logic::RingState::COUNTING:
             left = ui::fmt_time_left(pt.remaining_ns);
-            caption = brls::getStr("playguard/cadran/child/of", ui::fmt_limit(st.limit));
+            caption = aurore::getStr("playguard/cadran/child/of", ui::fmt_limit(st.limit));
             break;
         case pt_logic::RingState::IDLE:
             left = ui::fmt_limit(st.limit);
@@ -176,7 +176,7 @@ void CadranChildActivity::refresh()
     ring->setFraction(frac);
     ring->setValue(left);
     ring->setCaption(caption);
-    if (ending) ui::set_text(end_text, brls::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", n.at / 60, n.at % 60)));
+    if (ending) ui::set_text(end_text, aurore::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", n.at / 60, n.at % 60)));
     end_icon->setThemeColor("color", last ? "cadran/amber" : "cadran/teal");
     end_text->setThemeColor("textColor", last ? "cadran/amber" : "cadran/text");
     ui::set_visible(end_chip.getView(), ending);

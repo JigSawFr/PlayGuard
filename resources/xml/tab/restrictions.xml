@@ -7,7 +7,7 @@
      VR mode. The games allowed to communicate are in the diagnostic report
      until their list is understood. -->
 
-<brls:Box
+<aurore:Box
     width="auto"
     height="auto">
 
@@ -16,36 +16,36 @@
         height="auto"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingLeft="@style/brls/tab_frame/content_padding_sides"
-            paddingRight="@style/brls/tab_frame/content_padding_sides"
-            paddingTop="@style/brls/tab_frame/content_padding_top_bottom"
-            paddingBottom="@style/brls/tab_frame/content_padding_top_bottom">
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <brls:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
-            <brls:Box id="rs_levels" axis="column" alignItems="stretch" marginBottom="8">
-                <brls:Label id="rs_kicker" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="10"/>
-                <brls:Box id="rs_tiles" axis="row" alignItems="stretch"/>
-            </brls:Box>
-            <brls:Header id="rs_custom_header" title="@i18n/playguard/restrictions/section_custom" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="rs_age" title="@i18n/playguard/restrictions/age"/>
-            <brls:BooleanCell id="rs_sns"/>
-            <brls:BooleanCell id="rs_comm"/>
-            <brls:Label id="rs_custom_note" text="@i18n/playguard/restrictions/custom_only" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header title="@i18n/playguard/restrictions/section_rating" marginTop="24" marginBottom="8"/>
-            <brls:DetailCell id="rs_org" title="@i18n/playguard/restrictions/org"/>
-            <brls:DetailCell id="rs_blocked" title="@i18n/playguard/restrictions/blocked"/>
-            <brls:Label id="rs_blocked_note" text="@i18n/playguard/restrictions/blocked_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Header title="@i18n/playguard/restrictions/section_other" marginTop="24" marginBottom="8"/>
-            <brls:BooleanCell id="rs_vr"/>
-            <brls:Label id="rs_note" text="@i18n/playguard/restrictions/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
+            <aurore:Box id="rs_levels" axis="column" alignItems="stretch" marginBottom="8">
+                <aurore:Label id="rs_kicker" text="" fontSize="16" textColor="@theme/cadran/text2" marginBottom="10"/>
+                <aurore:Box id="rs_tiles" axis="row" alignItems="stretch"/>
+            </aurore:Box>
+            <aurore:Header id="rs_custom_header" title="@i18n/playguard/restrictions/section_custom" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="rs_age" title="@i18n/playguard/restrictions/age"/>
+            <aurore:BooleanCell id="rs_sns"/>
+            <aurore:BooleanCell id="rs_comm"/>
+            <aurore:Label id="rs_custom_note" text="@i18n/playguard/restrictions/custom_only" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/restrictions/section_rating" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="rs_org" title="@i18n/playguard/restrictions/org"/>
+            <aurore:DetailCell id="rs_blocked" title="@i18n/playguard/restrictions/blocked"/>
+            <aurore:Label id="rs_blocked_note" text="@i18n/playguard/restrictions/blocked_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/restrictions/section_other" marginTop="24" marginBottom="8"/>
+            <aurore:BooleanCell id="rs_vr"/>
+            <aurore:Label id="rs_note" text="@i18n/playguard/restrictions/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:Box>
+</aurore:Box>

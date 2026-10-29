@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/sys_update_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 #include <mutex>
 #include <string>
@@ -16,7 +16,7 @@
 #include "util/sys_updates.hpp"
 #include "util/update.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace sys_update_flow
 {
@@ -42,18 +42,18 @@ void note()
     const std::string ams = si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
     const std::string fw = ui::hos_text(si.hos_version);
     const std::string hekate = installed_hekate();
-    entry("sys_atmosphere", latest.atmosphere, ams, brls::getStr("playguard/notices/sys_atmosphere", latest.atmosphere),
-          brls::getStr("playguard/notices/sys_atmosphere_detail", ams));
-    entry("sys_hekate", latest.hekate, hekate, brls::getStr("playguard/notices/sys_hekate", latest.hekate),
-          brls::getStr("playguard/notices/sys_hekate_detail", hekate));
+    entry("sys_atmosphere", latest.atmosphere, ams, aurore::getStr("playguard/notices/sys_atmosphere", latest.atmosphere),
+          aurore::getStr("playguard/notices/sys_atmosphere_detail", ams));
+    entry("sys_hekate", latest.hekate, hekate, aurore::getStr("playguard/notices/sys_hekate", latest.hekate),
+          aurore::getStr("playguard/notices/sys_hekate_detail", hekate));
     // What the notes of Atmosphère and hekate say of that firmware, when they
     // say something: set once they are read (sys_notes_flow::load() calls
     // refresh_entries() then), so the entry does not change under the parent.
     if (!sys_notes_flow::ready()) return;
     const std::string advice = sys_notes_flow::firmware_advice();
     entry("sys_firmware", latest.firmware, si.hos_version ? std::string(fw) : "",
-          brls::getStr("playguard/notices/sys_firmware", latest.firmware),
-          brls::getStr("playguard/notices/sys_firmware_detail", std::string(fw)) + (advice.empty() ? "" : "\n" + advice));
+          aurore::getStr("playguard/notices/sys_firmware", latest.firmware),
+          aurore::getStr("playguard/notices/sys_firmware_detail", std::string(fw)) + (advice.empty() ? "" : "\n" + advice));
 }
 
 void check()
@@ -67,10 +67,10 @@ void check()
         // whether the newest firmware is supported yet.
         const sys_notes::Cache lists = ui::quitting() ? sys_notes::Cache{} : sys_notes_flow::fetch_lists();
         if (ui::quitting()) return;
-        brls::sync([found, error, lists]() {
+        aurore::sync([found, error, lists]() {
             sys_notes_flow::keep(lists);
             s_checking = false;
-            if (!error.empty()) brls::Logger::info("system update check: {}", error);
+            if (!error.empty()) aurore::Logger::info("system update check: {}", error);
             // What could not be read keeps what the last check found.
             auto& cfg = config::get();
             sys_updates::Latest kept = sys_updates::from_text(cfg.sys_latest);
@@ -125,7 +125,7 @@ std::string with_latest(const char* which, const std::string& running, bool* new
                                 : w == "syspatch" ? l.syspatch
                                                   : l.firmware;
     *newer = !latest.empty() && !running.empty() && update::compare_versions(latest, running) > 0;
-    return *newer ? brls::getStr("playguard/tools/available", running, latest) : running;
+    return *newer ? aurore::getStr("playguard/tools/available", running, latest) : running;
 }
 
 void at_start()

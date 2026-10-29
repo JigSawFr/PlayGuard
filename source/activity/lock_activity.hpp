@@ -6,11 +6,11 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/session_pause.hpp"
 
-class LockActivity : public brls::Activity
+class LockActivity : public aurore::Activity
 {
   public:
     CONTENT_FROM_XML_RES("activity/lock.xml");
@@ -29,5 +29,5 @@ class LockActivity : public brls::Activity
 
     void try_unlock();
 
-    BRLS_BIND(brls::Button, enter, "lock_enter");
+    AURORE_BIND(aurore::Button, enter, "lock_enter");
 };

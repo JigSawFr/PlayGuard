@@ -2,7 +2,7 @@
 #include "action/pt_block_flow.hpp"
 
 #include <algorithm>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 
 #include "ui/ui.hpp"
@@ -10,7 +10,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/pt_block.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace pt_block_flow
 {
@@ -40,7 +40,7 @@ void save_report(const pt_block::Reference& ref, const pt_block::Block& now)
     std::string err;
     const std::string path = diagnostic::save(pt_block::report(ref, now, ui::now_stamp()), &err);
     if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
-    else ui::notify(brls::getStr("playguard/toast/diag_saved", path));
+    else ui::notify(aurore::getStr("playguard/toast/diag_saved", path));
 }
 }   // namespace
 
@@ -68,14 +68,14 @@ void open()
     }
 
     std::array<std::string, 7> days;
-    for (int d = 0; d < 7; d++) days[d] = brls::getStr(fmt::format("playguard/days_short/{}", d));
+    for (int d = 0; d < 7; d++) days[d] = aurore::getStr(fmt::format("playguard/days_short/{}", d));
     const auto changes = pt_block::diff(ref.block, now);
     std::string text;
     if (changes.empty()) {
-        text = brls::getStr("playguard/dev/pt_block_same", ref.saved_at);
+        text = aurore::getStr("playguard/dev/pt_block_same", ref.saved_at);
     } else {
-        text = changes.size() == 1 ? brls::getStr("playguard/dev/pt_block_changed_one", ref.saved_at)
-                                   : brls::getStr("playguard/dev/pt_block_changed", (int)changes.size(), ref.saved_at);
+        text = changes.size() == 1 ? aurore::getStr("playguard/dev/pt_block_changed_one", ref.saved_at)
+                                   : aurore::getStr("playguard/dev/pt_block_changed", (int)changes.size(), ref.saved_at);
         text += "\n";
         for (const auto& c : changes)
             text += fmt::format("\n{}: {:04X} → {:04X} ({} → {})", pt_block::field_name(c.index, days),

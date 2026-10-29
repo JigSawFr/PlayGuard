@@ -5,15 +5,15 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
-class LoadingDial : public brls::View
+class LoadingDial : public aurore::View
 {
   public:
     LoadingDial();
 
     void draw(NVGcontext* vg, float x, float y, float width, float height,
-              brls::Style style, brls::FrameContext* ctx) override;
+              aurore::Style style, aurore::FrameContext* ctx) override;
 
-    static brls::View* create();
+    static aurore::View* create();
 };

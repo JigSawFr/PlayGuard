@@ -16,10 +16,10 @@
 #include <string>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
-#include <borealis/cadran/view/cadran_digits.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/view/cadran_digits.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "tab/tab_base.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -31,7 +31,7 @@ class DashboardTab : public TabBase
   public:
     DashboardTab();
     ~DashboardTab() override;
-    static brls::View* create();
+    static aurore::View* create();
 
   protected:
     void refresh() override;
@@ -56,9 +56,9 @@ class DashboardTab : public TabBase
     // A pill of the console's state.
     struct Pill
     {
-        brls::Box*       box  = nullptr;
+        aurore::Box*       box  = nullptr;
         cadran::kit::Mark* dot = nullptr;
-        brls::Label*     text = nullptr;
+        aurore::Label*     text = nullptr;
         int              rank = 1;   // 0 needs the parent (amber, coral), 1 fine (teal), 2 for the record (grey)
         bool             on   = false;   // has something to say (shown, unless folded into fine_pill)
     };
@@ -80,29 +80,29 @@ class DashboardTab : public TabBase
     bool fine_open = false;
     // What changed outside PlayGuard: a card of its own above the ring, its
     // lines rebuilt when the notice's text changes.
-    brls::Box*  outside_card  = nullptr;
-    brls::Box*  outside_lines = nullptr;
+    aurore::Box*  outside_card  = nullptr;
+    aurore::Box*  outside_lines = nullptr;
     std::string outside_shown;
     // First steps, while the PIN or the limits are missing: the three steps
     // as a list to tick, each one done on Ⓐ.
     struct Step
     {
-        brls::Box*   row  = nullptr;
+        aurore::Box*   row  = nullptr;
         CadranIcon*  done = nullptr;   // a check once done
-        brls::Box*   todo = nullptr;   // an empty ring until then
-        brls::Label* state = nullptr;
+        aurore::Box*   todo = nullptr;   // an empty ring until then
+        aurore::Label* state = nullptr;
     };
-    brls::Box*   steps_card  = nullptr;
-    brls::Label* steps_count = nullptr;
+    aurore::Box*   steps_card  = nullptr;
+    aurore::Label* steps_count = nullptr;
     Step         steps[3];
     bool         steps_shown = false;      // the card is up (it bows out once all is done)
     bool         steps_done[3] = {};       // each step as last shown (a step just done: its check pops)
     bool         steps_read  = false;      // steps_done read once (the first reading pops nothing)
     bool         low_lit     = false;      // the first amount stands out (show_low; lit anew: one breath)
     // What stops play first today, under the time played (show_next).
-    brls::Box*   next      = nullptr;
+    aurore::Box*   next      = nullptr;
     CadranIcon*  next_icon = nullptr;
-    brls::Label* next_text = nullptr;
+    aurore::Label* next_text = nullptr;
     // Or, before the time up or the bedtime alarm, the rest of the day as a line.
     CadranTimeline* timeline = nullptr;
     // The extra time whose chip has the focus (show_next says where it ends),
@@ -111,7 +111,7 @@ class DashboardTab : public TabBase
     bool unlocked_now  = false;
     // The extra-time amounts' chips, the first one standing out when little
     // time is left (show_low).
-    std::vector<brls::Box*> amount_chips;
+    std::vector<aurore::Box*> amount_chips;
 
     // refresh()'s sections.
     static TodayLog read_today_log();
@@ -132,40 +132,40 @@ class DashboardTab : public TabBase
     bool home_counts() const;
     Pill make_pill(const std::string& text, const char* dot);
     void build_pills();
-    void build_outside_card(brls::Box* column, int at);
-    void build_steps_card(brls::Box* column, int at);
+    void build_outside_card(aurore::Box* column, int at);
+    void build_steps_card(aurore::Box* column, int at);
 
-    BRLS_BIND(brls::Label,      applet,        "dash_applet");
-    BRLS_BIND(brls::Label,      headline,      "dash_gauge_text");
-    BRLS_BIND(brls::Label,      not_counting,  "dash_not_counting");
-    BRLS_BIND(brls::DetailCell, extra_pending, "dash_extra_pending");
-    BRLS_BIND(brls::DetailCell, alarm,         "dash_alarm");
-    BRLS_BIND(PtRing,       ring,        "dash_ring");
-    BRLS_BIND(brls::Label,  kicker,      "dash_kicker");
-    BRLS_BIND(brls::Box,    today_text,  "dash_today_text");
-    BRLS_BIND(brls::Box,    actions,     "dash_actions");
-    BRLS_BIND(brls::Button, relock,      "dash_relock");
-    BRLS_BIND(brls::Button, setup,       "dash_setup");
-    BRLS_BIND(brls::Box,    chips,       "dash_chips");
-    BRLS_BIND(brls::Button, stop,        "dash_stop");
-    BRLS_BIND(brls::Button, child,       "dash_child");
-    BRLS_BIND(brls::Box,    actions2,    "dash_actions2");
-    BRLS_BIND(brls::Button, limit,       "dash_limit");
-    BRLS_BIND(brls::Button, profile,     "dash_profile");
-    BRLS_BIND(brls::Box,    bed_card,    "dash_bed_card");
-    BRLS_BIND(brls::Label,  bed_state,   "dash_bed_state");
-    BRLS_BIND(CadranDigits, bed_value,   "dash_bed_value");
-    BRLS_BIND(brls::Label,  bed_sub,     "dash_bed_sub");
-    BRLS_BIND(brls::Box,    bed_key,     "dash_bed_key");
-    BRLS_BIND(brls::Box,    pc_card,     "dash_pc_card");
-    BRLS_BIND(brls::Label,  pc_state,    "dash_pc_state");
-    BRLS_BIND(CadranDigits, pc_value,    "dash_pc_value");
-    BRLS_BIND(brls::Label,  pc_sub,      "dash_pc_sub");
-    BRLS_BIND(brls::Box,    clock_card,  "dash_clock_card");
-    BRLS_BIND(brls::Label,  clock_title, "dash_clock_title");
-    BRLS_BIND(brls::Label,  clock_state, "dash_clock_state");
-    BRLS_BIND(CadranDigits, clock_value, "dash_clock_value");
-    BRLS_BIND(brls::Box,    clock_key,   "dash_clock_key");
-    BRLS_BIND(brls::Label,  clock_sub,   "dash_clock_sub");
-    BRLS_BIND(brls::Box,    pills,       "dash_pills");
+    AURORE_BIND(aurore::Label,      applet,        "dash_applet");
+    AURORE_BIND(aurore::Label,      headline,      "dash_gauge_text");
+    AURORE_BIND(aurore::Label,      not_counting,  "dash_not_counting");
+    AURORE_BIND(aurore::DetailCell, extra_pending, "dash_extra_pending");
+    AURORE_BIND(aurore::DetailCell, alarm,         "dash_alarm");
+    AURORE_BIND(PtRing,       ring,        "dash_ring");
+    AURORE_BIND(aurore::Label,  kicker,      "dash_kicker");
+    AURORE_BIND(aurore::Box,    today_text,  "dash_today_text");
+    AURORE_BIND(aurore::Box,    actions,     "dash_actions");
+    AURORE_BIND(aurore::Button, relock,      "dash_relock");
+    AURORE_BIND(aurore::Button, setup,       "dash_setup");
+    AURORE_BIND(aurore::Box,    chips,       "dash_chips");
+    AURORE_BIND(aurore::Button, stop,        "dash_stop");
+    AURORE_BIND(aurore::Button, child,       "dash_child");
+    AURORE_BIND(aurore::Box,    actions2,    "dash_actions2");
+    AURORE_BIND(aurore::Button, limit,       "dash_limit");
+    AURORE_BIND(aurore::Button, profile,     "dash_profile");
+    AURORE_BIND(aurore::Box,    bed_card,    "dash_bed_card");
+    AURORE_BIND(aurore::Label,  bed_state,   "dash_bed_state");
+    AURORE_BIND(CadranDigits, bed_value,   "dash_bed_value");
+    AURORE_BIND(aurore::Label,  bed_sub,     "dash_bed_sub");
+    AURORE_BIND(aurore::Box,    bed_key,     "dash_bed_key");
+    AURORE_BIND(aurore::Box,    pc_card,     "dash_pc_card");
+    AURORE_BIND(aurore::Label,  pc_state,    "dash_pc_state");
+    AURORE_BIND(CadranDigits, pc_value,    "dash_pc_value");
+    AURORE_BIND(aurore::Label,  pc_sub,      "dash_pc_sub");
+    AURORE_BIND(aurore::Box,    clock_card,  "dash_clock_card");
+    AURORE_BIND(aurore::Label,  clock_title, "dash_clock_title");
+    AURORE_BIND(aurore::Label,  clock_state, "dash_clock_state");
+    AURORE_BIND(CadranDigits, clock_value, "dash_clock_value");
+    AURORE_BIND(aurore::Box,    clock_key,   "dash_clock_key");
+    AURORE_BIND(aurore::Label,  clock_sub,   "dash_clock_sub");
+    AURORE_BIND(aurore::Box,    pills,       "dash_pills");
 };

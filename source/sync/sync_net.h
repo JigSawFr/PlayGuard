@@ -1,6 +1,6 @@
 // sync_net — the plain TCP stream under the MQTT client (POSIX sockets: libnx
 // on the Switch, the host's on desktop), and a monotonic clock. The socket
-// service itself must already be up (borealis starts it in the app; the
+// service itself must already be up (Aurore starts it in the app; the
 // agent sysmodule calls socketInitialize).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once

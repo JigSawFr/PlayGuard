@@ -3,8 +3,8 @@
 
 #include <algorithm>
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/clock_flow.hpp"
 #include "action/console_actions.hpp"
@@ -25,21 +25,21 @@
 #include "util/config.hpp"
 #include "util/perf.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
 // "Turn back on": the primary button, in the warning colour of the unlock it ends.
-const brls::ButtonStyle RELOCK = {
-    .shadowType              = brls::ShadowType::GENERIC,
+const aurore::ButtonStyle RELOCK = {
+    .shadowType              = aurore::ShadowType::GENERIC,
     .hideHighlightBackground = true,
-    .highlightPadding        = "brls/button/primary_highlight_padding",
+    .highlightPadding        = "aurore/button/primary_highlight_padding",
     .borderThickness         = "",
     .enabledBackgroundColor  = "cadran/amber_fill",
     .enabledLabelColor       = "cadran/navy",
     .enabledBorderColor      = "",
-    .disabledBackgroundColor = "brls/button/primary_disabled_background",
-    .disabledLabelColor      = "brls/button/primary_disabled_text",
+    .disabledBackgroundColor = "aurore/button/primary_disabled_background",
+    .disabledLabelColor      = "aurore/button/primary_disabled_text",
     .disabledBorderColor     = "",
 };
 }   // namespace
@@ -48,21 +48,21 @@ DashboardTab::DashboardTab()
     : TabBase("xml/tab/dashboard.xml"), list(this)
 {
     namespace kit = cadran::kit;
-    brls::Box* column = this->list.content();
+    aurore::Box* column = this->list.content();
     applet->setSingleLine(false);
     not_counting->setSingleLine(false);
     // Above the top, what needs the parent first: the first steps, then what
     // changed outside PlayGuard.
     const auto& lines = column->getChildren();
     const int at = (int)(std::find(lines.begin(), lines.end(), this->getView("dash_top")) - lines.begin());
-    pills->setWrap(brls::Wrap::WRAP);
+    pills->setWrap(aurore::Wrap::WRAP);
     this->build_outside_card(column, at);
     this->build_steps_card(column, at);
 
     // What stops play first, under the time played.
-    this->next = new brls::Box(brls::Axis::ROW);
-    this->next->setAlignItems(brls::AlignItems::FLEX_START);
-    this->next->setAlignSelf(brls::AlignSelf::STRETCH);   // the column's width, for its text to wrap in
+    this->next = new aurore::Box(aurore::Axis::ROW);
+    this->next->setAlignItems(aurore::AlignItems::FLEX_START);
+    this->next->setAlignSelf(aurore::AlignSelf::STRETCH);   // the column's width, for its text to wrap in
     this->next->setMarginTop(8);
     this->next_icon = kit::icon("timer", 18, "cadran/teal");
     this->next_icon->setMarginRight(8);
@@ -75,24 +75,24 @@ DashboardTab::DashboardTab()
     this->next_text->setGrow(1.0f);
     this->next_text->setWidth(0);
     this->next->addView(this->next_text);
-    this->next->setVisibility(brls::Visibility::GONE);
+    this->next->setVisibility(aurore::Visibility::GONE);
     today_text->addView(this->next, 2);
     // Or, before the time up or the bedtime alarm, the rest of the day as a line.
     this->timeline = new CadranTimeline();
-    this->timeline->setAlignSelf(brls::AlignSelf::STRETCH);
+    this->timeline->setAlignSelf(aurore::AlignSelf::STRETCH);
     this->timeline->setMarginTop(14);
     this->timeline->setMarginBottom(4);
-    this->timeline->setVisibility(brls::Visibility::GONE);
+    this->timeline->setVisibility(aurore::Visibility::GONE);
     today_text->addView(this->timeline, 3);
     this->list.apply({ { "dash_extra_pending", "refresh" }, { "dash_alarm", "bell" } });
-    extra_pending->registerClickAction([this](brls::View*) {
+    extra_pending->registerClickAction([this](aurore::View*) {
         pt_flow::offer_extra_time_restore(this->refresher(), true);
         return true;
     });
     // Shown only while the alarm is off: A turns it back on (the dialog says why).
     ui::set_detail(alarm, "playguard/dashboard/alarm_off"_i18n);
     alarm->detail->setThemeColor("textColor", "cadran/amber");
-    alarm->registerClickAction([this](brls::View*) {
+    alarm->registerClickAction([this](aurore::View*) {
         pt_flow::turn_alarm_on("overview", this->refresher());
         return true;
     });
@@ -107,22 +107,22 @@ DashboardTab::DashboardTab()
     CadranIcon* square = kit::icon("stop", 18, "cadran/coral");
     square->setMarginRight(10);
     stop->addView(square, 0);
-    stop->setAlignItems(brls::AlignItems::CENTER);
+    stop->setAlignItems(aurore::AlignItems::CENTER);
     CadranIcon* eye = kit::icon("eye", 18, "cadran/text2");
     eye->setMarginRight(10);
     child->addView(eye, 0);
-    child->setAlignItems(brls::AlignItems::CENTER);
+    child->setAlignItems(aurore::AlignItems::CENTER);
     CadranIcon* lock = kit::icon("lock", 20, "cadran/navy");
     lock->setMarginRight(10);
     relock->setStyle(&RELOCK);
     relock->addView(lock, 0);
-    relock->setAlignItems(brls::AlignItems::CENTER);
+    relock->setAlignItems(aurore::AlignItems::CENTER);
     CadranIcon* week = kit::icon("timer", 20, "cadran/navy");
     week->setMarginRight(10);
     setup->addView(week, 0);
-    setup->setAlignItems(brls::AlignItems::CENTER);
+    setup->setAlignItems(aurore::AlignItems::CENTER);
     // No limit yet: the Play timer, on its week, where the days are set.
-    setup->registerClickAction([](brls::View* view) {
+    setup->registerClickAction([](aurore::View* view) {
         if (ui::main_screen()) ui::open_tab(ui::tab::play_timer, "cpt_week");
         else ui::go_to_tab(view, ui::tab::play_timer);
         return true;
@@ -130,14 +130,14 @@ DashboardTab::DashboardTab()
     CadranIcon* timer = kit::icon("timer", 18, "cadran/text2");
     timer->setMarginRight(10);
     limit->addView(timer, 0);
-    limit->setAlignItems(brls::AlignItems::CENTER);
+    limit->setAlignItems(aurore::AlignItems::CENTER);
     CadranIcon* list_icon = kit::icon("list", 18, "cadran/text2");
     list_icon->setMarginRight(10);
     profile->addView(list_icon, 0);
-    profile->setAlignItems(brls::AlignItems::CENTER);
-    if (auto* text = dynamic_cast<brls::Label*>(profile->getView("brls/button/label"))) text->setSingleLine(true);
+    profile->setAlignItems(aurore::AlignItems::CENTER);
+    if (auto* text = dynamic_cast<aurore::Label*>(profile->getView("aurore/button/label"))) text->setSingleLine(true);
     // The saved profiles, the one in force checked: one press to change week.
-    profile->registerClickAction([this](brls::View*) {
+    profile->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         profile_flow::pick(this->refresher());
         return true;
@@ -147,21 +147,21 @@ DashboardTab::DashboardTab()
     kit::wrap(actions2.getView());
     // Broken only where it would be at the normal size: with the larger text,
     // the buttons' words smaller again instead, and the cards' states whole.
-    for (brls::Button* b : { stop.getView(), child.getView(), limit.getView(), profile.getView() }) kit::fit_button(b);
-    for (brls::Box* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() })
-        kit::fit_head(dynamic_cast<brls::Box*>(card->getChildren().front()));
+    for (aurore::Button* b : { stop.getView(), child.getView(), limit.getView(), profile.getView() }) kit::fit_button(b);
+    for (aurore::Box* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() })
+        kit::fit_head(dynamic_cast<aurore::Box*>(card->getChildren().front()));
     actions2->setColumnGap(12);
     actions2->setRowGap(10);
-    // Wrapped, the row's buttons are one line to borealis: ↓ would leave it
+    // Wrapped, the row's buttons are one line to Aurore: ↓ would leave it
     // past the last button, on the line under. Between its lines, ↑ and ↓ go
     // to the nearest button of the next line.
-    const std::vector<brls::View*> row2 = { stop.getView(), child.getView(), limit.getView(), profile.getView() };
-    const auto line_move = [row2](brls::View* from, bool down) {
-        brls::View* best = nullptr;
+    const std::vector<aurore::View*> row2 = { stop.getView(), child.getView(), limit.getView(), profile.getView() };
+    const auto line_move = [row2](aurore::View* from, bool down) {
+        aurore::View* best = nullptr;
         float best_line = 0, best_dx = 0;
         const float cx = from->getX() + from->getWidth() / 2;
-        for (brls::View* to : row2) {
-            if (to == from || to->getVisibility() != brls::Visibility::VISIBLE) continue;
+        for (aurore::View* to : row2) {
+            if (to == from || to->getVisibility() != aurore::Visibility::VISIBLE) continue;
             const float dy = to->getY() - from->getY();
             if (down ? dy <= 1 : dy >= -1) continue;
             const float dx = std::abs(to->getX() + to->getWidth() / 2 - cx);
@@ -173,44 +173,44 @@ DashboardTab::DashboardTab()
             }
         }
         if (!best) return false;
-        brls::Application::giveFocus(best);
+        aurore::Application::giveFocus(best);
         return true;
     };
-    for (brls::View* button : row2) {
-        button->registerAction("", brls::BUTTON_NAV_DOWN, [line_move](brls::View* view) { return line_move(view, true); }, true);
-        button->registerAction("", brls::BUTTON_NAV_UP, [line_move](brls::View* view) { return line_move(view, false); }, true);
+    for (aurore::View* button : row2) {
+        button->registerAction("", aurore::BUTTON_NAV_DOWN, [line_move](aurore::View* view) { return line_move(view, true); }, true);
+        button->registerAction("", aurore::BUTTON_NAV_UP, [line_move](aurore::View* view) { return line_move(view, false); }, true);
     }
 
-    relock->registerClickAction([this](brls::View*) {
+    relock->registerClickAction([this](aurore::View*) {
         console_actions::relock("", this->refresher());
         return true;
     });
-    limit->registerClickAction([this](brls::View*) {
+    limit->registerClickAction([this](aurore::View*) {
         this->choose_today_limit();
         return true;
     });
     // Extra time: its words, the amounts, then "…" for any other (a
     // duration, another day: the picker). One row, one way in.
     {
-        brls::Label* words = kit::label("playguard/cadran/today/extra"_i18n, kit::TEXT_LEAD, "cadran/text2");
+        aurore::Label* words = kit::label("playguard/cadran/today/extra"_i18n, kit::TEXT_LEAD, "cadran/text2");
         words->setSingleLine(true);
         words->setMarginRight(16);
         chips->addView(words);
     }
     for (int minutes : config::get().extra_amounts) {
-        brls::Box* amount = kit::chip("+" + ui::fmt_limit((uint16_t)minutes));
+        aurore::Box* amount = kit::chip("+" + ui::fmt_limit((uint16_t)minutes));
         amount->setMarginRight(10);
-        amount->registerClickAction([this, minutes](brls::View*) {
+        amount->registerClickAction([this, minutes](aurore::View*) {
             if (ui::refuse_read_only()) return true;
             pt_flow::add_extra_minutes(this->pt, (uint16_t)minutes, this->refresher());
             return true;
         });
         // Focused, the next stop's line says when play would end with it.
-        amount->getFocusEvent()->subscribe([this, minutes](brls::View*) {
+        amount->getFocusEvent()->subscribe([this, minutes](aurore::View*) {
             this->preview_extra = minutes;
             this->show_next(this->unlocked_now);
         });
-        amount->getFocusLostEvent()->subscribe([this](brls::View*) {
+        amount->getFocusLostEvent()->subscribe([this](aurore::View*) {
             this->preview_extra = 0;
             this->show_next(this->unlocked_now);
         });
@@ -218,34 +218,34 @@ DashboardTab::DashboardTab()
         this->amount_chips.push_back(amount);
     }
     {
-        brls::Box* other = kit::chip("\u2026");
-        other->registerClickAction([this](brls::View*) {
+        aurore::Box* other = kit::chip("\u2026");
+        other->registerClickAction([this](aurore::View*) {
             if (ui::refuse_read_only()) return true;
             pt_flow::add_extra_time(this->pt, this->refresher());
             return true;
         });
         chips->addView(other);
     }
-    stop->registerClickAction([this](brls::View*) {
+    stop->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         pt_flow::stop_today(this->pt, this->refresher());
         return true;
     });
-    child->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new CadranChildActivity());
+    child->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new CadranChildActivity());
         return true;
     });
     // The cards: where each is set.
-    bed_card->registerClickAction([](brls::View* view) {
+    bed_card->registerClickAction([](aurore::View* view) {
         ui::go_to_tab(view, ui::tab::play_timer);
         return true;
     });
-    pc_card->registerClickAction([](brls::View* view) {
+    pc_card->registerClickAction([](aurore::View* view) {
         ui::go_to_tab(view, ui::tab::security);
         return true;
     });
     // Inaccurate and writable: the guided measure-and-set path; else the clock's screen.
-    clock_card->registerClickAction([this](brls::View*) {
+    clock_card->registerClickAction([this](aurore::View*) {
         if (this->clock_inaccurate && !app::read_only()) clock_flow::guided(this->refresher());
         else ClockTab::open_screen();
         return true;
@@ -320,7 +320,7 @@ void DashboardTab::refresh()
     // Read-only: the actions that write stay in sight, greyed (A says why
     // and where it is turned off), as on the other tabs.
     const float actions_alpha = app::read_only() ? 0.45f : 1.0f;
-    for (brls::View* v : { (brls::View*)chips.getView(), (brls::View*)stop.getView(), (brls::View*)profile.getView() })
+    for (aurore::View* v : { (aurore::View*)chips.getView(), (aurore::View*)stop.getView(), (aurore::View*)profile.getView() })
         v->setAlpha(actions_alpha);
     ui::set_visible(relock.getView(), unlocked && !app::read_only());
     ui::set_visible(setup.getView(), !unlocked && !app::read_only() && timer.fw_supported && timer.valid &&
@@ -342,7 +342,7 @@ DashboardTab::~DashboardTab()
     play_data::unlisten(this->listener);
 }
 
-brls::View* DashboardTab::create()
+aurore::View* DashboardTab::create()
 {
     return new DashboardTab();
 }

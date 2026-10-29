@@ -4,11 +4,11 @@
 #include <algorithm>
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "ui/ui.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace
 {
@@ -27,50 +27,50 @@ float bar_height(uint64_t seconds, uint64_t top)
 
 PlayDaysView::PlayDaysView()
 {
-    this->setAxis(brls::Axis::COLUMN);
-    this->setAlignItems(brls::AlignItems::STRETCH);
+    this->setAxis(aurore::Axis::COLUMN);
+    this->setAlignItems(aurore::AlignItems::STRETCH);
     this->setFocusable(false);
 
-    auto* row = new brls::Box(brls::Axis::ROW);
-    row->setJustifyContent(brls::JustifyContent::SPACE_AROUND);
-    row->setAlignItems(brls::AlignItems::FLEX_END);
+    auto* row = new aurore::Box(aurore::Axis::ROW);
+    row->setJustifyContent(aurore::JustifyContent::SPACE_AROUND);
+    row->setAlignItems(aurore::AlignItems::FLEX_END);
     this->addView(row);
 
     for (auto& c : this->cols) {
-        auto* col = new brls::Box(brls::Axis::COLUMN);
-        col->setAlignItems(brls::AlignItems::CENTER);
-        col->setJustifyContent(brls::JustifyContent::FLEX_END);
+        auto* col = new aurore::Box(aurore::Axis::COLUMN);
+        col->setAlignItems(aurore::AlignItems::CENTER);
+        col->setJustifyContent(aurore::JustifyContent::FLEX_END);
         col->setGrow(1.0f);
 
-        c.value = new brls::Label();
+        c.value = new aurore::Label();
         c.value->setFontSize(LABEL_FONT);
-        c.value->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        c.value->setHorizontalAlign(aurore::HorizontalAlign::CENTER);
         c.value->setMarginBottom(8);   // clear of a limit line at the top of the lane
         // A fixed lane: the bar grows from its bottom, the limit line is
         // placed in it by height, whatever the bar.
-        auto* lane = new brls::Box(brls::Axis::COLUMN);
+        auto* lane = new aurore::Box(aurore::Axis::COLUMN);
         lane->setWidth(LANE_WIDTH);
         lane->setHeight(BAR_MAX);
-        lane->setAlignItems(brls::AlignItems::CENTER);
-        lane->setJustifyContent(brls::JustifyContent::FLEX_END);
-        c.bar = new brls::Rectangle();
+        lane->setAlignItems(aurore::AlignItems::CENTER);
+        lane->setJustifyContent(aurore::JustifyContent::FLEX_END);
+        c.bar = new aurore::Rectangle();
         c.bar->setWidth(BAR_WIDTH);
         c.bar->setHeight(BAR_MIN);
         c.bar->setCornerRadius(4);
-        c.limit = new brls::Rectangle();
+        c.limit = new aurore::Rectangle();
         c.limit->setWidth(LANE_WIDTH);
         c.limit->setHeight(2);
-        c.limit->setPositionType(brls::PositionType::ABSOLUTE);
+        c.limit->setPositionType(aurore::PositionType::ABSOLUTE);
         c.limit->setPositionLeft(0);
         c.limit->setPositionBottom(0);
-        c.limit->setVisibility(brls::Visibility::GONE);
+        c.limit->setVisibility(aurore::Visibility::GONE);
         lane->addView(c.bar);
         lane->addView(c.limit);
-        c.day = new brls::Label();
+        c.day = new aurore::Label();
         c.day->setFontSize(LABEL_FONT);
-        c.day->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        c.day->setHorizontalAlign(aurore::HorizontalAlign::CENTER);
         c.day->setMarginTop(6);
-        c.mark = new brls::Rectangle();
+        c.mark = new aurore::Rectangle();
         c.mark->setThemeColor("color", "cadran/text2");
         c.mark->setWidth(BAR_WIDTH);
         c.mark->setHeight(3);
@@ -84,9 +84,9 @@ PlayDaysView::PlayDaysView()
         row->addView(col);
     }
 
-    this->legend = new brls::Label();
+    this->legend = new aurore::Label();
     this->legend->setFontSize(LEGEND_FONT);
-    this->legend->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+    this->legend->setHorizontalAlign(aurore::HorizontalAlign::CENTER);
     this->legend->setThemeColor("textColor", "cadran/text3");
     this->legend->setMarginTop(10);
     this->addView(this->legend);
@@ -121,7 +121,7 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
         // alpha, so the colour stays the theme's key.
         c.bar->setThemeColor("color", over ? "cadran/amber" : "cadran/teal_fill");
         c.bar->setAlpha(!day_s[k] ? 40 / 255.0f : !today && !over ? 120 / 255.0f : 1.0f);
-        c.limit->setVisibility(has_limit ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        c.limit->setVisibility(has_limit ? aurore::Visibility::VISIBLE : aurore::Visibility::GONE);
         if (has_limit) {
             // 0 min (no play) sits on the floor of the lane.
             const float h = limits[k] ? bar_height((uint64_t)limits[k] * 60, top) : 0.0f;
@@ -134,7 +134,7 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
         const std::string played = day_s[k] ? ui::fmt_duration(day_s[k]) : "—";
         c.value->setText(over ? "! " + played : played);
         c.value->setThemeColor("textColor", over ? "cadran/amber" : today ? "cadran/text" : "cadran/text3");
-        c.day->setText(brls::getStr(fmt::format("playguard/days_short/{}", (int)day_wday[k])));
+        c.day->setText(aurore::getStr(fmt::format("playguard/days_short/{}", (int)day_wday[k])));
         c.day->setThemeColor("textColor", today ? "cadran/text2" : "cadran/text3");
         c.mark->setAlpha(today ? 1.0f : 0.0f);
     }
@@ -146,7 +146,7 @@ void PlayDaysView::show(const uint32_t day_s[7], const uint8_t day_wday[7], cons
     this->legend->setText(text);
 }
 
-brls::View* PlayDaysView::create()
+aurore::View* PlayDaysView::create()
 {
     return new PlayDaysView();
 }

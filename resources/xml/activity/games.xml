@@ -6,10 +6,10 @@
      source/activity/games_activity.cpp; A on one opens its screen
      (activity/game.xml). -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
-    <brls:Box
+    <aurore:Box
         title="@i18n/playguard/library/title"
         icon="@res/img/app_icon.jpg"
         width="auto"
@@ -19,7 +19,7 @@
         grow="1.0">
 
         <!-- The selected game: its icon, name and figures. -->
-        <brls:Box
+        <aurore:Box
             id="gs_head"
             width="auto"
             height="auto"
@@ -30,31 +30,31 @@
             paddingLeft="60"
             paddingRight="60"
             lineBottom="1"
-            lineColor="@theme/brls/header/border">
+            lineColor="@theme/aurore/header/border">
 
-            <brls:Image id="gs_icon" width="96" height="96" cornerRadius="@style/cadran/radius/icon" marginRight="24" backgroundColor="@theme/cadran/well"/>
-            <brls:Box axis="column" alignItems="stretch" grow="1.0">
-                <brls:Label id="gs_name" text=" " fontSize="26" singleLine="true"/>
-                <brls:Box axis="row" alignItems="flexStart" marginTop="10">
-                    <brls:Box axis="column" width="220" marginRight="16">
-                        <brls:Label id="gs_period_caption" text=" " fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
-                        <brls:Label id="gs_period" text="—" fontSize="22" marginTop="4" singleLine="true"/>
-                    </brls:Box>
-                    <brls:Box axis="column" width="220" marginRight="16">
-                        <brls:Label text="@i18n/playguard/activity/all_time" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
-                        <brls:Label id="gs_total" text="—" fontSize="22" marginTop="4" singleLine="true"/>
-                    </brls:Box>
-                    <brls:Box axis="column" width="140" marginRight="16">
-                        <brls:Label text="@i18n/playguard/activity/launches" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
-                        <brls:Label id="gs_launches" text="—" fontSize="22" marginTop="4" singleLine="true"/>
-                    </brls:Box>
-                    <brls:Box axis="column" grow="1.0">
-                        <brls:Label text="@i18n/playguard/activity/last" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
-                        <brls:Label id="gs_last" text="—" fontSize="22" marginTop="4" singleLine="true"/>
-                    </brls:Box>
-                </brls:Box>
-            </brls:Box>
-        </brls:Box>
+            <aurore:Image id="gs_icon" width="96" height="96" cornerRadius="@style/cadran/radius/icon" marginRight="24" backgroundColor="@theme/cadran/well"/>
+            <aurore:Box axis="column" alignItems="stretch" grow="1.0">
+                <aurore:Label id="gs_name" text=" " fontSize="26" singleLine="true"/>
+                <aurore:Box axis="row" alignItems="flexStart" marginTop="10">
+                    <aurore:Box axis="column" width="220" marginRight="16">
+                        <aurore:Label id="gs_period_caption" text=" " fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
+                        <aurore:Label id="gs_period" text="—" fontSize="22" marginTop="4" singleLine="true"/>
+                    </aurore:Box>
+                    <aurore:Box axis="column" width="220" marginRight="16">
+                        <aurore:Label text="@i18n/playguard/activity/all_time" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
+                        <aurore:Label id="gs_total" text="—" fontSize="22" marginTop="4" singleLine="true"/>
+                    </aurore:Box>
+                    <aurore:Box axis="column" width="140" marginRight="16">
+                        <aurore:Label text="@i18n/playguard/activity/launches" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
+                        <aurore:Label id="gs_launches" text="—" fontSize="22" marginTop="4" singleLine="true"/>
+                    </aurore:Box>
+                    <aurore:Box axis="column" grow="1.0">
+                        <aurore:Label text="@i18n/playguard/activity/last" fontSize="16" singleLine="true" textColor="@theme/cadran/text3"/>
+                        <aurore:Label id="gs_last" text="—" fontSize="22" marginTop="4" singleLine="true"/>
+                    </aurore:Box>
+                </aurore:Box>
+            </aurore:Box>
+        </aurore:Box>
 
         <ScrollView
             id="gs_scroll"
@@ -62,7 +62,7 @@
             height="auto"
             grow="1.0">
 
-            <brls:Box
+            <aurore:Box
                 id="gs_content"
                 width="auto"
                 height="auto"
@@ -71,24 +71,24 @@
                 paddingLeft="60"
                 paddingRight="60"
                 paddingTop="16"
-                paddingBottom="@style/brls/sidebar/padding_bottom">
+                paddingBottom="@style/aurore/sidebar/padding_bottom">
 
-                <brls:Box axis="row" alignItems="stretch" marginBottom="8">
-                    <brls:DetailCell id="gs_view" title="@i18n/playguard/library/view" grow="1.0" marginRight="16"/>
-                    <brls:DetailCell id="gs_period_cell" title="@i18n/playguard/activity/period" grow="1.0"/>
-                </brls:Box>
-                <brls:Box id="gs_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
-                    <brls:ProgressSpinner width="30" height="30" marginRight="14"/>
-                    <brls:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
-                </brls:Box>
-                <brls:Box id="gs_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
-                <brls:Label id="gs_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
-                <brls:Label id="gs_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
+                <aurore:Box axis="row" alignItems="stretch" marginBottom="8">
+                    <aurore:DetailCell id="gs_view" title="@i18n/playguard/library/view" grow="1.0" marginRight="16"/>
+                    <aurore:DetailCell id="gs_period_cell" title="@i18n/playguard/activity/period" grow="1.0"/>
+                </aurore:Box>
+                <aurore:Box id="gs_progress" axis="row" alignItems="center" marginTop="10" marginBottom="6" marginLeft="16" marginRight="16">
+                    <aurore:ProgressSpinner width="30" height="30" marginRight="14"/>
+                    <aurore:Label text="@i18n/playguard/activity/loading" fontSize="20" grow="1.0" textColor="@theme/cadran/text3"/>
+                </aurore:Box>
+                <aurore:Box id="gs_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
+                <aurore:Label id="gs_capped" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
+                <aurore:Label id="gs_status" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3" visibility="gone"/>
 
-            </brls:Box>
+            </aurore:Box>
 
         </ScrollView>
 
-    </brls:Box>
+    </aurore:Box>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

@@ -37,7 +37,7 @@ background_dim = 0.6
 logo = logo-light.png
 # Over the picture, a little darker than the palette makes them
 cadran/text3 = #574d66
-brls/header/subtitle = #574d66
+aurore/header/subtitle = #574d66
 
 [dark]
 background = #1b1838

@@ -2,7 +2,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/console_actions.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "action/backup_flow.hpp"
 #include "action/history_flow.hpp"
@@ -11,7 +11,7 @@
 #include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace console_actions
 {
@@ -31,7 +31,7 @@ void set_pin(const std::string& source, std::function<void()> after)
     if (ui::refuse_read_only()) return;
     // Blocks while the system PIN applet is shown; the session is released first.
     Result rc = pctl_set_pin();
-    brls::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
+    aurore::Logger::info("pctl_set_pin returned 0x{:08X}", (unsigned)rc);
     // Not recorded when it fails. Left with B: nothing changed, nothing to say.
     if (R_SUCCEEDED(rc)) history_flow::record_event("pin", source);
     if (rc != NXM_RC_CANCELLED)
@@ -61,7 +61,7 @@ void delete_all(const std::string& source, std::function<void()> after)
     if (ui::refuse_read_only()) return;
     ui::confirm_danger("playguard/security/delete_body"_i18n, "playguard/security/delete_confirm"_i18n, [source, after]() {
         // Second, separate confirmation with a different button: this cannot be undone.
-        brls::sync([source, after]() {
+        aurore::sync([source, after]() {
             ui::confirm_danger("playguard/security/delete_body2"_i18n, "playguard/security/delete_confirm2"_i18n, [source, after]() {
                 // A backup first, so the settings can come back (History › Restore a backup).
                 backup_flow::backup_then([source, after]() {

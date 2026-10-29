@@ -4,7 +4,7 @@
      A changes it); edits are staged in `pending[]` and written together by
      "Save" (also +). B leaves (asking first when something is unsaved). -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -16,37 +16,37 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
             <PtStateHeader id="pt_state_header"/>
 
-            <brls:Header title="@i18n/playguard/play_timer/week_title" marginBottom="8"/>
+            <aurore:Header title="@i18n/playguard/play_timer/week_title" marginBottom="8"/>
 
             <!-- The week and its keys: view/cadran_week_card.xml, added here. -->
-            <brls:Box id="pt_week_card" axis="column" alignItems="stretch"/>
-            <brls:Label id="pt_unavailable" text="@i18n/playguard/play_timer/perday/unavailable" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
+            <aurore:Box id="pt_week_card" axis="column" alignItems="stretch"/>
+            <aurore:Label id="pt_unavailable" text="@i18n/playguard/play_timer/perday/unavailable" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/amber"/>
 
-            <brls:Header title="@i18n/playguard/play_timer/perday/section_presets" marginTop="16" marginBottom="8"/>
+            <aurore:Header title="@i18n/playguard/play_timer/perday/section_presets" marginTop="16" marginBottom="8"/>
 
-            <brls:DetailCell id="pt_weekdays" title="@i18n/playguard/tiles/weekdays"/>
-            <brls:DetailCell id="pt_weekend"  title="@i18n/playguard/tiles/weekend"/>
-            <brls:DetailCell id="pt_copy_today"/>
-            <brls:DetailCell id="pt_revert"   title="@i18n/playguard/play_timer/perday/revert"/>
+            <aurore:DetailCell id="pt_weekdays" title="@i18n/playguard/tiles/weekdays"/>
+            <aurore:DetailCell id="pt_weekend"  title="@i18n/playguard/tiles/weekend"/>
+            <aurore:DetailCell id="pt_copy_today"/>
+            <aurore:DetailCell id="pt_revert"   title="@i18n/playguard/play_timer/perday/revert"/>
 
-            <brls:Header title="@i18n/playguard/play_timer/perday/section_save" marginTop="16" marginBottom="8"/>
+            <aurore:Header title="@i18n/playguard/play_timer/perday/section_save" marginTop="16" marginBottom="8"/>
 
-            <brls:DetailCell id="pt_save" title="@i18n/playguard/play_timer/perday/save"/>
+            <aurore:DetailCell id="pt_save" title="@i18n/playguard/play_timer/perday/save"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

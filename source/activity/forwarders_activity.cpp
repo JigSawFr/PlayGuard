@@ -3,10 +3,10 @@
 
 #include <algorithm>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/ui/cadran_list.hpp>
-#include <borealis/cadran/ui/cadran_text.hpp>
-#include <borealis/cadran/view/cadran_icon.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_text.hpp>
+#include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "action/forwarder_flow.hpp"
 #include "action/forwarders_text.hpp"
@@ -22,7 +22,7 @@
 #include "util/paths.hpp"
 #include "view/game_cell.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 using forwarders_logic::Row;
 using forwarders_logic::State;
 
@@ -55,53 +55,53 @@ std::vector<GameCell::Mark> list_marks(const Row& r)
 }
 
 // A box of the grouped list: the focus coming from below goes to its last
-// line, from above to its first (borealis' own: the line focused last),
+// line, from above to its first (Aurore's own: the line focused last),
 // so the arrows walk the lines in order across the groups.
 template <class Base>
 class Nearest : public Base
 {
   public:
     using Base::Base;
-    brls::View* getDefaultFocus() override
+    aurore::View* getDefaultFocus() override
     {
-        if (this->getVisibility() != brls::Visibility::VISIBLE) return nullptr;
-        brls::View* now = brls::Application::getCurrentFocus();
-        const std::vector<brls::View*>& kids = this->getChildren();
+        if (this->getVisibility() != aurore::Visibility::VISIBLE) return nullptr;
+        aurore::View* now = aurore::Application::getCurrentFocus();
+        const std::vector<aurore::View*>& kids = this->getChildren();
         const bool below = now && !kids.empty() && now->getY() >= this->getY() + this->getHeight();
         if (!below) {
-            for (brls::View* kid : kids)
-                if (brls::View* v = kid->getDefaultFocus()) return v;
+            for (aurore::View* kid : kids)
+                if (aurore::View* v = kid->getDefaultFocus()) return v;
             return nullptr;
         }
         for (size_t i = kids.size(); i-- > 0;)
-            if (brls::View* v = kids[i]->getDefaultFocus()) return v;
+            if (aurore::View* v = kids[i]->getDefaultFocus()) return v;
         return nullptr;
     }
 };
 
 // Under the protected ones: what each icon at their lines' end says, those
 // shown only (`used`: their icons' names).
-brls::Box* legend(const std::vector<std::string>& used)
+aurore::Box* legend(const std::vector<std::string>& used)
 {
     static const std::pair<const char*, const char*> MARKS[] = {
         { "key", "playguard/forwarders/state_pin" },          { "unlock", "playguard/forwarders/action_hours" },
         { "stop", "playguard/forwarders/action_closed" },     { "timer", "playguard/forwarders/action_limit" },
         { "pause", "playguard/forwarders/detail_paused" },
     };
-    auto* box = new brls::Box(brls::Axis::ROW);
-    box->setWrap(brls::Wrap::WRAP);   // on two lines when the words are long
-    box->setAlignItems(brls::AlignItems::CENTER);
+    auto* box = new aurore::Box(aurore::Axis::ROW);
+    box->setWrap(aurore::Wrap::WRAP);   // on two lines when the words are long
+    box->setAlignItems(aurore::AlignItems::CENTER);
     box->setMargins(8, 8, 0, 10);
     for (const auto& [icon, key] : MARKS) {
         if (std::find(used.begin(), used.end(), icon) == used.end()) continue;
-        auto* item = new brls::Box(brls::Axis::ROW);
-        item->setAlignItems(brls::AlignItems::CENTER);
+        auto* item = new aurore::Box(aurore::Axis::ROW);
+        item->setAlignItems(aurore::AlignItems::CENTER);
         item->setMarginRight(22);
         item->setMarginBottom(4);
         CadranIcon* glyph = cadran::kit::icon(icon, 16, std::string(icon) == "pause" ? "cadran/amber" : "cadran/teal");
         glyph->setMarginRight(6);
         item->addView(glyph);
-        brls::Label* word = cadran::kit::label(brls::getStr(key), cadran::kit::TEXT_META, "cadran/text3");
+        aurore::Label* word = cadran::kit::label(aurore::getStr(key), cadran::kit::TEXT_META, "cadran/text3");
         word->setSingleLine(true);
         item->addView(word);
         box->addView(item);
@@ -117,7 +117,7 @@ void ForwardersActivity::onContentAvailable()
     warning->setSingleLine(false);
     cadran::kit::empty_around(empty, "home");
     game_note->setSingleLine(false);
-    self_cell->registerClickAction([this](brls::View*) {
+    self_cell->registerClickAction([this](aurore::View*) {
         if (const Row* own = forwarders_logic::self_row(this->list_rows)) {
             if (own->state != State::NotInstalled) {
                 this->actions(*own);
@@ -129,18 +129,18 @@ void ForwardersActivity::onContentAvailable()
         return true;
     });
     other->setDetailText(ui::opens());
-    other->registerClickAction([this](brls::View*) {
+    other->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         this->pick_homebrew();
         return true;
     });
     ui::show_writable(other, !app::read_only());
     lock_note->setSingleLine(false);
-    lock_cell->registerClickAction([this](brls::View*) {
+    lock_cell->registerClickAction([this](aurore::View*) {
         std::weak_ptr<bool> weak = this->alive;
         // The setup may make forwarders: the list again, the focus kept here.
         const auto after = [this, weak](bool) {
-            brls::sync([this, weak]() {
+            aurore::sync([this, weak]() {
                 if (!weak.expired()) this->rebuild(0, lock_cell.getView());
             });
         };
@@ -149,35 +149,35 @@ void ForwardersActivity::onContentAvailable()
         return true;
     });
     reinstall->setDetailText(ui::opens());
-    reinstall->registerClickAction([this](brls::View*) {
+    reinstall->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         forwarder_flow::reinstall_all(this->then_rebuild());
         return true;
     });
-    protect_all->registerClickAction([this](brls::View*) {
+    protect_all->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         forwarder_flow::protect_all(this->then_rebuild());
         return true;
     });
-    pause_cell->registerClickAction([this](brls::View*) {
+    pause_cell->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         this->pick_pause();
         return true;
     });
     ui::show_writable(pause_cell, !app::read_only());
-    wait_cell->registerClickAction([this](brls::View*) {
+    wait_cell->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         this->pick_wait();
         return true;
     });
     ui::show_writable(wait_cell, !app::read_only());
     week_cell->setDetailText(ui::opens());
-    week_cell->registerClickAction([](brls::View*) {
+    week_cell->registerClickAction([](aurore::View*) {
         forwarder_flow::show_week();
         return true;
     });
     lock_check->setDetailText(ui::opens());
-    lock_check->registerClickAction([this](brls::View*) {
+    lock_check->registerClickAction([this](aurore::View*) {
         hbmenu_lock::show_check(this->then_rebuild());
         return true;
     });
@@ -206,7 +206,7 @@ void ForwardersActivity::onContentAvailable()
         this->show_patches();
     }
     // Y: what this screen does, in the guide (a QR code).
-    this->getContentView()->registerAction("playguard/forwarders/help"_i18n, brls::BUTTON_Y, [](brls::View*) {
+    this->getContentView()->registerAction("playguard/forwarders/help"_i18n, aurore::BUTTON_Y, [](aurore::View*) {
         ui::qr_dialog("playguard/forwarders/help_body"_i18n, app::doc_url("features", "forwarders"));
         return true;
     });
@@ -234,10 +234,10 @@ void ForwardersActivity::fixes()
         if (!writable || r.state == State::NotInstalled || r.self) continue;
         const Row copy = r;
         if (r.state == State::Elsewhere)
-            choices.push_back({ brls::getStr("playguard/forwarders/fix_delete", r.name),
+            choices.push_back({ aurore::getStr("playguard/forwarders/fix_delete", r.name),
                                 [this, copy]() { this->remove_with_undo(copy); }, "trash", "", "", Tone::DANGER });
         else if (!r.pin && (forwarders_logic::is_menu(r.nro) || !s.locked))
-            choices.push_back({ brls::getStr("playguard/forwarders/fix_protect", r.name),
+            choices.push_back({ aurore::getStr("playguard/forwarders/fix_protect", r.name),
                                 [this, copy]() { forwarder_flow::set_pin(copy, true, this->then_rebuild(copy.id)); }, "key" });
     }
     // Built with an older loader: made again, in one go.
@@ -261,16 +261,16 @@ void ForwardersActivity::offer_undo(std::function<void()> undo)
     // ZR, for a few seconds, as the change history's own undo.
     constexpr long OFFER_MS = 8000;
     this->withdraw_undo();
-    brls::View* view = this->getContentView();
+    aurore::View* view = this->getContentView();
     std::weak_ptr<bool> weak = this->alive;
-    this->undo_action = view->registerAction("playguard/history/undo_hint"_i18n, brls::BUTTON_RT, [this, weak, undo](brls::View*) {
+    this->undo_action = view->registerAction("playguard/history/undo_hint"_i18n, aurore::BUTTON_RT, [this, weak, undo](aurore::View*) {
         if (weak.expired()) return true;
         this->withdraw_undo();
         undo();
         return true;
     });
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
-    this->undo_timer = brls::delay(OFFER_MS, [this, weak]() {
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
+    this->undo_timer = aurore::delay(OFFER_MS, [this, weak]() {
         if (!weak.expired()) this->withdraw_undo();
     });
 }
@@ -278,10 +278,10 @@ void ForwardersActivity::offer_undo(std::function<void()> undo)
 void ForwardersActivity::withdraw_undo()
 {
     if (!this->undo_action) return;
-    brls::cancelDelay(this->undo_timer);
+    aurore::cancelDelay(this->undo_timer);
     this->getContentView()->unregisterAction(this->undo_action);
     this->undo_action = 0;
-    brls::Application::getGlobalHintsUpdateEvent()->fire();
+    aurore::Application::getGlobalHintsUpdateEvent()->fire();
 }
 
 void ForwardersActivity::remove_with_undo(const Row& row)
@@ -290,7 +290,7 @@ void ForwardersActivity::remove_with_undo(const Row& row)
     const bool known = forwarders::find(row.id, &m);
     std::weak_ptr<bool> weak = this->alive;
     forwarder_flow::remove(row, [this, weak, known, m](bool ok) {
-        brls::sync([this, weak, known, m, ok]() {
+        aurore::sync([this, weak, known, m, ok]() {
             if (weak.expired()) return;
             this->rebuild();
             // Made here: installed again from its .nro (the same program ID).
@@ -321,45 +321,45 @@ void ForwardersActivity::show_lock()
     if (c.self) add("PlayGuard");
     for (const std::string& m : c.menus) {
         const bool seen = std::find(c.verified.begin(), c.verified.end(), m) != c.verified.end();
-        add(seen ? m : brls::getStr("playguard/hbmenu/summary_untried", m));
+        add(seen ? m : aurore::getStr("playguard/hbmenu/summary_untried", m));
     }
     const bool both = c.self && !c.verified.empty();
     std::vector<ui::CheckLine> lines = {
         { on ? Check::Ok : Check::Info, on ? "playguard/hbmenu/summary_locked"_i18n : "playguard/hbmenu/summary_open"_i18n },
         { both ? Check::Ok : on ? Check::Bad : Check::Warn,
-          brls::getStr("playguard/hbmenu/summary_routes", routes.empty() ? "playguard/hbmenu/check_none"_i18n : routes) },
+          aurore::getStr("playguard/hbmenu/summary_routes", routes.empty() ? "playguard/hbmenu/check_none"_i18n : routes) },
     };
     if (c.open_doors.empty()) lines.push_back({ Check::Ok, "playguard/hbmenu/line_no_doors"_i18n });
     else {
         std::string doors;
         for (const std::string& d : c.open_doors) doors += (doors.empty() ? "" : ", ") + d;
-        lines.push_back({ Check::Warn, brls::getStr("playguard/hbmenu/summary_doors", doors) });
+        lines.push_back({ Check::Warn, aurore::getStr("playguard/hbmenu/summary_doors", doors) });
     }
     lines.push_back({ Check::Info, s.module ? "playguard/hbmenu/summary_module"_i18n : "playguard/hbmenu/summary_no_module"_i18n });
     ui::batch_layout(summary.getView(), [this, &lines, on]() {
         summary->clearViews();
         // A on it: what to do about what it says (fixes).
-        brls::Box* card = cadran::kit::card(true, false);
+        aurore::Box* card = cadran::kit::card(true, false);
         card->setCornerRadius(22);
         card->setHighlightCornerRadius(22);
         card->setPadding(22, 26, 22, 26);
-        card->registerClickAction([this](brls::View*) {
+        card->registerClickAction([this](aurore::View*) {
             this->fixes();
             return true;
         });
-        card->addGestureRecognizer(new brls::TapGestureRecognizer(card));
-        auto* head = new brls::Box(brls::Axis::ROW);
-        head->setAlignItems(brls::AlignItems::CENTER);
-        brls::Box* kick = cadran::kit::kicker(on ? "lock" : "unlock", "playguard/hbmenu/section"_i18n);
+        card->addGestureRecognizer(new aurore::TapGestureRecognizer(card));
+        auto* head = new aurore::Box(aurore::Axis::ROW);
+        head->setAlignItems(aurore::AlignItems::CENTER);
+        aurore::Box* kick = cadran::kit::kicker(on ? "lock" : "unlock", "playguard/hbmenu/section"_i18n);
         kick->setGrow(1.0f);
         head->addView(kick);
-        brls::Box* a = cadran::kit::key("A", 20);
+        aurore::Box* a = cadran::kit::key("A", 20);
         a->setMarginRight(6);
         head->addView(a);
         head->addView(cadran::kit::label("playguard/hbmenu/card_fix"_i18n, 15, "cadran/text2"));
         card->addView(head);
         for (const ui::CheckLine& l : lines) {
-            brls::Box* row = ui::check_row(l);
+            aurore::Box* row = ui::check_row(l);
             row->setMarginTop(10);
             card->addView(row);
         }
@@ -391,19 +391,19 @@ std::function<void(bool)> ForwardersActivity::then_rebuild(uint64_t id)
     return [this, weak, id](bool) {
         // Next frame: the dialog that ran this gives the focus back first,
         // to a cell the rebuild then moves it away from before deleting it.
-        brls::sync([this, weak, id]() {
+        aurore::sync([this, weak, id]() {
             if (!weak.expired()) this->rebuild(id);
         });
     };
 }
 
-void ForwardersActivity::rebuild(uint64_t focus_id, brls::View* keep)
+void ForwardersActivity::rebuild(uint64_t focus_id, aurore::View* keep)
 {
     // Under a dialog (one a change opened after it, the rescue sheet): once
     // it is closed, so the focus is not taken from it.
     if (!ui::on_top(this)) {
         std::weak_ptr<bool> weak = this->alive;
-        brls::delay(150, [this, weak, focus_id, keep]() {
+        aurore::delay(150, [this, weak, focus_id, keep]() {
             if (!weak.expired()) this->rebuild(focus_id, keep);
         });
         return;
@@ -411,10 +411,10 @@ void ForwardersActivity::rebuild(uint64_t focus_id, brls::View* keep)
     this->build(focus_id, keep);
 }
 
-void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
+void ForwardersActivity::build(uint64_t focus_id, aurore::View* keep)
 {
     // The focus to a cell that stays before the old rows go.
-    brls::Application::giveFocus(keep ? keep : (brls::View*)self_cell.getView());
+    aurore::Application::giveFocus(keep ? keep : (aurore::View*)self_cell.getView());
     this->cells.clear();
     this->list_rows = forwarder_flow::rows();
     // By group: PlayGuard's own, the others made here (protected or not:
@@ -434,12 +434,12 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 groups++;
                 break;
             }
-    brls::View* focus = nullptr;
-    brls::View* first = nullptr;
+    aurore::View* focus = nullptr;
+    aurore::View* first = nullptr;
     ui::batch_layout(list.getView(), [&]() {
         list->clearViews();
-        auto* groups_box = new Nearest<brls::Box>(brls::Axis::COLUMN);
-        groups_box->setAlignItems(brls::AlignItems::STRETCH);
+        auto* groups_box = new Nearest<aurore::Box>(aurore::Axis::COLUMN);
+        groups_box->setAlignItems(aurore::AlignItems::STRETCH);
         list->addView(groups_box);
         for (int g = 0; g < 4; g++) {
             cadran::Card* card = nullptr;
@@ -448,7 +448,7 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 if (!card) {
                     // Named when there is more than one group.
                     if (groups > 1 && LABELS[g]) {
-                        brls::Label* label = cadran::kit::label(brls::getStr(LABELS[g]), 15, "cadran/text3");
+                        aurore::Label* label = cadran::kit::label(aurore::getStr(LABELS[g]), 15, "cadran/text3");
                         label->setMarginTop(groups_box->getChildren().empty() ? 0 : 12);
                         label->setMarginBottom(6);
                         label->setMarginLeft(8);
@@ -472,7 +472,7 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
                 else if (!r.self && r.state != State::Elsewhere && r.state != State::NotInstalled)
                     cell->set_badge("unlock", "cadran/amber");
                 const Row copy = r;
-                cell->registerClickAction([this, copy](brls::View*) {
+                cell->registerClickAction([this, copy](aurore::View*) {
                     this->actions(copy);
                     return true;
                 });
@@ -499,7 +499,7 @@ void ForwardersActivity::build(uint64_t focus_id, brls::View* keep)
     // The view kept, else the forwarder asked for, else the first one, else PlayGuard's line.
     if (keep) focus = keep;
     if (!focus && first && !focus_id) focus = first;
-    brls::Application::giveFocus(focus ? focus : (brls::View*)self_cell.getView());
+    aurore::Application::giveFocus(focus ? focus : (aurore::View*)self_cell.getView());
 }
 
 void ForwardersActivity::load_icons()
@@ -593,7 +593,7 @@ void ForwardersActivity::actions(const Row& row)
                                 const bool known = forwarders::find(r.id, &m);
                                 std::weak_ptr<bool> weak = this->alive;
                                 forwarder_flow::forget(r, [this, weak, known, m](bool ok) {
-                                    brls::sync([this, weak, known, m, ok]() {
+                                    aurore::sync([this, weak, known, m, ok]() {
                                         if (weak.expired()) return;
                                         this->rebuild();
                                         if (ok && known)
@@ -692,7 +692,7 @@ void ForwardersActivity::hours(const Row& r, bool closed, const forwarder_flow::
 {
     std::weak_ptr<bool> weak = this->alive;
     const auto after = [this, weak, r, closed](bool ok) {
-        brls::sync([this, weak, r, ok, closed]() {
+        aurore::sync([this, weak, r, ok, closed]() {
             if (weak.expired()) return;
             this->rebuild(r.id);
             // The hours as they were, without the PIN again.
@@ -714,7 +714,7 @@ void ForwardersActivity::limit(const Row& r, bool on)
 {
     std::weak_ptr<bool> weak = this->alive;
     forwarder_flow::set_limit(r, on, [this, weak, r, on](bool ok) {
-        brls::sync([this, weak, r, ok, on]() {
+        aurore::sync([this, weak, r, ok, on]() {
             if (weak.expired()) return;
             this->rebuild(r.id);
             if (ok) this->offer_undo([this, r, on]() { forwarder_flow::set_limit(r, !on, this->then_rebuild(r.id), false); });
@@ -726,7 +726,7 @@ void ForwardersActivity::pin(const Row& r, bool on)
 {
     std::weak_ptr<bool> weak = this->alive;
     forwarder_flow::set_pin(r, on, [this, weak, r, on](bool ok) {
-        brls::sync([this, weak, r, ok, on]() {
+        aurore::sync([this, weak, r, ok, on]() {
             if (weak.expired()) return;
             this->rebuild(r.id);
             // Put back as it was: asked for again (or no longer) the usual way.

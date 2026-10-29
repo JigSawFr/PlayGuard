@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/nintendo_dns.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "util/diagnostics.hpp"
 #include "util/dns_hosts.hpp"
@@ -54,7 +54,7 @@ bool time_blocked() { return redirected(dns_hosts::TIME_HOST); }
 void at_start()
 {
     diagnostic::set_dns(&report);
-    brls::Logger::info("{}", dns_hosts::summary(seen()));
+    aurore::Logger::info("{}", dns_hosts::summary(seen()));
 }
 
 std::string report()

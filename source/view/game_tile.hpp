@@ -5,10 +5,10 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <string>
 
-class GameTile : public brls::Box
+class GameTile : public aurore::Box
 {
   public:
     // Its width, margins included: the grid fits as many a row as its width
@@ -27,13 +27,13 @@ class GameTile : public brls::Box
     // Back to the placeholder: the tile shows another game.
     void clear_icon();
 
-    void draw(NVGcontext* vg, float x, float y, float width, float height, brls::Style style,
-              brls::FrameContext* ctx) override;
+    void draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
+              aurore::FrameContext* ctx) override;
 
   private:
-    brls::Image* icon = nullptr;
-    brls::Label* name = nullptr;
-    brls::Label* detail = nullptr;
+    aurore::Image* icon = nullptr;
+    aurore::Label* name = nullptr;
+    aurore::Label* detail = nullptr;
     bool iconed = false;
-    brls::Time icon_since = 0;   // the icon arrived then (µs): it fades in; 0 at rest
+    aurore::Time icon_since = 0;   // the icon arrived then (µs): it fades in; 0 at rest
 };

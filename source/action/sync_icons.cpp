@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/sync_icons.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <chrono>
 #include <condition_variable>
 #include <cstdlib>
@@ -183,7 +183,7 @@ void collect()
         std::string error = j.error;
         const size_t n = std::strlen(j.conf.host);
         for (size_t at; n && (at = error.find(j.conf.host)) != std::string::npos;) error.replace(at, n, "<broker>");
-        brls::Logger::warning("sync: game icons: {} (again in 5 min)", error);
+        aurore::Logger::warning("sync: game icons: {} (again in 5 min)", error);
     } else if (j.resend) {
         for (const auto& e : j.sent) s.resent.insert(e.first);
         if (j.last_batch) {
@@ -192,7 +192,7 @@ void collect()
         }
     }
     if (!j.sent.empty() || !j.cleared.empty() || j.error.empty())
-        brls::Logger::info("sync: game icons: {} published, {} cleared{}", j.sent.size(), j.cleared.size(),
+        aurore::Logger::info("sync: game icons: {} published, {} cleared{}", j.sent.size(), j.cleared.size(),
                        j.too_large ? fmt::format(", {} larger than the broker takes", j.too_large) : "");
     s.job.reset();
 }
@@ -261,7 +261,7 @@ void step(const SyncConf& conf, bool online)
     try {
         s.thread = std::thread(run, job);
     } catch (const std::system_error& e) {
-        brls::Logger::error("sync: no thread for the game icons ({})", e.what());
+        aurore::Logger::error("sync: no thread for the game icons ({})", e.what());
         s.retry_at = Clock::now() + RETRY_AFTER;
         return;
     }
@@ -287,7 +287,7 @@ void stop()
         if (ended) {
             s.thread.join();
         } else {
-            brls::Logger::warning("sync: the game icons' thread did not end in time; left running");
+            aurore::Logger::warning("sync: the game icons' thread did not end in time; left running");
             (void)new std::thread(std::move(s.thread));
         }
     }

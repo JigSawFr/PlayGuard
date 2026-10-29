@@ -14,9 +14,9 @@ bool refuse_read_only()
     return true;
 }
 
-void guard_switch(brls::BooleanCell* cell)
+void guard_switch(aurore::BooleanCell* cell)
 {
-    cell->registerClickAction([cell](brls::View*) {
+    cell->registerClickAction([cell](aurore::View*) {
         if (refuse_read_only()) return true;
         cell->setOn(!cell->isOn());
         cell->getEvent()->fire(cell->isOn());

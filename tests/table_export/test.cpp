@@ -1,7 +1,7 @@
 // Host tests for source/util/table_export.cpp: the four export formats. The
 // XLSX and PDF structure is checked with independent code (a bitwise CRC-32,
 // a cross-reference walk), not with the writer's own helpers.
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 #include "check.h"
 #include "temp_dir.hpp"
 #include <cstdint>

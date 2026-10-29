@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <string>
 
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "util/date.hpp"
 

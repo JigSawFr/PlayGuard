@@ -8,7 +8,7 @@
 #include <array>
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
@@ -17,7 +17,7 @@
 #include "ui/ui.hpp"
 #include "util/profiles.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 DashboardTab::TodayLog DashboardTab::read_today_log()
 {
@@ -51,31 +51,31 @@ void DashboardTab::show_headline(int today, bool unlocked, const TodayLog& log)
                                                    : "playguard/cadran/today/head_no_play"_i18n);
                 break;
             case pt_logic::RingState::FREE:
-                ui::set_text(headline, log.ok ? brls::getStr("playguard/dashboard/gauge_none_played", ui::fmt_duration(log.played_s))
+                ui::set_text(headline, log.ok ? aurore::getStr("playguard/dashboard/gauge_none_played", ui::fmt_duration(log.played_s))
                                               : "playguard/dashboard/gauge_none"_i18n);
                 break;
             case pt_logic::RingState::ON_HOLD:
                 // The countdown may be off while unlocked: the limit is on hold.
-                ui::set_text(headline, brls::getStr("playguard/cadran/today/head_unlocked", ui::fmt_limit(day_limit)));
+                ui::set_text(headline, aurore::getStr("playguard/cadran/today/head_unlocked", ui::fmt_limit(day_limit)));
                 break;
             case pt_logic::RingState::TIME_UP:
                 if (st.over < 0 || (timer.restricted_valid && timer.restricted)) {
                     ui::set_text(headline, "playguard/dashboard/gauge_reached"_i18n);
                 } else {
                     // Past the limit, the console only warning: the time over it.
-                    ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_over", ui::fmt_played((uint16_t)st.played),
+                    ui::set_text(headline, aurore::getStr("playguard/dashboard/gauge_over", ui::fmt_played((uint16_t)st.played),
                                                         ui::fmt_limit(day_limit), ui::fmt_played((uint16_t)st.over)));
                 }
                 break;
             case pt_logic::RingState::COUNTING:
-                ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_known", ui::fmt_played((uint16_t)st.played),
+                ui::set_text(headline, aurore::getStr("playguard/dashboard/gauge_known", ui::fmt_played((uint16_t)st.played),
                                                     ui::fmt_limit(day_limit)));
                 break;
             case pt_logic::RingState::IDLE:
                 if (log.ok) {
                     // No game counted yet by the timer: the log's figure, marked as an
                     // estimate (it counts PlayGuard opened over a game, for instance).
-                    ui::set_text(headline, brls::getStr("playguard/dashboard/gauge_log", ui::fmt_duration(log.played_s),
+                    ui::set_text(headline, aurore::getStr("playguard/dashboard/gauge_log", ui::fmt_duration(log.played_s),
                                                         ui::fmt_limit(day_limit)));
                 } else {
                     ui::set_text(headline, "playguard/dashboard/gauge_idle"_i18n);
@@ -92,16 +92,16 @@ void DashboardTab::show_ring(bool unlocked)
     const PtState& timer = this->pt;
     const int today = ui::today_weekday();
     // Larger text: the day and its limit only ("THURSDAY · 2 h"), on one line.
-    if (brls::Label::getFontScale() > 1.0f) {
+    if (aurore::Label::getFontScale() > 1.0f) {
         const uint16_t day_limit = timer.valid ? timer.day_min[today] : PT_DAY_NOLIMIT;
         const std::string value = !timer.valid ? "—"
                                   : day_limit == 0 && (unlocked || timer.enabled) ? "playguard/cadran/today/no_play"_i18n
                                   : day_limit == PT_DAY_NOLIMIT || !timer.enabled ? "playguard/cadran/today/free"_i18n
                                                                                   : ui::fmt_limit(day_limit);
         // The day in capitals, as the kicker; the limit as everywhere else.
-        kicker->setText(brls::getStr("playguard/cadran/today/kicker_short", cadran::upper(ui::day_name(today)), value));
+        kicker->setText(aurore::getStr("playguard/cadran/today/kicker_short", cadran::upper(ui::day_name(today)), value));
     } else {
-        kicker->setText(cadran::upper(brls::getStr("playguard/cadran/today/kicker", ui::day_name_in_text(today))));
+        kicker->setText(cadran::upper(aurore::getStr("playguard/cadran/today/kicker", ui::day_name_in_text(today))));
     }
     const pt_logic::RingState st = pt_logic::ring_state(timer, today, unlocked);
     std::string left = "—", caption;
@@ -184,13 +184,13 @@ void DashboardTab::show_next(bool unlocked)
         text  = "playguard/dashboard/gauge_unlocked"_i18n;
         glyph = "unlock";
     } else if (with_extra && n.kind == pt_logic::NextStop::TIME_UP)
-        text = brls::getStr("playguard/cadran/today/next_with_extra", amount, clock(n.at));
+        text = aurore::getStr("playguard/cadran/today/next_with_extra", amount, clock(n.at));
     else if (with_extra && n.kind == pt_logic::NextStop::BEDTIME)
-        text = brls::getStr("playguard/cadran/today/next_with_extra_bed", amount, clock(n.at));
-    else if (n.kind == pt_logic::NextStop::TIME_UP) text = brls::getStr("playguard/cadran/today/next_time_up", clock(n.at));
+        text = aurore::getStr("playguard/cadran/today/next_with_extra_bed", amount, clock(n.at));
+    else if (n.kind == pt_logic::NextStop::TIME_UP) text = aurore::getStr("playguard/cadran/today/next_time_up", clock(n.at));
     else if (n.kind == pt_logic::NextStop::BEDTIME)
-        text = brls::getStr("playguard/cadran/today/next_bedtime", clock(n.at), ui::fmt_limit((uint16_t)n.in));
-    else if (n.kind == pt_logic::NextStop::BEDTIME_NOW) text = brls::getStr("playguard/cadran/today/next_bedtime_now", clock(n.at));
+        text = aurore::getStr("playguard/cadran/today/next_bedtime", clock(n.at), ui::fmt_limit((uint16_t)n.in));
+    else if (n.kind == pt_logic::NextStop::BEDTIME_NOW) text = aurore::getStr("playguard/cadran/today/next_bedtime_now", clock(n.at));
     if (!text.empty()) {
         ui::set_text(this->next_text, text);
         this->next_icon->setIcon(glyph);
@@ -210,7 +210,7 @@ void DashboardTab::show_next(bool unlocked)
         // An amount focused that the alarm would cut short: the alarm says so.
         const bool bed_first = with_extra && n.kind == pt_logic::NextStop::BEDTIME;
         this->timeline->show(now_min, up, bed_at,
-                             with_extra ? brls::getStr("playguard/cadran/today/tl_with", amount)
+                             with_extra ? aurore::getStr("playguard/cadran/today/tl_with", amount)
                                         : "playguard/cadran/today/tl_time_up"_i18n,
                              bed_first ? "playguard/cadran/today/tl_bed_first"_i18n : "");
     }
@@ -223,15 +223,15 @@ void DashboardTab::fit_text_size()
     // Larger text (on the TV): the same screen in the same height. The kicker
     // shortened to the day and its limit (show_ring()), the buttons and the
     // cards a little tighter.
-    const bool larger = brls::Label::getFontScale() > 1.0f;
+    const bool larger = aurore::Label::getFontScale() > 1.0f;
     kicker->setMarginBottom(larger ? 2 : 10);
     actions->setMarginTop(larger ? 6 : 14);
     actions->setMarginBottom(larger ? 4 : 12);
-    for (brls::View* button : { stop.getView(), child.getView(), limit.getView(), profile.getView() })
+    for (aurore::View* button : { stop.getView(), child.getView(), limit.getView(), profile.getView() })
         button->setHeight(larger ? 40 : 48);
-    for (brls::View* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() }) {
-        static_cast<brls::Box*>(card)->setPaddingTop(larger ? 10 : 20);
-        static_cast<brls::Box*>(card)->setPaddingBottom(larger ? 10 : 20);
+    for (aurore::View* card : { bed_card.getView(), pc_card.getView(), clock_card.getView() }) {
+        static_cast<aurore::Box*>(card)->setPaddingTop(larger ? 10 : 20);
+        static_cast<aurore::Box*>(card)->setPaddingBottom(larger ? 10 : 20);
     }
 }
 
@@ -262,7 +262,7 @@ void DashboardTab::choose_today_limit()
     const int today = ui::today_weekday();
     std::array<uint16_t, 7> days;
     for (int d = 0; d < 7; d++) days[d] = this->pt.day_min[d];
-    pt_flow::pick_limit(brls::getStr("playguard/play_timer/perday/pick_title", ui::day_name(today)), days[today],
+    pt_flow::pick_limit(aurore::getStr("playguard/play_timer/perday/pick_title", ui::day_name(today)), days[today],
                         [this, today, days](uint16_t v) mutable {
         if (v == days[today]) return;
         days[today] = v;
@@ -270,6 +270,6 @@ void DashboardTab::choose_today_limit()
             Result rc = pt_flow::write_days(days.data(), "per_day");
             pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
                                   "playguard/play_timer/write_err"_i18n, this->refresher());
-        }, days.data(), false, brls::getStr("playguard/cadran/today/limit_title", ui::day_name_in_text(today)));
+        }, days.data(), false, aurore::getStr("playguard/cadran/today/limit_title", ui::day_name_in_text(today)));
     });
 }

@@ -3,12 +3,12 @@
 
 #include <fmt/format.h>
 
-#include <borealis/cadran/ui/cadran_list.hpp>
+#include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/play_data.hpp"
 #include "app.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace game_check_parts
 {
@@ -28,8 +28,8 @@ std::string unnamed_text(const std::string& id)
 std::string version_text(const GameFacts& g, u32 version)
 {
     if (version == gamecheck_installed_version(&g) && g.display_version[0])
-        return brls::getStr("playguard/games/version", std::string(g.display_version));
-    if (version >> 16) return brls::getStr("playguard/games/update_n", (int)(version >> 16));
+        return aurore::getStr("playguard/games/version", std::string(g.display_version));
+    if (version >> 16) return aurore::getStr("playguard/games/update_n", (int)(version >> 16));
     return "playguard/games/base_only"_i18n;
 }
 
@@ -37,23 +37,23 @@ std::string cause_text(const GameFacts& g, GameIssue issue, u32 current_hos)
 {
     const std::string key = issue_text_key(issue, "cause");
     switch (issue) {
-        case GC_FIRMWARE_TOO_OLD: return brls::getStr(key, ui::hos_text(required_hos(g)), ui::hos_text(current_hos));
-        case GC_KEY_TOO_NEW:      return brls::getStr(key, ui::hos_text(current_hos), (int)g.key_generation);
+        case GC_FIRMWARE_TOO_OLD: return aurore::getStr(key, ui::hos_text(required_hos(g)), ui::hos_text(current_hos));
+        case GC_KEY_TOO_NEW:      return aurore::getStr(key, ui::hos_text(current_hos), (int)g.key_generation);
         case GC_LAUNCH_VERSION:
-            return brls::getStr(key, version_text(g, g.launch_required), version_text(g, gamecheck_installed_version(&g)));
-        case GC_LAUNCH_REFUSED:   return brls::getStr(key, ui::rc_text(g.launch_rc));
+            return aurore::getStr(key, version_text(g, g.launch_required), version_text(g, gamecheck_installed_version(&g)));
+        case GC_LAUNCH_REFUSED:   return aurore::getStr(key, ui::rc_text(g.launch_rc));
         case GC_CORRUPT: {
-            std::string text = brls::getStr(key, ui::time_text(g.verified_at));
-            if (g.verified_code) text += " " + brls::getStr("playguard/games/verify_code", console_code(g.verified_code));
+            std::string text = aurore::getStr(key, ui::time_text(g.verified_at));
+            if (g.verified_code) text += " " + aurore::getStr("playguard/games/verify_code", console_code(g.verified_code));
             return text;
         }
-        default:                  return brls::getStr(key);
+        default:                  return aurore::getStr(key);
     }
 }
 
 std::string fix_text(const GameFacts& g, GameIssue issue, u32 current_hos)
 {
-    return brls::getStr(game_check_text::fix_key(g, issue, current_hos));
+    return aurore::getStr(game_check_text::fix_key(g, issue, current_hos));
 }
 
 // What the console reports, for a hardware test (developer mode): not worded.
@@ -75,8 +75,8 @@ std::string game_name(const GameFacts& g)
 std::string short_text(const GameFacts& g, GameIssue issue)
 {
     const std::string key = issue_text_key(issue, "short");
-    if (issue == GC_FIRMWARE_TOO_OLD) return brls::getStr(key, ui::hos_text(required_hos(g)));
-    return brls::getStr(key);
+    if (issue == GC_FIRMWARE_TOO_OLD) return aurore::getStr(key, ui::hos_text(required_hos(g)));
+    return aurore::getStr(key);
 }
 
 // The screen's words, for what game_check_text puts together.
@@ -84,12 +84,12 @@ game_check_text::Words words()
 {
     game_check_text::Words w;
     w.unnamed = unnamed_text;
-    w.version = [](const std::string& v) { return brls::getStr("playguard/games/version", v); };
+    w.version = [](const std::string& v) { return aurore::getStr("playguard/games/version", v); };
     w.problem = short_text;
     w.list_title = "playguard/games/list_title"_i18n;
     w.checked_now = "playguard/games/checked_now"_i18n;
-    w.checked_min = [](int n) { return brls::getStr("playguard/games/checked_min", n); };
-    w.checked_h = [](int n) { return brls::getStr("playguard/games/checked_h", n); };
+    w.checked_min = [](int n) { return aurore::getStr("playguard/games/checked_min", n); };
+    w.checked_h = [](int n) { return aurore::getStr("playguard/games/checked_h", n); };
     return w;
 }
 
@@ -121,37 +121,37 @@ std::string action_label(const GameFacts& g, u32 action, const GameContent* cont
     switch (action) {
         case GA_RESET_LAUNCH:  return "playguard/games/action/reset_launch"_i18n;
         case GA_VERIFY:        return "playguard/games/action/verify"_i18n;
-        case GA_REMOVE_UPDATE: return brls::getStr("playguard/games/action/remove_update", version_text(g, content ? content->version : g.patch_version));
-        case GA_REMOVE_ADDON:  return brls::getStr("playguard/games/action/remove_addon", id_text(content ? content->id : 0));
+        case GA_REMOVE_UPDATE: return aurore::getStr("playguard/games/action/remove_update", version_text(g, content ? content->version : g.patch_version));
+        case GA_REMOVE_ADDON:  return aurore::getStr("playguard/games/action/remove_addon", id_text(content ? content->id : 0));
         default:               return "playguard/games/action/remove"_i18n;
     }
 }
 
 std::string view_label(bool grid)
 {
-    return brls::getStr(fmt::format("playguard/library/views/{}", grid ? 1 : 0));
+    return aurore::getStr(fmt::format("playguard/library/views/{}", grid ? 1 : 0));
 }
 
 // The details: the icon, the name and the problem, then why and what to do
 // in two blocks read from the left, the ID and version underneath.
-brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon)
+aurore::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, const std::vector<unsigned char>& icon)
 {
     namespace kit = cadran::kit;
-    auto* box = new brls::Box(brls::Axis::COLUMN);
-    box->setAlignItems(brls::AlignItems::STRETCH);
+    auto* box = new aurore::Box(aurore::Axis::COLUMN);
+    box->setAlignItems(aurore::AlignItems::STRETCH);
 
-    auto* head = new brls::Box(brls::Axis::ROW);
-    head->setAlignItems(brls::AlignItems::CENTER);
+    auto* head = new aurore::Box(aurore::Axis::ROW);
+    head->setAlignItems(aurore::AlignItems::CENTER);
     if (!icon.empty()) {
-        auto* image = new brls::Image();
+        auto* image = new aurore::Image();
         image->setImageFromMem(icon.data(), (int)icon.size());
-        image->setScalingType(brls::ImageScalingType::FIT);
+        image->setScalingType(aurore::ImageScalingType::FIT);
         image->setWidth(ICON_SIZE);
         image->setHeight(ICON_SIZE);
         image->setMarginRight(18);
         head->addView(image);
     }
-    auto* titles = new brls::Box(brls::Axis::COLUMN);
+    auto* titles = new aurore::Box(aurore::Axis::COLUMN);
     titles->setGrow(1.0f);
     titles->setShrink(1.0f);
     titles->addView(kit::display(game_name(g), 23));
@@ -163,14 +163,14 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
 
     // Each block on the second surface, its title a kicker.
     auto block = [box](const std::string& title, const std::string& text) {
-        auto* card = new brls::Box(brls::Axis::COLUMN);
+        auto* card = new aurore::Box(aurore::Axis::COLUMN);
         card->setThemeColor("backgroundColor", "cadran/surf2");
         card->setCornerRadius(14);
         card->setPadding(14, 18, 16, 18);
         card->setMarginTop(14);
-        brls::Label* t = kit::label(cadran::upper(title), 15, "cadran/text3");
+        aurore::Label* t = kit::label(cadran::upper(title), 15, "cadran/text3");
         card->addView(t);
-        brls::Label* body = kit::label(text, 18, "cadran/text");
+        aurore::Label* body = kit::label(text, 18, "cadran/text");
         body->setMarginTop(14);   // the kicker apart from what it heads
         card->addView(body);
         box->addView(card);
@@ -178,11 +178,11 @@ brls::Box* details_view(const GameFacts& g, GameIssue issue, u32 current_hos, co
     block("playguard/games/cause"_i18n, cause_text(g, issue, current_hos));
     block("playguard/games/fix"_i18n, fix_text(g, issue, current_hos));
 
-    std::string footer = brls::getStr("playguard/games/id", id_text(g.app_id));
-    if (g.display_version[0]) footer += " · " + brls::getStr("playguard/games/version", std::string(g.display_version));
-    if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + brls::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
+    std::string footer = aurore::getStr("playguard/games/id", id_text(g.app_id));
+    if (g.display_version[0]) footer += " · " + aurore::getStr("playguard/games/version", std::string(g.display_version));
+    if (g.verified == GC_VERIFIED_INTACT) footer += "\n" + aurore::getStr("playguard/games/verified_intact", ui::time_text(g.verified_at));
     if (app::dev_mode()) footer += "\n" + developer_text(g);
-    brls::Label* foot = kit::label(footer, 15.5f, "cadran/text3");
+    aurore::Label* foot = kit::label(footer, 15.5f, "cadran/text3");
     foot->setMarginTop(14);
     box->addView(foot);
     return box;
@@ -200,7 +200,7 @@ std::vector<unsigned char> icon_of(u64 app_id)
 
 // The Cadran look: a section's games in a card while they are a list (the
 // covers stand on the page), its buttons rounded as the boards' are.
-void card_look(brls::Box* list, bool grid)
+void card_look(aurore::Box* list, bool grid)
 {
     auto* card = dynamic_cast<cadran::Card*>(list);
     if (!card) return;
@@ -208,7 +208,7 @@ void card_look(brls::Box* list, bool grid)
     card->setAccent(grid ? "cadran/none" : "cadran/line");
 }
 
-void round_button(brls::Button* button)
+void round_button(aurore::Button* button)
 {
     button->setHeight(48);
     button->setCornerRadius(24);

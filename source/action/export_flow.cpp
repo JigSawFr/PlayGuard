@@ -2,7 +2,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/export_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <fmt/format.h>
 #include <vector>
 
@@ -10,7 +10,7 @@
 #include "util/config.hpp"
 #include "util/paths.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace export_flow
 {
@@ -18,7 +18,7 @@ namespace export_flow
 void choose(const char* what, const std::string& stem, std::function<table_export::Table()> make)
 {
     std::vector<std::string> labels;
-    for (int f = 0; f < 4; f++) labels.push_back(brls::getStr(fmt::format("playguard/activity/formats/{}", f)));
+    for (int f = 0; f < 4; f++) labels.push_back(aurore::getStr(fmt::format("playguard/activity/formats/{}", f)));
     ui::pick("playguard/activity/export_title"_i18n, labels, config::get().export_format, [what, stem, make](int index) {
         config::get().export_format = index;
         ui::save_config();
@@ -30,7 +30,7 @@ void choose(const char* what, const std::string& stem, std::function<table_expor
             std::string err;
             const std::string path = table_export::save(t, format, paths::exports_dir(), stem, &err);
             if (path.empty()) ui::error(failed, err);
-            else ui::notify(brls::getStr("playguard/activity/exported", path));
+            else ui::notify(aurore::getStr("playguard/activity/exported", path));
         });
     });
 }

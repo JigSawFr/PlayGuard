@@ -1,14 +1,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/upload_flow.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <ctime>
 #include <fmt/format.h>
 #include <memory>
 #include <vector>
 
-#include <borealis/cadran/ui/cadran_kit.hpp>
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "action/github_login_flow.hpp"
 #include "action/notices.hpp"
@@ -23,7 +23,7 @@
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace upload_flow
 {
@@ -57,8 +57,8 @@ void remember(const log_upload::Result& r)
 void show_link(const log_upload::Result& r, bool report)
 {
     if (!report) {
-        brls::Box* code = cadran::kit::qr(r.url, 220, "playguard/upload/qr_list"_i18n, log_upload::link_caption(r.url), 300);
-        code->setAlignSelf(brls::AlignSelf::CENTER);
+        aurore::Box* code = cadran::kit::qr(r.url, 220, "playguard/upload/qr_list"_i18n, log_upload::link_caption(r.url), 300);
+        code->setAlignSelf(aurore::AlignSelf::CENTER);
         auto* dialog = ui::dialog("playguard/upload/done_list"_i18n, code);
         dialog->addButton("hints/ok"_i18n, []() {});
         dialog->open();
@@ -81,8 +81,8 @@ void show_link(const log_upload::Result& r, bool report)
 
     // The link once, under its code: the text says which code is for whom,
     // where the link is found again and how the report is deleted.
-    auto* row = new brls::Box(brls::Axis::ROW);
-    row->setJustifyContent(brls::JustifyContent::SPACE_EVENLY);
+    auto* row = new aurore::Box(aurore::Axis::ROW);
+    row->setJustifyContent(aurore::JustifyContent::SPACE_EVENLY);
     row->addView(cadran::kit::qr(r.url, 200, "playguard/upload/qr_report"_i18n, log_upload::link_caption(r.url), 300));
     row->addView(cadran::kit::qr(issue, 200, "playguard/upload/qr_issue"_i18n, "playguard/upload/qr_issue_note"_i18n, 300));
     auto* dialog = ui::dialog("playguard/upload/done"_i18n, row);
@@ -101,7 +101,7 @@ void send_gist(const Parts& parts, const Kind& kind)
     for (const auto& p : *parts) list += "\n• " + p.name;
     if (cut) list += "\n" + "playguard/upload/partial"_i18n;
     const int kb = (int)((log_upload::total_bytes(*files) + 1023) / 1024);
-    std::string body = brls::getStr("playguard/upload/confirm", "playguard/upload/where_gist"_i18n, kb) + "\n" +
+    std::string body = aurore::getStr("playguard/upload/confirm", "playguard/upload/where_gist"_i18n, kb) + "\n" +
                        list + "\n\n" + "playguard/upload/confirm_gist"_i18n;
     // Its link goes into a bug report, which anyone can read.
     if (kind.report) body += " " + "playguard/upload/confirm_public"_i18n;
@@ -112,7 +112,7 @@ void send_gist(const Parts& parts, const Kind& kind)
         ui::notify("playguard/upload/sending"_i18n);
         ui::in_background("gist upload", [parts, files, token, kind]() {
             const log_upload::Result r = log_upload::upload_gist(*files, token, app::version(), kind.what);
-            brls::sync([parts, r, kind]() {
+            aurore::sync([parts, r, kind]() {
                 s_sending = false;
                 if (r.relogin) {
                     // The sign-in does not allow gists (or was revoked, and
@@ -121,14 +121,14 @@ void send_gist(const Parts& parts, const Kind& kind)
                     // a rate limit): the GitHub account cell signs out.
                     const std::string where = "playguard/tabs/about"_i18n + " › " + "playguard/prefs/help"_i18n +
                                               " › " + "playguard/github/account"_i18n;
-                    ui::confirm(brls::getStr("playguard/upload/relogin", where), "playguard/upload/sign_in"_i18n,
+                    ui::confirm(aurore::getStr("playguard/upload/relogin", where), "playguard/upload/sign_in"_i18n,
                                 [parts, kind]() {
                                     github_login_flow::sign_in([parts, kind]() { send_gist(parts, kind); });
                                 });
                     return;
                 }
                 if (!r.ok) {
-                    ui::error(brls::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
+                    ui::error(aurore::getStr(kind.report ? "playguard/upload/failed" : "playguard/upload/failed_list",
                                           r.error));
                     return;
                 }
@@ -183,7 +183,7 @@ void with_debug_files(const std::string& report)
         for (auto& f : log_upload::debug_files(pt_log)) parts.push_back(std::move(f));
         if (ui::quitting()) return;
         const Parts all = parts_of(std::move(parts));
-        brls::sync([all]() {
+        aurore::sync([all]() {
             s_collecting = false;
             send(all);
         });
@@ -212,7 +212,7 @@ void choose()
         return;
     }
     std::vector<std::string> labels{ "playguard/upload/current"_i18n };
-    for (const auto& name : saved) labels.push_back(brls::getStr("playguard/upload/saved", name));
+    for (const auto& name : saved) labels.push_back(aurore::getStr("playguard/upload/saved", name));
     ui::pick("playguard/upload/pick"_i18n, labels, 0, [saved](int i) {
         if (i == 0) {
             send_report(diagnostic::current_report());
@@ -221,7 +221,7 @@ void choose()
         const std::string name = saved[(size_t)i - 1];
         std::string content;
         if (!paths::read_file(paths::reports_dir() + "/" + name, content)) {
-            ui::error(brls::getStr("playguard/upload/failed", "cannot read " + name));
+            ui::error(aurore::getStr("playguard/upload/failed", "cannot read " + name));
             return;
         }
         send(parts_of({ { "logs/reports/" + name, std::move(content) } }));

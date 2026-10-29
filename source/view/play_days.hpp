@@ -7,11 +7,11 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 
 #include "util/pctl_ops_c.hpp"
 
-class PlayDaysView : public brls::Box
+class PlayDaysView : public aurore::Box
 {
   public:
     PlayDaysView();
@@ -22,17 +22,17 @@ class PlayDaysView : public brls::Box
     void show(const uint32_t day_s[7], const uint8_t day_wday[7],
               const uint16_t limits[7] = nullptr);                            // one game
 
-    static brls::View* create();
+    static aurore::View* create();
 
   private:
     struct Column
     {
-        brls::Label*     value = nullptr;
-        brls::Rectangle* bar   = nullptr;
-        brls::Rectangle* limit = nullptr;   // across the bar, at the day's limit
-        brls::Label*     day   = nullptr;
-        brls::Rectangle* mark  = nullptr;
+        aurore::Label*     value = nullptr;
+        aurore::Rectangle* bar   = nullptr;
+        aurore::Rectangle* limit = nullptr;   // across the bar, at the day's limit
+        aurore::Label*     day   = nullptr;
+        aurore::Rectangle* mark  = nullptr;
     };
     Column cols[7];   // left to right: six days ago … today
-    brls::Label* legend = nullptr;   // under the bars: the order, the limit line, the amber
+    aurore::Label* legend = nullptr;   // under the bars: the order, the limit line, the amber
 };

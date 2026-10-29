@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/game_notice.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <string>
 
 #include "action/game_check_text.hpp"
@@ -10,7 +10,7 @@
 #include "action/play_data.hpp"
 #include "activity/game_check_activity.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace game_notice
 {
@@ -46,11 +46,11 @@ void note(const std::vector<GameFacts>& games, u32 hos)
     }
     std::string list;
     for (size_t i = 0; i < names.size() && i < NAMES; i++) list += (list.empty() ? "" : ", ") + names[i];
-    if (names.size() > NAMES) list = brls::getStr("playguard/notices/games_more", list, (int)(names.size() - NAMES));
+    if (names.size() > NAMES) list = aurore::getStr("playguard/notices/games_more", list, (int)(names.size() - NAMES));
     const std::string title = names.size() == 1 ? "playguard/notices/games_one"_i18n
-                                                : brls::getStr("playguard/notices/games", (int)names.size());
+                                                : aurore::getStr("playguard/notices/games", (int)names.size());
     notices::set("games", notices::Level::Action, title, list, "playguard/games/open"_i18n,
-                 []() { brls::Application::pushActivity(new GameCheckActivity()); });
+                 []() { aurore::Application::pushActivity(new GameCheckActivity()); });
 }
 
 }   // namespace game_notice

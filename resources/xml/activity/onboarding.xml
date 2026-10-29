@@ -11,7 +11,7 @@
      Shown at start-up while no PIN is set; the bell's "no PIN" entry and
      About › Help & diagnostics › First steps bring it back. Filled by onboarding_activity.cpp. -->
 
-<brls:AppletFrame
+<aurore:AppletFrame
     iconInterpolation="linear">
 
     <ScrollView
@@ -23,33 +23,33 @@
         alignItems="stretch"
         grow="1.0">
 
-        <brls:Box
+        <aurore:Box
             width="auto"
             height="auto"
             axis="column"
             alignItems="stretch"
-            paddingTop="@style/brls/sidebar/padding_top"
-            paddingRight="@style/brls/sidebar/padding_right"
-            paddingBottom="@style/brls/sidebar/padding_bottom"
-            paddingLeft="@style/brls/sidebar/padding_left">
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
 
-            <brls:Label id="ob_headline" text="" fontSize="24" marginBottom="16"/>
-            <brls:Header title="@i18n/playguard/onboarding/section_steps" marginBottom="8"/>
-            <brls:DetailCell id="ob_pin" title="@i18n/playguard/onboarding/step_pin"/>
-            <brls:DetailCell id="ob_limit" title="@i18n/playguard/onboarding/step_limit"/>
-            <brls:DetailCell id="ob_clock" title="@i18n/playguard/onboarding/step_clock"/>
-            <brls:DetailCell id="ob_unlink" title="@i18n/playguard/onboarding/step_unlink"/>
-            <brls:DetailCell id="ob_alarm"/>
-            <brls:DetailCell id="ob_protect"/>
-            <brls:Label id="ob_note" text="@i18n/playguard/onboarding/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <brls:Label id="ob_storage_note" text="" fontSize="20" marginTop="4" marginBottom="6" textColor="@theme/cadran/amber"/>
-            <brls:BooleanCell id="ob_at_start" marginTop="16"/>
-            <brls:DetailCell id="ob_close" title="@i18n/playguard/onboarding/close"/>
-            <brls:DetailCell id="ob_support" title="@i18n/playguard/about/section_support" marginTop="24"/>
+            <aurore:Label id="ob_headline" text="" fontSize="24" marginBottom="16"/>
+            <aurore:Header title="@i18n/playguard/onboarding/section_steps" marginBottom="8"/>
+            <aurore:DetailCell id="ob_pin" title="@i18n/playguard/onboarding/step_pin"/>
+            <aurore:DetailCell id="ob_limit" title="@i18n/playguard/onboarding/step_limit"/>
+            <aurore:DetailCell id="ob_clock" title="@i18n/playguard/onboarding/step_clock"/>
+            <aurore:DetailCell id="ob_unlink" title="@i18n/playguard/onboarding/step_unlink"/>
+            <aurore:DetailCell id="ob_alarm"/>
+            <aurore:DetailCell id="ob_protect"/>
+            <aurore:Label id="ob_note" text="@i18n/playguard/onboarding/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Label id="ob_storage_note" text="" fontSize="20" marginTop="4" marginBottom="6" textColor="@theme/cadran/amber"/>
+            <aurore:BooleanCell id="ob_at_start" marginTop="16"/>
+            <aurore:DetailCell id="ob_close" title="@i18n/playguard/onboarding/close"/>
+            <aurore:DetailCell id="ob_support" title="@i18n/playguard/about/section_support" marginTop="24"/>
             <MadeInFrance marginTop="24"/>
 
-        </brls:Box>
+        </aurore:Box>
 
     </ScrollView>
 
-</brls:AppletFrame>
+</aurore:AppletFrame>

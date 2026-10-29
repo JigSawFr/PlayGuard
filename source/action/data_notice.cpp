@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/data_notice.hpp"
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <string>
 
 #include "action/history_flow.hpp"
@@ -10,7 +10,7 @@
 #include "util/config.hpp"
 #include "util/history.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace data_notice
 {
@@ -36,12 +36,12 @@ void rescue_unreadable()
 
 void history_put_aside()
 {
-    brls::Logger::warning("history: damaged file put aside as history.json.bad");
+    aurore::Logger::warning("history: damaged file put aside as history.json.bad");
     if (!s_started) {
         s_history = true;
         return;
     }
-    brls::sync([]() {
+    aurore::sync([]() {
         note("data_history", false, "playguard/data_notice/history_reset"_i18n);
         ui::notify("playguard/notices/data_toast"_i18n);
     });
@@ -74,15 +74,15 @@ void at_start()
     if (s_rescue) add("data_rescue", false, "playguard/data_notice/rescue_unreadable"_i18n);
 
     if (cfg == config::Loaded::PutAside || cfg == config::Loaded::Stuck) {
-        brls::Logger::warning("config: unreadable, defaults in use ({})",
+        aurore::Logger::warning("config: unreadable, defaults in use ({})",
                               cfg == config::Loaded::PutAside ? "kept as config.json.bad" : "could not be put aside");
         history_flow::record_event("config_reset");
     }
     if (hist != history::Damage::None)
-        brls::Logger::warning("history: unreadable at start-up ({})",
+        aurore::Logger::warning("history: unreadable at start-up ({})",
                               hist == history::Damage::PutAside ? "kept as history.json.bad" : "could not be put aside");
     // Said in the notification bell; a toast points to it.
-    if (found) brls::sync([]() { ui::notify("playguard/notices/data_toast"_i18n); });
+    if (found) aurore::sync([]() { ui::notify("playguard/notices/data_toast"_i18n); });
 }
 
 }   // namespace data_notice

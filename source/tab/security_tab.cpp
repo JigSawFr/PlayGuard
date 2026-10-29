@@ -1,8 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/security_tab.hpp"
 
-#include <borealis/cadran/ui/cadran_frame.hpp>
-#include <borealis/cadran/ui/cadran_kit.hpp>
+#include <aurore/cadran/ui/cadran_frame.hpp>
+#include <aurore/cadran/ui/cadran_kit.hpp>
 
 #include "action/console_actions.hpp"
 #include "action/hbmenu_lock.hpp"
@@ -19,7 +19,7 @@
 #include "util/config.hpp"
 #include "util/perf.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 SecurityTab::SecurityTab()
     : TabBase("xml/tab/security.xml"), list(this)
@@ -32,63 +32,63 @@ SecurityTab::SecurityTab()
     pin_lock_note->setSingleLine(false);
     // The homebrew menu's lock is made on Console › Forwarders, after its
     // checks: a line to it here, by the PIN that guards it.
-    hbmenu_lock->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new ForwardersActivity());
+    hbmenu_lock->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new ForwardersActivity());
         return true;
     });
     // Deleting everything is the one irreversible action here: its line is
     // drawn in the danger colour, not only its section title (refresh()).
-    pin_lock_cell->registerClickAction([this](brls::View*) {
+    pin_lock_cell->registerClickAction([this](aurore::View*) {
         pin_lock::choose(this->refresher());
         return true;
     });
     // Off by default: once entered, the PIN holds until PlayGuard closes.
     pin_ask_again->init("playguard/pin_lock/ask_again"_i18n, config::get().pin_ask_again, [](bool) {});
-    pin_ask_again->registerClickAction([this](brls::View*) {
+    pin_ask_again->registerClickAction([this](aurore::View*) {
         pin_lock::set_ask_again(!config::get().pin_ask_again, this->refresher());
         return true;
     });
     // Off by default: entering the PIN leaves parental controls as they are.
     pin_pauses->init("playguard/pin_lock/pauses"_i18n, config::get().pin_pauses, [](bool) {});
-    pin_pauses->registerClickAction([this](brls::View*) {
+    pin_pauses->registerClickAction([this](aurore::View*) {
         pin_lock::set_pauses(!config::get().pin_pauses, this->refresher());
         return true;
     });
     // While linked, anyone can save the block before and after a change made
     // in the phone app: the data ROADMAP.md waits for (Developer tools has it too).
     ui::set_detail(pr_decode, ui::fmt_played(2));   // how long it takes
-    pr_decode->registerClickAction([](brls::View*) {
+    pr_decode->registerClickAction([](aurore::View*) {
         pt_block_flow::open();
         return true;
     });
-    pr_unlink->registerClickAction([this](brls::View*) {
+    pr_unlink->registerClickAction([this](aurore::View*) {
         console_actions::unlink("", this->refresher());
         return true;
     });
-    set_pin->registerClickAction([this](brls::View*) {
+    set_pin->registerClickAction([this](aurore::View*) {
         this->change_pin();
         return true;
     });
-    show_pin->registerClickAction([this](brls::View*) {
+    show_pin->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         // Each step a frame later, after a dialog: nothing once the tab is gone.
         const auto change = ui::guarded(this->alive, [this]() { this->change_pin(); });
         const auto offer_change = ui::guarded(this->alive, [change]() {
             ui::confirm("playguard/security/show_pin_change_body"_i18n,
-                        "playguard/security/show_pin_change_confirm"_i18n, [change]() { brls::sync(change); });
+                        "playguard/security/show_pin_change_confirm"_i18n, [change]() { aurore::sync(change); });
         });
         const auto show = ui::guarded(this->alive, [offer_change]() {
             // The PIN every time (pin_lock.hpp); then, as it may have been
             // seen over a shoulder, a new one is offered.
             if (!pin_lock::before_show_pin()) return;
-            const bool shown = ui::show_pin_dialog([offer_change]() { brls::sync(offer_change); });
+            const bool shown = ui::show_pin_dialog([offer_change]() { aurore::sync(offer_change); });
             if (shown) history_flow::record_event("pin_shown");
         });
         ui::confirm("playguard/security/show_pin_body"_i18n, "playguard/security/show_pin_confirm"_i18n,
-                    [show]() { brls::sync(show); });
+                    [show]() { aurore::sync(show); });
         return true;
     });
-    unlock->registerClickAction([this](brls::View*) {
+    unlock->registerClickAction([this](aurore::View*) {
         if (ui::refuse_read_only()) return true;
         ui::confirm("playguard/security/unlock_body"_i18n, "playguard/security/unlock_confirm"_i18n, [this]() {
             Result rc = pt_flow::unlock_temporarily();
@@ -105,13 +105,13 @@ SecurityTab::SecurityTab()
         config::get().auto_relock = on;
         ui::save_config();
     });
-    del->registerClickAction([this](brls::View*) {
+    del->registerClickAction([this](aurore::View*) {
         console_actions::delete_all("", this->refresher());
         return true;
     });
     rescue_about->setSingleLine(false);
-    rescue->registerClickAction([](brls::View*) {
-        brls::Application::pushActivity(new ModulesActivity(ModulesActivity::Tab::Rescue));
+    rescue->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new ModulesActivity(ModulesActivity::Tab::Rescue));
         return true;
     });
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" }, { "sc_hbmenu", "home" } }, true);
@@ -202,9 +202,9 @@ void SecurityTab::refresh()
                           { pr_unlink.getView(), !s.pairing_active_ok || paired },
                           // The block comparison needs the app to sync.
                           { pr_decode.getView(), syncs } });
-    for (brls::DetailCell* c : { (brls::DetailCell*)set_pin.getView(), (brls::DetailCell*)show_pin.getView(),
-                                 (brls::DetailCell*)unlock.getView(), (brls::DetailCell*)pr_unlink.getView(),
-                                 (brls::DetailCell*)auto_relock.getView() })
+    for (aurore::DetailCell* c : { (aurore::DetailCell*)set_pin.getView(), (aurore::DetailCell*)show_pin.getView(),
+                                 (aurore::DetailCell*)unlock.getView(), (aurore::DetailCell*)pr_unlink.getView(),
+                                 (aurore::DetailCell*)auto_relock.getView() })
         ui::show_writable(c, writable);
     auto_relock->setOn(config::get().auto_relock, false);
     ui::show_writable(del, writable, "cadran/coral", "cadran/text2");
@@ -215,7 +215,7 @@ void SecurityTab::refresh()
     else cadran::set_pill("");
 }
 
-brls::View* SecurityTab::create()
+aurore::View* SecurityTab::create()
 {
     return new SecurityTab();
 }

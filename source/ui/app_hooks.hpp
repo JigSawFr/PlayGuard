@@ -7,7 +7,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <functional>
 #include <string>
 
@@ -18,7 +18,7 @@ struct Hooks
 {
     std::function<void()>             open_notices;           // the notification bell's list
     std::function<void()>             open_firmware_screen;   // fw_gate's
-    std::function<brls::View*()>      make_help_tab;          // Help & diagnostics, for a screen of its own
+    std::function<aurore::View*()>      make_help_tab;          // Help & diagnostics, for a screen of its own
     std::function<void(const char* what, bool ok)> note_write;   // notices::note_write
     std::function<void()>             mode_changed;           // the recorders after the developer mode
     std::function<bool()>             lock_screen_up;         // activity/lock_activity's screen is open

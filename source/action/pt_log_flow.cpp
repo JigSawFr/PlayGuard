@@ -2,7 +2,7 @@
 #include "action/pt_log_flow.hpp"
 
 #include <atomic>
-#include <borealis.hpp>
+#include <aurore.hpp>
 #include <chrono>
 #include <fmt/format.h>
 
@@ -19,7 +19,7 @@ namespace
 {
 constexpr int PERIOD_MS = 30000;
 
-brls::RepeatingTimer* s_timer = nullptr;   // made at the first start: borealis must be up
+aurore::RepeatingTimer* s_timer = nullptr;   // made at the first start: Aurore must be up
 bool s_running = false;
 pt_log::Previous s_prev;
 std::atomic<bool> s_warned{ false };   // one log line when the SD card refuses, not one every 30 s
@@ -49,7 +49,7 @@ void record(std::string event = "")
     ui::append_later("pt_log", "pt_log", [line]() {
         std::string error;
         if (pt_log::append(line, &error)) s_warned = false;
-        else if (!s_warned.exchange(true)) brls::Logger::warning("pt_log: {}", error);
+        else if (!s_warned.exchange(true)) aurore::Logger::warning("pt_log: {}", error);
     });
 }
 
@@ -61,7 +61,7 @@ void start()
     s_running = true;
     record("recording started");
     if (!s_timer) {
-        s_timer = new brls::RepeatingTimer();
+        s_timer = new aurore::RepeatingTimer();
         s_timer->setPeriod(PERIOD_MS);
         s_timer->setCallback([]() { record(); });
     }
@@ -86,7 +86,7 @@ void note(const std::string& event)
 {
     if (!s_running) return;
     // On the main thread, after the change that called this has returned.
-    brls::sync([event]() {
+    aurore::sync([event]() {
         if (s_running) record(event);
     });
 }

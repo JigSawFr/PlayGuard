@@ -6,10 +6,10 @@
 #include <cstdio>
 #include <cstring>
 
-#include <borealis/extern/nlohmann/json.hpp>
+#include <aurore/extern/nlohmann/json.hpp>
 
-#include <borealis/cadran/util/safe_text.hpp>
-#include <borealis/cadran/util/text.hpp>
+#include <aurore/cadran/util/safe_text.hpp>
+#include <aurore/cadran/util/text.hpp>
 
 #include "util/date.hpp"
 #include "util/json_util.hpp"

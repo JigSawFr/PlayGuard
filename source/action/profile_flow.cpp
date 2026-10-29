@@ -12,7 +12,7 @@
 #include "ui/ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
-using namespace brls::literals;
+using namespace aurore::literals;
 
 namespace profile_flow
 {
@@ -23,11 +23,11 @@ void apply(const profiles::Profile& p, std::function<void()> after)
     PtState live;
     pctl_play_timer_query(&live);
     if (live.valid && std::equal(days.begin(), days.end(), live.day_min)) {
-        ui::notify(brls::getStr("playguard/play_timer/profile_already", p.name));
+        ui::notify(aurore::getStr("playguard/play_timer/profile_already", p.name));
         return;
     }
     // The week as the profile sets it is drawn under the question.
-    pt_flow::confirm_write(brls::getStr("playguard/play_timer/profile_apply", p.name),
+    pt_flow::confirm_write(aurore::getStr("playguard/play_timer/profile_apply", p.name),
                            "playguard/play_timer/confirm_set"_i18n, [days, name = p.name, after](bool did_unlock) {
                                Result rc = pt_flow::write_days(days.data(), "profile", name);
                                pt_flow::finish_write(rc, did_unlock, "playguard/play_timer/written_days"_i18n,
@@ -51,7 +51,7 @@ void pick(std::function<void()> after)
     labels.push_back("playguard/cadran/today/profiles_manage"_i18n);
     details.push_back("");
     ui::pick("playguard/cadran/today/profiles_title"_i18n, labels, selected, [all, after](int i) {
-        if (i == (int)all.size()) brls::Application::pushActivity(new ProfilesActivity());
+        if (i == (int)all.size()) aurore::Application::pushActivity(new ProfilesActivity());
         else if (i >= 0 && i < (int)all.size()) apply(all[i], after);
     }, selected >= 0, details);
 }
