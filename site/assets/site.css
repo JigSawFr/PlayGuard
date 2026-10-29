@@ -183,13 +183,21 @@ pre code { background: none; border: 0; padding: 0; color: #d6deeb; }
   align-items: center;
   padding: clamp(32px, 6vw, 80px) max(var(--gutter-r), calc((100% - 1180px) / 2)) clamp(40px, 6vw, 72px) max(var(--gutter-l), calc((100% - 1180px) / 2));
 }
-.hero h1 { font-size: clamp(2.25rem, 5vw, 3.6rem); letter-spacing: -0.035em; line-height: 1.1; margin: 0 0 16px; }
+.hero h1 { font-size: clamp(2.1rem, 4.2vw, 3.15rem); letter-spacing: -0.035em; line-height: 1.1; margin: 0 0 16px; }
 .hero h1 em { font-style: normal; background: var(--aurora-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero .sub { font: 500 14px/1.6 var(--mono); color: var(--text); margin: 0 0 14px; }
 .hero p { color: var(--muted); font-size: clamp(1.0625rem, 1.6vw, 1.15rem); max-width: 56ch; }
 .hero .eyebrow { font-size: 13px; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
 .hero .source { margin: 16px 0 0; font-size: 15px; color: var(--dusk); }
+/* The latest release and its date, over the title: its notes. */
+.release-pill { margin: 0 0 18px; }
+.release-pill a {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px;
+  border: 1px solid rgb(0 255 204 / 0.35); border-radius: 999px; background: rgb(0 255 204 / 0.08);
+  color: var(--aurora); font: 500 13px var(--mono); text-decoration: none;
+}
+.release-pill a:hover { border-color: var(--aurora); color: var(--aurora); }
 .hero .source a { color: var(--muted); }
 /* The tour of the console's screens. */
 .hero-video { position: relative; }
@@ -239,6 +247,10 @@ pre code { background: none; border: 0; padding: 0; color: #d6deeb; }
 .section { max-width: 1180px; margin: 0 auto; padding: clamp(48px, 7vw, 88px) var(--gutter-r) 0 var(--gutter-l); }
 .section > h2, .columns h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.025em; margin: 0 0 28px; }
 .section.narrow { max-width: 720px; padding-bottom: 80px; }
+/* The page not found, under the sky. */
+.lost { padding: clamp(56px, 10vw, 120px) max(var(--gutter-r), calc((100% - 1180px) / 2)) clamp(72px, 12vw, 140px) max(var(--gutter-l), calc((100% - 1180px) / 2)); }
+.lost h1 { font-size: clamp(2.25rem, 6vw, 3.5rem); letter-spacing: -0.03em; margin: 0 0 14px; }
+.lost p { color: var(--muted); max-width: 50ch; }
 .cards { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
 .card { display: grid; gap: 10px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
 .card h3 { margin: 0; font-size: 18px; letter-spacing: -0.01em; }
@@ -270,6 +282,8 @@ pre code { background: none; border: 0; padding: 0; color: #d6deeb; }
 .compare td.no { color: var(--dusk); font-size: 18px; }
 
 .faq { display: grid; gap: 10px; max-width: 860px; }
+/* Two columns of questions where there is room for them. */
+@media (min-width: 1000px) { .faq { max-width: none; grid-template-columns: 1fr 1fr; align-items: start; } }
 .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 18px; }
 .faq summary { font-family: var(--display); letter-spacing: -0.01em; }
 .faq summary, .release summary { cursor: pointer; padding: 14px 28px 14px 0; font-weight: 600; list-style: none; position: relative; }
@@ -523,9 +537,9 @@ pre.has-copy { position: relative; padding-right: 76px; }
   .hero { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding-top: 24px; padding-bottom: 40px; }
   .hero-text { display: contents; }
   .hero-video { order: 1; margin: 6px 0 22px; }
-  .hero-text > p:not(.eyebrow, .sub), .actions, .hero .source { order: 2; }
+  .hero-text > p:not(.release-pill, .eyebrow, .sub), .actions, .hero .source { order: 2; }
   .hero .sub { margin-bottom: 0; }
-  .hero-text > p:not(.eyebrow, .sub) { margin-top: 0; }
+  .hero-text > p:not(.release-pill, .eyebrow, .sub) { margin-top: 0; }
   .actions { margin-top: 6px; }
   .actions .button { flex: 1 1 100%; text-align: center; }
   .hero .source a, .footer a { display: inline-block; padding: 10px 0; }

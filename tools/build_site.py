@@ -558,6 +558,8 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
         f'{current if c == lang else ""}>{html.escape(n)}</a></li>'
         for c, d, n, hl in LANGUAGES)
     language_name = next(n for c, _, n, _ in LANGUAGES if c == lang)
+    # The aurora behind the home page's hero, and the page not found's.
+    aurora = bool(hero)
     home = f"{to_root}{lang_dir(lang)}"
     full_title = full_title or ("PlayGuard" if not title else f"{title} · PlayGuard")
     head_extra = "\n".join(head)
@@ -592,12 +594,14 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <link rel="sitemap" type="application/xml" href="{SITE_URL}sitemap.xml">
   <link rel="alternate" type="application/atom+xml" title="PlayGuard releases" href="{SITE_URL}releases.atom">
 {"".join(json_ld(d) for d in structured)}
+  <link rel="preload" href="{to_root}assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{to_root}assets/fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{to_root}assets/site.css">
 {umami}</head>
 <body class="{body_class}">
   <a class="skip" href="#main">{t('skip')}</a>
-  <div class="sky{' sky-home' if hero else ''}">
-  {'<canvas id="sky" aria-hidden="true"></canvas>' if hero else ''}
+  <div class="sky{' sky-home' if aurora else ''}">
+  {'<canvas id="sky" aria-hidden="true"></canvas>' if aurora else ''}
   <header class="top">
     {switcher(t, lang, to_root, home, "playguard", f'<img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span>', VERSIONS)}
     <nav class="nav" aria-label="PlayGuard">
@@ -705,6 +709,8 @@ def home_body(t, lang, to_root):
     home = f"{to_root}{lang_dir(lang)}"
     return f"""    <section class="hero">
       <div class="hero-text">
+        <p class="release-pill"><a href="{home}changelog/#v{version}">v{version}
+          · <time class="release-date" datetime="{date}">{date}</time></a></p>
         <p class="eyebrow">{t('hero_eyebrow')}</p>
         <h1>{hero_title(t)}</h1>
         <p class="sub">{t('hero_sub')}</p>
@@ -713,8 +719,7 @@ def home_body(t, lang, to_root):
           <a class="button primary" href="#install">{t('install_cta')}</a>
           <a class="button" href="{to_root}simulator/?lang={code}">{t('try')}{size}</a>
         </div>
-        <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a>
-          · <a href="{home}changelog/#v{version}"><time class="release-date" datetime="{date}">{date}</time></a></p>
+        <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a></p>
         <p class="source"><a href="{home}docs/troubleshooting/#{locked_out_anchor(lang)}">{t('locked_out_link')}</a></p>
       </div>
       <div class="hero-video">
@@ -1435,8 +1440,9 @@ def main():
         blocks.append(f'      <div class="not-found" data-lang="{lang}" lang="{html_lang}"{" hidden" if lang != "en-US" else ""}>'
                       f'<h1>{tl("not_found_title")}</h1><p>{tl("not_found_text")}</p>'
                       f'<p><a class="button primary" href="{base_url}{f"{folder}/" if folder else ""}">{tl("home")}</a></p></div>')
-    write(out, "404.html", page(t, "en-US", base_url, "", t("not_found_title"),
-                                '    <section class="section narrow">\n' + "\n".join(blocks) + "\n    </section>",
+    # Under the sky, as the home page's hero.
+    write(out, "404.html", page(t, "en-US", base_url, "", t("not_found_title"), "",
+                                hero='    <section class="lost">\n' + "\n".join(blocks) + "\n    </section>\n",
                                 body_class="not-found-page", indexed=False))
     # The site's own files, then what the pages use from the repository and
     # the screenshots of tools/site_screenshots.mjs.
