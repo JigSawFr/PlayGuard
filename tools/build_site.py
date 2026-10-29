@@ -108,8 +108,9 @@ SCREENSHOTS = ["dashboard", "play_timer", "per_day", "activity", "restrictions",
 LOCALIZED_SHOTS = SCREENSHOTS + ["activity_game"]
 FAQ = ["closed", "offline", "ban", "children", "sysmodule", "emummc", "switch2", "free"]
 FEATURES = ["timer", "activity", "restrictions", "console", "app", "history", "notices", "languages"]
-# The three the home page puts first; the others in a shorter list under them.
-FEATURED = ["timer", "restrictions", "console"]
+# The three the home page puts first, each with the screen it shows; the
+# others in a shorter list under them.
+FEATURED = {"timer": "play_timer", "restrictions": "restrictions", "console": "console"}
 # Each feature's icon: a line drawing on a 24px grid, in the text's colour.
 ICONS = {
     "timer": '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6M12 2v3"/>',
@@ -121,6 +122,18 @@ ICONS = {
     "notices": '<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
     "languages": '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/>',
 }
+
+
+# The console's two sides around the tour (site.css's .device): a stick and
+# a cross on the left, the four buttons and a stick on the right; a
+# handheld of our own, no maker's.
+DEVICE_GRIPS = (
+    '<svg class="grip grip-l" viewBox="0 0 140 470" aria-hidden="true">'
+    '<path d="M86 44h20"/><circle class="stick" cx="70" cy="128" r="34"/><circle class="cap" cx="70" cy="128" r="22"/>'
+    '<circle cx="70" cy="262" r="12"/><circle cx="70" cy="330" r="12"/><circle cx="36" cy="296" r="12"/><circle cx="104" cy="296" r="12"/></svg>'
+    '<svg class="grip grip-r" viewBox="0 0 140 470" aria-hidden="true">'
+    '<path d="M34 44h20M44 34v20"/><circle cx="70" cy="92" r="12"/><circle cx="70" cy="160" r="12"/><circle cx="36" cy="126" r="12"/><circle cx="104" cy="126" r="12"/>'
+    '<circle class="stick" cx="70" cy="300" r="34"/><circle class="cap" cx="70" cy="300" r="22"/></svg>')
 
 
 def icon(name):
@@ -700,10 +713,13 @@ def hero_title(t):
 def home_body(t, lang, to_root):
     """The home page: its hero (under the header, on the sky), and the rest."""
     code = lang
-    def feature(key):
-        return (f'      <li class="card">{icon(key)}'
-                f'<h3>{t(f"f_{key}_title")}</h3><p>{t(f"f_{key}_text")}</p></li>')
-    featured = "\n".join(feature(k) for k in FEATURES if k in FEATURED)
+    def feature(key, shot=None):
+        # A featured one shows the top of its screen, fading into the card.
+        glimpse = (f'<img class="card-shot" src="{to_root}assets/{screenshot(lang, shot)}" alt="" width="1280" height="720" loading="lazy">'
+                   if shot else "")
+        return (f'      <li class="card{" card-featured" if shot else ""}">{icon(key)}'
+                f'<h3>{t(f"f_{key}_title")}</h3><p>{t(f"f_{key}_text")}</p>{glimpse}</li>')
+    featured = "\n".join(feature(k, FEATURED[k]) for k in FEATURES if k in FEATURED)
     others = "\n".join(feature(k) for k in FEATURES if k not in FEATURED)
     # PlayGuard and Nintendo's app on what each needs: PlayGuard needs none of
     # it but a custom firmware, which the app does not.
@@ -737,11 +753,16 @@ def home_body(t, lang, to_root):
         <p class="source"><a href="{REPO_URL}/releases/latest">{t('download')}</a></p>
         <p class="source"><a href="{home}docs/troubleshooting/#{locked_out_anchor(lang)}">{t('locked_out_link')}</a></p>
       </div>
+      <!-- The tour on a console's screen: a handheld drawn by site.css
+           (.device), leaning towards the text on a wide screen. -->
+      <div class="device">
+      {DEVICE_GRIPS}
       <div class="hero-video">
         <video src="{to_root}assets/{tour_video(lang)}" muted loop playsinline preload="none"
                poster="{to_root}assets/{screenshot(lang, 'dashboard')}" aria-label="{t('tour_title')}"></video>
         <button class="video-toggle" type="button" hidden aria-label="{t('video_play')}" data-play="{t('video_play')}" data-pause="{t('video_pause')}"></button>
         <button class="video-sound" type="button" hidden aria-pressed="false" aria-label="{t('video_sound_on')}" data-on="{t('video_sound_on')}" data-off="{t('video_sound_off')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="m16 9 6 6M22 9l-6 6"/></svg></button>
+      </div>
       </div>
     </section>
 """, f"""    <aside class="callout warning wide"><p><strong>{t('cfw_title')}</strong> {t('cfw_text')}</p></aside>
