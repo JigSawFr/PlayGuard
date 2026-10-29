@@ -1,4 +1,4 @@
-<!-- translated from docs/themes.md, sha256 293a65fda593 -->
+<!-- translated from docs/themes.md, sha256 9640cb722bc3 -->
 # Thèmes et palettes
 
 PlayGuard dessine chaque écran selon deux choix des *Préférences* :

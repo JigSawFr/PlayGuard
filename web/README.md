@@ -178,7 +178,8 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   `aurore_web_button()`, which the page calls to press a button; the CJK font
   below as Aurore's fallback when it is there at start-up.
 - **Japanese, Korean and Chinese**: a browser has no system font for Aurore
-  to fall back on, and PlayGuard's Latin font has no han, kana or hangul. The
+  to fall back on, and the Latin font (Inter, Aurore's off the Switch) has no
+  han, kana or hangul. The
   web build cuts the characters those four languages' catalogs use
   (PlayGuard's and Aurore's, for the theme names) out of Noto Sans CJK
   (SIL Open Font License; about 660 KiB, `tools/web_cjk_font.py`, which needs

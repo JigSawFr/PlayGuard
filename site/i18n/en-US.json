@@ -226,7 +226,7 @@
  "faq_offline_q": "Does it need the internet, a Nintendo account or the phone app?",
  "faq_offline_a": "No. Everything is set on the console. The play timer only needs the network clock to have been set once: from public time servers, or from the console clock on a console without internet.",
  "faq_ban_q": "Can it get the console banned?",
- "faq_ban_a": "PlayGuard never contacts Nintendo: online, it only reaches public time servers and GitHub. What gets consoles banned is custom firmware going online to Nintendo. No ban tied to parental-control or clock changes is documented; that is not a guarantee.",
+ "faq_ban_a": "PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub and switchbrew. What gets consoles banned is custom firmware going online to Nintendo. No ban tied to parental-control or clock changes is documented; that is not a guarantee.",
  "faq_children_q": "Can each child have their own limit?",
  "faq_children_a": "No: the console's play timer has one limit for the whole console. A replacement sysmodule can set one per user account, but it replaces the console's parental controls with its own.",
  "faq_sysmodule_q": "PlayGuard or a replacement sysmodule?",

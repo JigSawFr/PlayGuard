@@ -226,7 +226,7 @@
  "faq_offline_q": "Is internet, een Nintendo-account of de app nodig?",
  "faq_offline_a": "Nee. Alles wordt op de console ingesteld. De timer heeft alleen een netwerkklok nodig die één keer is ingesteld: via openbare tijdservers, of op een console zonder internet via de consoleklok.",
  "faq_ban_q": "Kan de console hierdoor een ban krijgen?",
- "faq_ban_a": "PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers en GitHub. Consoles krijgen een ban wanneer custom firmware verbinding maakt met Nintendo. Er is geen ban bekend door wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.",
+ "faq_ban_a": "PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers, GitHub en switchbrew. Consoles krijgen een ban wanneer custom firmware verbinding maakt met Nintendo. Er is geen ban bekend door wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.",
  "faq_children_q": "Kan elk kind een eigen limiet hebben?",
  "faq_children_a": "Nee: de timer van de console heeft één limiet voor de hele console. Een vervangende sysmodule kan er één per gebruikersaccount instellen, maar vervangt het ouderlijk toezicht van de console door zijn eigen.",
  "faq_sysmodule_q": "PlayGuard of een vervangende sysmodule?",
