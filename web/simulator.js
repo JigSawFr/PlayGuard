@@ -555,7 +555,7 @@ function start() {
 // ---- Input ------------------------------------------------------------
 
 function press(button, down) {
-  window.Module?._brls_web_button?.(button, down ? 1 : 0);
+  window.Module?._aurore_web_button?.(button, down ? 1 : 0);
 }
 
 // The keys SDL reads itself, as the buttons they press, for the steps.
