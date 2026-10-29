@@ -550,10 +550,14 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
         head.append(f'  <link rel="alternate" type="text/markdown" href="{markdown_url}">')
     if NOINDEX or not indexed:
         head.append('  <meta name="robots" content="noindex">')
+    # The languages, a menu under the header's button (a popover, as the
+    # menu of Boréale's sites): this page in each.
+    current = ' aria-current="true"'
     options = "\n".join(
-        f'        <option value="{to_root}{f"{d}/" if d else ""}{path}" data-lang="{c}" lang="{hl}"'
-        f'{" selected" if c == lang else ""}>{html.escape(n)}</option>'
+        f'        <li><a href="{to_root}{f"{d}/" if d else ""}{path}" data-lang="{c}" lang="{hl}" hreflang="{hl}"'
+        f'{current if c == lang else ""}>{html.escape(n)}</a></li>'
         for c, d, n, hl in LANGUAGES)
+    language_name = next(n for c, _, n, _ in LANGUAGES if c == lang)
     home = f"{to_root}{lang_dir(lang)}"
     full_title = full_title or ("PlayGuard" if not title else f"{title} · PlayGuard")
     head_extra = "\n".join(head)
@@ -604,10 +608,14 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
       <a href="{REPO_URL}" class="nav-gh">GitHub</a>
     </nav>
     <div class="settings">
-      <span class="picker picker-lang"><span class="picker-face" aria-hidden="true">{code.split("-")[0].upper()}</span>
-      <select id="site-language" aria-label="{t('language')}">
+      <button class="lang-button" type="button" popovertarget="languages" aria-label="{t('language')} · {html.escape(language_name)}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>
+        <span class="lang-name">{html.escape(language_name)}</span><span class="lang-code">{code.split("-")[0].upper()}</span>
+        <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <ul id="languages" class="langs" popover aria-label="{t('language')}">
 {options}
-      </select></span>
+      </ul>
     </div>
   </header>
 {hero}  </div>
