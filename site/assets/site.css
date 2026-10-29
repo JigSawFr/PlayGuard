@@ -7,6 +7,9 @@
    scripts fall back to the system's. */
 @font-face { font-family: "Sora"; src: url("fonts/sora.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
 @font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap; }
+/* The language menu's flags, the same everywhere (Windows draws none of its
+   own): the 15 cut out of Twemoji's (CC-BY 4.0, fonts/LICENSE-twemoji-flags.txt). */
+@font-face { font-family: "Twemoji Flags"; src: url("fonts/twemoji-flags.woff2") format("woff2"); unicode-range: U+1F1E6-1F1FF; font-display: swap; }
 @font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
 
 :root {
@@ -119,9 +122,12 @@ pre code { background: none; border: 0; padding: 0; color: #d6deeb; }
 .lang-button .chevron { width: 14px; height: 14px; color: var(--muted); transition: transform 0.2s; }
 .lang-button:has(+ .langs:popover-open) .chevron { transform: rotate(180deg); color: var(--aurora); }
 .lang-code { display: none; font: 500 13px var(--mono); }
+/* A language's flag before its name, in the button and in the menu. */
+.flag { flex: none; font: 18px/1 "Twemoji Flags", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+.langs .flag { margin-right: 10px; }
 .langs {
   position: absolute; inset: auto; top: 72px; right: 16px; margin: 0;
-  width: min(380px, calc(100vw - 24px)); max-height: min(70vh, 520px); overflow: auto; padding: 8px;
+  width: min(460px, calc(100vw - 24px)); max-height: min(70vh, 520px); overflow: auto; padding: 8px;
   list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
   border: 1px solid var(--line); border-radius: 16px; color: var(--text); background: var(--night);
   box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.8);
@@ -271,16 +277,6 @@ pre code { background: none; border: 0; padding: 0; color: #d6deeb; }
 .gallery a { display: block; position: relative; }
 .gallery img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); display: block; transition: transform 0.2s, border-color 0.2s; }
 .gallery figcaption { color: var(--muted); font-size: 15px; margin-top: 8px; }
-
-/* PlayGuard and Nintendo's app. */
-.compare table { width: 100%; max-width: 760px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); border-spacing: 0; border-collapse: separate; overflow: hidden; }
-.compare th, .compare td { position: relative; padding: 13px 18px; border-bottom: 1px solid var(--line); text-align: left; }
-.compare thead th { font-family: var(--display); background: var(--night-2); }
-.compare thead th, .compare td.yes, .compare td.no { text-align: center; width: 30%; }
-.compare tbody th { font-weight: 500; }
-.compare tr:last-child > * { border-bottom: 0; }
-.compare td.yes { color: var(--aurora); font-weight: 700; font-size: 18px; }
-.compare td.no { color: var(--dusk); font-size: 18px; }
 
 .faq { display: grid; gap: 10px; max-width: 860px; }
 /* Two columns of questions where there is room for them. */
@@ -615,9 +611,6 @@ pre.has-copy { position: relative; padding-right: 76px; }
   .lightbox-prev, .lightbox-next { top: auto; bottom: calc(14px + env(safe-area-inset-bottom)); }
   /* The features: each one's icon beside its title. */
   .cards { gap: 12px; }
-  .compare th, .compare td { padding: 12px 10px; }
-  .compare thead th, .compare td.yes, .compare td.no { width: 24%; }
-  .compare thead th { font-size: 14px; }
   .card { grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; padding: 16px; }
   .card .icon { grid-row: span 2; }
   .band { flex-direction: column; align-items: flex-start; margin: 48px var(--gutter-r) 0 var(--gutter-l); padding: 24px 20px; }
@@ -766,16 +759,6 @@ pre.has-copy { position: relative; padding-right: 76px; }
   .gallery.staged > figure:not(.gallery-stage) a:hover img { opacity: 1; transform: none; }
 }
 
-/* PlayGuard's column of the comparison, lit. */
-.compare thead th:nth-child(2) { color: var(--aurora); background: linear-gradient(180deg, rgb(0 255 204 / 0.16), rgb(0 255 204 / 0.06)); }
-.compare tr > :nth-child(2) { box-shadow: inset 1px 0 0 rgb(0 255 204 / 0.3), inset -1px 0 0 rgb(0 255 204 / 0.3); }
-.compare tbody td:nth-child(2) { background: rgb(0 255 204 / 0.04); }
-.compare td.yes span[aria-hidden], .compare td.no span[aria-hidden] {
-  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: 15px;
-}
-.compare td.yes span[aria-hidden] { background: rgb(0 255 204 / 0.14); box-shadow: 0 0 18px -4px rgb(0 255 204 / 0.6); }
-.compare td.no span[aria-hidden] { background: rgb(133 147 174 / 0.12); }
-
 /* The steps joined by a line of aurora, their numbers glowing. */
 .steps > li::before { box-shadow: 0 0 0 4px rgb(0 255 204 / 0.1), 0 0 20px -2px rgb(0 255 204 / 0.5); }
 .steps > li:not(:last-child)::after {
@@ -816,10 +799,6 @@ pre.has-copy { position: relative; padding-right: 76px; }
 @media (max-width: 600px) {
   .cards, .cards-small { grid-template-columns: minmax(0, 1fr); }
 }
-@media (max-width: 400px) {
-  .compare th, .compare td { padding: 11px 6px; font-size: 14.5px; }
-  .compare tbody th { padding-left: 12px; }
-}
 
 /* From one page of the site to the next: a short cross-fade, the header
    staying where it is (where the browser can; not with less motion asked). */
@@ -850,7 +829,7 @@ pre.has-copy { position: relative; padding-right: 76px; }
   .prose a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; color: #333; word-break: break-all; }
   .prose h2, .prose h3 { break-after: avoid; }
   .prose pre, .prose table, .shots figure, .callout { break-inside: avoid; }
-  .card, .compare table { box-shadow: none; }
+  .card { box-shadow: none; }
   .reveal, .reveal .card { opacity: 1 !important; transform: none !important; }
 }
 
