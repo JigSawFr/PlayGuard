@@ -377,6 +377,8 @@ if (PLAYGUARD_WEB)
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/mark.svg ${PLAYGUARD_SITE}/mark.svg
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/site/assets/marks ${PLAYGUARD_SITE}/marks
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/site/assets/fonts/sora.woff2 ${PLAYGUARD_SITE}/sora.woff2
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/site/assets/fonts/twemoji-flags.woff2
+                ${CMAKE_CURRENT_SOURCE_DIR}/site/assets/fonts/LICENSE-twemoji-flags.txt ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/apple-touch-icon.png ${PLAYGUARD_SITE}/apple-touch-icon.png
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/icon-192.png ${CMAKE_CURRENT_SOURCE_DIR}/images/icon-512.png ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/images/splash ${PLAYGUARD_SITE}/splash
