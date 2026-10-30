@@ -19,6 +19,8 @@ namespace forwarders
 constexpr size_t MAX_NAME   = 64;   // characters (code points) of a name or an author
 constexpr size_t MAX_AUTHOR = 64;
 constexpr int    ICON_X_MIDDLE = 50;   // an icon from the album: the screenshot's middle square
+// "schema" in forwarders.json (none before it: read as 1).
+constexpr int    SCHEMA = 1;
 
 struct Made
 {
@@ -76,8 +78,10 @@ struct Made
     bool        video = true;
 };
 
-// Every one remembered, in the file's order. A damaged file reads as none;
-// an entry without an ID or an .nro is skipped.
+// Every one remembered, in the file's order. A damaged file reads as none,
+// and so does one a newer version wrote (its "schema" above SCHEMA), which
+// save() and forget() then leave as it is; an entry without an ID or an .nro
+// is skipped. A save keeps the keys this version does not know.
 std::vector<Made> list();
 
 // The list as a JSON array (a settings backup's), and back: entries as

@@ -61,6 +61,7 @@ struct Record
     std::string reset_at;           // "HH:MM" the play time started over
     bool        accounts_known = false;   // the accounts were listed once
     std::vector<KnownAccount> accounts;   // oldest first
+    bool        newer = false;  // the file came from a newer version: read as empty, never saved
 };
 
 struct Observation
@@ -109,8 +110,10 @@ std::vector<std::string> check_accounts(Record& rec, const std::vector<std::stri
 std::vector<std::pair<std::string, std::string>> new_accounts(const Record& rec, const std::vector<std::string>& ids,
                                                               const std::string& today);
 
-// watch.json. parse() never fails: what is missing or out of range stays
-// unknown (a first reading), and a damaged file is a fresh record.
+// watch.json ("schema": SCHEMA). parse() never fails: what is missing or out
+// of range stays unknown (a first reading), and a damaged file is a fresh
+// record; so is a newer version's, with `newer` set.
+constexpr int SCHEMA = 1;
 Record      parse(const std::string& text);
 std::string serialize(const Record& rec);
 

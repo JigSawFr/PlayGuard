@@ -356,7 +356,7 @@ PlayGuard opens again, goes unseen.
 
 | Key | Type | Values |
 |---|---|---|
-| `schema` | integer | `1` |
+| `schema` | integer | `1`; a file with a higher one (a newer version's) is read as none and never written over |
 | `date` | string | `"YYYY-MM-DD"`, the day `spent_s` belongs to |
 | `spent_s` | integer | today's time spent, last seen (today's limit minus the time left), `0` to `86400` seconds. Written at most every 5 minutes of play, so it can be a little behind |
 | `offset_s` | integer | the user clock minus the steady clock (which neither a clock change nor sleep mode moves), in seconds |

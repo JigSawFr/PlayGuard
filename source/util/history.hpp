@@ -14,6 +14,9 @@ namespace history
 {
 
 constexpr size_t MAX_ENTRIES = 500;
+// "schema" in history.json. A file a newer version wrote reads as empty, and
+// append() leaves it as it is (the change is not recorded).
+constexpr int    SCHEMA = 1;
 
 struct Entry
 {

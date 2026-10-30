@@ -180,6 +180,10 @@ Record parse(const std::string& text)
     Record rec;
     nlohmann::json j;
     if (!json_util::parse(text, &j) || !j.is_object()) return rec;
+    if (json_util::newer_schema(j, SCHEMA)) {
+        rec.newer = true;
+        return rec;
+    }
     auto str = [&j](const char* key) { return json_util::string_at(j, key); };
     auto num = [&j](const char* key, int64_t* out) { return json_util::integer_at(j, key, out); };
 
@@ -231,7 +235,7 @@ Record parse(const std::string& text)
 
 std::string serialize(const Record& rec)
 {
-    nlohmann::json j = { { "schema", 1 } };
+    nlohmann::json j = { { "schema", SCHEMA } };
     if (!rec.date.empty()) j["date"] = rec.date;
     if (!rec.date.empty() && rec.spent_s >= 0) j["spent_s"] = rec.spent_s;
     if (rec.offset_known) {
