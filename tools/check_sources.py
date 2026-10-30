@@ -74,6 +74,7 @@ CONSOLE_ONLY = {
     "album.c": "sim_album.cpp",
     "console_info.c": "sim_console.c",
     "crash_handler.c": "the console's exception handler",
+    "device_key.c": "sim_device_key.cpp",
     "forwarder.c": "sim_forwarder.cpp",
     "gamecheck.c": "sim_gamecheck.c",
     "gate_nx.c": "the PIN gate's .nro",

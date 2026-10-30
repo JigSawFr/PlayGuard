@@ -1,10 +1,10 @@
-// github_auth — signs PlayGuard in to GitHub with the device flow, for the
+// github_auth — signs the app in to GitHub with the device flow, for the
 // developer tools' development builds (dev_builds.hpp: GitHub hands Actions
 // artifacts to signed-in users only) and the reports sent as gists.
 //
-// PlayGuard shows a short code and github.com/login/device (a QR code); the
-// developer enters the code on a phone and authorises the "PlayGuard dev
-// builds" GitHub App; PlayGuard polls until GitHub hands it a token. The app
+// The app shows a short code and github.com/login/device (a QR code); the
+// developer enters the code on a phone and authorises the app's "<app> dev
+// builds" GitHub App; the app polls until GitHub hands it a token. The app
 // asks for two permissions only: Actions (read), as GitHub hands artifacts
 // only to a token allowed to read Actions, and Gists (write), so that "Send a
 // report online" can make a secret gist (log_upload.hpp); otherwise the token
@@ -15,7 +15,9 @@
 // The earlier OAuth app's tokens ("gho_…") are refused the artifacts: token()
 // reads one as none, so the next opening asks to sign in again.
 //
-// The token is kept in its own file, sd:/config/playguard/github_token,
+// The token is kept in its own file, sd:/config/<app>/github_token,
+// sealed for this console (util/secret_box: one an older version kept as it
+// is gets sealed when it is read),
 // never in config.json, which "Send a report online" sends. It does not
 // expire (the app has token expiry off: docs/contributing/releases.md), so GitHub hands
 // no refresh token; one GitHub answers 401 (revoked, or the app's
@@ -37,7 +39,7 @@ constexpr const char* CLIENT_ID = "Iv23lipQVAoOXRkdiIc1";
 
 struct DeviceCode
 {
-    std::string device_code;        // kept by PlayGuard, sent back when polling
+    std::string device_code;        // kept by the app, sent back when polling
     std::string user_code;          // "ABCD-1234", shown
     std::string verification_uri;   // "https://github.com/login/device"
     int         interval = 5;       // seconds between polls
@@ -82,8 +84,8 @@ std::string api_url(const std::string& path);
 std::vector<std::string> api_headers(const std::string& token);
 
 // Asks GitHub for a code. Blocking (network). On the desktop build
-// PLAYGUARD_SIM_GITHUB_LOGIN ("ok", "denied" or "offline") replaces it.
-bool start(DeviceCode* out, std::string* error);
+// <APP>_SIM_GITHUB_LOGIN ("ok", "denied" or "offline") replaces it.
+[[nodiscard]] bool start(DeviceCode* out, std::string* error);
 // Asks whether the code was authorised. Blocking.
 Poll poll(const DeviceCode& code, std::string* token, std::string* error);
 
