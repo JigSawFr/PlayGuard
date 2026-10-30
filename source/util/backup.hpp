@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -24,51 +25,61 @@ constexpr int MAX_RATING_ORG  = 12;
 constexpr int MAX_DAY_MINUTES = 1440;
 constexpr int DAY_NO_LIMIT    = 0xFFFF;
 
-// Each *_ok flag says the value was read from the console when the backup was
-// made: a value that was not is neither saved nor restored.
+// The settings of the "Custom" level.
+struct Custom
+{
+    uint8_t rating_age      = 0;   // 0 == no age restriction, else up to 21
+    bool    sns_restricted  = false;
+    bool    comm_restricted = false;
+    bool    operator==(const Custom&) const = default;
+};
+
+// Console › Forwarders, not on the console's side: what PlayGuard made
+// (forwarders.json's, as util/forwarders.hpp keeps it) and whether the
+// homebrew menu was locked.
+struct Forwarders
+{
+    std::vector<forwarders::Made> made;
+    bool                          hbmenu_locked = false;
+};
+
+// Each value is there when it was read from the console when the backup was
+// made: one that was not is neither saved nor restored. (Mind the
+// std::optional<bool>s: `if (s.vr_restricted)` asks whether it is known,
+// `*s.vr_restricted` what it is.)
 struct Snapshot
 {
     std::string created;    // local time, "2026-10-07 18:30" (shown in the list)
     std::string firmware;   // "23.0.1" (information only)
 
-    bool     level_ok = false;
-    uint32_t level    = 0;  // PctlSafetyLevel, 0..4
+    std::optional<uint32_t> level;   // PctlSafetyLevel, 0..4
+    std::optional<Custom>   custom;
+    std::optional<bool>     vr_restricted;
 
-    bool    custom_ok    = false;   // the settings of the "Custom" level
-    uint8_t rating_age   = 0;       // 0 == no age restriction, else up to 21
-    bool    sns_restricted  = false;
-    bool    comm_restricted = false;
-
-    bool vr_ok         = false;
-    bool vr_restricted = false;
-
-    bool days_ok = false;
-    std::array<uint16_t, 7> days{};   // Sun..Sat minutes, 0xFFFF == no limit
+    std::optional<std::array<uint16_t, 7>> days;   // Sun..Sat minutes, 0xFFFF == no limit
 
     // "Time's up" alarm off (1458 / 1953, a debug-class command: restored
     // only with the advanced play-timer actions on). Saved with the limits.
-    bool alarm_ok       = false;
-    bool alarm_disabled = false;
+    std::optional<bool> alarm_disabled;
 
     // The default rating body (1037 / 1038), which the age limit is read with.
-    bool        rating_org_ok = false;
-    uint32_t    rating_org    = 0;
+    std::optional<uint32_t> rating_org;
 
     // For the record, not restored: the 0x44 PlayTimerSettings block as read
     // (136 hex digits), to tell later what the fields PlayGuard does not
     // decode held.
     std::string raw_block;
 
-    // Console › Forwarders, not on the console's side: what PlayGuard made
-    // (forwarders.json's, as util/forwarders.hpp keeps it) and whether the
-    // homebrew menu was locked. Restored apart, after the rest (backup_flow):
-    // the ones missing remembered again, then installed again if wanted.
-    bool                          forwarders_ok = false;
-    std::vector<forwarders::Made> forwarders;
-    bool                          hbmenu_locked = false;
+    // Restored apart, after the rest (backup_flow): the ones missing
+    // remembered again, then installed again if wanted.
+    std::optional<Forwarders> forwarders;
 
     // Nothing a restore would write.
-    bool empty() const { return !level_ok && !custom_ok && !vr_ok && !days_ok && !rating_org_ok; }
+    bool empty() const
+    {
+        return !level.has_value() && !custom.has_value() && !vr_restricted.has_value() && !days.has_value() &&
+               !rating_org.has_value();
+    }
 };
 
 // What a restore would do, value by value, as its summary compares them with
