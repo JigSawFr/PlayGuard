@@ -33,6 +33,7 @@ behind all meet files from another version. The rule:
 | `nand/<system>/history.json` | `util/history.cpp` | `history::SCHEMA` 1 | read as empty, not put aside, never written (changes not recorded) | an entry's skipped | `tests/history/` |
 | `nand/<system>/watch.json` | `action/outside_change_logic.cpp` | `outside_change_logic::SCHEMA` 1 | a fresh record, never saved | skipped | `tests/outside_change_logic/` |
 | `nand/<system>/forwarders.json` | `util/forwarders.cpp` | `forwarders::SCHEMA` 1 (none before: 1) | read as none, never written | kept on save (the file's and each entry's) | `tests/forwarders/` |
+| `github_token` | `util/github_auth.cpp` | the `v1:` prefix of `util/secret_box` | another console's box, or one this version cannot open: signed out, the file left as it is | a plain token (an older version's) sealed where it lies | `tests/secret_box/` |
 | `migrations.json` | `util/migrations.cpp` | `migrations::SCHEMA` 1 + `level` | a higher `level` brought back, nothing runs | skipped | `tests/migrations/` |
 | `nand/<system>/backups/*.json` | `util/backup.cpp` | `FORMAT` 1 (`format`), strict | refused | skipped | `tests/backup/` |
 | `compat.json`, `compat-<N>.json` (release assets) | `tools/gen_compat.py` → `util/update.cpp` | `update::COMPAT_SCHEMA` 1; `compat.json` stays 1 forever | `compat-<COMPAT_SCHEMA>.json` fetched first, `compat.json` when missing or unreadable | skipped | `tests/update/` |
