@@ -565,7 +565,8 @@ Assistant), and clears (empty retained publish) when the entry is removed:
 
 The console keeps it as it came (at most 512 bytes; a larger one is
 ignored) in `nand/<system>/sync/integration.json`, written by whichever of
-PlayGuard and the agent holds the link. PlayGuard shows the version in
+PlayGuard and the agent holds the link. One of a newer `schema` is kept but
+not read (no version known). PlayGuard shows the version in
 *Remote access › Home Assistant* and in the report, and checks the
 integration's latest release with its other updates (*Check for updates
 every day*, *Check for updates*), only once the integration is known: a

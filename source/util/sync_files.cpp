@@ -9,6 +9,7 @@
 #include <cstring>
 #include <sys/stat.h>
 
+#include "util/json_util.hpp"
 #include "util/paths.hpp"
 #include "util/title_id.hpp"
 
@@ -250,7 +251,7 @@ Integration parse_integration(const std::string& doc)
 {
     Integration out;
     const nlohmann::json j = nlohmann::json::parse(doc, nullptr, false);
-    if (!j.is_object()) return out;
+    if (!j.is_object() || json_util::newer_schema(j, INTEGRATION_SCHEMA)) return out;
     out.version = version_of(j, "version");
     out.homeassistant = version_of(j, "homeassistant");
     return out;

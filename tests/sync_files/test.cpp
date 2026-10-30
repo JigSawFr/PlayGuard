@@ -209,8 +209,10 @@ static void test_integration()
 {
     auto i = sync_files::parse_integration(R"({"schema":1,"version":"0.2.0","homeassistant":"2026.10.1"})");
     CHECK(i.version == "0.2.0" && i.homeassistant == "2026.10.1");
-    i = sync_files::parse_integration(R"({"schema":2,"version":"1.0.0-beta.1","extra":[1,2]})");
-    CHECK(i.version == "1.0.0-beta.1" && i.homeassistant.empty());   // a newer schema: what it knows
+    i = sync_files::parse_integration(R"({"version":"1.0.0-beta.1","extra":[1,2]})");
+    CHECK(i.version == "1.0.0-beta.1" && i.homeassistant.empty());   // no schema: 1; a field more skipped
+    i = sync_files::parse_integration(R"({"schema":2,"version":"1.0.0","homeassistant":"2026.10.1"})");
+    CHECK(i.version.empty() && i.homeassistant.empty());   // a newer schema: not read
     for (const char* bad : { "", "not json", "[1]", R"({"version":5})", R"({"version":"v1.0"})",
                              R"({"version":"1.0 beta"})", R"({"version":"1.0.0;rm"})",
                              R"({"version":"1234567890123456789012345"})" }) {

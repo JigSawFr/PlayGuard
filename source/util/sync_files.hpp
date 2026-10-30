@@ -94,8 +94,11 @@ struct Integration
     std::string version;         // "0.2.0"; "" when unknown
     std::string homeassistant;   // "2026.10.1"; "" when unknown
 };
+// The integration document's "schema" this version reads.
+constexpr int INTEGRATION_SCHEMA = 1;
 // Its two versions; each "" when missing or not a version (digits first, then
-// at most 24 of [0-9A-Za-z.+-]). A document that is not JSON gives both "".
+// at most 24 of [0-9A-Za-z.+-]). A document that is not JSON, or of a newer
+// schema than INTEGRATION_SCHEMA, gives both "".
 Integration parse_integration(const std::string& doc);
 // Writes `doc` as it came, or removes the file when "" (through the writer).
 void write_integration(const std::string& doc);
