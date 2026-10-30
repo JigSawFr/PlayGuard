@@ -282,3 +282,44 @@ const char *sync_conf_problem(const SyncConf *c)
         if (strchr(fields[i], '\n') || strchr(fields[i], '\r')) return "a setting holds a line break";
     return NULL;
 }
+
+_Static_assert(sizeof(((SyncConf *)0)->host) == BL_LINK_HOST_MAX && sizeof(((SyncConf *)0)->password) == BL_LINK_PASS_MAX &&
+                   sizeof(((SyncConf *)0)->username) == BL_LINK_USER_MAX && sizeof(((SyncConf *)0)->ca_file) == BL_LINK_PATH_MAX &&
+                   sizeof(((SyncConf *)0)->console_name) == BL_LINK_NAME_MAX &&
+                   sizeof(((SyncConf *)0)->topic_prefix) == BL_LINK_PREFIX_MAX,
+               "sync.conf's link fields are link.conf's");
+_Static_assert((int)SyncMqtt_V5 == (int)BlLinkMqtt_V5 && (int)SyncMqtt_V311 == (int)BlLinkMqtt_V311, "the MQTT versions");
+
+void sync_conf_to_link(const SyncConf *c, BlLinkConf *l)
+{
+    l->enabled = c->enabled;
+    copy(l->host, sizeof(l->host), c->host);
+    l->port = c->port;
+    l->tls = c->tls;
+    copy(l->ca_file, sizeof(l->ca_file), c->ca_file);
+    l->mqtt_version = (BlLinkMqtt)c->mqtt_version;
+    copy(l->username, sizeof(l->username), c->username);
+    copy(l->password, sizeof(l->password), c->password);
+    l->allow_anonymous = c->allow_anonymous;
+    copy(l->console_id, sizeof(l->console_id), c->console_id);
+    copy(l->console_name, sizeof(l->console_name), c->console_name);
+    copy(l->topic_prefix, sizeof(l->topic_prefix), c->topic_prefix);
+    copy(l->discovery_prefix, sizeof(l->discovery_prefix), c->discovery_prefix);
+}
+
+void sync_conf_from_link(SyncConf *c, const BlLinkConf *l)
+{
+    c->enabled = l->enabled;
+    copy(c->host, sizeof(c->host), l->host);
+    c->port = l->port;
+    c->tls = l->tls;
+    copy(c->ca_file, sizeof(c->ca_file), l->ca_file);
+    c->mqtt_version = (SyncMqttVersion)l->mqtt_version;
+    copy(c->username, sizeof(c->username), l->username);
+    copy(c->password, sizeof(c->password), l->password);
+    c->allow_anonymous = l->allow_anonymous;
+    copy(c->console_id, sizeof(c->console_id), l->console_id);
+    copy(c->console_name, sizeof(c->console_name), l->console_name);
+    copy(c->topic_prefix, sizeof(c->topic_prefix), l->topic_prefix);
+    copy(c->discovery_prefix, sizeof(c->discovery_prefix), l->discovery_prefix);
+}

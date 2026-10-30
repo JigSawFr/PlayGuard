@@ -1,4 +1,6 @@
-// sync_conf — the remote link's settings (sd:/config/playguard/sync.conf)
+// sync_conf — the remote link's settings (sd:/config/playguard/sync.conf,
+// and the broker's part in sd:/config/boreale/link.conf, shared with every
+// Boréale homebrew: sync_conf_from_link)
 // and the small flat files PlayGuard and the agent exchange: "key=value",
 // one per line, read by both processes with link/bl_kv (the agent has no
 // JSON library). PlayGuard's Sync screen writes
@@ -12,6 +14,7 @@
 #include <stdint.h>
 
 #include "bl_kv.h"
+#include "bl_link_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,6 +140,14 @@ bool        sync_conf_publishes(const SyncConf *c, SyncPublish p);
 const char *sync_publish_name(SyncPublish p);
 // "auto" / "5" / "3.1.1", as sync.conf writes it.
 const char *sync_mqtt_version_name(SyncMqttVersion v);
+
+// The broker's part of the settings, which config/boreale/link.conf holds
+// for every Boréale homebrew (bl_link_conf): enabled, the broker, TLS, the
+// MQTT version, the credentials, the console's id and name, the prefixes.
+// link.conf is the one read; sync.conf keeps a copy of them, for a PlayGuard
+// from before it. `l` keeps the lines it read and does not know.
+void sync_conf_to_link(const SyncConf *c, BlLinkConf *l);
+void sync_conf_from_link(SyncConf *c, const BlLinkConf *l);
 
 #ifdef __cplusplus
 }

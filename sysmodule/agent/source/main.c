@@ -52,6 +52,7 @@
 
 #define DATA_DIR     "sdmc:/config/playguard"
 #define CONF_PATH    DATA_DIR "/sync.conf"
+#define LINK_PATH    "sdmc:/" BL_LINK_CONF_FILE   // the broker's settings, every Boréale homebrew's
 #define SYNC_DIR     DATA_DIR "/sync"
 #define PROFILES     SYNC_DIR "/profiles.txt"
 #define REPORTS_DIR  DATA_DIR "/logs/reports"
@@ -297,7 +298,8 @@ static void system_paths(void)
 
 static SyncConf      g_conf;
 static bool          g_conf_ok;
-static uint64_t      g_conf_mtime, g_nro_mtime, g_conf_checked;
+static uint64_t      g_conf_mtime, g_link_mtime, g_nro_mtime, g_conf_checked;
+static BlLinkConf    g_link;
 static AgentNroState g_nro;
 static SyncRecords   g_records;
 static char          g_firmware[16];
@@ -330,8 +332,18 @@ static void load_conf(void)
     sync_conf_defaults(&g_conf);
     const size_t n = read_file(CONF_PATH, g_text, sizeof(g_text));
     g_conf_ok = n > 0 && sync_conf_parse(&g_conf, g_text, n);
+    // The broker's settings are link.conf's when there is one (PlayGuard
+    // makes it from sync.conf the first time it runs).
+    const size_t l = read_file(LINK_PATH, g_text, sizeof(g_text));
+    if (l > 0) {
+        bl_link_conf_defaults(&g_link);
+        bl_link_conf_parse(&g_link, g_text, l);
+        sync_conf_from_link(&g_conf, &g_link);
+        g_conf_ok = true;
+    }
     g_conf.emummc = g_emummc;   // this system's device (sync_conf_device_id)
     g_conf_mtime = mtime_of(CONF_PATH);
+    g_link_mtime = mtime_of(LINK_PATH);
 }
 
 static void save_records(void)
@@ -1019,7 +1031,7 @@ static void reload(bool force)
         make_dirs();
         force = true;
     }
-    const bool conf_changed = force || mtime_of(CONF_PATH) != g_conf_mtime;
+    const bool conf_changed = force || mtime_of(CONF_PATH) != g_conf_mtime || mtime_of(LINK_PATH) != g_link_mtime;
     const SyncConf before = g_conf;
     if (conf_changed) load_conf();
     if (force || mtime_of(NRO_STATE) != g_nro_mtime) {

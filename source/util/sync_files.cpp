@@ -51,6 +51,13 @@ std::string conf_file()
     return paths::data_dir() + "/sync.conf";
 }
 
+std::string link_file()
+{
+    std::string root = paths::sd_root();
+    if (root.empty() || root.back() != '/') root += '/';
+    return root + BL_LINK_CONF_FILE;
+}
+
 std::string dir()
 {
     return paths::data_dir() + "/sync";
@@ -67,12 +74,57 @@ bool exists()
     return stat(conf_file().c_str(), &st) == 0;
 }
 
+namespace
+{
+// link.conf as it is on the SD card (its defaults when there is none):
+// `found` says whether it was read.
+BlLinkConf read_link(bool& found)
+{
+    BlLinkConf l;
+    bl_link_conf_defaults(&l);
+    std::string text;
+    found = paths::read_file(link_file(), text);
+    if (found) bl_link_conf_parse(&l, text.data(), text.size());
+    return l;
+}
+
+// The broker's part of `c` into link.conf, its unknown keys kept; left as it
+// is when a newer version wrote it.
+bool save_link(const SyncConf& c, std::string* error)
+{
+    bool found = false;
+    BlLinkConf l = read_link(found);
+    if (!bl_link_conf_may_write(&l)) {
+        if (error) *error = "link.conf left as it is: written by a newer version";
+        return false;
+    }
+    sync_conf_to_link(&c, &l);
+    std::string text(4096, '\0');
+    const size_t n = bl_link_conf_write(&l, &text[0], text.size());
+    if (n == 0) {
+        if (error) *error = "the settings do not fit";
+        return false;
+    }
+    text.resize(n);
+    const std::string file = link_file();
+    paths::ensure_dir(file.substr(0, file.rfind('/')));
+    return paths::atomic_write(file, text, error);
+}
+}   // namespace
+
 SyncConf load()
 {
     SyncConf c;
     sync_conf_defaults(&c);
     std::string text;
-    if (paths::read_file(conf_file(), text)) sync_conf_parse(&c, text.data(), text.size());
+    const bool conf = paths::read_file(conf_file(), text);
+    if (conf) sync_conf_parse(&c, text.data(), text.size());
+    // The broker's settings are link.conf's, shared with every Boréale
+    // homebrew; a sync.conf from before it gives them to it, once.
+    bool found = false;
+    const BlLinkConf l = read_link(found);
+    if (found) sync_conf_from_link(&c, &l);
+    else if (conf) save_link(c, nullptr);
     c.emummc = paths::nand_key() == "emummc";
     return c;
 }
@@ -91,7 +143,9 @@ bool save(const SyncConf& c, std::string* error)
     }
     text.resize(n);
     paths::ensure_dir(paths::data_dir());
-    return paths::atomic_write(conf_file(), text, error);
+    // sync.conf keeps a copy of the broker's settings, for a PlayGuard from
+    // before link.conf.
+    return paths::atomic_write(conf_file(), text, error) && save_link(c, error);
 }
 
 bool ensure_id(SyncConf& c, const uint8_t random[4])

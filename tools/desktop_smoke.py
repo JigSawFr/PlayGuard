@@ -389,6 +389,11 @@ if UPDATE:
 sync_conf = os.path.join(run_dir, "playguard_data", "sync.conf")
 if os.path.exists(sync_conf):
     os.remove(sync_conf)   # the link is off but in the "sync" scenario
+# The broker's settings every Boréale homebrew shares: made from sync.conf
+# by each scenario's PlayGuard, from nothing.
+link_conf = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "link.conf")
+if os.path.exists(link_conf):
+    os.remove(link_conf)
 SYNC_ID = "5a0c3e11"
 mqtt_port = 0
 mqtt_broker = None

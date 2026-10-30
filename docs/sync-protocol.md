@@ -604,7 +604,8 @@ release's `CHANGELOG.md`) and the QR code that opens it in HACS.
 
 | File | Written by | Content |
 |---|---|---|
-| `config/playguard/sync.conf` | PlayGuard (*Remote access*); hand-editable | The link's settings, `key=value`, one per line (below). Shared by every system on the SD card. |
+| `config/boreale/link.conf` | PlayGuard (*Remote access*), or another Boréale homebrew's screen; hand-editable | The broker's settings every Boréale homebrew of the console shares (boreale-link's `bl_link_conf`): `schema=1`, `enabled`, `host`, `port`, `tls`, `ca_file`, `mqtt_version`, `username`, `password`, `allow_anonymous`, `console_id`, `console_name`, `topic_prefix`, `discovery_prefix`, as in `sync.conf` (below). Made from `sync.conf` the first time PlayGuard reads its settings, then the one read for those keys, by PlayGuard and the agent; unknown keys kept, a newer `schema` never written over. |
+| `config/playguard/sync.conf` | PlayGuard (*Remote access*); hand-editable | The link's settings, `key=value`, one per line (below). Shared by every system on the SD card. Its broker keys are a copy of `link.conf`'s, written with them, for a PlayGuard from before it. |
 | `config/playguard/sync/ca.pem` | the user | Optional CA certificate for a private broker. |
 | `config/playguard/sync/profiles.txt` | PlayGuard, when the link starts and when the profiles change | `60,90,120,120,120,180,180=School week`: minutes Sunday first (65535 no limit), then the name. Shared, as the profiles are. |
 | `config/playguard/nand/<system>/sync/nro_state.txt` | PlayGuard, after every settings save (`config.json`, this system's `state.json`) once `sync.conf` exists, when read-only mode changes and when the serial number it publishes does | The extra-time record, the console lock and its saved limits, `relock_pending`, `extra_auto_restore`, the firmware choice (`fw_gate_*`), `pin_lock`, `read_only` and `firmware` (the one PlayGuard last ran on): what the agent must know to act on PlayGuard's behalf; and `serial`, the serial number PlayGuard read, only with `publish_serial`. The agent changes nothing when `read_only=1`, when the key is missing, or when the console's firmware is no longer `firmware` (a system update PlayGuard has not seen). A line break in a value is written as a space. |
@@ -626,7 +627,7 @@ per-system files (`util/nand.hpp`; the agent names it the same way,
 `core/nand_key.h`). Each file has one writer — but for `sync.conf`, which the agent rewrites when
 Home Assistant switches the native discovery (`discovery/set`) while
 PlayGuard is closed. The IPC service is the live channel, the files the cold
-one. `sync.conf` is never included in a diagnostic report or
+one. `sync.conf` and `link.conf` are never included in a diagnostic report or
 an online upload; the report's *Remote link* section has the switches and the
 session's counters, never the broker's address, the user name or the
 password.
@@ -648,6 +649,9 @@ version's) is read for the keys this one knows and never written again, by
 PlayGuard or the agent; nor is one with more unknown lines than fit (1 KB of
 them). Anonymous brokers need
 `allow_anonymous=1`; without a user name the link otherwise stays off.
+The broker keys (`enabled` to `console_name`, the two prefixes) are read
+from `config/boreale/link.conf` when it exists: a change to them in
+`sync.conf` alone is not seen, edit `link.conf`.
 
 A `schema=1` file (an earlier version's) is read the same way: its
 `topic_prefix`, when it is the old default `playguard`, becomes `boreale`,

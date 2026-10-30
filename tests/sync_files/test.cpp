@@ -56,6 +56,7 @@ static void test_conf()
 
     // A newer version's file: read for what this one knows, never saved over.
     const std::string newer = "schema=3\nenabled=1\nhost=broker.lan\n";
+    std::remove(sync_files::link_file().c_str());   // else its broker settings are read (test_link)
     CHECK(paths::atomic_write(sync_files::conf_file(), newer));
     SyncConf later = sync_files::load();
     CHECK(later.enabled && !std::strcmp(later.host, "broker.lan"));
@@ -323,6 +324,44 @@ static void test_failure_said()
     sync_files::set_on_failure(nullptr);
 }
 
+// link.conf, the broker's settings every Boréale homebrew shares: made from
+// sync.conf the first time, then the one read; both written by a save, a
+// newer version's left as it is.
+static void test_link()
+{
+    std::remove(sync_files::link_file().c_str());
+    const std::string before = "schema=2\nenabled=1\nhost=old.lan\nport=1884\nconsole_id=0badc0de\npolicy=auto\n";
+    CHECK(paths::atomic_write(sync_files::conf_file(), before));
+    SyncConf c = sync_files::load();
+    CHECK(!std::strcmp(c.host, "old.lan") && c.port == 1884 && c.policy == SyncPolicy_Auto);
+    std::string text;
+    CHECK(paths::read_file(sync_files::link_file(), text));
+    CHECK(text.find("host=old.lan\n") != std::string::npos && text.find("console_id=0badc0de\n") != std::string::npos);
+    CHECK(text.find("policy") == std::string::npos);   // PlayGuard's own keys stay in sync.conf
+
+    // Set elsewhere (another homebrew's screen, or by hand): link.conf wins.
+    CHECK(paths::atomic_write(sync_files::link_file(), "schema=1\nenabled=1\nhost=new.lan\nport=8883\ntls=1\nother_key=1\n"));
+    c = sync_files::load();
+    CHECK(!std::strcmp(c.host, "new.lan") && c.port == 8883 && c.tls && c.policy == SyncPolicy_Auto);
+    // A save writes both: sync.conf's copy follows, link.conf keeps its unknown key.
+    c.port = 8884;
+    CHECK(sync_files::save(c));
+    CHECK(paths::read_file(sync_files::link_file(), text) && text.find("port=8884\n") != std::string::npos);
+    CHECK(text.find("other_key=1\n") != std::string::npos);
+    CHECK(paths::read_file(sync_files::conf_file(), text) && text.find("port=8884\n") != std::string::npos);
+
+    // A newer version's link.conf: read, never written over.
+    const std::string newer = "schema=2\nenabled=1\nhost=future.lan\n";
+    CHECK(paths::atomic_write(sync_files::link_file(), newer));
+    c = sync_files::load();
+    CHECK(!std::strcmp(c.host, "future.lan"));
+    std::string err;
+    CHECK(!sync_files::save(c, &err) && err.find("link.conf") != std::string::npos);
+    CHECK(paths::read_file(sync_files::link_file(), text) && text == newer);
+    std::remove(sync_files::link_file().c_str());
+    std::remove(sync_files::conf_file().c_str());
+}
+
 int main()
 {
     char dir[] = "/tmp/playguard_sync_files_XXXXXX";
@@ -331,6 +370,7 @@ int main()
     REQUIRE(paths::ensure_dir(paths::data_dir()));
 
     test_conf();
+    test_link();
     test_records();
     test_nro_state();
     test_failure_said();
