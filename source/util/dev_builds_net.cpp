@@ -13,6 +13,7 @@
 #include <aurore/cadran/util/text.hpp>
 
 #include "app.hpp"
+#include "app_id.h"
 #include "core/sim_env.h"
 #include "util/dev_builds.hpp"
 #include "util/github_auth.hpp"
@@ -40,7 +41,7 @@ std::string api_url()
 #ifndef __SWITCH__
 const char* sim()
 {
-    return sim_net::value("PLAYGUARD_SIM_DEV_BUILDS");
+    return sim_net::value(APP_ENV "_SIM_DEV_BUILDS");
 }
 #endif
 
@@ -50,8 +51,8 @@ bool api_get(const std::string& path, const char* name, const std::string& token
 {
 #ifndef __SWITCH__
     if (const char* folder = sim()) {
-        // PLAYGUARD_SIM_DEV_BUILDS_DELAY: each answer takes that many ms (the bar shows).
-        if (const long long delay = sim_env_int("PLAYGUARD_SIM_DEV_BUILDS_DELAY", 0, 0, 60000))
+        // <APP_ENV>_SIM_DEV_BUILDS_DELAY: each answer takes that many ms (the bar shows).
+        if (const long long delay = sim_env_int(APP_ENV "_SIM_DEV_BUILDS_DELAY", 0, 0, 60000))
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         return sim_net::get(folder, name, body, error);
     }
@@ -94,7 +95,7 @@ std::expected<std::vector<Build>, std::string> fetch(bool* needs_login, Progress
     if (!token.empty()) {
         // The artifacts of the last runs, newest first, 100 a page: the API
         // only filters by an exact name, and a run names its artifacts after
-        // its build (is_build_artifact keeps the one holding playguard.nro,
+        // its build (is_build_artifact keeps the one holding <app>.nro,
         // about one in six). Five pages are some eighty runs, more than
         // main's last commits and the open pull requests need; a page with
         // fewer than 100 entries is the last one (the simulated folder answers
@@ -189,20 +190,20 @@ std::expected<Build, std::string> fetch_release()
     std::string body, err;
     if (!api_get("/releases/latest", "latest.json", github_auth::token(), &body, &err, 512 * 1024)) return std::unexpected(err);
     Build b;
-    if (!parse_release(body, &b)) return std::unexpected("no playguard.nro in the latest release");
+    if (!parse_release(body, &b)) return std::unexpected("no " APP_ID ".nro in the latest release");
     return b;
 }
 
 Done download(const Build& b, const std::string& path, std::function<void(uint64_t done, uint64_t total)> progress,
               const std::atomic<bool>* cancel)
 {
-    if (b.size > MAX_DOWNLOAD) return std::unexpected("too large for PlayGuard");
+    if (b.size > MAX_DOWNLOAD) return std::unexpected("too large for " APP_NAME);
     // Refused before anything is fetched (verify_file would, after).
     if (b.sha256.empty()) return std::unexpected(NO_DIGEST);
     // Why it stopped, written by the steps below.
     std::string why;
     std::string* const error = &why;
-    // An artifact arrives as a zip next to the target, playguard.nro is taken out of it.
+    // An artifact arrives as a zip next to the target, <app>.nro is taken out of it.
     const std::string file = b.artifact ? path + ".zip" : path;
     // Received into <file>.part; a download cut short leaves it, with what it
     // is of (<file>.part.json), and the next one of the same build goes on
@@ -312,7 +313,7 @@ Done download(const Build& b, const std::string& path, std::function<void(uint64
         ok = false;
     }
     std::remove(part.c_str());
-    if (ok && b.artifact) ok = zip_read::extract(file, "playguard.nro", path, MAX_DOWNLOAD, error);
+    if (ok && b.artifact) ok = zip_read::extract(file, APP_ID ".nro", path, MAX_DOWNLOAD, error);
     if (ok) {
         if (const auto nro = verify_nro(path); !nro) {
             why = nro.error();

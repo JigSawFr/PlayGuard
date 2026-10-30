@@ -1,18 +1,19 @@
-// dev_builds — install another build of PlayGuard in place, from the
+// dev_builds — install another build of the app in place, from the
 // developer tools: one of the last releases, one of the last commits of main, or
 // the newest build of an open pull request (from this repository: a fork's
 // build is never offered, nobody with write access has reviewed its code).
 //
-// A release is the playguard.nro of a GitHub release (pre-releases included,
-// marked), readable without an account. The others are the playguard-<version>-<ref>-<commit>-nro
+// A release is the <app>.nro (APP_ID, app_id.h) of a GitHub release
+// (pre-releases included, marked), readable without an account. The others
+// are the <app>-<version>-<ref>-<commit>-nro
 // artifact the build workflow keeps for every run (.github/workflows/build.yml
 // names each artifact of a run after its build and its component; the
-// recovery sysmodule is the -rescue one): a zip holding playguard.nro, which
+// recovery sysmodule is the -rescue one): a zip holding <app>.nro, which
 // GitHub only hands to a signed-in user, hence the token of
 // util/github_auth.hpp. Artifacts expire (90 days by default).
 //
 // The download is checked (size and the SHA-256 GitHub records; for an
-// artifact, the zip's, then the CRC-32 of playguard.nro inside it; the NRO
+// artifact, the zip's, then the CRC-32 of <app>.nro inside it; the NRO
 // header) before it replaces the running .nro, which hbloader loaded whole
 // into memory, so it can be overwritten once romfs:/ lets go of it
 // (platform_romfs_release, dev_build_flow.cpp); then hbloader starts it.
@@ -35,7 +36,7 @@ namespace dev_builds
 
 enum class Kind
 {
-    Release,       // a release (its playguard.nro)
+    Release,       // a release (its <app>.nro)
     Main,          // a commit of main
     PullRequest,   // the newest build of an open pull request
     Commit,        // a commit found by Find a build (any branch of this repository)
@@ -53,7 +54,7 @@ enum class Ci
 struct Build
 {
     Kind        kind = Kind::Main;
-    bool        artifact = false;   // url, size and sha256 are those of a zip holding playguard.nro
+    bool        artifact = false;   // url, size and sha256 are those of a zip holding <app>.nro
     std::string version;   // Release: "1.2.0"
     bool        prerelease = false;   // Release: marked a pre-release on GitHub
     int         pr = 0;    // PullRequest: its number
@@ -107,18 +108,18 @@ struct Run
 // through util/safe_text.hpp first, and a release's version must be one
 // (safe_text::is_version): nothing GitHub sends can hide or reorder text.
 
-// The latest release (GET /repos/…/releases/latest): its playguard.nro and
+// The latest release (GET /repos/…/releases/latest): its <app>.nro and
 // its notes (at most MAX_NOTES bytes, cut on a line). False for anything
 // else (a pre-release, no such asset, a tag that is not a version, malformed).
 constexpr size_t MAX_NOTES = 16 * 1024;
 bool parse_release(const std::string& json, Build* out);
 // The releases (GET /repos/…/releases), newest first as listed: each one with
-// a playguard.nro, pre-releases included (Build::prerelease), drafts left
+// an <app>.nro, pre-releases included (Build::prerelease), drafts left
 // out, at most `keep`, one per version. False when the answer is not a list.
 constexpr size_t MAX_RELEASES = 20;
 bool parse_releases(const std::string& json, std::vector<Build>* out, size_t keep = MAX_RELEASES);
-// The artifact holding playguard.nro: "playguard-<version>-<ref>-<commit>-nro",
-// or "playguard_release", the name the runs before that scheme gave it.
+// The artifact holding <app>.nro: "<app>-<version>-<ref>-<commit>-nro",
+// or "<app>_release", the name the runs before that scheme gave it.
 bool is_build_artifact(const std::string& name);
 // The build artifacts (is_build_artifact) that have not expired, newest first
 // as listed. *listed (when given) is how many artifacts the page held, of
@@ -213,7 +214,7 @@ std::string digest_hex(const std::string& digest);
 bool is_nro(const std::string& head);
 
 // Checks a downloaded file against `size` and `sha256`. A file without a
-// digest to check it against is refused (*error = NO_DIGEST): the size and
+// digest to check it against is refused (the error NO_DIGEST): the size and
 // the NRO header say nothing of what it holds. NO_DIGEST is a marker the
 // screens compare against and say as dev_build/no_digest, in the user's
 // language.
@@ -244,8 +245,11 @@ struct Cache
 // A list older than this is fetched again before it is shown.
 constexpr int64_t CACHE_MAX_AGE_S = 10 * 60;
 
+// cache/dev_builds.json's "schema" (named "version" before: still read).
+constexpr int CACHE_SCHEMA = 1;
+
 std::string encode_cache(const Cache& cache);
-// False for anything else (damaged, another layout); a build that does not
+// False for anything else (damaged, another schema: fetched again); a build that does not
 // look like one (a URL not on https://github.com/ or https://api.github.com/,
 // a malformed commit, a digest missing or malformed) is left out.
 bool decode_cache(const std::string& json, Cache* out);
@@ -268,7 +272,7 @@ using Progress = std::function<void(float done, Step step)>;
 // run it with aurore::async; `progress` (when set) is called from that thread.
 // *needs_login is set when there is no token, so only the releases are listed,
 // whether or not the fetch succeeds.
-// On the desktop build PLAYGUARD_SIM_DEV_BUILDS ("offline", or a folder
+// On the desktop build <APP_ENV>_SIM_DEV_BUILDS ("offline", or a folder
 // holding releases.json, artifacts.json and pulls.json; latest.json for
 // fetch_release) replaces the network.
 [[nodiscard]] std::expected<std::vector<Build>, std::string> fetch(bool* needs_login, Progress progress = nullptr);
@@ -283,9 +287,9 @@ using Progress = std::function<void(float done, Step step)>;
 // installs. Blocking (network); simulated like fetch().
 [[nodiscard]] std::expected<Build, std::string> fetch_release();
 
-// Downloads `b` to `path` (playguard.nro itself, out of the zip for an
+// Downloads `b` to `path` (<app>.nro itself, out of the zip for an
 // artifact) and verifies it. Blocking. On the desktop build, with
-// PLAYGUARD_SIM_DEV_BUILDS set, a URL "https://<path>" is a local file.
+// <APP_ENV>_SIM_DEV_BUILDS set, a URL "https://<path>" is a local file.
 // `progress` (when set) gets the bytes received and the total, from the
 // calling thread.
 // `cancel` (when given), set by another thread, stops it within a second
