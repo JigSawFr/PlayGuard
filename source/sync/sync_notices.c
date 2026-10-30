@@ -88,7 +88,7 @@ size_t sync_notices_build(const char *sd_root, int64_t now, char *out, size_t ca
             continue;
         // Its name: the registry's, else its module.
         char name[BL_APP_NAME_MAX];
-        snprintf(name, sizeof(name), "%s", found[i]);
+        snprintf(name, sizeof(name), "%.*s", (int)sizeof(found[0]) - 1, found[i]);
         BlApp app;
         bl_app_defaults(&app);
         if (bl_app_path(found[i], rel, sizeof(rel)) && under(sd_root, rel, path, sizeof(path))) {
