@@ -116,6 +116,7 @@ struct Config
     std::vector<std::string> notices_acked;
     bool notices_ack_remind = true;
     bool notices_others     = true;   // the other Boréale homebrews' notices in the bell, counted on it
+    bool look_shared        = true;   // the look shared with the other Boréale homebrews (action/shared_look)
     std::string summary_seen;
 
     // Console lock (PIN › Block all games): every day's limit set to 0, so a

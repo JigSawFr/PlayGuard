@@ -1318,6 +1318,7 @@
         "notices_reminders": "リマインダー：バックアップ、本体のもう一つのシステム、ソフトのブロック",
         "notices_ack_remind": "無視した警告を30日後に再び数える",
         "notices_others": "ほかの Boréale homebrew の通知",
+        "look_shared": "ほかの Boréale のHomebrewと同じ見た目",
         "help": "ヘルプと診断",
         "effects": "視覚効果",
         "effects_values": {

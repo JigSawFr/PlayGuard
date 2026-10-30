@@ -382,6 +382,7 @@ static void load_shared()
             if (v.is_string()) c.notices_acked.push_back(v.get<std::string>());
     read_bool(j, "notices_ack_remind", c.notices_ack_remind);
     read_bool(j, "notices_others", c.notices_others);
+    read_bool(j, "look_shared", c.look_shared);
     auto amounts = j.find("extra_amounts");
     if (amounts != j.end() && amounts->is_array())
         c.extra_amounts = read_int_list(*amounts);   // sanitize() keeps it only when it is one of EXTRA_SETS
@@ -510,6 +511,7 @@ bool snapshot(Snapshot& snap)
     j["notices_acked"]     = s_config.notices_acked;
     j["notices_ack_remind"] = s_config.notices_ack_remind;
     j["notices_others"]     = s_config.notices_others;
+    j["look_shared"]        = s_config.look_shared;
     j["summary_seen"]      = s_config.summary_seen;
 
     nlohmann::json st = s_state_read;
