@@ -34,8 +34,9 @@ started again (`source/action/agent_update.cpp`, the steps host-tested in
   which PlayGuard writes), and publishes `state`, `activity` and, after
   midnight, the finished day.
 - Publishes the icon of the game played when the broker does not have it
-  yet and PlayGuard's icon cache on the SD card does
-  (`config/playguard/cache/icons/`), streamed from the file a piece at a time;
+  yet and the Boréale homebrews' shared icon cache on the SD card does
+  (`config/boreale/cache/icons/`, boreale-link's `bl_cache`), streamed from
+  the file a piece at a time;
   every other icon is PlayGuard's to publish (no `ns` here to read one).
 - Carries out orders **only under the *auto* policy**, through the same gate,
   unlock and relock as PlayGuard (`source/sync/sync_exec.c`). Under *ask*,

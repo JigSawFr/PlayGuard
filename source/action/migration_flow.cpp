@@ -10,6 +10,7 @@
 
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/data_cleanup.hpp"
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"
 #include "util/migrations.hpp"
@@ -62,6 +63,13 @@ const std::vector<Known>& known()
         { { migrations::NandDirs, "per-system folder",
             []() { return data_move::to_nand(paths::data_dir(), paths::nand_dir()); } },
           "playguard/dev/migration_nand", "playguard/dev/migration_nand_detail" },
+        // The icons PlayGuard kept for itself before the Boréale homebrews
+        // shared theirs (boreale-link's bl_cache, config/boreale/cache/): read
+        // again from the console as they are needed. Goes with the releases
+        // that still had cache/icons/ (after April 2027).
+        { { migrations::SharedIcons, "own icon cache",
+            []() { return data_cleanup::remove_folder(paths::cache_dir() + "/icons").removed; } },
+          "playguard/dev/migration_icons", "playguard/dev/migration_icons_detail" },
     };
     return all;
 }
@@ -146,7 +154,7 @@ void at_start()
 void for_system()
 {
     migrations::run(paths::migrations_file(),
-                    steps({}, std::make_shared<size_t>(0), migrations::NandDirs, migrations::NandDirs), app::version(),
+                    steps({}, std::make_shared<size_t>(0), migrations::NandDirs, migrations::Latest), app::version(),
                     log_to("start-up"));
 }
 

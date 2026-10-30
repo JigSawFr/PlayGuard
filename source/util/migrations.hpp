@@ -40,7 +40,8 @@ enum Level : int
     DataDir   = 1,   // sd:/switch/playguard to sd:/config/playguard (data_move::run, the console only)
     LogsDirs  = 2,   // logs/ before its subfolders (log_files::migrate)
     NandDirs  = 3,   // what every system shared, to the first one's nand/<key> (data_move::to_nand)
-    Latest    = NandDirs,
+    SharedIcons = 4, // cache/icons/ gone: the icons are the Boréale homebrews' shared cache (config/boreale/cache/)
+    Latest    = SharedIcons,
 };
 
 constexpr int SCHEMA = 1;   // "schema" in migrations.json

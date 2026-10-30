@@ -1,8 +1,8 @@
 // playstats_logic — the parts of the play data layer (playstats.c) that never
 // talk to a service: one raw log entry as a playlog event, the bounded walk
-// of the log through a query function, the names already known, and the
-// game icons kept on the SD card (a game's name out of its control.nacp is
-// nacp.h's, shared with the installed games check). libnx calls stay in
+// of the log through a query function and the names already known (a game's
+// name out of its control.nacp is nacp.h's, shared with the installed games
+// check; its icon is kept in boreale-link's bl_cache). libnx calls stay in
 // playstats.c, so the host tests (tests/playstats/) run all of this against a
 // fake <switch.h>.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -67,22 +67,6 @@ void playnames_seed(PlayNames *m, const PlayStats *known);
 const char *playnames_find(const PlayNames *m, u64 id);   // NULL when unknown
 void playnames_add(PlayNames *m, u64 id, const char *name);
 
-// Game icons on the SD card: one JPEG per game (<dir>/<title ID>.jpg) in the
-// console language of a `lang` file next to them. Opening it with another
-// language, or a folder over its bounds (a crash between two runs), empties
-// it; a run then adds at most `max_bytes` / `max_files` in all.
-typedef struct {
-    char dir[192];
-    u8   lang;
-    bool ready;
-    u64  bytes, max_bytes;
-    u32  files, max_files;
-} IconStore;
-
-bool icon_store_open(IconStore *s, const char *dir, u8 lang, u64 max_bytes, u32 max_files);
-// The JPEG kept for `id`, malloc'ed (the caller frees it), or NULL.
-unsigned char *icon_store_get(const IconStore *s, u64 id, size_t *size);
-void icon_store_put(IconStore *s, u64 id, const unsigned char *jpeg, size_t size);
 
 #ifdef __cplusplus
 }

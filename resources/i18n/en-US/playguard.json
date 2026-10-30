@@ -1469,6 +1469,8 @@
         "migration_logs_detail": "logs/ as before 1.0.0",
         "migration_nand": "Each system's folder",
         "migration_nand_detail": "From what every system shared",
+        "migration_icons": "Shared game icons",
+        "migration_icons_detail": "PlayGuard's own icon folder removed",
         "migrations_confirm": "Run",
         "migrations_done": "Migrations run again ({} steps). Entries moved: {}. The details are in the session log.",
         "mode_off_body": "Turn developer mode off? Its tools leave the end of About › Help & diagnostics and the play-timer recording stops. Seven presses of Y on About › Version bring them back.",

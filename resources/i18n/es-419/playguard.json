@@ -1469,6 +1469,8 @@
         "migration_logs_detail": "logs/ como antes de la 1.0.0",
         "migration_nand": "La carpeta de cada sistema",
         "migration_nand_detail": "Desde lo que compartían todos los sistemas",
+        "migration_icons": "Íconos de juegos compartidos",
+        "migration_icons_detail": "Carpeta de íconos propia de PlayGuard eliminada",
         "migrations_confirm": "Ejecutar",
         "migrations_done": "Migraciones ejecutadas de nuevo ({} pasos). Elementos movidos: {}. El detalle está en el registro de sesión.",
         "mode_off_body": "¿Desactivar el modo desarrollador? Sus herramientas salen del final de Información › Ayuda y diagnóstico y el registro del temporizador se detiene. Siete pulsaciones de Y en Información › Versión las recuperan.",

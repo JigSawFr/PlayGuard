@@ -52,7 +52,7 @@ std::vector<mg::Step> start_steps()
 // Both calls of a start (main.cpp: before and after the system's folder).
 size_t start(const std::string& file, const std::string& version)
 {
-    return mg::run(file, start_steps(), version) + mg::run(file, { step(mg::NandDirs) }, version);
+    return mg::run(file, start_steps(), version) + mg::run(file, { step(mg::NandDirs), step(mg::SharedIcons, 0) }, version);
 }
 
 mg::State state(const std::string& file)
@@ -91,7 +91,7 @@ static void test_first_and_next()
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line) == 0);
     CHECK(g_ran.empty() && fs::read(file) == before);
-    CHECK(g_lines.size() == 2 && logged("migrations: level 3 recorded, last started by PlayGuard 1.2.0") &&
+    CHECK(g_lines.size() == 2 && logged("migrations: level 4 recorded, last started by PlayGuard 1.2.0") &&
           logged("migrations: steps 1 to 2 already done, nothing run"));
 
     // An update: nothing to run, the build recorded.
@@ -107,8 +107,8 @@ static void test_update()
     const std::string file = tmp.path() + "/migrations.json";
     fs::write(file, "{\"schema\": 1, \"level\": 1, \"version\": \"1.1.0\"}");
     g_ran.clear();
-    CHECK(start(file, "1.2.0") == 2);
-    CHECK((g_ran == std::vector<int>{ mg::LogsDirs, mg::NandDirs }));
+    CHECK(start(file, "1.2.0") == 3);
+    CHECK((g_ran == std::vector<int>{ mg::LogsDirs, mg::NandDirs, mg::SharedIcons }));
     CHECK(state(file).level == mg::Latest && state(file).version == "1.2.0");
 }
 
@@ -125,7 +125,7 @@ static void test_unreadable()
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line) == 2);
     CHECK(logged("W migrations: " + file + " unreadable (damaged): steps 1 to 2 to run again"));
-    CHECK(start(file, "1.2.0") == 1 && state(file).level == mg::Latest);
+    CHECK(start(file, "1.2.0") == 2 && state(file).level == mg::Latest);
 
     // Not written (a folder in its place): a warning, the steps again next time.
     TempDir dir("migrations");
@@ -157,8 +157,8 @@ static void test_later_then_earlier()
     CHECK(mg::run(file, { step(mg::NandDirs) }, "1.2.0") == 0);
     CHECK(g_ran.empty());
     CHECK(logged("migrations: PlayGuard 1.4.0 started last, a later build; this is PlayGuard 1.2.0"));
-    CHECK(logged("migrations: level 5 is a later build's (this one knows up to 3): back to 3"));
-    // Its own level and version: the later build runs 4 and 5 again.
+    CHECK(logged("migrations: level 5 is a later build's (this one knows up to 4): back to 4"));
+    // Its own level and version: the later build runs 5 again.
     CHECK(state(file).level == mg::Latest && state(file).version == "1.2.0");
 }
 
@@ -174,14 +174,14 @@ static void test_earlier_build_next()
     CHECK(mg::write(file, { mg::Latest, "1.2.0" }));
     g_lines.clear();
     CHECK(mg::earlier_build_next(file, log_line));
-    CHECK(logged("is next: level 3 set to 0") && logged("level 0 and PlayGuard 1.2.0 written"));
+    CHECK(logged("is next: level 4 set to 0") && logged("level 0 and PlayGuard 1.2.0 written"));
     g_lines.clear();
     CHECK(mg::earlier_build_next(file, log_line) && logged("level already 0"));
     CHECK(state(file).level == mg::None && state(file).version == "1.2.0");
     // The earlier build (one from before this file) leaves it so; this one
     // is back: every step again, once.
     g_ran.clear();
-    CHECK(start(file, "1.2.0") == 3 && start(file, "1.2.0") == 0);
+    CHECK(start(file, "1.2.0") == 4 && start(file, "1.2.0") == 0);
 
     // Damaged: written as level 0.
     fs::write(file, "garbage");
