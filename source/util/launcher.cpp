@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/launcher.hpp"
 
+#include "app_id.h"
 #include "bl_notices.h"
 #include "core/platform.h"
 #include "util/paths.hpp"
@@ -14,10 +15,10 @@ namespace
 // first two (sphaira/source/app.cpp); hb-appstore unzips to /switch/appstore/.
 const char* const SPHAIRA[]  = { "/switch/sphaira/sphaira.nro", "/switch/sphaira.nro" };
 const char* const APPSTORE[] = { "/switch/appstore/appstore.nro" };
-// libget's folder for PlayGuard: hb-appstore runs from /switch/appstore/
+// libget's folder for the app (its name in the store): hb-appstore runs from /switch/appstore/
 // with its records in ./.get/packages/; sphaira's App Store writes the same
 // one for the official catalogue (sphaira's ui/menus/appstore.cpp).
-const char* const STORE_RECORD = "/switch/appstore/.get/packages/PlayGuard/";
+const char* const STORE_RECORD = "/switch/appstore/.get/packages/" APP_NAME "/";
 
 bool exists(const std::string& sd_path)
 {
