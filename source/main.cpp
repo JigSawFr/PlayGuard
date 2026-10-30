@@ -34,6 +34,7 @@
 #include "action/pin_lock.hpp"
 #include "action/pt_flow.hpp"
 #include "action/pt_log_flow.hpp"
+#include "action/report_sections.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
 #include "action/session_pause.hpp"
@@ -443,6 +444,8 @@ int main(int argc, char* argv[])
 
     // What ui/ and view/ ask of the screens above them, before any opens.
     install_screen_hooks();
+    // What PlayGuard adds to the diagnostic report (util/diagnostics.hpp).
+    report_sections::install();
     // Under logs/ but not logs: the block reference and its interrupted
     // write (util/pt_block.hpp), which "Delete the log files" leaves.
     data_cleanup::keep_log("play_timer/block.json");

@@ -4,27 +4,27 @@
 #include <ctime>
 #include <format>
 #include <sys/statvfs.h>
+#include <utility>
 #include <vector>
 
-#include "action/sync_flow.hpp"
 #include "app.hpp"
+#include "app_id.h"
 #include "util/log_files.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"
-#include "util/pctl_ops_c.hpp"
 #include "util/perf.hpp"
 #include "util/session_log.hpp"
 #include "util/startup.h"
 #include "core/platform.h"
+#include "core/sysinfo.h"
 
 namespace diagnostic
 {
 
 namespace
 {
-std::string (*s_firmware_choice)() = nullptr;
-std::string (*s_homebrew_lock)() = nullptr;
-std::string (*s_dns)() = nullptr;
+std::vector<std::function<std::string()>> s_sections;
+std::vector<std::function<std::string()>> s_header_lines;
 
 // This run, the one before, the memory, the SD card and the crash files kept.
 std::string logs_section()
@@ -73,9 +73,8 @@ std::string logs_section()
 }
 }   // namespace
 
-void set_firmware_choice(std::string (*summary)()) { s_firmware_choice = summary; }
-void set_homebrew_lock(std::string (*section)()) { s_homebrew_lock = section; }
-void set_dns(std::string (*section)()) { s_dns = section; }
+void add_section(std::function<std::string()> section) { s_sections.push_back(std::move(section)); }
+void add_header_line(std::function<std::string()> line) { s_header_lines.push_back(std::move(line)); }
 
 std::string current_report()
 {
@@ -91,18 +90,17 @@ std::string current_report()
     // public bug reports.
     const char* storage = storage_name(sysinfo_storage(&si));
     std::string out = std::format(
-        "=== PlayGuard diagnostic ===\n"
+        "=== " APP_NAME " diagnostic ===\n"
         "app version : {}{}\n"
-        "modes       : read_only={} dev={} firmware_choice={} platform={}\n"
+        "modes       : read_only={} dev={} platform={}\n"
         "firmware    : {}\n"
         "atmosphere  : {} ({})\n"
         "launch mode : {}\n"
         "storage     : {}\n"
         "prodinfo    : {}\n"
-        "game patches: {}\n"
-        "compat      : {}\n\n",
+        "game patches: {}\n",
         app::version(), app::commit().empty() ? std::string() : " (commit " + app::commit() + ")",
-        app::read_only() ? 1 : 0, app::dev_mode() ? 1 : 0, s_firmware_choice ? s_firmware_choice() : "unknown",
+        app::read_only() ? 1 : 0, app::dev_mode() ? 1 : 0,
 #ifdef __SWITCH__
         "switch",
 #else
@@ -111,13 +109,12 @@ std::string current_report()
         fw,
         si.ams_valid ? std::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : std::string("unknown"),
         si.is_atmosphere ? "detected" : "not detected",
-        si.applet_mode ? "applet (album)" : si.forwarder ? "application (forwarder)" : "application (over a game)",
-        std::format("{} (data: nand/{})",
-                    storage ? storage : "unknown",
-                    paths::nand_key()),
+        si.applet_mode ? "applet (album)" : "application (over a game)",
+        std::format("{} (data: nand/{})", storage ? storage : "unknown", paths::nand_key()),
         !si.blank_valid ? "unknown" : (si.blank ? "blanked" : "not blanked"),
-        patches_text,
-        (int)sysinfo_compat(&si));
+        patches_text);
+    for (const auto& line : s_header_lines) out += line();
+    out += "\n";
 
     // How long this run took to start, step by step (util/startup.h).
     std::vector<char> buf(4096);
@@ -126,18 +123,8 @@ std::string current_report()
     out += "\n";
     // How long the slow work of the screens took in this run (util/perf.hpp).
     out += perf::report() + "\n";
-    if (s_homebrew_lock) out += s_homebrew_lock();
-    if (s_dns) out += s_dns();
+    for (const auto& section : s_sections) out += section();
     out += logs_section();
-
-    time_clock_dump(buf.data(), buf.size());
-    out += buf.data();
-
-    buf.assign(24576, '\0');
-    pctl_dump(buf.data(), buf.size());
-    out += buf.data();
-    if (std::string(buf.data()).size() >= buf.size() - 1) out += "\n(report truncated)\n";
-    out += sync_flow::report_section();
 
     // Last: what led here, which can be long.
     const std::string recent = session_log::recent();

@@ -3,7 +3,6 @@
 
 #include <aurore.hpp>
 
-#include "util/diagnostics.hpp"
 #include "util/dns_hosts.hpp"
 #include "util/paths.hpp"
 
@@ -53,7 +52,6 @@ bool time_blocked() { return redirected(dns_hosts::TIME_HOST); }
 
 void at_start()
 {
-    diagnostic::set_dns(&report);
     aurore::Logger::info("{}", dns_hosts::summary(seen()));
 }
 
