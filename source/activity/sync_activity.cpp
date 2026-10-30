@@ -11,7 +11,7 @@
 #include "action/ha_update_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
-#include "link/bl_net.h"
+#include "bl_net.h"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"

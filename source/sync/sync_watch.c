@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-#include "../link/bl_json.h"
+#include "bl_json.h"
 #include "sync_titles.h"
 
 static void notice(SyncNotice out[SYNC_NOTICE_MAX], size_t *n, const char *type, uint64_t app_id, int kind,

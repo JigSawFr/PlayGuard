@@ -2,13 +2,14 @@
 # Produces out/playguard-agent.nsp, which the release zip places at
 # atmosphere/contents/4200000000504741/exefs.nsp and PlayGuard bundles in its
 # romfs (Console › Optional modules). It links the app's C service layer
-# (source/core/) and the remote link (source/link/, source/sync/) unchanged.
+# (source/core/) and the remote link (library/boreale-link/source/,
+# source/sync/) unchanged.
 
 # TOPDIR: this folder, in both passes (the second runs from build/).
 TOPDIR      ?= $(CURDIR)
 TARGET      := playguard-agent
-SOURCES     := source ../../source/core ../../source/sync ../../source/link ../../source/util
-INCLUDES    := source ../../source/core ../../source/sync ../../source/link ../../source/util
+SOURCES     := source ../../source/core ../../source/sync ../../library/boreale-link/source ../../source/util
+INCLUDES    := source ../../source/core ../../source/sync ../../library/boreale-link/source ../../source/util
 APP_JSON    := $(TOPDIR)/playguard-agent.json
 
 # The version PlayGuard shows for it (the app's, from CMakeLists.txt).

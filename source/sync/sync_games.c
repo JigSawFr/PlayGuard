@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../link/bl_json.h"
+#include "bl_json.h"
 #include "sync_state.h"   // SYNC_SCHEMA
 
 // What one game takes at most: its id, a long name, the numbers.

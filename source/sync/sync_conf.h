@@ -11,7 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "../link/bl_kv.h"
+#include "bl_kv.h"
 
 #ifdef __cplusplus
 extern "C" {

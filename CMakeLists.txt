@@ -142,6 +142,11 @@ else ()
                               ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/agent/source/agent_core.c)
 endif ()
 
+# The remote link's transport, shared by the Boréale homebrews
+# (JigSawFr/boreale-link, a submodule in library/boreale-link).
+file(GLOB BOREALE_LINK_SRC CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-link/source/*.c)
+list(APPEND PLAYGUARD_SRC ${BOREALE_LINK_SRC})
+
 # QR codes of the funding links in About (MIT, vendored: extern/qrcodegen).
 list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/qrcodegen/qrcodegen.cpp)
 # JPEG writing for the NRO forwarders' icons (public domain, vendored: extern/stb).
@@ -154,7 +159,7 @@ endif ()
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 23)
 
-target_include_directories(${PROJECT_NAME} PRIVATE source extern/qrcodegen extern/stb)
+target_include_directories(${PROJECT_NAME} PRIVATE source library/boreale-link/source extern/qrcodegen extern/stb)
 if (NOT PLATFORM_SWITCH)
     target_include_directories(${PROJECT_NAME} PRIVATE source/sync sysmodule/agent/source)
 endif ()
