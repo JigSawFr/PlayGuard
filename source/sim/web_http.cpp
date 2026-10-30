@@ -10,26 +10,35 @@
 namespace http
 {
 
-bool get(const std::string&, std::string*, std::string* error, size_t, long, const Headers&, long*)
+namespace
 {
-    return sim_net::offline(error);
+std::unexpected<Failure> offline()
+{
+    Failure f;
+    sim_net::offline(&f.error);
+    return std::unexpected(std::move(f));
+}
+}   // namespace
+
+Result<Reply> get(const std::string&, size_t, long, const Headers&)
+{
+    return offline();
 }
 
-bool post(const std::string&, const std::string&, const char*, std::string*, std::string* error, long*, size_t, long,
-          const Headers&)
+Result<Reply> post(const std::string&, const std::string&, const char*, size_t, long, const Headers&)
 {
-    return sim_net::offline(error);
+    return offline();
 }
 
-bool redirect(const std::string&, std::string*, std::string* error, const Headers&, long*)
+Result<std::string> redirect(const std::string&, const Headers&)
 {
-    return sim_net::offline(error);
+    return offline();
 }
 
-bool download(const std::string&, const std::string&, std::string* error, size_t, long,
-              std::function<void(uint64_t, uint64_t)>, uint64_t, const std::atomic<bool>*)
+Result<void> download(const std::string&, const std::string&, size_t, long, std::function<void(uint64_t, uint64_t)>,
+                      uint64_t, const std::atomic<bool>*)
 {
-    return sim_net::offline(error);
+    return offline();
 }
 
 void abort_all() {}

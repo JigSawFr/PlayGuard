@@ -30,30 +30,22 @@ static size_t                            s_max_asked;
 
 namespace http
 {
-bool redirect(const std::string& url, std::string* target, std::string* error, const Headers&, long*)
+Result<std::string> redirect(const std::string& url, const Headers&)
 {
     s_asked.push_back(url);
     const auto it = s_redirects.find(url);
-    if (it == s_redirects.end()) {
-        if (error) *error = "no redirect";
-        return false;
-    }
-    *target = it->second;
-    return true;
+    if (it == s_redirects.end()) return std::unexpected(Failure{ "no redirect" });
+    return it->second;
 }
 // switchbrew's System_Versions page; the integration's changelog
 // (sys_updates::fetch_integration_changelog) is not asked for by these tests.
-bool get(const std::string& url, std::string* body, std::string* error, size_t max_bytes, long, const Headers&, long*)
+Result<Reply> get(const std::string& url, size_t max_bytes, long, const Headers&)
 {
     s_asked.push_back(url);
     s_max_asked = max_bytes;
     const auto it = s_pages.find(url);
-    if (it == s_pages.end()) {
-        if (error) *error = "not served";
-        return false;
-    }
-    *body = it->second;
-    return true;
+    if (it == s_pages.end()) return std::unexpected(Failure{ "not served" });
+    return Reply{ it->second, 200 };
 }
 }   // namespace http
 

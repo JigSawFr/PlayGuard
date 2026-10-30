@@ -20,12 +20,12 @@ namespace
 // The version releases/latest redirects to; "" (and *error) when it does not.
 std::string latest_of(const char* repo, std::string* error)
 {
-    std::string target, err;
-    if (!http::redirect(std::string("https://github.com/") + repo + "/releases/latest", &target, &err)) {
-        if (error && error->empty()) *error = std::string(repo) + ": " + err;
+    const auto target = http::redirect(std::string("https://github.com/") + repo + "/releases/latest");
+    if (!target) {
+        if (error && error->empty()) *error = std::string(repo) + ": " + target.error().error;
         return "";
     }
-    return version_of_tag(tag_of_url(target));
+    return version_of_tag(tag_of_url(*target));
 }
 
 // switchbrew's System_Versions table, as wikitext: about 6 KB.
@@ -36,12 +36,12 @@ constexpr size_t      FIRMWARE_MAX  = 256 * 1024;
 // cannot be read.
 std::string latest_firmware(std::string* error)
 {
-    std::string page, err;
-    if (!http::get(FIRMWARE_PAGE, &page, &err, FIRMWARE_MAX, 20)) {
-        if (error && error->empty()) *error = "switchbrew: " + err;
+    const auto page = http::get(FIRMWARE_PAGE, FIRMWARE_MAX, 20);
+    if (!page) {
+        if (error && error->empty()) *error = "switchbrew: " + page.error().error;
         return "";
     }
-    return firmware_of_versions(page);
+    return firmware_of_versions(page->body);
 }
 }   // namespace
 #endif
@@ -113,7 +113,13 @@ bool fetch_integration_changelog(const std::string& version, std::string* md, st
     return true;
 #else
     const std::string url = std::string("https://raw.githubusercontent.com/") + HA_REPO + "/v" + version + "/CHANGELOG.md";
-    return http::get(url, md, error, CHANGELOG_MAX, 30);
+    auto got = http::get(url, CHANGELOG_MAX, 30);
+    if (!got) {
+        if (error) *error = got.error().error;
+        return false;
+    }
+    *md = std::move(got->body);
+    return true;
 #endif
 }
 

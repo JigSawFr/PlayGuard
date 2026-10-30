@@ -25,7 +25,6 @@ Result check(uint32_t console_fw)
 {
     Result r;
     std::string body;
-    long status = 0;
 #ifndef __SWITCH__
     // Desktop simulation: "1.1.0:24.0.0" (latest version : firmware it supports),
     // "none" (no release published) or "offline".
@@ -48,17 +47,21 @@ Result check(uint32_t console_fw)
         // The document in this version's schema; compat.json (schema 1, kept
         // for every version) when the release has none or it cannot be read.
         const std::string versioned = "compat-" + std::to_string(COMPAT_SCHEMA) + ".json";
-        const bool got = http::get(compat_url(versioned), &body, &r.error, 64 * 1024, 10, {}, &status);
-        if (!got && status != 404) return r;
+        auto got = http::get(compat_url(versioned), 64 * 1024, 10);
+        if (!got && got.error().status != 404) {
+            r.error = got.error().error;
+            return r;
+        }
+        if (got) body = std::move(got->body);
         if (!got || !parse_compat(body, &r.latest)) {
-            body.clear();
-            r.error.clear();
-            status = 0;
-            if (!http::get(compat_url("compat.json"), &body, &r.error, 64 * 1024, 10, {}, &status)) {
+            auto fallback = http::get(compat_url("compat.json"), 64 * 1024, 10);
+            if (!fallback) {
+                r.error = fallback.error().error;
                 // GitHub answers 404 for releases/latest while none is published.
-                if (status == 404) r.verdict = Verdict::NoRelease;
+                if (fallback.error().status == 404) r.verdict = Verdict::NoRelease;
                 return r;
             }
+            body = std::move(fallback->body);
         }
     }
     if (!parse_compat(body, &r.latest)) {
