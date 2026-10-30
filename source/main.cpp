@@ -61,6 +61,7 @@
 #include "util/config.hpp"
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
+#include "util/data_cleanup.hpp"
 #include "util/diagnostics.hpp"
 #include "util/http.hpp"
 #include "util/nand.hpp"
@@ -442,6 +443,10 @@ int main(int argc, char* argv[])
 
     // What ui/ and view/ ask of the screens above them, before any opens.
     install_screen_hooks();
+    // Under logs/ but not logs: the block reference and its interrupted
+    // write (util/pt_block.hpp), which "Delete the log files" leaves.
+    data_cleanup::keep_log("play_timer/block.json");
+    data_cleanup::keep_log("play_timer/block.json.tmp");
 
     // Preferences first: their language replaces the console's once Aurore
     // has read it (Aurore's Cadran, in Application::init()).

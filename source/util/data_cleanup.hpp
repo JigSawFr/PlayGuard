@@ -1,5 +1,5 @@
 // data_cleanup — what the developer tools' "Clear the cache" and "Delete the
-// log files" remove from PlayGuard's data folder, and the removal itself.
+// log files" remove from the app's data folder, and the removal itself.
 // Folders stay; only files go. Never the settings, the change history, backups, profiles,
 // exports or the GitHub sign-in. No Aurore: host-tested (tests/data_cleanup).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -20,20 +20,23 @@ struct Plan
 };
 
 // Every file under `data_dir`/cache and each system's
-// `data_dir`/nand/<key>/cache, in their subfolders too: the last play
-// activity read, the development build list (the game icons are the
-// Boréale homebrews' shared cache, config/boreale/cache/, not PlayGuard's). All of it is read again from the console (or GitHub) when needed.
+// `data_dir`/nand/<key>/cache, in their subfolders too: what the app reads
+// again from the console (or GitHub) when needed, such as the development
+// build list (util/paths.hpp). The game icons are the Boréale homebrews'
+// shared cache (config/boreale/cache/), not the app's.
 Plan cache(const std::string& data_dir);
 
-// Every file under `data_dir`/logs and its subfolders (crashes/, reports/,
-// the play-timer recording in play_timer/) except what is not a log:
-// uploads/ (the links of the reports sent online, and the removal links of
-// the bpa.st pastes sent before; the limits of About › Help & diagnostics prune it)
-// and play_timer/block.json (the reference a block comparison is made
-// against, and its ".tmp": an interrupted write, read in its place), nor
-// `session`, this run's session file (sessions/<name>, util/session_log.hpp),
+// Every file under `data_dir`/logs and its subfolders (crashes/, reports/…)
+// except what is not a log: uploads/ (the links of the reports sent online;
+// the limits of About › Help & diagnostics prune it), the files the app
+// named with keep_log(), nor `session`, this run's session file (sessions/<name>, util/session_log.hpp),
 // still being written.
 Plan logs(const std::string& data_dir, const std::string& session = "");
+
+// Leaves `rel`, a path from `data_dir`/logs ("play_timer/block.json"), out of
+// logs(): a file the app keeps there that is not a log. Called at start-up,
+// before any logs().
+void keep_log(std::string rel);
 
 struct Outcome
 {
