@@ -43,7 +43,7 @@ bool             s_waiting_any = false;
 
 std::string cache_file() { return paths::cache_dir() + "/sys_notes.json"; }
 
-int index(Which which) { return (int)which; }
+int index(Which which) { return std::to_underlying(which); }
 
 // Off the UI thread (ui::write_later), the encoding too: the write takes a
 // copy of the lists.

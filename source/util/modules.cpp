@@ -8,6 +8,7 @@
 #include <map>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <utility>
 
 #include "util/paths.hpp"
 #include "util/sha256.hpp"
@@ -313,7 +314,7 @@ const char* step_name(Step s)
 {
     static const char* const NAMES[] = { "shutdown", "stop",    "swap", "start",       "check", "stop_new",
                                          "restore",  "restart", "confirm", "done", "rolled_back", "failed" };
-    return NAMES[(int)s];
+    return NAMES[std::to_underlying(s)];
 }
 
 bool step_final(Step s)

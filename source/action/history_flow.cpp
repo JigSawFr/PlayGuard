@@ -6,6 +6,7 @@
 #include <charconv>
 #include <chrono>
 #include <string_view>
+#include <utility>
 #include <aurore.hpp>
 #include <fmt/format.h>
 
@@ -332,7 +333,7 @@ std::string day_title(const std::string& day)
 
 std::string filter_label(history_logic::Filter f)
 {
-    return aurore::getStr(fmt::format("playguard/history/filters/{}", (int)f));
+    return aurore::getStr(fmt::format("playguard/history/filters/{}", std::to_underlying(f)));
 }
 
 table_export::Table table(const std::vector<history::Entry>& entries)

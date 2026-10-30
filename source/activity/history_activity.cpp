@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/history_activity.hpp"
 
+#include <utility>
+
 #include <aurore/cadran/ui/cadran_kit.hpp>
 #include <aurore/cadran/ui/cadran_list.hpp>
 
@@ -70,8 +72,8 @@ void HistoryActivity::onContentAvailable()
 void HistoryActivity::choose_filter()
 {
     std::vector<std::string> labels;
-    for (int f = 0; f < (int)Filter::Count; f++) labels.push_back(history_flow::filter_label((Filter)f));
-    ui::pick("playguard/history/show"_i18n, labels, (int)this->filter, [this](int index) {
+    for (int f = 0; f < std::to_underlying(Filter::Count); f++) labels.push_back(history_flow::filter_label((Filter)f));
+    ui::pick("playguard/history/show"_i18n, labels, std::to_underlying(this->filter), [this](int index) {
         this->filter = (Filter)index;
         this->rebuild();
     });

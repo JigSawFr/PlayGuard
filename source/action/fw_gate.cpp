@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/fw_gate.hpp"
 
+#include <utility>
+
 #include <aurore.hpp>
 
 #include "action/update_flow.hpp"
@@ -36,7 +38,7 @@ void apply_session(Choice c)
 {
     app::set_read_only(c != Choice::Risk);
     if (c == Choice::Probe) app::set_dev_mode(true, false);
-    s_choice = NAMES[(int)c];
+    s_choice = NAMES[std::to_underlying(c)];
 }
 }   // namespace
 
@@ -92,7 +94,7 @@ void apply(Choice choice, bool remember)
     if (remember) {
         cfg.fw_gate_fw     = firmware();
         cfg.fw_gate_app    = app::version();
-        cfg.fw_gate_choice = NAMES[(int)choice];
+        cfg.fw_gate_choice = NAMES[std::to_underlying(choice)];
         ui::save_config();
     } else {
         forget();
