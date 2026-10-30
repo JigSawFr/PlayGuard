@@ -50,7 +50,7 @@ CMAKE_ARGS ?=
 JSON_HPP := library/aurore/library/include/aurore/extern/nlohmann/json.hpp
 # The remote link's console-free C (source/link/ the transport, source/sync/
 # PlayGuard's documents and orders), shared by its host tests.
-SYNC_PURE := source/link/bl_json.c source/link/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
+SYNC_PURE := source/link/bl_json.c source/link/mqtt_packet.c source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
              source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c source/sync/sync_icons.c source/sync/sync_titles.c \
              source/core/console_info_pure.c
@@ -342,20 +342,20 @@ modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/module
 # The remote link's files on the SD card, with its C parts (built by $(CC):
 # g++ would build a .c as C++).
 sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
-sync_files_CSRC  := $(CALENDAR_C) source/sync/sync_conf.c source/sync/sync_records.c
-sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/core
+sync_files_CSRC  := $(CALENDAR_C) source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c
+sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
 
 # C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
 # writes the documents it builds (_ARGS: where) for tools/check_sync_json.py.
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
 sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
-sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c source/link/bl_json.c tests/sync_exec/test.c
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c source/link/bl_json.c tests/sync_exec/test.c
 sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync -Isource/link
 sync_engine_SRC   := $(SYNC_PURE) source/link/mqtt_client.c source/link/bl_session.c source/sync/sync_engine.c tests/sync_engine/test.c
 sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
-agent_SRC   := sysmodule/agent/source/agent_core.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
-agent_FLAGS := -std=gnu11 -Isource/sync -Isource/core -Isysmodule/agent/source
+agent_SRC   := sysmodule/agent/source/agent_core.c source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
+agent_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core -Isysmodule/agent/source
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))

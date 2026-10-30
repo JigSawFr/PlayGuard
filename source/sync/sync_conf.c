@@ -23,44 +23,6 @@ void sync_conf_defaults(SyncConf *c)
     c->log_level = 1;
 }
 
-bool sync_parse_uint(const char *s, uint32_t min, uint32_t max, uint32_t *out)
-{
-    if (!s || !*s) return false;
-    uint64_t v = 0;
-    for (const char *p = s; *p; p++) {
-        if (*p < '0' || *p > '9') return false;
-        v = v * 10 + (uint64_t)(*p - '0');
-        if (v > 0xFFFFFFFFull) return false;
-    }
-    if (v < min || v > max) return false;
-    *out = (uint32_t)v;
-    return true;
-}
-
-static bool equal_nocase(const char *a, const char *b)
-{
-    for (; *a && *b; a++, b++) {
-        char x = *a, y = *b;
-        if (x >= 'A' && x <= 'Z') x = (char)(x - 'A' + 'a');
-        if (y >= 'A' && y <= 'Z') y = (char)(y - 'A' + 'a');
-        if (x != y) return false;
-    }
-    return *a == *b;
-}
-
-bool sync_parse_bool(const char *s, bool *out)
-{
-    if (equal_nocase(s, "1") || equal_nocase(s, "true") || equal_nocase(s, "on") || equal_nocase(s, "yes")) {
-        *out = true;
-        return true;
-    }
-    if (equal_nocase(s, "0") || equal_nocase(s, "false") || equal_nocase(s, "off") || equal_nocase(s, "no")) {
-        *out = false;
-        return true;
-    }
-    return false;
-}
-
 bool sync_conf_id_valid(const char *id)
 {
     if (!id || strlen(id) != SYNC_ID_LEN) return false;
@@ -119,40 +81,6 @@ const char *sync_policy_name(SyncPolicy p)
     }
 }
 
-void sync_kv_each(const char *text, size_t len, SyncKvFn fn, void *ctx)
-{
-    size_t i = 0;
-    while (i < len) {
-        size_t end = i;
-        while (end < len && text[end] != '\n') end++;
-        size_t a = i, b = end;
-        if (b > a && text[b - 1] == '\r') b--;
-        // UTF-8 byte-order mark on the first line.
-        if (i == 0 && b - a >= 3 && (unsigned char)text[0] == 0xEF && (unsigned char)text[1] == 0xBB &&
-            (unsigned char)text[2] == 0xBF)
-            a += 3;
-        while (a < b && (text[a] == ' ' || text[a] == '\t')) a++;
-        if (a < b && text[a] != '#') {
-            size_t eq = a;
-            while (eq < b && text[eq] != '=') eq++;
-            if (eq < b) {
-                size_t ke = eq;
-                while (ke > a && (text[ke - 1] == ' ' || text[ke - 1] == '\t')) ke--;
-                char key[48], value[512];
-                const size_t kn = ke - a, vn = b - eq - 1;
-                if (kn > 0 && kn < sizeof(key) && vn < sizeof(value)) {
-                    memcpy(key, text + a, kn);
-                    key[kn] = '\0';
-                    memcpy(value, text + eq + 1, vn);
-                    value[vn] = '\0';
-                    fn(ctx, key, value);
-                }
-            }
-        }
-        i = end + 1;
-    }
-}
-
 typedef struct {
     SyncConf *c;
     int read;
@@ -179,15 +107,15 @@ static void on_kv(void *vctx, const char *key, const char *value)
     bool b = false;
     p->read++;
     if (!strcmp(key, "schema")) {
-        if (sync_parse_uint(value, 1, 1000, &u)) c->schema = (int)u;
+        if (bl_parse_uint(value, 1, 1000, &u)) c->schema = (int)u;
     } else if (!strcmp(key, "enabled")) {
-        if (sync_parse_bool(value, &b)) c->enabled = b;
+        if (bl_parse_bool(value, &b)) c->enabled = b;
     } else if (!strcmp(key, "host")) {
         str_field(c->host, sizeof(c->host), value);
     } else if (!strcmp(key, "port")) {
-        if (sync_parse_uint(value, 1, 65535, &u)) c->port = (uint16_t)u;
+        if (bl_parse_uint(value, 1, 65535, &u)) c->port = (uint16_t)u;
     } else if (!strcmp(key, "tls")) {
-        if (sync_parse_bool(value, &b)) c->tls = b;
+        if (bl_parse_bool(value, &b)) c->tls = b;
     } else if (!strcmp(key, "ca_file")) {
         str_field(c->ca_file, sizeof(c->ca_file), value);
     } else if (!strcmp(key, "mqtt_version")) {
@@ -199,7 +127,7 @@ static void on_kv(void *vctx, const char *key, const char *value)
     } else if (!strcmp(key, "password")) {
         str_field(c->password, sizeof(c->password), value);
     } else if (!strcmp(key, "allow_anonymous")) {
-        if (sync_parse_bool(value, &b)) c->allow_anonymous = b;
+        if (bl_parse_bool(value, &b)) c->allow_anonymous = b;
     } else if (!strcmp(key, "console_id")) {
         if (sync_conf_id_valid(value)) copy(c->console_id, sizeof(c->console_id), value);
     } else if (!strcmp(key, "console_name")) {
@@ -209,34 +137,34 @@ static void on_kv(void *vctx, const char *key, const char *value)
         else if (!strcmp(value, "auto")) c->policy = SyncPolicy_Auto;
         else if (!strcmp(value, "off")) c->policy = SyncPolicy_Off;
     } else if (!strcmp(key, "remote_timer_writes")) {
-        if (sync_parse_bool(value, &b)) c->remote_timer_writes = b;
+        if (bl_parse_bool(value, &b)) c->remote_timer_writes = b;
     } else if (!strcmp(key, "publish_report")) {
-        if (sync_parse_bool(value, &b)) c->publish_report = b;
+        if (bl_parse_bool(value, &b)) c->publish_report = b;
     } else if (!strcmp(key, "publish_activity")) {
-        if (sync_parse_bool(value, &b)) c->publish_activity = b;
+        if (bl_parse_bool(value, &b)) c->publish_activity = b;
     } else if (!strcmp(key, "publish_games")) {
-        if (sync_parse_bool(value, &b)) c->publish_games = b;
+        if (bl_parse_bool(value, &b)) c->publish_games = b;
     } else if (!strcmp(key, "publish_icons")) {
-        if (sync_parse_bool(value, &b)) c->publish_icons = b;
+        if (bl_parse_bool(value, &b)) c->publish_icons = b;
     } else if (!strcmp(key, "publish_console")) {
-        if (sync_parse_bool(value, &b)) c->publish_console = b;
+        if (bl_parse_bool(value, &b)) c->publish_console = b;
     } else if (!strcmp(key, "publish_network")) {
-        if (sync_parse_bool(value, &b)) c->publish_network = b;
+        if (bl_parse_bool(value, &b)) c->publish_network = b;
     } else if (!strcmp(key, "publish_hardware")) {
-        if (sync_parse_bool(value, &b)) c->publish_hardware = b;
+        if (bl_parse_bool(value, &b)) c->publish_hardware = b;
     } else if (!strcmp(key, "publish_serial")) {
-        if (sync_parse_bool(value, &b)) c->publish_serial = b;
+        if (bl_parse_bool(value, &b)) c->publish_serial = b;
     } else if (!strcmp(key, "ha_discovery")) {
-        if (sync_parse_bool(value, &b)) c->ha_discovery = b;
+        if (bl_parse_bool(value, &b)) c->ha_discovery = b;
     } else if (!strcmp(key, "poll_s")) {
-        if (sync_parse_uint(value, 10, 300, &u)) c->poll_s = (uint16_t)u;
+        if (bl_parse_uint(value, 10, 300, &u)) c->poll_s = (uint16_t)u;
     } else if (!strcmp(key, "topic_prefix")) {
         if (strlen(value) < sizeof(c->topic_prefix) && prefix_valid(value)) copy(c->topic_prefix, sizeof(c->topic_prefix), value);
     } else if (!strcmp(key, "discovery_prefix")) {
         if (strlen(value) < sizeof(c->discovery_prefix) && prefix_valid(value))
             copy(c->discovery_prefix, sizeof(c->discovery_prefix), value);
     } else if (!strcmp(key, "log_level")) {
-        if (sync_parse_uint(value, 0, 2, &u)) c->log_level = (int)u;
+        if (bl_parse_uint(value, 0, 2, &u)) c->log_level = (int)u;
     } else {
         keep_extra(c, key, value);
     }
@@ -246,7 +174,7 @@ bool sync_conf_parse(SyncConf *c, const char *text, size_t len)
 {
     ParseCtx p = { c, 0 };
     c->extra[0] = '\0';
-    sync_kv_each(text, len, on_kv, &p);
+    bl_kv_each(text, len, on_kv, &p);
     return p.read > 0 || len == 0;
 }
 

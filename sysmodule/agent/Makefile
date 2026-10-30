@@ -19,7 +19,7 @@ CFILES      := main.c agent_core.c agent_ipc.c \
                pctl_ops.c pctl_dump.c pure.c rescue.c write_guard.c time_ops.c calendar.c sysinfo.c \
                playstats.c playstats_logic.c playlog.c nacp.c nacp_read.c \
                console_info.c console_info_pure.c \
-               bl_json.c mqtt_packet.c mqtt_client.c sync_conf.c sync_apply.c sync_records.c sync_exec.c \
+               bl_json.c mqtt_packet.c mqtt_client.c bl_kv.c sync_conf.c sync_apply.c sync_records.c sync_exec.c \
                sync_entities.c sync_discovery.c sync_state.c sync_system.c sync_watch.c sync_engine.c \
                bl_net.c bl_tls.c bl_session.c sync_icons.c sync_titles.c
 # nacp.c reads compressed game titles (zlib).

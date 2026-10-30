@@ -1,7 +1,7 @@
 // sync_conf — the remote link's settings (sd:/config/playguard/sync.conf)
 // and the small flat files PlayGuard and the agent exchange: "key=value",
-// one per line, '#' starts a comment. Read by both processes with this one
-// parser (the agent has no JSON library). PlayGuard's Sync screen writes
+// one per line, read by both processes with link/bl_kv (the agent has no
+// JSON library). PlayGuard's Sync screen writes
 // sync.conf; it can also be edited by hand. A key this version does not know
 // is kept and written back.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -10,6 +10,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include "../link/bl_kv.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -122,17 +124,6 @@ bool        sync_conf_publishes(const SyncConf *c, SyncPublish p);
 const char *sync_publish_name(SyncPublish p);
 // "auto" / "5" / "3.1.1", as sync.conf writes it.
 const char *sync_mqtt_version_name(SyncMqttVersion v);
-
-// The generic reader the other flat files use: calls `fn` for each
-// "key=value" line (key trimmed, value as written up to the line end, a
-// trailing '\r' dropped).
-typedef void (*SyncKvFn)(void *ctx, const char *key, const char *value);
-void sync_kv_each(const char *text, size_t len, SyncKvFn fn, void *ctx);
-
-// Parses an unsigned integer with bounds; false when it is not one.
-bool sync_parse_uint(const char *s, uint32_t min, uint32_t max, uint32_t *out);
-// "1" / "true" / "on" / "yes" and "0" / "false" / "off" / "no".
-bool sync_parse_bool(const char *s, bool *out);
 
 #ifdef __cplusplus
 }
