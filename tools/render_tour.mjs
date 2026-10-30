@@ -10,7 +10,7 @@
 // The texts are the site's catalog (site/i18n/<language>.json, its tour_*
 // keys), the music branding/tour-music.m4a (branding/tour-music.txt), the
 // clips images/screenshots/clips/*.webm (tools/readme_screenshots.py clips).
-// Needs Node + Playwright (Chromium) and ffmpeg; the Sora font is the site's own (site/assets/fonts/).
+// Needs Node + Playwright (Chromium) and ffmpeg; the Sora font is the sites' own (library/boreale-site/assets/fonts/).
 //   node tools/render_tour.mjs [--gif]
 // The website's tour in the console's other languages: their texts (the
 // site's catalogs, site/i18n/) over their screenshots (tools/site_screenshots.mjs)

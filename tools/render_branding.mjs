@@ -10,7 +10,7 @@
 // home screen, starts: SPLASH below, each iPhone's screen in both orientations;
 // web/index.html links each with its media query).
 // Needs Node + Playwright (Chromium); loads the Sora font from Google Fonts
-// (the splash screens: site/assets/fonts/sora.woff2).
+// (the splash screens: library/boreale-site/assets/fonts/sora.woff2).
 //   node tools/render_branding.mjs            everything
 //   node tools/render_branding.mjs splash     the splash screens only
 import { chromium } from 'playwright';
@@ -81,7 +81,7 @@ for (const job of splashOnly ? [] : jobs) {
 
 // The splash screens: the simulator's dark ground (web/simulator.css' --bg),
 // the icon and the wordmark in the middle, as PlayGuard's loading screen.
-const sora = readFileSync(join(root, 'site/assets/fonts/sora.woff2')).toString('base64');
+const sora = readFileSync(join(root, 'library/boreale-site/assets/fonts/sora.woff2')).toString('base64');
 const icon = readFileSync(join(root, 'branding/icon.svg'), 'utf8');
 for (const [w, h, ratio] of SPLASH) {
   const splash = await browser.newPage({ deviceScaleFactor: ratio });
