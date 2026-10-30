@@ -51,7 +51,7 @@ static std::string read(const std::string& path)
 static std::string sha(const std::string& bytes)
 {
     Sha256 h;
-    h.update(bytes.data(), bytes.size());
+    h.update(bytes);
     return h.hex();
 }
 

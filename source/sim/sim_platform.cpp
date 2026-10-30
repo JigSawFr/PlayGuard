@@ -80,7 +80,7 @@ bool platform_random(void* buf, size_t size)
 // For sim_pctl.c's pctl_pin_hmac: `dst` gets 32 bytes.
 extern "C" void sim_hmac_sha256(void* dst, const void* key, size_t key_size, const void* msg, size_t size)
 {
-    const std::array<uint8_t, 32> mac = hmac_sha256(key, key_size, msg, size);
+    const std::array<uint8_t, 32> mac = hmac_sha256({static_cast<const uint8_t*>(key), key_size}, {static_cast<const uint8_t*>(msg), size});
     std::memcpy(dst, mac.data(), mac.size());
 }
 

@@ -166,7 +166,7 @@ void seed(const std::string& sd_root)
 extern "C" void forwarder_sha256(const void* data, size_t size, uint8_t out[32])
 {
     Sha256 h;
-    h.update(data, size);
+    h.update({static_cast<const uint8_t*>(data), size});
     const auto d = h.digest();
     std::memcpy(out, d.data(), d.size());
 }
