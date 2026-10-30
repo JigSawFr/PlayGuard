@@ -1,4 +1,4 @@
-// json_util — reading the JSON files and answers PlayGuard is given without
+// json_util — reading the JSON files and answers the app is given without
 // an exception: each field read as its type or not at all, a text that is no
 // JSON as a false. Header-only, plain C++ (nlohmann/json, from Aurore).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

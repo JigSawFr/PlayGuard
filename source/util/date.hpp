@@ -69,5 +69,4 @@ inline std::string local_time(std::time_t t, const char* fmt)
 // midnight. Inline, as local_time.
 inline std::string hh_mm(int hour, int minute) { return std::format("{:02}:{:02}", hour, minute); }
 inline std::string hh_mm(int minutes) { return hh_mm(minutes / 60, minutes % 60); }
-
 }   // namespace date

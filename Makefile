@@ -323,9 +323,9 @@ pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.c
 session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp
 # A C source a C++ suite links (clang++ refuses to build a .c as C++).
 session_log_CSRC  := source/util/crash_dump.c
-session_log_CFLAGS := -std=c11 -Isource/util
+session_log_CFLAGS := -std=c11 -Isource/util -Isource
 crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
-crash_dump_FLAGS := -std=c11 -Isource/util
+crash_dump_FLAGS := -std=c11 -Isource/util -Isource
 # The desktop and web simulators' console (source/sim/*.c, sim_state.h) and
 # their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
 # parts of the service layer they share with the console.

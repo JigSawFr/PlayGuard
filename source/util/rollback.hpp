@@ -1,4 +1,4 @@
-// rollback — going back to the build PlayGuard ran before the last one
+// rollback — going back to the build the app ran before the last one
 // installed in place (Install another build, Update in place). Installing
 // keeps the replaced .nro as "<nro>.previous" and its name in
 // previous_build.json; starting a build just installed is checked
@@ -14,6 +14,12 @@
 
 namespace rollback
 {
+
+// previous_build.json, boot_check.json and went_back.json's "schema". They
+// are read by the build gone back to, older by design: a key is only ever
+// added (one changing meaning would be a new key), and their readers take
+// any schema, skipping what they do not know.
+constexpr int SCHEMA = 1;
 
 // "<nro>.previous": the build that ran before.
 std::string previous_file(const std::string& nro);
@@ -37,20 +43,20 @@ bool write_check(const std::string& json_file, const Check& check);
 // build installed did not reach its first screen. `checked`: boot_check.json
 // was there, `starts_before` read from it (before this start counts);
 // `have_previous`: <nro>.previous is there. It is offered before
-// PlayGuard's own lock screen (which may be what crashes); going back still
+// the app's own lock screen (which may be what crashes); going back still
 // needs the PIN (go_back_allowed).
 bool offer_at_start(bool checked, int starts_before, bool have_previous);
 
 // Whether the start-up may go back once the system's PIN screen (pctlauth,
-// not PlayGuard's code) was shown: the PIN entered, or no PIN set. A start
+// not the app's code) was shown: the PIN entered, or no PIN set. A start
 // that did not finish is easy to cause (the power button), and going back
-// replaces PlayGuard, as Install another build does with the PIN.
+// replaces the app, as Install another build does with the PIN.
 bool go_back_allowed(bool pin_entered, bool no_pin_set);
 
 // Swaps <nro> and <nro>.previous (the build running becomes the previous
 // one), through paths::replace_file. When a step fails, what was moved is
 // put back.
-bool swap(const std::string& nro, std::string* error);
+[[nodiscard]] bool swap(const std::string& nro, std::string* error);
 
 // An install or a swap stopped half-way (a power cut between its renames,
 // paths::recover_replace): <nro> put back from "<nro>.old", or the build
