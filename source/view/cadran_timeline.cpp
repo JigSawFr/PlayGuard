@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <fmt/format.h>
 #include <vector>
 
 using namespace aurore::literals;
@@ -18,10 +17,17 @@ constexpr float WORD_SIZE = 15;   // the words'
 constexpr float GAP       = 8;    // between the line and the times
 constexpr int   LOW_MIN   = 15;   // the last minutes, in amber
 
-std::string clock_text(int minutes)
+// "HH:MM", on the stack: the view writes it at every frame.
+struct Clock
+{
+    char text[6];
+};
+
+Clock clock_text(int minutes)
 {
     minutes = std::max(0, minutes) % (24 * 60);
-    return fmt::format("{:02d}:{:02d}", minutes / 60, minutes % 60);
+    const int h = minutes / 60, m = minutes % 60;
+    return { { char('0' + h / 10), char('0' + h % 10), ':', char('0' + m / 10), char('0' + m % 10), '\0' } };
 }
 }   // namespace
 
@@ -74,14 +80,15 @@ void CadranTimeline::draw(NVGcontext* vg, float x, float y, float width, float h
 
     // A label: the time in the display face, its word after it, quieter.
     const float time_px = TIME_SIZE * s, word_px = WORD_SIZE * s, space = 6 * s;
-    const auto advance = [vg](int font, float size, const std::string& text) {
+    const auto advance = [vg](int font, float size, const char* text) {
         float b[4];
         nvgFontFaceId(vg, font);
         nvgFontSize(vg, size);
-        return nvgTextBounds(vg, 0, 0, text.c_str(), nullptr, b);
+        return nvgTextBounds(vg, 0, 0, text, nullptr, b);
     };
     const auto label_width = [&](const Mark& m) {
-        return advance(this->digits_font, time_px, clock_text(m.at)) + space + advance(this->text_font, word_px, m.word);
+        return advance(this->digits_font, time_px, clock_text(m.at).text) + space +
+               advance(this->text_font, word_px, m.word.c_str());
     };
     // At least an hour wide; the last mark short of the right edge by half
     // its label.
@@ -124,12 +131,12 @@ void CadranTimeline::draw(NVGcontext* vg, float x, float y, float width, float h
 
         const float w = label_width(m);
         const float left = std::max(min_left, std::min(mx - w / 2, x + width - w));
-        const std::string time = clock_text(m.at);
+        const Clock time = clock_text(m.at);
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
         nvgFontFaceId(vg, this->digits_font);
         nvgFontSize(vg, time_px);
         nvgFillColor(vg, this->a(next ? ink : quiet));
-        const float tw = nvgText(vg, left, ty + time_px, time.c_str(), nullptr) - left;
+        const float tw = nvgText(vg, left, ty + time_px, time.text, nullptr) - left;
         nvgFontFaceId(vg, this->text_font);
         nvgFontSize(vg, word_px);
         nvgFillColor(vg, this->a(quiet));
