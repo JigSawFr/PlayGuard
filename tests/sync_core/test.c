@@ -20,7 +20,7 @@
 #include "sync_titles.h"
 #include "sync_system.h"
 #include "sync_exec.h"
-#include "sync_json.h"
+#include "bl_json.h"
 #include "sync_state.h"
 #include "sync_watch.h"
 
@@ -49,44 +49,44 @@ static void save(const char *name, const char *text)
 static void test_json(void)
 {
     char buf[256];
-    SyncJson j;
-    sync_json_init(&j, buf, sizeof(buf));
-    sync_json_obj(&j);
-    sync_json_kstr(&j, "a", "x\"y\\z\n\t\x01");
-    sync_json_kint(&j, "n", -42);
-    sync_json_kbool(&j, "t", true);
-    sync_json_knull(&j, "z");
-    sync_json_key(&j, "arr");
-    sync_json_arr(&j);
-    sync_json_int(&j, 1);
-    sync_json_obj(&j);
-    sync_json_obj_end(&j);
-    sync_json_hex64(&j, 0x0100000000010000ULL);
-    sync_json_arr_end(&j);
-    sync_json_kint_or_null(&j, "maybe", false, 5);
-    sync_json_members(&j, "\"m\":1,\"k\":2");
-    sync_json_obj_end(&j);
-    const size_t n = sync_json_end(&j);
+    BlJson j;
+    bl_json_init(&j, buf, sizeof(buf));
+    bl_json_obj(&j);
+    bl_json_kstr(&j, "a", "x\"y\\z\n\t\x01");
+    bl_json_kint(&j, "n", -42);
+    bl_json_kbool(&j, "t", true);
+    bl_json_knull(&j, "z");
+    bl_json_key(&j, "arr");
+    bl_json_arr(&j);
+    bl_json_int(&j, 1);
+    bl_json_obj(&j);
+    bl_json_obj_end(&j);
+    bl_json_hex64(&j, 0x0100000000010000ULL);
+    bl_json_arr_end(&j);
+    bl_json_kint_or_null(&j, "maybe", false, 5);
+    bl_json_members(&j, "\"m\":1,\"k\":2");
+    bl_json_obj_end(&j);
+    const size_t n = bl_json_end(&j);
     CHECK(n == strlen(buf));
     CHECK(!strcmp(buf, "{\"a\":\"x\\\"y\\\\z\\n\\t\\u0001\",\"n\":-42,\"t\":true,\"z\":null,"
                         "\"arr\":[1,{},\"0100000000010000\"],\"maybe\":null,\"m\":1,\"k\":2}"));
 
     // Too small: 0, and the buffer stays a valid C string.
     char small[8];
-    sync_json_init(&j, small, sizeof(small));
-    sync_json_obj(&j);
-    sync_json_kstr(&j, "long", "value");
-    sync_json_obj_end(&j);
-    CHECK(sync_json_end(&j) == 0);
+    bl_json_init(&j, small, sizeof(small));
+    bl_json_obj(&j);
+    bl_json_kstr(&j, "long", "value");
+    bl_json_obj_end(&j);
+    CHECK(bl_json_end(&j) == 0);
     CHECK(strlen(small) < sizeof(small));
 
     // Unbalanced: 0.
-    sync_json_init(&j, buf, sizeof(buf));
-    sync_json_obj(&j);
-    CHECK(sync_json_end(&j) == 0);
-    sync_json_init(&j, buf, sizeof(buf));
-    sync_json_obj_end(&j);
-    CHECK(sync_json_end(&j) == 0);
+    bl_json_init(&j, buf, sizeof(buf));
+    bl_json_obj(&j);
+    CHECK(bl_json_end(&j) == 0);
+    bl_json_init(&j, buf, sizeof(buf));
+    bl_json_obj_end(&j);
+    CHECK(bl_json_end(&j) == 0);
 }
 
 // ---------------------------------------------------------------- MQTT
@@ -1270,42 +1270,42 @@ static void test_export_entities(void)
     size_t count = 0;
     const SyncEntity *e = sync_entities(&count);
     static const char *const WRITE[] = { "none", "free", "timer" };
-    SyncJson j;
-    sync_json_init(&j, buf, sizeof(buf));
-    sync_json_obj(&j);
-    sync_json_kint(&j, "schema", SYNC_SCHEMA);
-    sync_json_key(&j, "entities");
-    sync_json_arr(&j);
+    BlJson j;
+    bl_json_init(&j, buf, sizeof(buf));
+    bl_json_obj(&j);
+    bl_json_kint(&j, "schema", SYNC_SCHEMA);
+    bl_json_key(&j, "entities");
+    bl_json_arr(&j);
     for (size_t i = 0; i < count; i++) {
-        sync_json_obj(&j);
-        sync_json_kstr(&j, "id", e[i].id);
-        sync_json_kstr(&j, "platform", e[i].platform);
-        sync_json_kstr(&j, "write", WRITE[e[i].write]);
-        sync_json_kstr(&j, "name", e[i].name);
-        sync_json_kstr_or_null(&j, "value_template", e[i].value_template);
-        sync_json_kstr(&j, "topic", e[i].topic ? e[i].topic : "state");
-        sync_json_kstr(&j, "publish", sync_publish_name(e[i].publish));
-        sync_json_key(&j, "extra");
-        sync_json_obj(&j);
-        sync_json_members(&j, e[i].extra);
-        sync_json_obj_end(&j);
-        sync_json_obj_end(&j);
+        bl_json_obj(&j);
+        bl_json_kstr(&j, "id", e[i].id);
+        bl_json_kstr(&j, "platform", e[i].platform);
+        bl_json_kstr(&j, "write", WRITE[e[i].write]);
+        bl_json_kstr(&j, "name", e[i].name);
+        bl_json_kstr_or_null(&j, "value_template", e[i].value_template);
+        bl_json_kstr(&j, "topic", e[i].topic ? e[i].topic : "state");
+        bl_json_kstr(&j, "publish", sync_publish_name(e[i].publish));
+        bl_json_key(&j, "extra");
+        bl_json_obj(&j);
+        bl_json_members(&j, e[i].extra);
+        bl_json_obj_end(&j);
+        bl_json_obj_end(&j);
     }
-    sync_json_arr_end(&j);
+    bl_json_arr_end(&j);
     // What the discovery removes (an earlier version's).
     size_t gone = 0;
     const SyncRetired *r = sync_entities_retired(&gone);
-    sync_json_key(&j, "retired");
-    sync_json_arr(&j);
+    bl_json_key(&j, "retired");
+    bl_json_arr(&j);
     for (size_t i = 0; i < gone; i++) {
-        sync_json_obj(&j);
-        sync_json_kstr(&j, "id", r[i].id);
-        sync_json_kstr(&j, "platform", r[i].platform);
-        sync_json_obj_end(&j);
+        bl_json_obj(&j);
+        bl_json_kstr(&j, "id", r[i].id);
+        bl_json_kstr(&j, "platform", r[i].platform);
+        bl_json_obj_end(&j);
     }
-    sync_json_arr_end(&j);
-    sync_json_obj_end(&j);
-    const size_t n = sync_json_end(&j);
+    bl_json_arr_end(&j);
+    bl_json_obj_end(&j);
+    const size_t n = bl_json_end(&j);
     CHECK(n > 0 && contains(buf, "\"id\":\"limit_mon\",\"platform\":\"number\",\"write\":\"timer\""));
     CHECK(contains(buf, "\"retired\":[{\"id\":\"temp_unlocked\",\"platform\":\"binary_sensor\"}"));
     CHECK(contains(buf, "\"id\":\"ip_address\",\"platform\":\"sensor\",\"write\":\"none\",\"name\":\"IP address\","

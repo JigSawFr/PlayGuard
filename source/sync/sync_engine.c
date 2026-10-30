@@ -67,7 +67,7 @@ static void identity(SyncEngine *e)
     snprintf(e->client_id, sizeof(e->client_id), "pg-%s-%s", id, e->source);
 }
 
-void sync_engine_init(SyncEngine *e, const SyncConf *conf, SyncIo io, const SyncHost *host, uint64_t (*now_ms)(void),
+void sync_engine_init(SyncEngine *e, const SyncConf *conf, BlIo io, const SyncHost *host, uint64_t (*now_ms)(void),
                       const char *source, const char *sw_version)
 {
     memset(e, 0, sizeof(*e));

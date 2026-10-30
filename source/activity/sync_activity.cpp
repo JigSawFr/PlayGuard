@@ -11,7 +11,7 @@
 #include "action/ha_update_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
-#include "sync/sync_net.h"
+#include "link/bl_net.h"
 #include "ui/ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -54,7 +54,7 @@ std::string or_none(const char* value)
 std::string since_text(uint64_t then_ms)
 {
     if (!then_ms) return "";
-    const uint64_t now = sync_now_ms();
+    const uint64_t now = bl_now_ms();
     const uint64_t ago_s = now > then_ms ? (now - then_ms) / 1000 : 0;
     u64 posix = 0;
     if (!time_local_now(&posix, nullptr) || !posix) return "";

@@ -15,8 +15,8 @@
 
 #include "action/game_scan.hpp"
 #include "action/title_names.hpp"
-#include "sync/sync_net.h"
-#include "sync/sync_tls.h"
+#include "link/bl_net.h"
+#include "link/bl_tls.h"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sync_files.hpp"
@@ -107,14 +107,14 @@ void publish(MqttClient& c, Job& j, const std::string& sub, const void* bytes, s
 void run(std::shared_ptr<Job> job)
 {
     Job& j = *job;
-    SyncTcp tcp{ -1 };
-    SyncTls tls;
+    BlTcp tcp{ -1 };
+    BlTls tls;
     std::memset(&tls, 0, sizeof(tls));
     tls.tcp.fd = -1;
-    const SyncIo io = j.conf.tls ? sync_tls_io(&tls, j.conf.ca_file) : sync_tcp_io(&tcp);
+    const BlIo io = j.conf.tls ? bl_tls_io(&tls, j.conf.ca_file) : bl_tcp_io(&tcp);
     uint8_t rx[512];   // a CONNACK: nothing is subscribed
     MqttClient c;
-    mqtt_client_init(&c, io, rx, sizeof(rx), sync_now_ms, noop, nullptr);
+    mqtt_client_init(&c, io, rx, sizeof(rx), bl_now_ms, noop, nullptr);
     std::vector<std::pair<uint64_t, uint32_t>> sent;
     std::vector<uint64_t> cleared;
     size_t too_large = 0;

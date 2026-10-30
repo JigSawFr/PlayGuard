@@ -15,7 +15,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include "mqtt_client.h"
+#include "../link/mqtt_client.h"
 #include "sync_apply.h"
 #include "sync_conf.h"
 #include "sync_discovery.h"
@@ -138,7 +138,7 @@ typedef struct {
     char        line[320];
 } SyncEngine;
 
-void sync_engine_init(SyncEngine *e, const SyncConf *conf, SyncIo io, const SyncHost *host, uint64_t (*now_ms)(void),
+void sync_engine_init(SyncEngine *e, const SyncConf *conf, BlIo io, const SyncHost *host, uint64_t (*now_ms)(void),
                       const char *source, const char *sw_version);
 // New settings: reconnects when the broker or the identity changed, else
 // publishes the discovery again.

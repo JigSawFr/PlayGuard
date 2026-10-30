@@ -6,7 +6,7 @@
 
 #define WRITE_TIMEOUT_MS 5000
 
-void mqtt_client_init(MqttClient *c, SyncIo io, uint8_t *rx, size_t rx_cap, uint64_t (*now_ms)(void),
+void mqtt_client_init(MqttClient *c, BlIo io, uint8_t *rx, size_t rx_cap, uint64_t (*now_ms)(void),
                       MqttOnMessage on_message, void *user)
 {
     memset(c, 0, sizeof(*c));

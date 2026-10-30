@@ -1,6 +1,6 @@
-// mqtt_client — a small MQTT 5.0 / 3.1.1 client over any byte stream (SyncIo):
-// plain TCP (sync_net.c), TLS through the console's ssl service
-// (nx/sync_tls_nx.c), or a scripted broker in the host tests. One thread
+// mqtt_client — a small MQTT 5.0 / 3.1.1 client over any byte stream (BlIo):
+// plain TCP (bl_net.c), TLS through the console's ssl service
+// (bl_tls.c), or a scripted broker in the host tests. One thread
 // drives it; nothing is allocated (the receive buffer is the caller's).
 //
 // Outbound publishes are QoS 0: the retained state heals itself at the next
@@ -28,12 +28,12 @@ typedef struct {
     // Up to `len` bytes: > 0 read, 0 nothing within `timeout_ms`, < 0 closed or failed.
     long (*read)(void *ctx, void *buf, size_t len, int timeout_ms);
     void (*close)(void *ctx);
-} SyncIo;
+} BlIo;
 
 typedef void (*MqttOnMessage)(void *user, const MqttPublish *msg);
 
 typedef struct {
-    SyncIo        io;
+    BlIo          io;
     uint8_t      *rx;
     size_t        rx_cap, rx_len;
     size_t        skip;             // bytes of an oversized packet still to drop
@@ -57,7 +57,7 @@ typedef struct {
     char          error[128];
 } MqttClient;
 
-void mqtt_client_init(MqttClient *c, SyncIo io, uint8_t *rx, size_t rx_cap, uint64_t (*now_ms)(void),
+void mqtt_client_init(MqttClient *c, BlIo io, uint8_t *rx, size_t rx_cap, uint64_t (*now_ms)(void),
                       MqttOnMessage on_message, void *user);
 
 // Opens the stream, sends CONNECT and waits for an accepted CONNACK.

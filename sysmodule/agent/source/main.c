@@ -29,6 +29,8 @@
 #include <switch.h>
 
 #include "agent_core.h"
+#include "bl_net.h"
+#include "bl_tls.h"
 #include "calendar.h"
 #include "console_info.h"
 #include "nand_key.h"
@@ -36,11 +38,9 @@
 #include "playstats.h"
 #include "sync_engine.h"
 #include "sync_icons.h"
-#include "sync_titles.h"
-#include "sync_net.h"
 #include "sync_state.h"
 #include "sync_system.h"
-#include "sync_tls.h"
+#include "sync_titles.h"
 #include "sync_watch.h"
 #include "sysinfo.h"
 #include "time_ops.h"
@@ -104,7 +104,7 @@ static bool wall_stamp(char out[32])
 {
     const u64 wall = g_wall_posix;
     if (!wall) return false;
-    const uint64_t now = sync_now_ms(), read = g_wall_ms;
+    const uint64_t now = bl_now_ms(), read = g_wall_ms;
     const s64 local = (s64)(wall + (now > read ? (now - read) / 1000 : 0)) + g_wall_offset;
     const s64 days = local >= 0 ? local / 86400 : (local - 86399) / 86400;
     const unsigned s = (unsigned)(local - days * 86400);
@@ -304,8 +304,8 @@ static char          g_firmware[16];
 static char          g_today[11];
 static SyncEngine    g_engine;
 static bool          g_engine_on;
-static SyncTcp       g_tcp;
-static SyncTls       g_tls;
+static BlTcp         g_tcp;
+static BlTls         g_tls;
 static bool          g_sockets;
 static bool          g_stopped;   // PrepareShutdown: offline until the process ends
 
@@ -630,7 +630,7 @@ static size_t host_activity(void *ctx, char *out, size_t cap)
     }
     mutexUnlock(&g_lock);
     if (session) return n;
-    read_activity(sync_now_ms(), false);
+    read_activity(bl_now_ms(), false);
     if (!g_activity_len || g_activity_len >= cap) return 0;
     memcpy(out, g_activity, g_activity_len);
     return g_activity_len;
@@ -848,7 +848,7 @@ static size_t host_system(void *ctx, char *out, size_t cap)
     sysinfo_get(&si);
     const char *was = phase("the console's readings (psm, ts, apm, nifm)");
     console_live_read(&live);
-    const uint64_t now_ms = sync_now_ms();
+    const uint64_t now_ms = bl_now_ms();
     if (!space_at || now_ms - space_at >= SPACE_EVERY_MS) {
         space_at = now_ms ? now_ms : 1;
         phase("the storage (fs)");
@@ -937,8 +937,8 @@ static void engine_start(void)
     g_tcp.fd = -1;
     memset(&g_tls, 0, sizeof(g_tls));
     g_tls.tcp.fd = -1;
-    const SyncIo io = g_conf.tls ? sync_tls_io(&g_tls, g_conf.ca_file) : sync_tcp_io(&g_tcp);
-    sync_engine_init(&g_engine, &g_conf, io, &HOST, sync_now_ms, "agent", AGENT_VERSION);
+    const BlIo io = g_conf.tls ? bl_tls_io(&g_tls, g_conf.ca_file) : bl_tcp_io(&g_tcp);
+    sync_engine_init(&g_engine, &g_conf, io, &HOST, bl_now_ms, "agent", AGENT_VERSION);
     g_engine_on = true;
     mutexLock(&g_lock);
     sync_conf_device_id(&g_conf, g_shared.console_id);   // this system's
@@ -981,7 +981,7 @@ static void watchdog(void *arg)
     uint64_t told = 0, prev = 0;
     for (;;) {
         svcSleepThread(5000000000ULL);
-        const uint64_t turn = g_turn_ms, now = sync_now_ms();
+        const uint64_t turn = g_turn_ms, now = bl_now_ms();
         // A round long after the last one (the console slept, and the tick
         // may have run on): the loop has not had its chance to turn yet.
         const bool awake = prev && now - prev < 15000;
@@ -1048,7 +1048,7 @@ static void new_day(bool app_session)
     memcpy(g_today, today, sizeof(g_today));
     if (app_session) return;
     if (!first && g_conf.publish_activity && sync_engine_online(&g_engine)) {
-        read_activity(sync_now_ms(), true);
+        read_activity(bl_now_ms(), true);
         // Yesterday, as the date it was.
         char date[11] = "";
         const TimeRule *rule = time_console_rule();
@@ -1184,7 +1184,7 @@ static void publish_status(void)
     g_shared.status.pending = (uint32_t)sync_engine_pending(&g_engine);
     g_shared.status.configured = g_conf.enabled && !sync_conf_problem(&g_conf);
     g_shared.status.read_only = !may_write();
-    g_shared.status.uptime_ms = sync_now_ms();
+    g_shared.status.uptime_ms = bl_now_ms();
     mutexUnlock(&g_lock);
 }
 
@@ -1257,12 +1257,12 @@ int main(int argc, char **argv)
     load_conf();
     load_records();
     agent_ipc_start();
-    wall_read(sync_now_ms());
+    wall_read(bl_now_ms());
     if (R_SUCCEEDED(threadCreate(&g_watchdog, watchdog, NULL, NULL, 0x2000, 0x2D, -2))) threadStart(&g_watchdog);
     slog("agent %s started, firmware %s", AGENT_VERSION, g_firmware);
 
     for (;;) {
-        const uint64_t now = sync_now_ms();
+        const uint64_t now = bl_now_ms();
         g_turn_ms = now;
         phase("the clock (time)");
         wall_read(now);

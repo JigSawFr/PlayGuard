@@ -29,11 +29,11 @@
 #include "action/sys_update_flow.hpp"
 #include "app.hpp"
 #include "core/console_info.h"
+#include "link/bl_net.h"
+#include "link/bl_tls.h"
 #include "sync/sync_games.h"
-#include "sync/sync_net.h"
 #include "sync/sync_state.h"
 #include "sync/sync_system.h"
-#include "sync/sync_tls.h"
 #include "ui/app_hooks.hpp"
 #include "ui/ui.hpp"
 #include "util/agent_client.hpp"
@@ -234,16 +234,16 @@ void host_log(void* ctx, const char* line)
 struct Link
 {
     SyncEngine engine;
-    SyncTcp    tcp;
-    SyncTls    tls;
+    BlTcp      tcp;
+    BlTls      tls;
 };
 
-SyncIo io_for(Link& l, const SyncConf& c)
+BlIo io_for(Link& l, const SyncConf& c)
 {
     l.tcp.fd = -1;
     std::memset(&l.tls, 0, sizeof(l.tls));
     l.tls.tcp.fd = -1;
-    return c.tls ? sync_tls_io(&l.tls, c.ca_file) : sync_tcp_io(&l.tcp);
+    return c.tls ? bl_tls_io(&l.tls, c.ca_file) : bl_tcp_io(&l.tcp);
 }
 
 void worker(std::shared_ptr<Shared> sh, SyncConf conf, std::string version)
@@ -265,7 +265,7 @@ void worker(std::shared_ptr<Shared> sh, SyncConf conf, std::string version)
 
     // About 40 KiB: on the heap, not on this thread's stack.
     std::unique_ptr<Link> link(new Link());
-    sync_engine_init(&link->engine, &conf, io_for(*link, conf), &host, sync_now_ms, "app", version.c_str());
+    sync_engine_init(&link->engine, &conf, io_for(*link, conf), &host, bl_now_ms, "app", version.c_str());
 
     for (;;) {
         bool reconf = false, now = false, state = false, activity = false, discovery = false;
@@ -294,7 +294,7 @@ void worker(std::shared_ptr<Shared> sh, SyncConf conf, std::string version)
                 const uint32_t next_id = e->next_id;
                 sync_engine_stop(e);
                 conf = next;
-                sync_engine_init(e, &conf, io_for(*link, conf), &host, sync_now_ms, "app", version.c_str());
+                sync_engine_init(e, &conf, io_for(*link, conf), &host, bl_now_ms, "app", version.c_str());
                 e->next_id = next_id;
             } else {
                 conf = next;
@@ -1401,7 +1401,7 @@ Status status()
         st.agent_read_only = s_agent_status.read_only;
         // Its turns stamp the status with the system tick, which PlayGuard
         // reads too.
-        const uint64_t now = sync_now_ms();
+        const uint64_t now = bl_now_ms();
         if (s_agent_status.uptime_ms && now > s_agent_status.uptime_ms) st.agent_quiet_ms = now - s_agent_status.uptime_ms;
     } else if (s_shared) {
         std::lock_guard<std::mutex> lk(s_shared->m);

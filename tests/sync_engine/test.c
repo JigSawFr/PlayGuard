@@ -524,7 +524,7 @@ static void setup(bool timer_writes, SyncPolicy policy)
     strcpy(conf.console_name, "Salon");
     conf.remote_timer_writes = timer_writes;
     conf.policy = policy;
-    SyncIo io = { NULL, io_open, io_write, io_read, io_close };
+    BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
                    h_device };
@@ -962,7 +962,7 @@ static void test_custom_discovery_prefix(void)
 {
     setup(false, SyncPolicy_Auto);
     strcpy(conf.discovery_prefix, "ha");
-    SyncIo io = { NULL, io_open, io_write, io_read, io_close };
+    BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
                    h_device };
