@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-slim
     permissions:
       contents: write
       pull-requests: write

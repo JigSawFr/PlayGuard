@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   sync:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
