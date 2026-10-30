@@ -109,7 +109,8 @@ class Sheet : public aurore::Box
         // suggests first), then the screenshots; the one in use focused.
         this->choices.push_back(Choice{});
         this->suggested = forwarder_library::suggest(forwarder.name, forwarder.nro);
-        std::vector<std::string> library = forwarder_library::ids();
+        const auto               ids = forwarder_library::ids();
+        std::vector<std::string> library(ids.begin(), ids.end());
         const auto first = std::find(library.begin(), library.end(), this->suggested);
         if (first != library.end()) std::rotate(library.begin(), first, first + 1);
         for (const std::string& lib_id : library) {

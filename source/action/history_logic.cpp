@@ -2,7 +2,9 @@
 #include "action/history_logic.hpp"
 
 #include <algorithm>
+#include <span>
 #include <string>
+#include <string_view>
 
 #include <aurore/cadran/util/text.hpp>
 
@@ -89,7 +91,7 @@ Day day_of(const std::string& when, const std::string& today, const std::string&
 
 namespace
 {
-const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
+constexpr std::string_view KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm", "pin", "pin_shown",
                               "unlock", "relock", "unlink", "delete", "clock", "restore", "rescue",
                               "console_lock", "bedtime", "config_reset", "outside_reset", "outside_clock",
                               "outside_limits", "new_account", "time_up", "countdown", "remove_game",
@@ -99,31 +101,29 @@ const char* const KINDS[] = { "limits", "level", "custom", "org", "vr", "alarm",
                               "hbmenu_lock_removed", "gate_open", "gate_free", "gate_refused", "gate_hours", "gate_paused", "gate_closed",
                               "gate_closed_hours", "gate_pause", "gate_pause_lifted", "gate_limit", "gate_limit_set",
                               "forwarder_options", "module" };
-const char* const SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra", "bonus", "restore_bonus", "schedule_end",
+constexpr std::string_view SOURCES[] = { "uniform", "day", "per_day", "extra", "stop", "restore_extra", "bonus", "restore_bonus", "schedule_end",
                                 "remove", "backup", "undo", "first_steps", "overview", "console_lock", "notices",
                                 "rescue", "remote", "remote_extra", "remote_stop", "remote_console_lock",
                                 "remote_restore_extra" };
 
-bool listed(const std::vector<std::string>& list, const std::string& s)
+bool listed(std::span<const std::string_view> list, std::string_view s)
 {
     return std::ranges::contains(list, s);
 }
 }   // namespace
 
-const std::vector<std::string>& known_kinds()
+std::span<const std::string_view> known_kinds()
 {
-    static const std::vector<std::string> kinds(std::begin(KINDS), std::end(KINDS));
-    return kinds;
+    return KINDS;
 }
 
-bool known_kind(const std::string& kind) { return listed(known_kinds(), kind); }
+bool known_kind(std::string_view kind) { return listed(known_kinds(), kind); }
 
-const std::vector<std::string>& known_sources()
+std::span<const std::string_view> known_sources()
 {
-    static const std::vector<std::string> sources(std::begin(SOURCES), std::end(SOURCES));
-    return sources;
+    return SOURCES;
 }
 
-bool known_source(const std::string& source) { return listed(known_sources(), source); }
+bool known_source(std::string_view source) { return listed(known_sources(), source); }
 
 }   // namespace history_logic
