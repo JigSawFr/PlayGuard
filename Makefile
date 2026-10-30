@@ -286,7 +286,11 @@ launcher_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
-dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp $(C)/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp tests/dev_builds/test.cpp
+# A secret sealed for this console: AES and HMAC, and the console's key
+# (the desktop build's random one: sim/sim_device_key.cpp).
+SECRET_BOX := source/util/secret_box.cpp source/util/aes.cpp source/sim/sim_device_key.cpp
+secret_box_SRC := $(SECRET_BOX) source/util/sha256.cpp source/util/paths.cpp tests/secret_box/test.cpp
+dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp $(C)/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp $(SECRET_BOX) tests/dev_builds/test.cpp
 dev_builds_LIBS  := -lz
 # The download and its resume: without PLAYGUARD_SIM_DEV_BUILDS the desktop
 # build takes the console's path, here against a fake http::download and
