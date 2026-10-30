@@ -482,11 +482,11 @@ static void test_conf(void)
 
     CHECK(sync_conf_id_valid("0123abcd") && !sync_conf_id_valid("0123ABCD") && !sync_conf_id_valid("123"));
     uint32_t u;
-    CHECK(sync_parse_uint("300", 10, 300, &u) && u == 300);
-    CHECK(!sync_parse_uint("301", 10, 300, &u) && !sync_parse_uint("-1", 0, 9, &u) && !sync_parse_uint("", 0, 9, &u));
-    CHECK(!sync_parse_uint("99999999999", 0, 0xFFFFFFFFu, &u));
+    CHECK(bl_parse_uint("300", 10, 300, &u) && u == 300);
+    CHECK(!bl_parse_uint("301", 10, 300, &u) && !bl_parse_uint("-1", 0, 9, &u) && !bl_parse_uint("", 0, 9, &u));
+    CHECK(!bl_parse_uint("99999999999", 0, 0xFFFFFFFFu, &u));
     bool b;
-    CHECK(sync_parse_bool("TRUE", &b) && b && sync_parse_bool("off", &b) && !b && !sync_parse_bool("maybe", &b));
+    CHECK(bl_parse_bool("TRUE", &b) && b && bl_parse_bool("off", &b) && !b && !bl_parse_bool("maybe", &b));
 }
 
 static void test_records(void)

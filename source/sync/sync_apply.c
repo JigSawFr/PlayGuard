@@ -45,7 +45,7 @@ static SyncReason minutes(const char *s, uint16_t *out)
         s = buf;
     }
     uint32_t v = 0;
-    if (!sync_parse_uint(s, 0, 0xFFFFFFFFu, &v)) return SyncReason_Invalid;
+    if (!bl_parse_uint(s, 0, 0xFFFFFFFFu, &v)) return SyncReason_Invalid;
     if (v > SYNC_NO_LIMIT_MIN) return SyncReason_OutOfRange;
     *out = v == SYNC_NO_LIMIT_MIN ? (uint16_t)NOLIMIT : (uint16_t)v;
     return SyncReason_None;
@@ -149,7 +149,7 @@ SyncReason sync_apply_parse(const char *entity, const char *payload, size_t len,
             return SyncReason_None;
         }
         uint32_t v = 0;
-        if (!sync_parse_uint(s, 0, 0xFFFFFFFFu, &v)) return SyncReason_Invalid;
+        if (!bl_parse_uint(s, 0, 0xFFFFFFFFu, &v)) return SyncReason_Invalid;
         if (v < 5 || v > 180) return SyncReason_OutOfRange;
         out->minutes = (uint16_t)v;
         return SyncReason_None;

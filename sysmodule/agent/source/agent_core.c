@@ -259,7 +259,7 @@ static void nro_kv(void *ctx, const char *key, const char *value)
     AgentNroState *n = c->n;
     bool b = false;
     if (!strcmp(key, "read_only")) {
-        if (sync_parse_bool(value, &b)) {
+        if (bl_parse_bool(value, &b)) {
             n->read_only = b;
             c->saw_read_only = true;
         }
@@ -285,7 +285,7 @@ void agent_nro_parse(AgentNroState *n, const char *text, size_t len)
     n->read_only = true;
     sync_records_parse(&n->records, text, len);
     NroCtx ctx = { n, false };
-    sync_kv_each(text, len, nro_kv, &ctx);
+    bl_kv_each(text, len, nro_kv, &ctx);
     if (!ctx.saw_read_only) n->read_only = true;   // the switch must be in the file to allow anything
 }
 

@@ -147,7 +147,7 @@ static void test_nro_state()
     CHECK(r.extra_weekday == 1 && !std::strcmp(r.extra_date, "2026-10-05") && r.extra_base == 30 && r.extra_value == 0);
     CHECK(!r.relock_pending);   // the smuggled line did not become a key
     std::string keys;
-    sync_kv_each(text.data(), text.size(), kv, &keys);
+    bl_kv_each(text.data(), text.size(), kv, &keys);
     CHECK(keys.find("extra_auto_restore=1;") != std::string::npos);
     CHECK(keys.find("fw_gate_fw=24.0.0;") != std::string::npos);
     CHECK(keys.find("fw_gate_choice=read_only relock_pending=1;") != std::string::npos);

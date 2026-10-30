@@ -35,15 +35,15 @@ static void on_record(void *ctx, const char *key, const char *value)
     uint32_t u = 0;
     bool b = false;
     if (!strcmp(key, "extra_weekday")) {
-        r->extra_weekday = (strcmp(value, "-1") && sync_parse_uint(value, 0, 6, &u)) ? (int8_t)u : (int8_t)-1;
+        r->extra_weekday = (strcmp(value, "-1") && bl_parse_uint(value, 0, 6, &u)) ? (int8_t)u : (int8_t)-1;
     } else if (!strcmp(key, "extra_date")) {
         if (strlen(value) == 10) snprintf(r->extra_date, sizeof(r->extra_date), "%s", value);
     } else if (!strcmp(key, "extra_base")) {
-        if (sync_parse_uint(value, 0, 0xFFFF, &u)) r->extra_base = (uint16_t)u;
+        if (bl_parse_uint(value, 0, 0xFFFF, &u)) r->extra_base = (uint16_t)u;
     } else if (!strcmp(key, "extra_value")) {
-        if (sync_parse_uint(value, 0, 0xFFFF, &u)) r->extra_value = (uint16_t)u;
+        if (bl_parse_uint(value, 0, 0xFFFF, &u)) r->extra_value = (uint16_t)u;
     } else if (!strcmp(key, "console_lock")) {
-        if (sync_parse_bool(value, &b)) r->console_lock = b;
+        if (bl_parse_bool(value, &b)) r->console_lock = b;
     } else if (!strcmp(key, "console_lock_prev")) {
         uint16_t days[7];
         const char *p = value;
@@ -55,21 +55,21 @@ static void on_record(void *ctx, const char *key, const char *value)
             if (n == 0 || n >= sizeof(part)) break;
             memcpy(part, p, n);
             part[n] = '\0';
-            if (!sync_parse_uint(part, 0, 0xFFFF, &u)) break;
+            if (!bl_parse_uint(part, 0, 0xFFFF, &u)) break;
             days[d] = (uint16_t)u;
             p = comma ? comma + 1 : p + n;
         }
         r->console_lock_prev_ok = d == 7 && *p == '\0';
         if (r->console_lock_prev_ok) memcpy(r->console_lock_prev, days, sizeof(days));
     } else if (!strcmp(key, "relock_pending")) {
-        if (sync_parse_bool(value, &b)) r->relock_pending = b;
+        if (bl_parse_bool(value, &b)) r->relock_pending = b;
     }
 }
 
 void sync_records_parse(SyncRecords *r, const char *text, size_t len)
 {
     sync_records_clear(r);
-    sync_kv_each(text, len, on_record, r);
+    bl_kv_each(text, len, on_record, r);
     // A record without its date is no record.
     if (r->extra_weekday >= 0 && strlen(r->extra_date) != 10) r->extra_weekday = -1;
 }

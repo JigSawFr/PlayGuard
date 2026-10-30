@@ -115,7 +115,7 @@ void SyncActivity::onContentAvailable()
     port->registerClickAction([this](aurore::View*) {
         ui::prompt_text("playguard/sync/port_prompt"_i18n, std::to_string(conf.port), 5, [this](std::string text) {
             uint32_t value = 0;
-            if (!sync_parse_uint(text.c_str(), 1, 65535, &value)) {
+            if (!bl_parse_uint(text.c_str(), 1, 65535, &value)) {
                 ui::error("playguard/sync/port_invalid"_i18n);
                 return;
             }
