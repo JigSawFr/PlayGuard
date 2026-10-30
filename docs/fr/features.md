@@ -519,6 +519,10 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 - Comment PlayGuard a été lancé (une application par-dessus un jeu ou par son icône HOME, ou une applet) et son dossier des données.
 - **Exporter un rapport de diagnostic**, ou **l'envoyer en ligne** (*Envoyer un rapport…* ; voir [Signaler un bug](troubleshooting.md#signaler-un-bug)) ; combien de rapports enregistrés, de fichiers de plantage, de journaux de session et de liens des rapports envoyés en ligne sont gardés, par nombre, âge ou taille.
 
+### Les homebrews Boréale
+
+*Homebrews Boréale* liste les homebrews de la famille Boréale installés sur la console, tels que chacun s'ajoute à son démarrage (`config/boreale/apps/`), PlayGuard en premier, chacun avec sa version. Ⓐ sur un autre le lance une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message dit de l'ouvrir de là. Un homebrew supprimé de la carte SD quitte la liste.
+
 ### Crédits
 
 *Crédits et licence ›* : qui l'a fait, sur quoi il s'appuie, sa licence et son code source en QR code, dans une seule fenêtre. Puis comment **soutenir PlayGuard** ([GitHub Sponsors](https://github.com/sponsors/JigSawFr), [Ko-fi](https://ko-fi.com/jigsawfr), affichés en QR codes à scanner avec un téléphone), et un petit *Made in France* 🇫🇷.

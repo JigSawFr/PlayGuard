@@ -1305,7 +1305,8 @@
         "reminder_title": "Gefällt Ihnen PlayGuard?",
         "reminder_never": "Nicht mehr anzeigen",
         "reminder_off": "Die monatliche Erinnerung ist aus. Unter Optionen › Benachrichtigungen lässt sie sich wieder einschalten.",
-        "whats_new_close": "Weiter"
+        "whats_new_close": "Weiter",
+        "boreale": "Boréale-Homebrews"
     },
     "prefs": {
         "section_app": "App",
@@ -2327,5 +2328,10 @@
         "hekate": "bootloader/patches.ini von hekate bleibt: Wenn hekate_ipl.ini noch kip1patch=nosigchk enthält, entfernen Sie diese Zeile, bevor Sie mit fss0 von hekate starten.",
         "failed": "Die Sigpatch-Dateien wurden nicht alle verschoben: {}",
         "done": "Die Sigpatch-Dateien sind beiseitegelegt. Starten Sie die Konsole neu und versuchen Sie den Forwarder dann erneut."
+    },
+    "boreale": {
+        "intro": "Die Homebrews der Boréale-Familie auf dieser Konsole: Jedes trägt sich beim Start hier ein. Mit A auf einem öffnen Sie es.",
+        "this_app": "Diese App",
+        "open_manual": "Öffnen Sie {} über das Homebrew-Menü."
     }
 }

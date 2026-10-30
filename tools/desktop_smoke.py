@@ -1268,7 +1268,7 @@ if GATE:
     key("Left")
     key("Right")
     key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-    key("Up", 2)               # past Source: Help & diagnostics
+    key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
     key("Return")
     key_to_end("Down", hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
@@ -1402,7 +1402,7 @@ if DEVBUILD:
     key("Left")
     key("Right")
     key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-    key("Up", 2)               # past Source: Help & diagnostics
+    key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
     key("Return")
     key_to_end("Down", hold=0.15) # the Developer section, down to its last cell (Run the migrations again)
     key("Up")                  # Install another build
@@ -2443,6 +2443,16 @@ if CADRAN:
         shot(f"{i:02d}_{tab}_end")
         key("Left")            # back to the sidebar
 
+    # About › Boréale homebrews: PlayGuard, then the made-up Lantern.
+    key("Right")               # About, where the loop above left it: its end
+    key("Up", 12)              # its first line, Version
+    key("Down", 3)             # past Check for updates and Help
+    key("Return")
+    time.sleep(0.6)
+    shot("10_boreale")
+    key("Escape")
+    key("Left")
+
     # The child screen, then back to the parent's with the PIN (the simulated
     # PIN screen accepts at once), which pauses parental controls while
     # PlayGuard is open (action/session_pause).
@@ -2634,7 +2644,7 @@ if CADRANLARGE:
     key("Right")
     shot("07_about")
     key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-    key("Up", 2)               # past Source: Help & diagnostics
+    key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
     key("Return")
     time.sleep(0.6)
     shot("08_help")            # its title after where it opened from
@@ -3001,7 +3011,7 @@ saved = saved_reports()
 key("Down", steps("dashboard", "about"))
 key("Right")
 key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-key("Up", 2)               # past Source: Help & diagnostics
+key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
 key("Return")
 key("Right")               # past First steps: Send a report online, the tile beside it
 key("Return")

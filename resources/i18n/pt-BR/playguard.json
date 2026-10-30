@@ -1305,7 +1305,8 @@
         "reminder_title": "O PlayGuard está sendo útil?",
         "reminder_never": "Não mostrar de novo",
         "reminder_off": "O lembrete mensal está desativado. Você pode reativá-lo em Preferências › Notificações.",
-        "whats_new_close": "Continuar"
+        "whats_new_close": "Continuar",
+        "boreale": "Homebrews Boréale"
     },
     "prefs": {
         "section_app": "App",
@@ -2327,5 +2328,10 @@
         "hekate": "O bootloader/patches.ini do hekate permanece: se o hekate_ipl.ini ainda tiver kip1patch=nosigchk, remova essa linha antes de iniciar com o fss0 do hekate.",
         "failed": "Nem todos os arquivos de sigpatch foram movidos: {}",
         "done": "Os arquivos de sigpatch foram deixados de lado. Reinicie o console e tente o forwarder de novo."
+    },
+    "boreale": {
+        "intro": "Os homebrews da família Boréale instalados neste console: cada um se adiciona aqui ao iniciar. A em um deles o abre.",
+        "this_app": "Este app",
+        "open_manual": "Abra {} pelo menu de homebrew."
     }
 }

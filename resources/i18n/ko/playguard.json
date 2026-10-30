@@ -1305,7 +1305,8 @@
         "reminder_title": "PlayGuard가 도움이 되나요?",
         "reminder_never": "다시 표시하지 않음",
         "reminder_off": "월간 알림을 껐습니다. 환경 설정 › 알림에서 다시 켤 수 있습니다.",
-        "whats_new_close": "계속"
+        "whats_new_close": "계속",
+        "boreale": "Boréale 홈브류"
     },
     "prefs": {
         "section_app": "앱",
@@ -2327,5 +2328,10 @@
         "hekate": "hekate의 bootloader/patches.ini는 그대로 남습니다. hekate_ipl.ini에 아직 kip1patch=nosigchk가 있으면, hekate의 fss0로 부팅하기 전에 그 줄을 지우세요.",
         "failed": "일부 sigpatch 파일을 옮기지 못했습니다: {}",
         "done": "sigpatch 파일을 치워 두었습니다. 본체를 다시 시작한 뒤 포워더를 다시 실행해 보세요."
+    },
+    "boreale": {
+        "intro": "이 콘솔에 설치된 Boréale 패밀리의 홈브류입니다. 각각 시작할 때 여기에 추가됩니다. A를 누르면 열립니다.",
+        "this_app": "이 앱",
+        "open_manual": "홈브류 메뉴에서 {}을(를) 여세요."
     }
 }

@@ -1305,7 +1305,8 @@
         "reminder_title": "PlayGuard 對您有幫助嗎？",
         "reminder_never": "不再顯示",
         "reminder_off": "每月提醒已關閉。可在「偏好設定 › 通知」重新開啟。",
-        "whats_new_close": "繼續"
+        "whats_new_close": "繼續",
+        "boreale": "Boréale 自製軟體"
     },
     "prefs": {
         "section_app": "應用程式",
@@ -2327,5 +2328,10 @@
         "hekate": "hekate的bootloader/patches.ini會保留：如果hekate_ipl.ini中仍有kip1patch=nosigchk，請在用hekate的fss0啟動前刪除該行。",
         "failed": "未能移動全部Sigpatch檔案：{}",
         "done": "Sigpatch檔案已移到一旁。請重新啟動主機，然後再試一次轉發器。"
+    },
+    "boreale": {
+        "intro": "此主機上安裝的 Boréale 家族自製軟體：每個軟體啟動時會把自己加到這裡。在其中一個上按 A 即可開啟。",
+        "this_app": "本應用程式",
+        "open_manual": "請從自製軟體選單開啟 {}。"
     }
 }
