@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/titles.hpp"
+#include "util/number.hpp"
 #include "util/title_id.hpp"
 
 #include <cstdio>
@@ -84,9 +85,9 @@ Record parse(const std::string& in)
         if (!line.empty() && line.back() == '\r') line.pop_back();
         const size_t colon = line.find(':');
         if (line.size() < 18 || line[16] != '=' || colon == std::string::npos) continue;
-        uint64_t id = 0;
-        if (std::sscanf(line.c_str(), "%16llx", (unsigned long long*)&id) != 1) continue;
-        auto it = r.find(id);
+        const auto id = number::parse<uint64_t>(std::string_view(line).substr(0, 16), 16);
+        if (!id) continue;
+        auto it = r.find(*id);
         if (it != r.end()) it->second.name = line.substr(colon + 1);
     }
     return r;

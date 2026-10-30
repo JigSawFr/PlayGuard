@@ -3,6 +3,7 @@
 
 #include <aurore/extern/nlohmann/json.hpp>
 #include <cctype>
+#include <charconv>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -280,9 +281,9 @@ std::vector<std::string> split(const std::string& s, char sep)
 bool parse_int(const std::string& s, long long lo, long long hi, long long* out)
 {
     if (s.empty() || s.size() > 20) return false;
-    char* end = nullptr;
-    const long long v = std::strtoll(s.c_str(), &end, 10);
-    if (*end || v < lo || v > hi) return false;
+    long long  v = 0;
+    const auto [end, ec] = std::from_chars(s.data(), s.data() + s.size(), v);
+    if (ec != std::errc{} || end != s.data() + s.size() || v < lo || v > hi) return false;
     *out = v;
     return true;
 }

@@ -7,6 +7,7 @@
 #include <set>
 
 #include "core/sysinfo.h"
+#include "util/number.hpp"
 #include "util/paths.hpp"
 
 namespace prodinfo
@@ -34,7 +35,7 @@ bool device_id_at(const std::string& data, size_t cert, uint64_t* out)
     std::memcpy(hex, data.data() + at, 16);
     for (int i = 0; i < 16; i++)
         if (!std::isxdigit((unsigned char)hex[i])) return false;
-    *out = std::strtoull(hex, nullptr, 16) & kDeviceIdMask;
+    *out = *number::parse<uint64_t>(std::string_view(hex, 16), 16) & kDeviceIdMask;   // hex digits, checked above
     return true;
 }
 }   // namespace
