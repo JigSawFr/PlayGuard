@@ -14,6 +14,12 @@ namespace config
 
 static Config s_config;
 static Loaded s_loaded = Loaded::Missing;
+// The files as read, for the keys this version does not know: a save keeps
+// them (a rollback or a newer build finds its settings). A file a newer
+// version wrote (its "schema" above SCHEMA) is read as missing and never
+// written over: the settings changed meanwhile stay in memory.
+static nlohmann::json s_shared_read = nlohmann::json::object(), s_state_read = nlohmann::json::object();
+static bool s_shared_newer = false, s_state_newer = false;
 
 Config& get() { return s_config; }
 Loaded loaded() { return s_loaded; }
@@ -307,6 +313,11 @@ static void load_shared()
         return;
     }
     s_loaded = Loaded::Read;
+    if (json_util::newer_schema(j, SCHEMA)) {
+        s_shared_newer = true;
+        return;
+    }
+    s_shared_read = j;
 
     Config& c = s_config;
     read_string(j, "language", c.look.language);
@@ -391,7 +402,11 @@ static void load_state()
         const nlohmann::json j = parse_object(text);
         if (!j.is_null()) {
             clear_system(s_config);
-            read_system(j, s_config);
+            if (json_util::newer_schema(j, SCHEMA)) s_state_newer = true;
+            else {
+                s_state_read = j;
+                read_system(j, s_config);
+            }
             return;
         }
     }
@@ -405,6 +420,9 @@ void load()
 {
     s_config = Config{};
     s_loaded = Loaded::Missing;
+    s_shared_read = nlohmann::json::object();
+    s_state_read = nlohmann::json::object();
+    s_shared_newer = s_state_newer = false;
     load_shared();
     load_state();
     sanitize(s_config);
@@ -419,9 +437,10 @@ void set_saved_hook(void (*hook)())
 
 bool write(const Snapshot& snap)
 {
-    // Both, even when the first fails.
-    const bool shared = paths::atomic_write(paths::config_file(), snap.shared);
-    const bool system = paths::atomic_write(paths::state_file(), snap.system);
+    // Both, even when the first fails; an empty one is not written (a newer
+    // version's file).
+    const bool shared = snap.shared.empty() || paths::atomic_write(paths::config_file(), snap.shared);
+    const bool system = snap.system.empty() || paths::atomic_write(paths::state_file(), snap.system);
     return shared && system;
 }
 
@@ -431,7 +450,7 @@ bool snapshot(Snapshot& snap)
     const auto dump = [](const nlohmann::json& j) {
         return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
     };
-    nlohmann::json j;
+    nlohmann::json j = s_shared_read;
     j["schema"]          = SCHEMA;
     j["language"]        = s_config.look.language;
     j["theme"]           = s_config.look.theme;
@@ -489,9 +508,8 @@ bool snapshot(Snapshot& snap)
     j["notices_acked"]     = s_config.notices_acked;
     j["notices_ack_remind"] = s_config.notices_ack_remind;
     j["summary_seen"]      = s_config.summary_seen;
-    snap.shared = dump(j);
 
-    nlohmann::json st;
+    nlohmann::json st = s_state_read;
     st["schema"]            = SCHEMA;
     st["console_lock"]      = s_config.console_lock;
     st["console_lock_prev"] = s_config.console_lock_prev;
@@ -514,7 +532,12 @@ bool snapshot(Snapshot& snap)
     st["schedule_applied"]  = s_config.schedule_applied;
     st["schedule_prev"]     = s_config.schedule_prev;
     st["relock_pending"]    = s_config.relock_pending;
-    snap.system = dump(st);
+    // This system's fields live in state.json now, not in config.json where
+    // the versions before it kept them.
+    for (const auto& item : st.items())
+        if (item.key() != "schema") j.erase(item.key());
+    snap.shared = s_shared_newer ? std::string() : dump(j);
+    snap.system = s_state_newer ? std::string() : dump(st);
     if (s_saved_hook) s_saved_hook();
     return true;
 }

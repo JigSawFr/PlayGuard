@@ -32,7 +32,12 @@ settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)
   Types are strict: `true`, not `1`; `90`, not `90.5` or `"90"`.
 - **A value outside the list below goes back to its default**, without a
   message.
-- Keys PlayGuard does not know are ignored, and dropped at the next save.
+- Keys PlayGuard does not know are ignored, and kept at the next save (an
+  older or a newer version finds its own settings again).
+- **A file a newer version wrote** (`schema` above PlayGuard's, `1`) is read
+  as missing: the defaults are used, and the file is never written over;
+  what is changed meanwhile lasts until PlayGuard closes. The same for
+  `state.json`. A file without `schema` is read as `1`.
 - Some groups of keys are all-or-nothing: the [firmware choice](#firmware-not-supported-yet)
   and the [extra time of the day](#extra-time-today). One key refused, and the
   whole group is cleared.
@@ -43,7 +48,7 @@ settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)
 
 | Key | Type | Values | Default | Set in |
 |---|---|---|---|---|
-| `schema` | integer | `1` | `1` | written by PlayGuard, not read |
+| `schema` | integer | `1` | `1` | written by PlayGuard; a higher one: the file is not read nor written (above) |
 | `language` | string | `"system"` (the console's language), `"en-US"`, `"fr"`, `"fr-CA"`, `"de"`, `"es"`, `"es-419"`, `"it"`, `"nl"`, `"pt"`, `"pt-BR"`, `"ru"`, `"ja"`, `"ko"`, `"zh-Hans"`, `"zh-Hant"` | `"system"` | Preferences |
 | `theme` | string | `"dark"`, `"system"` (the console's), `"light"` | `"dark"` | Preferences |
 | `theme_file` | string | the palette: `""` (PlayGuard's own colours), one of Aurore's presets (`"builtin:high-contrast-dark"`, `"builtin:high-contrast-light"`, `"builtin:ocean"`, `"builtin:amethyst"`, `"builtin:sand"`, a season such as `"builtin:halloween"`, or `"builtin:seasonal"`, which follows the calendar) or the path of a theme file in `config/playguard/themes/`, or of a theme folder's `theme.theme` there ([themes.md](themes.md)); a palette made for one variant only (light or dark) sets `theme` to it; a file that cannot be read: PlayGuard's own colours | `""` | Preferences › Palette |
