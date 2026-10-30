@@ -67,12 +67,14 @@ void written(const std::string& source, const TimeApply& a, const std::string& b
 {
     if (a.write_attempted && R_SUCCEEDED(a.write_rc)) history_flow::record_event("clock", "", ui::time_text(a.target));
     if (a.write_attempted && R_FAILED(a.write_rc)) history_flow::record_failure("clock", a.write_rc, {}, {}, "", ui::time_text(a.target));
-    diagnostic::save(std::format(
+    std::string err;
+    if (diagnostic::save(std::format(
         "=== Network clock change ===\nserver={}\ntarget_utc={}\nopen_rc=0x{:08X} write_attempted={} write_rc=0x{:08X}\n"
         "verify_attempted={} verify_rc=0x{:08X} verified={} readback={}\nrefused_automatic={}\n\n--- Before ---\n{}\n--- After ---\n{}",
         source, a.target, (unsigned)a.open_rc, a.write_attempted, (unsigned)a.write_rc,
         a.verify_attempted, (unsigned)a.verify_rc, a.verified, a.readback, a.refused_automatic,
-        before, diagnostic::current_report()));
+        before, diagnostic::current_report()), &err).empty())
+        aurore::Logger::warning("clock: the report of the change not saved: {}", err);
     done(message);
 }
 

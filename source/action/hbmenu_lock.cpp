@@ -25,7 +25,6 @@
 #include "core/hbl_lock.h"
 #include "core/rescue.h"
 #include "ui/ui.hpp"
-#include "util/diagnostics.hpp"
 #include "util/forwarders.hpp"
 #include "util/paths.hpp"
 #include "util/rescue_page.hpp"
@@ -394,7 +393,6 @@ void forwarder_notices()
 void at_start(std::function<void()> open)
 {
     s_open = open;
-    diagnostic::set_homebrew_lock(&report);
     take_report(open);
     tell_refusals(forwarder_flow::at_start());
     // Many more refused PINs this week than the week before: the bell, its week a press away.
