@@ -52,9 +52,15 @@ void Sha256::block(const uint8_t* p)
     h[4] += e; h[5] += f; h[6] += g; h[7] += k;
 }
 
-void Sha256::update(const void* data, size_t size)
+void Sha256::update(std::string_view text)
 {
-    const uint8_t* p = static_cast<const uint8_t*>(data);
+    update({reinterpret_cast<const uint8_t*>(text.data()), text.size()});
+}
+
+void Sha256::update(std::span<const uint8_t> bytes)
+{
+    const uint8_t* p = bytes.data();
+    size_t         size = bytes.size();
     total += size;
     while (size > 0) {
         const size_t n = std::min(size, sizeof(buf) - used);
@@ -73,12 +79,12 @@ std::array<uint8_t, 32> Sha256::digest()
 {
     const uint64_t bits = total * 8;
     const uint8_t pad = 0x80;
-    update(&pad, 1);
+    update({&pad, 1});
     const uint8_t zero = 0;
-    while (used != 56) update(&zero, 1);
+    while (used != 56) update({&zero, 1});
     uint8_t len[8];
     for (int i = 0; i < 8; i++) len[i] = (uint8_t)(bits >> (56 - 8 * i));
-    update(len, 8);
+    update(len);
     std::array<uint8_t, 32> out;
     for (size_t i = 0; i < 8; i++)
         for (size_t b = 0; b < 4; b++) out[4 * i + b] = (uint8_t)(h[i] >> (24 - 8 * b));
@@ -96,27 +102,32 @@ std::string Sha256::hex()
     return out;
 }
 
-std::array<uint8_t, 32> hmac_sha256(const void* key, size_t key_size, const void* msg, size_t msg_size)
+std::array<uint8_t, 32> hmac_sha256(std::span<const uint8_t> key, std::span<const uint8_t> msg)
 {
     // A key longer than a block is hashed first; a shorter one is padded with zeros.
     uint8_t k[64] = {};
-    if (key_size > sizeof(k)) {
+    if (key.size() > sizeof(k)) {
         Sha256 h;
-        h.update(key, key_size);
+        h.update(key);
         const std::array<uint8_t, 32> d = h.digest();
         std::memcpy(k, d.data(), d.size());
-    } else if (key_size) {
-        std::memcpy(k, key, key_size);
+    } else if (!key.empty()) {
+        std::memcpy(k, key.data(), key.size());
     }
     uint8_t pad[64];
     for (size_t i = 0; i < sizeof(pad); i++) pad[i] = (uint8_t)(k[i] ^ 0x36);
     Sha256 inner;
-    inner.update(pad, sizeof(pad));
-    inner.update(msg, msg_size);
+    inner.update(pad);
+    inner.update(msg);
     const std::array<uint8_t, 32> in = inner.digest();
     for (size_t i = 0; i < sizeof(pad); i++) pad[i] = (uint8_t)(k[i] ^ 0x5c);
     Sha256 outer;
-    outer.update(pad, sizeof(pad));
-    outer.update(in.data(), in.size());
+    outer.update(pad);
+    outer.update(in);
     return outer.digest();
+}
+
+std::array<uint8_t, 32> hmac_sha256(std::span<const uint8_t> key, std::string_view msg)
+{
+    return hmac_sha256(key, {reinterpret_cast<const uint8_t*>(msg.data()), msg.size()});
 }

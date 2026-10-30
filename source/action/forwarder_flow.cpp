@@ -100,14 +100,14 @@ std::string loader_id()
         std::string main, npdm;
         if (paths::read_file(AURORE_ASSET("forwarder/main"), main) && paths::read_file(AURORE_ASSET("forwarder/main.npdm"), npdm)) {
             Sha256 hash;
-            hash.update(main.data(), main.size());
-            hash.update(npdm.data(), npdm.size());
+            hash.update(main);
+            hash.update(npdm);
             // How forwarder_pack patches the NPDM, which the files above do
             // not show: raised when that changes, so the forwarders made
             // before are offered to be made again. 2: ForceDebug in the
             // ACID too, without which Atmosphère 1.8.0+ refused to start them.
-            static const char PACK_REVISION[] = "pack 2";
-            hash.update(PACK_REVISION, sizeof(PACK_REVISION) - 1);
+            constexpr std::string_view PACK_REVISION = "pack 2";
+            hash.update(PACK_REVISION);
             id = hash.hex().substr(0, 16);
         }
     }

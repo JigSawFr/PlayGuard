@@ -107,7 +107,7 @@ Gate gate_nro()
     std::string bundled;
     if (paths::read_file(AURORE_ASSET("gate/gate.nro"), bundled) && !bundled.empty()) {
         Sha256 h;
-        h.update(bundled.data(), bundled.size());
+        h.update(bundled);
         g.sha256 = h.digest();
         std::string hex;
         for (size_t i = 0; i < 8; i++) hex += std::format("{:02x}", g.sha256[i]);
