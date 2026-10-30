@@ -1305,7 +1305,8 @@
         "reminder_title": "Heb je iets aan PlayGuard?",
         "reminder_never": "Niet meer tonen",
         "reminder_off": "De maandelijkse herinnering staat uit. Zet hem weer aan via Voorkeuren › Meldingen.",
-        "whats_new_close": "Doorgaan"
+        "whats_new_close": "Doorgaan",
+        "boreale": "Boréale-homebrews"
     },
     "prefs": {
         "section_app": "App",
@@ -2327,5 +2328,10 @@
         "hekate": "bootloader/patches.ini van hekate blijft staan: als hekate_ipl.ini nog kip1patch=nosigchk bevat, verwijder die regel dan voordat je opstart met fss0 van hekate.",
         "failed": "De sigpatch-bestanden zijn niet allemaal verplaatst: {}",
         "done": "De sigpatch-bestanden zijn opzijgezet. Start de console opnieuw op en probeer de forwarder daarna nog eens."
+    },
+    "boreale": {
+        "intro": "De homebrews van de Boréale-familie op deze console: elk voegt zich hier toe bij het starten. A op een ervan opent het.",
+        "this_app": "Deze app",
+        "open_manual": "Open {} via het homebrewmenu."
     }
 }

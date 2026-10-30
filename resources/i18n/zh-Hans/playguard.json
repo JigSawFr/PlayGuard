@@ -1305,7 +1305,8 @@
         "reminder_title": "PlayGuard 对您有帮助吗？",
         "reminder_never": "不再显示",
         "reminder_off": "每月提醒已关闭。可在“偏好设置 › 通知”重新开启。",
-        "whats_new_close": "继续"
+        "whats_new_close": "继续",
+        "boreale": "Boréale 自制软件"
     },
     "prefs": {
         "section_app": "应用",
@@ -2327,5 +2328,10 @@
         "hekate": "hekate的bootloader/patches.ini会保留：如果hekate_ipl.ini中仍有kip1patch=nosigchk，请在用hekate的fss0启动前删除该行。",
         "failed": "未能移动全部签名补丁文件：{}",
         "done": "签名补丁文件已移到一旁。请重新启动主机，然后再试一次转发器。"
+    },
+    "boreale": {
+        "intro": "此主机上安装的 Boréale 家族自制软件：每个软件启动时会把自己添加到这里。在其中一个上按 A 即可打开。",
+        "this_app": "本应用",
+        "open_manual": "请从自制软件菜单打开 {}。"
     }
 }

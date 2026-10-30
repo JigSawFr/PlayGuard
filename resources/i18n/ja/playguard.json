@@ -1305,7 +1305,8 @@
         "reminder_title": "PlayGuardはお役に立っていますか？",
         "reminder_never": "今後表示しない",
         "reminder_off": "毎月のお知らせをOFFにしました。「オプション › お知らせ」から再びONにできます。",
-        "whats_new_close": "続ける"
+        "whats_new_close": "続ける",
+        "boreale": "Boréale のHomebrew"
     },
     "prefs": {
         "section_app": "アプリ",
@@ -2327,5 +2328,10 @@
         "hekate": "hekateのbootloader/patches.iniはそのまま残ります。hekate_ipl.iniにまだkip1patch=nosigchkがある場合は、hekateのfss0で起動する前にその行を削除してください。",
         "failed": "一部のsigpatchファイルを移動できませんでした：{}",
         "done": "sigpatchファイルを退避しました。本体を再起動してから、もう一度フォワーダーを試してください。"
+    },
+    "boreale": {
+        "intro": "このコンソールにインストールされている Boréale ファミリーのHomebrew です。それぞれ起動時にここに追加されます。A で開きます。",
+        "this_app": "このアプリ",
+        "open_manual": "Homebrew メニューから {} を開いてください。"
     }
 }
