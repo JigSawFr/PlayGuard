@@ -12,6 +12,7 @@
 
 #include "fuzz.h"
 #include "util/config.hpp"
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 
 extern "C" int LLVMFuzzerInitialize(int*, char***)

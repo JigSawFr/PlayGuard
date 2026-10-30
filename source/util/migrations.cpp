@@ -5,6 +5,7 @@
 
 #include <aurore/extern/nlohmann/json.hpp>
 
+#include "app_id.h"
 #include "util/json_util.hpp"
 #include "util/paths.hpp"
 #include "util/update.hpp"
@@ -46,7 +47,7 @@ Found read_state(const std::string& file, State* out)
 
 std::string build_name(const std::string& version)
 {
-    return "PlayGuard " + (version.empty() ? std::string("?") : version);
+    return APP_NAME " " + (version.empty() ? std::string("?") : version);
 }
 
 // "steps 1 to 3", "step 3": the levels of `steps` (in ascending order).
@@ -95,6 +96,14 @@ bool write(const std::string& file, const State& state)
     return write_logged(file, state, nullptr);
 }
 
+namespace
+{
+int s_latest = None;
+}
+
+void set_latest(int level) { s_latest = level; }
+int  latest() { return s_latest; }
+
 size_t run(const std::string& file, const std::vector<Step>& steps, const std::string& version, const Log& log,
            bool all)
 {
@@ -117,14 +126,15 @@ size_t run(const std::string& file, const std::vector<Step>& steps, const std::s
                        (order < 0 ? "an earlier build (an update since)" : order > 0 ? "a later build" : "another build") +
                        "; this is " + build_name(version));
     }
-    if (s.level > Latest) {
+    const int known = latest();
+    if (s.level > known) {
         // A later build's layout: this one writes its own, the steps above
         // it run again when the later build is back.
         if (log)
             log(false, "migrations: level " + std::to_string(s.level) + " is a later build's (this one knows up to " +
-                           std::to_string(Latest) + "): back to " + std::to_string(Latest) +
+                           std::to_string(known) + "): back to " + std::to_string(known) +
                            ", so that build runs the steps above it again");
-        s.level = Latest;
+        s.level = known;
     }
     const int kept = s.level;
     if (all) {

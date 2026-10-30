@@ -14,9 +14,18 @@
 
 #include <aurore/extern/nlohmann/json.hpp>
 
+#include "app_id.h"
 #include "util/migrations.hpp"
 
 namespace mg = migrations;
+
+// The steps of a made-up app: three of them.
+enum : int
+{
+    DataDir  = 1,
+    LogsDirs = 2,
+    NandDirs = 3,
+};
 
 namespace
 {
@@ -46,13 +55,13 @@ mg::Step step(int level, size_t moved = 0)
 
 std::vector<mg::Step> start_steps()
 {
-    return { step(mg::DataDir, 2), step(mg::LogsDirs) };
+    return { step(DataDir, 2), step(LogsDirs) };
 }
 
 // Both calls of a start (main.cpp: before and after the system's folder).
 size_t start(const std::string& file, const std::string& version)
 {
-    return mg::run(file, start_steps(), version) + mg::run(file, { step(mg::NandDirs) }, version);
+    return mg::run(file, start_steps(), version) + mg::run(file, { step(NandDirs) }, version);
 }
 
 mg::State state(const std::string& file)
@@ -72,32 +81,32 @@ static void test_first_and_next()
     g_ran.clear();
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line) == 2);
-    CHECK((g_ran == std::vector<int>{ mg::DataDir, mg::LogsDirs }));
+    CHECK((g_ran == std::vector<int>{ DataDir, LogsDirs }));
     CHECK(g_lines.size() == 4);
     CHECK(logged("migrations: no " + file + " (a first start, or a build from before it): steps 1 to 2 to run"));
     CHECK(logged("migration 1 (test): 2 entries moved in ") && logged("migration 2 (test): 0 entries moved in "));
-    CHECK(logged("migrations: level 2 and PlayGuard 1.2.0 written to " + file));
+    CHECK(logged("migrations: level 2 and " APP_NAME " 1.2.0 written to " + file));
     const nlohmann::json j = nlohmann::json::parse(fs::read(file));
-    CHECK(j["schema"] == mg::SCHEMA && j["level"] == mg::LogsDirs && j["version"] == "1.2.0");
+    CHECK(j["schema"] == mg::SCHEMA && j["level"] == LogsDirs && j["version"] == "1.2.0");
 
     // Then the system's step, in a call of its own.
-    CHECK(mg::run(file, { step(mg::NandDirs) }, "1.2.0") == 1);
-    CHECK(state(file).level == mg::NandDirs);
+    CHECK(mg::run(file, { step(NandDirs) }, "1.2.0") == 1);
+    CHECK(state(file).level == NandDirs);
 
     // The next start: nothing, and nothing written.
     g_ran.clear();
-    CHECK(mg::write(file, { mg::Latest, "1.2.0" }));
+    CHECK(mg::write(file, { mg::latest(), "1.2.0" }));
     const std::string before = fs::read(file);
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line) == 0);
     CHECK(g_ran.empty() && fs::read(file) == before);
-    CHECK(g_lines.size() == 2 && logged("migrations: level 3 recorded, last started by PlayGuard 1.2.0") &&
+    CHECK(g_lines.size() == 2 && logged("migrations: level 3 recorded, last started by " APP_NAME " 1.2.0") &&
           logged("migrations: steps 1 to 2 already done, nothing run"));
 
     // An update: nothing to run, the build recorded.
     g_lines.clear();
-    CHECK(mg::run(file, { step(mg::NandDirs) }, "1.3.0", log_line) == 0 && state(file).version == "1.3.0");
-    CHECK(logged("migrations: PlayGuard 1.2.0 started last, an earlier build (an update since); this is PlayGuard 1.3.0"));
+    CHECK(mg::run(file, { step(NandDirs) }, "1.3.0", log_line) == 0 && state(file).version == "1.3.0");
+    CHECK(logged("migrations: " APP_NAME " 1.2.0 started last, an earlier build (an update since); this is " APP_NAME " 1.3.0"));
     CHECK(logged("migrations: step 3 already done") && logged("written to"));
 }
 
@@ -108,8 +117,8 @@ static void test_update()
     fs::write(file, "{\"schema\": 1, \"level\": 1, \"version\": \"1.1.0\"}");
     g_ran.clear();
     CHECK(start(file, "1.2.0") == 2);
-    CHECK((g_ran == std::vector<int>{ mg::LogsDirs, mg::NandDirs }));
-    CHECK(state(file).level == mg::Latest && state(file).version == "1.2.0");
+    CHECK((g_ran == std::vector<int>{ LogsDirs, NandDirs }));
+    CHECK(state(file).level == mg::latest() && state(file).version == "1.2.0");
 }
 
 static void test_unreadable()
@@ -125,7 +134,7 @@ static void test_unreadable()
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line) == 2);
     CHECK(logged("W migrations: " + file + " unreadable (damaged): steps 1 to 2 to run again"));
-    CHECK(start(file, "1.2.0") == 1 && state(file).level == mg::Latest);
+    CHECK(start(file, "1.2.0") == 1 && state(file).level == mg::latest());
 
     // Not written (a folder in its place): a warning, the steps again next time.
     TempDir dir("migrations");
@@ -142,7 +151,7 @@ static void test_unreadable()
     // An interrupted write: its .tmp is read in its place.
     std::remove(file.c_str());
     fs::write(file + ".tmp", "{\"level\": 3, \"version\": \"1.2.0\"}");
-    CHECK(state(file).level == mg::NandDirs);
+    CHECK(state(file).level == NandDirs);
 }
 
 static void test_later_then_earlier()
@@ -154,12 +163,12 @@ static void test_later_then_earlier()
     g_ran.clear();
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line) == 0);
-    CHECK(mg::run(file, { step(mg::NandDirs) }, "1.2.0") == 0);
+    CHECK(mg::run(file, { step(NandDirs) }, "1.2.0") == 0);
     CHECK(g_ran.empty());
-    CHECK(logged("migrations: PlayGuard 1.4.0 started last, a later build; this is PlayGuard 1.2.0"));
+    CHECK(logged("migrations: " APP_NAME " 1.4.0 started last, a later build; this is " APP_NAME " 1.2.0"));
     CHECK(logged("migrations: level 5 is a later build's (this one knows up to 3): back to 3"));
     // Its own level and version: the later build runs 4 and 5 again.
-    CHECK(state(file).level == mg::Latest && state(file).version == "1.2.0");
+    CHECK(state(file).level == mg::latest() && state(file).version == "1.2.0");
 }
 
 static void test_earlier_build_next()
@@ -171,10 +180,10 @@ static void test_earlier_build_next()
     CHECK(mg::earlier_build_next(file, log_line) && !fs::exists(file));
     CHECK(logged("every step runs at the next start anyway"));
 
-    CHECK(mg::write(file, { mg::Latest, "1.2.0" }));
+    CHECK(mg::write(file, { mg::latest(), "1.2.0" }));
     g_lines.clear();
     CHECK(mg::earlier_build_next(file, log_line));
-    CHECK(logged("is next: level 3 set to 0") && logged("level 0 and PlayGuard 1.2.0 written"));
+    CHECK(logged("is next: level 3 set to 0") && logged("level 0 and " APP_NAME " 1.2.0 written"));
     g_lines.clear();
     CHECK(mg::earlier_build_next(file, log_line) && logged("level already 0"));
     CHECK(state(file).level == mg::None && state(file).version == "1.2.0");
@@ -202,29 +211,30 @@ static void test_all()
 {
     TempDir tmp("migrations");
     const std::string file = tmp.path() + "/migrations.json";
-    CHECK(mg::write(file, { mg::Latest, "1.2.0" }));
+    CHECK(mg::write(file, { mg::latest(), "1.2.0" }));
     g_ran.clear();
     g_lines.clear();
     CHECK(mg::run(file, start_steps(), "1.2.0", log_line, true) == 2);
-    CHECK((g_ran == std::vector<int>{ mg::DataDir, mg::LogsDirs }));
+    CHECK((g_ran == std::vector<int>{ DataDir, LogsDirs }));
     CHECK(logged("migrations: steps 1, 2 run again, whatever level is recorded"));
     // The level recorded is not lowered.
-    CHECK(state(file).level == mg::Latest);
+    CHECK(state(file).level == mg::latest());
 
     // One or a few of them.
     g_ran.clear();
     g_lines.clear();
-    CHECK(mg::run(file, { step(mg::DataDir), step(mg::NandDirs) }, "1.2.0", log_line, true) == 2);
-    CHECK((g_ran == std::vector<int>{ mg::DataDir, mg::NandDirs }));
-    CHECK(logged("migrations: steps 1, 3 run again") && state(file).level == mg::Latest);
+    CHECK(mg::run(file, { step(DataDir), step(NandDirs) }, "1.2.0", log_line, true) == 2);
+    CHECK((g_ran == std::vector<int>{ DataDir, NandDirs }));
+    CHECK(logged("migrations: steps 1, 3 run again") && state(file).level == mg::latest());
 
     // Over a file not there: the level the steps reached.
     std::remove(file.c_str());
-    CHECK(mg::run(file, { step(mg::LogsDirs) }, "1.2.0", nullptr, true) == 1 && state(file).level == mg::LogsDirs);
+    CHECK(mg::run(file, { step(LogsDirs) }, "1.2.0", nullptr, true) == 1 && state(file).level == LogsDirs);
 }
 
 int main()
 {
+    mg::set_latest(NandDirs);
     test_first_and_next();
     test_update();
     test_unreadable();
