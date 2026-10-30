@@ -1318,6 +1318,7 @@
         "notices_reminders": "Promemoria: backup, il secondo sistema della console, i giochi bloccati",
         "notices_ack_remind": "Conta di nuovo gli avvisi ignorati dopo 30 giorni",
         "notices_others": "Le notifiche degli altri homebrew Boréale",
+        "look_shared": "Stesso aspetto degli altri homebrew Boréale",
         "help": "Aiuto e diagnostica",
         "effects": "Effetti visivi",
         "effects_values": {

@@ -1318,6 +1318,7 @@
         "notices_reminders": "Reminders: backups, the console's second system, blocked games",
         "notices_ack_remind": "Count ignored warnings again after 30 days",
         "notices_others": "The other Boréale homebrews' notifications",
+        "look_shared": "Same look as the other Boréale homebrews",
         "help": "Help & diagnostics",
         "effects": "Visual effects",
         "effects_values": {
