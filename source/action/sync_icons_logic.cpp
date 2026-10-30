@@ -63,7 +63,8 @@ std::string target_of(const std::string& host, uint16_t port, const std::string&
     return out;
 }
 
-Plan plan(const std::vector<uint64_t>& want, const Sent& sent, const std::string& target)
+Plan plan(const std::vector<uint64_t>& want, const Sent& sent, const std::string& target,
+          const std::string& old_target)
 {
     Plan p;
     const bool same = sent.target == target;
@@ -73,6 +74,9 @@ Plan plan(const std::vector<uint64_t>& want, const Sent& sent, const std::string
     if (same)
         for (const auto& s : sent.icons)
             if (!wanted_set.count(s.first)) p.clear.push_back(s.first);
+    if (!same && !old_target.empty() && sent.target == old_target)
+        for (const auto& s : sent.icons)
+            if (s.second) p.clear_old.push_back(s.first);
     return p;
 }
 

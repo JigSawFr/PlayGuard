@@ -78,6 +78,20 @@ static void test_plan()
     record(sent, other, 5, 100, false);
     CHECK(sent.target == other && sent.icons.size() == 1 && sent.icons.count(5));
     CHECK(plan({ 1, 5 }, sent, other).send == std::vector<uint64_t>({ 1 }));
+
+    // Boréale's tree on the same broker: the icons published under the old
+    // one (those with an icon) are cleared there, as the new ones are sent.
+    Sent before;
+    record(before, t, 1, 40000, false);
+    record(before, t, 2, 0, false);
+    const std::string tree = target_of("broker.lan", 1883, "boreale/a1b2c3d4");
+    p = plan({ 1, 2 }, before, tree, t);
+    CHECK(p.send == std::vector<uint64_t>({ 1, 2 }) && p.clear.empty() && p.clear_old == std::vector<uint64_t>({ 1 }));
+    CHECK(plan({ 1, 2 }, before, tree, other).clear_old.empty());   // not where they went
+    CHECK(plan({ 1, 2 }, before, t, t).clear_old.empty());         // the same tree
+    record(before, t, 1, 0, true);
+    record(before, tree, 1, 40000, false);
+    CHECK(before.target == tree && before.icons.size() == 1 && plan({ 1 }, before, tree, t).empty());
 }
 
 static void test_file()

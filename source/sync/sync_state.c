@@ -374,6 +374,25 @@ size_t sync_names_build(uint64_t ts, const SyncAppName *apps, size_t n_apps, con
     return bl_json_end(&j);
 }
 
+size_t sync_capabilities_build(const char *sw_version, char *out, size_t cap)
+{
+    BlJson j;
+    bl_json_init(&j, out, cap);
+    bl_json_obj(&j);
+    bl_json_kint(&j, "schema", SYNC_CAPABILITIES_SCHEMA);
+    bl_json_kstr(&j, "platform", SYNC_PLATFORM);
+    bl_json_key(&j, "modules");
+    bl_json_obj(&j);
+    bl_json_key(&j, "playguard");
+    bl_json_obj(&j);
+    bl_json_kint(&j, "schema", SYNC_SCHEMA);
+    bl_json_kstr_or_null(&j, "version", sw_version && *sw_version ? sw_version : NULL);
+    bl_json_obj_end(&j);
+    bl_json_obj_end(&j);
+    bl_json_obj_end(&j);
+    return bl_json_end(&j);
+}
+
 size_t sync_event_build(const char *source, uint64_t ts, const char *event_type, const char *entity,
                         const char *payload, SyncReason reason, bool rc_set, uint32_t rc, char *out, size_t cap)
 {

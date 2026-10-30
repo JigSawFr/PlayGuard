@@ -51,13 +51,17 @@ struct Plan
 {
     std::vector<uint64_t> send;    // read and published (wanted's order)
     std::vector<uint64_t> clear;   // no longer wanted: an empty retained message
-    bool empty() const { return send.empty() && clear.empty(); }
+    std::vector<uint64_t> clear_old;   // on `old_target`, the tree topics left: cleared there
+    bool empty() const { return send.empty() && clear.empty() && clear_old.empty(); }
 };
 
 // What to do so the broker holds `want`'s icons and no others. Sent to
 // another target: every wanted one again, none cleared (those are on the
-// other broker, or under the other topics).
-Plan plan(const std::vector<uint64_t>& want, const Sent& sent, const std::string& target);
+// other broker, or under the other topics), but when that target is
+// `old_target` (the same broker, the tree before Boréale's), every one
+// published there is cleared there.
+Plan plan(const std::vector<uint64_t>& want, const Sent& sent, const std::string& target,
+          const std::string& old_target = "");
 
 // One published (`bytes`, 0 when the game has none) or cleared (`cleared`).
 void record(Sent& sent, const std::string& target, uint64_t app_id, uint32_t bytes, bool cleared);

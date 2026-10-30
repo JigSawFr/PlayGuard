@@ -29,6 +29,7 @@ def keys_of(doc, prefix=""):
 
 # What an entity shows (sync.conf's publish_* switches; "controls" always).
 PUBLISH = ("controls", "activity", "games", "icons", "console", "network", "hardware", "serial", "report")
+MODULE = "playguard"   # source/sync/sync_discovery.h: SYNC_MODULE
 
 
 def main():
@@ -48,6 +49,12 @@ def main():
     for key in ("dev", "o", "avty_t", "cmps"):
         if key not in disc:
             fail(f"discovery: no {key}")
+    # Components are keyed by module (one device, every Boréale homebrew's).
+    cmps = {}
+    for key, c in disc["cmps"].items():
+        if not key.startswith(MODULE + "_"):
+            fail(f"discovery: {key!r} is not keyed by its module {MODULE}")
+        cmps[key[len(MODULE) + 1:]] = c
     state_keys = keys_of(docs["state.json"])
     if keys_of(docs["state_empty.json"]) != state_keys:
         fail("the state read with nothing available has other keys than a full one")
@@ -57,7 +64,7 @@ def main():
     # The keys of the document each state topic carries.
     topic_keys = {"state": state_keys, "system": system_keys, "games": keys_of(docs["games.json"])}
     uniq = set()
-    for oid, c in disc["cmps"].items():
+    for oid, c in cmps.items():
         if not re.fullmatch(r"[a-z0-9_]+", oid):
             fail(f"discovery: bad object id {oid!r}")
         if set(c) == {"p"}:
@@ -108,12 +115,12 @@ def main():
     for oid, platform in gone.items():
         if oid in ids:
             fail(f"entities.json: {oid} is both offered and retired")
-        if disc["cmps"].get(oid) != {"p": platform}:
+        if cmps.get(oid) != {"p": platform}:
             fail(f"discovery: the retired {oid} is not sent as its platform alone")
-    missing = set(disc["cmps"]) - set(ids) - set(gone)
+    missing = set(cmps) - set(ids) - set(gone)
     if missing:
         fail(f"entities.json lacks {sorted(missing)}")
-    print(f"check_sync_json: {len(disc['cmps'])} components, {len(state_keys)} state keys, "
+    print(f"check_sync_json: {len(cmps)} components, {len(state_keys)} state keys, "
           f"{len(system_keys)} system keys, {len(table)} entities: OK")
 
 

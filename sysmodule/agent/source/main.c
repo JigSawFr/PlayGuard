@@ -804,8 +804,10 @@ static size_t host_profiles(void *ctx, char (*names)[SYNC_PROFILE_MAX], size_t m
 static void host_conf_changed(void *ctx, const SyncConf *conf)
 {
     (void)ctx;
-    // Only Home Assistant's discovery switch changes this way.
+    // Home Assistant's discovery switch, and the old tree cleared
+    // (legacy_prefix), change this way.
     g_conf.ha_discovery = conf->ha_discovery;
+    memcpy(g_conf.legacy_prefix, conf->legacy_prefix, sizeof(g_conf.legacy_prefix));
     // A newer version's file, or one whose unknown lines did not all fit:
     // the switch holds until the agent restarts, the file is left as it is.
     if (sync_conf_unwritable(&g_conf)) return;

@@ -479,7 +479,7 @@ static uint64_t h_now_posix(void *ctx)
 static void h_log(void *ctx, const char *line)
 {
     (void)ctx;
-    if (strstr(line, "refused playguard/a1b2c3d4/integration, the integration's version stays unknown"))
+    if (strstr(line, "refused boreale/a1b2c3d4/integration, the integration's version stays unknown"))
         host.refused_logs++;
 }
 
@@ -556,20 +556,20 @@ static size_t count_on(const char *topic)
 static void ha_order(const char *entity, const char *payload)
 {
     char topic[160];
-    snprintf(topic, sizeof(topic), "playguard/a1b2c3d4/%s/set", entity);
+    snprintf(topic, sizeof(topic), "boreale/a1b2c3d4/playguard/%s/set", entity);
     broker_publish(topic, payload, strlen(payload), true);
 }
 
 static bool retained_order(const char *entity)
 {
     char topic[160];
-    snprintf(topic, sizeof(topic), "playguard/a1b2c3d4/%s/set", entity);
+    snprintf(topic, sizeof(topic), "boreale/a1b2c3d4/playguard/%s/set", entity);
     return find_retained(topic) != NULL;
 }
 
 static const char *last_event(void)
 {
-    const Message *m = last_on("playguard/a1b2c3d4/event");
+    const Message *m = last_on("boreale/a1b2c3d4/playguard/event");
     return m ? m->payload : "";
 }
 
@@ -582,23 +582,27 @@ static void test_connect_and_publish(void)
     CHECK(sync_engine_online(&engine) && engine.status.state == SyncLink_Online);
     CHECK(!strcmp(broker.client_id, "pg-a1b2c3d4-app"));
     CHECK(!strcmp(broker.username, "parent") && !strcmp(broker.password, "secret"));
-    CHECK(broker.has_will && !strcmp(broker.will.topic, "playguard/a1b2c3d4/availability") &&
+    CHECK(broker.has_will && !strcmp(broker.will.topic, "boreale/a1b2c3d4/availability") &&
            !strcmp(broker.will.payload, "offline") && broker.will.retain);
-    const Message *avail = find_retained("playguard/a1b2c3d4/availability");
+    const Message *avail = find_retained("boreale/a1b2c3d4/availability");
     CHECK(avail && !strcmp(avail->payload, "online"));
-    CHECK(broker.n_subs == 3 && !strcmp(broker.subs[0], "playguard/a1b2c3d4/+/set") && broker.sub_qos[0] == 1 &&
-           !strcmp(broker.subs[1], "homeassistant/status") && !strcmp(broker.subs[2], "playguard/a1b2c3d4/integration") &&
+    CHECK(broker.n_subs == 3 && !strcmp(broker.subs[0], "boreale/a1b2c3d4/playguard/+/set") && broker.sub_qos[0] == 1 &&
+           !strcmp(broker.subs[1], "homeassistant/status") && !strcmp(broker.subs[2], "boreale/a1b2c3d4/integration") &&
            broker.sub_qos[2] == 1);
-    const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
-    CHECK(disc && strstr(disc->payload, "\"cmps\":{") && strstr(disc->payload, "\"limit_mon\":{\"p\":\"number\"}") &&
+    const Message *disc = find_retained("homeassistant/device/boreale_a1b2c3d4/config");
+    CHECK(disc && strstr(disc->payload, "\"cmps\":{") && strstr(disc->payload, "\"playguard_limit_mon\":{\"p\":\"number\"}") &&
           !strstr(disc->payload, "limit_mon/set"));
     CHECK(host.profiles_asked >= 1);
-    const Message *st = find_retained("playguard/a1b2c3d4/state");
+    const Message *st = find_retained("boreale/a1b2c3d4/playguard/state");
     CHECK(st && strstr(st->payload, "\"schema\":1"));
     // The system document with it, retained.
-    const Message *sy = find_retained("playguard/a1b2c3d4/system");
+    const Message *sy = find_retained("boreale/a1b2c3d4/system");
     CHECK(sy && sy->retain && strstr(sy->payload, "\"schema\":1") && host.systems >= 1);
-    CHECK(find_retained("playguard/a1b2c3d4/activity"));
+    CHECK(find_retained("boreale/a1b2c3d4/playguard/activity"));
+    // What the console is and which homebrews publish on it, retained.
+    const Message *cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && cap->retain && strstr(cap->payload, "\"platform\":\"switch\"") &&
+          strstr(cap->payload, "\"modules\":{\"playguard\":{\"schema\":1,\"version\":\"1.1.0\"}}"));
 
     // The state again after poll_s, not before.
     const unsigned states = host.states, systems = host.systems;
@@ -608,15 +612,15 @@ static void test_connect_and_publish(void)
     now += 25000;
     turns(1);
     CHECK(host.states == states + 1 && host.systems == systems + 1);
-    CHECK(strstr(find_retained("playguard/a1b2c3d4/system")->payload, "\"n\":") != NULL);
+    CHECK(strstr(find_retained("boreale/a1b2c3d4/system")->payload, "\"n\":") != NULL);
 
     // Today's activity: every minute, or at once when the host says it changed.
-    const size_t acts = count_on("playguard/a1b2c3d4/activity");
+    const size_t acts = count_on("boreale/a1b2c3d4/playguard/activity");
     turns(1);
-    CHECK(count_on("playguard/a1b2c3d4/activity") == acts);
+    CHECK(count_on("boreale/a1b2c3d4/playguard/activity") == acts);
     sync_engine_activity_changed(&engine);
     turns(1);
-    CHECK(count_on("playguard/a1b2c3d4/activity") == acts + 1);
+    CHECK(count_on("boreale/a1b2c3d4/playguard/activity") == acts + 1);
 }
 
 // What the host's sync_watch finds while building the state: on the event
@@ -625,22 +629,22 @@ static void test_notices(void)
 {
     setup(false, SyncPolicy_Auto);
     turns(3);
-    const size_t events = count_on("playguard/a1b2c3d4/event");
+    const size_t events = count_on("boreale/a1b2c3d4/playguard/event");
     host.notice = (SyncNotice){ "time_warning", 0x0100000000010000ULL, SyncTitle_Game, 10, NULL };
     sync_engine_state_changed(&engine);
     turns(1);
     host.notice.event_type = NULL;
-    CHECK(count_on("playguard/a1b2c3d4/event") == events + 1);
-    const Message *m = last_on("playguard/a1b2c3d4/event");
+    CHECK(count_on("boreale/a1b2c3d4/playguard/event") == events + 1);
+    const Message *m = last_on("boreale/a1b2c3d4/playguard/event");
     CHECK(m && !m->retain && strstr(m->payload, "\"event_type\":\"time_warning\"") &&
           strstr(m->payload, "\"source\":\"app\",\"ts\":1791000000") &&
           strstr(m->payload, "\"app_id\":\"0100000000010000\",\"kind\":\"game\",\"minutes_left\":10"));
-    CHECK(m > last_on("playguard/a1b2c3d4/state"));   // after the state that found it
+    CHECK(m > last_on("boreale/a1b2c3d4/playguard/state"));   // after the state that found it
     sync_engine_state_changed(&engine);
     turns(1);
-    CHECK(count_on("playguard/a1b2c3d4/event") == events + 1);
+    CHECK(count_on("boreale/a1b2c3d4/playguard/event") == events + 1);
     // The discovery's event entity knows these events.
-    const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
+    const Message *disc = find_retained("homeassistant/device/boreale_a1b2c3d4/config");
     CHECK(disc && strstr(disc->payload, "\"command_waiting\",\"play_started\",\"play_stopped\",\"time_warning\","
                                         "\"play_blocked\""));
 }
@@ -704,15 +708,15 @@ static void test_policy_off(void)
     turns(2);
     CHECK(host.orders == 0 && strstr(last_event(), "policy_off"));
     // Harmless orders still work.
-    const size_t before = count_on("homeassistant/device/playguard_a1b2c3d4/config");
+    const size_t before = count_on("homeassistant/device/boreale_a1b2c3d4/config");
     ha_order("sync_now", "PRESS");
     turns(2);
     CHECK(strstr(last_event(), "command_applied"));
-    CHECK(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(count_on("homeassistant/device/boreale_a1b2c3d4/config") == before + 1);
     ha_order("export_report", "PRESS");
     turns(2);
     CHECK(host.reports == 1 && strstr(last_event(), "command_applied"));
-    CHECK(!find_retained("playguard/a1b2c3d4/report"));   // publish_report is off
+    CHECK(!find_retained("boreale/a1b2c3d4/playguard/report"));   // publish_report is off
 }
 
 static void test_limits_merged(void)
@@ -740,11 +744,11 @@ static void test_limits_merged(void)
     // Two events, one per order.
     size_t applied = 0;
     for (size_t i = 0; i < broker.n_log; i++)
-        if (!strcmp(broker.log[i].topic, "playguard/a1b2c3d4/event") && strstr(broker.log[i].payload, "command_applied"))
+        if (!strcmp(broker.log[i].topic, "boreale/a1b2c3d4/playguard/event") && strstr(broker.log[i].payload, "command_applied"))
             applied++;
     CHECK(applied == 2);
     // The discovery announces the timer entities and the profiles.
-    const Message *disc = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
+    const Message *disc = find_retained("homeassistant/device/boreale_a1b2c3d4/config");
     CHECK(strstr(disc->payload, "limit_mon") && strstr(disc->payload, "\"ops\":[\"School week\",\"Holidays\"]"));
 }
 
@@ -771,10 +775,10 @@ static void test_async_and_waiting(void)
     ha_order("stop_today", "PRESS");
     turns(2);
     CHECK(retained_order("stop_today") && strstr(last_event(), "command_waiting"));
-    const size_t events = count_on("playguard/a1b2c3d4/event");
+    const size_t events = count_on("boreale/a1b2c3d4/playguard/event");
     sync_engine_replay_orders(&engine);
     turns(2);
-    CHECK(host.orders == 3 && count_on("playguard/a1b2c3d4/event") == events);
+    CHECK(host.orders == 3 && count_on("boreale/a1b2c3d4/playguard/event") == events);
     // Confirmed later.
     host.answer = SyncReason_None;
     sync_engine_replay_orders(&engine);
@@ -809,7 +813,7 @@ static void test_replay_in_flight(void)
     turns(2);
     CHECK(host.orders == 2 && !strcmp(host.last_entity, "console_lock") && !host.last_intent.on);
     const uint32_t second = host.taken_id;
-    broker_publish("playguard/a1b2c3d4/console_lock/set", "OFF", 3, false);
+    broker_publish("boreale/a1b2c3d4/playguard/console_lock/set", "OFF", 3, false);
     turns(2);
     CHECK(host.orders == 3);
     const uint32_t third = host.taken_id;
@@ -833,7 +837,7 @@ static void test_device(void)
     host.device.hos_version = (23u << 16) | (0u << 8) | 1u;
     host.device.ams_version = (1u << 16) | (10u << 8) | 1u;
     turns(3);
-    const char *topic = "homeassistant/device/playguard_a1b2c3d4/config";
+    const char *topic = "homeassistant/device/boreale_a1b2c3d4/config";
     CHECK(count_on(topic) == 1 && host.devices >= 1);
     const Message *disc = last_on(topic);
     CHECK(strstr(disc->payload, "\"mf\":\"Nintendo\",\"mdl\":\"Nintendo Switch \xe2\x80\x93 OLED Model\","
@@ -862,9 +866,9 @@ static void test_unpublished_cleared(void)
 {
     setup(false, SyncPolicy_Auto);   // the report is off by default
     turns(3);
-    const Message *m = last_on("playguard/a1b2c3d4/report");
+    const Message *m = last_on("boreale/a1b2c3d4/playguard/report");
     CHECK(m && m->retain && m->len == 0);
-    CHECK(!last_on("playguard/a1b2c3d4/games") && !last_on("playguard/a1b2c3d4/week"));
+    CHECK(!last_on("boreale/a1b2c3d4/playguard/games") && !last_on("boreale/a1b2c3d4/playguard/week"));
     // Play time and the games turned off: their documents go.
     SyncConf next = conf;
     next.publish_activity = next.publish_games = false;
@@ -873,7 +877,7 @@ static void test_unpublished_cleared(void)
     static const char *const gone[] = { "activity", "week", "names", "games" };
     for (size_t i = 0; i < sizeof(gone) / sizeof(gone[0]); i++) {
         char topic[96];
-        snprintf(topic, sizeof(topic), "playguard/a1b2c3d4/%s", gone[i]);
+        snprintf(topic, sizeof(topic), "boreale/a1b2c3d4/playguard/%s", gone[i]);
         m = last_on(topic);
         CHECK(m && m->retain && m->len == 0);
     }
@@ -888,26 +892,26 @@ static void test_home_assistant_restart_and_discovery_switch(void)
 {
     setup(false, SyncPolicy_Auto);
     turns(3);
-    const size_t before = count_on("homeassistant/device/playguard_a1b2c3d4/config");
+    const size_t before = count_on("homeassistant/device/boreale_a1b2c3d4/config");
     broker_publish("homeassistant/status", "online", 6, false);
     turns(2);
-    CHECK(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(count_on("homeassistant/device/boreale_a1b2c3d4/config") == before + 1);
     // "offline" changes nothing.
     broker_publish("homeassistant/status", "offline", 7, false);
     turns(2);
-    CHECK(count_on("homeassistant/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(count_on("homeassistant/device/boreale_a1b2c3d4/config") == before + 1);
 
     // The integration takes over: the native discovery is cleared and saved off.
     ha_order("discovery", "off");
     turns(2);
-    CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(!find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
     CHECK(host.conf_changes == 1 && !host.saved.ha_discovery);
     broker_publish("homeassistant/status", "online", 6, false);
     turns(2);
-    CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(!find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
     ha_order("discovery", "on");
     turns(2);
-    CHECK(find_retained("homeassistant/device/playguard_a1b2c3d4/config") && host.saved.ha_discovery);
+    CHECK(find_retained("homeassistant/device/boreale_a1b2c3d4/config") && host.saved.ha_discovery);
 }
 
 // The integration's version: handed over as it came, at the subscription
@@ -915,7 +919,7 @@ static void test_home_assistant_restart_and_discovery_switch(void)
 // broker refusing the topic keeps the link up.
 static void test_integration_version(void)
 {
-    const char *topic = "playguard/a1b2c3d4/integration";
+    const char *topic = "boreale/a1b2c3d4/integration";
     const char *doc = "{\"schema\":1,\"version\":\"0.2.0\",\"homeassistant\":\"2026.10.1\"}";
     setup(false, SyncPolicy_Auto);
     broker_publish(topic, doc, strlen(doc), true);
@@ -923,7 +927,7 @@ static void test_integration_version(void)
     CHECK(sync_engine_online(&engine));
     CHECK(host.integrations == 1 && host.integration_len == strlen(doc) && !strcmp(host.integration, doc));
     // Not an order: no event, left on the broker.
-    CHECK(!last_on("playguard/a1b2c3d4/event") && find_retained(topic));
+    CHECK(!last_on("boreale/a1b2c3d4/playguard/event") && find_retained(topic));
 
     const char *newer = "{\"schema\":1,\"version\":\"0.3.0\"}";
     broker_publish(topic, newer, strlen(newer), true);
@@ -968,15 +972,15 @@ static void test_custom_discovery_prefix(void)
                    h_device };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
     turns(3);
-    CHECK(sync_engine_online(&engine) && find_retained("ha/device/playguard_a1b2c3d4/config"));
+    CHECK(sync_engine_online(&engine) && find_retained("ha/device/boreale_a1b2c3d4/config"));
     CHECK(broker.n_subs == 3 && !strcmp(broker.subs[1], "homeassistant/status"));
-    const size_t before = count_on("ha/device/playguard_a1b2c3d4/config");
+    const size_t before = count_on("ha/device/boreale_a1b2c3d4/config");
     broker_publish("homeassistant/status", "online", 6, false);
     turns(2);
-    CHECK(count_on("ha/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(count_on("ha/device/boreale_a1b2c3d4/config") == before + 1);
     broker_publish("ha/status", "online", 6, false);
     turns(2);
-    CHECK(count_on("ha/device/playguard_a1b2c3d4/config") == before + 1);
+    CHECK(count_on("ha/device/boreale_a1b2c3d4/config") == before + 1);
 }
 
 static void test_connection_failures(void)
@@ -999,13 +1003,13 @@ static void test_connection_failures(void)
     // engine reconnects and says online again.
     broker_drop(true);
     turns(1);
-    const Message *avail = find_retained("playguard/a1b2c3d4/availability");
+    const Message *avail = find_retained("boreale/a1b2c3d4/availability");
     CHECK(avail && !strcmp(avail->payload, "offline"));
     CHECK(!sync_engine_online(&engine));
     now += 6000;
     turns(3);
     CHECK(sync_engine_online(&engine));
-    avail = find_retained("playguard/a1b2c3d4/availability");
+    avail = find_retained("boreale/a1b2c3d4/availability");
     CHECK(!strcmp(avail->payload, "online"));
 
     // Unreachable: the pause doubles, up to 5 minutes.
@@ -1026,7 +1030,7 @@ static void test_connection_failures(void)
     const unsigned disconnects = broker.disconnects;
     sync_engine_stop(&engine);
     CHECK(broker.disconnects == disconnects + 1);
-    avail = find_retained("playguard/a1b2c3d4/availability");
+    avail = find_retained("boreale/a1b2c3d4/availability");
     CHECK(!strcmp(avail->payload, "offline"));
 }
 
@@ -1092,7 +1096,7 @@ static void test_woke(void)
     CHECK(broker.n_log == sent + 1 && broker.disconnects == disconnects);   // not written, no DISCONNECT
     turns(2);
     CHECK(sync_engine_online(&engine) && broker.connects == connects + 1);
-    const Message *avail = find_retained("playguard/a1b2c3d4/availability");
+    const Message *avail = find_retained("boreale/a1b2c3d4/availability");
     CHECK(avail && !strcmp(avail->payload, "online"));
     // Asleep while offline: nothing to close, the step connects as before.
     sync_engine_stop(&engine);
@@ -1127,14 +1131,14 @@ static void test_oversized_and_reconfigure(void)
     turns(3);
     CHECK(sync_engine_online(&engine) && broker.connects == connects + 1);
     CHECK(!strcmp(broker.client_id, "pg-21b2c3d4-app"));
-    const Message *cleared = find_retained("homeassistant/device/playguard_a1b2c3d4/config");
+    const Message *cleared = find_retained("homeassistant/device/boreale_a1b2c3d4/config");
     CHECK(!cleared || !cleared->payload[0]);
-    CHECK(find_retained("homeassistant/device/playguard_21b2c3d4/config"));
-    const Message *avail = find_retained("playguard/21b2c3d4/availability");
+    CHECK(find_retained("homeassistant/device/boreale_21b2c3d4/config"));
+    const Message *avail = find_retained("boreale/21b2c3d4/availability");
     CHECK(avail && !strcmp(avail->payload, "online"));
-    avail = find_retained("playguard/a1b2c3d4/availability");
+    avail = find_retained("boreale/a1b2c3d4/availability");
     CHECK(avail && !strcmp(avail->payload, "offline"));
-    CHECK(find_retained("playguard/21b2c3d4/state"));
+    CHECK(find_retained("boreale/21b2c3d4/playguard/state"));
     sync_engine_reconfigure(&engine, &conf);
     turns(3);
     CHECK(sync_engine_online(&engine) && !strcmp(broker.client_id, "pg-a1b2c3d4-app"));
@@ -1168,7 +1172,7 @@ static void test_mqtt_versions(void)
     turns(3);
     CHECK(sync_engine_online(&engine) && broker.version == MQTT_V5 && engine.status.protocol == MQTT_V5);
     CHECK(broker.client_max_packet == SYNC_RX_SIZE);
-    CHECK(find_retained("playguard/a1b2c3d4/state") && find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(find_retained("boreale/a1b2c3d4/playguard/state") && find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
     // Orders and their answers work the same.
     ha_order("vr_restricted", "ON");
     turns(2);
@@ -1253,7 +1257,7 @@ static void test_mqtt5_properties(void)
     broker.max_packet = 2048;
     turns(3);
     CHECK(sync_engine_online(&engine) && engine.session.mqtt.too_large >= 1);
-    CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config") && find_retained("playguard/a1b2c3d4/state"));
+    CHECK(!find_retained("homeassistant/device/boreale_a1b2c3d4/config") && find_retained("boreale/a1b2c3d4/playguard/state"));
 
     // The broker ends the session, saying why.
     setup(false, SyncPolicy_Auto);
@@ -1291,7 +1295,7 @@ static void test_publish_stream(void)
     const uint32_t publishes = sync_engine_status(&engine)->publishes;
     Reader r = { icon, sizeof(icon), 0, 1500 };
     CHECK(sync_engine_publish_stream(&engine, "icon/0100000000010000", sizeof(icon), true, read_piece, &r) == 0);
-    const Message *m = last_on("playguard/a1b2c3d4/icon/0100000000010000");
+    const Message *m = last_on("boreale/a1b2c3d4/icon/0100000000010000");
     CHECK(m && m->retain && m->len == sizeof(icon) && !memcmp(m->payload, icon, sizeof(icon)));
     CHECK(sync_engine_status(&engine)->publishes == publishes + 1 && sync_engine_online(&engine));
     // A file that comes short: half a packet went out, so the connection is
@@ -1302,11 +1306,52 @@ static void test_publish_stream(void)
     CHECK(strstr(sync_engine_status(&engine)->error, "cut short") != NULL);
     turns(3);
     CHECK(sync_engine_online(&engine));
-    CHECK(!last_on("playguard/a1b2c3d4/icon/0100000000020000"));
+    CHECK(!last_on("boreale/a1b2c3d4/icon/0100000000020000"));
     // Offline: refused at once.
     sync_engine_stop(&engine);
     Reader none = { icon, 10, 0, 10 };
     CHECK(sync_engine_publish_stream(&engine, "icon/0100000000030000", 10, true, read_piece, &none) < 0 && none.at == 0);
+}
+
+// A schema-1 settings file: what is left of the old tree (no module level,
+// the discovery's device playguard_<id>) is cleared once, then the settings
+// are saved without legacy_prefix.
+static void test_legacy_tree(void)
+{
+    setup(false, SyncPolicy_Auto);
+    host.posix = 1791000000;   // the finished days are cleared around it
+    broker_publish("playguard/a1b2c3d4/state", "{\"schema\":1}", 12, true);
+    broker_publish("playguard/a1b2c3d4/availability", "offline", 7, true);
+    broker_publish("playguard/a1b2c3d4/system", "{}", 2, true);
+    broker_publish("playguard/a1b2c3d4/limit_mon/set", "90", 2, true);
+    broker_publish("playguard/a1b2c3d4/activity/2026-10-02", "{}", 2, true);
+    broker_publish("homeassistant/device/playguard_a1b2c3d4/config", "{}", 2, true);
+    strcpy(conf.legacy_prefix, "playguard");
+    sync_engine_reconfigure(&engine, &conf);
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    CHECK(!find_retained("playguard/a1b2c3d4/state") && !find_retained("playguard/a1b2c3d4/availability"));
+    CHECK(!find_retained("playguard/a1b2c3d4/system") && !find_retained("playguard/a1b2c3d4/limit_mon/set"));
+    CHECK(!find_retained("playguard/a1b2c3d4/activity/2026-10-02"));
+    CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(find_retained("boreale/a1b2c3d4/playguard/state") && find_retained("boreale/a1b2c3d4/availability"));
+    CHECK(host.conf_changes >= 1 && !host.saved.legacy_prefix[0] && !engine.conf.legacy_prefix[0]);
+    // Once only.
+    const unsigned changes = host.conf_changes;
+    sync_engine_sync_now(&engine);
+    turns(2);
+    CHECK(host.conf_changes == changes);
+
+    // The same prefix (one of the user's own): the availability and the
+    // system document are where they were, and stay.
+    setup(false, SyncPolicy_Auto);
+    broker_publish("boreale/a1b2c3d4/state", "{}", 2, true);
+    strcpy(conf.legacy_prefix, "boreale");
+    sync_engine_reconfigure(&engine, &conf);
+    turns(3);
+    CHECK(!find_retained("boreale/a1b2c3d4/state") && find_retained("boreale/a1b2c3d4/playguard/state"));
+    const Message *avail = find_retained("boreale/a1b2c3d4/availability");
+    CHECK(avail && !strcmp(avail->payload, "online") && find_retained("boreale/a1b2c3d4/system"));
 }
 
 int main(void)
@@ -1332,5 +1377,6 @@ int main(void)
     test_mqtt_versions();
     test_mqtt5_properties();
     test_publish_stream();
+    test_legacy_tree();
     return CHECK_DONE("sync_engine: all tests passed");
 }

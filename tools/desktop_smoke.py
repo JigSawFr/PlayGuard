@@ -112,8 +112,11 @@ other scenario waits for the first screen after it, at least 2 s later (the
 intro), but "lock", which turns the intro off in config.json.
 
 The "sync" scenario starts a local Mosquitto (needs mosquitto and
-mosquitto-clients) and sets the remote link up in sync.conf: PlayGuard must
-come online, publish the Home Assistant discovery, the state, today's
+mosquitto-clients) and sets the remote link up in an earlier version's
+sync.conf (schema 1): PlayGuard must come online on Boréale's tree, publish
+the capabilities, clear what the earlier version left retained under
+playguard/<id> and its discovery, save sync.conf as schema 2, publish the
+Home Assistant discovery, the state, today's
 activity and the names, carry out a limit order (event, retained order
 cleared, new state, change history), refuse one out of range, publish the
 discovery again when Home Assistant says it restarted, publish the system
@@ -424,6 +427,12 @@ if SYNC:
         tail = open(broker_log, errors="replace").read()[-2000:]
         print(f"SMOKE FAILED: mosquitto ({found}) did not start (exit {mqtt_broker.returncode}):\n{tail}")
         sys.exit(1)
+    # What an earlier version (the playguard/<id> tree) left retained.
+    OLD_TREE = (f"playguard/{SYNC_ID}/state", f"playguard/{SYNC_ID}/availability", f"playguard/{SYNC_ID}/system",
+                f"playguard/{SYNC_ID}/limit_mon/set", f"homeassistant/device/playguard_{SYNC_ID}/config")
+    for topic in OLD_TREE:
+        subprocess.run(["mosquitto_pub", "-h", "127.0.0.1", "-p", str(mqtt_port), "-t", topic, "-m", "{}", "-r"],
+                       check=True)
     # The Home Assistant integration's newer release and its changelog (the
     # daily check runs once the integration says which version it is).
     ha_changelog = os.path.join(OUT, "ha_changelog.md")
@@ -450,8 +459,10 @@ if SYNC:
     if os.path.exists(icons_txt):
         os.remove(icons_txt)   # a new broker: every icon sent to it
     os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
+    # An earlier version's file (schema 1, the old default prefix): the
+    # link moves to Boréale's tree and clears the old one.
     open(sync_conf, "w").write(
-        "enabled=1\nhost=127.0.0.1\n"
+        "schema=1\nenabled=1\nhost=127.0.0.1\n"
         f"port={mqtt_port}\nallow_anonymous=1\nconsole_id={SYNC_ID}\nconsole_name=Smoke\n"
         f"mqtt_version={'3.1.1' if MQTT311 else 'auto'}\n"
         f"publish_serial={1 if MQTT311 else 0}\n"
@@ -1536,7 +1547,8 @@ if ERRORS:
             fail("the network clock was not set to the console clock (no history entry)")
     finish(told_unlock_failed)
 if SYNC:
-    BASE = f"playguard/{SYNC_ID}"
+    BASE = f"boreale/{SYNC_ID}"
+    MOD = f"{BASE}/playguard"   # PlayGuard's module; the device's topics are under BASE
 
     def mqtt_get(topic, timeout=3):
         """The retained message on `topic`, or None."""
@@ -1576,35 +1588,43 @@ if SYNC:
             fail(f"{topic} is not JSON: {text[:200]}")
 
     wait_for("availability online", lambda: mqtt_get(f"{BASE}/availability") == "online")
+    caps = wait_for("the capabilities", lambda: doc(f"{BASE}/capabilities"))
+    if caps.get("platform") != "switch" or caps.get("modules", {}).get("playguard", {}).get("schema") != 1:
+        fail(f"capabilities: {caps}")
+    # The tree an earlier version left (seeded before PlayGuard started), cleared.
+    for topic in OLD_TREE:
+        wait_for(f"{topic} cleared", lambda topic=topic: mqtt_get(topic, 1) is None, 20)
+    wait_for("sync.conf written as schema 2, without legacy_prefix",
+             lambda: "schema=2\n" in open(sync_conf).read() and "legacy_prefix" not in open(sync_conf).read(), 10)
     # The version the client spoke, as Mosquitto logs it: "as pg-<id>-app (p5, …"
     # (its own numbering: p2 is 3.1.1, p5 is 5.0).
     level = "p2" if MQTT311 else "p5"
     broker_log = open(os.path.join(OUT, "mosquitto.log"), errors="replace").read()
     if f"as pg-{SYNC_ID}-app ({level}," not in broker_log:
         fail(f"the client did not connect with {level}: {broker_log[-600:]}")
-    discovery = wait_for("discovery", lambda: doc(f"homeassistant/device/playguard_{SYNC_ID}/config"))
-    if "limit_mon" not in discovery.get("cmps", {}) or discovery["dev"]["name"] != "Smoke":
+    discovery = wait_for("discovery", lambda: doc(f"homeassistant/device/boreale_{SYNC_ID}/config"))
+    if "playguard_limit_mon" not in discovery.get("cmps", {}) or discovery["dev"]["name"] != "Smoke":
         fail("the discovery lacks the timer entities or the console's name")
     # The device is the console as Nintendo names it (the simulated OLED).
     dev = discovery["dev"]
     if dev.get("mf") != "Nintendo" or dev.get("mdl_id") != "HEG-001" or "OLED" not in dev.get("mdl", ""):
         fail(f"unexpected device: {dev}")
-    state = wait_for("state", lambda: doc(f"{BASE}/state"))
+    state = wait_for("state", lambda: doc(f"{MOD}/state"))
     # PlayGuard publishing: it is what the console is doing.
     if state.get("activity_today", {}).get("now") != "playguard":
         fail(f"the state's now: {state.get('activity_today')}")
     if state.get("source") != "app" or state.get("local_date") != "2026-10-08":
         fail(f"unexpected state: {json.dumps(state)[:300]}")
-    wait_for("today's activity", lambda: doc(f"{BASE}/activity"))
-    wait_for("names", lambda: doc(f"{BASE}/names"))
+    wait_for("today's activity", lambda: doc(f"{MOD}/activity"))
+    wait_for("names", lambda: doc(f"{MOD}/names"))
     # The console itself (the simulated OLED on Wi-Fi), its entities in the
     # discovery; the serial number only with publish_serial (sync-311).
     system = wait_for("the system document", lambda: doc(f"{BASE}/system"))
     hw, power = system.get("hardware", {}), system.get("power", {})
     # sync-311 leaves the network unpublished: null, its entities removed.
     want_ssid = None if MQTT311 else "Maison"
-    if MQTT311 and discovery["cmps"].get("ip_address") != {"p": "sensor"}:
-        fail(f"the network's entities are still offered: {discovery['cmps'].get('ip_address')}")
+    if MQTT311 and discovery["cmps"].get("playguard_ip_address") != {"p": "sensor"}:
+        fail(f"the network's entities are still offered: {discovery['cmps'].get('playguard_ip_address')}")
     if state.get("link", {}).get("publishes", {}).get("network") is not (not MQTT311):
         fail(f"the state does not say what is published: {state.get('link')}")
     if hw.get("model") != "oled" or power.get("battery_pct") != 87 or system.get("network", {}).get("ssid") != want_ssid \
@@ -1614,9 +1634,9 @@ if SYNC:
     want_serial = "XAW10000000001" if MQTT311 else None
     if hw.get("serial") != want_serial:
         fail(f"the serial number is {hw.get('serial')!r}, not {want_serial!r}")
-    if "/system" not in discovery["cmps"].get("battery", {}).get("stat_t", ""):
+    if "/system" not in discovery["cmps"].get("playguard_battery", {}).get("stat_t", ""):
         fail("the discovery lacks the console's own entities")
-    games = wait_for("the games document", lambda: doc(f"{BASE}/games"))
+    games = wait_for("the games document", lambda: doc(f"{MOD}/games"))
     if not games.get("games") or games.get("total_min") is None:
         fail(f"unexpected games document: {json.dumps(games)[:400]}")
 
@@ -1641,21 +1661,21 @@ if SYNC:
     # (PLAYGUARD_SIM_HOMEBREW) by neither their ID nor their name, their time
     # as one total (homebrew_min), which the totals still count.
     homebrew_ids = ("050537E2542E2000", "052EB87E6426D000")
-    week = wait_for("the week", lambda: doc(f"{BASE}/week"))
+    week = wait_for("the week", lambda: doc(f"{MOD}/week"))
     if week.get("homebrew_min") != [0, 0, 0, 0, 20, 10, 0]:
         fail(f"the week's homebrew time: {week.get('homebrew_min')}")
     days = {}
     for d in week.get("days", [])[:-1]:
-        days[d] = wait_for(f"the finished day {d}", lambda d=d: doc(f"{BASE}/activity/{d}"))
+        days[d] = wait_for(f"the finished day {d}", lambda d=d: doc(f"{MOD}/activity/{d}"))
     two_days_ago = days[week["days"][4]]
     if two_days_ago.get("homebrew_min") != 20 or \
             two_days_ago.get("total_s") != sum(a["s"] for a in two_days_ago["per_app"]) + two_days_ago.get("homebrew_s", -1):
         fail(f"a finished day's homebrew time: {json.dumps(two_days_ago)[:300]}")
-    games_doc = doc(f"{BASE}/games")
+    games_doc = doc(f"{MOD}/games")
     if games_doc.get("homebrew_min") != 340 or "forwarders" not in games_doc or not isinstance(games_doc.get("homebrews"), int):
         fail(f"the games document's homebrews: {json.dumps(games_doc)[:300]}")
     for topic in ("names", "games", "week", "activity", "state") + tuple(f"activity/{d}" for d in days):
-        text = mqtt_get(f"{BASE}/{topic}") or ""
+        text = mqtt_get(f"{MOD}/{topic}") or ""
         if any(h in text.upper() for h in homebrew_ids) or "sphaira" in text:
             fail(f"a homebrew on {topic}: {text[:300]}")
     # Sky Kingdom: installed, never played.
@@ -1664,19 +1684,19 @@ if SYNC:
         fail("a homebrew's icon on the broker")
     wait_for("icons.txt", lambda: os.path.exists(icons_txt) and first.rsplit("/", 1)[1] in open(icons_txt).read(), 10)
 
-    events = watch(f"{BASE}/event", "events.txt")
-    discoveries = watch(f"homeassistant/device/playguard_{SYNC_ID}/config", "discoveries.txt")
+    events = watch(f"{MOD}/event", "events.txt")
+    discoveries = watch(f"homeassistant/device/boreale_{SYNC_ID}/config", "discoveries.txt")
 
     # A limit order: applied, answered, cleared, and the state follows.
-    mqtt_pub(f"{BASE}/limit_uniform/set", "90")
+    mqtt_pub(f"{MOD}/limit_uniform/set", "90")
     wait_for("the order's event", lambda: any('"command_applied"' in e and '"limit_uniform"' in e for e in events()))
-    wait_for("the order cleared", lambda: mqtt_get(f"{BASE}/limit_uniform/set", 1) is None)
+    wait_for("the order cleared", lambda: mqtt_get(f"{MOD}/limit_uniform/set", 1) is None)
     wait_for("the new limits in the state",
-             lambda: (doc(f"{BASE}/state") or {}).get("timer", {}).get("limits_min") == [90] * 7)
+             lambda: (doc(f"{MOD}/state") or {}).get("timer", {}).get("limits_min") == [90] * 7)
     # Out of range: refused with the reason, cleared too.
-    mqtt_pub(f"{BASE}/limit_mon/set", "5000")
+    mqtt_pub(f"{MOD}/limit_mon/set", "5000")
     wait_for("the refusal", lambda: any('"command_rejected"' in e and '"out_of_range"' in e for e in events()))
-    wait_for("the refused order cleared", lambda: mqtt_get(f"{BASE}/limit_mon/set", 1) is None)
+    wait_for("the refused order cleared", lambda: mqtt_get(f"{MOD}/limit_mon/set", 1) is None)
     # Home Assistant restarted: the discovery again.
     before = len(discoveries())
     mqtt_pub("homeassistant/status", "online", retain=False)
@@ -1717,9 +1737,9 @@ if SYNC:
     shot("07_published")
     key("Return")
     wait_for("publish_games saved off", lambda: "publish_games=0" in open(sync_conf).read(), 10)
-    wait_for("the games document cleared", lambda: mqtt_get(f"{BASE}/games", 1) is None, 20)
-    wait_for("the games' entities removed", lambda: (doc(f"homeassistant/device/playguard_{SYNC_ID}/config") or {})
-             .get("cmps", {}).get("games_installed") == {"p": "sensor"}, 20)
+    wait_for("the games document cleared", lambda: mqtt_get(f"{MOD}/games", 1) is None, 20)
+    wait_for("the games' entities removed", lambda: (doc(f"homeassistant/device/boreale_{SYNC_ID}/config") or {})
+             .get("cmps", {}).get("playguard_games_installed") == {"p": "sensor"}, 20)
     # The icons turned off: each one cleared from the broker.
     go_to("Publish the games' icons (installed and played)")
     key("Return")
