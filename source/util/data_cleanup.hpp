@@ -1,7 +1,6 @@
 // data_cleanup — what the developer tools' "Clear the cache" and "Delete the
 // log files" remove from the app's data folder, and the removal itself.
-// Folders stay (the icon store keeps writing to its own while the app runs);
-// only files go. Never the settings, the change history, backups, profiles,
+// Folders stay; only files go. Never the settings, the change history, backups, profiles,
 // exports or the GitHub sign-in. No Aurore: host-tested (tests/data_cleanup).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -22,8 +21,9 @@ struct Plan
 
 // Every file under `data_dir`/cache and each system's
 // `data_dir`/nand/<key>/cache, in their subfolders too: what the app reads
-// again from the console (or GitHub) when needed, such as the game icons and
-// their language or the development build list (util/paths.hpp).
+// again from the console (or GitHub) when needed, such as the development
+// build list (util/paths.hpp). The game icons are the Boréale homebrews'
+// shared cache (config/boreale/cache/), not the app's.
 Plan cache(const std::string& data_dir);
 
 // Every file under `data_dir`/logs and its subfolders (crashes/, reports/…)
@@ -48,6 +48,10 @@ struct Outcome
 // Removes the plan's files. One already gone (removed since the plan was
 // made) is neither removed nor failed.
 Outcome remove(const Plan& plan);
+
+// Removes the folder `dir`, its files first (it has no subfolders): a
+// migration's old folder. Nothing when it is not there.
+Outcome remove_folder(const std::string& dir);
 
 // A size as a whole number of KB (under 1 MB; a non-empty file is at least
 // 1 KB) or of MB (rounded, 1 MB at least): no decimals, whose separator

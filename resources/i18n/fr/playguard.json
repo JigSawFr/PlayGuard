@@ -1469,6 +1469,8 @@
         "migration_logs_detail": "logs/ d'avant la 1.0.0",
         "migration_nand": "Le dossier de chaque système",
         "migration_nand_detail": "Depuis ce que tous les systèmes partageaient",
+        "migration_icons": "Icônes de jeux partagées",
+        "migration_icons_detail": "Dossier d'icônes propre à PlayGuard supprimé",
         "migrations_confirm": "Rejouer",
         "migrations_done": "Migrations rejouées ({} étapes). Éléments déplacés : {}. Le détail est dans le journal de session.",
         "mode_off_body": "Désactiver le mode développeur ? Ses outils quittent la fin de l'onglet À propos › Aide et diagnostic et l'enregistrement du temps de jeu s'arrête. Sept appuis sur Y dans À propos › Version les font revenir.",

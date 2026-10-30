@@ -1469,6 +1469,8 @@
         "migration_logs_detail": "1.0.0 之前的 logs/",
         "migration_nand": "每个系统的文件夹",
         "migration_nand_detail": "来自所有系统共用的内容",
+        "migration_icons": "共享的游戏图标",
+        "migration_icons_detail": "已删除 PlayGuard 自己的图标文件夹",
         "migrations_confirm": "运行",
         "migrations_done": "已重新运行迁移（{} 步）。移动的项目：{}。详细信息见会话日志。",
         "mode_off_body": "关闭开发者模式？“关于 › 帮助与诊断”末尾的开发者工具会消失，游戏时间记录也会停止。在“关于”的“版本”上按 Y 七次即可恢复。",

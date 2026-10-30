@@ -1469,6 +1469,8 @@
         "migration_logs_detail": "1.0.0 之前的 logs/",
         "migration_nand": "每個系統的資料夾",
         "migration_nand_detail": "來自所有系統共用的內容",
+        "migration_icons": "共用的遊戲圖示",
+        "migration_icons_detail": "已刪除 PlayGuard 自己的圖示資料夾",
         "migrations_confirm": "執行",
         "migrations_done": "已重新執行移轉（{} 個步驟）。移動的項目：{}。詳細資訊請見工作階段記錄。",
         "mode_off_body": "關閉開發者模式？「關於 › 說明與診斷」底部的開發者工具會消失，遊玩時間限制記錄也會停止。在「關於」的「版本」上按 Y 七次即可恢復。",

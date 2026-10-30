@@ -10,6 +10,7 @@
 
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/data_cleanup.hpp"
 #include "util/data_move.hpp"
 #include "util/log_files.hpp"
 #include "util/migrations.hpp"
@@ -30,6 +31,7 @@ enum : int
     DataDir  = 1,   // sd:/switch/playguard to sd:/config/playguard (data_move::run, the console only)
     LogsDirs = 2,   // logs/ before its subfolders (data_move::logs)
     NandDirs = 3,   // what every system shared, to the first one's nand/<key> (data_move::to_nand)
+    SharedIcons = 4, // cache/icons/ gone: the icons are the Boréale homebrews' shared cache (config/boreale/cache/)
 };
 
 // The lines of util/migrations.hpp, in the log, after `prefix`.
@@ -72,6 +74,13 @@ const std::vector<Known>& known()
         { { NandDirs, "per-system folder",
             []() { return data_move::to_nand(paths::data_dir(), paths::nand_dir()); } },
           "playguard/dev/migration_nand", "playguard/dev/migration_nand_detail" },
+        // The icons PlayGuard kept for itself before the Boréale homebrews
+        // shared theirs (boreale-link's bl_cache, config/boreale/cache/): read
+        // again from the console as they are needed. Goes with the releases
+        // that still had cache/icons/ (after April 2027).
+        { { SharedIcons, "own icon cache",
+            []() { return data_cleanup::remove_folder(paths::cache_dir() + "/icons").removed; } },
+          "playguard/dev/migration_icons", "playguard/dev/migration_icons_detail" },
     };
     return all;
 }
@@ -148,7 +157,7 @@ void choose(std::vector<bool> chosen, int focus)
 
 void at_start()
 {
-    migrations::set_latest(NandDirs);
+    migrations::set_latest(SharedIcons);
     migrations::run(paths::migrations_file(),
                     steps({}, std::make_shared<size_t>(0), DataDir, LogsDirs), app::version(),
                     log_to("start-up"));
@@ -157,7 +166,7 @@ void at_start()
 void for_system()
 {
     migrations::run(paths::migrations_file(),
-                    steps({}, std::make_shared<size_t>(0), NandDirs, NandDirs), app::version(),
+                    steps({}, std::make_shared<size_t>(0), NandDirs, SharedIcons), app::version(),
                     log_to("start-up"));
 }
 

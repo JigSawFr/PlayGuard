@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <utility>
 
 namespace data_cleanup
@@ -100,6 +101,21 @@ Outcome remove(const Plan& plan)
             out.failed++;
         }
     }
+    return out;
+}
+
+Outcome remove_folder(const std::string& dir)
+{
+    Plan plan;
+    if (DIR* d = opendir(dir.c_str())) {
+        while (dirent* e = readdir(d)) {
+            const std::string n = e->d_name;
+            if (n != "." && n != "..") plan.files.push_back(dir + "/" + n);
+        }
+        closedir(d);
+    }
+    Outcome out = remove(plan);
+    if (rmdir(dir.c_str()) != 0 && errno != ENOENT) out.failed++;
     return out;
 }
 

@@ -320,8 +320,8 @@ is not tried again.
 
 **The agent publishes one icon itself:** the game played, when the broker
 does not have it yet (neither `icons.txt` nor its own `agent_icons.txt`
-lists it for this broker and console) and PlayGuard's icon cache on the SD
-card (`config/playguard/cache/icons/<APP_ID>.jpg`) has it, looked for once
+lists it for this broker and console) and the homebrews' shared icon cache on the SD
+card (`config/boreale/cache/icons/<APP_ID>.jpg`) has it, looked for once
 per game while it runs. It streams the file in pieces (the header says the
 length, then the bytes follow through the engine's 32 KiB scratch buffer:
 no buffer of its own), on its own session, then adds the game to
@@ -643,7 +643,7 @@ release's `CHANGELOG.md`) and the QR code that opens it in HACS.
 | `config/playguard/nand/<system>/sync/titles.txt` | PlayGuard, with the record | The same without the names (`050537E2542E2000=homebrew`): what the agent reads before it publishes play time, `now_playing`, an event or an icon. A kind it does not know (a newer PlayGuard's) is read as `homebrew`: never published by its ID. |
 | `config/playguard/nand/<system>/sync/icons.txt` | PlayGuard, after it published or cleared game icons | `target=<8 hex>` (a hash of the broker's host, port and `<prefix>/<id>`), then `0100000000010000=40123`: each icon on the broker and its size in bytes (0: the game has none to publish). Read when PlayGuard starts. |
 | `config/playguard/nand/<system>/sync/agent_icons.txt` | the agent, after it published the icon of the game played | The same form, for what the agent sent itself. PlayGuard takes it (renamed, read, removed) after each read of the play log and adds its games to `icons.txt`; the agent reads both before publishing an icon. |
-| `config/playguard/cache/icons/<APP_ID>.jpg` | PlayGuard, each icon it reads (its screens, its names, the icons it publishes) | Its icon cache, shared by every system on the SD card (16 MiB, 512 icons at most, emptied when the console language changes or it is full); the agent reads it, never writes it. |
+| `config/boreale/cache/icons/<APP_ID>.jpg` | PlayGuard and the other Boréale homebrews, each icon they read from the console (boreale-link's `bl_cache`, with `names.txt` and `cache.conf` beside it) | The icon cache the homebrews share, and every system on the SD card (16 MiB, 1024 icons at most, emptied when the console language changes or it is full); the agent reads it, never writes it. |
 | `config/playguard/nand/<system>/sync/agent_state.txt` | the agent | The same records, for what the agent changed itself. At start the agent takes the newer of this file and `nro_state.txt`; PlayGuard adopts the agent's records (`GetRecords`) when it opens. |
 | `config/playguard/nand/<system>/sync/integration.json` | the link that got it (PlayGuard's or the agent's) | The HA integration's document (`integration`, above), as it came; removed when the integration clears it. PlayGuard reads it at start, and every 30 s while the agent holds the link. |
 | `config/playguard/nand/<system>/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. A line with more fields than PlayGuard knows is read for the ones it knows; one it cannot read is kept in `agent_events.log.rejected` (for a later version), and the file is not removed until it is. |

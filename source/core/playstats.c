@@ -9,14 +9,13 @@
 #include <string.h>
 
 #include "../util/playlog.h"
+#include "bl_cache.h"
 #include "calendar.h"
 #include "playstats_logic.h"
 #include "time_ops.h"
 
 #define RECORD_CHUNK 64
 #define DAY_S        86400u
-#define ICONS_MAX_BYTES (16u << 20)          // the icons kept on the SD card, in all
-#define ICONS_MAX_FILES (2 * PLAYSTATS_MAX)
 
 // Names read earlier (this run, or the last one's through playstats_remember):
 // reading a game's control data is the slow part, about 0.5 s a game on
@@ -35,9 +34,16 @@ static u64  s_logged[LOGGED_MAX];
 static u32  s_logged_count;
 static bool s_logged_read;
 
-static char s_icon_dir[sizeof(((IconStore *)0)->dir)];
-static IconStore s_icons;
-static bool s_icons_tried;
+// The icons and names shared by the Boréale homebrews (boreale-link's
+// bl_cache, config/boreale/cache/), opened once the console language is known.
+static char s_cache_root[BL_CACHE_ROOT_MAX];
+static BlCache s_cache;
+static bool s_cache_tried;
+// The names read from ns since they were last written to it, written in one
+// go at the end of a read.
+static u64  s_new_ids[PLAYSTATS_MAX];
+static char s_new_names[PLAYSTATS_MAX][PLAYSTATS_NAME_LEN];
+static u32  s_new_count;
 
 // The names and the icons above are read on Aurore's task thread
 // (play_data, game_icons) and on the UI thread (a game's icon in a dialog,
@@ -114,17 +120,56 @@ static Result read_events(u64 since, PlayLogEvent **events, size_t *count, bool 
 }
 
 // With s_cache_lock held.
-static void open_icon_store(u8 lang)
+static void open_cache(u8 lang)
 {
-    if (s_icons_tried || !s_icon_dir[0] || !lang) return;
-    s_icons_tried = true;
-    icon_store_open(&s_icons, s_icon_dir, lang, ICONS_MAX_BYTES, ICONS_MAX_FILES);
+    if (s_cache_tried || !s_cache_root[0] || !lang) return;
+    s_cache_tried = true;
+    bl_cache_open(&s_cache, s_cache_root, lang);
 }
 
-void playstats_set_icon_dir(const char *dir)
+void playstats_set_cache_root(const char *root)
 {
-    const int n = snprintf(s_icon_dir, sizeof(s_icon_dir), "%s", dir ? dir : "");
-    if (n < 0 || (size_t)n >= sizeof(s_icon_dir)) s_icon_dir[0] = '\0';   // too long: none
+    const size_t n = root ? strlen(root) : 0;
+    if (n >= sizeof(s_cache_root)) return;   // too long: none
+    memcpy(s_cache_root, root ? root : "", n + 1);
+}
+
+// A name read from ns, for the shared cache. With s_cache_lock held.
+static void note_new_name(u64 id, const char *name)
+{
+    if (s_new_count >= PLAYSTATS_MAX || !name[0]) return;
+    s_new_ids[s_new_count] = id;
+    nacp_copy_utf8(s_new_names[s_new_count], sizeof(s_new_names[0]), name);
+    s_new_count++;
+}
+
+// The names read from ns this time, written to the shared cache (one rewrite).
+static void flush_new_names(void)
+{
+    mutexLock(&s_cache_lock);
+    if (s_new_count && s_cache.ready) {
+        const char *names[PLAYSTATS_MAX];
+        for (u32 i = 0; i < s_new_count; i++) names[i] = s_new_names[i];
+        bl_cache_names_put(&s_cache, s_new_ids, names, s_new_count);
+    }
+    s_new_count = 0;
+    mutexUnlock(&s_cache_lock);
+}
+
+// The icon kept for `id`, malloc'ed, or NULL. With s_cache_lock held.
+static unsigned char *cached_icon(u64 id, size_t *size)
+{
+    *size = 0;
+    if (!s_cache.ready) return NULL;
+    unsigned char *buf = (unsigned char *)malloc(BL_CACHE_ICON_MAX);
+    if (!buf) return NULL;
+    *size = bl_cache_icon_get(&s_cache, id, buf, BL_CACHE_ICON_MAX);
+    if (!*size) {
+        free(buf);
+        return NULL;
+    }
+    unsigned char *fit = (unsigned char *)realloc(buf, *size);
+    return fit ? fit : buf;
 }
 
 void playstats_remember(const PlayStats *known)
@@ -141,7 +186,7 @@ static void keep_icon(u64 id, const NsApplicationControlData *cd, u64 size)
 {
     if (size <= sizeof(cd->nacp)) return;
     mutexLock(&s_cache_lock);
-    icon_store_put(&s_icons, id, cd->icon, (size_t)(size - sizeof(cd->nacp)));
+    bl_cache_icon_put(&s_cache, id, cd->icon, (size_t)(size - sizeof(cd->nacp)));
     mutexUnlock(&s_cache_lock);
 }
 
@@ -154,6 +199,16 @@ static void read_name(GameStat *g, NsApplicationControlData **cd, u32 nacp_index
     if (known) return;
     for (u32 i = 0; i < s_unnamed_count; i++)
         if (s_unnamed[i] == g->app_id) return;
+    // Another Boréale homebrew read it already (the shared cache): no ns.
+    char shared[BL_CACHE_NAME_MAX];
+    mutexLock(&s_cache_lock);
+    const bool got = s_cache.ready && bl_cache_name_get(&s_cache, g->app_id, shared, sizeof(shared));
+    if (got) {
+        nacp_copy_utf8(g->name, sizeof(g->name), shared);
+        playnames_add(&s_names, g->app_id, g->name);
+    }
+    mutexUnlock(&s_cache_lock);
+    if (got) return;
     if (!*cd) *cd = (NsApplicationControlData *)malloc(sizeof(NsApplicationControlData));
     u64 size = 0;
     if (*cd && nacp_read_control(g->app_id, *cd, false, &size)) {
@@ -161,6 +216,7 @@ static void read_name(GameStat *g, NsApplicationControlData **cd, u32 nacp_index
         if (nacp_name(&(*cd)->nacp, sizeof((*cd)->nacp), nacp_index, g->name, sizeof(g->name))) {
             mutexLock(&s_cache_lock);
             playnames_add(&s_names, g->app_id, g->name);
+            note_new_name(g->app_id, g->name);
             mutexUnlock(&s_cache_lock);
             return;
         }
@@ -410,12 +466,13 @@ void playstats_fetch_for(PlayStats *out, const PlayAccount *account)
     out->names_lang = nacp_console_language(&nacp_index);
     mutexLock(&s_cache_lock);
     playnames_use_language(&s_names, out->names_lang);
-    open_icon_store(out->names_lang);
+    open_cache(out->names_lang);
     mutexUnlock(&s_cache_lock);
     NsApplicationControlData *cd = NULL;
     for (u32 i = 0; i < out->count && !playstats_cancelled(); i++) read_name(&out->games[i], &cd, nacp_index);
     free(cd);
     nsExit();
+    flush_new_names();
 }
 
 void playstats_icons(PlayIcon *icons, size_t count)
@@ -428,11 +485,11 @@ void playstats_icons(PlayIcon *icons, size_t count)
     u32 nacp_index = 0;
     const u8 lang = nacp_console_language(&nacp_index);
     mutexLock(&s_cache_lock);
-    open_icon_store(lang);
+    open_cache(lang);
     // Kept on the SD card by an earlier read: no ns at all.
     size_t missing = 0;
     for (size_t i = 0; i < count && !playstats_cancelled(); i++) {
-        icons[i].jpeg = icon_store_get(&s_icons, icons[i].app_id, &icons[i].size);
+        icons[i].jpeg = cached_icon(icons[i].app_id, &icons[i].size);
         if (!icons[i].jpeg) missing++;
     }
     mutexUnlock(&s_cache_lock);
@@ -456,13 +513,17 @@ void playstats_icons(PlayIcon *icons, size_t count)
             char name[PLAYSTATS_NAME_LEN];
             const bool named = nacp_name(&cd->nacp, sizeof(cd->nacp), nacp_index, name, sizeof(name));
             mutexLock(&s_cache_lock);
-            icon_store_put(&s_icons, icons[i].app_id, icons[i].jpeg, size);
-            if (named && !playnames_find(&s_names, icons[i].app_id)) playnames_add(&s_names, icons[i].app_id, name);
+            bl_cache_icon_put(&s_cache, icons[i].app_id, icons[i].jpeg, size);
+            if (named && !playnames_find(&s_names, icons[i].app_id)) {
+                playnames_add(&s_names, icons[i].app_id, name);
+                note_new_name(icons[i].app_id, name);
+            }
             mutexUnlock(&s_cache_lock);
         }
         free(cd);
     }
     nsExit();
+    flush_new_names();
 }
 
 size_t playstats_accounts(PlayAccount *out, size_t max, Result *rc_out)
