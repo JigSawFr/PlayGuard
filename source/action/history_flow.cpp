@@ -3,7 +3,9 @@
 
 #include <algorithm>
 #include <atomic>
+#include <charconv>
 #include <chrono>
+#include <string_view>
 #include <aurore.hpp>
 #include <fmt/format.h>
 
@@ -247,11 +249,10 @@ uint64_t changes()
 // The result code of a refused change, as recorded ("0x0001088E").
 static Result result_of(const history::Entry& e)
 {
-    try {
-        return (Result)std::stoul(e.result, nullptr, 16);
-    } catch (...) {
-        return 0;
-    }
+    std::string_view hex = e.result;
+    if (hex.starts_with("0x") || hex.starts_with("0X")) hex.remove_prefix(2);
+    unsigned long v = 0;
+    return std::from_chars(hex.data(), hex.data() + hex.size(), v, 16).ec == std::errc{} ? (Result)v : 0;
 }
 
 static std::string plain_title(const history::Entry& e)
