@@ -36,13 +36,13 @@ static void test_snapshot()
     PtState pt;
     read_all(&st, &pt);
     backup::Snapshot s = backup_logic::snapshot_of(st, pt);
-    CHECK(s.level_ok && s.level == PctlSafetyLevel_Teen);
-    CHECK(s.custom_ok && s.rating_age == 12 && s.sns_restricted && !s.comm_restricted);
-    CHECK(s.vr_ok && s.vr_restricted);
-    CHECK(s.rating_org_ok && s.rating_org == 3);
-    CHECK(s.days_ok && s.days[0] == PT_DAY_NOLIMIT && s.days[1] == 120 && s.days[6] == PT_DAY_NOLIMIT);
+    CHECK(s.level == PctlSafetyLevel_Teen);
+    CHECK(s.custom && s.custom->rating_age == 12 && s.custom->sns_restricted && !s.custom->comm_restricted);
+    CHECK(s.vr_restricted == true);
+    CHECK(s.rating_org == 3u);
+    CHECK(s.days && (*s.days)[0] == PT_DAY_NOLIMIT && (*s.days)[1] == 120 && (*s.days)[6] == PT_DAY_NOLIMIT);
     CHECK(s.raw_block.size() == 4 * PT_U16_COUNT && s.raw_block.compare(0, 8, "00000001") == 0);
-    CHECK(s.alarm_ok && s.alarm_disabled);
+    CHECK(s.alarm_disabled == true);
     CHECK(s.created.empty() && s.firmware.empty());   // the caller's
     CHECK(!s.empty());
 
@@ -51,35 +51,35 @@ static void test_snapshot()
     st.safety_level = PctlSafetyLevel_Teen + 1;
     st.settings.rating_age = 22;
     s = backup_logic::snapshot_of(st, pt);
-    CHECK(!s.level_ok && !s.custom_ok && s.vr_ok);
+    CHECK(!s.level && !s.custom && s.vr_restricted.has_value());
     read_all(&st, &pt);
     st.settings.rating_age = 21;
-    CHECK(backup_logic::snapshot_of(st, pt).custom_ok);
+    CHECK(backup_logic::snapshot_of(st, pt).custom.has_value());
 
     // A limit past 24 h: the limits, the raw block and the alarm go together.
     pt.day_min[4] = 1441;
     s = backup_logic::snapshot_of(st, pt);
-    CHECK(!s.days_ok && s.raw_block.empty() && !s.alarm_ok);
+    CHECK(!s.days && s.raw_block.empty() && !s.alarm_disabled.has_value());
     pt.day_min[4] = 1440;
-    CHECK(backup_logic::snapshot_of(st, pt).days_ok);
+    CHECK(backup_logic::snapshot_of(st, pt).days.has_value());
 
     // The play timer unread, or not on this firmware.
     pt.valid = false;
     s = backup_logic::snapshot_of(st, pt);
-    CHECK(!s.days_ok && s.raw_block.empty() && !s.alarm_ok && s.level_ok);
+    CHECK(!s.days && s.raw_block.empty() && !s.alarm_disabled.has_value() && s.level);
     read_all(&st, &pt);
     pt.fw_supported = false;
-    CHECK(!backup_logic::snapshot_of(st, pt).days_ok);
+    CHECK(!backup_logic::snapshot_of(st, pt).days);
     read_all(&st, &pt);
     pt.alarm_disabled_valid = false;
     s = backup_logic::snapshot_of(st, pt);
-    CHECK(s.days_ok && !s.alarm_ok);
+    CHECK(s.days && !s.alarm_disabled.has_value());
 
     // Nothing read at all: nothing a restore would write.
     std::memset(&st, 0, sizeof(st));
     std::memset(&pt, 0, sizeof(pt));
     s = backup_logic::snapshot_of(st, pt);
-    CHECK(s.empty() && !s.alarm_ok);
+    CHECK(s.empty() && !s.alarm_disabled.has_value());
     // The JSON round trip keeps what was read.
     read_all(&st, &pt);
     s = backup_logic::snapshot_of(st, pt);

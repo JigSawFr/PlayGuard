@@ -42,31 +42,31 @@ std::string to_json(const Snapshot& s)
     j["created"]  = s.created;
     j["firmware"] = s.firmware;
     nlohmann::json r = nlohmann::json::object();
-    if (s.level_ok) r["level"] = s.level;
-    if (s.custom_ok)
-        r["custom"] = { { "rating_age", s.rating_age },
-                        { "sns_post_restricted", s.sns_restricted },
-                        { "free_communication_restricted", s.comm_restricted } };
-    if (s.vr_ok) r["vr_restricted"] = s.vr_restricted;
-    if (s.rating_org_ok) r["rating_organization"] = s.rating_org;
+    if (s.level) r["level"] = *s.level;
+    if (s.custom)
+        r["custom"] = { { "rating_age", s.custom->rating_age },
+                        { "sns_post_restricted", s.custom->sns_restricted },
+                        { "free_communication_restricted", s.custom->comm_restricted } };
+    if (s.vr_restricted.has_value()) r["vr_restricted"] = *s.vr_restricted;
+    if (s.rating_org) r["rating_organization"] = *s.rating_org;
     j["restrictions"] = r;
     // The play-timer part goes with its limits (the alarm flag and the raw
     // block were read with them).
-    if (s.days_ok) {
+    if (s.days) {
         nlohmann::json days = nlohmann::json::array();
-        for (uint16_t d : s.days) {
+        for (uint16_t d : *s.days) {
             if (d == 0xFFFF) days.push_back(nullptr);
             else days.push_back(d);
         }
         nlohmann::json pt = { { "days_from_sunday", days } };
-        if (s.alarm_ok) pt["alarm_disabled"] = s.alarm_disabled;
+        if (s.alarm_disabled.has_value()) pt["alarm_disabled"] = *s.alarm_disabled;
         if (!s.raw_block.empty()) pt["raw_0x44"] = s.raw_block;
         j["play_timer"] = pt;
     }
-    if (s.forwarders_ok) {
+    if (s.forwarders) {
         nlohmann::json list;
-        if (!json_util::parse(forwarders::list_text(s.forwarders), &list)) list = nlohmann::json::array();
-        j["forwarders"] = { { "made", list }, { "hbmenu_locked", s.hbmenu_locked } };
+        if (!json_util::parse(forwarders::list_text(s.forwarders->made), &list)) list = nlohmann::json::array();
+        j["forwarders"] = { { "made", list }, { "hbmenu_locked", s.forwarders->hbmenu_locked } };
     }
     return j.dump(2, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
 }
@@ -86,31 +86,31 @@ bool from_json(const std::string& text, Snapshot& out)
             if (r.contains("level")) {
                 int level = 0;
                 if (!int_in(r.at("level"), 0, MAX_LEVEL, level)) return false;
-                s.level    = (uint32_t)level;
-                s.level_ok = true;
+                s.level = (uint32_t)level;
             }
             if (r.contains("custom")) {
                 const auto& c = r.at("custom");
-                int age = 0;
+                Custom      custom;
+                int         age = 0;
                 if (!c.is_object() || !c.contains("rating_age") || !c.contains("sns_post_restricted") ||
                     !c.contains("free_communication_restricted"))
                     return false;
                 if (!int_in(c.at("rating_age"), 0, MAX_RATING_AGE, age) ||
-                    !boolean(c.at("sns_post_restricted"), s.sns_restricted) ||
-                    !boolean(c.at("free_communication_restricted"), s.comm_restricted))
+                    !boolean(c.at("sns_post_restricted"), custom.sns_restricted) ||
+                    !boolean(c.at("free_communication_restricted"), custom.comm_restricted))
                     return false;
-                s.rating_age = (uint8_t)age;
-                s.custom_ok  = true;
+                custom.rating_age = (uint8_t)age;
+                s.custom          = custom;
             }
             if (r.contains("vr_restricted")) {
-                if (!boolean(r.at("vr_restricted"), s.vr_restricted)) return false;
-                s.vr_ok = true;
+                bool vr = false;
+                if (!boolean(r.at("vr_restricted"), vr)) return false;
+                s.vr_restricted = vr;
             }
             if (r.contains("rating_organization")) {
                 int org = 0;
                 if (!int_in(r.at("rating_organization"), 0, MAX_RATING_ORG, org)) return false;
                 s.rating_org = (uint32_t)org;
-                s.rating_org_ok = true;
             }
         }
 
@@ -119,16 +119,18 @@ bool from_json(const std::string& text, Snapshot& out)
             if (!pt.is_object() || !pt.contains("days_from_sunday")) return false;
             const auto& days = pt.at("days_from_sunday");
             if (!days.is_array() || days.size() != 7) return false;
+            std::array<uint16_t, 7> minutes{};
             for (size_t i = 0; i < 7; i++) {
                 int v = 0;
                 if (days[i].is_null()) v = DAY_NO_LIMIT;
                 else if (!int_in(days[i], 0, MAX_DAY_MINUTES, v)) return false;
-                s.days[i] = (uint16_t)v;
+                minutes[i] = (uint16_t)v;
             }
-            s.days_ok = true;
+            s.days = minutes;
             if (pt.contains("alarm_disabled")) {
-                if (!boolean(pt.at("alarm_disabled"), s.alarm_disabled)) return false;
-                s.alarm_ok = true;
+                bool disabled = false;
+                if (!boolean(pt.at("alarm_disabled"), disabled)) return false;
+                s.alarm_disabled = disabled;
             }
             if (pt.contains("raw_0x44")) {
                 // 34 u16 as 136 hex digits; anything else is not this block.
@@ -144,9 +146,7 @@ bool from_json(const std::string& text, Snapshot& out)
         if (const nlohmann::json* f = json_util::object_at(j, "forwarders")) {
             const auto made = f->find("made");
             if (made != f->end() && made->is_array()) {
-                s.forwarders = forwarders::parse_list(made->dump());
-                s.forwarders_ok = true;
-                s.hbmenu_locked = json_util::flag_at(*f, "hbmenu_locked");
+                s.forwarders = Forwarders{ forwarders::parse_list(made->dump()), json_util::flag_at(*f, "hbmenu_locked") };
             }
         }
         return true;

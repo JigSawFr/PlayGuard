@@ -64,32 +64,36 @@ std::string summary(const backup::Snapshot& s, backup::RestoreTally* tally)
         rows.push_back({ label, (known ? now : unknown) + " → " + then });
     };
 
-    if (s.level_ok)
+    if (s.level)
         compare("playguard/restrictions/section_level"_i18n, st.safety_level_ok,
-                ui::level_name(st.safety_level), ui::level_name(s.level));
-    if (s.level_ok && s.level == PctlSafetyLevel_Custom && s.custom_ok) {
-        compare("playguard/restrictions/age"_i18n, st.settings_ok, ui::age_text(st.settings.rating_age), ui::age_text(s.rating_age));
-        compare("playguard/restrictions/sns"_i18n, st.settings_ok, ui::yes_no(st.settings.sns_post_restriction), ui::yes_no(s.sns_restricted));
+                ui::level_name(st.safety_level), ui::level_name(*s.level));
+    if (s.level == PctlSafetyLevel_Custom && s.custom) {
+        compare("playguard/restrictions/age"_i18n, st.settings_ok, ui::age_text(st.settings.rating_age),
+                ui::age_text(s.custom->rating_age));
+        compare("playguard/restrictions/sns"_i18n, st.settings_ok, ui::yes_no(st.settings.sns_post_restriction),
+                ui::yes_no(s.custom->sns_restricted));
         compare("playguard/restrictions/comm"_i18n, st.settings_ok, ui::yes_no(st.settings.free_communication_restriction),
-                ui::yes_no(s.comm_restricted));
+                ui::yes_no(s.custom->comm_restricted));
     }
-    if (s.vr_ok) compare("playguard/restrictions/vr"_i18n, st.stereo_vision_ok, ui::yes_no(st.stereo_vision_restricted), ui::yes_no(s.vr_restricted));
-    if (s.rating_org_ok)
+    if (s.vr_restricted.has_value())
+        compare("playguard/restrictions/vr"_i18n, st.stereo_vision_ok, ui::yes_no(st.stereo_vision_restricted),
+                ui::yes_no(*s.vr_restricted));
+    if (s.rating_org)
         compare("playguard/restrictions/org"_i18n, st.rating_org_ok, pctl_rating_org_name(st.rating_org),
-                pctl_rating_org_name(s.rating_org));
-    if (s.days_ok) {
+                pctl_rating_org_name(*s.rating_org));
+    if (s.days) {
         std::array<uint16_t, 7> now{};
         for (int d = 0; d < 7; d++) now[d] = pt.day_min[d];
-        compare("playguard/play_timer/section_limit"_i18n, pt.valid, days_text(now), days_text(s.days));
+        compare("playguard/play_timer/section_limit"_i18n, pt.valid, days_text(now), days_text(*s.days));
     }
     // A debug-class command: written only with the advanced actions shown.
-    if (s.alarm_ok) {
+    if (s.alarm_disabled.has_value()) {
         auto on_off = [](bool disabled) { return disabled ? "playguard/common/off"_i18n : "playguard/common/on"_i18n; };
         const bool advanced = config::get().advanced;
-        if (pt.alarm_disabled_valid && pt.alarm_disabled == s.alarm_disabled) tally->add(true, true);
+        if (pt.alarm_disabled_valid && pt.alarm_disabled == *s.alarm_disabled) tally->add(true, true);
         else
             compare("playguard/play_timer/alarm"_i18n, pt.alarm_disabled_valid, on_off(pt.alarm_disabled),
-                    on_off(s.alarm_disabled) + (advanced ? "" : "playguard/backup/not_restored_advanced"_i18n), advanced);
+                    on_off(*s.alarm_disabled) + (advanced ? "" : "playguard/backup/not_restored_advanced"_i18n), advanced);
     }
 
     // Nothing to write: a statement, not the restore question.
@@ -122,34 +126,34 @@ void write_all(const backup::Snapshot& s, bool did_unlock, std::function<void()>
     pctl_status_fetch(&was);
     backup_logic::Tally tally;
     auto check = [&](Result rc, const std::string& what) { tally.add(rc, what); };
-    if (s.level_ok) {
-        const Result rc = pctl_set_safety_level(s.level);
+    if (s.level) {
+        const Result rc = pctl_set_safety_level(*s.level);
         check(rc, "playguard/restrictions/section_level"_i18n);
         if (R_SUCCEEDED(rc) && was.safety_level_ok)
-            history_flow::record_values("level", { (int)was.safety_level }, { (int)s.level }, "backup");
-        if (s.level == PctlSafetyLevel_Custom && s.custom_ok) {
-            PctlCustomSettings cs = { s.rating_age, s.sns_restricted, s.comm_restricted };
+            history_flow::record_values("level", { (int)was.safety_level }, { (int)*s.level }, "backup");
+        if (*s.level == PctlSafetyLevel_Custom && s.custom) {
+            PctlCustomSettings cs = { s.custom->rating_age, s.custom->sns_restricted, s.custom->comm_restricted };
             const Result crc = pctl_set_custom_settings(&cs);
             check(crc, "playguard/restrictions/section_custom"_i18n);
             if (R_SUCCEEDED(crc) && was.settings_ok)
                 history_flow::record_values("custom", history_flow::custom_values(was.settings), history_flow::custom_values(cs), "backup");
         }
     }
-    if (s.vr_ok) {
-        const Result rc = pctl_set_stereo_vision_restricted(s.vr_restricted);
+    if (s.vr_restricted.has_value()) {
+        const Result rc = pctl_set_stereo_vision_restricted(*s.vr_restricted);
         check(rc, "playguard/restrictions/vr"_i18n);
         if (R_SUCCEEDED(rc) && was.stereo_vision_ok)
-            history_flow::record_values("vr", { was.stereo_vision_restricted ? 1 : 0 }, { s.vr_restricted ? 1 : 0 }, "backup");
+            history_flow::record_values("vr", { was.stereo_vision_restricted ? 1 : 0 }, { *s.vr_restricted ? 1 : 0 }, "backup");
     }
-    if (s.rating_org_ok) {
-        const Result rc = pctl_set_rating_org(s.rating_org);
+    if (s.rating_org) {
+        const Result rc = pctl_set_rating_org(*s.rating_org);
         check(rc, "playguard/restrictions/org"_i18n);
         if (R_SUCCEEDED(rc) && was.rating_org_ok)
-            history_flow::record_values("org", { (int)was.rating_org }, { (int)s.rating_org }, "backup");
+            history_flow::record_values("org", { (int)was.rating_org }, { (int)*s.rating_org }, "backup");
     }
-    if (s.days_ok) check(pt_flow::write_days(s.days.data(), "backup"), "playguard/play_timer/section_limit"_i18n);
-    if (s.alarm_ok && config::get().advanced)
-        check(pt_flow::write_alarm_disabled(s.alarm_disabled, "backup"), "playguard/play_timer/alarm"_i18n);
+    if (s.days) check(pt_flow::write_days(s.days->data(), "backup"), "playguard/play_timer/section_limit"_i18n);
+    if (s.alarm_disabled.has_value() && config::get().advanced)
+        check(pt_flow::write_alarm_disabled(*s.alarm_disabled, "backup"), "playguard/play_timer/alarm"_i18n);
     // Recorded only when something was restored: every write refused
     // changed nothing.
     if (tally.any_written()) history_flow::record_event("restore", "", s.created);
@@ -163,9 +167,9 @@ void write_all(const backup::Snapshot& s, bool did_unlock, std::function<void()>
 // is the parent's to put back (its checks first): only said.
 void offer_forwarders(const backup::Snapshot& s)
 {
-    if (!s.forwarders_ok || app::read_only()) return;
-    const std::vector<forwarders::Made> missing = forwarder_flow::missing_from(s.forwarders);
-    const bool relock = s.hbmenu_locked && !hbmenu_lock::locked();
+    if (!s.forwarders || app::read_only()) return;
+    const std::vector<forwarders::Made> missing = forwarder_flow::missing_from(s.forwarders->made);
+    const bool relock = s.forwarders->hbmenu_locked && !hbmenu_lock::locked();
     const auto tell_lock = [relock]() {
         if (relock)
             aurore::sync([]() {
@@ -192,7 +196,7 @@ void restore(const backup::Snapshot& s, std::function<void()> refresh)
     // unlock, no write, no "restored" in the history); its forwarders may
     // still be missing.
     if (tally.nothing_to_write()) {
-        if (s.forwarders_ok && !forwarder_flow::missing_from(s.forwarders).empty()) offer_forwarders(s);
+        if (s.forwarders && !forwarder_flow::missing_from(s.forwarders->made).empty()) offer_forwarders(s);
         else ui::info(body);
         return;
     }
@@ -206,8 +210,8 @@ void restore(const backup::Snapshot& s, std::function<void()> refresh)
     // the Restrictions tab.
     // It overwrites the current settings: the confirm button says so by its colour.
     // The alarm is a play-timer write as well.
-    const bool timer = s.days_ok || (s.alarm_ok && config::get().advanced);
-    if (timer) pt_flow::confirm_write(body, "playguard/backup/restore_confirm"_i18n, run, s.days_ok ? s.days.data() : nullptr, true);
+    const bool timer = s.days || (s.alarm_disabled.has_value() && config::get().advanced);
+    if (timer) pt_flow::confirm_write(body, "playguard/backup/restore_confirm"_i18n, run, s.days ? s.days->data() : nullptr, true);
     else if (ui::refuse_read_only()) return;
     else ui::confirm(pt_flow::with_link_note(body), "playguard/backup/restore_confirm"_i18n, [run]() { run(false); }, nullptr, true);
 }
@@ -253,9 +257,8 @@ backup::Snapshot capture()
 
     s.created = ui::now_stamp();
     // What Console › Forwarders made, and the lock, when there is any.
-    s.forwarders = forwarders::list();
-    s.hbmenu_locked = hbmenu_lock::locked();
-    s.forwarders_ok = !s.forwarders.empty() || s.hbmenu_locked;
+    backup::Forwarders made{ forwarders::list(), hbmenu_lock::locked() };
+    if (!made.made.empty() || made.hbmenu_locked) s.forwarders = std::move(made);
     return s;
 }
 

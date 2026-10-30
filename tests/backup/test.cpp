@@ -17,19 +17,11 @@ static backup::Snapshot full()
     backup::Snapshot s;
     s.created  = "2026-10-07 18:30";
     s.firmware = "23.0.1";
-    s.level_ok = true;
-    s.level    = 1;
-    s.custom_ok       = true;
-    s.rating_age      = 12;
-    s.sns_restricted  = true;
-    s.comm_restricted = false;
-    s.vr_ok         = true;
-    s.vr_restricted = true;
-    s.days_ok = true;
-    s.days    = { 180, 120, 120, 0xFFFF, 120, 0, 1440 };
-    s.alarm_ok       = true;
+    s.level          = 1;
+    s.custom         = backup::Custom{ 12, true, false };
+    s.vr_restricted  = true;
+    s.days           = std::array<uint16_t, 7>{ 180, 120, 120, 0xFFFF, 120, 0, 1440 };
     s.alarm_disabled = true;
-    s.rating_org_ok  = true;
     s.rating_org     = 6;
     s.raw_block      = std::string(4, '0') + "0101" + std::string(128, 'A');
     return s;
@@ -37,12 +29,9 @@ static backup::Snapshot full()
 
 static bool same(const backup::Snapshot& a, const backup::Snapshot& b)
 {
-    return a.created == b.created && a.firmware == b.firmware && a.level_ok == b.level_ok &&
-           a.level == b.level && a.custom_ok == b.custom_ok && a.rating_age == b.rating_age &&
-           a.sns_restricted == b.sns_restricted && a.comm_restricted == b.comm_restricted &&
-           a.vr_ok == b.vr_ok && a.vr_restricted == b.vr_restricted && a.days_ok == b.days_ok &&
-           a.days == b.days && a.alarm_ok == b.alarm_ok && a.alarm_disabled == b.alarm_disabled &&
-           a.rating_org_ok == b.rating_org_ok && a.rating_org == b.rating_org && a.raw_block == b.raw_block;
+    return a.created == b.created && a.firmware == b.firmware && a.level == b.level && a.custom == b.custom &&
+           a.vr_restricted == b.vr_restricted && a.days == b.days && a.alarm_disabled == b.alarm_disabled &&
+           a.rating_org == b.rating_org && a.raw_block == b.raw_block;
 }
 
 static bool parses(const std::string& text)
@@ -71,13 +60,12 @@ static void test_round_trip()
 
     // Values that could not be read are left out, and stay unset when read back.
     in = backup::Snapshot();
-    in.vr_ok = true;
     in.vr_restricted = false;
     const std::string partial = backup::to_json(in);
     CHECK(partial.find("\"level\"") == std::string::npos && partial.find("play_timer") == std::string::npos);
     out = full();
     CHECK(backup::from_json(partial, out));
-    CHECK(out.vr_ok && !out.vr_restricted && !out.level_ok && !out.custom_ok && !out.days_ok);
+    CHECK(out.vr_restricted == false && !out.level && !out.custom && !out.days);
 
     // Nothing at all to restore: refused.
     CHECK(!parses(backup::to_json(backup::Snapshot())));
@@ -115,10 +103,12 @@ static void test_validation()
 
     // A backup from before these fields still reads.
     backup::Snapshot old_one = full();
-    old_one.alarm_ok = old_one.rating_org_ok = false;
+    old_one.alarm_disabled.reset();
+    old_one.rating_org.reset();
     old_one.raw_block.clear();
     backup::Snapshot back;
-    CHECK(backup::from_json(backup::to_json(old_one), back) && !back.alarm_ok && !back.rating_org_ok && back.raw_block.empty());
+    CHECK(backup::from_json(backup::to_json(old_one), back) && !back.alarm_disabled.has_value() && !back.rating_org &&
+          back.raw_block.empty());
 }
 
 static void test_files()
@@ -194,11 +184,9 @@ static void test_forwarders()
 {
     // Without the part (an older backup): none, nothing else changed.
     backup::Snapshot out;
-    CHECK(backup::from_json(backup::to_json(full()), out) && !out.forwarders_ok && out.forwarders.empty());
+    CHECK(backup::from_json(backup::to_json(full()), out) && !out.forwarders);
     // With it: what PlayGuard made, protected or not, and the lock.
     backup::Snapshot in = full();
-    in.forwarders_ok = true;
-    in.hbmenu_locked = true;
     forwarders::Made a;
     a.id = 0x050537E2542E2000ull;
     a.nro = a.argv = "sdmc:/switch/sphaira/sphaira.nro";
@@ -214,17 +202,17 @@ static void test_forwarders()
     b.nro = b.argv = "sdmc:/switch/StarAtlas.nro";
     b.name = "Star Atlas";
     b.icon = "sdmc:/Nintendo/Album/2026/10/20/2026102018300000-0.jpg";
-    in.forwarders = { a, b };
-    CHECK(backup::from_json(backup::to_json(in), out) && out.forwarders_ok && out.hbmenu_locked && same(in, out));
-    CHECK(out.forwarders.size() == 2);
-    if (out.forwarders.size() == 2) {
-        CHECK(out.forwarders[0].pin && out.forwarders[0].verified && out.forwarders[0].closed_days == 0x7F &&
-              out.forwarders[0].closed_to == 420);
-        CHECK(!out.forwarders[1].pin && out.forwarders[1].icon == b.icon);
+    in.forwarders = backup::Forwarders{ { a, b }, true };
+    CHECK(backup::from_json(backup::to_json(in), out) && out.forwarders && out.forwarders->hbmenu_locked && same(in, out));
+    CHECK(out.forwarders && out.forwarders->made.size() == 2);
+    if (out.forwarders && out.forwarders->made.size() == 2) {
+        const auto& made = out.forwarders->made;
+        CHECK(made[0].pin && made[0].verified && made[0].closed_days == 0x7F && made[0].closed_to == 420);
+        CHECK(!made[1].pin && made[1].icon == b.icon);
     }
     // A damaged part: left out, the rest still read.
     CHECK(backup::from_json(with("\"restrictions\"", "\"forwarders\": {\"made\": 7}, \"restrictions\""), out) &&
-          !out.forwarders_ok);
+          !out.forwarders);
 }
 
 int main()
