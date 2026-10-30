@@ -17,6 +17,7 @@
 #include <utility>
 #include <vector>
 
+#include "bl_app.h"
 #include "sync/sync_conf.h"
 #include "sync/sync_exec.h"
 #include "util/config.hpp"
@@ -27,6 +28,7 @@ namespace sync_files
 
 std::string conf_file();    // data_dir()/sync.conf
 std::string link_file();    // sd:/config/boreale/link.conf, the broker's settings every Boréale homebrew shares
+std::string app_file();     // sd:/config/boreale/apps/playguard.conf, PlayGuard in the Boréale homebrews' registry
 std::string dir();          // data_dir()/sync: shared by every system
 std::string system_dir();   // nand_dir()/sync: this system's
 bool exists();              // sync.conf is there: the link was set up once
@@ -39,6 +41,14 @@ bool save(const SyncConf& c, std::string* error = nullptr);
 // Gives the console its id ("a1b2c3d4", from 4 random bytes) when it has
 // none. True when it changed.
 bool ensure_id(SyncConf& c, const uint8_t random[4]);
+
+// PlayGuard in the registry of the Boréale homebrews installed (bl_app.h),
+// so that the others know it is there: its version, and where its .nro is
+// from the SD card's root ("/switch/PlayGuard/PlayGuard.nro", app::self_path();
+// "" unknown keeps the one written before). Written only when something
+// changed, its unknown keys kept; left as it is when a newer version wrote
+// it. False when the SD card refused it (`error` says why).
+bool register_app(const std::string& version, const std::string& nro, std::string* error = nullptr);
 
 // How the files the agent reads are written (nro_state.txt, profiles.txt,
 // names.txt): their text is made at the call, on the caller's thread; the

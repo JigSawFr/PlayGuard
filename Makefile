@@ -342,7 +342,7 @@ modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/module
 # The remote link's files on the SD card, with its C parts (built by $(CC):
 # g++ would build a .c as C++).
 sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
-sync_files_CSRC  := $(CALENDAR_C) library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_records.c
+sync_files_CSRC  := $(CALENDAR_C) library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c library/boreale-link/source/bl_app.c source/sync/sync_conf.c source/sync/sync_records.c
 sync_files_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
 
 # C: the remote link (source/sync/) and the agent sysmodule's core. sync_core

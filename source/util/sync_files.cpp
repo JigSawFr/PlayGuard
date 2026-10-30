@@ -9,6 +9,7 @@
 #include <cstring>
 #include <sys/stat.h>
 
+#include "sync/sync_discovery.h"
 #include "util/json_util.hpp"
 #include "util/paths.hpp"
 #include "util/title_id.hpp"
@@ -56,6 +57,41 @@ std::string link_file()
     std::string root = paths::sd_root();
     if (root.empty() || root.back() != '/') root += '/';
     return root + BL_LINK_CONF_FILE;
+}
+
+std::string app_file()
+{
+    std::string root = paths::sd_root();
+    if (root.empty() || root.back() != '/') root += '/';
+    char file[BL_APP_PATH_MAX];
+    bl_app_path(SYNC_MODULE, file, sizeof(file));
+    return root + file;
+}
+
+bool register_app(const std::string& version, const std::string& nro, std::string* error)
+{
+    BlApp a;
+    bl_app_defaults(&a);
+    std::string before;
+    const std::string file = app_file();
+    if (paths::read_file(file, before)) bl_app_parse(&a, before.data(), before.size());
+    if (!bl_app_may_write(&a)) return true;   // a newer version's: it says what it knows
+    std::snprintf(a.name, sizeof(a.name), "PlayGuard");
+    std::snprintf(a.version, sizeof(a.version), "%s", version.c_str());
+    std::snprintf(a.repo, sizeof(a.repo), "JigSawFr/PlayGuard");
+    const std::string under_root = !nro.empty() && nro[0] == '/' ? nro.substr(1) : nro;
+    if (!under_root.empty() && under_root.size() < sizeof(a.nro))
+        std::snprintf(a.nro, sizeof(a.nro), "%s", under_root.c_str());
+    std::string text(2048, '\0');
+    const size_t n = bl_app_write(&a, &text[0], text.size());
+    if (n == 0) {
+        if (error) *error = "the registry entry does not fit";
+        return false;
+    }
+    text.resize(n);
+    if (text == before) return true;   // the SD card is not written at each start
+    paths::ensure_dir(file.substr(0, file.rfind('/')));
+    return paths::atomic_write(file, text, error);
 }
 
 std::string dir()

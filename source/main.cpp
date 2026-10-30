@@ -464,6 +464,13 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     startup_mark(StartupStep_Borealis);
+    // In the Boréale homebrews' registry, for the others to know it is there
+    // (written only when its version or place changed).
+    ui::write_later("Boréale registry", []() {
+        std::string why;
+        if (!sync_files::register_app(app::version(), app::self_path(), &why))
+            aurore::Logger::error("Boréale registry: {} not saved: {}", sync_files::app_file(), why);
+    }, sync_files::app_file());
 
     // PlayGuard's own colours, before the window reads the theme file that
     // may change them.
