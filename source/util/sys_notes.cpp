@@ -5,6 +5,7 @@
 #include <cctype>
 #include <cstdio>
 #include <cstring>
+#include <format>
 
 #include <aurore/extern/nlohmann/json.hpp>
 
@@ -297,9 +298,7 @@ std::string wiki_date(const std::string& text)
         char comma = 0;
         if (std::sscanf(t.c_str() + n, " %d%c %d", &d, &comma, &y) != 3 || comma != ',') return "";
         if (d < 1 || d > 31 || y < 2000 || y > 9999) return "";
-        char out[16];
-        std::snprintf(out, sizeof(out), "%04d-%02d-%02d", y, m + 1, d);
-        return out;
+        return std::format("{:04}-{:02}-{:02}", y, m + 1, d);
     }
     return "";
 }

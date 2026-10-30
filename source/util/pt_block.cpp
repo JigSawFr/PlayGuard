@@ -2,7 +2,7 @@
 #include "util/pt_block.hpp"
 
 #include <aurore/extern/nlohmann/json.hpp>
-#include <cstdio>
+#include <format>
 
 #include "util/json_util.hpp"
 #include "util/paths.hpp"
@@ -14,9 +14,7 @@ namespace
 {
 std::string word_hex(uint16_t w)
 {
-    char buf[8];
-    std::snprintf(buf, sizeof(buf), "%04X", (unsigned)w);
-    return buf;
+    return std::format("{:04X}", w);
 }
 
 int digit(char c)
@@ -85,11 +83,8 @@ std::string report(const Reference& ref, const Block& now, const std::string& no
     const auto changes = diff(ref.block, now);
     if (changes.empty()) text += "No value changed.\n";
     for (const auto& c : changes) {
-        char line[128];
-        std::snprintf(line, sizeof(line), "  u16[%2u] %-16s %s -> %s  (%u -> %u)\n", (unsigned)c.index,
-                      field_name(c.index, english_days()).c_str(), word_hex(c.before).c_str(), word_hex(c.after).c_str(),
-                      (unsigned)c.before, (unsigned)c.after);
-        text += line;
+        text += std::format("  u16[{:2}] {:<16} {} -> {}  ({} -> {})\n", c.index, field_name(c.index, english_days()),
+                            word_hex(c.before), word_hex(c.after), c.before, c.after);
     }
     text += "\nreference " + to_hex(ref.block) + "\nnow       " + to_hex(now) + "\n";
     return text;

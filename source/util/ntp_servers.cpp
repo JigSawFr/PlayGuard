@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "util/ntp_servers.hpp"
 
-#include <cstdio>
+#include <format>
 
 #include "core/platform.h"
 
@@ -55,10 +55,8 @@ std::string flag(std::string code)
     std::string out;
     for (char c : code) {
         if (c < 'a' || c > 'z') return "";
-        char hex[8];
-        std::snprintf(hex, sizeof hex, "%x", 0x1F1E6 + (c - 'a'));
         if (!out.empty()) out += '-';
-        out += hex;
+        out += std::format("{:x}", 0x1F1E6 + (c - 'a'));
     }
     return out;
 }

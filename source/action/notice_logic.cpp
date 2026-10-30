@@ -2,7 +2,7 @@
 #include "action/notice_logic.hpp"
 
 #include <algorithm>
-#include <cstdio>
+#include <format>
 
 #include <aurore/cadran/util/text.hpp>
 #include <iterator>
@@ -239,9 +239,7 @@ std::string read_key(const std::string& id, const std::string& title, const std:
     uint32_t h = 2166136261u;   // FNV-1a
     for (const std::string* part : { &title, &detail })
         for (unsigned char c : *part) h = (h ^ c) * 16777619u;
-    char hex[9];
-    std::snprintf(hex, sizeof(hex), "%08x", (unsigned)h);
-    return id + ":" + hex;
+    return std::format("{}:{:08x}", id, h);
 }
 
 bool ackable(const std::string& id)

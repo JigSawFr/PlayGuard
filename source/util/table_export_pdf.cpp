@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstdio>
+#include <format>
 
 #include <aurore/cadran/util/utf8.hpp>
 
@@ -82,9 +82,7 @@ std::string pdf_string(const std::string& winansi_text)
             out += '\\';
             out += (char)c;
         } else if (c < 0x20 || c >= 0x7F) {
-            char oct[8];
-            std::snprintf(oct, sizeof(oct), "\\%03o", c);
-            out += oct;
+            out += std::format("\\{:03o}", c);
         } else {
             out += (char)c;
         }
@@ -94,9 +92,7 @@ std::string pdf_string(const std::string& winansi_text)
 
 std::string num(double v)
 {
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%.2f", v);
-    return buf;
+    return std::format("{:.2f}", v);
 }
 
 std::string text_at(double x, double y, const std::string& winansi_text, double size, bool bold)
@@ -132,18 +128,15 @@ std::vector<std::string> header_lines(const std::string& s, double max, double s
 std::string pdf_text_string(const std::string& text)
 {
     std::string out = "<FEFF";
-    char hex[8];
     for (size_t i = 0; i < text.size();) {
         uint32_t cp;
         i += utf8::decode_replacing(text, i, &cp);
         if (cp >= 0x10000) {
             cp -= 0x10000;
-            std::snprintf(hex, sizeof(hex), "%04X", (unsigned)(0xD800 + (cp >> 10)));
-            out += hex;
+            out += std::format("{:04X}", 0xD800 + (cp >> 10));
             cp = 0xDC00 + (cp & 0x3FF);
         }
-        std::snprintf(hex, sizeof(hex), "%04X", (unsigned)(cp & 0xFFFF));
-        out += hex;
+        out += std::format("{:04X}", cp & 0xFFFF);
     }
     return out + ">";
 }
@@ -245,9 +238,7 @@ std::string render_pdf(const Table& t)
     const size_t xref = out.size();
     out += "xref\n0 " + std::to_string(objs.size() + 1) + "\n0000000000 65535 f \n";
     for (size_t off : offsets) {
-        char entry[24];
-        std::snprintf(entry, sizeof(entry), "%010zu 00000 n \n", off);
-        out += entry;
+        out += std::format("{:010} 00000 n \n", off);
     }
     out += "trailer\n<< /Size " + std::to_string(objs.size() + 1) + " /Root 1 0 R /Info 5 0 R >>\nstartxref\n" +
            std::to_string(xref) + "\n%%EOF\n";

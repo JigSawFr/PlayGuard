@@ -3,8 +3,8 @@
 #include "util/title_id.hpp"
 
 #include <algorithm>
-#include <cstdio>
 #include <cstring>
+#include <format>
 #include <strings.h>
 
 namespace game_check_text
@@ -73,9 +73,7 @@ std::string history_label(const GameFacts& g)
 
 std::string console_code(Result rc)
 {
-    char buf[16];
-    std::snprintf(buf, sizeof(buf), "%04u-%04u", 2000u + (unsigned)(rc & 0x1FF), (unsigned)((rc >> 9) & 0x1FFF));
-    return buf;
+    return std::format("{:04}-{:04}", 2000u + (unsigned)(rc & 0x1FF), (unsigned)((rc >> 9) & 0x1FFF));
 }
 
 std::string game_name(const GameFacts& g, const std::function<std::string(const std::string& id)>& unnamed)
