@@ -1,8 +1,8 @@
-// sync_engine — the remote link's session, shared by PlayGuard and the agent
-// sysmodule: connects to the broker (last will "offline"), subscribes to the
-// orders, publishes the state, today's activity and Home Assistant's
-// discovery, and hands each order to the host, which carries it out on the
-// console. Single-threaded and allocation-free: the host owns one SyncEngine
+// sync_engine — the remote link's PlayGuard side, shared by PlayGuard and the
+// agent sysmodule: on the broker session (link/bl_session: the connection,
+// the last will "offline", the retries), subscribes to the orders, publishes
+// the state, today's activity and Home Assistant's discovery, and hands each
+// order to the host, which carries it out on the console. Single-threaded and allocation-free: the host owns one SyncEngine
 // (about 40 KiB) and calls sync_engine_step() in a loop.
 //
 // An order's life: received on `<base>/<entity>/set` (retained by whoever
@@ -15,7 +15,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include "../link/mqtt_client.h"
+#include "../link/bl_session.h"
 #include "sync_apply.h"
 #include "sync_conf.h"
 #include "sync_discovery.h"
@@ -27,18 +27,18 @@ extern "C" {
 #endif
 
 #define SYNC_QUEUE_MAX       16
-#define SYNC_RX_SIZE         4096
+#define SYNC_RX_SIZE         BL_RX_SIZE
 #define SYNC_SCRATCH_SIZE    32768   // the discovery: 18.5 KiB with every entity
 #define SYNC_LIMIT_SETTLE_MS 1500
-#define SYNC_KEEPALIVE_S     30
+#define SYNC_KEEPALIVE_S     BL_KEEPALIVE_S
 // The integration's document on <base>/integration: larger ones are dropped.
 #define SYNC_INTEGRATION_MAX 512
 
 typedef enum {
-    SyncLink_Off = 0,     // disabled, or not configured
-    SyncLink_Waiting,     // waiting before the next attempt
-    SyncLink_Connecting,
-    SyncLink_Online,
+    SyncLink_Off = BlLink_Off,               // disabled, or not configured
+    SyncLink_Waiting = BlLink_Waiting,       // waiting before the next attempt
+    SyncLink_Connecting = BlLink_Connecting,
+    SyncLink_Online = BlLink_Online,
 } SyncLinkState;
 
 typedef struct {
@@ -105,21 +105,18 @@ typedef struct {
 typedef struct {
     SyncConf    conf;
     SyncHost    host;
-    MqttClient  mqtt;
+    BlSession   session;         // the broker: connection, last will, retries
     uint64_t  (*now_ms)(void);
     const char *source;          // "agent" or "app"
     const char *sw_version;
     char        base[96];        // <prefix>/<id>
     char        client_id[24];
 
-    uint64_t    backoff_ms;
-    uint8_t     proto_ok;        // "auto": the version the broker took (0: try 5.0 first)
     bool        want_state, want_activity, want_discovery, want_names, want_online;
     bool        want_clear;      // the documents of what is not published, cleared
     uint64_t    next_state_ms, next_activity_ms;
     bool        discovery_published;
     SyncDevice  device;          // as the last discovery said it
-    uint64_t    seen_posix;      // the wall clock at the last call (0: not read yet)
 
     SyncQueued  queue[SYNC_QUEUE_MAX];
     uint32_t    next_id;
@@ -133,7 +130,6 @@ typedef struct {
 
     SyncStatus  status;
     char        profiles[16][SYNC_PROFILE_MAX];
-    uint8_t     rx[SYNC_RX_SIZE];
     char        scratch[SYNC_SCRATCH_SIZE];
     char        line[320];
 } SyncEngine;
@@ -163,7 +159,7 @@ int  sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, si
 // (into the engine's scratch: a file sent without holding it whole). A read
 // that fails or comes short closes the connection, the packet cannot be
 // finished: the next step connects again. 0 or negative.
-typedef size_t (*SyncReadFn)(void *ctx, void *buf, size_t cap);
+typedef BlReadFn SyncReadFn;
 int  sync_engine_publish_stream(SyncEngine *e, const char *sub, size_t len, bool retained, SyncReadFn read, void *ctx);
 // An event (`event_type`, optional entity) on `<base>/event`.
 void sync_engine_event(SyncEngine *e, const char *event_type, const char *entity);
