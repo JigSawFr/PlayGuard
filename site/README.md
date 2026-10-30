@@ -17,7 +17,7 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   (`switcher()`, a popover; its CSS and script are boreale.dev's "site
   switcher" blocks, the marks boreale's, the versions boreale.dev's
   `versions.json` read at the build; each site in the page's language, the
-  four sites sharing the 15 folders), and a button opens the 15 languages,
+  sites sharing the 15 folders: the homebrew, Aurore, Atlas and Lantern), and a button opens the 15 languages,
   each with its flag (a popover too). The footer has a Boréale column: the
   other sites and the privacy and legal notice in the page's language,
   `contact@boreale.dev`. The page not found

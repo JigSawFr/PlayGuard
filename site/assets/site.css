@@ -845,7 +845,7 @@ pre.has-copy { position: relative; padding-right: 76px; }
 }
 
 /* ---- Boréale's site switcher: the name, a button that opens the menu of
-   the four sites (a popover: the browser closes it on Esc or a click
+   Boréale's sites (a popover: the browser closes it on Esc or a click
    elsewhere), the site's own leading home. The same block in boreale.dev's,
    PlayGuard's, PlayShelf's and Aurore's site.css; boreale's is the
    reference. The name keeps the site's .brand look; the colours are the
