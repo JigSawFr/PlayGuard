@@ -422,7 +422,9 @@ def steps_link(new_page):
         else:
             print("ok   steps link replayed")
         # A report: GitHub's bug form, the steps link in it.
-        url = page.evaluate("() => { let u = ''; window.open = (x) => { u = x; }; report(); return u; }")
+        url = page.evaluate("() => { let u = ''; const click = HTMLAnchorElement.prototype.click; "
+                            "HTMLAnchorElement.prototype.click = function () { u = this.referrerPolicy === 'strict-origin' ? this.href : 'no strict-origin'; }; "
+                            "report(); HTMLAnchorElement.prototype.click = click; return u; }")
         if "template=1-bug.yml" not in url or "steps=" not in url or len(url) > 8000:
             fail(f"report: not the bug form with the steps ({len(url)} characters)")
         else:
