@@ -2027,6 +2027,8 @@
         "ignored_until": "Genegeerd tot {}",
         "ignored_kept": "Genegeerd",
         "open_tab": "{} openen",
+        "open_in": "Openen in {}",
+        "open_manual": "Open {} via het homebrewmenu om dit af te handelen.",
         "pin_missing": "Ouderlijk toezicht is niet ingesteld",
         "pin_missing_detail": "Nog geen pincode: de console is niet beschermd.",
         "alarm_off": "Alarm \"Tijd is om\": uit",

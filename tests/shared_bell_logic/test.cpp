@@ -1,9 +1,12 @@
 // shared_bell_logic: PlayGuard's bell as the other Boréale homebrews read it.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 
 #include "action/shared_bell_logic.hpp"
 #include "check.h"
+#include "temp_dir.hpp"
 
 using shared_bell_logic::Entry;
 using shared_bell_logic::text;
@@ -77,6 +80,54 @@ static void test_bounds()
     CHECK(has(t2, "\"title\":\"" + std::string(95, 'a') + "\""));
 }
 
+static void put(const std::string& path, const std::string& text)
+{
+    CHECK(std::system(("mkdir -p '" + path.substr(0, path.rfind('/')) + "'").c_str()) == 0);
+    std::FILE* f = std::fopen(path.c_str(), "wb");
+    if (!CHECK(f)) return;
+    std::fputs(text.c_str(), f);
+    std::fclose(f);
+}
+
+static void test_others()
+{
+    TempDir sd("shared_bell");
+    const std::string root = sd.path();
+    CHECK(shared_bell_logic::others(root, "en", 100).empty());   // no folder yet
+    // Lantern: two shown (one to do with its progress), one expired, one in
+    // French; its name from the registry. Atelier: its .nro gone. PlayGuard's
+    // own file: not another's. A file that is not one: skipped.
+    put(root + "/switch/Lantern/Lantern.nro", "NRO0");
+    put(root + "/config/boreale/apps/lantern.conf", "schema=1\nname=Lantern\nversion=0.3.0\n");
+    put(root + "/config/boreale/notices/lantern.json",
+        "{\"schema\":1,\"module\":\"lantern\",\"nro\":\"switch/Lantern/Lantern.nro\",\"notices\":["
+        "{\"id\":\"dl\",\"level\":\"progress\",\"title\":\"Downloading\",\"detail\":\"Star Kart\",\"lang\":\"en\",\"progress\":40,\"route\":\"downloads\"},"
+        "{\"id\":\"fail\",\"level\":\"error\",\"title\":\"Install failed\",\"lang\":\"en\",\"route\":\"downloads/queue\"},"
+        "{\"id\":\"old\",\"level\":\"todo\",\"title\":\"Old\",\"lang\":\"en\",\"expires\":50},"
+        "{\"id\":\"fr\",\"level\":\"todo\",\"title\":\"En français\",\"lang\":\"fr\"}]}");
+    put(root + "/config/boreale/notices/atelier.json",
+        "{\"schema\":1,\"module\":\"atelier\",\"nro\":\"switch/Atelier/Atelier.nro\",\"notices\":[{\"id\":\"a\",\"level\":\"todo\",\"title\":\"x\"}]}");
+    put(root + "/config/boreale/notices/playguard.json",
+        "{\"schema\":1,\"module\":\"playguard\",\"nro\":\"switch/Lantern/Lantern.nro\",\"notices\":[{\"id\":\"a\",\"level\":\"todo\",\"title\":\"x\"}]}");
+    put(root + "/config/boreale/notices/broken.json", "{oops");
+    // Kite: no registry file, nothing to do but information.
+    put(root + "/switch/kite.nro", "NRO0");
+    put(root + "/config/boreale/notices/kite.json",
+        "{\"schema\":1,\"nro\":\"/switch/kite.nro\",\"notices\":[{\"id\":\"i\",\"level\":\"info\",\"title\":\"Ready\"}]}");
+
+    const auto all = shared_bell_logic::others(root, "en", 100);
+    if (!CHECK(all.size() == 2)) return;
+    CHECK(all[0].name == "Lantern" && all[0].module == "lantern" && all[0].nro == "/switch/Lantern/Lantern.nro");
+    CHECK(all[1].name == "kite" && all[1].nro == "/switch/kite.nro" && all[1].notices.size() == 1 && !all[1].notices[0].attention);
+    if (!CHECK(all[0].notices.size() == 2)) return;
+    CHECK(all[0].notices[0].id == "dl" && !all[0].notices[0].attention && all[0].notices[0].detail == "Star Kart · 40\u00a0%");
+    CHECK(all[0].notices[0].route == "downloads");
+    CHECK(all[0].notices[1].id == "fail" && all[0].notices[1].attention && all[0].notices[1].route == "downloads/queue");
+    // In French: its French notice instead.
+    const auto fr = shared_bell_logic::others(root, "fr", 100);
+    CHECK(fr.size() == 2 && fr[0].notices.size() == 1 && fr[0].notices[0].id == "fr");
+}
+
 int main()
 {
     CHECK(shared_bell_logic::file("/") == "/config/boreale/notices/playguard.json");
@@ -84,5 +135,6 @@ int main()
     test_written();
     test_previous();
     test_bounds();
-    return CHECK_DONE("shared_bell_logic: written, kept, bounded assertions passed");
+    test_others();
+    return CHECK_DONE("shared_bell_logic: written, kept, bounded, the others read assertions passed");
 }

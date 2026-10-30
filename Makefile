@@ -277,6 +277,8 @@ forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
 forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core
 pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
+launcher_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_json.c library/boreale-link/source/bl_jread.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_notices.c
+launcher_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
 log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp

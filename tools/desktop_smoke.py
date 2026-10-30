@@ -403,6 +403,26 @@ if os.path.exists(app_conf):
 bell_file = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "notices", "playguard.json")
 if os.path.exists(bell_file):
     os.remove(bell_file)
+# Another Boréale homebrew's notices, for the bell's list (cadran): a
+# fictional one, its .nro, its registry file and its bell.
+other_dir = os.path.join(run_dir, "playguard_data", "sd")
+for rel in ("switch/Lantern/Lantern.nro", "config/boreale/apps/lantern.conf", "config/boreale/notices/lantern.json"):
+    if os.path.exists(os.path.join(other_dir, rel)):
+        os.remove(os.path.join(other_dir, rel))
+if CADRAN:
+    for rel, text in (
+        ("switch/Lantern/Lantern.nro", "NRO0"),
+        ("config/boreale/apps/lantern.conf", "schema=1\nname=Lantern\nversion=0.3.0\n"),
+        ("config/boreale/notices/lantern.json", json.dumps({
+            "schema": 1, "module": "lantern", "nro": "switch/Lantern/Lantern.nro", "notices": [
+                {"id": "dl", "level": "progress", "title": "Downloading Star Kart Racers", "detail": "2 of 3 files",
+                 "lang": "en-US", "progress": 40, "updated": 0, "expires": 0, "route": "downloads"},
+                {"id": "fail", "level": "error", "title": "Moonlit Garden could not be installed",
+                 "detail": "Not enough space on the SD card.", "lang": "en-US", "updated": 0, "expires": 0,
+                 "route": "downloads/queue"}]})),
+    ):
+        os.makedirs(os.path.dirname(os.path.join(other_dir, rel)), exist_ok=True)
+        open(os.path.join(other_dir, rel), "w").write(text)
 SYNC_ID = "5a0c3e11"
 mqtt_port = 0
 mqtt_broker = None
@@ -2508,10 +2528,16 @@ if CADRAN:
     shot("19_game")
     key("Escape")
 
-    # The notification bell's list (Y, the keyboard's y), its entries in cards.
+    # The notification bell's list (Y, the keyboard's y), its entries in cards;
+    # at its end, another Boréale homebrew's, under its name.
     key("y")
     time.sleep(1)              # the screen's own entrance over
     shot("20_notices")
+    if not logged("1 other homebrews"):
+        fail("the bell's list does not read the other homebrew's notices")
+    key("Down", 20)
+    time.sleep(1)
+    shot("20_notices_others")
     key("Escape")
 
     # Preferences › Theme and Language, applied at once: every screen made

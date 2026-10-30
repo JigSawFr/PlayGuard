@@ -50,7 +50,9 @@ bool can_launch();
 bool launch(const Target& target);
 
 // The same for any .nro, from the SD card root ("/switch/playguard/playguard.nro"):
-// PlayGuard itself after it was replaced (dev_build_flow).
-bool launch_nro(const std::string& path);
+// PlayGuard itself after it was replaced (dev_build_flow); another Boréale
+// homebrew at the screen `route` its notice names ("" its home: started
+// with --open=<route>, boreale-link's bl_open_args).
+bool launch_nro(const std::string& path, const std::string& route = "");
 
 }   // namespace launcher

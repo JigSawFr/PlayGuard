@@ -103,6 +103,10 @@ Les entrées qui concernent la console plutôt que le contrôle parental viennen
 
 Celles pour information : un retour à la version précédente, un firmware non testé avec cette version, une nouvelle version d'Atmosphère, de hekate ou du firmware (vérifiée avec *Rechercher les mises à jour chaque jour* ; l'entrée du firmware conseille d'attendre qu'Atmosphère le prenne en charge), une nouvelle version de l'intégration Home Assistant (une fois qu'elle a indiqué la version que Home Assistant utilise : *Nouveautés* montre ce qui a changé depuis et le QR code qui l'ouvre dans HACS), le numéro de série non masqué sur emuMMC, le contrôle parental propre à l'autre système, un fichier de PlayGuard trouvé endommagé et mis de côté (une notification au lancement y renvoie).
 
+### Les autres homebrews Boréale
+
+Sous les entrées de PlayGuard, chaque autre homebrew Boréale installé sur la console qui a quelque chose à dire a sa section, à son nom : ce qu'il télécharge, ce qui a échoué, ce qui vous attend chez lui (à faire ou en échec en orange). Ⓐ sur une entrée lance ce homebrew à l'écran qu'elle indique, une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message invite à l'ouvrir depuis ce menu. Rien de l'autre homebrew ne s'exécute dans PlayGuard. En retour, les entrées de PlayGuard s'affichent dans leurs cloches, et en ouvrir une lance PlayGuard sur l'onglet où elle se règle.
+
 ### Comportement des entrées
 
 - Chaque section liste ses entrées dans un ordre fixe, quelle que soit la vérification qui a fini la première.

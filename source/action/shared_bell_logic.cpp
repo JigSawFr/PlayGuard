@@ -1,9 +1,14 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/shared_bell_logic.hpp"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <dirent.h>
+#include <fstream>
 #include <memory>
+#include <sstream>
+#include <sys/stat.h>
 
 #include "bl_notices.h"
 #include "sync/sync_discovery.h"
@@ -13,6 +18,21 @@ namespace shared_bell_logic
 
 namespace
 {
+bool read_file(const std::string& path, std::string& out)
+{
+    std::ifstream in(path, std::ios::binary);
+    if (!in) return false;
+    std::ostringstream ss;
+    ss << in.rdbuf();
+    out = ss.str();
+    return true;
+}
+
+std::string under(const std::string& sd_root, const std::string& path)
+{
+    return sd_root + (sd_root.empty() || sd_root.back() != '/' ? "/" : "") + path;
+}
+
 // `s` into `out`, cut before a character that does not fit whole.
 void copy(char* out, size_t cap, const std::string& s)
 {
@@ -27,7 +47,7 @@ std::string file(const std::string& sd_root)
 {
     char path[BL_APP_PATH_MAX];
     bl_notices_path(SYNC_MODULE, path, sizeof(path));
-    return sd_root + (sd_root.empty() || sd_root.back() != '/' ? "/" : "") + path;
+    return under(sd_root, path);
 }
 
 std::string text(const std::vector<Entry>& entries, const std::string& lang, const std::string& nro,
@@ -72,6 +92,55 @@ std::string text(const std::vector<Entry>& entries, const std::string& lang, con
     if (len == 0) return "";
     out.resize(len);
     return out == previous ? "" : out;
+}
+
+std::vector<Other> others(const std::string& sd_root, const std::string& lang, int64_t now)
+{
+    std::vector<Other> out;
+    DIR* dir = opendir(under(sd_root, BL_NOTICES_DIR).c_str());
+    if (!dir) return out;
+    auto file_notices = std::make_unique<BlNotices>();
+    auto toks = std::make_unique<BlJTok[]>(BL_NOTICES_TOKENS);
+    while (const dirent* ent = readdir(dir)) {
+        char module[BL_APP_MODULE_MAX];
+        if (!bl_notices_module_of(ent->d_name, module, sizeof(module)) || !std::strcmp(module, SYNC_MODULE)) continue;
+        std::string text;
+        if (!read_file(under(sd_root, BL_NOTICES_DIR "/") + ent->d_name, text)) continue;
+        bl_notices_init(file_notices.get(), module, "");
+        if (!bl_notices_parse(file_notices.get(), text.data(), text.size(), toks.get(), BL_NOTICES_TOKENS)) continue;
+        // Its .nro, from its file; gone (the homebrew deleted): nothing.
+        struct stat st;
+        if (!file_notices->nro[0] || stat(under(sd_root, file_notices->nro).c_str(), &st) != 0) continue;
+        Other o;
+        o.module = module;
+        o.nro = std::string(file_notices->nro[0] == '/' ? "" : "/") + file_notices->nro;
+        o.name = module;
+        char app_path[BL_APP_PATH_MAX];
+        std::string app_text;
+        if (bl_app_path(module, app_path, sizeof(app_path)) && read_file(under(sd_root, app_path), app_text)) {
+            BlApp app;
+            bl_app_defaults(&app);
+            bl_app_parse(&app, app_text.data(), app_text.size());
+            if (app.name[0]) o.name = app.name;
+        }
+        for (size_t i = 0; i < file_notices->count; i++) {
+            const BlNotice& n = file_notices->items[i];
+            if (!bl_notice_shown(&n, now, lang.c_str())) continue;
+            Notice shown;
+            shown.id = n.id;
+            shown.attention = n.level == BlNotice_Todo || n.level == BlNotice_Error;
+            shown.title = n.title;
+            shown.detail = n.detail;
+            if (n.progress >= 0)
+                shown.detail += (shown.detail.empty() ? "" : " · ") + std::to_string(n.progress) + "\u00a0%";
+            shown.route = n.route;
+            o.notices.push_back(shown);
+        }
+        if (!o.notices.empty()) out.push_back(std::move(o));
+    }
+    closedir(dir);
+    std::sort(out.begin(), out.end(), [](const Other& a, const Other& b) { return a.name < b.name; });
+    return out;
 }
 
 }   // namespace shared_bell_logic

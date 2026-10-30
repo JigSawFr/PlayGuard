@@ -5,7 +5,11 @@
 // (the fix, or the screen where it is made); an entry for information with
 // nothing to do is put away. X puts one for information away, or ignores one
 // to do the parent may ignore (notice_logic::ackable): those come last,
-// under "Ignored", where A counts them again. Y puts every entry for
+// under "Ignored", where A counts them again. Before them, a section per
+// other Boréale homebrew with notices (action/shared_bell_logic), under its
+// name: A starts it at the screen its notice names once PlayGuard exits
+// (only when PlayGuard was started through hbloader; else it says where to
+// go). Nothing of another homebrew runs here. Y puts every entry for
 // information away. Rebuilt when the entries change; closes by itself once
 // none is left.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -16,6 +20,7 @@
 #include <vector>
 
 #include "action/notices.hpp"
+#include "action/shared_bell_logic.hpp"
 
 class NoticesActivity : public aurore::Activity
 {
@@ -42,6 +47,7 @@ class NoticesActivity : public aurore::Activity
     aurore::DetailCell* console_line(const std::vector<notices::Entry>& all);
     aurore::DetailCell* entry_cell(const notices::Entry& e, bool todo);
     aurore::DetailCell* ignored_cell(const notices::Entry& e);
+    aurore::DetailCell* other_cell(const shared_bell_logic::Other& o, const shared_bell_logic::Notice& n);
 
     AURORE_BIND(aurore::Box, root, "nt_root");
 };
