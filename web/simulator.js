@@ -431,7 +431,7 @@ function writeData(done) {
 // with the page's language, theme and first tab over what it kept.
 function mountKept(m, config) {
   m.FS.mkdirTree(DATA);
-  m.FS.mount(m.FS.filesystems.IDBFS, {}, DATA);
+  m.FS.mount(m.IDBFS, {}, DATA);
   m.addRunDependency('keep');
   m.FS.syncfs(true, (e) => {
     if (e) log(`keep: ${e}`, true);
