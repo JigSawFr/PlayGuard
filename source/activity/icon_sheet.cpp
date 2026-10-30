@@ -20,6 +20,7 @@
 #include "ui/ui.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/forwarder_library.hpp"
+#include "util/number.hpp"
 #include "util/paths.hpp"
 
 using namespace aurore::literals;
@@ -88,8 +89,9 @@ std::string day_word(const forwarders_logic::ShotTime& t, bool caption)
     const std::string today = ui::today_date();
     int days = 99;
     if (today.size() == 10)
-        days = forwarders_logic::days_before(t, std::atoi(today.substr(0, 4).c_str()), std::atoi(today.substr(5, 2).c_str()),
-                                             std::atoi(today.substr(8, 2).c_str()));
+        days = forwarders_logic::days_before(t, number::parse<int>(today.substr(0, 4)).value_or(0),
+                                             number::parse<int>(today.substr(5, 2)).value_or(0),
+                                             number::parse<int>(today.substr(8, 2)).value_or(0));
     const std::string ymd = fmt::format("{:04}-{:02}-{:02}", t.year, t.month, t.day);
     if (days == 0) return "playguard/forwarders/icon_today"_i18n;
     if (days == 1) return "playguard/forwarders/icon_yesterday"_i18n;

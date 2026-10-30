@@ -17,6 +17,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/number.hpp"
 #include "util/profiles.hpp"
 
 using namespace aurore::literals;
@@ -60,7 +61,7 @@ void clear()
 std::string day_text(const std::string& ymd)
 {
     if (ymd.size() != 10) return ymd;
-    const int month = std::atoi(ymd.substr(5, 2).c_str()), day = std::atoi(ymd.substr(8, 2).c_str());
+    const int month = number::parse<int>(ymd.substr(5, 2)).value_or(0), day = number::parse<int>(ymd.substr(8, 2)).value_or(0);
     if (month < 1 || month > 12 || day < 1) return ymd;
     return aurore::getStr("playguard/schedule/date", day, aurore::getStr(fmt::format("cadran/months/{}", month)));
 }

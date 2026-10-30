@@ -6,6 +6,7 @@
 #include <set>
 
 #include "sync/sync_icons.h"
+#include "util/number.hpp"
 #include "util/title_id.hpp"
 
 namespace sync_icons_logic
@@ -120,9 +121,8 @@ Sent parse(const std::string& text)
         uint64_t id = 0;
         if (key == "target") {
             out.target = value;
-        } else if (parse_id(key, &id) && !value.empty() && value.size() <= 9 &&
-                   value.find_first_not_of("0123456789") == std::string::npos) {
-            out.icons[id] = (uint32_t)std::strtoul(value.c_str(), nullptr, 10);
+        } else if (parse_id(key, &id) && value.size() <= 9) {
+            if (const auto n = number::parse<uint32_t>(value)) out.icons[id] = *n;
         }
     }
     return out;

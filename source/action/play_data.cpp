@@ -14,6 +14,7 @@
 #include "util/paths.hpp"
 #include "util/play_cache.hpp"
 #include "action/title_names.hpp"
+#include "util/number.hpp"
 #include "util/system_titles.hpp"
 #include "util/title_id.hpp"
 
@@ -207,7 +208,7 @@ std::string fallback_name(u64 app_id, const std::string& id)
 
 std::string unnamed(const std::string& id)
 {
-    const std::string name = fallback_name(std::strtoull(id.c_str(), nullptr, 16), id);
+    const std::string name = fallback_name(number::parse<uint64_t>(id, 16).value_or(0), id);
     return name.empty() ? aurore::getStr("playguard/games/unnamed", id) : name;
 }
 

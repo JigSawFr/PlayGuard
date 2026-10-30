@@ -336,6 +336,8 @@ sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem library/
 sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 sim_backend_LIBS   := -pthread -lm
 frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
+# A whole text read as a number (header only).
+number_SRC := tests/number/test.cpp
 log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
 migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/update.cpp source/util/migrations.cpp tests/migrations/test.cpp
 modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/modules.cpp tests/modules/test.cpp
