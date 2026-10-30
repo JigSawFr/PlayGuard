@@ -412,6 +412,13 @@ taken a second time; a press that comes live meanwhile is. Orders received
 while PlayGuard is open are applied by PlayGuard, with its policy (*ask* shows
 the usual confirmation on the console).
 
+Orders carry no `schema` of their own: they follow the `schema` of the
+`state` the console publishes. That is how the console says which orders it
+accepts: a publisher sends the entities and payloads of that schema (the
+table below for schema 1) and nothing newer, and a console of an older
+schema refuses an entity it does not know (`command_rejected`, reason
+`unknown_entity`) and clears the order.
+
 | Entity | Payload | Bounds | Needs `remote_timer_writes` | Effect |
 |---|---|---|---|---|
 | `limit_sun` … `limit_sat` | integer | 0–1440, 1440 = no limit | yes | That weekday's limit. Several within 1.5 s are merged into one write. |
@@ -707,6 +714,8 @@ updated and `AGENT_PROTOCOL` goes up.
 
 - `schema` is on every JSON document and in `sync.conf`. Adding a field does
   not bump it; removing or renaming one, or changing an order's payload, does.
+- Orders (`<entity>/set`) follow `state`'s `schema`: the console announces
+  there what it accepts (see *Orders* above).
 - The HA integration pins the schema it understands and raises a repair issue
   on a newer one.
 - The entity table (`source/sync/sync_entities.h`) is exported by a host test
