@@ -215,7 +215,7 @@ set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/app.cpp APPEND PROPERTY C
 set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/action/rescue.cpp APPEND PROPERTY COMPILE_DEFINITIONS
              APP_RESCUE_REV="${RESCUE_REV}")
 target_link_libraries(${PROJECT_NAME} PRIVATE Aurore::aurore ${APP_PLATFORM_LIB})
-# On the desktop: Aurore, fmt and the standard headers most files include,
+# On the desktop: Aurore and the standard headers most files include,
 # parsed once (a precompiled header) instead of in each of the 200-odd C++
 # files: a change to a header many include (ui/ui.hpp, app.hpp) rebuilds in
 # about half the time. The Switch and the web keep compiling as before (their
@@ -225,7 +225,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Aurore::aurore ${APP_PLATFORM_LIB}
 if (PLATFORM_DESKTOP AND NOT PLAYGUARD_WEB AND NOT CMAKE_VERSION VERSION_LESS 3.16)
     target_precompile_headers(${PROJECT_NAME} PRIVATE
         "$<$<COMPILE_LANGUAGE:CXX>:<aurore.hpp$<ANGLE-R>>"
-        "$<$<COMPILE_LANGUAGE:CXX>:<fmt/format.h$<ANGLE-R>>"
+        "$<$<COMPILE_LANGUAGE:CXX>:<format$<ANGLE-R>>"
         "$<$<COMPILE_LANGUAGE:CXX>:<algorithm$<ANGLE-R>>"
         "$<$<COMPILE_LANGUAGE:CXX>:<chrono$<ANGLE-R>>"
         "$<$<COMPILE_LANGUAGE:CXX>:<functional$<ANGLE-R>>"

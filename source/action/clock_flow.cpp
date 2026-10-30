@@ -2,8 +2,8 @@
 #include "action/clock_flow.hpp"
 
 #include <atomic>
+#include <format>
 #include <aurore.hpp>
-#include <fmt/format.h>
 #include <memory>
 #include <optional>
 #include <system_error>
@@ -67,7 +67,7 @@ void written(const std::string& source, const TimeApply& a, const std::string& b
 {
     if (a.write_attempted && R_SUCCEEDED(a.write_rc)) history_flow::record_event("clock", "", ui::time_text(a.target));
     if (a.write_attempted && R_FAILED(a.write_rc)) history_flow::record_failure("clock", a.write_rc, {}, {}, "", ui::time_text(a.target));
-    diagnostic::save(fmt::format(
+    diagnostic::save(std::format(
         "=== Network clock change ===\nserver={}\ntarget_utc={}\nopen_rc=0x{:08X} write_attempted={} write_rc=0x{:08X}\n"
         "verify_attempted={} verify_rc=0x{:08X} verified={} readback={}\nrefused_automatic={}\n\n--- Before ---\n{}\n--- After ---\n{}",
         source, a.target, (unsigned)a.open_rc, a.write_attempted, (unsigned)a.write_rc,
@@ -229,7 +229,7 @@ std::string offset_text(int64_t offset)
     const uint64_t a = offset < 0 ? (uint64_t)(-(offset + 1)) + 1 : (uint64_t)offset;
     std::string span;
     if (a >= 86400) span = aurore::getStr("playguard/clock/days", (unsigned long long)(a / 86400));
-    else if (a >= 3600) span = aurore::getStr("cadran/common/hours_minutes", (int)(a / 3600), fmt::format("{:02}", (int)(a % 3600 / 60)));
+    else if (a >= 3600) span = aurore::getStr("cadran/common/hours_minutes", (int)(a / 3600), std::format("{:02}", (int)(a % 3600 / 60)));
     else if (a >= 60) span = aurore::getStr("playguard/common/min_sec", (int)(a / 60), (int)(a % 60));
     else span = aurore::getStr("playguard/common/sec", (int)a);
     // The servers ahead of the network clock: it is behind.

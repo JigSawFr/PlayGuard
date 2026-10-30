@@ -1,9 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/icon_sheet.hpp"
 
-#include <fmt/format.h>
-
 #include <algorithm>
+#include <format>
 #include <map>
 #include <memory>
 
@@ -92,7 +91,7 @@ std::string day_word(const forwarders_logic::ShotTime& t, bool caption)
         days = forwarders_logic::days_before(t, number::parse<int>(today.substr(0, 4)).value_or(0),
                                              number::parse<int>(today.substr(5, 2)).value_or(0),
                                              number::parse<int>(today.substr(8, 2)).value_or(0));
-    const std::string ymd = fmt::format("{:04}-{:02}-{:02}", t.year, t.month, t.day);
+    const std::string ymd = std::format("{:04}-{:02}-{:02}", t.year, t.month, t.day);
     if (days == 0) return "playguard/forwarders/icon_today"_i18n;
     if (days == 1) return "playguard/forwarders/icon_yesterday"_i18n;
     if (days > 1 && days < 7)
@@ -478,8 +477,8 @@ class Sheet : public aurore::Box
                                                  : "playguard/forwarders/icon_shot"_i18n);
             forwarders_logic::ShotTime t;
             if (forwarders_logic::shot_time(c.shot, t)) {
-                const std::string at = c.seconds ? fmt::format("{:02}:{:02}:{:02}", t.hour, t.minute, t.second)
-                                                 : fmt::format("{:02}:{:02}", t.hour, t.minute);
+                const std::string at = c.seconds ? std::format("{:02}:{:02}:{:02}", t.hour, t.minute, t.second)
+                                                 : std::format("{:02}:{:02}", t.hour, t.minute);
                 this->when->setText(aurore::getStr("playguard/forwarders/icon_when", day_word(t, false), at));
             } else {
                 this->when->setText(forwarders_logic::file_title(c.shot));

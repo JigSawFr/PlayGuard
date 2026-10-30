@@ -3,6 +3,7 @@
 
 #include <aurore.hpp>
 #include <cstdio>
+#include <format>
 
 #include "action/dev_build_flow.hpp"
 #include "action/notices.hpp"
@@ -93,7 +94,7 @@ bool at_start()
         aurore::Logger::info("rollback: not gone back, the PIN not entered (0x{:08X})", (unsigned)pin);
         // Left with B: said plainly; another failure with its code.
         const std::string why =
-            pin == NXM_RC_CANCELLED ? std::string() : " (" + fmt::format("0x{:08X}", (unsigned)pin) + ")";
+            pin == NXM_RC_CANCELLED ? std::string() : " (" + std::format("0x{:08X}", (unsigned)pin) + ")";
         platform_boot_choice(("\n  The PIN was not entered" + why + ": " + previous + " stays where it is.\n\n" +
                               "  (A) / (B)  Start " + running_label() + "\n")
                                  .c_str());

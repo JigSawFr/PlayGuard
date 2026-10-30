@@ -2,7 +2,7 @@
 #include "action/sys_notes_flow.hpp"
 
 #include <aurore.hpp>
-#include <fmt/format.h>
+#include <format>
 #include <memory>
 #include <utility>
 
@@ -111,7 +111,7 @@ std::string installed(Which which)
     SysInfo si;
     sysinfo_get(&si);
     if (which == Which::Atmosphere)
-        return si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
+        return si.ams_valid ? std::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
     if (!si.hos_version) return "";
     return ui::hos_text(si.hos_version);
 }

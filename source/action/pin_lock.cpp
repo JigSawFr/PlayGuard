@@ -3,6 +3,7 @@
 
 #include <aurore.hpp>
 #include <chrono>
+#include <format>
 #include <vector>
 
 #include "action/pin_lock_logic.hpp"
@@ -151,7 +152,7 @@ bool before_show_pin()
 std::string refusal_text()
 {
     if (R_SUCCEEDED(s_last_rc) || NXM_IS_APP_RESULT(s_last_rc)) return ui::rc_text(NXM_RC_NOT_CONFIRMED);
-    return aurore::getStr("playguard/error/code_hint", fmt::format("0x{:08X}", (unsigned)s_last_rc),
+    return aurore::getStr("playguard/error/code_hint", std::format("0x{:08X}", (unsigned)s_last_rc),
                         "playguard/error/not_confirmed"_i18n);
 }
 

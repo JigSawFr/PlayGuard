@@ -3,13 +3,13 @@
 
 #include <algorithm>
 #include <atomic>
+#include <format>
 #include <aurore.hpp>
 #include <aurore/extern/nlohmann/json.hpp>
 #include <chrono>
 #include <condition_variable>
 #include <cstring>
 #include <deque>
-#include <fmt/format.h>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -431,7 +431,7 @@ void post_publish(const std::string& sub, const std::string& payload, bool retai
 
 std::string date_text(int year, unsigned month, unsigned day)
 {
-    return fmt::format("{:04d}-{:02d}-{:02d}", year, month, day);
+    return std::format("{:04d}-{:02d}-{:02d}", year, month, day);
 }
 
 // The local date `back` days before today ("" when the clock cannot say).
@@ -1184,7 +1184,7 @@ void agent_adopt()
         LocalTime t{};
         std::string when;
         if (rule && rule->to_local(rule->ctx, ev.ts, &t))
-            when = fmt::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}", (int)t.year, (int)t.month, (int)t.day, (int)t.hour,
+            when = std::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}", (int)t.year, (int)t.month, (int)t.day, (int)t.hour,
                                (int)t.minute);
         sync_orders::import(ev, when);
     }
@@ -1437,24 +1437,24 @@ std::string report_section()
     static const char* const STATES[] = { "off", "waiting", "connecting", "online" };
     std::string out = "\n=== Remote link ===\n";
     if (!sync_files::exists()) return out + "not set up\n";
-    out += fmt::format("settings    : enabled={} ready={} tls={} mqtt={} user={} anonymous={} policy={} timer_writes={} "
+    out += std::format("settings    : enabled={} ready={} tls={} mqtt={} user={} anonymous={} policy={} timer_writes={} "
                        "discovery={} report={} activity={} poll={}s\n",
                        c.enabled ? 1 : 0, st.ready ? 1 : 0, c.tls ? 1 : 0, sync_mqtt_version_name(c.mqtt_version),
                        c.username[0] ? "set" : "none",
                        c.allow_anonymous ? 1 : 0, sync_policy_name(c.policy), c.remote_timer_writes ? 1 : 0,
                        c.ha_discovery ? 1 : 0, c.publish_report ? 1 : 0, c.publish_activity ? 1 : 0, c.poll_s);
     if (!ha_update_flow::installed().empty())
-        out += fmt::format("integration : {} (Home Assistant {}){}\n", ha_update_flow::installed(),
+        out += std::format("integration : {} (Home Assistant {}){}\n", ha_update_flow::installed(),
                            ha_update_flow::homeassistant().empty() ? "?" : ha_update_flow::homeassistant(),
                            ha_update_flow::newer().empty() ? "" : ", " + ha_update_flow::newer() + " available");
     if (st.agent || st.agent_refused)
-        out += fmt::format("agent       : {} {}\n", st.agent_version,
+        out += std::format("agent       : {} {}\n", st.agent_version,
                            st.agent ? (st.agent_read_only ? "(holds the link, read-only)" : "(holds the link)")
                                     : "(another protocol: not used)");
     // A link that stopped turning keeps its last status: say so, the
     // session line below is then that old view.
     if (st.agent && st.agent_quiet_ms >= AGENT_QUIET_MS)
-        out += fmt::format("agent loop  : last turn {} s ago (stuck: its status below is that old)\n",
+        out += std::format("agent loop  : last turn {} s ago (stuck: its status below is that old)\n",
                            st.agent_quiet_ms / 1000);
     // The agent's last lines, its watchdog's among them: what it did while
     // PlayGuard was not there to log it.
@@ -1483,13 +1483,13 @@ std::string report_section()
     }
     if (!st.running) return out + "session     : not running\n" + tail;
     const SyncStatus& l = st.link;
-    out += fmt::format("session     : {} mqtt={} connects={} publishes={} orders={} rejected={} dropped={} pending={}\n",
+    out += std::format("session     : {} mqtt={} connects={} publishes={} orders={} rejected={} dropped={} pending={}\n",
                        STATES[l.state <= SyncLink_Online ? l.state : 0],
                        l.protocol == MQTT_V5 ? "5.0" : l.protocol == MQTT_V311 ? "3.1.1" : "-", l.connects, l.publishes,
                        l.orders, l.rejected, l.dropped, st.pending);
     // "cannot find <host>": reports are public, the broker's name is not.
-    if (l.error[0]) out += fmt::format("last error  : {}\n", without_broker(l.error, c.host));
-    if (l.last_result[0]) out += fmt::format("last order  : {}\n", l.last_result);
+    if (l.error[0]) out += std::format("last error  : {}\n", without_broker(l.error, c.host));
+    if (l.last_result[0]) out += std::format("last order  : {}\n", l.last_result);
     return out + tail;
 }
 

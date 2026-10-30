@@ -5,10 +5,10 @@
 #include <atomic>
 #include <charconv>
 #include <chrono>
+#include <format>
 #include <string_view>
 #include <utility>
 #include <aurore.hpp>
-#include <fmt/format.h>
 
 #include <aurore/cadran/ui/cadran_modal.hpp>
 #include <aurore/cadran/ui/cadran_text.hpp>
@@ -218,7 +218,7 @@ void record_failure(const char* kind, Result rc, std::vector<int> before, std::v
     e.detail = detail;
     e.before = std::move(before);
     e.after  = std::move(after);
-    e.result = fmt::format("0x{:08X}", (unsigned)rc);
+    e.result = std::format("0x{:08X}", (unsigned)rc);
     aurore::Logger::warning("history: {} refused ({})", e.kind, e.result);
     store(e);
 }
@@ -333,7 +333,7 @@ std::string day_title(const std::string& day)
 
 std::string filter_label(history_logic::Filter f)
 {
-    return aurore::getStr(fmt::format("playguard/history/filters/{}", std::to_underlying(f)));
+    return aurore::getStr(std::format("playguard/history/filters/{}", std::to_underlying(f)));
 }
 
 table_export::Table table(const std::vector<history::Entry>& entries)

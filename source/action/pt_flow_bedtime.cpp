@@ -3,8 +3,8 @@
 #include "action/pt_flow.hpp"
 
 #include <array>
+#include <format>
 #include <aurore.hpp>
-#include <fmt/format.h>
 
 #include <aurore/cadran/ui/cadran_modal.hpp>
 
@@ -19,7 +19,7 @@ namespace pt_flow
 
 static std::string hm(int hour, int minute)
 {
-    return fmt::format("{:02d}:{:02d}", hour, minute);
+    return std::format("{:02d}:{:02d}", hour, minute);
 }
 
 static std::string bed_text(const PtBedtime& b)
@@ -124,7 +124,7 @@ static std::vector<DaySet> day_sets()
                                  { pt_logic::WEEKEND, "playguard/play_timer/bedtime_weekend"_i18n } };
     for (int i = 0; i < 7; i++) {
         const int d = (i + 1) % 7;   // Monday first
-        sets.push_back({ (uint8_t)(1u << d), aurore::getStr(fmt::format("cadran/days/{}", d)) });
+        sets.push_back({ (uint8_t)(1u << d), aurore::getStr(std::format("cadran/days/{}", d)) });
     }
     return sets;
 }

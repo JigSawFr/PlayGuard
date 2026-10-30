@@ -2,7 +2,7 @@
 #include "action/agent_update.hpp"
 
 #include <aurore.hpp>
-#include <fmt/format.h>
+#include <format>
 #include <memory>
 
 #include "action/history_flow.hpp"

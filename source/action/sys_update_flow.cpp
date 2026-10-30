@@ -2,7 +2,7 @@
 #include "action/sys_update_flow.hpp"
 
 #include <aurore.hpp>
-#include <fmt/format.h>
+#include <format>
 #include <mutex>
 #include <string>
 
@@ -39,7 +39,7 @@ void note()
     const sys_updates::Latest latest = sys_updates::from_text(config::get().sys_latest);
     SysInfo si;
     sysinfo_get(&si);
-    const std::string ams = si.ams_valid ? fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
+    const std::string ams = si.ams_valid ? std::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
     const std::string fw = ui::hos_text(si.hos_version);
     const std::string hekate = installed_hekate();
     entry("sys_atmosphere", latest.atmosphere, ams, aurore::getStr("playguard/notices/sys_atmosphere", latest.atmosphere),

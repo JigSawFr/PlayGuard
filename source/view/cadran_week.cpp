@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <fmt/format.h>
+#include <format>
 
 #include <aurore/cadran/ui/effects.hpp>
 #include <aurore/cadran/ui/motion.hpp>
@@ -246,7 +246,7 @@ void CadranWeekView::set_edit(bool on)
     // changes are saved with + or Save, not by it.
     for (int d = 0; d < 7; d++)
         this->cols[d].box->updateActionHint(
-            aurore::BUTTON_A, on ? aurore::getStr("playguard/cadran/week/done_day", aurore::getStr(fmt::format("cadran/days_lower/{}", d)))
+            aurore::BUTTON_A, on ? aurore::getStr("playguard/cadran/week/done_day", aurore::getStr(std::format("cadran/days_lower/{}", d)))
                                : "playguard/cadran/week/edit"_i18n);
     aurore::Application::getGlobalHintsUpdateEvent()->fire();
     this->render();

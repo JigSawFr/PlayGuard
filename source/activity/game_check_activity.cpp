@@ -5,7 +5,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstring>
-#include <fmt/format.h>
+#include <format>
 #include <functional>
 #include <map>
 #include <string>
@@ -334,7 +334,7 @@ void GameCheckActivity::check(std::vector<GameRecord> records, bool full)
         GameCheckTiming t;
         gamecheck_last_timing(&t);
         const auto ms = [](u64 ns) { return (unsigned long long)(ns / 1000000ULL); };
-        const std::string spent = fmt::format("{} games in {} ms: setup {}, control {}, contents {}, state {}", t.games,
+        const std::string spent = std::format("{} games in {} ms: setup {}, control {}, contents {}, state {}", t.games,
                                               ms(t.total_ns), ms(t.setup_ns), ms(t.control_ns), ms(t.contents_ns), ms(t.state_ns));
         aurore::Logger::info("games check: {}", spent);
         perf::record("Installed games check", (double)t.total_ns / 1e6);

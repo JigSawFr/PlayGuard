@@ -12,7 +12,7 @@
 #include "sim/sim_homebrew.hpp"
 #endif
 
-#include <fmt/format.h>
+#include <format>
 
 using namespace aurore::literals;
 
@@ -29,9 +29,9 @@ std::string hos_text(u32 version)
 std::string fw_text(const SysInfo& info)
 {
     const std::string fw = hos_text(info.hos_version);
-    std::string ams = info.ams_valid ? fmt::format("{}.{}.{}", info.ams_major, info.ams_minor, info.ams_micro)
+    std::string ams = info.ams_valid ? std::format("{}.{}.{}", info.ams_major, info.ams_minor, info.ams_micro)
                                      : std::string("?");
-    return fmt::format("{} · Atmosphère {}", fw, ams);
+    return std::format("{} · Atmosphère {}", fw, ams);
 }
 
 std::string compat_text(const SysInfo& info, const char** color)

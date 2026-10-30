@@ -2,7 +2,7 @@
 #include "action/outside_watch.hpp"
 
 #include <aurore.hpp>
-#include <fmt/format.h>
+#include <format>
 
 #include "action/history_flow.hpp"
 #include "action/outside_change_logic.hpp"
@@ -62,7 +62,7 @@ std::string nickname_of(const std::string& id)
 std::string hex(const uint8_t* b, size_t n)
 {
     std::string out;
-    for (size_t i = 0; i < n; i++) out += fmt::format("{:02x}", b[i]);
+    for (size_t i = 0; i < n; i++) out += std::format("{:02x}", b[i]);
     return out;
 }
 }   // namespace
