@@ -24,11 +24,11 @@ namespace
 {
 // PlayGuard's steps (util/migrations.hpp), in the order they run. Their
 // numbers never change; a step whose shim goes (data_move's and
-// log_files::migrate's, after April 2027) leaves its number unused.
+// data_move::logs's, after April 2027) leaves its number unused.
 enum : int
 {
     DataDir  = 1,   // sd:/switch/playguard to sd:/config/playguard (data_move::run, the console only)
-    LogsDirs = 2,   // logs/ before its subfolders (log_files::migrate)
+    LogsDirs = 2,   // logs/ before its subfolders (data_move::logs)
     NandDirs = 3,   // what every system shared, to the first one's nand/<key> (data_move::to_nand)
 };
 
@@ -66,7 +66,7 @@ const std::vector<Known>& known()
             } },
           "playguard/dev/migration_data_dir", "playguard/dev/migration_data_dir_detail" },
         // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
-        { { LogsDirs, "logs subfolders", []() { return log_files::migrate(paths::logs_dir()); } },
+        { { LogsDirs, "logs subfolders", []() { return data_move::logs(paths::logs_dir()); } },
           "playguard/dev/migration_logs", "playguard/dev/migration_logs_detail" },
         // What every system shared, to this one's nand/<key>.
         { { NandDirs, "per-system folder",

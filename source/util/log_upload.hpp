@@ -1,6 +1,6 @@
 // log_upload — sends a diagnostic report, with the latest crash reports, the
 // last runs' session logs and the developer tools' debug files, to a secret gist in the parent's GitHub
-// account (PlayGuard signed in to GitHub: github_auth.hpp) and gives back its
+// account (the app signed in to GitHub: github_auth.hpp) and gives back its
 // link, so a report reaches whoever helps (a bug report, a chat) without
 // taking the SD card out. The link also prefills the bug-report form of the
 // repository. The gist stays until deleted on GitHub.
@@ -9,7 +9,7 @@
 //
 // What is sent is only what the parent picked, after a confirmation that
 // says where it goes: the diagnostic report never holds the PIN or the
-// serial number, and the debug files are PlayGuard's own settings and the
+// serial number, and the debug files are the app's own settings and the
 // last changes of its history, without names or times of day. Anyone with
 // the link can read it, and a bug report opened with it is public.
 //
@@ -26,29 +26,23 @@
 namespace log_upload
 {
 
-// The most a gist takes from PlayGuard. A report is about 30 KiB; the change
+// The most a gist takes from the app. A report is about 30 KiB; the change
 // history is what grows.
 constexpr size_t GIST_MAX_BYTES = 512 * 1024;
 
 struct Part
 {
-    std::string name;      // "diagnostic report", "logs/play_timer/block.json"
+    std::string name;      // "diagnostic report", "config.json"
     std::string content;
 };
 
-// The end of logs/play_timer/log.csv sent, at most (util/pt_log.hpp).
-constexpr size_t PT_LOG_BYTES = 48 * 1024;
-
 // The debug files found in the data directory, in a fixed order:
-// logs/play_timer/block.json (Developer › Compare the play-timer block),
-// logs/play_timer/log.csv (Developer › Record the play timer: its last
-// PT_LOG_BYTES, header kept) only with `play_timer_log` (the recorder is on:
-// it is what the developer asked to be sent; otherwise a child's play time
-// stays home), history_recent.json (recent_history() of the change history)
-// and config.json (PlayGuard's settings; the PIN is not one of them).
+// history_recent.json (recent_history() of the change history) and
+// config.json (the app's settings). The app adds its own
+// files before them (PlayGuard's play-timer files).
 // Missing ones are left out. Never the GitHub token (github_auth.hpp keeps
 // it in a file of its own).
-std::vector<Part> debug_files(bool play_timer_log = false);
+std::vector<Part> debug_files();
 
 // The last `limit` entries of history.json's text (util/history.hpp), oldest
 // first as in the file, for a report: what changed and how, without what
@@ -59,7 +53,7 @@ std::vector<Part> debug_files(bool play_timer_log = false);
 constexpr size_t HISTORY_ENTRIES = 20;
 std::string recent_history(const std::string& text, size_t limit = HISTORY_ENTRIES);
 
-// PlayGuard's own crash files (logs/crashes/crash_<date>.txt,
+// The app's own crash files (logs/crashes/crash_<date>.txt,
 // util/crash_report.hpp: a CPU exception, an exception nothing caught, a run
 // that never ended), newest first, at most `limit`.
 std::vector<Part> crash_files(size_t limit = 3);
@@ -77,7 +71,7 @@ std::vector<Part> session_files(size_t limit = 2);
 std::string head_and_tail(const std::string& text, size_t max_bytes);
 
 // Atmosphère's crash reports, sd:/atmosphere/crash_reports/<POSIX time>_<program id>.log,
-// of a homebrew: its process is hbloader, which PlayGuard runs as (over a
+// of a homebrew: its process is hbloader, which the app runs as (over a
 // game or the Album), so another homebrew's crash can be one of them (the
 // confirmation lists them). Those of the `days` days before `now`, newest
 // first, at most `limit`, each cut to its first ATMOSPHERE_CRASH_BYTES (the
@@ -127,7 +121,7 @@ struct IssueFields
 std::string issue_url(const std::string& repo_url, const std::string& paste_url, const IssueFields& fields);
 
 // The JSON body of a new secret gist holding `files` (gist_files()),
-// described as "PlayGuard <version> <what>".
+// described as "<app> <version> <what>" (APP_NAME).
 std::string gist_body(const std::vector<Part>& files, const std::string& version,
                       const std::string& what = "diagnostic report");
 
@@ -141,7 +135,7 @@ struct Result
 
 // Sends `files` (gist_files()) to a secret gist with `token`. Blocking
 // (network): run it in the background. On the desktop build
-// PLAYGUARD_SIM_PASTE ("offline", or the link to answer) replaces the network.
+// <APP>_SIM_PASTE ("offline", or the link to answer) replaces the network.
 Result upload_gist(const std::vector<Part>& files, const std::string& token, const std::string& version,
                    const std::string& what = "diagnostic report");
 

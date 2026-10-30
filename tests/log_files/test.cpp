@@ -189,7 +189,7 @@ static void test_migrate_logs()
     // Taken already in the new layout: the old file stays.
     write("logs/reports/report_20261009_141203_1.txt", "newer");
 
-    CHECK(lf::migrate(g_root + "/logs") == 6);   // not the report whose name is taken
+    CHECK(data_move::logs(g_root + "/logs") == 6);   // not the report whose name is taken
     CHECK(read("logs/reports/report_20261009_141203.txt") == "report a");
     CHECK(read("logs/reports/report_20261009_141203_1.txt") == "newer" && read("logs/20261009_141203_1.txt") == "report b");
     CHECK(there("logs/notes.txt") && there("logs/20261009_141203_x.txt"));
@@ -205,27 +205,27 @@ static void test_migrate_logs()
     CHECK(read("logs/uploads/upload_20261008_092000_1.url").find("Removal=") == std::string::npos);
     CHECK(lf::list(g_root + "/logs/uploads", lf::UPLOAD).size() == 2);
     // Done once: nothing left to move.
-    CHECK(lf::migrate(g_root + "/logs") == 0);
+    CHECK(data_move::logs(g_root + "/logs") == 0);
 
     // The upload files of the version before the shortcuts, a .txt per link:
     // a shortcut each; a name already taken, the next one.
     write("logs/uploads/upload_20261009_100000.txt", "2026-10-09 10:00  https://bpa.st/CCCC  (remove: https://bpa.st/remove/DDDD)\n");
     write("logs/uploads/upload_20261008_092000.txt", "2026-10-08 09:20  https://bpa.st/EEEE\n");
     write("logs/uploads/notes.txt", "not an upload");
-    CHECK(lf::migrate(g_root + "/logs") == 2);
+    CHECK(data_move::logs(g_root + "/logs") == 2);
     CHECK(!there("logs/uploads/upload_20261009_100000.txt") && !there("logs/uploads/upload_20261008_092000.txt"));
     CHECK(read("logs/uploads/upload_20261009_100000.url") ==
           lf::shortcut("https://bpa.st/CCCC", "https://bpa.st/remove/DDDD", "2026-10-09 10:00"));
     CHECK(read("logs/uploads/upload_20261008_092000_2.url").find("URL=https://bpa.st/EEEE\r\n") != std::string::npos);
     CHECK(there("logs/uploads/notes.txt") && lf::list(g_root + "/logs/uploads", lf::UPLOAD).size() == 4);
-    CHECK(lf::migrate(g_root + "/logs") == 0);
+    CHECK(data_move::logs(g_root + "/logs") == 0);
 
     // A crash.txt without a date: its name says so, and a second one does not replace it.
     write("logs/crash.txt", "garbage");
-    CHECK(lf::migrate(g_root + "/logs") == 1 && read("logs/crashes/crash_19700101_000000.txt") == "garbage");
+    CHECK(data_move::logs(g_root + "/logs") == 1 && read("logs/crashes/crash_19700101_000000.txt") == "garbage");
     write("logs/crash.txt", "garbage 2");
-    CHECK(lf::migrate(g_root + "/logs") == 1 && read("logs/crashes/crash_19700101_000000_1.txt") == "garbage 2");
-    CHECK(lf::migrate(g_root + "/missing") == 0);
+    CHECK(data_move::logs(g_root + "/logs") == 1 && read("logs/crashes/crash_19700101_000000_1.txt") == "garbage 2");
+    CHECK(data_move::logs(g_root + "/missing") == 0);
 }
 
 static void test_data_move()

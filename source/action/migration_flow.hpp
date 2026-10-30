@@ -1,5 +1,5 @@
 // migration_flow — the steps of util/migrations.hpp, with what they move
-// (util/data_move.hpp, log_files::migrate), in the log: those of the start,
+// (util/data_move.hpp, data_move::logs), in the log: those of the start,
 // before anything is written to the data folder (the session file goes to
 // the logs/ they leave), and the system's, once its folder is known. Then
 // the developer tools' "Run the migrations again": the steps chosen in a

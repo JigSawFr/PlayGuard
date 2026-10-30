@@ -19,6 +19,7 @@
 #include "util/github_auth.hpp"
 #include "util/log_files.hpp"
 #include "util/log_upload.hpp"
+#include "util/pt_upload.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/session_log.hpp"
@@ -180,7 +181,8 @@ void with_debug_files(const std::string& report)
         for (auto& f : log_upload::crash_files()) parts.push_back(std::move(f));
         for (auto& f : log_upload::atmosphere_crashes(std::time(nullptr))) parts.push_back(std::move(f));
         for (auto& f : log_upload::session_files()) parts.push_back(std::move(f));
-        for (auto& f : log_upload::debug_files(pt_log)) parts.push_back(std::move(f));
+        for (auto& f : pt_upload::debug_files(pt_log)) parts.push_back(std::move(f));
+        for (auto& f : log_upload::debug_files()) parts.push_back(std::move(f));
         if (ui::quitting()) return;
         const Parts all = parts_of(std::move(parts));
         aurore::sync([all]() {
