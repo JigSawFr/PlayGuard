@@ -10,33 +10,43 @@
 #include <unistd.h>
 
 #include "util/log_upload.hpp"
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 #include "util/pt_log.hpp"
+#include "util/pt_upload.hpp"
 
 static void write(const std::string& path, const std::string& content)
 {
     CHECK(paths::atomic_write(path, content));
 }
 
+// What "Send a report…" adds: PlayGuard's play-timer files, then the kit's.
+static std::vector<log_upload::Part> debug_files(bool play_timer_log = false)
+{
+    std::vector<log_upload::Part> out = pt_upload::debug_files(play_timer_log);
+    for (auto& f : log_upload::debug_files()) out.push_back(std::move(f));
+    return out;
+}
+
 static void test_files()
 {
-    CHECK(log_upload::debug_files().empty());
+    CHECK(debug_files().empty());
     CHECK(log_upload::saved_reports().empty());
 
     CHECK(paths::ensure_dir(paths::logs_dir()));
     write(paths::config_file(), "{\"pin_lock\": \"off\"}");
     write(paths::play_timer_dir() + "/block.json", "{}");
-    auto files = log_upload::debug_files();
+    auto files = debug_files();
     CHECK(files.size() == 2);
     CHECK(files[0].name == "logs/play_timer/block.json" && files[0].content == "{}");
     CHECK(files[1].name == "config.json");
     write(paths::history_file(), "[]");
-    files = log_upload::debug_files();
+    files = debug_files();
     CHECK(files.size() == 3 && files[1].name == "history_recent.json" && files[2].name == "config.json");
     CHECK(files[1].content.find("could not be read") != std::string::npos);   // not the shape history.json has
     // The GitHub token (util/github_auth.hpp) is never sent.
     write(paths::data_dir() + "/github_token", "ghu_secret");
-    files = log_upload::debug_files();
+    files = debug_files();
     CHECK(files.size() == 3);
     for (const auto& f : files) CHECK(f.content.find("ghu_secret") == std::string::npos);
 
@@ -45,15 +55,15 @@ static void test_files()
     std::string csv = pt_log::header();
     for (int i = 0; i < 5000; i++) csv += "2026-10-09 20:10:52,1791569454,0,1,0,0,1428,5772,7200,,\n";
     write(pt_log::path(), csv);
-    files = log_upload::debug_files();
+    files = debug_files();
     CHECK(files.size() == 3);
     for (const auto& f : files) CHECK(f.name != "logs/play_timer/log.csv");
-    files = log_upload::debug_files(true);
+    files = debug_files(true);
     CHECK(files.size() == 4 && files[1].name == "logs/play_timer/log.csv" && files[2].name == "history_recent.json");
-    CHECK(files[1].content.size() <= log_upload::PT_LOG_BYTES && files[1].content.size() > 40000);
+    CHECK(files[1].content.size() <= pt_upload::LOG_BYTES && files[1].content.size() > 40000);
     CHECK(files[1].content.compare(0, pt_log::header().size(), pt_log::header()) == 0);
     // Only its end is read, and what is kept is the same as from the whole file.
-    CHECK(files[1].content == pt_log::tail(csv, log_upload::PT_LOG_BYTES));
+    CHECK(files[1].content == pt_log::tail(csv, pt_upload::LOG_BYTES));
     CHECK(std::remove(pt_log::path().c_str()) == 0);
 
     write(paths::reports_dir() + "/report_20261008_090000.txt", "a");

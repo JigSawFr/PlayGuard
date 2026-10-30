@@ -29,6 +29,7 @@
 #include <switch.h>
 
 #include "agent_core.h"
+#include "bl_cache.h"
 #include "bl_net.h"
 #include "bl_tls.h"
 #include "calendar.h"
@@ -57,7 +58,7 @@
 #define SYNC_DIR     DATA_DIR "/sync"
 #define PROFILES     SYNC_DIR "/profiles.txt"
 #define REPORTS_DIR  DATA_DIR "/logs/reports"
-#define ICON_CACHE   DATA_DIR "/cache/icons"   // PlayGuard's (playstats_set_icon_dir), read only
+#define ICON_CACHE   "sdmc:/" BL_CACHE_ICONS_DIR   // the homebrews' shared icons (bl_cache), read only
 
 // This system's (nand/<key>/sync/), once the system is known (system_paths()).
 static char g_system_dir[64];

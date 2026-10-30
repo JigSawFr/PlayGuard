@@ -1470,6 +1470,8 @@
         "migration_logs_detail": "logs/ de antes da 1.0.0",
         "migration_nand": "A pasta de cada sistema",
         "migration_nand_detail": "Do que todos os sistemas partilhavam",
+        "migration_icons": "Ícones de jogos partilhados",
+        "migration_icons_detail": "Pasta de ícones própria do PlayGuard removida",
         "migrations_confirm": "Executar",
         "migrations_done": "Migrações executadas de novo ({} passos). Elementos movidos: {}. O detalhe está no registo de sessão.",
         "mode_off_body": "Desativar o modo de programador? As suas ferramentas saem do fim de Sobre › Ajuda e diagnóstico e o registo do temporizador para. Sete toques em Y em Sobre › Versão trazem-nas de volta.",

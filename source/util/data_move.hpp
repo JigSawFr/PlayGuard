@@ -3,7 +3,7 @@
 // "start clean") does not take the backups, the profiles and the change
 // history with it. Run at start-up, before config::load(), as the steps of
 // util/migrations.hpp (once each, not at every start); then the files of the
-// logs/ layout before its subfolders are moved into them (log_files::migrate).
+// logs/ layout before its subfolders are moved into them (logs()).
 // Plain C++ (no Aurore): host-tested (tests/log_files).
 //
 // A shim for the 1.0.x layout, which 1.1.0 (October 2026) left: run() and
@@ -38,5 +38,20 @@ size_t run(const std::string& from, const std::string& to);
 // them; the others start without. Same rules as run(). Returns how many
 // entries were moved.
 size_t to_nand(const std::string& data_dir, const std::string& nand_dir);
+
+// Moves the files of the layout before the subfolders into them, in
+// `logs_dir`: <stamp>[_n].txt to reports/report_<stamp>[_n].txt, crash.txt to
+// crashes/crash_<date of its first line>.txt, uploads.txt to one
+// uploads/upload_<date of the line>.url (log_files::shortcut()) per line
+// ("2026-10-11 14:25  <link>  (remove: <link>)"; a line without a link
+// dropped), the uploads/upload_<date>.txt of the version before (the same
+// lines) to .url files too, play_timer_log.csv,
+// play_timer_log.old.csv and play_timer_block.json to play_timer/. A file
+// whose new name is taken stays where it is. Returns how many were moved.
+//
+// A shim for the builds before 1.0.0 (October 2026), the only ones that
+// wrote this layout: it can go with run() and to_nand(), in the first
+// release after April 2027. Run once, as a step of util/migrations.hpp.
+size_t logs(const std::string& logs_dir);
 
 }   // namespace data_move

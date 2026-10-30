@@ -1470,6 +1470,8 @@
         "migration_logs_detail": "1.0.0 より前の logs/",
         "migration_nand": "各システムのフォルダー",
         "migration_nand_detail": "すべてのシステムで共有していたものから",
+        "migration_icons": "共有のゲームアイコン",
+        "migration_icons_detail": "PlayGuard 独自のアイコンフォルダーを削除",
         "migrations_confirm": "実行",
         "migrations_done": "移行をもう一度実行しました（{} ステップ）。移動した項目：{}。詳細はセッションログにあります。",
         "mode_off_body": "開発者モードをOFFにしますか？「情報 › ヘルプと診断」の最後から開発者向けの項目が消え、プレイ時間の記録も止まります。「情報」の「バージョン」でYを7回押すと元に戻ります。",

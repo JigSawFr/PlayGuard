@@ -1272,7 +1272,7 @@ if GATE:
     key("Return")
     key_to_end("Down", hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
-    # Run the migrations again (its last cell), two of the three chosen: a
+    # Run the migrations again (its last cell), two of the four chosen: a
     # diagnostic report saved in the logs/ layout before its subfolders, left
     # there while PlayGuard runs, goes to logs/reports/ (then away: the
     # cleanup below counts its files).
@@ -1280,14 +1280,16 @@ if GATE:
     with open(old_report, "w") as f:
         f.write("smoke test\n")
     key("Return")
-    shot("05b_migrations")     # a line per migration, all checked, then "Run the 3 chosen"
+    shot("05b_migrations")     # a line per migration, all checked, then "Run the 4 chosen"
     key("Return")              # the data folder unchecked: the list again, on it
-    shot("05c_migrations_two") # "Run the 2 chosen"
+    shot("05c_migrations_two") # "Run the 3 chosen"
     key("Down", 2)             # the system's folder unchecked too
     key("Return")
-    key("Up", 2)               # the data folder checked again
+    key("Down")                # the shared icons too
     key("Return")
-    key("Down", 3)             # Run the 2 chosen (the data folder and the logs' subfolders)
+    key("Up", 3)               # the data folder checked again
+    key("Return")
+    key("Down", 4)             # Run the 2 chosen (the data folder and the logs' subfolders)
     key("Return")
     shot("05d_migrations_confirm")   # the migrations chosen, Run
     key("Right")               # Run

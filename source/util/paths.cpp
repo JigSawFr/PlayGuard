@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "util/paths.hpp"
 
+#include "app_id.h"
+
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
@@ -18,9 +20,9 @@ namespace paths
 std::string data_dir()
 {
 #ifdef __SWITCH__
-    return "/config/playguard";
+    return "/config/" APP_ID;
 #else
-    return "./playguard_data";
+    return "./" APP_ID "_data";
 #endif
 }
 
@@ -29,11 +31,8 @@ std::string reports_dir()  { return logs_dir() + "/reports"; }
 std::string crashes_dir()  { return logs_dir() + "/crashes"; }
 std::string sessions_dir() { return logs_dir() + "/sessions"; }
 std::string uploads_dir()  { return logs_dir() + "/uploads"; }
-std::string play_timer_dir() { return logs_dir() + "/play_timer"; }
-std::string profiles_dir() { return data_dir() + "/profiles"; }
-std::string exports_dir()  { return data_dir() + "/exports"; }
-std::string themes_dir()   { return data_dir() + "/themes"; }
 std::string config_file()  { return data_dir() + "/config.json"; }
+std::string themes_dir()   { return data_dir() + "/themes"; }
 std::string migrations_file() { return data_dir() + "/migrations.json"; }
 std::string cache_dir()    { return data_dir() + "/cache"; }
 
@@ -44,9 +43,7 @@ std::string s_nand = "unknown";
 void        set_nand(const std::string& key) { s_nand = key.empty() ? "unknown" : key; }
 std::string nand_key()     { return s_nand; }
 std::string nand_dir()     { return data_dir() + "/nand/" + s_nand; }
-std::string backups_dir()  { return nand_dir() + "/backups"; }
 std::string history_file() { return nand_dir() + "/history.json"; }
-std::string state_file()   { return nand_dir() + "/state.json"; }
 std::string nand_cache_dir() { return nand_dir() + "/cache"; }
 
 std::string sd_root()
@@ -54,7 +51,7 @@ std::string sd_root()
 #ifdef __SWITCH__
     return "/";
 #else
-    return "./playguard_data/sd";
+    return "./" APP_ID "_data/sd";
 #endif
 }
 

@@ -1,27 +1,15 @@
 // Host tests for source/core/playstats_logic.c: raw log entries as playlog
 // events, the bounded walk of the log, the games the whole log names, the
 // all-time list and its cut, game names out of a control.nacp (compressed
-// titles included), the names kept between reads, and the icons kept on the
-// SD card.
-#define _DEFAULT_SOURCE   // mkdtemp
+// titles included) and the names kept between reads. The icons kept on the
+// SD card are boreale-link's bl_cache, tested there.
 #include "check.h"
-#include <dirent.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <zlib.h>
 
 #include "playstats_logic.h"
-
-// A file for the test to damage, owner-writable only (CodeQL: no 0666).
-static FILE *create_file(const char *path)
-{
-    const int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    return fd < 0 ? NULL : fdopen(fd, "wb");
-}
 
 // ---------------------------------------------------------------- convert
 
@@ -453,102 +441,6 @@ static void test_names(void)
     CHECK(m.count == PLAYSTATS_MAX && playnames_find(&m, 1));
 }
 
-// ---------------------------------------------------------------- icons
-
-static size_t files_in(const char *dir)
-{
-    size_t n = 0;
-    DIR *d = opendir(dir);
-    if (!d) return 0;
-    for (struct dirent *e; (e = readdir(d));) n += e->d_name[0] != '.';
-    closedir(d);
-    return n;
-}
-
-static void test_icons(void)
-{
-    char root[] = "/tmp/playguard_playstats_XXXXXX";
-    REQUIRE(mkdtemp(root) != NULL);
-    char dir[128];
-    snprintf(dir, sizeof(dir), "%s/cache/icons", root);
-    unsigned char jpeg[1000];
-    memset(jpeg, 0x42, sizeof(jpeg));
-    jpeg[0] = 0xFF;
-    jpeg[1] = 0xD8;
-
-    IconStore s;
-    CHECK(icon_store_open(&s, dir, 3, 4000, 8));   // makes the folders
-    size_t size = 1;
-    CHECK(icon_store_get(&s, 0x0100A1B2C3D40000ULL, &size) == NULL && size == 0);
-    icon_store_put(&s, 0x0100A1B2C3D40000ULL, jpeg, sizeof(jpeg));
-    unsigned char *got = icon_store_get(&s, 0x0100A1B2C3D40000ULL, &size);
-    CHECK(got && size == sizeof(jpeg) && memcmp(got, jpeg, size) == 0);
-    free(got);
-    char path[192];
-    snprintf(path, sizeof(path), "%s/0100A1B2C3D40000.jpg", dir);
-    CHECK(access(path, F_OK) == 0);
-
-    // Not a JPEG, or too large: not kept. Over the bytes allowed: not kept.
-    unsigned char text[16] = "not a jpeg";
-    icon_store_put(&s, 2, text, sizeof(text));
-    CHECK(icon_store_get(&s, 2, &size) == NULL);
-    icon_store_put(&s, 3, jpeg, sizeof(jpeg));
-    icon_store_put(&s, 4, jpeg, sizeof(jpeg));
-    icon_store_put(&s, 5, jpeg, sizeof(jpeg));   // 4000 bytes now
-    icon_store_put(&s, 6, jpeg, sizeof(jpeg));
-    CHECK(s.bytes == 4000 && icon_store_get(&s, 6, &size) == NULL);
-
-    // A file damaged meanwhile is not handed out; a .tmp left by a crash goes.
-    snprintf(path, sizeof(path), "%s/0000000000000003.jpg", dir);
-    FILE *f = create_file(path);
-    REQUIRE(f != NULL);
-    fputs("junk", f);
-    fclose(f);
-    CHECK(icon_store_get(&s, 3, &size) == NULL);
-    snprintf(path, sizeof(path), "%s/0000000000000009.tmp", dir);
-    f = create_file(path);
-    REQUIRE(f != NULL);
-    fclose(f);
-
-    // Opened again in the same language: kept, the .tmp gone.
-    CHECK(icon_store_open(&s, dir, 3, 8000, 8));
-    CHECK(s.files == 4 && s.bytes == 3004 && access(path, F_OK) != 0);
-    got = icon_store_get(&s, 4, &size);
-    CHECK(got && size == sizeof(jpeg));
-    free(got);
-    // Full (bytes or files) when opened: emptied, to fill again.
-    CHECK(icon_store_open(&s, dir, 3, 3004, 8));
-    CHECK(s.files == 0 && s.bytes == 0 && icon_store_get(&s, 4, &size) == NULL);
-    icon_store_put(&s, 7, jpeg, sizeof(jpeg));
-    icon_store_put(&s, 8, jpeg, sizeof(jpeg));
-    CHECK(icon_store_open(&s, dir, 3, 1u << 20, 2));
-    CHECK(s.files == 0 && icon_store_get(&s, 7, &size) == NULL);
-    icon_store_put(&s, 7, jpeg, sizeof(jpeg));
-    icon_store_put(&s, 8, jpeg, sizeof(jpeg));
-    icon_store_put(&s, 9, jpeg, sizeof(jpeg));   // past max_files
-    CHECK(s.files == 2 && icon_store_get(&s, 9, &size) == NULL);
-
-    // Another console language: emptied (icons follow the language).
-    CHECK(icon_store_open(&s, dir, 4, 1u << 20, 8));
-    CHECK(s.files == 0 && icon_store_get(&s, 7, &size) == NULL);
-    CHECK(files_in(dir) == 1);   // only the language file
-
-    // Not opened, or no folder: nothing, quietly.
-    IconStore none;
-    memset(&none, 0, sizeof(none));
-    icon_store_put(&none, 1, jpeg, sizeof(jpeg));
-    CHECK(icon_store_get(&none, 1, &size) == NULL);
-    CHECK(!icon_store_open(&none, "", 3, 4000, 8) && !none.ready);
-
-    // Clean up.
-    snprintf(path, sizeof(path), "%s/lang", dir);
-    remove(path);
-    rmdir(dir);
-    snprintf(path, sizeof(path), "%s/cache", root);
-    rmdir(path);
-    rmdir(root);
-}
-
 int main(void)
 {
     test_convert();
@@ -558,6 +450,5 @@ int main(void)
     test_utf8();
     test_nacp();
     test_names();
-    test_icons();
-    return CHECK_DONE("playstats convert, log, logged games, played games cut, NACP name, name and icon cache assertions passed");
+    return CHECK_DONE("playstats convert, log, logged games, played games cut, NACP name and name cache assertions passed");
 }

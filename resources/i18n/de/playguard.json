@@ -1470,6 +1470,8 @@
         "migration_logs_detail": "logs/ wie vor 1.0.0",
         "migration_nand": "Der Ordner jedes Systems",
         "migration_nand_detail": "Aus dem, was alle Systeme gemeinsam hatten",
+        "migration_icons": "Gemeinsame Spielsymbole",
+        "migration_icons_detail": "PlayGuards eigener Symbolordner entfernt",
         "migrations_confirm": "Ausführen",
         "migrations_done": "Migrationen erneut ausgeführt ({} Schritte). Verschobene Einträge: {}. Die Einzelheiten stehen im Sitzungsprotokoll.",
         "mode_off_body": "Entwicklermodus ausschalten? Seine Werkzeuge verschwinden vom Ende von Info › Hilfe & Diagnose und die Spielzeit-Aufzeichnung endet. Sieben Drücke auf Y bei Info › Version holen sie zurück.",

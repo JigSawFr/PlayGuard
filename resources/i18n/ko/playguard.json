@@ -1470,6 +1470,8 @@
         "migration_logs_detail": "1.0.0 이전의 logs/",
         "migration_nand": "각 시스템의 폴더",
         "migration_nand_detail": "모든 시스템이 함께 쓰던 것에서",
+        "migration_icons": "공유 게임 아이콘",
+        "migration_icons_detail": "PlayGuard 전용 아이콘 폴더 삭제",
         "migrations_confirm": "실행",
         "migrations_done": "마이그레이션을 다시 실행했습니다({}단계). 옮긴 항목: {}. 자세한 내용은 세션 로그에 있습니다.",
         "mode_off_body": "개발자 모드를 끌까요? 정보 › 도움말 및 진단 탭 맨 아래의 개발자 항목이 사라지고 플레이 타이머 기록이 멈춥니다. 정보 › 버전에서 Y를 일곱 번 누르면 다시 나타납니다.",

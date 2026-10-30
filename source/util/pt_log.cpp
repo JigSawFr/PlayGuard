@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 
 namespace pt_log

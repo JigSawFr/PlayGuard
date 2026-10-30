@@ -1470,6 +1470,8 @@
         "migration_logs_detail": "logs/ come prima della 1.0.0",
         "migration_nand": "La cartella di ogni sistema",
         "migration_nand_detail": "Da ciò che tutti i sistemi condividevano",
+        "migration_icons": "Icone dei giochi condivise",
+        "migration_icons_detail": "Cartella di icone propria di PlayGuard rimossa",
         "migrations_confirm": "Riesegui",
         "migrations_done": "Migrazioni rieseguite ({} passaggi). Elementi spostati: {}. I dettagli sono nel log di sessione.",
         "mode_off_body": "Disattivare la modalità sviluppatore? I suoi strumenti spariscono dalla fine di Informazioni › Aiuto e diagnostica e la registrazione del tempo di gioco si ferma. Sette pressioni di Y su Informazioni › Versione li riportano.",

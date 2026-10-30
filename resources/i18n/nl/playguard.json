@@ -1470,6 +1470,8 @@
         "migration_logs_detail": "logs/ van vóór 1.0.0",
         "migration_nand": "De map van elk systeem",
         "migration_nand_detail": "Uit wat alle systemen deelden",
+        "migration_icons": "Gedeelde spelpictogrammen",
+        "migration_icons_detail": "Eigen pictogrammenmap van PlayGuard verwijderd",
         "migrations_confirm": "Uitvoeren",
         "migrations_done": "Migraties opnieuw uitgevoerd ({} stappen). Verplaatste items: {}. De details staan in het sessielog.",
         "mode_off_body": "Ontwikkelaarsmodus uitschakelen? De tools verdwijnen van het einde van Info › Hulp en diagnose en het vastleggen van de speeltijdtimer stopt. Zeven keer op Y drukken bij Info › Versie brengt ze terug.",

@@ -28,6 +28,7 @@
 #include "action/upload_flow.hpp"
 #include "app.hpp"
 #include "util/config.hpp"
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/table_export.hpp"

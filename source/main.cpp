@@ -507,8 +507,8 @@ int main(int argc, char* argv[])
     aurore::Application::pushActivity(loading, aurore::TransitionAnimation::NONE);
     aurore::sync([loading]() { start(loading); });
 
-    // Game icons kept between runs, next to the play data cache.
-    playstats_set_icon_dir((paths::cache_dir() + "/icons").c_str());
+    // Game icons kept between runs, shared with the other Boréale homebrews.
+    playstats_set_cache_root(paths::sd_root().c_str());
     // Aurore joins its task thread before mainLoop() returns: a play-data
     // or icon read running there stops now, not after every game is read.
     aurore::Application::getExitEvent()->subscribe([]() { playstats_cancel(); });
