@@ -1586,7 +1586,8 @@
         "relocked": "Controle dos pais bloqueado de novo.",
         "relock_err": "Não foi possível bloquear de novo o controle dos pais",
         "relocked_after_stop": "Da última vez, o PlayGuard foi fechado com o controle dos pais desbloqueado: ele foi bloqueado de novo.",
-        "config_err": "Não foi possível salvar as preferências no cartão SD"
+        "config_err": "Não foi possível salvar as preferências no cartão SD",
+        "save_err": "Não foi possível salvar uma alteração no cartão SD; ela será salva na próxima"
     },
     "history": {
         "title": "Histórico de alterações",
@@ -1905,6 +1906,7 @@
         "started": "Módulo iniciado.",
         "stopped": "Módulo parado.",
         "error": "Não foi possível alterar o módulo",
+        "meta_err": "O módulo está instalado, mas não foi possível gravar a versão dele no cartão SD: ele poderá ser oferecido de novo",
         "start_failed": "A nova versão não iniciou ({}): a anterior foi restaurada.",
         "locked_out": "Sem acesso?",
         "state": {

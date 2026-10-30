@@ -45,6 +45,10 @@ bool ensure_id(SyncConf& c, const uint8_t random[4]);
 // still waiting is replaced by the newer one).
 using Writer = void (*)(const std::string& file, std::function<void()> write);
 void set_writer(Writer writer);
+// Told of a file the SD card refused (`why`), on the thread that wrote it:
+// the app logs it and says so; none in the tests and the agent.
+using Failed = void (*)(const std::string& file, const std::string& why);
+void set_on_failure(Failed failed);
 
 // config.json's records <-> the shared form sync_exec updates.
 SyncRecords records_from(const config::Config& c);

@@ -119,8 +119,13 @@ void go(std::shared_ptr<Run> r)
             return;
         }
         case S::Swap: {
-            const bool ok = modules::install(sd, m, r->bundle, true, &err);
+            std::string warning;
+            const bool ok = modules::install(sd, m, r->bundle, true, &err, &warning);
             if (!ok) r->out.why = err;
+            if (!warning.empty()) {
+                aurore::Logger::warning("agent update: the agent is in place, {}", warning);
+                aurore::sync([]() { ui::notify("playguard/modules/meta_err"_i18n, ui::Toast::Refused); });
+            }
             advance(r, ok);
             return;
         }

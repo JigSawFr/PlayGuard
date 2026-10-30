@@ -1586,7 +1586,8 @@
         "relocked": "Ouderlijk toezicht weer vergrendeld.",
         "relock_err": "Kan het ouderlijk toezicht niet opnieuw vergrendelen",
         "relocked_after_stop": "PlayGuard werd vorige keer gesloten terwijl het ouderlijk toezicht ontgrendeld was: het is weer vergrendeld.",
-        "config_err": "Kan de voorkeuren niet op de SD-kaart opslaan"
+        "config_err": "Kan de voorkeuren niet op de SD-kaart opslaan",
+        "save_err": "Een wijziging kon niet op de SD-kaart worden opgeslagen; bij de volgende wordt ze opgeslagen"
     },
     "history": {
         "title": "Wijzigingsgeschiedenis",
@@ -1905,6 +1906,7 @@
         "started": "Module gestart.",
         "stopped": "Module gestopt.",
         "error": "De module kon niet worden gewijzigd",
+        "meta_err": "De module is geïnstalleerd, maar de versie kon niet op de SD-kaart worden geschreven: hij kan opnieuw worden aangeboden",
         "start_failed": "De nieuwe versie startte niet ({}): de vorige is teruggezet.",
         "locked_out": "Buitengesloten?",
         "state": {

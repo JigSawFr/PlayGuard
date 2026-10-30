@@ -1586,7 +1586,8 @@
         "relocked": "Parental controls locked again.",
         "relock_err": "Could not lock parental controls again",
         "relocked_after_stop": "PlayGuard was closed last time while parental controls were unlocked: they are locked again.",
-        "config_err": "Could not save the preferences on the SD card"
+        "config_err": "Could not save the preferences on the SD card",
+        "save_err": "A change could not be saved on the SD card; it is saved again at the next one"
     },
     "history": {
         "title": "Change history",
@@ -1905,6 +1906,7 @@
         "started": "Module started.",
         "stopped": "Module stopped.",
         "error": "The module could not be changed",
+        "meta_err": "The module is installed, but its version could not be written on the SD card: it may be offered again",
         "start_failed": "The new version did not start ({}): the previous one was put back.",
         "locked_out": "Locked out?",
         "state": {
