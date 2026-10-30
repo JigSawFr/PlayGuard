@@ -3,34 +3,28 @@
 
 #include <algorithm>
 #include <cctype>
-#include <charconv>
 #include <dirent.h>
 #include <utility>
 
 #include <aurore/extern/nlohmann/json.hpp>
 
+
 #include <aurore/cadran/util/text.hpp>
 #include <aurore/cadran/util/utf8.hpp>
 
+#include "app_id.h"
 #include "util/json_util.hpp"
 #include "util/log_files.hpp"
+#include "util/number.hpp"
 #include "util/paths.hpp"
-#include "util/pt_block.hpp"
-#include "util/pt_log.hpp"
 
 namespace log_upload
 {
 
-std::vector<Part> debug_files(bool play_timer_log)
+std::vector<Part> debug_files()
 {
     std::vector<Part> out;
     std::string content;
-    if (paths::read_file(pt_block::reference_path(), content))
-        out.push_back({ "logs/play_timer/block.json", content });
-    // The recorder's file can reach megabytes: its last lines only, and
-    // only those read (one byte more than kept: tail() then cuts the same).
-    if (play_timer_log && paths::read_ends(pt_log::path(), 0, PT_LOG_BYTES + 1, content))
-        out.push_back({ "logs/play_timer/log.csv", pt_log::tail(content, PT_LOG_BYTES) });
     if (paths::read_file(paths::history_file(), content))
         out.push_back({ "history_recent.json", recent_history(content) });
     if (paths::read_file(paths::config_file(), content)) out.push_back({ "config.json", content });
@@ -151,8 +145,7 @@ std::vector<Part> atmosphere_crashes(std::time_t now, int days, size_t limit)
             if (sep == std::string::npos || sep == 0 || sep > 12 || !name.ends_with(".log") ||
                 !std::all_of(name.begin(), name.begin() + sep, [](char c) { return c >= '0' && c <= '9'; }))
                 continue;
-            long long t = 0;
-            std::from_chars(name.data(), name.data() + sep, t);   // 12 digits at most: no overflow
+            const long long t = *number::parse<long long>(std::string_view(name).substr(0, sep));   // digits, checked above
             if (t <= (long long)now && (long long)now - t <= (long long)days * 86400) found.push_back({ t, name });
         }
         closedir(d);
@@ -265,7 +258,7 @@ std::string issue_url(const std::string& repo_url, const std::string& paste_url,
 std::string gist_body(const std::vector<Part>& files, const std::string& version, const std::string& what)
 {
     nlohmann::json j;
-    j["description"] = "PlayGuard " + version + " " + what;
+    j["description"] = APP_NAME " " + version + " " + what;
     j["public"] = false;
     j["files"] = nlohmann::json::object();
     for (const Part& f : files) j["files"][f.name]["content"] = f.content;

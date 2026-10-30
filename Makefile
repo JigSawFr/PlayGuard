@@ -285,7 +285,7 @@ launcher_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/sourc
 launcher_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
-log_upload_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
+log_upload_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp source/util/pt_upload.cpp tests/log_upload/test.cpp
 # A secret sealed for this console: AES and HMAC, and the console's key
 # (the desktop build's random one: sim/sim_device_key.cpp).
 SECRET_BOX := source/util/secret_box.cpp source/util/aes.cpp source/sim/sim_device_key.cpp

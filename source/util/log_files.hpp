@@ -7,8 +7,8 @@
 //   logs/uploads/upload_20261011_142530.url    one per report sent online: an
 //                                              Internet shortcut to its gist
 //                                              (shortcut())
-//   logs/play_timer/log.csv, log.old.csv       Developer › record the play timer
-//   logs/play_timer/block.json                 Developer › play-timer block reference
+//   logs/<other folders>                       the app's own (PlayGuard's
+//                                              play_timer/), left alone here
 //
 // The reports, the crashes, the sessions and the uploads are pruned with the limits of
 // About › Help & diagnostics (config: logs_keep, logs_keep_days, logs_keep_mb), each folder on
@@ -85,20 +85,5 @@ std::string save(const std::string& dir, const char* prefix, const std::string& 
 // Removes the `prefix` files of `dir` that `limits` leave out at time `now`.
 // Returns how many were removed.
 size_t prune(const std::string& dir, const char* prefix, const Limits& limits, std::time_t now);
-
-// Moves the files of the layout before the subfolders into them, in
-// `logs_dir`: <stamp>[_n].txt to reports/report_<stamp>[_n].txt, crash.txt to
-// crashes/crash_<date of its first line>.txt, uploads.txt to one
-// uploads/upload_<date of the line>.url (shortcut()) per line
-// ("2026-10-11 14:25  <link>  (remove: <link>)"; a line without a link
-// dropped), the uploads/upload_<date>.txt of the version before (the same
-// lines) to .url files too, play_timer_log.csv,
-// play_timer_log.old.csv and play_timer_block.json to play_timer/. A file
-// whose new name is taken stays where it is. Returns how many were moved.
-//
-// A shim for the builds before 1.0.0 (October 2026), the only ones that
-// wrote this layout: it can go with data_move's (util/data_move.hpp), in the
-// first release after April 2027. Run once, as a step of util/migrations.hpp.
-size_t migrate(const std::string& logs_dir);
 
 }   // namespace log_files
