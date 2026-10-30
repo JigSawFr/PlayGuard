@@ -28,6 +28,7 @@ Then a pull request with a conventional title and a scope (`fix(play-timer): …
 | [Pull requests and releases](docs/contributing/releases.md) | Conventional titles, squash merges, stacked pull requests, release-please, the release page, development builds, reproducible zips |
 | [The user guide and the website](docs/contributing/docs.md) | Which page a change goes to, the French version, the stamps of the other translations, the links the app keeps |
 | [Translating PlayGuard](docs/contributing/translating.md) | The 15 catalogs, how to add a language, the checks |
+| [File and message formats](docs/contributing/formats.md) | The `schema` rule every file, document and IPC structure follows, and each format's version, readers and tests |
 | [Testing on a console](docs/hardware-test.md) | What no simulator can show: the forwarders, the PIN gate and the homebrew menu's lock, to go through on a console |
 | [Host tests](tests/README.md) | Each suite and what it covers, the fuzz targets, the fakes they share |
 
