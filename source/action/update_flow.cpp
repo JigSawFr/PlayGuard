@@ -4,6 +4,11 @@
 #include <iterator>
 #include <string_view>
 
+#include <ctime>
+#include <utility>
+#include <vector>
+
+#include "action/boreale_apps_logic.hpp"
 #include "action/dev_build_flow.hpp"
 #include "action/hbmenu_lock.hpp"
 #include "action/notices.hpp"
@@ -12,10 +17,12 @@
 #include "action/sys_update_flow.hpp"
 #include "activity/update_activity.hpp"
 #include "app.hpp"
+#include "sync/sync_discovery.h"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
 #include "util/launcher.hpp"
+#include "util/paths.hpp"
 
 using namespace aurore::literals;
 
@@ -107,6 +114,35 @@ void record_check(const update::Result& r)
     ui::save_config();
 }
 
+// The update check made for all the Boréale homebrews installed (their
+// registry's repositories, config/boreale/updates.conf: boreale-link's
+// bl_updates), at most once a day whoever made the last one: the bells show
+// another homebrew's update without the network. PlayGuard's own newest
+// release, from the check just made. On the update check's thread.
+void check_others(const update::Result& own)
+{
+    const std::string file = boreale_apps_logic::updates_file(paths::sd_root());
+    std::string text;
+    paths::read_file(file, text);
+    const int64_t now = (int64_t)std::time(nullptr);
+    if (!boreale_apps_logic::updates_due(text, now)) return;
+    std::vector<std::pair<std::string, std::string>> latest;
+    if (own.verdict != update::Verdict::Unknown && own.verdict != update::Verdict::NoRelease)
+        latest.emplace_back(SYNC_MODULE, own.latest.version);
+    for (const boreale_apps_logic::App& app : boreale_apps_logic::installed(paths::sd_root())) {
+        if (app.self || app.repo.empty()) continue;
+        const std::string version = update::latest_of(app.repo);
+        if (!version.empty()) latest.emplace_back(app.module, version);
+    }
+    const std::string out = boreale_apps_logic::updates_text(text, latest, now);
+    std::string why;
+    if (out.empty()) return;
+    if (!paths::ensure_dir(file.substr(0, file.rfind('/'))) || !paths::atomic_write(file, out, &why))
+        aurore::Logger::warning("update: {} not written: {}", file, why);
+    else
+        aurore::Logger::info("update: newest releases of {} homebrew(s) kept for all", latest.size());
+}
+
 // Asks the server (or joins the request under way), then tells `done`.
 void run_check(std::function<void(const Offer&)> done)
 {
@@ -117,6 +153,7 @@ void run_check(std::function<void(const Offer&)> done)
     ui::in_background("update check", [fw]() {
         Offer o;
         o.result = update::check(fw);
+        check_others(o.result);
         // The newer release's file and notes, for the update screen and an
         // update in place (shown without its notes when they cannot be read).
         if (newer(o.result)) {

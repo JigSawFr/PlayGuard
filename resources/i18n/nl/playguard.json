@@ -2034,6 +2034,7 @@
         "open_tab": "{} openen",
         "open_in": "Openen in {}",
         "open_manual": "Open {} via het homebrewmenu om dit af te handelen.",
+        "update_available": "{} {} is beschikbaar",
         "pin_missing": "Ouderlijk toezicht is niet ingesteld",
         "pin_missing_detail": "Nog geen pincode: de console is niet beschermd.",
         "alarm_off": "Alarm \"Tijd is om\": uit",

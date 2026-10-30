@@ -2034,6 +2034,7 @@
         "open_tab": "打开{}",
         "open_in": "在 {} 中打开",
         "open_manual": "从 homebrew 菜单打开 {} 进行处理。",
+        "update_available": "{} {} 可用",
         "pin_missing": "尚未设置家长控制",
         "pin_missing_detail": "还没有 PIN：主机未受保护。",
         "alarm_off": "“时间到”提醒：已关闭",

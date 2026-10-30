@@ -2034,6 +2034,7 @@
         "open_tab": "Abrir {}",
         "open_in": "Abrir em {}",
         "open_manual": "Abra {} pelo menu de homebrew para resolver isso.",
+        "update_available": "{} {} está disponível",
         "pin_missing": "O controle parental não está configurado",
         "pin_missing_detail": "Ainda sem PIN: o console não está protegido.",
         "alarm_off": "Alarme \"Tempo esgotado\": desativado",

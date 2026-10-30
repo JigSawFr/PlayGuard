@@ -2034,6 +2034,7 @@
         "open_tab": "{}を開く",
         "open_in": "{}で開く",
         "open_manual": "homebrewメニューから{}を開いて対応してください。",
+        "update_available": "{} {} が利用可能です",
         "pin_missing": "みまもり設定がされていません",
         "pin_missing_detail": "暗証番号がまだありません。本体は保護されていません。",
         "alarm_off": "「時間です」アラーム：オフ",

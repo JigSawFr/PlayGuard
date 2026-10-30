@@ -2034,6 +2034,7 @@
         "open_tab": "Open {}",
         "open_in": "Open in {}",
         "open_manual": "Open {} from the homebrew menu to deal with it.",
+        "update_available": "{} {} is available",
         "pin_missing": "Parental controls are not set up",
         "pin_missing_detail": "No PIN yet: the console is not protected.",
         "alarm_off": "\"Time's up\" alarm: off",
