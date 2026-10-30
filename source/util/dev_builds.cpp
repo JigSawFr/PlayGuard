@@ -568,13 +568,10 @@ bool is_nro(const std::string& head)
 
 const char* const NO_DIGEST = "GitHub gives no SHA-256 for this file: not installed";
 
-bool verify_file(const std::string& path, uint64_t size, const std::string& sha256, std::string* error)
+Done verify_file(const std::string& path, uint64_t size, const std::string& sha256)
 {
     FILE* f = std::fopen(path.c_str(), "rb");
-    if (!f) {
-        if (error) *error = "cannot read the download";
-        return false;
-    }
+    if (!f) return std::unexpected("cannot read the download");
     Sha256 hash;
     uint64_t got = 0;
     char buf[16 * 1024];
@@ -585,41 +582,28 @@ bool verify_file(const std::string& path, uint64_t size, const std::string& sha2
     }
     const bool read_error = std::ferror(f) != 0;
     std::fclose(f);
-    if (read_error) {
-        if (error) *error = "cannot read the download";
-        return false;
-    }
-    if (got != size) {
-        if (error) *error = "size " + std::to_string(got) + " instead of " + std::to_string(size);
-        return false;
-    }
-    if (sha256.empty()) {
-        if (error) *error = NO_DIGEST;
-        return false;
-    }
-    if (hash.hex() != sha256) {
-        if (error) *error = "SHA-256 does not match";
-        return false;
-    }
-    return true;
+    if (read_error) return std::unexpected("cannot read the download");
+    if (got != size) return std::unexpected("size " + std::to_string(got) + " instead of " + std::to_string(size));
+    if (sha256.empty()) return std::unexpected(NO_DIGEST);
+    if (hash.hex() != sha256) return std::unexpected("SHA-256 does not match");
+    return {};
 }
 
-bool verify_nro(const std::string& path, std::string* error)
+Done verify_nro(const std::string& path)
 {
     FILE* f = std::fopen(path.c_str(), "rb");
     char head[0x20] = {};
     const size_t n = f ? std::fread(head, 1, sizeof(head), f) : 0;
     if (f) std::fclose(f);
-    if (!is_nro(std::string(head, n))) {
-        if (error) *error = "not an NRO file";
-        return false;
-    }
-    return true;
+    if (!is_nro(std::string(head, n))) return std::unexpected("not an NRO file");
+    return {};
 }
 
-bool replace(const std::string& target, const std::string& fresh, std::string* error, const std::string& keep_as)
+Done replace(const std::string& target, const std::string& fresh, const std::string& keep_as)
 {
-    return paths::replace_file(target, fresh, keep_as, error);
+    std::string error;
+    if (!paths::replace_file(target, fresh, keep_as, &error)) return std::unexpected(error);
+    return {};
 }
 
 }   // namespace dev_builds

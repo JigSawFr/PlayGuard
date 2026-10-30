@@ -70,9 +70,10 @@ bool api_get(const std::string& path, const char* name, const std::string& token
 }
 }   // namespace
 
-bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error, Progress progress)
+std::expected<std::vector<Build>, std::string> fetch(bool* needs_login, Progress progress)
 {
-    out->clear();
+    std::vector<Build> builds_found;
+    std::vector<Build>* const out = &builds_found;
     const std::string token = github_auth::token();
     *needs_login = token.empty();
     std::string body, err;
@@ -128,19 +129,15 @@ bool fetch(std::vector<Build>* out, bool* needs_login, std::string* error, Progr
         for (Build& b : builds) out->push_back(std::move(b));
     }
     step(1.0f, Step::Runs);
-    if (!out->empty()) return true;
-    if (error) *error = reached ? std::string("no build found") : err;
-    return false;
+    if (!out->empty()) return builds_found;
+    return std::unexpected(reached ? std::string("no build found") : err);
 }
 
-bool find(const Query& q, Build* out, std::string* error)
+std::expected<Build, std::string> find(const Query& q)
 {
     const std::string token = github_auth::token();
     std::string body, err;
-    auto fail = [error](const std::string& why) {
-        if (error) *error = why;
-        return false;
-    };
+    auto fail = [](const std::string& why) { return std::unexpected(why); };
     if (token.empty()) return fail("sign in to GitHub first");
     Pull pull;
     std::string sha;
@@ -182,36 +179,29 @@ bool find(const Query& q, Build* out, std::string* error)
             b.notes = pull.body;
             b.page = pull.page;
         }
-        *out = b;
-        return true;
+        return b;
     }
     return fail("no build of " + (q.pr ? "#" + std::to_string(q.pr) : sha.substr(0, 7)) + " left (artifacts expire after 90 days)");
 }
 
-bool fetch_release(Build* out, std::string* error)
+std::expected<Build, std::string> fetch_release()
 {
     std::string body, err;
-    if (!api_get("/releases/latest", "latest.json", github_auth::token(), &body, &err, 512 * 1024)) {
-        if (error) *error = err;
-        return false;
-    }
-    if (parse_release(body, out)) return true;
-    if (error) *error = "no playguard.nro in the latest release";
-    return false;
+    if (!api_get("/releases/latest", "latest.json", github_auth::token(), &body, &err, 512 * 1024)) return std::unexpected(err);
+    Build b;
+    if (!parse_release(body, &b)) return std::unexpected("no playguard.nro in the latest release");
+    return b;
 }
 
-bool download(const Build& b, const std::string& path, std::string* error,
-              std::function<void(uint64_t done, uint64_t total)> progress, const std::atomic<bool>* cancel)
+Done download(const Build& b, const std::string& path, std::function<void(uint64_t done, uint64_t total)> progress,
+              const std::atomic<bool>* cancel)
 {
-    if (b.size > MAX_DOWNLOAD) {
-        if (error) *error = "too large for PlayGuard";
-        return false;
-    }
+    if (b.size > MAX_DOWNLOAD) return std::unexpected("too large for PlayGuard");
     // Refused before anything is fetched (verify_file would, after).
-    if (b.sha256.empty()) {
-        if (error) *error = NO_DIGEST;
-        return false;
-    }
+    if (b.sha256.empty()) return std::unexpected(NO_DIGEST);
+    // Why it stopped, written by the steps below.
+    std::string why;
+    std::string* const error = &why;
     // An artifact arrives as a zip next to the target, playguard.nro is taken out of it.
     const std::string file = b.artifact ? path + ".zip" : path;
     // Received into <file>.part; a download cut short leaves it, with what it
@@ -308,10 +298,13 @@ bool download(const Build& b, const std::string& path, std::string* error,
             std::remove(part.c_str());
             std::remove(meta.c_str());
         }
-        return false;
+        return std::unexpected(why);
     }
     // Complete: checked whole, the part kept no more (a bad one would only fail again).
-    ok = verify_file(part, b.size, b.sha256, error);
+    if (const auto checked = verify_file(part, b.size, b.sha256); !checked) {
+        why = checked.error();
+        ok = false;
+    }
     std::remove(meta.c_str());
     if (ok) std::remove(file.c_str());   // left by an attempt cut short: FAT rename does not replace it
     if (ok && std::rename(part.c_str(), file.c_str()) != 0) {
@@ -320,10 +313,18 @@ bool download(const Build& b, const std::string& path, std::string* error,
     }
     std::remove(part.c_str());
     if (ok && b.artifact) ok = zip_read::extract(file, "playguard.nro", path, MAX_DOWNLOAD, error);
-    if (ok) ok = verify_nro(path, error);
+    if (ok) {
+        if (const auto nro = verify_nro(path); !nro) {
+            why = nro.error();
+            ok = false;
+        }
+    }
     if (b.artifact) std::remove(file.c_str());
-    if (!ok) std::remove(path.c_str());
-    return ok;
+    if (!ok) {
+        std::remove(path.c_str());
+        return std::unexpected(why);
+    }
+    return {};
 }
 
 }   // namespace dev_builds
