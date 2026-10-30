@@ -256,49 +256,59 @@ bool perform(const std::string& url, const Extra& x, std::string* body, std::str
 }
 }   // namespace
 
-bool get(const std::string& url, std::string* body, std::string* error, size_t max_bytes, long timeout_s,
-         const Headers& headers, long* status)
+namespace
+{
+Result<Reply> reply_of(const std::string& url, const Extra& x, size_t max_bytes, long timeout_s)
+{
+    Reply       r;
+    std::string error;
+    if (!perform(url, x, &r.body, &error, max_bytes, timeout_s, &r.status))
+        return std::unexpected(Failure{ std::move(error), r.status });
+    return r;
+}
+}   // namespace
+
+Result<Reply> get(const std::string& url, size_t max_bytes, long timeout_s, const Headers& headers)
 {
     Extra x;
     x.headers = &headers;
-    return perform(url, x, body, error, max_bytes, timeout_s, status);
+    return reply_of(url, x, max_bytes, timeout_s);
 }
 
-bool post(const std::string& url, const std::string& data, const char* content_type, std::string* body,
-          std::string* error, long* status, size_t max_bytes, long timeout_s, const Headers& headers)
+Result<Reply> post(const std::string& url, const std::string& data, const char* content_type, size_t max_bytes,
+                   long timeout_s, const Headers& headers)
 {
     Extra x;
     x.post = &data;
     x.content_type = content_type;
     x.headers = &headers;
-    return perform(url, x, body, error, max_bytes, timeout_s, status);
+    return reply_of(url, x, max_bytes, timeout_s);
 }
 
-bool redirect(const std::string& url, std::string* target, std::string* error, const Headers& headers, long* status)
+Result<std::string> redirect(const std::string& url, const Headers& headers)
 {
-    Extra x;
+    std::string target;
+    Extra       x;
     x.headers = &headers;
     x.follow = false;
-    x.location = target;
-    std::string body;
-    long answered = 0;
-    const bool ok = perform(url, x, &body, error, 64 * 1024, 30, &answered);
-    if (status) *status = answered;
-    if (!ok) return false;
-    return http_logic::redirect_ok(answered, *target, error);
+    x.location = &target;
+    std::string body, error;
+    long        answered = 0;
+    if (!perform(url, x, &body, &error, 64 * 1024, 30, &answered) || !http_logic::redirect_ok(answered, target, &error))
+        return std::unexpected(Failure{ std::move(error), answered });
+    return target;
 }
 
-bool download(const std::string& url, const std::string& path, std::string* error, size_t max_bytes,
-              long timeout_s, std::function<void(uint64_t, uint64_t)> progress, uint64_t resume_from,
-              const std::atomic<bool>* cancel)
+Result<void> download(const std::string& url, const std::string& path, size_t max_bytes, long timeout_s,
+                      std::function<void(uint64_t, uint64_t)> progress, uint64_t resume_from,
+                      const std::atomic<bool>* cancel)
 {
     // Owner-writable only (fopen would ask for 0666): an executable lands here.
     const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | (resume_from ? O_APPEND : O_TRUNC), 0644);
     FILE* file = fd >= 0 ? ::fdopen(fd, resume_from ? "ab" : "wb") : nullptr;
     if (!file) {
         if (fd >= 0) ::close(fd);
-        if (error) *error = "cannot create " + path;
-        return false;
+        return std::unexpected(Failure{ "cannot create " + path });
     }
     std::string unused;
     Sink sink{ &unused, max_bytes };
@@ -308,16 +318,18 @@ bool download(const std::string& url, const std::string& path, std::string* erro
     sink.cancel = cancel;
     Extra x;
     x.to_file = &sink;
-    bool ok = perform(url, x, &unused, error, max_bytes, timeout_s, nullptr);
+    Failure failed;
+    bool    ok = perform(url, x, &unused, &failed.error, max_bytes, timeout_s, &failed.status);
     if (cancel && cancel->load()) {
-        if (error) *error = "cancelled";
+        failed.error = "cancelled";
         ok = false;
     }
     if (std::fclose(file) != 0 && ok) {
-        if (error) *error = "cannot write the file";
+        failed.error = "cannot write the file";
         ok = false;
     }
-    return ok;
+    if (!ok) return std::unexpected(std::move(failed));
+    return {};
 }
 
 void abort_all()

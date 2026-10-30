@@ -29,7 +29,13 @@ bool get(const std::string& url, const std::string& name, const http::Headers& h
     return sim_net::get(sim_net::value("PLAYGUARD_SIM_SYS_NOTES"), name, body, error);
 #else
     (void)name;
-    return http::get(url, body, error, max, 20, headers);
+    auto got = http::get(url, max, 20, headers);
+    if (!got) {
+        if (error) *error = got.error().error;
+        return false;
+    }
+    *body = std::move(got->body);
+    return true;
 #endif
 }
 }   // namespace
