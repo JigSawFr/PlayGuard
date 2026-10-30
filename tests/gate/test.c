@@ -3,7 +3,7 @@
 // (a span in the day, one past midnight, no day or an empty span never
 // free), the rules file (round trip, the right forwarder found, broken lines
 // skipped) and the log (round trip, Windows line ends, unknown results
-// refused).
+// read as "other").
 #include "check.h"
 #include <stdio.h>
 #include <string.h>
@@ -113,7 +113,9 @@ static void test_log(void)
         CHECK(gate_log_parse(line, strlen(line) - 1, &when, &wn, &r, &nro, &nn) && r == (GateResult)i);
     }
     CHECK(gate_log_parse("t\tpin\tsdmc:/a.nro\r", 18, &when, &wn, &r, &nro, &nn) && nn == 11);
-    CHECK(!gate_log_parse("t\tmaybe\tsdmc:/a.nro", 19, &when, &wn, &r, &nro, &nn));
+    // A result a newer gate wrote: kept as "other", not dropped.
+    CHECK(gate_log_parse("t\tmaybe\tsdmc:/a.nro", 19, &when, &wn, &r, &nro, &nn) && r == GateResult_Other && nn == 11);
+    CHECK(!gate_log_parse("t\t\tsdmc:/a.nro", 14, &when, &wn, &r, &nro, &nn));
     CHECK(!gate_log_parse("t\tpin\t", 6, &when, &wn, &r, &nro, &nn));
     CHECK(!gate_log_parse("\tpin\tx", 6, &when, &wn, &r, &nro, &nn));
     CHECK(!gate_log_parse("no tabs", 7, &when, &wn, &r, &nro, &nn));

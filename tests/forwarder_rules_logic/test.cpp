@@ -64,10 +64,11 @@ static void test_fold_log()
                              "2026-10-21 08:00\trefused\tsdmc:/hbmenu.nro\n"
                              "2026-10-21 08:01\tfree\tsdmc:/switch/files.nro\n"
                              "?\terror\tsdmc:/switch/other/ftpd.nro\n"
-                             "?\terror\tsdmc:/switch/other/ftpd.nro";   // no time: never joined
+                             "?\terror\tsdmc:/switch/other/ftpd.nro\n"   // no time: never joined
+                             "2026-10-21 09:00\tlater\tsdmc:/switch/files.nro";   // a newer gate's result
     gate_tally::Tally tally;
     const Log log = fold_log(text, list, tally);
-    if (!CHECK(log.seen.size() == 6)) return;
+    if (!CHECK(log.seen.size() == 7)) return;
     CHECK(std::string(log.seen[0].kind) == "gate_refused" && log.seen[0].when == "2026-10-20 21:03" && log.seen[0].detail == "Menu");
     CHECK((log.seen[0].times == std::vector<std::string>{ "21:03", "21:04" }));   // the same day: one entry
     CHECK(std::string(log.seen[1].kind) == "gate_open" && log.seen[1].times.size() == 1);
@@ -76,6 +77,8 @@ static void test_fold_log()
     // An .nro PlayGuard did not make: its file name; an error says so.
     CHECK(std::string(log.seen[4].kind) == "gate_refused" && log.seen[4].detail == "ftpd (error)" && log.seen[4].when.empty());
     CHECK(log.seen[5].detail == "ftpd (error)" && log.seen[5].times == std::vector<std::string>{ "" });
+    // A result this version does not know: kept, as an "other change".
+    CHECK(std::string(log.seen[6].kind) == "gate_other" && log.seen[6].detail == "Files");
 
     if (!CHECK(log.refused.size() == 3)) return;
     CHECK(log.refused[0].first == "Menu" && log.refused[0].second == "2026-10-20 21:03");

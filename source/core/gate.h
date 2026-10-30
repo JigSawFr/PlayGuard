@@ -107,16 +107,18 @@ typedef enum {
     GateResult_Paused = 4,  // paused after refusals: the PIN not asked, not started
     GateResult_Closed = 5,  // in its hours without any access: not started
     GateResult_Limit = 6,   // the day's play time used up (GateRules.limit): not started
+    GateResult_Other = 7,   // a result a newer gate wrote: read back only, never written
 } GateResult;
 
 // A line of the log: "<YYYY-MM-DD HH:MM>\t<gate_result_name>\t<nro>\n".
 size_t gate_log_format(const char *when, GateResult r, const char *nro, char *buf, size_t size);
 // One line back (without its "\n"); false for anything else. `when` and
-// `nro` point into `line`, with their lengths.
+// `nro` point into `line`, with their lengths. A result this version does not
+// know is GateResult_Other.
 bool gate_log_parse(const char *line, size_t len, const char **when, size_t *when_len, GateResult *r,
                     const char **nro, size_t *nro_len);
 
-const char *gate_result_name(GateResult r);   // "pin", "free", "refused", "error", "paused", "closed", "limit"
+const char *gate_result_name(GateResult r);   // "pin", "free", "refused", "error", "paused", "closed", "limit", "other"
 
 // The opening screen once it starts (the PIN entered, or its free hours),
 // as PlayGuard's own intro: its bar fills over that long, Ⓐ or Ⓑ skip the
