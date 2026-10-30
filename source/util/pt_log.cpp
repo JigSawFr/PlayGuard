@@ -2,9 +2,9 @@
 #include "util/pt_log.hpp"
 
 #include <cerrno>
-#include <cinttypes>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -17,9 +17,7 @@ namespace
 {
 std::string failed(Result rc)
 {
-    char buf[16];
-    std::snprintf(buf, sizeof(buf), "!0x%08" PRIX32, (uint32_t)rc);
-    return buf;
+    return std::format("!0x{:08X}", (uint32_t)rc);
 }
 
 std::string flag(Result rc, bool v) { return R_FAILED(rc) ? failed(rc) : v ? "1" : "0"; }
@@ -34,16 +32,12 @@ std::string seconds(int64_t ns)
 
 std::string seconds(uint64_t ns)
 {
-    char buf[32];
     const uint64_t s = ns / 1000000000ULL, ms = (ns % 1000000000ULL) / 1000000ULL;
-    if (ns % 1000000000ULL == 0) std::snprintf(buf, sizeof(buf), "%" PRIu64, s);
-    else {
-        std::snprintf(buf, sizeof(buf), "%" PRIu64 ".%03" PRIu64, s, ms);
-        // "1428.500" -> "1428.5"
-        size_t n = std::strlen(buf);
-        while (buf[n - 1] == '0') buf[--n] = '\0';
-    }
-    return buf;
+    if (ns % 1000000000ULL == 0) return std::to_string(s);
+    // "1428.500" -> "1428.5"
+    std::string out = std::format("{}.{:03}", s, ms);
+    while (out.back() == '0') out.pop_back();
+    return out;
 }
 
 std::string time_cell(Result rc, uint64_t ns) { return R_FAILED(rc) ? failed(rc) : seconds(ns); }
@@ -142,10 +136,7 @@ std::string row(const std::string& local, uint64_t posix, const PtSample& s, Pre
     std::string bedtime;
     if (R_FAILED(s.bedtime_rc)) bedtime = failed(s.bedtime_rc);
     else {
-        char buf[16];
-        std::snprintf(buf, sizeof(buf), "%s %02u:%02u", s.bedtime_on ? "on" : "off", (unsigned)s.bedtime_hour,
-                      (unsigned)s.bedtime_minute);
-        bedtime = buf;
+        bedtime = std::format("{} {:02}:{:02}", s.bedtime_on ? "on" : "off", (unsigned)s.bedtime_hour, (unsigned)s.bedtime_minute);
     }
     const std::string block = R_FAILED(s.block_rc) ? failed(s.block_rc) : hex(s.block, sizeof(s.block));
 
@@ -165,9 +156,7 @@ std::string clock_moved(Clock* last, uint64_t posix, uint64_t steady_s)
     if (last->known) {
         const int64_t gap = ((int64_t)posix - (int64_t)last->posix) - ((int64_t)steady_s - (int64_t)last->steady_s);
         if (gap >= CLOCK_SLACK_S || gap <= -CLOCK_SLACK_S) {
-            char buf[48];
-            std::snprintf(buf, sizeof(buf), "clock %+" PRId64 " s vs elapsed", gap);
-            out = buf;
+            out = std::format("clock {:+} s vs elapsed", gap);
         }
     }
     *last = { true, posix, steady_s };

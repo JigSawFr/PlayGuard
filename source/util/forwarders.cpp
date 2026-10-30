@@ -2,7 +2,7 @@
 #include "util/forwarders.hpp"
 
 #include <aurore/extern/nlohmann/json.hpp>
-#include <cstdio>
+#include <format>
 
 #include <aurore/cadran/util/utf8.hpp>
 
@@ -248,9 +248,7 @@ std::string clean_text(const std::string& text, size_t max)
 
 std::string hex_id(uint64_t id)
 {
-    char buf[17];
-    std::snprintf(buf, sizeof(buf), "%016llx", (unsigned long long)id);
-    return buf;
+    return std::format("{:016x}", id);
 }
 
 bool parse_id(const std::string& hex, uint64_t* id)

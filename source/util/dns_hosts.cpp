@@ -2,8 +2,8 @@
 #include "util/dns_hosts.hpp"
 
 #include <cctype>
-#include <cstdio>
 #include <cstdlib>
+#include <format>
 #include <sstream>
 
 namespace dns_hosts
@@ -124,9 +124,7 @@ std::vector<std::string> candidates(const std::string& nand, int emummc_id)
     std::vector<std::string> files;
     if (nand == "emummc") {
         if (emummc_id >= 0) {
-            char name[64];
-            std::snprintf(name, sizeof(name), "atmosphere/hosts/emummc_%04x.txt", (unsigned)emummc_id);
-            files.push_back(name);
+            files.push_back(std::format("atmosphere/hosts/emummc_{:04x}.txt", (unsigned)emummc_id));
         }
         files.push_back("atmosphere/hosts/emummc.txt");
     } else if (nand == "sysmmc") {

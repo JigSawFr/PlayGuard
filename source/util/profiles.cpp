@@ -3,6 +3,7 @@
 
 #include <aurore/extern/nlohmann/json.hpp>
 #include <cstdio>
+#include <format>
 
 #include <aurore/cadran/util/text.hpp>
 #include <aurore/cadran/util/utf8.hpp>
@@ -100,9 +101,7 @@ std::string file_stem(const std::string& name)
     if (!alnum && !clean.empty()) {
         uint32_t h = 2166136261u;   // FNV-1a
         for (unsigned char c : clean) h = (h ^ c) * 16777619u;
-        char hex[9];
-        std::snprintf(hex, sizeof(hex), "%08x", (unsigned)h);
-        out = std::string("profile-") + hex;
+        out = std::format("profile-{:08x}", h);
     }
     return out;
 }

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <charconv>
-#include <cstdio>
+#include <format>
 
 #include <aurore/cadran/util/text.hpp>
 
@@ -171,11 +171,7 @@ bool writes_sd(const std::string& nro)
 
 std::string hours_text(int days, int from, int to, const std::vector<std::string>& day_names)
 {
-    const auto hm = [](int m) {
-        char b[16];
-        std::snprintf(b, sizeof(b), "%02d:%02d", m / 60, m % 60);
-        return std::string(b);
-    };
+    const auto hm = [](int m) { return std::format("{:02}:{:02}", m / 60, m % 60); };
     std::string d;
     if (day_names.size() == 7) {
         if ((days & 0x7F) == 0x7F) d = day_names[1] + "–" + day_names[0];   // Monday to Sunday
