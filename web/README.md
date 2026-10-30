@@ -224,7 +224,14 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   own files, no inline script or style; `'wasm-unsafe-eval'` compiles
   PlayGuard and `blob:` workers are Emscripten's threads. The theme is set
   before the first paint by `theme.js`, a file rather than an inline script
-  for that reason. The page loads nothing from elsewhere.
+  for that reason. The page loads nothing from elsewhere (but the
+  published page's audience, below).
+- **The audience**: the published page (on the site, not a pull request's
+  preview) gets Umami's tracker, the website's own copy
+  (`../assets/umami.js`, `tools/simulator_audience.py` in CI's `web`
+  workflow), which counts each visit on the site's address alone, without
+  cookie; its policy then lets the page send to `gateway.umami.is`. The
+  sites menu links to the privacy and legal notice (boreale.dev's).
 - CI writes `build.json` (the repository, commit, branch, pull request and
   its title) for the page's header, and the page asks for PlayGuard's files
   with the commit in their URL: GitHub Pages lets browsers keep them 10

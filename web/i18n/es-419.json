@@ -87,7 +87,8 @@
   "tour_activity": "Actividad: quién jugó a qué y cuánto tiempo, según el registro de la consola.",
   "tour_console": "Consola: el reloj de red, los juegos instalados y lo que ejecuta la consola.",
   "tour_time": "Pasa el tiempo: una hora de juego después, el tiempo de hoy se ha agotado.",
-  "tour_end": "Te toca: las flechas mueven, Intro es A, Esc es B. El panel ajusta cualquier estado."
+  "tour_end": "Te toca: las flechas mueven, Intro es A, Esc es B. El panel ajusta cualquier estado.",
+  "sites_legal": "Privacidad y aviso legal"
  },
  "groups": {
   "app": "PlayGuard",

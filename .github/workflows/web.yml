@@ -360,6 +360,8 @@ jobs:
           python3 tools/check_site_links.py out "$SITE_URL"
           cp -r build-web/simulator out/simulator
           cp -r build-web/shots out/simulator/shots
+          # Its visits counted as the site's (not a preview's): Umami's tracker.
+          python3 tools/simulator_audience.py out/simulator
           python3 - <<'EOF'
           import json, os
           build = {k.lower(): os.environ[k] for k in ("REPO", "SHA", "REF", "TITLE")}

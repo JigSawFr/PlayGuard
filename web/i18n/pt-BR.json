@@ -87,7 +87,8 @@
   "tour_activity": "Atividade: quem jogou o quê, e por quanto tempo, segundo o registro do console.",
   "tour_console": "Console: o relógio de rede, os jogos instalados e o que o console executa.",
   "tour_time": "O tempo passa: uma hora de jogo depois, o tempo de hoje acabou.",
-  "tour_end": "Sua vez: as setas movem, Enter é A, Esc é B. O painel define qualquer estado."
+  "tour_end": "Sua vez: as setas movem, Enter é A, Esc é B. O painel define qualquer estado.",
+  "sites_legal": "Privacidade e aviso legal"
  },
  "groups": {
   "app": "PlayGuard",
