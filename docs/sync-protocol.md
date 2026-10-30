@@ -412,6 +412,13 @@ taken a second time; a press that comes live meanwhile is. Orders received
 while PlayGuard is open are applied by PlayGuard, with its policy (*ask* shows
 the usual confirmation on the console).
 
+Orders carry no `schema` of their own: they follow the `schema` of the
+`state` the console publishes. That is how the console says which orders it
+accepts: a publisher sends the entities and payloads of that schema (the
+table below for schema 1) and nothing newer, and a console of an older
+schema refuses an entity it does not know (`command_rejected`, reason
+`unknown_entity`) and clears the order.
+
 | Entity | Payload | Bounds | Needs `remote_timer_writes` | Effect |
 |---|---|---|---|---|
 | `limit_sun` … `limit_sat` | integer | 0–1440, 1440 = no limit | yes | That weekday's limit. Several within 1.5 s are merged into one write. |
@@ -565,7 +572,8 @@ Assistant), and clears (empty retained publish) when the entry is removed:
 
 The console keeps it as it came (at most 512 bytes; a larger one is
 ignored) in `nand/<system>/sync/integration.json`, written by whichever of
-PlayGuard and the agent holds the link. PlayGuard shows the version in
+PlayGuard and the agent holds the link. One of a newer `schema` is kept but
+not read (no version known). PlayGuard shows the version in
 *Remote access › Home Assistant* and in the report, and checks the
 integration's latest release with its other updates (*Check for updates
 every day*, *Check for updates*), only once the integration is known: a
@@ -582,13 +590,13 @@ release's `CHANGELOG.md`) and the QR code that opens it in HACS.
 | `config/playguard/nand/<system>/sync/nro_state.txt` | PlayGuard, after every settings save (`config.json`, this system's `state.json`) once `sync.conf` exists, when read-only mode changes and when the serial number it publishes does | The extra-time record, the console lock and its saved limits, `relock_pending`, `extra_auto_restore`, the firmware choice (`fw_gate_*`), `pin_lock`, `read_only` and `firmware` (the one PlayGuard last ran on): what the agent must know to act on PlayGuard's behalf; and `serial`, the serial number PlayGuard read, only with `publish_serial`. The agent changes nothing when `read_only=1`, when the key is missing, or when the console's firmware is no longer `firmware` (a system update PlayGuard has not seen). A line break in a value is written as a space. |
 | `config/playguard/nand/<system>/sync/names.txt` | PlayGuard, after a read of the play log | `0100000000010000=Super Mario Odyssey`: the agent's "now playing". |
 | `config/playguard/nand/<system>/titles.txt` | PlayGuard, after each read of the play log and when it makes a forwarder | The titles that are not games (*Games and homebrews*), each with its name: `050537E2542E2000=homebrew:sphaira` (`homebrew`, `playguard` for PlayGuard's own forwarder, `system`, `game` for one the ID would misplace). Never deleted: a forwarder deleted since keeps its name. |
-| `config/playguard/nand/<system>/sync/titles.txt` | PlayGuard, with the record | The same without the names (`050537E2542E2000=homebrew`): what the agent reads before it publishes play time, `now_playing`, an event or an icon. |
+| `config/playguard/nand/<system>/sync/titles.txt` | PlayGuard, with the record | The same without the names (`050537E2542E2000=homebrew`): what the agent reads before it publishes play time, `now_playing`, an event or an icon. A kind it does not know (a newer PlayGuard's) is read as `homebrew`: never published by its ID. |
 | `config/playguard/nand/<system>/sync/icons.txt` | PlayGuard, after it published or cleared game icons | `target=<8 hex>` (a hash of the broker's host, port and `<prefix>/<id>`), then `0100000000010000=40123`: each icon on the broker and its size in bytes (0: the game has none to publish). Read when PlayGuard starts. |
 | `config/playguard/nand/<system>/sync/agent_icons.txt` | the agent, after it published the icon of the game played | The same form, for what the agent sent itself. PlayGuard takes it (renamed, read, removed) after each read of the play log and adds its games to `icons.txt`; the agent reads both before publishing an icon. |
 | `config/playguard/cache/icons/<APP_ID>.jpg` | PlayGuard, each icon it reads (its screens, its names, the icons it publishes) | Its icon cache, shared by every system on the SD card (16 MiB, 512 icons at most, emptied when the console language changes or it is full); the agent reads it, never writes it. |
 | `config/playguard/nand/<system>/sync/agent_state.txt` | the agent | The same records, for what the agent changed itself. At start the agent takes the newer of this file and `nro_state.txt`; PlayGuard adopts the agent's records (`GetRecords`) when it opens. |
 | `config/playguard/nand/<system>/sync/integration.json` | the link that got it (PlayGuard's or the agent's) | The HA integration's document (`integration`, above), as it came; removed when the integration clears it. PlayGuard reads it at start, and every 30 s while the agent holds the link. |
-| `config/playguard/nand/<system>/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. |
+| `config/playguard/nand/<system>/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. A line with more fields than PlayGuard knows is read for the ones it knows; one it cannot read is kept in `agent_events.log.rejected` (for a later version), and the file is not removed until it is. |
 | `config/playguard/nand/<system>/sync/agent_watchdog.log` | the agent | One line each time its loop has not turned for a minute, and when it turns again: the local date and time, how long, and where it stopped (and whether its socket was shut down to free it). Started again past 16 KiB. PlayGuard's report shows the last 6 lines. |
 | `config/playguard/logs/reports/report_<date>_<time>.txt` | the agent | A report asked for by `export_report` while PlayGuard is closed (clocks and parental controls, as PlayGuard's report has them). Named as PlayGuard's reports, so *About › Help & diagnostics* lists, sends and prunes it with them. |
 | `atmosphere/contents/<tid>/{exefs.nsp, flags/boot2.flag, toolbox.json, version.txt}` | *Console › Optional modules*, or the user | The installed module (`4200000000505247` recovery, `4200000000504741` agent). |
@@ -614,7 +622,10 @@ stays off the broker; it needs `publish_hardware` too) (see *What is
 published* below), `ha_discovery`, `poll_s` (30, 10–300),
 `topic_prefix` (`playguard`), `discovery_prefix` (`homeassistant`),
 `log_level`. A value out of range keeps its default; unknown keys are kept
-when PlayGuard writes the file again. Anonymous brokers need
+when PlayGuard writes the file again. A file with a higher `schema` (a newer
+version's) is read for the keys this one knows and never written again, by
+PlayGuard or the agent; nor is one with more unknown lines than fit (1 KB of
+them). Anonymous brokers need
 `allow_anonymous=1`; without a user name the link otherwise stays off.
 
 ### What is published
@@ -692,10 +703,19 @@ Everything but `Hello`, `GetStatus` and `GetLog` needs the session. The
 command dispatch is host-tested (`tests/agent/`); the HIPC framing runs only
 on a console.
 
+`AgentHello` and `AgentHelloReply` never change: a `Hello` of any size gets
+its reply, so any PlayGuard learns the agent's protocol. The size of every
+structure exchanged (and of `SyncIntent`, `SyncStatus` and `SyncRecords`,
+which they embed) is checked at build time against the values next to
+`AGENT_PROTOCOL`: a change to one fails the build until those values are
+updated and `AGENT_PROTOCOL` goes up.
+
 ## Schema and compatibility
 
 - `schema` is on every JSON document and in `sync.conf`. Adding a field does
   not bump it; removing or renaming one, or changing an order's payload, does.
+- Orders (`<entity>/set`) follow `state`'s `schema`: the console announces
+  there what it accepts (see *Orders* above).
 - The HA integration pins the schema it understands and raises a repair issue
   on a newer one.
 - The entity table (`source/sync/sync_entities.h`) is exported by a host test

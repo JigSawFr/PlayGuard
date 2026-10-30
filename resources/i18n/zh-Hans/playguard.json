@@ -1586,7 +1586,8 @@
         "relocked": "家长控制已重新启用。",
         "relock_err": "无法重新启用家长控制",
         "relocked_after_stop": "上次PlayGuard在家长控制解除期间被关闭：家长控制已重新启用。",
-        "config_err": "无法将偏好设置保存到SD卡"
+        "config_err": "无法将偏好设置保存到SD卡",
+        "save_err": "无法将更改保存到SD卡；将在下次更改时保存"
     },
     "history": {
         "title": "更改历史",
@@ -1905,6 +1906,7 @@
         "started": "模块已启动。",
         "stopped": "模块已停止。",
         "error": "无法更改模块",
+        "meta_err": "模块已安装，但无法将其版本写入SD卡：可能会再次提示安装",
         "start_failed": "新版本未能启动（{}）：已恢复之前的版本。",
         "locked_out": "被锁在外面？",
         "state": {

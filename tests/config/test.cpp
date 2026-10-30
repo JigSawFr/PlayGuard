@@ -552,6 +552,57 @@ static void test_systems()
     paths::set_nand("unknown");
 }
 
+// The rule of every format (docs/contributing/formats.md): a missing
+// "schema" is 1, a newer one is read as missing and never written over, a
+// key this version does not know survives a save.
+static void test_schema()
+{
+    paths::set_nand("sysmmc");
+    // No schema, and keys a later version added: read, kept on save.
+    write_config(R"({"theme": "light", "later_setting": {"on": true}})");
+    CHECK(paths::atomic_write(paths::state_file(), R"({"console_lock": true, "later_state": [1, 2]})"));
+    config::load();
+    CHECK(config::loaded() == config::Loaded::Read && config::get().look.theme == "light" && config::get().console_lock);
+    config::get().dev_mode = true;
+    CHECK(save_config());
+    std::string text;
+    CHECK(paths::read_file(paths::config_file(), text));
+    CHECK(text.find("\"later_setting\"") != std::string::npos && text.find("\"dev_mode\": true") != std::string::npos);
+    CHECK(text.find("\"schema\": 1") != std::string::npos);
+    CHECK(paths::read_file(paths::state_file(), text) && text.find("\"later_state\"") != std::string::npos);
+    config::load();
+    CHECK(config::get().dev_mode && config::get().console_lock);
+
+    // Written by a newer version: the defaults, in memory; the files left as
+    // they are, whatever is saved meanwhile.
+    const std::string newer = R"({"schema": 2, "theme": "light", "dev_mode": true})";
+    const std::string newer_state = R"({"schema": 2, "console_lock": true})";
+    write_config(newer);
+    CHECK(paths::atomic_write(paths::state_file(), newer_state));
+    config::load();
+    CHECK(config::loaded() == config::Loaded::Read);
+    CHECK(config::get().look.theme == "dark" && !config::get().dev_mode && !config::get().console_lock);
+    config::get().pt_log = true;
+    config::get().relock_pending = true;
+    CHECK(save_config());
+    CHECK(paths::read_file(paths::config_file(), text) && text == newer);
+    CHECK(paths::read_file(paths::state_file(), text) && text == newer_state);
+
+    // Only state.json newer: config.json is still saved.
+    write_config(R"({"schema": 1, "theme": "light"})");
+    CHECK(paths::atomic_write(paths::state_file(), newer_state));
+    config::load();
+    CHECK(config::get().look.theme == "light" && !config::get().console_lock);
+    config::get().pt_log = true;
+    CHECK(save_config());
+    CHECK(paths::read_file(paths::config_file(), text) && text.find("\"pt_log\": true") != std::string::npos);
+    CHECK(paths::read_file(paths::state_file(), text) && text == newer_state);
+
+    std::remove(paths::config_file().c_str());
+    std::system(("rm -rf '" + paths::data_dir() + "/nand'").c_str());
+    paths::set_nand("unknown");
+}
+
 int main()
 {
     TempDir tmp("config", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
@@ -564,7 +615,8 @@ int main()
     test_preferences();
     test_tmp_recovery();
     test_systems();
+    test_schema();
 
     CHECK(tmp.remove());
-    return CHECK_DONE("config fields, ranges, round trip, .tmp recovery, damaged-file and per-system state assertions passed");
+    return CHECK_DONE("config fields, ranges, round trip, .tmp recovery, damaged-file, per-system state and schema assertions passed");
 }

@@ -8,7 +8,7 @@ From the SD card to a console set up for your child, in about ten minutes, then 
 - **A supported firmware.** 21.0.0 to 23.0.1 for every feature; older ones, everything but the play timer; a newer one opens read-only until a release supports it ([compatibility](compatibility.md)).
 - **One limit for the whole console.** The play timer is the console's: it is the same for every user. Different limits per child need another tool ([why](compatibility.md#playguard-or-a-replacement-sysmodule)).
 
-Want to look around first? [Try PlayGuard in your browser](https://guard.boreale.dev/simulator/?not_set_up=1), against a simulated console on its first start.
+Want to look around first? [Try PlayGuard in your browser](https://guard.boreale.dev/simulator/?not_set_up=1&utm_source=github&utm_medium=docs), against a simulated console on its first start.
 
 ## 1. Install it
 

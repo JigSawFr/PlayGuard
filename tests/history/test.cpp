@@ -239,6 +239,29 @@ static void test_trim_and_damage()
     CHECK(std::remove((older + "/x").c_str()) == 0 && rmdir(older.c_str()) == 0);
 }
 
+// "schema": a file without it is read (the versions before wrote 1); a newer
+// version's reads as empty, is not damaged, and is never written over.
+static void test_schema()
+{
+    std::remove(paths::history_file().c_str());
+    CHECK(history::append(limits(60, 90)));
+    std::string kept;
+    CHECK(paths::read_file(paths::history_file(), kept) && kept.find("\"schema\": 1") != std::string::npos);
+    CHECK(paths::atomic_write(paths::history_file(),
+                              R"({"entries": [{"when": "2026-10-08 18:30", "kind": "pin", "later": true}]})"));
+    CHECK(history::load().size() == 1 && history::load()[0].kind == "pin");
+
+    const std::string newer = R"({"schema": 2, "entries": [{"when": "2026-10-08 18:30", "kind": "pin"}]})";
+    CHECK(paths::atomic_write(paths::history_file(), newer));
+    size_t counted = 99;
+    CHECK(history::check(&counted) == history::Damage::None && counted == 0);
+    CHECK(history::load().empty());
+    bool put_aside = true;
+    CHECK(history::append(limits(60, 90), nullptr, &put_aside) && !put_aside);
+    CHECK(paths::read_file(paths::history_file(), kept) && kept == newer);
+    std::remove(paths::history_file().c_str());
+}
+
 int main()
 {
     TempDir tmp("history", TempDir::Enter);   // paths::data_dir() is ./playguard_data on the host
@@ -248,7 +271,8 @@ int main()
     test_dev_build();
     test_trim_and_damage();
     test_value_ranges();
+    test_schema();
 
     CHECK(tmp.remove());
-    return CHECK_DONE("history round trip, order, trimming, damaged-file, undo and value-range assertions passed");
+    return CHECK_DONE("history round trip, order, trimming, damaged-file, undo, value-range and schema assertions passed");
 }

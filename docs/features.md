@@ -115,7 +115,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 
 ## Today — the day at a glance
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### The ring and the line
 
@@ -192,7 +192,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 ## Play timer — the week is the editor
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### Editing the week
 
@@ -251,7 +251,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 ## Activity — who played what, and how long
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account shown first* (every account, or one; at the bottom of the tab, with *All games*).
 
@@ -289,7 +289,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 ## Restrictions — level, age rating, communication
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **The restriction level:** Young child, Child, Teen and Custom side by side as tiles, each with what it restricts (a coral padlock for restricted, a green check otherwise, and the installed games it blocks; Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); *None* under them. The level in force says *✓ Current*; the teal ring is only where the focus is. What a level restricts (age limit, posting, communication) is said again before it is set; *None* asks in coral, as it lifts every restriction.
 - **The level's settings:** age rating, social-media posting, communication with others. Under a preset, they are its own: changing one makes the level *Custom*, from the preset's settings with that change, asked first (the settings listed).
@@ -302,7 +302,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 ## Security — the PIN, unlocking, the homebrew menu, companion app
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **At the top**, four tiles: the PIN, the restrictions, the temporary unlock and the homebrew menu, each with a teal check when it is as it should be (a PIN set, restrictions on, locked) or an amber warning when it needs you; the homebrew menu says *Open* or *Locked* (a check once locked: open is fine without forwarders).
 - **Set / change the PIN** (system PIN screen).
@@ -348,7 +348,7 @@ Last in the tab: the optional recovery module, for a forgotten PIN with a 0-minu
 
 ## History — what PlayGuard changed, and the backups
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **At the top**, how many changes are recorded and the day of the last backup as tiles: a teal check, or an amber warning when there is none or none for 30 days.
 
@@ -368,7 +368,7 @@ Last in the tab: the optional recovery module, for a forgotten PIN with a 0-minu
 
 ## Console — the network clock, the installed games, what the console runs
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles, under *Tools* (*Network clock*, *Installed games* and *Forwarders*; the first two show what needs a look in their corner; then *Remote access* and *Optional modules*), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
@@ -448,7 +448,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
   - While it is locked, deleting PlayGuard's own forwarder, or the last protected menu (or taking its PIN away), is refused: unlock first. Deleting one of several protected menus asks first, in coral, naming those that remain.
   - Before locking, it offers to protect the forwarders PlayGuard made that are not protected yet, in one go, and says which would still start homebrew without the PIN (a menu not protected, or one another app made), which write to the SD card (a file manager, an installer such as Cyberfoil or Goldleaf, an FTP server: they could change the lock's file), and when uLaunch is installed (it starts homebrew its own way, which the lock does not reach).
   - The PIN refused three times or more on one day at a forwarder's gate is told in the bell (which forwarder, the day, how many times).
-  - When writing a file fails, the error says why when it can tell: the SD card full, or nothing written to it at all (its lock switch, or the archive bit hekate's *Tools* fixes).
+  - When writing a file fails, the error says why when it can tell: the SD card full, or nothing written to it at all (its lock switch, or the archive bit hekate's *Tools* fixes). A remote link file the SD card refuses, or the version of a module just installed, is said too, and logged with its reason.
   - *Check the homebrew menu* shows what Atmosphère will read (whether the album and a game started with R open the homebrew menu), the ways back, the signature patches, the Atmosphère version it was locked on and the recovery sysmodule; the diagnostic report has the same. Not locked, it says so first and offers *Lock*, the steps still to do (the rescue sheet stays); an outdated recovery sysmodule, the PlayGuard it came with and how to replace it (*Update the module* when this build carries it). On emuMMC, or on sysMMC with an emuMMC set up, it says that the other system reads the lock too, without the forwarders installed here.
   - It is a few lines at the end of `atmosphere/config/override_config.ini`, between two of PlayGuard's comments; the rest of the file is left as it is, and kept as it was in `config/playguard/override_config.ini.backup`. Atmosphère reads the file at every start of a program: no restart. Unlocking takes the lines away, and writes back Atmosphère's own values for the keys the rest of the file does not set (Atmosphère keeps what it read until the console restarts).
   - Locking and unlocking ask for the PIN whatever *Protect PlayGuard with the PIN* says, and are in the change history. While it is locked, PlayGuard checks at every start that both ways back are still there; the bell says when one is gone. A lock taken away from the file outside PlayGuard (a computer, a homebrew) is told in the bell and the change history; PlayGuard never puts it back by itself, deleting the file being the way back from a computer. Deleting a forwarder (System Settings › Data Management, where no PIN is asked) never lifts the lock: it only takes a way back away.
@@ -478,7 +478,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ## Preferences
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - What sets PlayGuard itself up:
   - As tiles first: language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger) and the tab to start on.
@@ -493,7 +493,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ## About
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### Version and updates
 

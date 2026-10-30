@@ -20,6 +20,23 @@ std::string file_path()
     return paths::nand_dir() + "/forwarders.json";
 }
 
+// Every key array_of() writes in an entry: the others (a newer version's)
+// are kept as the file had them.
+constexpr const char* ENTRY_KEYS[] = { "id", "nro", "argv", "name", "author", "pin", "gate", "gone", "verified",
+                                       "free", "free2", "closed", "limit", "carried", "icon", "loader", "icon_x",
+                                       "ask_user", "screenshots", "video" };
+
+// The file as an object; false when it is missing or damaged (read as none).
+// *newer: a newer version wrote it (read as none, never written over).
+bool read_doc(nlohmann::json* doc, bool* newer)
+{
+    *newer = false;
+    std::string text;
+    if (!paths::read_file(file_path(), text) || !json_util::parse(text, doc) || !doc->is_object()) return false;
+    *newer = json_util::newer_schema(*doc, SCHEMA);
+    return !*newer;
+}
+
 nlohmann::json array_of(const std::vector<Made>& all)
 {
     nlohmann::json list = nlohmann::json::array();
@@ -55,7 +72,33 @@ std::vector<Made> from_array(const nlohmann::json& list);
 
 bool write_all(const std::vector<Made>& all, std::string* error)
 {
-    const nlohmann::json doc = { { "forwarders", array_of(all) } };
+    // What the file holds that this version does not know is kept: its other
+    // keys, and each entry's (by id).
+    nlohmann::json doc;
+    bool newer = false;
+    if (!read_doc(&doc, &newer)) {
+        if (newer) {
+            if (error) *error = "written by a newer PlayGuard, left as it is";
+            return false;
+        }
+        doc = nlohmann::json::object();
+    }
+    nlohmann::json old = nlohmann::json::array();
+    if (const nlohmann::json* a = json_util::array_at(doc, "forwarders")) old = *a;
+    nlohmann::json list = array_of(all);
+    for (size_t i = 0; i < all.size(); i++)
+        for (const nlohmann::json& o : old) {
+            uint64_t id = 0;
+            if (!o.is_object() || !parse_id(json_util::string_at(o, "id"), &id) || id != all[i].id) continue;
+            nlohmann::json& e = list[i];
+            nlohmann::json merged = o;
+            for (const char* key : ENTRY_KEYS) merged.erase(key);
+            merged.update(e);
+            e = std::move(merged);
+            break;
+        }
+    doc["schema"] = SCHEMA;
+    doc["forwarders"] = std::move(list);
     if (!paths::ensure_dir(paths::nand_dir())) {
         if (error) *error = "cannot create " + paths::nand_dir();
         return false;
@@ -69,9 +112,9 @@ bool write_all(const std::vector<Made>& all, std::string* error)
 
 std::vector<Made> list()
 {
-    std::string text;
     nlohmann::json doc;
-    if (!paths::read_file(file_path(), text) || !json_util::parse(text, &doc) || !doc.is_object()) return {};
+    bool newer = false;
+    if (!read_doc(&doc, &newer)) return {};
     const auto it = doc.find("forwarders");
     if (it == doc.end()) return {};
     return from_array(*it);

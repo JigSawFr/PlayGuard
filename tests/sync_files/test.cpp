@@ -5,6 +5,7 @@
 // by the agent's own parser, no line break smuggled into a value), and the
 // profiles and names files.
 #include "check.h"
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -52,6 +53,17 @@ static void test_conf()
     CHECK(sync_files::save(back));
     CHECK(paths::read_file(sync_files::conf_file(), text));
     CHECK(text.find("future_key=42") != std::string::npos);
+
+    // A newer version's file: read for what this one knows, never saved over.
+    const std::string newer = "schema=2\nenabled=1\nhost=broker.lan\n";
+    CHECK(paths::atomic_write(sync_files::conf_file(), newer));
+    SyncConf later = sync_files::load();
+    CHECK(later.enabled && !std::strcmp(later.host, "broker.lan"));
+    later.enabled = false;
+    err.clear();
+    CHECK(!sync_files::save(later, &err) && !err.empty());
+    CHECK(paths::read_file(sync_files::conf_file(), text) && text == newer);
+    CHECK(sync_files::save(back));
 
     // One sync.conf for every system on the SD card; each system's files in
     // its own folder, and on an emuMMC a device of its own: the id and the
@@ -197,8 +209,10 @@ static void test_integration()
 {
     auto i = sync_files::parse_integration(R"({"schema":1,"version":"0.2.0","homeassistant":"2026.10.1"})");
     CHECK(i.version == "0.2.0" && i.homeassistant == "2026.10.1");
-    i = sync_files::parse_integration(R"({"schema":2,"version":"1.0.0-beta.1","extra":[1,2]})");
-    CHECK(i.version == "1.0.0-beta.1" && i.homeassistant.empty());   // a newer schema: what it knows
+    i = sync_files::parse_integration(R"({"version":"1.0.0-beta.1","extra":[1,2]})");
+    CHECK(i.version == "1.0.0-beta.1" && i.homeassistant.empty());   // no schema: 1; a field more skipped
+    i = sync_files::parse_integration(R"({"schema":2,"version":"1.0.0","homeassistant":"2026.10.1"})");
+    CHECK(i.version.empty() && i.homeassistant.empty());   // a newer schema: not read
     for (const char* bad : { "", "not json", "[1]", R"({"version":5})", R"({"version":"v1.0"})",
                              R"({"version":"1.0 beta"})", R"({"version":"1.0.0;rm"})",
                              R"({"version":"1234567890123456789012345"})" }) {
@@ -233,6 +247,19 @@ void test_agent_events()
     CHECK(ev[1].source == "remote_console_lock" && ev[1].after[3] == 0 && ev[1].console_lock_after == 1);
     CHECK(ev[2].entity == "unlock" && ev[2].before.empty() && ev[2].source == "remote" && ev[2].console_lock_after == -1);
 
+    // A newer agent's line, with a field this version does not know: the
+    // known ones are read. The lines that do not parse are handed back.
+    std::string rejected;
+    const auto newer = sync_files::parse_agent_events(
+        "1760000500\tlimit_uniform\t75\t1\tnone\t1\t7\tremote\t90,90,90,90,90,90,90\t75,75,75,75,75,75,75\t-1\tfuture\n"
+        "1760000600\tlimit_uniform\t75\n",
+        &rejected);
+    CHECK(newer.size() == 1 && newer[0].ts == 1760000500ULL && newer[0].after[0] == 75 && newer[0].console_lock_after == -1);
+    CHECK(rejected == "1760000600\tlimit_uniform\t75\n");
+    rejected.clear();
+    CHECK(sync_files::parse_agent_events(text, &rejected).size() == 3);
+    CHECK(std::count(rejected.begin(), rejected.end(), '\n') == 3);   // too few values, garbage, no entity
+
     // Whose records are newer: the agent's only once it wrote some, and not
     // before PlayGuard's last save.
     const std::string agent_state = sync_files::system_dir() + "/agent_state.txt", nro = sync_files::system_dir() + "/nro_state.txt";
@@ -248,14 +275,23 @@ void test_agent_events()
     CHECK(utimes(nro.c_str(), old_times) == 0);
     CHECK(sync_files::agent_records_newer());
 
-    // Taken once: renamed, read, removed.
+    // Taken once: renamed, read, removed; the lines it could not read kept
+    // aside in agent_events.log.rejected (added to, never replaced).
     CHECK(paths::ensure_dir(sync_files::system_dir()));
+    const std::string aside = sync_files::system_dir() + "/agent_events.log.rejected";
+    std::remove(aside.c_str());
     CHECK(paths::atomic_write(sync_files::system_dir() + "/agent_events.log", text));
     CHECK(sync_files::take_agent_events().size() == 3);
     CHECK(sync_files::take_agent_events().empty());
     struct stat st;
     CHECK(stat((sync_files::system_dir() + "/agent_events.log").c_str(), &st) != 0);
     CHECK(stat((sync_files::system_dir() + "/agent_events.log.read").c_str(), &st) != 0);
+    std::string kept;
+    CHECK(paths::read_file(aside, kept) && kept.find("garbage\n") != std::string::npos);
+    CHECK(paths::atomic_write(sync_files::system_dir() + "/agent_events.log", "more garbage\n"));
+    CHECK(sync_files::take_agent_events().empty());
+    CHECK(paths::read_file(aside, kept) && kept.find("garbage\n") != std::string::npos && kept.ends_with("more garbage\n"));
+    std::remove(aside.c_str());
 
     // The icons the agent published: taken the same way; icons.txt next to it.
     CHECK(sync_files::take_agent_icons().empty());
@@ -269,6 +305,24 @@ void test_agent_events()
     CHECK(paths::read_file(sync_files::icons_file(), written) && written == "target=0a1b2c3d\n");
 }
 
+// A file the SD card refuses is told to the app (its log and a toast there),
+// with its name and why; none told while the writes go through.
+static std::string s_refused;
+static void test_failure_said()
+{
+    sync_files::set_on_failure([](const std::string& file, const std::string& why) { s_refused = file + ": " + why; });
+    sync_files::export_nro_state();   // sync.conf exists (test_nro_state)
+    CHECK(s_refused.empty());
+    // A plain file where the folder goes: nothing can be written in it.
+    const std::string folder = sync_files::system_dir();
+    CHECK(std::system(("rm -rf '" + folder + "'").c_str()) == 0);
+    CHECK(paths::atomic_write(folder, "in the way"));
+    sync_files::export_nro_state();
+    CHECK(s_refused.find("nro_state.txt") != std::string::npos);
+    std::remove(folder.c_str());
+    sync_files::set_on_failure(nullptr);
+}
+
 int main()
 {
     char dir[] = "/tmp/playguard_sync_files_XXXXXX";
@@ -279,11 +333,12 @@ int main()
     test_conf();
     test_records();
     test_nro_state();
+    test_failure_said();
     test_lists();
     test_integration();
     test_agent_events();
 
     const std::string cleanup = std::string("rm -rf '") + dir + "'";
     CHECK(std::system(cleanup.c_str()) == 0);
-    return CHECK_DONE("sync_files: sync.conf, records, nro_state.txt, profiles, names, the integration, agent records and events assertions passed");
+    return CHECK_DONE("sync_files: sync.conf, records, nro_state.txt, profiles, names, a refused write told, the integration, agent records and events assertions passed");
 }

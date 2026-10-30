@@ -63,6 +63,7 @@ Log fold_log(const std::string& text, const std::vector<forwarders::Made>& made,
                                : r == GateResult_Paused ? "gate_paused"
                                : r == GateResult_Closed ? "gate_closed"
                                : r == GateResult_Limit  ? "gate_limit"
+                               : r == GateResult_Other  ? "gate_other"   // a newer gate's: "Other change"
                                                         : "gate_refused";
             std::string w(when, wn);
             if (w == "?") w.clear();

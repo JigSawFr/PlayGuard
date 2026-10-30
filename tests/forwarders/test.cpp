@@ -182,6 +182,37 @@ static void test_files()
     CHECK(nro::sd_path("/switch/x.nro").empty());
 }
 
+// "schema": none is read as 1; what a newer version added (a key of the file,
+// of an entry) survives a save; a newer version's file reads as none and is
+// left as it is.
+static void test_schema()
+{
+    TempDir tmp("forwarders_schema", TempDir::Enter);
+    CHECK(paths::ensure_dir(paths::nand_dir()));
+    const std::string file = paths::nand_dir() + "/forwarders.json";
+    CHECK(paths::atomic_write(file, R"({"later": [1], "forwarders": [
+        {"id": "0500000000AB1000", "nro": "sdmc:/switch/starfield_racer.nro", "name": "Starfield Racer",
+         "pin": true, "gate": "sdmc:/config/playguard/gate.nro", "theme": "night"}]})"));
+    auto all = forwarders::list();
+    CHECK(all.size() == 1 && all[0].pin && all[0].name == "Starfield Racer");
+    all[0].pin = false;
+    all[0].gate.clear();
+    CHECK(forwarders::save(all[0]));
+    std::string text;
+    CHECK(paths::read_file(file, text));
+    CHECK(text.find("\"schema\": 1") != std::string::npos && text.find("\"later\"") != std::string::npos);
+    CHECK(text.find("\"theme\": \"night\"") != std::string::npos && text.find("\"pin\"") == std::string::npos);
+    CHECK(forwarders::list().size() == 1 && !forwarders::list()[0].pin);
+
+    const std::string newer = R"({"schema": 2, "forwarders": [{"id": "0500000000AB1000", "nro": "sdmc:/x.nro"}]})";
+    CHECK(paths::atomic_write(file, newer));
+    CHECK(forwarders::list().empty());
+    std::string error;
+    CHECK(!forwarders::save(all[0], &error) && !error.empty());
+    CHECK(forwarders::forget(all[0].id));
+    CHECK(paths::read_file(file, text) && text == newer);
+}
+
 static void test_registry()
 {
     TempDir tmp("forwarders_reg", TempDir::Enter);
@@ -883,6 +914,7 @@ int main()
     test_parse();
     test_files();
     test_registry();
+    test_schema();
     test_text();
     test_merge();
     test_gate();

@@ -70,6 +70,25 @@ static void test_session(void)
     CHECK(hello(AGENT_PROTOCOL + 1, &r) == 0);
     CHECK(!r.accepted && r.protocol == AGENT_PROTOCOL && !strcmp(r.version, "1.2.0-agent") && !S.app_session);
 
+    // A Hello of another size (an older or a newer PlayGuard) still learns
+    // the agent's protocol: a reply, not BAD_INPUT.
+    uint8_t small[8] = {0}, big[sizeof(AgentHello) + 16] = {0};
+    const uint32_t other = AGENT_PROTOCOL + 1;
+    memcpy(small, &other, sizeof(other));
+    memcpy(big, &other, sizeof(other));
+    size_t n_reply = 0;
+    memset(&r, 0, sizeof(r));
+    CHECK(call(AgentCmd_Hello, small, sizeof(small), NULL, 0, &r, sizeof(r), &n_reply) == 0);
+    CHECK(n_reply == sizeof(r) && !r.accepted && r.protocol == AGENT_PROTOCOL && !S.app_session);
+    memset(&r, 0, sizeof(r));
+    CHECK(call(AgentCmd_Hello, big, sizeof(big), NULL, 0, &r, sizeof(r), &n_reply) == 0);
+    CHECK(n_reply == sizeof(r) && !r.accepted && r.protocol == AGENT_PROTOCOL && !S.app_session);
+    // Our protocol in a short Hello is not ours: no session.
+    const uint32_t ours = AGENT_PROTOCOL;
+    memcpy(small, &ours, sizeof(ours));
+    CHECK(call(AgentCmd_Hello, small, sizeof(small), NULL, 0, &r, sizeof(r), &n_reply) == 0 && !r.accepted);
+    CHECK(call(AgentCmd_Hello, small, 2, NULL, 0, &r, sizeof(r), &n_reply) == AGENT_RC_BAD_INPUT);
+
     CHECK(hello(AGENT_PROTOCOL, &r) == 0 && r.accepted);
     CHECK(!strcmp(r.console_id, "a1b2c3d4") && r.online && S.app_session && S.app_foreground && S.session_changed);
     CHECK(!strcmp(S.app_version, "1.2.0"));

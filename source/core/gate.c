@@ -240,6 +240,7 @@ const char *gate_result_name(GateResult r)
         case GateResult_Paused: return "paused";
         case GateResult_Closed: return "closed";
         case GateResult_Limit: return "limit";
+        case GateResult_Other: return "other";
         default: return "error";
     }
 }
@@ -353,6 +354,7 @@ bool gate_log_parse(const char *line, size_t len, const char **when, size_t *whe
     else if (name_len == 6 && memcmp(rest, "paused", 6) == 0) res = GateResult_Paused;
     else if (name_len == 6 && memcmp(rest, "closed", 6) == 0) res = GateResult_Closed;
     else if (name_len == 5 && memcmp(rest, "limit", 5) == 0) res = GateResult_Limit;
+    else if (name_len > 0) res = GateResult_Other;
     else return false;
     const char *path = tab2 + 1;
     const size_t path_len = len - (size_t)(path - line);

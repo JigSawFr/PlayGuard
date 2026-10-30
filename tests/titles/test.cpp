@@ -46,9 +46,11 @@ int main()
     SyncTitles kinds;
     sync_titles_parse(&kinds, a.data(), a.size());
     CHECK(kinds.n == 2 && sync_titles_kind(&kinds, nsp) == SyncTitle_Homebrew);
-    // A name with a colon; lines it does not understand.
+    // A name with a colon; lines it does not understand; a kind a newer
+    // version wrote, kept as not a game (a homebrew), with its name.
     const Record odd = parse("052EB87E6426D000=homebrew:Tool: the sequel\r\nnonsense\n0100000000010000=what:x\n");
-    CHECK(odd.size() == 1 && name(odd, 0x052EB87E6426D000ULL) == "Tool: the sequel");
+    CHECK(odd.size() == 2 && name(odd, 0x052EB87E6426D000ULL) == "Tool: the sequel");
+    CHECK(kind(odd, 0x0100000000010000ULL) == SyncTitle_Homebrew && name(odd, 0x0100000000010000ULL) == "x");
     // Bounded.
     Record many;
     for (uint64_t i = 1; i <= MAX + 10; i++) note(many, 0x0500000000000000ULL + (i << 12), SyncTitle_Homebrew, "x");

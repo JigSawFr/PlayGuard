@@ -21,7 +21,7 @@ it). The flags are the website's `site/assets/fonts/twemoji-flags.woff2`
 (Twemoji's 15, CC-BY 4.0), copied by CMake next to the page with
 `LICENSE-twemoji-flags.txt`, so Windows shows them too.
 
-- **main**: <https://guard.boreale.dev/simulator/>, on PlayGuard's
+- **main**: [guard.boreale.dev/simulator/](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs), on PlayGuard's
   website ([`site/README.md`](../site/README.md)).
 - **a pull request**: `https://guard.boreale.dev/pr-<number>/simulator/`,
   linked in a comment on the pull request and updated at each push. It goes
@@ -232,6 +232,9 @@ builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8
   workflow), which counts each visit on the site's address alone, without
   cookie; its policy then lets the page send to `gateway.umami.is`. The
   sites menu links to the privacy and legal notice (boreale.dev's).
+  Its links to our other sites carry `utm_source=guard&utm_medium=nav`
+  (`SITE_TAGS`), for Umami's *UTM* report; a visit's own tags stay out of
+  the links the page makes (`toQuery()`), so a shared link does not carry them.
 - CI writes `build.json` (the repository, commit, branch, pull request and
   its title) for the page's header, and the page asks for PlayGuard's files
   with the commit in their URL: GitHub Pages lets browsers keep them 10

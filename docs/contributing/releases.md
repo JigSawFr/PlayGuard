@@ -17,7 +17,7 @@ nothing is published for them. The developer tools install the `playguard-<versi
 
 ## What a release publishes
 
-Each release also publishes `compat.json` (`tools/gen_compat.py`: the version and the newest checked firmware), which the app's update check reads, plus `build-info.txt` and `SHA256SUMS.txt`. Details in [`packaging/README.md`](../../packaging/README.md). The `.nro`, both `.zip`, `compat.json`, `build-info.txt` and `SHA256SUMS.txt` also carry a [build provenance attestation](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations): `gh attestation verify playguard.nro -R JigSawFr/PlayGuard` checks that a download was built by this repository's CI.
+Each release also publishes `compat.json` and `compat-1.json` (`tools/gen_compat.py`: the version and the newest checked firmware), which the app's update check reads (`compat-<schema>.json` first, `compat.json`, kept in schema 1 for the versions installed before, when it is missing), plus `build-info.txt` and `SHA256SUMS.txt`. Details in [`packaging/README.md`](../../packaging/README.md). The `.nro`, both `.zip`, `compat.json`, `compat-1.json`, `build-info.txt` and `SHA256SUMS.txt` also carry a [build provenance attestation](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations): `gh attestation verify playguard.nro -R JigSawFr/PlayGuard` checks that a download was built by this repository's CI.
 
 ## Reproducible zips
 

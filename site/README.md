@@ -199,6 +199,14 @@ pages; no framework, nothing to install but that.
   changes it. Its site in Umami (`UMAMI_WEBSITE` in `build_site.py`) is
   Boréale's, shared with the other projects' sites: Umami's *Hostname*
   filter tells them apart.
+  A link to another of our sites (boreale.dev, its other sub-domains) says
+  where the visit comes from, for Umami's *UTM* report: `build_site.py`
+  (`utm()`) adds `utm_source=guard` and `utm_medium=nav` (header), `footer`
+  or `link` (the page's text); a link to guard.boreale.dev itself loses the
+  tags a documentation page was written with for GitHub
+  (`utm_source=github`), and `tools/check_site_links.py` checks both. The
+  app's QR codes to the documentation carry `utm_source=playguard&utm_medium=qr`
+  (`app::doc_url()`), the release notes `utm_source=release`.
 - **A Content-Security-Policy** on every page (a `<meta>`: GitHub Pages sends
   no headers): only the site's own files, no inline script or style; the one
   address it may send to is Umami's (`connect-src`). The

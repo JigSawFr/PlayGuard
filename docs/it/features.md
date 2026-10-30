@@ -116,7 +116,7 @@ Quelle per informazione: un ritorno alla build precedente, un firmware non testa
 
 ## Oggi — la giornata a colpo d'occhio
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### L'anello e la linea
 
@@ -193,7 +193,7 @@ Con il testo più grande, Oggi sta ancora in una sola schermata: la riga sopra i
 
 ## Tempo di gioco — la settimana è l'editor
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### Modificare la settimana
 
@@ -252,7 +252,7 @@ Con il testo più grande, Oggi sta ancora in una sola schermata: la riga sopra i
 
 ## Attività — chi ha giocato a cosa, e per quanto
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registro attività della console stessa — per tutti gli utenti o per **un solo utente** (gli utenti come chip in alto, quando la console ne ha più di uno). PlayGuard si apre sull'utente mostrato per ultimo, o su quello scelto in *Account mostrato per primo* (tutti gli utenti, o uno solo; in fondo alla scheda, con *Tutti i giochi*).
 
@@ -290,7 +290,7 @@ Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registr
 
 ## Limitazioni — livello, classificazione per età, comunicazione
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **Il livello limitazioni:** Bambino piccolo, Bambino, Adolescente e Personalizzato affiancati come tessere, ognuno con ciò che limita (un lucchetto corallo per ciò che è limitato, una spunta verde per il resto, e i giochi installati che blocca; Ⓐ lo imposta; con *Personalizzato* in vigore, Ⓐ porta alle sue impostazioni qui sotto); *Nessuno* sotto di esse. Il livello in vigore dice *✓ Attuale*; il contorno verde acqua è solo dove si trova il focus. Ciò che un livello limita (limite di età, pubblicazione, comunicazione) viene ripetuto prima di impostarlo; *Nessuno* lo chiede in corallo, perché toglie ogni limitazione.
 - **Le impostazioni del livello:** classificazione per età, pubblicazione sui social media, comunicazione con altri utenti. Con un livello predefinito sono le sue: cambiarne una rende il livello *Personalizzato*, dalle impostazioni del livello predefinito con quella modifica, dopo una domanda (con le impostazioni elencate).
@@ -303,7 +303,7 @@ Tempo per gioco **oggi**, negli **ultimi 7 giorni** e **in totale**, dal registr
 
 ## Sicurezza — il PIN, lo sblocco, il menu homebrew, l'app Filtro famiglia
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **In alto**, quattro tessere: il PIN, le limitazioni, lo sblocco temporaneo e il menu homebrew, ognuna con una spunta verde acqua quando è come deve essere (un PIN impostato, limitazioni attive, bloccato) o un segnale di avviso ambra quando serve intervenire; il menu homebrew dice *Aperto* o *Bloccato* (una spunta una volta bloccato: aperto va bene senza forwarder).
 - **Imposta o cambia il PIN** (schermata PIN del sistema).
@@ -349,7 +349,7 @@ Ultimo nella scheda: il modulo di ripristino facoltativo, per un PIN dimenticato
 
 ## Cronologia — cosa ha cambiato PlayGuard, e i backup
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **In alto**, come tessere, quante modifiche sono registrate e il giorno dell'ultimo backup: una spunta verde acqua, o un segnale di avviso ambra quando non ce n'è nessuno o nessuno da 30 giorni.
 
@@ -369,7 +369,7 @@ Ultimo nella scheda: il modulo di ripristino facoltativo, per un PIN dimenticato
 
 ## Console — l'orologio di rete, i giochi installati, cosa esegue la console
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **In alto**, ciò che esegue la console come tessere, sotto *Sistema* (il firmware, Atmosphère, hekate quando è sulla scheda SD e sys-patch quando è installato; Ⓐ apre le sue note di rilascio), poi gli strumenti come tessere, sotto *Strumenti* (*Orologio di rete*, *Giochi installati* e *Forwarder*; i primi due mostrano ciò che richiede un'occhiata nel loro angolo; poi *Accesso remoto* e *Moduli facoltativi*), poi le righe della console, prima la compatibilità (solo una spunta verde acqua quando PlayGuard è stato verificato su questo firmware, altrimenti un avviso e cosa non va).
 
@@ -479,7 +479,7 @@ Su una console senza Internet, *Usa l'orologio della console* è proposto nella 
 
 ## Preferenze
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - Ciò che configura PlayGuard stesso:
   - Prima, come tessere: lingua (tutte le lingue della console, o quella della console), tema (scuro per impostazione predefinita, chiaro, o quello della console), dimensione del testo (automatica / normale / più grande) e la scheda da cui partire.
@@ -494,7 +494,7 @@ Su una console senza Internet, *Usa l'orologio della console* è proposto nella 
 
 ## Informazioni
 
-*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[Provalo nel simulatore ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### Versione e aggiornamenti
 

@@ -241,11 +241,15 @@ void ModuleTab::install()
         }
         // The recovery module only acts at boot: nothing to stop or start.
         const std::string sd = paths::sd_root();
-        std::string err;
-        const bool ok = modules::install(sd, target, b, false, &err);
+        std::string err, warning;
+        const bool ok = modules::install(sd, target, b, false, &err, &warning);
         if (!ok) {
             ui::error("playguard/modules/error"_i18n + " — " + err);
         } else {
+            if (!warning.empty()) {
+                aurore::Logger::warning("modules: {} installed, {}", target.name, warning);
+                ui::notify("playguard/modules/meta_err"_i18n, ui::Toast::Refused);
+            }
             modules::confirm(sd, target);
             // Which PlayGuard it comes with, as the release's zip says: the
             // bell's "out of date" entry goes.

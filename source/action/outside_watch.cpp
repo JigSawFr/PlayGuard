@@ -35,6 +35,7 @@ void load_once()
 // back at the next start.
 void save()
 {
+    if (s_rec.newer) return;   // a newer version's file: left as it is
     const std::string text = outside_change_logic::serialize(s_rec);
     ui::write_later("watch", [text]() {
         std::string err;

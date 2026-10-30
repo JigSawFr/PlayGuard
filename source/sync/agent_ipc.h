@@ -30,6 +30,19 @@ extern "C" {
 // nand/<system>/sync/). 3: PushGames. An agent of another protocol is
 // refused, and PlayGuard offers the one it carries.
 #define AGENT_PROTOCOL     3
+// The size of each structure exchanged (and of the ones they embed), checked
+// at build time below: a change to any of them fails the build until it is
+// written here and AGENT_PROTOCOL goes up. AgentHello and AgentHelloReply
+// never change: they are how two protocols find out they differ.
+#define AGENT_SIZE_HELLO        28
+#define AGENT_SIZE_HELLO_REPLY  44
+#define AGENT_SIZE_ORDER        212
+#define AGENT_SIZE_RESULT       12
+#define AGENT_SIZE_STATUS       304
+#define AGENT_SIZE_RECORDS      42
+#define AGENT_SIZE_SYNC_INTENT  68
+#define AGENT_SIZE_SYNC_STATUS  264
+#define AGENT_SIZE_SYNC_RECORDS 34
 #define AGENT_VERSION_MAX  24
 #define AGENT_ORDERS_MAX   SYNC_QUEUE_MAX
 #define AGENT_LOG_LINES    200
@@ -63,6 +76,9 @@ typedef enum {
     AgentCmd_PushGames       = 16,  // in buffer: the games document
 } AgentCmd;
 
+// Frozen across protocols, as is its reply: any PlayGuard must be able to
+// say hello to any agent and learn its protocol. The agent reads `protocol`
+// from a Hello of any size.
 typedef struct {
     uint32_t protocol;
     char     version[AGENT_VERSION_MAX];   // PlayGuard's
@@ -70,7 +86,7 @@ typedef struct {
 
 // Always answered with success (a reply that comes with an error is not
 // delivered): `accepted` says whether PlayGuard got its session (0: another
-// protocol, PlayGuard offers to update the agent).
+// protocol, PlayGuard offers to update the agent). Frozen, as AgentHello.
 typedef struct {
     uint32_t protocol;
     char     version[AGENT_VERSION_MAX];   // the agent's
@@ -113,6 +129,22 @@ typedef struct {
     uint8_t     pad[7];
     SyncRecords records;       // what the agent changed (extra time, console lock, relock)
 } AgentRecords;
+
+#ifdef __cplusplus
+#define AGENT_SIZE_CHECK(type, size) static_assert(sizeof(type) == (size), #type ": bump AGENT_PROTOCOL")
+#else
+#define AGENT_SIZE_CHECK(type, size) _Static_assert(sizeof(type) == (size), #type ": bump AGENT_PROTOCOL")
+#endif
+AGENT_SIZE_CHECK(AgentHello, AGENT_SIZE_HELLO);
+AGENT_SIZE_CHECK(AgentHelloReply, AGENT_SIZE_HELLO_REPLY);
+AGENT_SIZE_CHECK(AgentOrder, AGENT_SIZE_ORDER);
+AGENT_SIZE_CHECK(AgentResult, AGENT_SIZE_RESULT);
+AGENT_SIZE_CHECK(AgentStatus, AGENT_SIZE_STATUS);
+AGENT_SIZE_CHECK(AgentRecords, AGENT_SIZE_RECORDS);
+AGENT_SIZE_CHECK(SyncIntent, AGENT_SIZE_SYNC_INTENT);
+AGENT_SIZE_CHECK(SyncStatus, AGENT_SIZE_SYNC_STATUS);
+AGENT_SIZE_CHECK(SyncRecords, AGENT_SIZE_SYNC_RECORDS);
+#undef AGENT_SIZE_CHECK
 
 #ifdef __cplusplus
 }

@@ -170,6 +170,14 @@ static void test_file()
     CHECK(r.date.empty() && r.spent_s == -1 && !r.limits_known && r.notice == 0);
     r = parse(R"({"notice": 1, "notice_date": "2026-10-08", "reset_at": "25h"})");
     CHECK(r.notice == NOTICE_RESET && r.reset_at.empty());
+
+    // "schema": none is 1 (and written); a newer version's file is a fresh
+    // record marked newer, which outside_watch never saves.
+    CHECK(serialize(Record()).find("\"schema\": 1") != std::string::npos);
+    r = parse(R"({"date": "2026-10-08", "spent_s": 60, "later": 1})");
+    CHECK(r.date == "2026-10-08" && r.spent_s == 60 && !r.newer);
+    r = parse(R"({"schema": 2, "date": "2026-10-08", "spent_s": 60})");
+    CHECK(r.newer && r.date.empty() && r.spent_s == -1);
 }
 
 static const std::string ALICE = "00000000000000010000000000000001", LEO = "00000000000000020000000000000002",

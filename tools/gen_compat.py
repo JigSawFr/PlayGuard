@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Writes compat.json, published with every release next to playguard.nro.
+"""Writes compat.json and compat-<SCHEMA>.json, published with every release
+next to playguard.nro.
 
 The app reads the one of the latest release (About › Check for updates, and
 the "firmware not supported yet" screen) to know whether updating would make
@@ -11,9 +12,17 @@ never disagree with the build:
                      a firmware only once it was verified there)
   fw_min_play_timer  source/core/sysinfo.h  PCTL_FW_MIN_PLAYTIMER
 
-Usage: tools/gen_compat.py [repo-root] [output]   (default: . and ./compat.json)
+compat.json stays at schema 1 forever: every installed PlayGuard before
+compat-<N>.json existed reads that name. A version reads
+compat-<its COMPAT_SCHEMA>.json first (source/util/update.hpp), so when the
+format changes meaning, SCHEMA goes up here and there, and compat.json keeps
+being written in schema 1 next to it (docs/contributing/formats.md).
+
+Usage: tools/gen_compat.py [repo-root] [output]   (default: . and ./compat.json;
+compat-<SCHEMA>.json is written in the same folder)
 """
 import json
+import os
 import re
 import sys
 
@@ -44,13 +53,19 @@ def firmware(macro):
     return ".".join(m.groups())
 
 
+SCHEMA = 1   # compat-<SCHEMA>.json; update::COMPAT_SCHEMA in source/util/update.hpp
+
 compat = {
-    "schema": 1,
+    "schema": SCHEMA,
     "version": ".".join(parts),
     "fw_tested_max": firmware("PCTL_FW_TESTED_MAX"),
     "fw_min_play_timer": firmware("PCTL_FW_MIN_PLAYTIMER"),
 }
-with open(OUT, "w", encoding="utf-8") as f:
-    json.dump(compat, f, indent=2)
-    f.write("\n")
-print(f"{OUT}: {json.dumps(compat)}")
+# compat.json: schema 1, the same document while SCHEMA is 1.
+legacy = dict(compat, schema=1)
+versioned = os.path.join(os.path.dirname(OUT), f"compat-{SCHEMA}.json")
+for path, doc in ((OUT, legacy), (versioned, compat)):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(doc, f, indent=2)
+        f.write("\n")
+    print(f"{path}: {json.dumps(doc)}")

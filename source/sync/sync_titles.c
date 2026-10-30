@@ -49,7 +49,9 @@ void sync_titles_parse(SyncTitles *t, const char *text, size_t len)
         else if (word(k, kn, "system")) kind = SyncTitle_System;
         else if (word(k, kn, "playguard")) kind = SyncTitle_PlayGuard;
         else if (word(k, kn, "game")) kind = SyncTitle_Game;
-        else continue;
+        // A kind a newer PlayGuard added: not a game, so never published by
+        // its ID (told as a homebrew).
+        else kind = SyncTitle_Homebrew;
         t->ids[t->n] = id;
         t->kinds[t->n] = (uint8_t)kind;
         t->n++;

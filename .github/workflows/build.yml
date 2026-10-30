@@ -844,6 +844,8 @@ jobs:
           # .nro files after --romfs with their RomFS in their assets (the PIN
           # gate's font, and something after its code for the forwarders' loader).
           python3 tools/check_nro.py sysmodule/rescue/out/playguard-rescue.elf sysmodule/agent/out/playguard-agent.elf --romfs playguard.nro gate/out/gate.nro
+      # compat.json (schema 1, for every installed version) and
+      # compat-<schema>.json (what this version and later ones read).
       - name: compat.json
         run: python3 tools/gen_compat.py . compat.json
       - name: Build identity
@@ -858,7 +860,7 @@ jobs:
             git submodule status
             cat toolchain.txt
           } > build-info.txt
-          sha256sum playguard.nro playguard.zip playguard-rescue.zip playguard-agent.zip compat.json build-info.txt > SHA256SUMS.txt
+          sha256sum playguard.nro playguard.zip playguard-rescue.zip playguard-agent.zip compat.json compat-1.json build-info.txt > SHA256SUMS.txt
           cat build-info.txt
           unzip -l playguard.zip
           unzip -l playguard-rescue.zip
@@ -896,6 +898,7 @@ jobs:
           path: |
             playguard.nro
             compat.json
+            compat-1.json
             build-info.txt
             SHA256SUMS.txt
           if-no-files-found: error
@@ -1045,6 +1048,7 @@ jobs:
             dist/playguard-rescue.zip
             dist/playguard-agent.zip
             dist/compat.json
+            dist/compat-1.json
             dist/build-info.txt
             dist/SHA256SUMS.txt
       # The release exists (release-please created it with the tag): the
@@ -1056,7 +1060,8 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           gh release upload "$TAG" --clobber dist/playguard.nro dist/playguard.zip dist/playguard-rescue.zip \
-            dist/playguard-agent.zip dist/compat.json dist/build-info.txt dist/SHA256SUMS.txt dist/playguard-screens.zip
+            dist/playguard-agent.zip dist/compat.json dist/compat-1.json dist/build-info.txt dist/SHA256SUMS.txt \
+            dist/playguard-screens.zip
       # The release page laid out (tools/release_page.sh): "PlayGuard X.Y.Z",
       # a summary, the figures, the commit list release-please wrote folded
       # (what users notice, what contributors do), the screens that changed,

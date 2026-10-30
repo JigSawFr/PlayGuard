@@ -116,7 +116,7 @@ Celles pour information : un retour à la version précédente, un firmware non 
 
 ## Aujourd'hui — la journée en un coup d'œil
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### L'anneau et la ligne
 
@@ -193,7 +193,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 ## Temps de jeu — la semaine sert d'éditeur
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### Modifier la semaine
 
@@ -252,7 +252,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 ## Activité — qui a joué à quoi, et combien de temps
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **depuis toujours**, lu dans le journal d'activité de la console — pour tous les comptes ou **un seul compte utilisateur** (les comptes en puces en haut, quand la console en a plusieurs). PlayGuard s'ouvre sur le dernier compte affiché, ou sur celui choisi dans *Compte affiché en premier* (tous les comptes, ou un seul ; en bas de l'onglet, avec *Tous les jeux*).
 
@@ -290,7 +290,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 
 ## Restrictions — niveau, classification par âge, communication
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **Le niveau de restriction :** Jeune enfant, Enfant, Adolescent et Personnalisé côte à côte en tuiles, chacun avec ce qu'il restreint (un cadenas corail pour restreint, une coche verte sinon, et les jeux installés qu'il bloque ; Ⓐ le choisit ; sur *Personnalisé* en vigueur, Ⓐ mène à ses réglages en dessous) ; *Aucun* en dessous. Le niveau en vigueur indique *✓ Actuel* ; l'anneau sarcelle marque seulement le focus. Ce qu'impose un niveau (limite d'âge, publications, communication) est redit avant de l'appliquer ; *Aucun* demande confirmation en corail, puisqu'il lève toutes les restrictions.
 - **Les réglages du niveau :** classification par âge, publications sur les réseaux sociaux, communication avec d'autres joueurs. Sous un niveau prédéfini, ce sont les siens : en modifier un fait passer au niveau *Personnalisé*, à partir de ses réglages avec ce changement, après confirmation (les réglages listés).
@@ -303,7 +303,7 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 
 ## Sécurité — code PIN, déverrouillage, menu homebrew, application mobile
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **En haut**, quatre tuiles : le code PIN, les restrictions, le déverrouillage temporaire et le menu homebrew, chacune avec une coche turquoise quand tout est comme il faut (code PIN défini, restrictions actives, verrouillé) ou un triangle orange quand il faut intervenir ; le menu homebrew dit *Ouvert* ou *Verrouillé* (une coche une fois verrouillé : ouvert convient sans forwarders).
 - **Définir ou changer le code PIN** (écran système).
@@ -349,7 +349,7 @@ Le dernier de l'onglet : le sysmodule de récupération facultatif, pour un code
 
 ## Historique — ce que PlayGuard a changé, et les sauvegardes
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **En haut**, combien de modifications sont enregistrées et le jour de la dernière sauvegarde, en tuiles : une coche turquoise, ou un triangle orange quand il n'y en a aucune, ou aucune depuis 30 jours.
 
@@ -369,7 +369,7 @@ Le dernier de l'onglet : le sysmodule de récupération facultatif, pour un code
 
 ## Console — l'horloge réseau, les jeux installés, ce que fait tourner la console
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les outils en tuiles, sous *Outils* (*Horloge réseau*, *Jeux installés* et *Forwarders* ; les deux premiers montrent dans leur coin ce qui demande un coup d'œil ; puis *Accès à distance* et *Modules facultatifs*), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
 
@@ -449,7 +449,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
   - Tant que c'est verrouillé, supprimer le forwarder de PlayGuard, ou le dernier menu protégé (ou lui retirer son code PIN), est refusé : déverrouillez d'abord. Supprimer l'un de plusieurs menus protégés demande confirmation, en corail, en nommant ceux qui restent.
   - Avant de verrouiller, il propose de protéger d'un coup les forwarders créés par PlayGuard qui ne le sont pas encore, et indique ceux qui lanceraient encore des homebrews sans le code PIN (un menu non protégé, ou un forwarder créé par une autre application), ceux qui écrivent sur la carte SD (un explorateur de fichiers, un installeur comme Cyberfoil ou Goldleaf, un serveur FTP : ils pourraient modifier le fichier du verrou), et si uLaunch est installé (il lance les homebrews à sa façon, que le verrou n'atteint pas).
   - Le code PIN refusé trois fois ou plus le même jour au portail d'un forwarder est signalé dans la cloche (quel forwarder, quel jour, combien de fois).
-  - Quand l'écriture d'un fichier échoue, l'erreur dit pourquoi quand c'est possible : la carte SD pleine, ou rien ne peut y être écrit (son verrou, ou le bit d'archive que corrige *Tools* de hekate).
+  - Quand l'écriture d'un fichier échoue, l'erreur dit pourquoi quand c'est possible : la carte SD pleine, ou rien ne peut y être écrit (son verrou, ou le bit d'archive que corrige *Tools* de hekate). Un fichier du lien distant refusé par la carte SD, ou la version d'un module qu'on vient d'installer, est signalé aussi, et noté dans le journal avec sa raison.
   - *Vérifier le menu homebrew* montre ce qu'Atmosphère lira (si l'album et un jeu lancé avec R ouvrent le menu homebrew), les accès de secours, les patchs de signature, la version d'Atmosphère du verrouillage et le sysmodule de récupération ; le rapport de diagnostic contient la même chose. Non verrouillé, il le dit d'abord et propose *Verrouiller*, avec les étapes qui restent (la fiche de secours reste) ; un sysmodule de récupération pas à jour, le PlayGuard avec lequel il a été installé et comment le remplacer (*Mettre à jour le module* quand ce build l'embarque). Sur l'emuMMC, ou sur la sysMMC avec une emuMMC configurée, il précise que l'autre système lit aussi le verrou, sans les forwarders installés ici.
   - Ce sont quelques lignes à la fin de `atmosphere/config/override_config.ini`, entre deux commentaires de PlayGuard ; le reste du fichier n'est pas touché, et l'original est gardé dans `config/playguard/override_config.ini.backup`. Atmosphère relit le fichier à chaque lancement d'un programme : pas de redémarrage. Déverrouiller retire ces lignes et réécrit les valeurs d'Atmosphère pour les clés que le reste du fichier ne fixe pas (Atmosphère garde ce qu'il a lu jusqu'au redémarrage de la console).
   - Verrouiller et déverrouiller demandent le code PIN, quel que soit le réglage *Protéger PlayGuard par le code PIN*, et figurent dans l'historique. Tant que c'est verrouillé, PlayGuard vérifie à chaque ouverture que les deux accès sont toujours là ; la cloche signale celui qui manque. Un verrou retiré du fichier en dehors de PlayGuard (un ordinateur, un homebrew) est signalé dans la cloche et l'historique ; PlayGuard ne le remet jamais de lui-même, supprimer le fichier étant la sortie de secours depuis un ordinateur. Supprimer un forwarder (Paramètres › Gestion des données, sans code PIN) ne lève jamais le verrou : cela retire seulement un accès.
@@ -479,7 +479,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 ## Préférences
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - Ce qui règle PlayGuard lui-même :
   - En tuiles d'abord : langue (toutes celles de la console, ou celle de la console), thème (sombre par défaut, clair, ou celui de la console), taille du texte (automatique / normale / plus grande) et l'onglet d'ouverture.
@@ -494,7 +494,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 ## À propos
 
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### Version et mises à jour
 
