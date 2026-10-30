@@ -23,7 +23,7 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 
 Every Boréale homebrew shares one tree per device: `boreale/<id>/` holds
 what belongs to the device (`availability`, `capabilities`, `system`,
-`icon/…`, `integration`), and each homebrew publishes under its own module
+`notices`, `icon/…`, `integration`), and each homebrew publishes under its own module
 name, `playguard/` here. `boreale` is `topic_prefix`'s default; the same
 tree goes under another prefix.
 
@@ -32,6 +32,7 @@ tree goes under another prefix.
 | `boreale/<id>/availability` | yes | console → | `online` or `offline`. Last will (`offline`), and `offline` published before a clean disconnect. |
 | `boreale/<id>/playguard/state` | yes | console → | The state snapshot (below). |
 | `boreale/<id>/system` | yes | console → | The console itself: versions, model, name, storage, power, network (below). With the state, every `poll_s`. |
+| `boreale/<id>/notices` | yes | console → | Every Boréale homebrew's shared bell (below): what waits, runs or failed in each. With the state, when it changed, and at each connection. |
 | `boreale/<id>/playguard/games` | yes | console (app) → | The games installed and played, each with its play time in all, and the homebrews as counts only (below), published by PlayGuard after a read of the play log. |
 | `boreale/<id>/icon/<APP_ID>` | yes | console (app; agent: the game played) → | A game's icon: the raw JPEG of its control data, for every game installed or played (below). An empty retained message clears it. |
 | `boreale/<id>/playguard/activity` | yes | console → | Today's play time from the play log: each game's, the homebrews' as one total. |
@@ -185,6 +186,32 @@ platform:
 
 `platform` (`switch`) is also in the `system` document. Each module gives
 the `schema` of its documents (`state`'s) and its version.
+
+## `notices`
+
+The bell the Boréale homebrews share, as their files under
+`config/boreale/notices/` say (each homebrew writes its own: PlayGuard's is
+`playguard.json`, below), retained. Whichever of PlayGuard and the agent
+holds the link builds it from those files, so a homebrew that is closed is
+still in it. Published with the state when it changed, and at each
+connection.
+
+```json
+{"schema": 1,
+ "homebrews": [{"module": "playguard", "name": "PlayGuard", "notices": [
+     {"id": "pin_weak", "level": "todo", "title": "The PIN is easy to guess", "detail": "Like 0000 or 1234…",
+      "lang": "en-US", "updated": 1790990000, "route": "security"}]},
+   {"module": "playshelf", "name": "PlayShelf", "notices": [
+     {"id": "downloads_failed", "level": "todo", "title": "1 download failed", "detail": "",
+      "lang": "en-US", "progress": 40, "updated": 1790990100, "route": "downloads"}]}],
+ "todo": 2, "error": 0}
+```
+
+- **`homebrews`:** by module, at most 8. The name comes from the homebrew's registry file (`config/boreale/apps/<module>.conf`), else its module.
+  - Left out: a homebrew whose `.nro` is gone, and a file of a newer `schema`.
+- **Each notice:** `level` is `todo`, `progress`, `error` or `info`. `title` and `detail` are as written by its homebrew, in `lang`. `progress` (0 to 100) only when it has one. `route` is the screen of its homebrew it opens at.
+  - An expired notice is left out.
+- **`todo` and `error`:** how many notices are to do, and how many failed, across all homebrews: what Home Assistant counts.
 
 ## `system`
 

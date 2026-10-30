@@ -20,7 +20,7 @@ size_t sync_topic_base(const SyncConf *conf, char *out, size_t cap)
 bool sync_topic_is_device(const char *sub)
 {
     return !strcmp(sub, "availability") || !strcmp(sub, "capabilities") || !strcmp(sub, "system") ||
-           !strcmp(sub, "integration") || !strncmp(sub, "icon/", 5);
+           !strcmp(sub, "integration") || !strcmp(sub, "notices") || !strncmp(sub, "icon/", 5);
 }
 
 size_t sync_topic_sub(const char *sub, char *out, size_t cap)

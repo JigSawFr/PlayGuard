@@ -1623,6 +1623,11 @@ if SYNC:
 
     wait_for("availability online", lambda: mqtt_get(f"{BASE}/availability") == "online")
     caps = wait_for("the capabilities", lambda: doc(f"{BASE}/capabilities"))
+    # Every homebrew's shared bell, PlayGuard's own in it (written at start-up).
+    shared = wait_for("the shared bell on the broker",
+                      lambda: (d := doc(f"{BASE}/notices")) and any(h.get("module") == "playguard" for h in d.get("homebrews", [])) and d)
+    if shared.get("schema") != 1 or "todo" not in shared or "error" not in shared:
+        fail(f"the shared bell's document: {shared}")
     if caps.get("platform") != "switch" or caps.get("modules", {}).get("playguard", {}).get("schema") != 1:
         fail(f"capabilities: {caps}")
     # The tree an earlier version left (seeded before PlayGuard started), cleared.

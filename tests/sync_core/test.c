@@ -14,6 +14,7 @@
 #include "sync_conf.h"
 #include "sync_discovery.h"
 #include "sync_engine.h"   // SYNC_SCRATCH_SIZE: what the discovery must fit in
+#include "sync_notices.h"
 #include "sync_entities.h"
 #include "sync_games.h"
 #include "sync_icons.h"
@@ -1483,6 +1484,64 @@ static void test_icons_record(void)
     CHECK(n == 0);
 }
 
+static void put_file(const char *root, const char *rel, const char *text)
+{
+    char path[512], cmd[600];
+    snprintf(path, sizeof(path), "%s/%s", root, rel);
+    snprintf(cmd, sizeof(cmd), "mkdir -p \"$(dirname '%s')\"", path);
+    CHECK(system(cmd) == 0);
+    FILE *f = fopen(path, "wb");
+    if (!CHECK(f)) return;
+    fputs(text, f);
+    fclose(f);
+}
+
+// The notices document: every homebrew's shared bell, by module, each under
+// its registry's name; a homebrew whose .nro is gone, an expired notice and a
+// newer file left out; what is to do and what failed counted.
+static void test_notices_document(void)
+{
+    char root[] = "/tmp/playguard_notices_XXXXXX";
+    if (!CHECK(mkdtemp(root))) return;
+    static char out[SYNC_SCRATCH_SIZE];
+    size_t n = sync_notices_build(root, 100, out, sizeof(out));
+    CHECK(n && !strcmp(out, "{\"schema\":1,\"homebrews\":[],\"todo\":0,\"error\":0}"));   // no folder
+
+    put_file(root, "switch/PlayGuard/PlayGuard.nro", "NRO0");
+    put_file(root, "switch/Lantern/Lantern.nro", "NRO0");
+    put_file(root, "config/boreale/apps/lantern.conf", "schema=1\nname=Lantern\n");
+    put_file(root, "config/boreale/notices/playguard.json",
+             "{\"schema\":1,\"module\":\"playguard\",\"nro\":\"switch/PlayGuard/PlayGuard.nro\",\"notices\":["
+             "{\"id\":\"pin_weak\",\"level\":\"todo\",\"title\":\"The PIN is easy to guess\",\"lang\":\"en\",\"updated\":5,\"route\":\"security\"}]}");
+    put_file(root, "config/boreale/notices/lantern.json",
+             "{\"schema\":1,\"module\":\"lantern\",\"nro\":\"switch/Lantern/Lantern.nro\",\"notices\":["
+             "{\"id\":\"dl\",\"level\":\"progress\",\"title\":\"Downloading\",\"progress\":40,\"route\":\"downloads\"},"
+             "{\"id\":\"fail\",\"level\":\"error\",\"title\":\"Install failed\"},"
+             "{\"id\":\"old\",\"level\":\"todo\",\"title\":\"Old\",\"expires\":50}]}");
+    put_file(root, "config/boreale/notices/atelier.json",   // its .nro gone
+             "{\"schema\":1,\"nro\":\"switch/Atelier/Atelier.nro\",\"notices\":[{\"id\":\"a\",\"level\":\"todo\",\"title\":\"x\"}]}");
+    put_file(root, "config/boreale/notices/hawk.json",      // started from nxlink: no .nro, kept
+             "{\"schema\":1,\"nro\":\"\",\"notices\":[{\"id\":\"h\",\"level\":\"info\",\"title\":\"Hi\"}]}");
+    put_file(root, "config/boreale/notices/kite.json",      // a newer version's
+             "{\"schema\":2,\"nro\":\"switch/Lantern/Lantern.nro\",\"notices\":[]}");
+    n = sync_notices_build(root, 100, out, sizeof(out));
+    CHECK(n > 0 && strstr(out, "\"schema\":1,\"homebrews\":[{\"module\":\"hawk\",\"name\":\"hawk\""));
+    CHECK(strstr(out, "{\"module\":\"lantern\",\"name\":\"Lantern\"") != NULL);
+    CHECK(strstr(out, "{\"module\":\"playguard\",\"name\":\"playguard\"") != NULL);   // no registry file: its module
+    CHECK(strstr(out, "\"id\":\"dl\",\"level\":\"progress\",\"title\":\"Downloading\",\"detail\":\"\",\"lang\":\"\",\"progress\":40") != NULL);
+    CHECK(!strstr(out, "\"old\"") && !strstr(out, "atelier") && !strstr(out, "kite"));
+    CHECK(strstr(out, "\"todo\":1,\"error\":1}") != NULL);
+    // As the root is spelled: with its '/' too.
+    char slash[64];
+    snprintf(slash, sizeof(slash), "%s/", root);
+    static char again[SYNC_SCRATCH_SIZE];
+    CHECK(sync_notices_build(slash, 100, again, sizeof(again)) == n && !strcmp(again, out));
+    CHECK(sync_notices_build(root, 100, out, 40) == 0);   // does not fit
+    char cmd[128];
+    snprintf(cmd, sizeof(cmd), "rm -rf '%s'", root);
+    CHECK(system(cmd) == 0);
+}
+
 int main(int argc, char **argv)
 {
     if (argc > 1) out_dir = argv[1];
@@ -1506,5 +1565,6 @@ int main(int argc, char **argv)
     test_system_document();
     test_games_document();
     test_export_entities();
+    test_notices_document();
     return CHECK_DONE("sync_core: all tests passed");
 }
