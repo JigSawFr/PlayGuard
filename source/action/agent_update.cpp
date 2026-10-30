@@ -105,7 +105,6 @@ void go(std::shared_ptr<Run> r)
     using S = modules::Step;
     const modules::Module& m = agent();
     const std::string sd = paths::sd_root();
-    std::string err;
     switch (r->step) {
         case S::Shutdown:
             // "offline" from the agent itself, then the next step.
@@ -119,14 +118,13 @@ void go(std::shared_ptr<Run> r)
             return;
         }
         case S::Swap: {
-            std::string warning;
-            const bool ok = modules::install(sd, m, r->bundle, true, &err, &warning);
-            if (!ok) r->out.why = err;
-            if (!warning.empty()) {
-                aurore::Logger::warning("agent update: the agent is in place, {}", warning);
+            const auto done = modules::install(sd, m, r->bundle, true);
+            if (!done) r->out.why = done.error();
+            if (done && !done->warning.empty()) {
+                aurore::Logger::warning("agent update: the agent is in place, {}", done->warning);
                 aurore::sync([]() { ui::notify("playguard/modules/meta_err"_i18n, ui::Toast::Refused); });
             }
-            advance(r, ok);
+            advance(r, done.has_value());
             return;
         }
         case S::Start:
@@ -143,9 +141,9 @@ void go(std::shared_ptr<Run> r)
         case S::Restore: {
             // A first install that does not answer is removed; an update
             // gets the previous agent back.
-            const bool ok = r->out.update ? modules::rollback(sd, m, &err) : modules::uninstall(sd, m, &err);
-            if (!ok) r->out.why += (r->out.why.empty() ? "" : " — ") + err;
-            advance(r, ok);
+            const auto done = r->out.update ? modules::rollback(sd, m) : modules::uninstall(sd, m);
+            if (!done) r->out.why += (r->out.why.empty() ? "" : " — ") + done.error();
+            advance(r, done.has_value());
             return;
         }
         case S::Confirm:

@@ -12,6 +12,7 @@
 #pragma once
 
 #include <cstdint>
+#include <expected>
 #include <string>
 #include <vector>
 
@@ -68,31 +69,38 @@ enum class Offer
 };
 Offer offer(const State& s, const Bundle& b);
 
+// Applied, or why not.
+using Applied = std::expected<void, std::string>;
+
+// An install that went through.
+struct Installed
+{
+    // Set when the module is in place but toolbox.json or version.txt could
+    // not be written (its version then unknown: the install is offered again).
+    std::string warning;
+};
+
 // Copies the bundled module in: exefs.nsp.new (checked against the bundle's
 // SHA-256), the installed one moved to exefs.nsp.bak, the new one in place;
 // toolbox.json and version.txt written; boot2.flag created on a first
 // install (an update keeps the choice). With `keep_backup` the .bak stays
 // until confirm() or rollback() (the agent: until it is seen running).
-// `warning`: set when the module is in place but toolbox.json or version.txt
-// could not be written (its version then unknown: the install is offered
-// again); the install still succeeds.
-[[nodiscard]] bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool keep_backup,
-                           std::string* error = nullptr, std::string* warning = nullptr);
+[[nodiscard]] std::expected<Installed, std::string> install(const std::string& sd_root, const Module& m, const Bundle& b,
+                                                            bool keep_backup);
 // The new module works: the backup goes.
 void confirm(const std::string& sd_root, const Module& m);
-// Puts exefs.nsp.bak back in place. False when there is none.
-[[nodiscard]] bool rollback(const std::string& sd_root, const Module& m, std::string* error = nullptr);
+// Puts exefs.nsp.bak back in place. An error when there is none.
+[[nodiscard]] Applied rollback(const std::string& sd_root, const Module& m);
 
 // The recovery module's playguard-rescue.txt, as Makefile's dist-rescue
 // writes it in the zip: "<PlayGuard version> <revision>" (tools/rescue_rev.cmake),
 // which action/rescue compares with its own to tell a module out of date.
 // Nothing is written without a revision (a build that has none).
-bool write_rescue_note(const std::string& sd_root, const std::string& version, const std::string& revision,
-                       std::string* error = nullptr);
+Applied write_rescue_note(const std::string& sd_root, const std::string& version, const std::string& revision);
 
-[[nodiscard]] bool set_at_boot(const std::string& sd_root, const Module& m, bool on, std::string* error = nullptr);
+[[nodiscard]] Applied set_at_boot(const std::string& sd_root, const Module& m, bool on);
 // Removes the module's whole folder.
-[[nodiscard]] bool uninstall(const std::string& sd_root, const Module& m, std::string* error = nullptr);
+[[nodiscard]] Applied uninstall(const std::string& sd_root, const Module& m);
 
 std::string toolbox_json(const Module& m);
 
