@@ -2027,6 +2027,8 @@
         "ignored_until": "Ignoriert bis {}",
         "ignored_kept": "Ignoriert",
         "open_tab": "{} öffnen",
+        "open_in": "In {} öffnen",
+        "open_manual": "Öffnen Sie {} über das Homebrew-Menü, um sich darum zu kümmern.",
         "pin_missing": "Die Jugendschutzeinstellungen sind nicht eingerichtet",
         "pin_missing_detail": "Noch keine PIN: Die Konsole ist nicht geschützt.",
         "alarm_off": "Alarm „Zeit ist um“: aus",

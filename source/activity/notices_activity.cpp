@@ -2,6 +2,7 @@
 #include "activity/notices_activity.hpp"
 
 #include <algorithm>
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -14,11 +15,19 @@
 #include "action/pin_lock.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/launcher.hpp"
+#include "util/paths.hpp"
 
 using namespace aurore::literals;
 
 namespace
 {
+// The other Boréale homebrews' notices shown now.
+std::vector<shared_bell_logic::Other> others()
+{
+    return shared_bell_logic::others(paths::sd_root(), aurore::Application::getLocale(), (int64_t)std::time(nullptr));
+}
+
 // What an entry says below its title.
 aurore::Label* detail_label(const std::string& detail)
 {
@@ -43,9 +52,10 @@ NoticesActivity::~NoticesActivity()
 
 void NoticesActivity::open()
 {
-    aurore::Logger::info("notices: {} to do, {} for information, {} about the console to do", notices::action_count(),
-                       notices::info_count(), notices::console_count());
-    if (notices::list().empty() && notices::ignored().empty()) {
+    const size_t from_others = others().size();
+    aurore::Logger::info("notices: {} to do, {} for information, {} about the console to do, {} other homebrews",
+                       notices::action_count(), notices::info_count(), notices::console_count(), from_others);
+    if (notices::list().empty() && notices::ignored().empty() && !from_others) {
         ui::notify("playguard/notices/none"_i18n);
         return;
     }
@@ -172,11 +182,35 @@ aurore::DetailCell* NoticesActivity::ignored_cell(const notices::Entry& e)
     return cell;
 }
 
+// Another homebrew's notice: its title (amber when it is to do or failed),
+// and A to start that homebrew at the screen it names once PlayGuard exits.
+aurore::DetailCell* NoticesActivity::other_cell(const shared_bell_logic::Other& o, const shared_bell_logic::Notice& n)
+{
+    auto* cell = new aurore::DetailCell();
+    cell->setText(n.title);
+    if (n.attention) cell->title->setThemeColor("textColor", "cadran/amber");
+    cell->detail->setThemeColor("textColor", "cadran/text2");
+    cell->setDetailText(aurore::getStr("playguard/notices/open_in", o.name) + "  ›");
+    const std::string name = o.name, nro = o.nro, route = n.route, id = o.module + "/" + n.id;
+    cell->registerClickAction([this, name, nro, route, id](aurore::View*) {
+        if (launcher::can_launch() && launcher::launch_nro(nro, route)) {
+            aurore::Logger::info("notices: {} opens {} at '{}'", id, nro, route);
+            this->closing = true;
+            aurore::Application::quit();   // hbloader starts it as soon as PlayGuard exits
+            return true;
+        }
+        ui::info(aurore::getStr("playguard/notices/open_manual", name));
+        return true;
+    });
+    return cell;
+}
+
 void NoticesActivity::rebuild()
 {
     const auto all = notices::list();
     const auto ignored = notices::ignored();
-    if (all.empty() && ignored.empty()) {
+    const auto from_others = others();
+    if (all.empty() && ignored.empty() && from_others.empty()) {
         // Nothing left: back to the main screen, once.
         this->closing = true;
         aurore::Application::popActivity();
@@ -237,6 +271,19 @@ void NoticesActivity::rebuild()
         if (console && this->console_open && !focus) focus = cell;
 
         if (!e.item.detail.empty()) box->addView(detail_label(e.item.detail));
+    }
+
+    // The other Boréale homebrews', each under its name.
+    for (const shared_bell_logic::Other& o : from_others) {
+        header(o.name);
+        for (const shared_bell_logic::Notice& n : o.notices) {
+            aurore::DetailCell* cell = this->other_cell(o, n);
+            mark(cell);
+            if (n.attention) todos.push_back(cell);
+            box->addView(cell);
+            if (!first) first = cell;
+            if (!n.detail.empty()) box->addView(detail_label(n.detail));
+        }
     }
 
     // Last, what the parent chose to ignore.

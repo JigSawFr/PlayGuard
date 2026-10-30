@@ -2027,6 +2027,8 @@
         "ignored_until": "Ignorado até {}",
         "ignored_kept": "Ignorado",
         "open_tab": "Abrir {}",
+        "open_in": "Abrir em {}",
+        "open_manual": "Abra {} pelo menu de homebrew para resolver isso.",
         "pin_missing": "O controle parental não está configurado",
         "pin_missing_detail": "Ainda sem PIN: o console não está protegido.",
         "alarm_off": "Alarme \"Tempo esgotado\": desativado",

@@ -1,6 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/launcher.hpp"
 
+#include "bl_notices.h"
 #include "core/platform.h"
 #include "util/paths.hpp"
 
@@ -59,10 +60,13 @@ bool launch(const Target& target)
     return launch_nro(target.path);
 }
 
-bool launch_nro(const std::string& path)
+bool launch_nro(const std::string& path, const std::string& route)
 {
     if (path.empty() || path[0] != '/') return false;
-    return platform_set_next_load(("sdmc:" + path).c_str());
+    if (route.empty()) return platform_set_next_load(("sdmc:" + path).c_str());
+    char sd_path[BL_APP_PATH_MAX + 8], args[BL_APP_PATH_MAX + BL_NOTICE_ROUTE_MAX + 16];
+    if (!bl_open_args(path.c_str(), route.c_str(), sd_path, sizeof(sd_path), args, sizeof(args))) return false;
+    return platform_set_next_load_args(sd_path, args);
 }
 
 }   // namespace launcher

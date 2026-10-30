@@ -102,6 +102,10 @@ The entries about the console rather than the parental controls come last, on on
 
 Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), a newer release of the Home Assistant integration (once it said which version Home Assistant runs: *What's new* shows what changed since and the QR code that opens it in HACS), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
 
+### The other Boréale homebrews
+
+Below PlayGuard's own entries, each other Boréale homebrew installed on the console that has something to say gets a section under its name: what it is downloading, what failed, what waits on you there (to do or failed in amber). Ⓐ on one starts that homebrew at the screen it names once PlayGuard closes; when PlayGuard was not started from the homebrew menu, a message says to open it from there. Nothing of the other homebrew runs in PlayGuard. In return, PlayGuard's own entries are shown in their bells, and opening one there starts PlayGuard on the tab where it is dealt with.
+
 ### How entries behave
 
 - Each section lists its entries in a fixed order, whichever check finished first.

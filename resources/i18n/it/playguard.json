@@ -2027,6 +2027,8 @@
         "ignored_until": "Ignorato fino al {}",
         "ignored_kept": "Ignorato",
         "open_tab": "Apri {}",
+        "open_in": "Apri in {}",
+        "open_manual": "Apri {} dal menu degli homebrew per occupartene.",
         "pin_missing": "Il filtro famiglia non è configurato",
         "pin_missing_detail": "Ancora nessun PIN: la console non è protetta.",
         "alarm_off": "Avviso \"Tempo scaduto\": disattivato",

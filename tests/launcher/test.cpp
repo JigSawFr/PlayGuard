@@ -16,16 +16,19 @@
 
 static bool        g_hbloader = false;
 static std::string g_next;
+static std::string g_args;
 static int         g_calls = 0;
 
 extern "C" bool platform_can_launch(void) { return g_hbloader; }
-extern "C" bool platform_set_next_load(const char* path)
+extern "C" bool platform_set_next_load_args(const char* path, const char* args)
 {
     g_calls++;
     if (!g_hbloader) return false;
     g_next = path;
+    g_args = args;
     return true;
 }
+extern "C" bool platform_set_next_load(const char* path) { return platform_set_next_load_args(path, path); }
 
 static void install(const std::string& sd_path)
 {
@@ -76,6 +79,13 @@ int main()
     CHECK(launcher::launch_nro("/switch/playguard/playguard.nro") && g_next == "sdmc:/switch/playguard/playguard.nro");
     const int nro_calls = g_calls;
     CHECK(!launcher::launch_nro("") && !launcher::launch_nro("switch/playguard.nro") && g_calls == nro_calls);
+    // Another Boréale homebrew at the screen its notice names (--open), the
+    // path quoted when it has a space; a route that is not one never reaches the loader.
+    CHECK(launcher::launch_nro("/switch/PlayShelf/PlayShelf.nro", "downloads/queue"));
+    CHECK(g_next == "sdmc:/switch/PlayShelf/PlayShelf.nro" && g_args == "sdmc:/switch/PlayShelf/PlayShelf.nro --open=downloads/queue");
+    CHECK(launcher::launch_nro("/switch/My Apps/x.nro", "home") && g_args == "\"sdmc:/switch/My Apps/x.nro\" --open=home");
+    const int route_calls = g_calls;
+    CHECK(!launcher::launch_nro("/switch/x.nro", "../etc") && g_calls == route_calls);
 
     // The App Store's record of PlayGuard (libget's): its manifest, not its info.json alone.
     const std::string record = "/switch/appstore/.get/packages/PlayGuard/";

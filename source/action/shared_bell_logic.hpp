@@ -1,9 +1,10 @@
-// shared_bell_logic — PlayGuard's bell as the other Boréale homebrews see
-// it: sd:/config/boreale/notices/playguard.json (boreale-link's bl_notices),
-// each entry with the tab where it is dealt with as its route, so that a
-// click in another homebrew's bell opens PlayGuard there (--open=<tab>).
-// Only the text: action/notices writes it. Plain C++ so the host tests can
-// run it (tests/shared_bell_logic).
+// shared_bell_logic — the bell shared by the Boréale homebrews
+// (sd:/config/boreale/notices/, boreale-link's bl_notices). PlayGuard's
+// side, playguard.json: each entry with the tab where it is dealt with as
+// its route, so that a click in another homebrew's bell opens PlayGuard
+// there (--open=<tab>); action/notices writes it. The others' side: their
+// notices, for PlayGuard's bell (activity/notices_activity). Plain C++ so
+// the host tests can run it (tests/shared_bell_logic).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -34,5 +35,28 @@ std::string file(const std::string& sd_root);
 // written by a newer version (never written over).
 std::string text(const std::vector<Entry>& entries, const std::string& lang, const std::string& nro,
                  const std::string& previous, int64_t now);
+
+// Another homebrew's notice, as PlayGuard's bell shows it.
+struct Notice
+{
+    std::string id;
+    bool        attention = false;   // to do or failed: amber
+    std::string title;
+    std::string detail;              // with its progress, when it has one ("40 %")
+    std::string route;               // the screen it opens at
+};
+
+struct Other
+{
+    std::string         module;   // "playshelf"
+    std::string         name;     // its registry's (config/boreale/apps/), else the module
+    std::string         nro;      // from the SD card's root, with its '/': "/switch/PlayShelf/PlayShelf.nro"
+    std::vector<Notice> notices;
+};
+
+// The other homebrews' notices shown at `now` on a console in `lang`, read
+// from under `sd_root`: by name; a homebrew whose .nro is no longer there,
+// or with nothing to show, left out, and PlayGuard's own file too.
+std::vector<Other> others(const std::string& sd_root, const std::string& lang, int64_t now);
 
 }   // namespace shared_bell_logic
