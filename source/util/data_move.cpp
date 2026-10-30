@@ -88,7 +88,7 @@ size_t to_nand(const std::string& data_dir, const std::string& nand_dir)
     // The remote link's records and what the agent sysmodule wrote for this
     // system (util/sync_files.hpp); profiles.txt stays shared.
     if (has("sync"))
-        for (const char* f : { "nro_state.txt", "agent_state.txt", "agent_events.log", "agent_events.log.read", "names.txt" })
+        for (const char* f : { "nro_state.txt", "agent_state.txt", "agent_events.log", "agent_events.log.read", "agent_events.log.rejected", "names.txt" })
             moves.push_back({ std::string("sync/") + f, std::string("sync/") + f });
     if (has("cache"))
         for (const std::string& n : paths::list_files(data_dir + "/cache", ".bin"))

@@ -118,10 +118,13 @@ struct AgentEvent
     std::vector<int> before, after;
     int              console_lock_after = -1;
 };
-// The lines that parse, oldest first.
-std::vector<AgentEvent> parse_agent_events(const std::string& text);
+// The lines that parse, oldest first (a line with more fields than this
+// version knows is read for the ones it knows). The others go to `rejected`,
+// one per line, when given.
+std::vector<AgentEvent> parse_agent_events(const std::string& text, std::string* rejected = nullptr);
 // Takes the file (renamed first, so a line the agent appends meanwhile waits
-// for the next time), parses it, and removes it.
+// for the next time), parses it, and removes it once the lines it could not
+// read are kept aside in agent_events.log.rejected.
 std::vector<AgentEvent> take_agent_events();
 
 }   // namespace sync_files

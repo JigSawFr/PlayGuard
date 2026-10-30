@@ -309,22 +309,34 @@ bool agent_records_newer()
     return agent.st_mtime >= nro.st_mtime;
 }
 
-std::vector<AgentEvent> parse_agent_events(const std::string& text)
+std::vector<AgentEvent> parse_agent_events(const std::string& text, std::string* rejected)
 {
     std::vector<AgentEvent> out;
     for (std::string line : split(text, '\n')) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
+        if (line.empty()) continue;
+        const auto reject = [&] {
+            if (rejected) *rejected += line + "\n";
+        };
         const std::vector<std::string> f = split(line, '\t');
-        // The console lock's field came last; a line without it is older.
-        if (f.size() != 10 && f.size() != 11) continue;
+        // The console lock's field came last; a line without it is older,
+        // one with more fields newer (what this version knows is read).
+        if (f.size() < 10) {
+            reject();
+            continue;
+        }
         AgentEvent e;
         long long ts = 0, applied = 0, change = 0, n = 0, lock = -1;
         if (!parse_int(f[0], 1, 0x7FFFFFFFFFFFLL, &ts) || !parse_int(f[3], 0, 1, &applied) ||
-            !parse_int(f[5], 0, 64, &change) || !parse_int(f[6], 0, 7, &n))
+            !parse_int(f[5], 0, 64, &change) || !parse_int(f[6], 0, 7, &n)) {
+            reject();
             continue;
-        if (f[1].empty() || !parse_values(f[8], (size_t)n, &e.before) || !parse_values(f[9], (size_t)n, &e.after))
+        }
+        if (f[1].empty() || !parse_values(f[8], (size_t)n, &e.before) || !parse_values(f[9], (size_t)n, &e.after) ||
+            (f.size() >= 11 && !parse_int(f[10], -1, 1, &lock))) {
+            reject();
             continue;
-        if (f.size() == 11 && !parse_int(f[10], -1, 1, &lock)) continue;
+        }
         e.ts = (uint64_t)ts;
         e.entity = f[1];
         e.payload = f[2];
@@ -355,9 +367,21 @@ std::vector<AgentEvent> take_agent_events()
     struct stat st;
     // A file left by a run that stopped before removing it comes first.
     if (stat(taken.c_str(), &st) != 0 && std::rename(file.c_str(), taken.c_str()) != 0) return {};
-    std::string text;
+    std::string text, rejected;
     paths::read_file(taken, text);
-    std::vector<AgentEvent> out = parse_agent_events(text);
+    std::vector<AgentEvent> out = parse_agent_events(text, &rejected);
+    // The lines this version cannot read are kept for a later one, in
+    // agent_events.log.rejected; when that fails, the taken file keeps them
+    // (and only them: the others are in the history now).
+    if (!rejected.empty()) {
+        const std::string aside = file + ".rejected";
+        std::string kept;
+        paths::read_file(aside, kept);
+        if (!paths::atomic_write(aside, kept + rejected)) {
+            if (!paths::atomic_write(taken, rejected)) return {};   // nothing lost: all of it again next time
+            return out;
+        }
+    }
     std::remove(taken.c_str());
     return out;
 }
