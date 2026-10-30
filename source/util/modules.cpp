@@ -53,10 +53,10 @@ std::string value_of(const std::string& text, const std::string& key)
     return "";
 }
 
-bool fail(std::string* error, const std::string& what)
+// `what`, with errno's text when it is set.
+std::unexpected<std::string> fail(const std::string& what)
 {
-    if (error) *error = what + (errno ? std::string(": ") + std::strerror(errno) : std::string());
-    return false;
+    return std::unexpected(what + (errno ? std::string(": ") + std::strerror(errno) : std::string()));
 }
 
 bool remove_tree(const std::string& path)
@@ -177,44 +177,39 @@ std::string toolbox_json(const Module& m)
            "\",\n  \"requires_reboot\": " + (m.resident ? "false" : "true") + "\n}\n";
 }
 
-bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool keep_backup, std::string* error,
-             std::string* warning)
+std::expected<Installed, std::string> install(const std::string& sd_root, const Module& m, const Bundle& b, bool keep_backup)
 {
     s_seen.clear();
     errno = 0;
-    if (!b.present) return fail(error, "this build carries no copy of the module");
+    if (!b.present) return fail("this build carries no copy of the module");
     std::string bytes;
-    if (!paths::read_file(b.nsp, bytes)) return fail(error, "cannot read the bundled module");
+    if (!paths::read_file(b.nsp, bytes)) return fail("cannot read the bundled module");
     if (sha256_of(bytes) != b.sha256) {
         errno = 0;
-        return fail(error, "the bundled module is damaged");
+        return fail("the bundled module is damaged");
     }
     const std::string d = dir(sd_root, m), target = d + "/exefs.nsp", fresh = target + ".new", old = target + ".bak";
-    if (!paths::ensure_dir(d + "/flags")) return fail(error, "cannot create " + d);
-    std::string werr;
-    if (!paths::atomic_write(fresh, bytes, &werr)) {
-        if (error) *error = werr;
-        return false;
-    }
+    if (!paths::ensure_dir(d + "/flags")) return fail("cannot create " + d);
+    if (std::string werr; !paths::atomic_write(fresh, bytes, &werr)) return std::unexpected(werr);
     std::string check;
     if (!paths::read_file(fresh, check) || sha256_of(check) != b.sha256) {
         std::remove(fresh.c_str());
         errno = 0;
-        return fail(error, "the copy on the SD card does not match");
+        return fail("the copy on the SD card does not match");
     }
     const bool first = !paths::file_exists(target);
     if (!first) {
         std::remove(old.c_str());   // an older backup: this one is newer
         if (std::rename(target.c_str(), old.c_str()) != 0) {
             std::remove(fresh.c_str());
-            return fail(error, "cannot move the installed module aside");
+            return fail("cannot move the installed module aside");
         }
     }
     if (std::rename(fresh.c_str(), target.c_str()) != 0) {
         const int err = errno;
         if (!first) std::rename(old.c_str(), target.c_str());
         errno = err;
-        return fail(error, "cannot put the module in place");
+        return fail("cannot put the module in place");
     }
     if (!keep_backup) std::remove(old.c_str());
     // The module is in place: what the sysmodule managers and the next update
@@ -223,10 +218,12 @@ bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool 
     const bool listed = paths::atomic_write(d + "/toolbox.json", toolbox_json(m), &listed_why);
     const bool noted = paths::atomic_write(
         d + "/version.txt", "version=" + b.version + "\ncommit=" + b.commit + "\nsha256=" + b.sha256 + "\n", &noted_why);
-    if (warning && !noted) *warning = "version.txt not written: " + noted_why;
-    else if (warning && !listed) *warning = "toolbox.json not written: " + listed_why;
-    if (first && !set_at_boot(sd_root, m, true, error)) return false;
-    return true;
+    Installed done;
+    if (!noted) done.warning = "version.txt not written: " + noted_why;
+    else if (!listed) done.warning = "toolbox.json not written: " + listed_why;
+    if (first)
+        if (auto on = set_at_boot(sd_root, m, true); !on) return std::unexpected(on.error());
+    return done;
 }
 
 void confirm(const std::string& sd_root, const Module& m)
@@ -235,12 +232,12 @@ void confirm(const std::string& sd_root, const Module& m)
     std::remove((dir(sd_root, m) + "/exefs.nsp.bak").c_str());
 }
 
-bool rollback(const std::string& sd_root, const Module& m, std::string* error)
+Applied rollback(const std::string& sd_root, const Module& m)
 {
     s_seen.clear();
     errno = 0;
     const std::string d = dir(sd_root, m), target = d + "/exefs.nsp", old = target + ".bak";
-    if (!paths::file_exists(old)) return fail(error, "no previous module to put back");
+    if (!paths::file_exists(old)) return fail("no previous module to put back");
     const std::string failed = target + ".failed";
     std::remove(failed.c_str());
     std::rename(target.c_str(), failed.c_str());
@@ -248,45 +245,43 @@ bool rollback(const std::string& sd_root, const Module& m, std::string* error)
         const int err = errno;
         std::rename(failed.c_str(), target.c_str());
         errno = err;
-        return fail(error, "cannot put the previous module back");
+        return fail("cannot put the previous module back");
     }
     std::remove(failed.c_str());
     std::remove((d + "/version.txt").c_str());   // its version is not known any more
-    return true;
+    return {};
 }
 
-bool write_rescue_note(const std::string& sd_root, const std::string& version, const std::string& revision,
-                       std::string* error)
+Applied write_rescue_note(const std::string& sd_root, const std::string& version, const std::string& revision)
 {
-    if (revision.empty()) return true;
-    return paths::atomic_write(dir(sd_root, get(Id::Rescue)) + "/playguard-rescue.txt", version + " " + revision + "\n",
-                               error);
+    if (revision.empty()) return {};
+    std::string err;
+    if (!paths::atomic_write(dir(sd_root, get(Id::Rescue)) + "/playguard-rescue.txt", version + " " + revision + "\n",
+                             &err))
+        return std::unexpected(err);
+    return {};
 }
 
-bool set_at_boot(const std::string& sd_root, const Module& m, bool on, std::string* error)
+Applied set_at_boot(const std::string& sd_root, const Module& m, bool on)
 {
     errno = 0;
     const std::string flag = dir(sd_root, m) + "/flags/boot2.flag";
     if (!on) {
-        if (std::remove(flag.c_str()) != 0 && errno != ENOENT) return fail(error, "cannot remove " + flag);
-        return true;
+        if (std::remove(flag.c_str()) != 0 && errno != ENOENT) return fail("cannot remove " + flag);
+        return {};
     }
-    std::string werr;
-    if (!paths::atomic_write(flag, "", &werr)) {
-        if (error) *error = werr;
-        return false;
-    }
-    return true;
+    if (std::string werr; !paths::atomic_write(flag, "", &werr)) return std::unexpected(werr);
+    return {};
 }
 
-bool uninstall(const std::string& sd_root, const Module& m, std::string* error)
+Applied uninstall(const std::string& sd_root, const Module& m)
 {
     s_seen.clear();
     errno = 0;
     const std::string d = dir(sd_root, m);
-    if (!is_dir(d)) return true;
-    if (!remove_tree(d)) return fail(error, "cannot remove " + d);
-    return true;
+    if (!is_dir(d)) return {};
+    if (!remove_tree(d)) return fail("cannot remove " + d);
+    return {};
 }
 
 Step first_step(bool running)

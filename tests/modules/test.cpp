@@ -20,6 +20,9 @@
 
 using namespace modules;
 
+// Why a call failed; "" when it did not.
+template <class T> static std::string error_of(const std::expected<T, std::string>& r) { return r ? "" : r.error(); }
+
 static std::string g_base;
 static int g_n = 0;
 
@@ -110,10 +113,9 @@ static void test_install_update_rollback()
     const Module& m = get(Id::Rescue);
     const std::string sd = fresh("sd");
     const Bundle v1 = bundled(bundle("NSP0 v1", "1.1.0"), m);
-    std::string err;
 
     // First install: in place, at boot, toolbox.json, version.txt.
-    CHECK(install(sd, m, v1, false, &err));
+    CHECK(install(sd, m, v1, false));
     State s = state(sd, m);
     CHECK(s.installed && s.at_boot && !s.backup && s.sha256 == v1.sha256 && s.version == "1.1.0");
     CHECK(read(dir(sd, m) + "/toolbox.json") == toolbox_json(m));
@@ -121,24 +123,24 @@ static void test_install_update_rollback()
     CHECK(!paths::file_exists(dir(sd, m) + "/exefs.nsp.new"));
 
     // The boot choice survives an update.
-    CHECK(set_at_boot(sd, m, false, &err));
+    CHECK(set_at_boot(sd, m, false));
     CHECK(!state(sd, m).at_boot);
-    CHECK(set_at_boot(sd, m, false, &err));   // already off
+    CHECK(set_at_boot(sd, m, false));   // already off
     const Bundle v2 = bundled(bundle("NSP0 v2", "1.2.0"), m);
     CHECK(offer(state(sd, m), v2) == Offer::Update);
-    CHECK(install(sd, m, v2, true, &err));
+    CHECK(install(sd, m, v2, true));
     s = state(sd, m);
     CHECK(s.sha256 == v2.sha256 && s.version == "1.2.0" && s.backup && !s.at_boot);
     CHECK(read(dir(sd, m) + "/exefs.nsp.bak") == "NSP0 v1");
 
     // The new one did not start: the previous one goes back.
-    CHECK(rollback(sd, m, &err));
+    CHECK(rollback(sd, m));
     s = state(sd, m);
     CHECK(s.sha256 == v1.sha256 && !s.backup && s.version.empty());
-    CHECK(!rollback(sd, m, &err) && !err.empty());   // nothing left to put back
+    CHECK(!error_of(rollback(sd, m)).empty());   // nothing left to put back
 
     // Updated again, and confirmed: the backup goes.
-    CHECK(install(sd, m, v2, true, &err));
+    CHECK(install(sd, m, v2, true));
     confirm(sd, m);
     s = state(sd, m);
     CHECK(s.sha256 == v2.sha256 && !s.backup);
@@ -148,39 +150,38 @@ static void test_install_update_rollback()
     const std::string version = dir(sd, m) + "/version.txt";
     std::remove(version.c_str());
     CHECK(paths::ensure_dir(version + "/in_the_way"));
-    std::string warning;
-    CHECK(install(sd, m, v1, false, &err, &warning));
-    CHECK(warning.find("version.txt") != std::string::npos);
+    const auto kept = install(sd, m, v1, false);
+    CHECK(kept && kept->warning.contains("version.txt"));
     s = state(sd, m);
     CHECK(s.sha256 == v1.sha256 && s.version.empty());
     CHECK(std::system(("rm -rf '" + version + "'").c_str()) == 0);
-    warning.clear();
-    CHECK(install(sd, m, v2, false, &err, &warning) && warning.empty());   // v2 back, as below expects
+    const auto back = install(sd, m, v2, false);
+    CHECK(back && back->warning.empty());   // v2 back, as below expects
 
     // A damaged bundle installs nothing and keeps what is there.
     const Bundle bad = bundled(bundle("NSP0 v3", "1.3.0", true), m);
     CHECK(bad.present);
-    CHECK(!install(sd, m, bad, false, &err) && err.find("damaged") != std::string::npos);
+    CHECK(error_of(install(sd, m, bad, false)).contains("damaged"));
     CHECK(state(sd, m).sha256 == v2.sha256);
     const Bundle absent;
-    CHECK(!install(sd, m, absent, false, &err));
+    CHECK(!install(sd, m, absent, false));
 
     // playguard-rescue.txt as the release's zip has it ("<version> <revision>",
     // what action/rescue reads); none without a revision, and none replaced
     // by an empty one.
-    CHECK(write_rescue_note(sd, "1.2.0", "84d0eaa86878", &err));
+    CHECK(write_rescue_note(sd, "1.2.0", "84d0eaa86878"));
     CHECK(read(dir(sd, m) + "/playguard-rescue.txt") == "1.2.0 84d0eaa86878\n");
-    CHECK(write_rescue_note(sd, "1.2.0", "", &err));
+    CHECK(write_rescue_note(sd, "1.2.0", ""));
     CHECK(read(dir(sd, m) + "/playguard-rescue.txt") == "1.2.0 84d0eaa86878\n");
     const std::string none = fresh("sd");
-    CHECK(write_rescue_note(none, "1.2.0", "", &err) && !is_dir(dir(none, m)));
+    CHECK(write_rescue_note(none, "1.2.0", "") && !is_dir(dir(none, m)));
 
     // Removed with everything in its folder.
     put(dir(sd, m) + "/LICENSE.txt", "GPL");
-    CHECK(set_at_boot(sd, m, true, &err));
-    CHECK(uninstall(sd, m, &err));
+    CHECK(set_at_boot(sd, m, true));
+    CHECK(uninstall(sd, m));
     CHECK(!is_dir(dir(sd, m)) && !state(sd, m).installed);
-    CHECK(uninstall(sd, m, &err));   // already gone
+    CHECK(uninstall(sd, m));   // already gone
 }
 
 // Runs the update plan with the steps that fail, and returns the steps taken.
