@@ -2,7 +2,7 @@
 #include "activity/games_activity.hpp"
 
 #include <algorithm>
-#include <fmt/format.h>
+#include <format>
 #include <limits>
 #include <string>
 
@@ -39,7 +39,7 @@ constexpr size_t ICONS_AHEAD = 30;
 
 std::string period_label(int period)
 {
-    return aurore::getStr(fmt::format("playguard/activity/periods/{}", period));
+    return aurore::getStr(std::format("playguard/activity/periods/{}", period));
 }
 }   // namespace
 
@@ -117,7 +117,7 @@ void GamesActivity::set_hints()
 {
     // Ⓨ says what it switches to.
     aurore::View* frame = this->getContentView();
-    frame->registerAction(aurore::getStr(fmt::format("playguard/library/views/{}", this->grid ? 0 : 1)), aurore::BUTTON_Y,
+    frame->registerAction(aurore::getStr(std::format("playguard/library/views/{}", this->grid ? 0 : 1)), aurore::BUTTON_Y,
                           [this](aurore::View*) {
                               this->switch_view();
                               return true;
@@ -134,7 +134,7 @@ void GamesActivity::set_hints()
         return true;
     });
 #endif
-    view_cell->setDetailText(aurore::getStr(fmt::format("playguard/library/views/{}", this->grid ? 1 : 0)));
+    view_cell->setDetailText(aurore::getStr(std::format("playguard/library/views/{}", this->grid ? 1 : 0)));
     period_cell->setDetailText(period_label(this->period));
     period_caption->setText(period_label(this->period));
     aurore::Application::getGlobalHintsUpdateEvent()->fire();
@@ -416,7 +416,7 @@ void GamesActivity::show_status()
     } else if (this->period == activity_summary::AllTime && R_FAILED(this->data->stats_rc)) {
         text = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(this->data->stats_rc);
     } else if (this->rows.empty()) {
-        text = aurore::getStr(fmt::format("playguard/activity/none/{}", this->period));
+        text = aurore::getStr(std::format("playguard/activity/none/{}", this->period));
         error = false;
     }
     status->setText(text);

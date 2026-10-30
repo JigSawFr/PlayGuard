@@ -6,7 +6,7 @@
 #include <condition_variable>
 #include <cstdlib>
 #include <cstring>
-#include <fmt/format.h>
+#include <format>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -193,7 +193,7 @@ void collect()
     }
     if (!j.sent.empty() || !j.cleared.empty() || j.error.empty())
         aurore::Logger::info("sync: game icons: {} published, {} cleared{}", j.sent.size(), j.cleared.size(),
-                       j.too_large ? fmt::format(", {} larger than the broker takes", j.too_large) : "");
+                       j.too_large ? std::format(", {} larger than the broker takes", j.too_large) : "");
     s.job.reset();
 }
 }   // namespace

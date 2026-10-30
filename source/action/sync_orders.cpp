@@ -2,7 +2,7 @@
 #include "action/sync_orders.hpp"
 
 #include <aurore.hpp>
-#include <fmt/format.h>
+#include <format>
 #include <vector>
 
 #include "action/history_flow.hpp"
@@ -24,7 +24,7 @@ namespace
 {
 std::string hm(int hour, int minute)
 {
-    return fmt::format("{:02d}:{:02d}", hour, minute);
+    return std::format("{:02d}:{:02d}", hour, minute);
 }
 
 std::string on_off(const char* on_key, const char* off_key, bool on)

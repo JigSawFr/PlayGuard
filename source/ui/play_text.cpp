@@ -3,7 +3,7 @@
 #include "ui/play_text.hpp"
 
 #include <algorithm>
-#include <fmt/format.h>
+#include <format>
 
 #include <aurore/cadran/ui/tr.hpp>
 
@@ -31,7 +31,7 @@ std::string fmt_limit(uint16_t m)
     if (m == 0) return "playguard/common/zero_minutes"_i18n;
     if (m < 60) return glued(aurore::getStr("cadran/common/minutes", (int)m));
     if (m % 60 == 0) return glued(aurore::getStr("cadran/common/hours", (int)(m / 60)));
-    return glued(aurore::getStr("cadran/common/hours_minutes", (int)(m / 60), fmt::format("{:02d}", (int)(m % 60))));
+    return glued(aurore::getStr("cadran/common/hours_minutes", (int)(m / 60), std::format("{:02d}", (int)(m % 60))));
 }
 
 std::string days_summary(const uint16_t days[7])
@@ -86,7 +86,7 @@ std::string age_text(int age)
 std::string level_name(uint32_t level)
 {
     if (level > 4) return "?";
-    return aurore::getStr(fmt::format("playguard/restrictions/levels/{}", level));
+    return aurore::getStr(std::format("playguard/restrictions/levels/{}", level));
 }
 
 std::string day_short(int wday)

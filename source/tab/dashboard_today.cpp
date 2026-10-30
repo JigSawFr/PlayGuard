@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <array>
-#include <fmt/format.h>
+#include <format>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 
@@ -174,7 +174,7 @@ void DashboardTab::show_next(bool unlocked)
         now_min = now.hour * 60 + now.minute;
         n = pt_logic::next_stop(now_min, left, timer.bed[today]);
     }
-    const auto clock = [](int minutes) { return fmt::format("{:02d}:{:02d}", minutes / 60, minutes % 60); };
+    const auto clock = [](int minutes) { return std::format("{:02d}:{:02d}", minutes / 60, minutes % 60); };
     const std::string amount = ui::fmt_limit((uint16_t)this->preview_extra);
     std::string text;
     const char* glyph = n.kind == pt_logic::NextStop::TIME_UP ? "timer" : "moon";

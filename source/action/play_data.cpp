@@ -3,7 +3,7 @@
 
 #include <aurore.hpp>
 #include <cstdlib>
-#include <fmt/format.h>
+#include <format>
 #include <functional>
 #include <map>
 #include <memory>

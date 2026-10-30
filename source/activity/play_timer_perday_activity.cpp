@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cstring>
-#include <fmt/format.h>
+#include <format>
 #include <vector>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>

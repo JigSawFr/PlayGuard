@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/modules_activity.hpp"
 
-#include <fmt/format.h>
+#include <format>
 #include <iterator>
 #include <memory>
 

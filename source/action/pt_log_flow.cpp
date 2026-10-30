@@ -2,9 +2,9 @@
 #include "action/pt_log_flow.hpp"
 
 #include <atomic>
+#include <format>
 #include <aurore.hpp>
 #include <chrono>
-#include <fmt/format.h>
 
 #include "app.hpp"
 #include "ui/ui.hpp"
@@ -37,7 +37,7 @@ void record(std::string event = "")
     u64 posix = 0;
     LocalTime l {};
     const bool local = time_local_now(&posix, &l);
-    const std::string stamp = local ? fmt::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}", (int)l.year,
+    const std::string stamp = local ? std::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}", (int)l.year,
                                                   (int)l.month, (int)l.day, (int)l.hour, (int)l.minute, (int)l.second)
                                     : std::string("?");
     const std::string moved = pt_log::clock_moved(&s_clock, posix, steady_s());

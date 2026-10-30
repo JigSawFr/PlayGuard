@@ -2,7 +2,7 @@
 #include "tab/activity_tab.hpp"
 
 #include <algorithm>
-#include <fmt/format.h>
+#include <format>
 #include <string>
 #include <vector>
 
@@ -32,7 +32,6 @@ constexpr float  WEEK_BAR_MAX = 56.0f;
 constexpr float  SPARK_MAX = 40.0f;
 // The accounts' avatars, in turn (no picture of theirs is read).
 const char* const AVATARS[] = { "cadran/avatar0", "cadran/avatar1", "cadran/avatar2", "cadran/avatar3" };
-
 
 // Shared by every ActivityTab (Aurore rebuilds the tab each time the
 // sidebar reaches it); the play data itself is play_data's. UI thread only.
@@ -293,7 +292,7 @@ void ActivityTab::show_status(const PlayStats& s, bool none_played)
     else if (p == AllTime && R_FAILED(s.stats_rc))
         text = "playguard/activity/err_stats"_i18n + " — " + ui::rc_text(s.stats_rc);
     else if (none_played) {
-        text  = aurore::getStr(fmt::format("playguard/activity/none/{}", p));
+        text  = aurore::getStr(std::format("playguard/activity/none/{}", p));
         error = false;
     }
     status->setText(text);
@@ -325,7 +324,7 @@ void ActivityTab::show_summary(const std::shared_ptr<const PlayStats>& data)
     if (sum.known && sum.days_played >= 0)
         days_played->setDetailText(aurore::getStr("playguard/activity/summary/days_played_value", sum.days_played));
     if (sum.known && sum.busiest >= 0)
-        busiest->setDetailText(aurore::getStr(fmt::format("cadran/days/{}", (int)data->day_wday[sum.busiest] % 7)) + " · " +
+        busiest->setDetailText(aurore::getStr(std::format("cadran/days/{}", (int)data->day_wday[sum.busiest] % 7)) + " · " +
                                ui::fmt_duration(sum.busiest_s));
     if (sum.known && sum.session_s > 0) session->setDetailText(ui::fmt_duration(sum.session_s));
     ui::set_visible_all({
@@ -346,10 +345,10 @@ void ActivityTab::show_hours(const std::shared_ptr<const PlayStats>& data)
                                              ui::fmt_duration(h.average_s)));
     if (h.longest_day >= 0)
         longest->setDetailText(ui::fmt_duration(h.longest_s) + " · " +
-                               aurore::getStr(fmt::format("cadran/days/{}", (int)data->day_wday[h.longest_day] % 7)));
+                               aurore::getStr(std::format("cadran/days/{}", (int)data->day_wday[h.longest_day] % 7)));
     if (h.busy_from >= 0)
-        busy_hours->setDetailText(aurore::getStr("playguard/activity/hours/busy_value", fmt::format("{:02d}:00", h.busy_from),
-                                               fmt::format("{:02d}:00", h.busy_from + 2)));
+        busy_hours->setDetailText(aurore::getStr("playguard/activity/hours/busy_value", std::format("{:02d}:00", h.busy_from),
+                                               std::format("{:02d}:00", h.busy_from + 2)));
     late->setDetailText(ui::fmt_duration(h.late_s));
     ui::set_visible_all({
         { hours_header.getView(), h.known },
@@ -368,7 +367,7 @@ void ActivityTab::choose_period()
     int selected = 0;
     for (int i = 0; i < activity_summary::PERIOD_COUNT; i++) {
         const int p = activity_summary::PERIODS[i];
-        labels.push_back(aurore::getStr(fmt::format("playguard/activity/periods/{}", p)));
+        labels.push_back(aurore::getStr(std::format("playguard/activity/periods/{}", p)));
         if (p == this->period) selected = i;
     }
     ui::pick("playguard/activity/period"_i18n, labels, selected, [this](int index) {
@@ -572,7 +571,7 @@ void ActivityTab::show_top()
             if (auto* l = dynamic_cast<aurore::Label*>(v)) l->setThemeColor("textColor", on ? "cadran/teal" : "cadran/text");
     }
     const int p = this->period;
-    const std::string period_name = aurore::getStr(fmt::format("playguard/activity/periods/{}", p));
+    const std::string period_name = aurore::getStr(std::format("playguard/activity/periods/{}", p));
     period_label->setText(period_name);
     games_title->setText(cadran::upper("playguard/activity/section_games"_i18n + " · " + period_name));
 
@@ -643,7 +642,7 @@ void ActivityTab::show_top()
     ui::set_visible(games_note, false);
     ui::set_visible(this->empty.box, none);
     ui::set_visible(this->see_all, p != AllTime && all.known && all.total_s > 0);
-    if (none) this->empty.title->setText(aurore::getStr(fmt::format("playguard/activity/none/{}", p)));
+    if (none) this->empty.title->setText(aurore::getStr(std::format("playguard/activity/none/{}", p)));
     if (aurore::View* status_view = this->getView("ac_status"); status_view && none) ui::set_visible(status_view, false);
     // Over the last 7 days, the card of the game played most more than the
     // week before says by how much (half an hour at least).

@@ -6,6 +6,7 @@
 #include <aurore.hpp>
 #include <cerrno>
 #include <cstdio>
+#include <format>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
@@ -165,10 +166,10 @@ State read_state(bool take_log)
     std::string s;
     st.state = paths::read_file(in_data(HBL_LOCK_STATE_NAME), s);
     uint8_t a, b, c;
-    if (st.state && hbl_lock_state_parse(s.data(), s.size(), &a, &b, &c)) st.locked_on = fmt::format("{}.{}.{}", a, b, c);
+    if (st.state && hbl_lock_state_parse(s.data(), s.size(), &a, &b, &c)) st.locked_on = std::format("{}.{}.{}", a, b, c);
     SysInfo si;
     sysinfo_get(&si);
-    if (si.ams_valid) st.ams = fmt::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro);
+    if (si.ams_valid) st.ams = std::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro);
     const auto p = forwarders_logic::patches_state(ui::patch_report());
     st.patches = p == forwarders_logic::Patches::Ready        ? "ready"
                  : p == forwarders_logic::Patches::Unknown    ? "unknown"
@@ -270,7 +271,7 @@ std::string report()
 {
     // What is on the card as it is: the report may be built off the UI thread.
     const State st = read_state(false);
-    return fmt::format(
+    return std::format(
         "=== homebrew menu ===\n"
         "override_config: {} (PlayGuard lock={} defaults={})\n"
         "as read        : album opens hbmenu={} R on a game={}\n"

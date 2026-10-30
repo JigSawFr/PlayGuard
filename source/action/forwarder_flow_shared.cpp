@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <aurore.hpp>
 
@@ -100,7 +101,6 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
     return true;
 }
 
-
 Gate gate_nro()
 {
     Gate g;
@@ -110,7 +110,7 @@ Gate gate_nro()
         h.update(bundled.data(), bundled.size());
         g.sha256 = h.digest();
         std::string hex;
-        for (size_t i = 0; i < 8; i++) hex += fmt::format("{:02x}", g.sha256[i]);
+        for (size_t i = 0; i < 8; i++) hex += std::format("{:02x}", g.sha256[i]);
         const std::string pinned = paths::data_dir() + "/gate-" + hex + ".nro";
         const std::string plain = paths::data_dir() + "/" + GATE_NRO_NAME;
         // Written when missing or not this one (a file changed on the card is

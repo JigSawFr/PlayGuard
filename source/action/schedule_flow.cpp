@@ -3,9 +3,9 @@
 
 #include <algorithm>
 #include <array>
+#include <format>
 #include <aurore.hpp>
 #include <cstdlib>
-#include <fmt/format.h>
 #include <vector>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
@@ -63,7 +63,7 @@ std::string day_text(const std::string& ymd)
     if (ymd.size() != 10) return ymd;
     const int month = number::parse<int>(ymd.substr(5, 2)).value_or(0), day = number::parse<int>(ymd.substr(8, 2)).value_or(0);
     if (month < 1 || month > 12 || day < 1) return ymd;
-    return aurore::getStr("playguard/schedule/date", day, aurore::getStr(fmt::format("cadran/months/{}", month)));
+    return aurore::getStr("playguard/schedule/date", day, aurore::getStr(std::format("cadran/months/{}", month)));
 }
 
 bool find_profile(const std::string& file, profiles::Profile* out)

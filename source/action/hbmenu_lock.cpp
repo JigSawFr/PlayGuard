@@ -4,6 +4,7 @@
 #include <aurore.hpp>
 #include <cerrno>
 #include <cstdio>
+#include <format>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
@@ -292,9 +293,9 @@ void setup(std::function<void(bool)> done)
     for (size_t i = 0; i < steps.size(); i++) {
         if (!steps[i].done && next < 0) next = (int)i;
         const ui::Check mark = steps[i].done ? ui::Check::Ok : (int)i == next ? ui::Check::Warn : ui::Check::Info;
-        lines.push_back({ mark, fmt::format("{}. {}", i + 1, steps[i].label) });
+        lines.push_back({ mark, std::format("{}. {}", i + 1, steps[i].label) });
     }
-    lines.push_back({ ui::Check::Info, fmt::format("{}. {}", steps.size() + 1, "playguard/hbmenu/step_lock"_i18n) });
+    lines.push_back({ ui::Check::Info, std::format("{}. {}", steps.size() + 1, "playguard/hbmenu/step_lock"_i18n) });
     const SetupStep::Kind kind = steps[(size_t)next].kind;
     auto* dialog = ui::box_dialog(ui::checklist_body("playguard/hbmenu/setup_title"_i18n, lines,
                                                        "playguard/hbmenu/setup_note"_i18n,

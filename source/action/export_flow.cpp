@@ -3,7 +3,7 @@
 #include "action/export_flow.hpp"
 
 #include <aurore.hpp>
-#include <fmt/format.h>
+#include <format>
 #include <vector>
 
 #include "ui/ui.hpp"
@@ -18,7 +18,7 @@ namespace export_flow
 void choose(const char* what, const std::string& stem, std::function<table_export::Table()> make)
 {
     std::vector<std::string> labels;
-    for (int f = 0; f < 4; f++) labels.push_back(aurore::getStr(fmt::format("playguard/activity/formats/{}", f)));
+    for (int f = 0; f < 4; f++) labels.push_back(aurore::getStr(std::format("playguard/activity/formats/{}", f)));
     ui::pick("playguard/activity/export_title"_i18n, labels, config::get().export_format, [what, stem, make](int index) {
         config::get().export_format = index;
         ui::save_config();

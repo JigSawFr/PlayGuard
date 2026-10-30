@@ -8,7 +8,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstring>
-#include <fmt/format.h>
+#include <format>
 #include <functional>
 #include <map>
 #include <string>
@@ -302,7 +302,7 @@ void GameCheckActivity::removal_summary(const Removal& r)
             left->addView(cover);
         }
         if (r.failed.size() > LEFT_SHOWN)
-            left->addView(cadran::kit::label(fmt::format("+{}", r.failed.size() - LEFT_SHOWN), 18, "cadran/text3"));
+            left->addView(cadran::kit::label(std::format("+{}", r.failed.size() - LEFT_SHOWN), 18, "cadran/text3"));
         box->addView(left);
         std::string names = game_check_text::name_lines(r.failed, words());
         if (!names.empty() && names[0] == '\n') names.erase(0, 1);
@@ -541,7 +541,7 @@ void GameCheckActivity::remove_content(const GameFacts& g, const GameContent& c)
             return;
         }
         history_flow::record_event(update ? "remove_update" : "remove_addon", "",
-                                   update ? label : fmt::format("{} · {}", label, title_id::text(c.id)));
+                                   update ? label : std::format("{} · {}", label, title_id::text(c.id)));
         if (weak.expired()) {
             ui::notify(done);
             return;

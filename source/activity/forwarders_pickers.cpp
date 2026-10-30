@@ -2,8 +2,8 @@
 #include "activity/forwarders_pickers.hpp"
 
 #include <algorithm>
+#include <format>
 #include <aurore.hpp>
-#include <fmt/format.h>
 #include <vector>
 
 #include "ui/ui.hpp"
@@ -19,8 +19,8 @@ void span(const std::string& title, int from_hour, int to_hour, std::weak_ptr<bo
 {
     std::weak_ptr<bool> weak = alive;
     std::vector<std::string> starts, ends;
-    for (int h = 0; h < 24; h++) starts.push_back(fmt::format("{:02}:00", h));
-    for (int h = 1; h <= 24; h++) ends.push_back(fmt::format("{:02}:00", h));
+    for (int h = 0; h < 24; h++) starts.push_back(std::format("{:02}:00", h));
+    for (int h = 1; h <= 24; h++) ends.push_back(std::format("{:02}:00", h));
     const std::string from_title = title.empty() ? "playguard/forwarders/hours_from"_i18n
                                                  : aurore::getStr("playguard/forwarders/hours_from_of", title);
     const std::string to_title = title.empty() ? "playguard/forwarders/hours_to"_i18n

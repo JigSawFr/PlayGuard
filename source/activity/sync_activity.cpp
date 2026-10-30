@@ -2,7 +2,7 @@
 #include "activity/sync_activity.hpp"
 
 #include <cstring>
-#include <fmt/format.h>
+#include <format>
 #include <string>
 #include <vector>
 
@@ -306,7 +306,7 @@ void SyncActivity::onContentAvailable()
         char device[SYNC_ID_LEN + 1];
         sync_conf_device_id(&conf, device);
         if (!device[0]) return true;
-        ui::info(aurore::getStr("playguard/sync/id_body", device, fmt::format("{}/{}", conf.topic_prefix, device)));
+        ui::info(aurore::getStr("playguard/sync/id_body", device, std::format("{}/{}", conf.topic_prefix, device)));
         return true;
     });
 

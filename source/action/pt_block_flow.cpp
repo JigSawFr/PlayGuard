@@ -2,8 +2,8 @@
 #include "action/pt_block_flow.hpp"
 
 #include <algorithm>
+#include <format>
 #include <aurore.hpp>
-#include <fmt/format.h>
 
 #include "ui/ui.hpp"
 #include "util/diagnostics.hpp"
@@ -78,7 +78,7 @@ void open()
                                    : aurore::getStr("playguard/dev/pt_block_changed", (int)changes.size(), ref.saved_at);
         text += "\n";
         for (const auto& c : changes)
-            text += fmt::format("\n{}: {:04X} → {:04X} ({} → {})", pt_block::field_name(c.index, days),
+            text += std::format("\n{}: {:04X} → {:04X} ({} → {})", pt_block::field_name(c.index, days),
                                 (unsigned)c.before, (unsigned)c.after, (unsigned)c.before, (unsigned)c.after);
     }
     auto* dialog = ui::dialog(text);

@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/cadran_child_activity.hpp"
 
-#include <fmt/format.h>
+#include <format>
 #include <string>
 #include <utility>
 
@@ -176,7 +176,7 @@ void CadranChildActivity::refresh()
     ring->setFraction(frac);
     ring->setValue(left);
     ring->setCaption(caption);
-    if (ending) ui::set_text(end_text, aurore::getStr("playguard/cadran/child/end", fmt::format("{:02d}:{:02d}", n.at / 60, n.at % 60)));
+    if (ending) ui::set_text(end_text, aurore::getStr("playguard/cadran/child/end", std::format("{:02d}:{:02d}", n.at / 60, n.at % 60)));
     end_icon->setThemeColor("color", last ? "cadran/amber" : "cadran/teal");
     end_text->setThemeColor("textColor", last ? "cadran/amber" : "cadran/text");
     ui::set_visible(end_chip.getView(), ending);
@@ -190,7 +190,7 @@ void CadranChildActivity::refresh()
     const bool bed = pt.bedtime_valid && pt.bedtime_enabled;
     ui::set_visible(bed_chip.getView(), bed);
     if (bed) {
-        bedtime->setText(fmt::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
+        bedtime->setText(std::format("{:02d}:{:02d}", pt.bedtime_hour, pt.bedtime_minute));
         // Amber only once it is near: before, nothing calls for attention.
         const int until = (pt.bedtime_hour * 60 + pt.bedtime_minute - (now.hour * 60 + now.minute) + 24 * 60) % (24 * 60);
         const bool soon = until <= BED_SOON;

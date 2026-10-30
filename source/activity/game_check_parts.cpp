@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/game_check_parts.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 #include <aurore/cadran/ui/cadran_list.hpp>
 
@@ -60,8 +60,8 @@ std::string fix_text(const GameFacts& g, GameIssue issue, u32 current_hos)
 // What the console reports, for a hardware test (developer mode): not worded.
 std::string developer_text(const GameFacts& g)
 {
-    return fmt::format("event {} · view {} · key generation {} · launch {} / installed {} · ticket {} · contents {}",
-                       (int)g.record_event, g.view_ok ? fmt::format("0x{:X}", g.view_flags) : "?", (int)g.key_generation,
+    return std::format("event {} · view {} · key generation {} · launch {} / installed {} · ticket {} · contents {}",
+                       (int)g.record_event, g.view_ok ? std::format("0x{:X}", g.view_flags) : "?", (int)g.key_generation,
                        g.launch_checked ? std::to_string(g.launch_required) : "?", gamecheck_installed_version(&g),
                        g.needs_ticket ? (g.ticket_missing ? "missing" : "present") : "none", (int)g.meta_count);
 }
@@ -130,7 +130,7 @@ std::string action_label(const GameFacts& g, u32 action, const GameContent* cont
 
 std::string view_label(bool grid)
 {
-    return aurore::getStr(fmt::format("playguard/library/views/{}", grid ? 1 : 0));
+    return aurore::getStr(std::format("playguard/library/views/{}", grid ? 1 : 0));
 }
 
 // The details: the icon, the name and the problem, then why and what to do
