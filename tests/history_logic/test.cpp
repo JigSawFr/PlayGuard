@@ -154,7 +154,7 @@ static void test_known()
     CHECK(!history_logic::known_kind("") && !history_logic::known_kind("teleport") && !history_logic::known_kind("Limits"));
     CHECK(history_logic::known_kinds().size() == 50);
     CHECK(history_logic::known_kind("module"));   // an optional module installed or removed
-    for (const std::string& k : history_logic::known_kinds()) CHECK(history_logic::known_kind(k));
+    for (const std::string_view k : history_logic::known_kinds()) CHECK(history_logic::known_kind(k));
 
     for (const char* s : { "uniform", "per_day", "extra", "stop", "undo", "backup", "overview", "console_lock" })
         CHECK(history_logic::known_source(s));
@@ -166,7 +166,7 @@ static void test_known()
     // "profile" is named apart (with the profile's name), others not at all.
     CHECK(!history_logic::known_source("profile") && !history_logic::known_source("") &&
           !history_logic::known_source("telepathy"));
-    for (const std::string& s : history_logic::known_sources()) CHECK(history_logic::known_source(s));
+    for (const std::string_view s : history_logic::known_sources()) CHECK(history_logic::known_source(s));
 }
 
 int main()

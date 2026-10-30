@@ -8,8 +8,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <span>
 #include <string>
-#include <vector>
+#include <string_view>
 
 namespace forwarder_library
 {
@@ -19,7 +20,7 @@ namespace forwarder_library
 constexpr const char* BADGE = "img/forwarder/badge.png";
 
 // Every icon's id, in the order the icon sheet shows them.
-const std::vector<std::string>& ids();
+std::span<const std::string_view> ids();
 
 // Whether `icon` (forwarders::Made::icon) names one of the library ("lib:…").
 bool is_ref(const std::string& icon);

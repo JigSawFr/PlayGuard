@@ -7,7 +7,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
+#include <span>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "util/history.hpp"
@@ -80,12 +82,12 @@ Day day_of(const std::string& when, const std::string& today, const std::string&
 // The kinds of change this version records, each named under
 // playguard/history/kinds/ (tools/check_resources.py checks the catalog
 // against the list): one not in it was written by a newer version.
-const std::vector<std::string>& known_kinds();
-bool known_kind(const std::string& kind);
+std::span<const std::string_view> known_kinds();
+bool                              known_kind(std::string_view kind);
 // What made a change, each named under playguard/history/sources/ ("day" is
 // no longer written, but older histories hold it). "profile" is said apart,
 // with the profile's name; any other source is not said.
-const std::vector<std::string>& known_sources();
-bool known_source(const std::string& source);
+std::span<const std::string_view> known_sources();
+bool                              known_source(std::string_view source);
 
 }   // namespace history_logic

@@ -838,12 +838,12 @@ static void test_library()
     namespace lib = forwarder_library;
     // Every icon once, its image among the resources (read from the
     // repository root, as `make test` runs), the badge's too.
-    const std::vector<std::string>& ids = lib::ids();
+    const auto ids = lib::ids();
     CHECK(ids.size() >= 30);
     for (size_t i = 0; i < ids.size(); i++) {
         CHECK(std::count(ids.begin(), ids.end(), ids[i]) == 1);
         int w = 0, h = 0, comp = 0;
-        const std::string png = "resources/" + lib::asset_of(ids[i]);
+        const std::string png = "resources/" + lib::asset_of(std::string(ids[i]));
         if (!CHECK(stbi_info(png.c_str(), &w, &h, &comp))) std::printf("  %s\n", png.c_str());
         CHECK(w == 256 && h == 256);
     }

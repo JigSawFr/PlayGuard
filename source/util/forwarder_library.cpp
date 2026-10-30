@@ -2,6 +2,7 @@
 #include "util/forwarder_library.hpp"
 
 #include <algorithm>
+#include <string_view>
 #include <utility>
 
 #include <aurore/cadran/util/text.hpp>
@@ -16,7 +17,7 @@ constexpr const char* PREFIX = "lib:";
 
 // Each one's name is playguard/forwarders/icon_lib/<id> (tools/
 // check_resources.py reads this list), its image img/forwarder/<id>.png.
-const char* const IDS[] = {
+constexpr std::string_view IDS[] = {
     "emulation", "games",    "saves",       "files",    "install", "store",    "launcher",   "overlays", "cheats",
     "mods",      "themes",   "network",     "wifi",     "download", "update",  "streaming",  "video",    "music",
     "reader",    "web",      "chat",        "camera",   "drawing", "learning", "controllers", "monitor", "system",
@@ -66,10 +67,9 @@ const std::pair<const char*, std::vector<const char*>> WORDS[] = {
 
 }   // namespace
 
-const std::vector<std::string>& ids()
+std::span<const std::string_view> ids()
 {
-    static const std::vector<std::string> all(std::begin(IDS), std::end(IDS));
-    return all;
+    return IDS;
 }
 
 bool is_ref(const std::string& icon)
@@ -81,8 +81,7 @@ std::string id_of(const std::string& icon)
 {
     if (!is_ref(icon)) return "";
     const std::string id = icon.substr(std::char_traits<char>::length(PREFIX));
-    const auto& all = ids();
-    return std::ranges::contains(all, id) ? id : "";
+    return std::ranges::contains(IDS, id) ? id : "";
 }
 
 std::string ref_of(const std::string& id)
