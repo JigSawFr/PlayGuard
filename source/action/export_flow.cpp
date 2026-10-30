@@ -8,6 +8,7 @@
 
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 
 using namespace aurore::literals;

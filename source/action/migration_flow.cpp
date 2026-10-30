@@ -23,6 +23,17 @@ namespace migration_flow
 
 namespace
 {
+// PlayGuard's steps (util/migrations.hpp), in the order they run. Their
+// numbers never change; a step whose shim goes (data_move's and
+// log_files::migrate's, after April 2027) leaves its number unused.
+enum : int
+{
+    DataDir  = 1,   // sd:/switch/playguard to sd:/config/playguard (data_move::run, the console only)
+    LogsDirs = 2,   // logs/ before its subfolders (log_files::migrate)
+    NandDirs = 3,   // what every system shared, to the first one's nand/<key> (data_move::to_nand)
+    SharedIcons = 4, // cache/icons/ gone: the icons are the Boréale homebrews' shared cache (config/boreale/cache/)
+};
+
 // The lines of util/migrations.hpp, in the log, after `prefix`.
 migrations::Log log_to(const char* prefix)
 {
@@ -47,7 +58,7 @@ const std::vector<Known>& known()
 {
     static const std::vector<Known> all = {
         // The data folder of the versions that kept it next to the .nro.
-        { { migrations::DataDir, "data folder",
+        { { DataDir, "data folder",
             []() -> size_t {
 #ifdef __SWITCH__
                 return data_move::run(data_move::old_dir(), paths::data_dir());
@@ -57,17 +68,17 @@ const std::vector<Known>& known()
             } },
           "playguard/dev/migration_data_dir", "playguard/dev/migration_data_dir_detail" },
         // logs/ before its subfolders (reports/, crashes/, uploads/, play_timer/).
-        { { migrations::LogsDirs, "logs subfolders", []() { return log_files::migrate(paths::logs_dir()); } },
+        { { LogsDirs, "logs subfolders", []() { return log_files::migrate(paths::logs_dir()); } },
           "playguard/dev/migration_logs", "playguard/dev/migration_logs_detail" },
         // What every system shared, to this one's nand/<key>.
-        { { migrations::NandDirs, "per-system folder",
+        { { NandDirs, "per-system folder",
             []() { return data_move::to_nand(paths::data_dir(), paths::nand_dir()); } },
           "playguard/dev/migration_nand", "playguard/dev/migration_nand_detail" },
         // The icons PlayGuard kept for itself before the Boréale homebrews
         // shared theirs (boreale-link's bl_cache, config/boreale/cache/): read
         // again from the console as they are needed. Goes with the releases
         // that still had cache/icons/ (after April 2027).
-        { { migrations::SharedIcons, "own icon cache",
+        { { SharedIcons, "own icon cache",
             []() { return data_cleanup::remove_folder(paths::cache_dir() + "/icons").removed; } },
           "playguard/dev/migration_icons", "playguard/dev/migration_icons_detail" },
     };
@@ -146,15 +157,16 @@ void choose(std::vector<bool> chosen, int focus)
 
 void at_start()
 {
+    migrations::set_latest(SharedIcons);
     migrations::run(paths::migrations_file(),
-                    steps({}, std::make_shared<size_t>(0), migrations::DataDir, migrations::LogsDirs), app::version(),
+                    steps({}, std::make_shared<size_t>(0), DataDir, LogsDirs), app::version(),
                     log_to("start-up"));
 }
 
 void for_system()
 {
     migrations::run(paths::migrations_file(),
-                    steps({}, std::make_shared<size_t>(0), migrations::NandDirs, migrations::Latest), app::version(),
+                    steps({}, std::make_shared<size_t>(0), NandDirs, SharedIcons), app::version(),
                     log_to("start-up"));
 }
 

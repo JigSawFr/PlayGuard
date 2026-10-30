@@ -8,44 +8,40 @@
 namespace paths
 {
 
-// sd:/config/playguard on the console (the .nro stays in sd:/switch/playguard:
-// util/data_move.hpp); ./playguard_data on desktop.
+// sd:/config/<app> (APP_ID, app_id.h) on the console (the .nro stays in
+// sd:/switch/<app>); ./<app>_data on desktop. The folders only one app
+// has are declared by the app, in this namespace, beside these.
 std::string data_dir();
 std::string logs_dir();
 // Inside logs_dir() (util/log_files.hpp): the saved diagnostic reports, one
 // file per crash, one per run (everything logged), one per report sent
-// online, and the developer tools' play-timer files.
+// online.
 std::string reports_dir();
 std::string crashes_dir();
 std::string sessions_dir();
 std::string uploads_dir();
-std::string play_timer_dir();
-std::string profiles_dir();
-std::string exports_dir();
-// The user's theme files (*.theme) and theme folders (<id>/theme.theme with
-// its pictures), listed by Preferences › Palette (Aurore's
-// Theme::listThemes, docs/themes.md); PlayGuard never writes there.
-std::string themes_dir();
 std::string config_file();
+// The user's theme files (*.theme) and theme folders (<id>/theme.theme with
+// its pictures), listed by the palette picker (Aurore's Theme::listThemes):
+// none unless the user made the folder; the app never writes there.
+std::string themes_dir();
 // The last migration done and the build that last started (util/migrations.hpp).
 std::string migrations_file();
 // What can be fetched or read again (data_cleanup::cache empties it): the
 // whole console's (lists fetched, icons) and, in nand_dir(), the system's
-// own (its play data).
+// own.
 std::string cache_dir();
 std::string nand_cache_dir();
 
-// The folder of the system PlayGuard runs on (util/nand.hpp):
+// The folder of the system the app runs on (util/nand.hpp):
 // data_dir()/nand/<key>. set_nand() once at start-up, before config::load();
 // "unknown" until then.
 void        set_nand(const std::string& key);
 std::string nand_key();
 std::string nand_dir();
-std::string backups_dir();    // in nand_dir()
 std::string history_file();   // the change history (util/history.hpp), in nand_dir()
-std::string state_file();     // config's per-system part (util/config.hpp), in nand_dir()
 
-// Root of the SD card: "/" on the console; ./playguard_data/sd on desktop,
+// Root of the SD card: "/" on the console; ./<app>_data/sd on desktop,
 // so the simulated build can be given fake Atmosphère / sys-patch files.
 std::string sd_root();
 
