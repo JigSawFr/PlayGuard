@@ -17,6 +17,7 @@
 #include "core/calendar.h"
 #include "ui/play_text.hpp"
 #include "ui/ui.hpp"
+#include "util/date.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/forwarder_library.hpp"
 #include "util/number.hpp"
@@ -478,7 +479,7 @@ class Sheet : public aurore::Box
             forwarders_logic::ShotTime t;
             if (forwarders_logic::shot_time(c.shot, t)) {
                 const std::string at = c.seconds ? std::format("{:02}:{:02}:{:02}", t.hour, t.minute, t.second)
-                                                 : std::format("{:02}:{:02}", t.hour, t.minute);
+                                                 : date::hh_mm(t.hour, t.minute);
                 this->when->setText(aurore::getStr("playguard/forwarders/icon_when", day_word(t, false), at));
             } else {
                 this->when->setText(forwarders_logic::file_title(c.shot));

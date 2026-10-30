@@ -16,6 +16,7 @@
 #include "action/pt_logic.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/date.hpp"
 
 using namespace aurore::literals;
 
@@ -262,14 +263,14 @@ void DashboardTab::show_cards(bool unlocked, bool has_pin)
         bed_state->setText("");
         bed_sub->setText(app::read_only() ? "" : "playguard/cadran/today/bed_set"_i18n);
     } else if (timer.bedtime_valid) {
-        bed_value->setText(std::format("{:02d}:{:02d}", timer.bedtime_hour, timer.bedtime_minute));
+        bed_value->setText(date::hh_mm(timer.bedtime_hour, timer.bedtime_minute));
         bed_state->setText("playguard/cadran/today/on"_i18n);
         bed_state->setThemeColor("textColor", "cadran/teal");
         std::string sub;
         if (timer.bedtime_reset_valid) {
             // The time kept with the word before it: "again at / 06:00" never
             // breaks there (Aurore, patch 0010).
-            const std::string at = std::format("{:02d}:{:02d}", timer.bedtime_reset_hour, timer.bedtime_reset_minute);
+            const std::string at = date::hh_mm(timer.bedtime_reset_hour, timer.bedtime_reset_minute);
             sub = aurore::getStr("playguard/cadran/today/bed_sub", at);
             const size_t pos = sub.find(" " + at);
             if (pos != std::string::npos) sub.replace(pos, 1, "\u00A0");

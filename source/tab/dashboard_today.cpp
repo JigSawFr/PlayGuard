@@ -15,6 +15,7 @@
 #include "action/pt_logic.hpp"
 #include "app.hpp"
 #include "ui/ui.hpp"
+#include "util/date.hpp"
 #include "util/profiles.hpp"
 
 using namespace aurore::literals;
@@ -174,7 +175,6 @@ void DashboardTab::show_next(bool unlocked)
         now_min = now.hour * 60 + now.minute;
         n = pt_logic::next_stop(now_min, left, timer.bed[today]);
     }
-    const auto clock = [](int minutes) { return std::format("{:02d}:{:02d}", minutes / 60, minutes % 60); };
     const std::string amount = ui::fmt_limit((uint16_t)this->preview_extra);
     std::string text;
     const char* glyph = n.kind == pt_logic::NextStop::TIME_UP ? "timer" : "moon";
@@ -184,13 +184,13 @@ void DashboardTab::show_next(bool unlocked)
         text  = "playguard/dashboard/gauge_unlocked"_i18n;
         glyph = "unlock";
     } else if (with_extra && n.kind == pt_logic::NextStop::TIME_UP)
-        text = aurore::getStr("playguard/cadran/today/next_with_extra", amount, clock(n.at));
+        text = aurore::getStr("playguard/cadran/today/next_with_extra", amount, date::hh_mm(n.at));
     else if (with_extra && n.kind == pt_logic::NextStop::BEDTIME)
-        text = aurore::getStr("playguard/cadran/today/next_with_extra_bed", amount, clock(n.at));
-    else if (n.kind == pt_logic::NextStop::TIME_UP) text = aurore::getStr("playguard/cadran/today/next_time_up", clock(n.at));
+        text = aurore::getStr("playguard/cadran/today/next_with_extra_bed", amount, date::hh_mm(n.at));
+    else if (n.kind == pt_logic::NextStop::TIME_UP) text = aurore::getStr("playguard/cadran/today/next_time_up", date::hh_mm(n.at));
     else if (n.kind == pt_logic::NextStop::BEDTIME)
-        text = aurore::getStr("playguard/cadran/today/next_bedtime", clock(n.at), ui::fmt_limit((uint16_t)n.in));
-    else if (n.kind == pt_logic::NextStop::BEDTIME_NOW) text = aurore::getStr("playguard/cadran/today/next_bedtime_now", clock(n.at));
+        text = aurore::getStr("playguard/cadran/today/next_bedtime", date::hh_mm(n.at), ui::fmt_limit((uint16_t)n.in));
+    else if (n.kind == pt_logic::NextStop::BEDTIME_NOW) text = aurore::getStr("playguard/cadran/today/next_bedtime_now", date::hh_mm(n.at));
     if (!text.empty()) {
         ui::set_text(this->next_text, text);
         this->next_icon->setIcon(glyph);

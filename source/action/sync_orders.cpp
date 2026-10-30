@@ -12,6 +12,7 @@
 #include "action/session_pause_logic.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/date.hpp"
 #include "util/profiles.hpp"
 #include "util/sync_files.hpp"
 
@@ -22,11 +23,6 @@ namespace sync_orders
 
 namespace
 {
-std::string hm(int hour, int minute)
-{
-    return std::format("{:02d}:{:02d}", hour, minute);
-}
-
 std::string on_off(const char* on_key, const char* off_key, bool on)
 {
     return aurore::getStr(on ? on_key : off_key);
@@ -203,8 +199,8 @@ std::string describe(const SyncIntent& in)
         case SyncIntent_Alarm: return on_off("playguard/sync/orders/alarm_on", "playguard/sync/orders/alarm_off", in.on);
         case SyncIntent_BedtimeEnabled:
             return on_off("playguard/sync/orders/bedtime_on", "playguard/sync/orders/bedtime_off", in.on);
-        case SyncIntent_Bedtime: return aurore::getStr("playguard/sync/orders/bedtime", hm(in.hour, in.minute));
-        case SyncIntent_BedtimeEnd: return aurore::getStr("playguard/sync/orders/bedtime_end", hm(in.hour, in.minute));
+        case SyncIntent_Bedtime: return aurore::getStr("playguard/sync/orders/bedtime", date::hh_mm(in.hour, in.minute));
+        case SyncIntent_BedtimeEnd: return aurore::getStr("playguard/sync/orders/bedtime_end", date::hh_mm(in.hour, in.minute));
         case SyncIntent_Profile: return aurore::getStr("playguard/sync/orders/profile", std::string(in.profile));
         case SyncIntent_Level: return aurore::getStr("playguard/sync/orders/level", ui::level_name(in.level));
         case SyncIntent_Vr: return on_off("playguard/sync/orders/vr_on", "playguard/sync/orders/vr_off", in.on);
