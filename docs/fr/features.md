@@ -105,7 +105,7 @@ Celles pour information : un retour à la version précédente, un firmware non 
 
 ### Les autres homebrews Boréale
 
-Sous les entrées de PlayGuard, chaque autre homebrew Boréale installé sur la console qui a quelque chose à dire a sa section, à son nom : ce qu'il télécharge, ce qui a échoué, ce qui vous attend chez lui (à faire ou en échec en orange). Ⓐ sur une entrée lance ce homebrew à l'écran qu'elle indique, une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message invite à l'ouvrir depuis ce menu. Rien de l'autre homebrew ne s'exécute dans PlayGuard. En retour, les entrées de PlayGuard s'affichent dans leurs cloches, et en ouvrir une lance PlayGuard sur l'onglet où elle se règle.
+Sous les entrées de PlayGuard, chaque autre homebrew Boréale installé sur la console qui a quelque chose à dire a sa section, à son nom : ce qu'il télécharge, ce qui a échoué, ce qui vous attend chez lui (à faire ou en échec en orange). Ⓐ sur une entrée lance ce homebrew à l'écran qu'elle indique, une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message invite à l'ouvrir depuis ce menu. Rien de l'autre homebrew ne s'exécute dans PlayGuard. Ce qui est à faire ou en échec chez lui est compté sur la cloche avec les entrées de PlayGuard, relu chaque minute tant que l'écran principal est ouvert ; *Préférences › Notifications › Les notifications des autres homebrews Boréale* masque ces sections et leur compte. En retour, les entrées de PlayGuard s'affichent dans leurs cloches, et en ouvrir une lance PlayGuard sur l'onglet où elle se règle.
 
 ### Comportement des entrées
 

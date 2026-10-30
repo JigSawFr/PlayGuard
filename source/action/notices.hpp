@@ -61,7 +61,11 @@ std::vector<Entry> list();
 std::vector<Entry> ignored();
 // The day `id`, ignored, counts again ("" with no reminder).
 std::string ignored_until(const std::string& id);
-int action_count();    // the parental controls' entries to do: the bell's number
+int action_count();    // the parental controls' entries to do: the bell's number, with others_count()
+// The other Boréale homebrews' notices to do or failed (none when
+// Preferences › Notifications › Other homebrews is off), as the main
+// screen's sweep last read them.
+int others_count();
 int info_count();      // the parental controls' entries for information
 int console_count();   // the console's entries to do
 int tab_count(const std::string& tab);   // the entries to do of a tab (notice_logic::tab_of): its sidebar badge

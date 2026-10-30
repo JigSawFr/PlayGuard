@@ -104,7 +104,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 
 ### The other Boréale homebrews
 
-Below PlayGuard's own entries, each other Boréale homebrew installed on the console that has something to say gets a section under its name: what it is downloading, what failed, what waits on you there (to do or failed in amber). Ⓐ on one starts that homebrew at the screen it names once PlayGuard closes; when PlayGuard was not started from the homebrew menu, a message says to open it from there. Nothing of the other homebrew runs in PlayGuard. In return, PlayGuard's own entries are shown in their bells, and opening one there starts PlayGuard on the tab where it is dealt with.
+Below PlayGuard's own entries, each other Boréale homebrew installed on the console that has something to say gets a section under its name: what it is downloading, what failed, what waits on you there (to do or failed in amber). Ⓐ on one starts that homebrew at the screen it names once PlayGuard closes; when PlayGuard was not started from the homebrew menu, a message says to open it from there. Nothing of the other homebrew runs in PlayGuard. What is to do or failed there is counted on the bell with PlayGuard's own, read again every minute while the main screen is open; *Preferences › Notifications › The other Boréale homebrews' notifications* turns the sections and their count off. In return, PlayGuard's own entries are shown in their bells, and opening one there starts PlayGuard on the tab where it is dealt with.
 
 ### How entries behave
 

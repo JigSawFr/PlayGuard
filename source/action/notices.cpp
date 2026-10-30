@@ -76,12 +76,34 @@ void write_shared_bell()
     }, file);
 }
 
-void changed()
+void tell_listeners()
 {
-    write_shared_bell();
     // A copy: a listener may unlisten (a screen closing).
     const auto listeners = s_listeners;
     for (const auto& l : listeners) l.second();
+}
+
+void changed()
+{
+    write_shared_bell();
+    tell_listeners();
+}
+
+// What the other Boréale homebrews have to do or failed, as their files say
+// now (Preferences › Notifications › Other homebrews): read again by the
+// sweep, the listeners told when it changed.
+int s_others = 0;
+
+void count_others()
+{
+    int count = 0;
+    if (config::get().notices_others)
+        for (const auto& other : shared_bell_logic::others(paths::sd_root(), aurore::Application::getLocale(),
+                                                           (int64_t)std::time(nullptr)))
+            for (const auto& n : other.notices) count += n.attention;
+    if (count == s_others) return;
+    s_others = count;
+    tell_listeners();
 }
 
 std::string open_label(const char* tab)
@@ -302,6 +324,11 @@ std::string ignored_until(const std::string& id)
 int action_count()
 {
     return s_store.action_count();
+}
+
+int others_count()
+{
+    return s_others;
 }
 
 int info_count()
@@ -633,11 +660,13 @@ void sweep()
     outside_watch::observe(pt);
     refresh_status(s, pt, si, accuracy_rc, accurate);
     note_pin_strength(s);
+    count_others();
 }
 
 void publish()
 {
     write_shared_bell();
+    count_others();
 }
 
 void open_tab(int position, const std::string& row)

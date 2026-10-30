@@ -115,6 +115,7 @@ struct Config
     std::vector<std::string> notices_read;
     std::vector<std::string> notices_acked;
     bool notices_ack_remind = true;
+    bool notices_others     = true;   // the other Boréale homebrews' notices in the bell, counted on it
     std::string summary_seen;
 
     // Console lock (PIN › Block all games): every day's limit set to 0, so a

@@ -1316,6 +1316,7 @@
         "notices_summary": "本週遊戲時間",
         "notices_reminders": "提醒：備份、主機的第二個系統、封鎖遊戲",
         "notices_ack_remind": "30 天後重新計入已忽略的警告",
+        "notices_others": "其他 Boréale homebrew 的通知",
         "help": "說明與診斷",
         "effects": "視覺效果",
         "effects_values": {

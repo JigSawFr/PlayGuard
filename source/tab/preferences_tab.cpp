@@ -113,6 +113,11 @@ PreferencesTab::PreferencesTab()
         ui::save_config();
         notices::apply_preferences();
     });
+    notices_others->init("playguard/prefs/notices_others"_i18n, config::get().notices_others, [](bool on) {
+        config::get().notices_others = on;
+        ui::save_config();
+        notices::apply_preferences();
+    });
     // Support PlayGuard once a month at start-up (action/support_flow).
     support_reminder->init("playguard/prefs/support_reminder"_i18n, config::get().support_reminder, [](bool on) {
         config::get().support_reminder = on;
@@ -138,7 +143,7 @@ PreferencesTab::PreferencesTab()
     this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
                        { "pf_start_tab", "home" } }, false);
     this->list.apply({ { "pf_palette", "contrast" }, { "pf_effects", "sparkle" }, { "pf_rail", "rail-auto" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
-                       { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" },
+                       { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" }, { "pf_notices_others", "list" },
                        { "pf_support_reminder", "heart" }, { "pf_update_daily", "calendar" }, { "pf_update_via", "server" },
                        { "pf_first_steps", "sparkle" } });
 }
@@ -158,6 +163,7 @@ void PreferencesTab::refresh()
     notices_summary->setOn(cfg.notices_summary, false);
     notices_reminders->setOn(cfg.notices_reminders, false);
     notices_ack_remind->setOn(cfg.notices_ack_remind, false);
+    notices_others->setOn(cfg.notices_others, false);
     support_reminder->setOn(cfg.support_reminder, false);
     update_daily->setOn(cfg.update_daily, false);
     update_via->setDetailText(update_flow::method_text());

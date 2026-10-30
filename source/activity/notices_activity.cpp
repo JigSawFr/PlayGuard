@@ -25,6 +25,7 @@ namespace
 // The other Boréale homebrews' notices shown now.
 std::vector<shared_bell_logic::Other> others()
 {
+    if (!config::get().notices_others) return {};
     return shared_bell_logic::others(paths::sd_root(), aurore::Application::getLocale(), (int64_t)std::time(nullptr));
 }
 

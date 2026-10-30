@@ -43,6 +43,7 @@
             <aurore:BooleanCell id="pf_notices_summary"/>
             <aurore:BooleanCell id="pf_notices_reminders"/>
             <aurore:BooleanCell id="pf_notices_ack_remind"/>
+            <aurore:BooleanCell id="pf_notices_others"/>
             <aurore:BooleanCell id="pf_support_reminder"/>
             <aurore:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
             <aurore:BooleanCell id="pf_update_daily"/>
