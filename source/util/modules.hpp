@@ -73,8 +73,11 @@ Offer offer(const State& s, const Bundle& b);
 // toolbox.json and version.txt written; boot2.flag created on a first
 // install (an update keeps the choice). With `keep_backup` the .bak stays
 // until confirm() or rollback() (the agent: until it is seen running).
+// `warning`: set when the module is in place but toolbox.json or version.txt
+// could not be written (its version then unknown: the install is offered
+// again); the install still succeeds.
 [[nodiscard]] bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool keep_backup,
-                           std::string* error = nullptr);
+                           std::string* error = nullptr, std::string* warning = nullptr);
 // The new module works: the backup goes.
 void confirm(const std::string& sd_root, const Module& m);
 // Puts exefs.nsp.bak back in place. False when there is none.

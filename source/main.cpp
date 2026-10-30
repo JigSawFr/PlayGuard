@@ -453,6 +453,10 @@ int main(int argc, char* argv[])
     sync_files::set_writer([](const std::string& file, std::function<void()> write) {
         ui::write_later("remote link file", std::move(write), file);
     });
+    sync_files::set_on_failure([](const std::string& file, const std::string& why) {
+        aurore::Logger::error("remote link: {} not saved: {}", file, why);
+        aurore::sync([]() { ui::notify("playguard/toast/save_err"_i18n, ui::Toast::Refused); });
+    });
     config::set_saved_hook(sync_files::export_nro_state);
 
     if (!aurore::Application::init()) {

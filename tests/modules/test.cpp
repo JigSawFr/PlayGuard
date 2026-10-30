@@ -143,6 +143,20 @@ static void test_install_update_rollback()
     s = state(sd, m);
     CHECK(s.sha256 == v2.sha256 && !s.backup);
 
+    // version.txt cannot be written (a folder with a file in its place): the
+    // module is in place all the same, and the failure said.
+    const std::string version = dir(sd, m) + "/version.txt";
+    std::remove(version.c_str());
+    CHECK(paths::ensure_dir(version + "/in_the_way"));
+    std::string warning;
+    CHECK(install(sd, m, v1, false, &err, &warning));
+    CHECK(warning.find("version.txt") != std::string::npos);
+    s = state(sd, m);
+    CHECK(s.sha256 == v1.sha256 && s.version.empty());
+    CHECK(std::system(("rm -rf '" + version + "'").c_str()) == 0);
+    warning.clear();
+    CHECK(install(sd, m, v2, false, &err, &warning) && warning.empty());   // v2 back, as below expects
+
     // A damaged bundle installs nothing and keeps what is there.
     const Bundle bad = bundled(bundle("NSP0 v3", "1.3.0", true), m);
     CHECK(bad.present);

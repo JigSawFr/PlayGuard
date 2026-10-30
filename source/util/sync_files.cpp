@@ -18,15 +18,17 @@ namespace sync_files
 namespace
 {
 Writer s_writer = nullptr;
+Failed s_failed = nullptr;
 
 // `text` to `dir`/`name`: at once, or through the writer.
 void write(const std::string& dir, const char* name, std::string text)
 {
     const std::string file = dir + "/" + name;
     auto job = [dir, file, text]() {
-        paths::ensure_dir(dir);
-        // Written again at the next change: a failed write is not reported.
-        (void)paths::atomic_write(file, text);
+        // Written again at the next change; a refusal is said meanwhile.
+        std::string why = "cannot make its folder";
+        if (paths::ensure_dir(dir) && paths::atomic_write(file, text, &why)) return;
+        if (s_failed) s_failed(file, why);
     };
     if (s_writer) s_writer(file, job);
     else job();
@@ -36,6 +38,11 @@ void write(const std::string& dir, const char* name, std::string text)
 void set_writer(Writer writer)
 {
     s_writer = writer;
+}
+
+void set_on_failure(Failed failed)
+{
+    s_failed = failed;
 }
 
 std::string conf_file()

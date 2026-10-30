@@ -1586,7 +1586,8 @@
         "relocked": "Contrôle parental de nouveau verrouillé.",
         "relock_err": "Impossible de verrouiller de nouveau le contrôle parental",
         "relocked_after_stop": "PlayGuard a été fermé alors que le contrôle parental était déverrouillé : il est de nouveau verrouillé.",
-        "config_err": "Impossible d'enregistrer les préférences sur la carte SD"
+        "config_err": "Impossible d'enregistrer les préférences sur la carte SD",
+        "save_err": "Une modification n'a pas pu être enregistrée sur la carte SD ; elle le sera à la suivante"
     },
     "history": {
         "title": "Historique des modifications",
@@ -1905,6 +1906,7 @@
         "started": "Module démarré.",
         "stopped": "Module arrêté.",
         "error": "Le module n'a pas pu être modifié",
+        "meta_err": "Le module est installé, mais sa version n'a pas pu être écrite sur la carte SD : il pourra être proposé à nouveau",
         "start_failed": "La nouvelle version n'a pas démarré ({}) : la précédente a été remise.",
         "locked_out": "Bloqué ?",
         "state": {

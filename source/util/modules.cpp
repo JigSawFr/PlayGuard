@@ -177,7 +177,8 @@ std::string toolbox_json(const Module& m)
            "\",\n  \"requires_reboot\": " + (m.resident ? "false" : "true") + "\n}\n";
 }
 
-bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool keep_backup, std::string* error)
+bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool keep_backup, std::string* error,
+             std::string* warning)
 {
     s_seen.clear();
     errno = 0;
@@ -217,10 +218,13 @@ bool install(const std::string& sd_root, const Module& m, const Bundle& b, bool 
     }
     if (!keep_backup) std::remove(old.c_str());
     // The module is in place: what the sysmodule managers and the next update
-    // read about it follows, its failure not undoing the install.
-    (void)paths::atomic_write(d + "/toolbox.json", toolbox_json(m));
-    (void)paths::atomic_write(d + "/version.txt",
-                              "version=" + b.version + "\ncommit=" + b.commit + "\nsha256=" + b.sha256 + "\n");
+    // read about it follows, its failure said (`warning`), not undoing the install.
+    std::string listed_why, noted_why;
+    const bool listed = paths::atomic_write(d + "/toolbox.json", toolbox_json(m), &listed_why);
+    const bool noted = paths::atomic_write(
+        d + "/version.txt", "version=" + b.version + "\ncommit=" + b.commit + "\nsha256=" + b.sha256 + "\n", &noted_why);
+    if (warning && !noted) *warning = "version.txt not written: " + noted_why;
+    else if (warning && !listed) *warning = "toolbox.json not written: " + listed_why;
     if (first && !set_at_boot(sd_root, m, true, error)) return false;
     return true;
 }

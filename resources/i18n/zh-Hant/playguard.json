@@ -1586,7 +1586,8 @@
         "relocked": "已重新鎖定家長監護。",
         "relock_err": "無法重新鎖定家長監護",
         "relocked_after_stop": "上次PlayGuard在家長監護解除期間被關閉：已重新鎖定家長監護。",
-        "config_err": "無法將偏好設定儲存至SD卡"
+        "config_err": "無法將偏好設定儲存至SD卡",
+        "save_err": "無法將變更儲存至SD卡；將於下次變更時儲存"
     },
     "history": {
         "title": "變更紀錄",
@@ -1905,6 +1906,7 @@
         "started": "模組已啟動。",
         "stopped": "模組已停止。",
         "error": "無法變更模組",
+        "meta_err": "模組已安裝，但無法將其版本寫入SD卡：可能會再次提示安裝",
         "start_failed": "新版本未能啟動（{}）：已改回先前的版本。",
         "locked_out": "被鎖在外面？",
         "state": {

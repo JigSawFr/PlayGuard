@@ -269,6 +269,24 @@ void test_agent_events()
     CHECK(paths::read_file(sync_files::icons_file(), written) && written == "target=0a1b2c3d\n");
 }
 
+// A file the SD card refuses is told to the app (its log and a toast there),
+// with its name and why; none told while the writes go through.
+static std::string s_refused;
+static void test_failure_said()
+{
+    sync_files::set_on_failure([](const std::string& file, const std::string& why) { s_refused = file + ": " + why; });
+    sync_files::export_nro_state();   // sync.conf exists (test_nro_state)
+    CHECK(s_refused.empty());
+    // A plain file where the folder goes: nothing can be written in it.
+    const std::string folder = sync_files::system_dir();
+    CHECK(std::system(("rm -rf '" + folder + "'").c_str()) == 0);
+    CHECK(paths::atomic_write(folder, "in the way"));
+    sync_files::export_nro_state();
+    CHECK(s_refused.find("nro_state.txt") != std::string::npos);
+    std::remove(folder.c_str());
+    sync_files::set_on_failure(nullptr);
+}
+
 int main()
 {
     char dir[] = "/tmp/playguard_sync_files_XXXXXX";
@@ -279,11 +297,12 @@ int main()
     test_conf();
     test_records();
     test_nro_state();
+    test_failure_said();
     test_lists();
     test_integration();
     test_agent_events();
 
     const std::string cleanup = std::string("rm -rf '") + dir + "'";
     CHECK(std::system(cleanup.c_str()) == 0);
-    return CHECK_DONE("sync_files: sync.conf, records, nro_state.txt, profiles, names, the integration, agent records and events assertions passed");
+    return CHECK_DONE("sync_files: sync.conf, records, nro_state.txt, profiles, names, a refused write told, the integration, agent records and events assertions passed");
 }
