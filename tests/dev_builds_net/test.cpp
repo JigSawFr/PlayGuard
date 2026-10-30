@@ -54,7 +54,7 @@ struct Answer
     std::string error;   // "" for a success
 };
 
-struct Call
+struct DownloadCall
 {
     std::string url, path;
     uint64_t    resume_from = 0;
@@ -62,7 +62,7 @@ struct Call
 };
 
 static std::deque<Answer>  s_answers;
-static std::vector<Call>   s_calls;
+static std::vector<DownloadCall>   s_calls;
 static std::string         s_identity;   // what <part>.json should hold during a call
 static std::string         s_redirect_to;   // "" : http::redirect fails with s_redirect_error
 static std::string         s_redirect_error;
@@ -90,7 +90,7 @@ Result<std::string> redirect(const std::string&, const Headers& headers)
 Result<void> download(const std::string& url, const std::string& path, size_t, long,
                       std::function<void(uint64_t, uint64_t)>, uint64_t resume_from, const std::atomic<bool>*)
 {
-    Call c;
+    DownloadCall c;
     c.url = url;
     c.path = path;
     c.resume_from = resume_from;

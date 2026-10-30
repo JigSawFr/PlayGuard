@@ -69,6 +69,69 @@ template <class T> using Result = std::expected<T, Failure>;
                                     std::function<void(uint64_t done, uint64_t total)> progress = nullptr,
                                     uint64_t resume_from = 0, const std::atomic<bool>* cancel = nullptr);
 
+// GETs bytes [offset, offset + length) of `url` (a Range request,
+// redirects followed) and hands them to `sink` as they arrive, in order.
+// The server must answer 206 with exactly that range: a 200 (no ranges) or
+// another range fails before any byte reaches `sink`. Fails when `sink`
+// returns false ("stopped"), when nothing arrives for 30 s, or when the
+// range comes out short; no overall timeout. `cancel` as for download().
+// `pinned_key` ("sha256//<base64>", as CURLOPT_PINNEDPUBLICKEY takes it): the
+// server must hold that public key, which vouches for it in place of the CA
+// store (a LAN server's own certificate); empty, the CA store does.
+Result<void> range(const std::string& url, uint64_t offset, uint64_t length,
+                   const std::function<bool(const uint8_t*, size_t)>& sink, const Headers& headers = {},
+                   const std::atomic<bool>* cancel = nullptr, const std::string& pinned_key = "");
+
+// The size of `url`'s resource, from the Content-Range of a request for its
+// first byte: a Failure when the server does not serve ranges.
+[[nodiscard]] Result<uint64_t> resource_size(const std::string& url, const Headers& headers = {},
+                                             const std::string& pinned_key = "");
+
+// A GET as get() does, its pinned key as range()'s, and whether the TLS
+// handshake failed on the server's certificate or key (tls_failed): a LAN
+// server's own certificate, never vouched for, that a pin may be made for.
+struct Response
+{
+    long        status = 0;
+    std::string body;
+    bool        tls_failed = false;
+    // call(): the cookies the answer sets ("name=value", without their
+    // attributes), and where it redirects to when the redirect is not followed.
+    std::vector<std::string> cookies;
+    std::string              location;
+};
+bool request(const std::string& url, const Headers& headers, const std::string& pinned_key, Response* response,
+             std::string* error, size_t max_bytes = 4 * 1024 * 1024, long timeout_s = 30);
+
+// A request beyond a GET, made as request() makes one (its pinned key, its
+// TLS failure told): its method, a body sent as it is or a form (multipart/
+// form-data: its fields, then a file's part read from the disk as it goes),
+// the answer's body kept in memory or written to a file.
+struct Call
+{
+    std::string method;                  // "" a GET (a POST when it has a body or a form); "DELETE", "OPTIONS"…
+    std::string body, content_type;      // sent as it is
+    std::vector<std::pair<std::string, std::string>> fields;   // multipart/form-data
+    std::string file_field, file_path, file_name;               // its file's part, when `file_path` is set
+    std::string to_path;                 // the answer's body into this file (created or truncated), not Response::body
+    bool        follow = true;           // redirects followed: a GET's only, never a POST's
+    const std::atomic<bool>* cancel = nullptr;                   // set by another thread: stops within a second
+    // The bytes sent so far and their total (a file sent), else received and
+    // the total announced (0 when unknown); from the request's thread.
+    std::function<void(uint64_t done, uint64_t total)> progress = nullptr;
+};
+// False as request() is (a status >= 400 included, the status told); a file
+// sent or received gives up on 30 s without a byte rather than on
+// `timeout_s` (0: no overall limit).
+bool call(const std::string& url, const Call& c, const Headers& headers, const std::string& pinned_key, Response* response,
+          std::string* error, size_t max_bytes = 4 * 1024 * 1024, long timeout_s = 30);
+
+// The certificate `url`'s server presents, as PEM, without checking it and
+// without sending anything but the request line (no header, no
+// credential): what a pin is made from, which the user is asked about
+// before it is trusted. A Failure when the TLS backend cannot give it.
+[[nodiscard]] Result<std::string> peer_certificate(const std::string& url);
+
 // At exit: a request still running stops at its next progress tick (about a
 // second), and a new one fails at once, so the threads they run on can end
 // before the app does.
@@ -77,5 +140,26 @@ void abort_all();
 // Releases libcurl's global state (and the Switch ssl service). At exit;
 // does nothing while a request is still running.
 void cleanup();
+
+#ifndef __SWITCH__
+// Not the console (the simulator): what answers some addresses in place of
+// the network, without libcurl (a demo the app plays, when it has one).
+// `serves` says which; each of the others answers as the function of its
+// name above. Set once, before the first request; nullptr: the network.
+struct StandIn
+{
+    bool (*serves)(const std::string& url);
+    decltype(&http::get)              get;
+    decltype(&http::post)             post;
+    decltype(&http::redirect)         redirect;
+    decltype(&http::download)         download;
+    decltype(&http::range)            range;
+    decltype(&http::resource_size)    resource_size;
+    decltype(&http::request)          request;
+    decltype(&http::call)             call;
+    decltype(&http::peer_certificate) peer_certificate;
+};
+void set_stand_in(const StandIn* answers);
+#endif
 
 }   // namespace http
