@@ -692,6 +692,13 @@ Everything but `Hello`, `GetStatus` and `GetLog` needs the session. The
 command dispatch is host-tested (`tests/agent/`); the HIPC framing runs only
 on a console.
 
+`AgentHello` and `AgentHelloReply` never change: a `Hello` of any size gets
+its reply, so any PlayGuard learns the agent's protocol. The size of every
+structure exchanged (and of `SyncIntent`, `SyncStatus` and `SyncRecords`,
+which they embed) is checked at build time against the values next to
+`AGENT_PROTOCOL`: a change to one fails the build until those values are
+updated and `AGENT_PROTOCOL` goes up.
+
 ## Schema and compatibility
 
 - `schema` is on every JSON document and in `sync.conf`. Adding a field does
