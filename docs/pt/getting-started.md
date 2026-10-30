@@ -9,7 +9,7 @@ Do cartão SD a uma consola configurada para o seu filho, em cerca de dez minuto
 - **Um firmware suportado.** Da 21.0.0 à 23.0.1, todas as funcionalidades; nos anteriores, tudo menos o temporizador de jogo; num mais recente, abre só de leitura até uma versão o suportar ([compatibilidade](compatibility.md)).
 - **Um só limite para toda a consola.** O temporizador de jogo é o da consola: é o mesmo para todos os utilizadores. Limites diferentes para cada criança precisam de outra ferramenta ([porquê](compatibility.md#playguard-ou-um-sysmodule-de-substituição)).
 
-Quer dar uma vista de olhos primeiro? [Experimente o PlayGuard no navegador](https://guard.boreale.dev/simulator/?not_set_up=1), com uma consola simulada no seu primeiro arranque.
+Quer dar uma vista de olhos primeiro? [Experimente o PlayGuard no navegador](https://guard.boreale.dev/simulator/?not_set_up=1&utm_source=github&utm_medium=docs), com uma consola simulada no seu primeiro arranque.
 
 ## 1. Instale-o
 

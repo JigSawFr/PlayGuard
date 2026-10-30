@@ -116,7 +116,7 @@ PlayGuard의 디자인은 Cadran이라고 부릅니다. 탭을 위한 아이콘 
 
 ## 오늘 — 하루를 한눈에
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### 링과 줄
 
@@ -193,7 +193,7 @@ PlayGuard가 애플리케이션으로 실행되는 동안에는 PlayGuard 자체
 
 ## 플레이 타이머 — 주간 화면이 곧 편집기
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### 주간 편집
 
@@ -252,7 +252,7 @@ PlayGuard가 애플리케이션으로 실행되는 동안에는 PlayGuard 자체
 
 ## 플레이 기록 — 누가 무엇을 얼마나 했는지
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 게임별 시간을 **오늘**, **최근 7일**, **전체 기간**으로 본체 자체의 플레이 기록에서 보여 줍니다. 모든 사용자 또는 **사용자 한 명**(본체에 사용자가 여럿일 때 맨 위의 칩으로)을 볼 수 있습니다. PlayGuard는 마지막으로 표시한 사용자, 또는 *처음 표시할 계정*에서 정한 것(모든 사용자 또는 한 명. 탭 맨 아래, *모든 게임*과 함께 있음)으로 시작합니다.
 
@@ -290,7 +290,7 @@ PlayGuard가 애플리케이션으로 실행되는 동안에는 PlayGuard 자체
 
 ## 제한 — 레벨, 연령 등급, 커뮤니케이션
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **제한 레벨:** 유아, 어린이, 청소년, 사용자 설정이 타일로 나란히 놓이며, 각각 무엇을 제한하는지 표시됩니다(제한되는 것에는 산호색 자물쇠, 허용되는 것에는 초록색 체크 표시, 그리고 그 레벨이 차단하는 설치된 게임. Ⓐ로 설정. 적용 중인 *사용자 설정*에서는 Ⓐ로 아래의 설정으로 이동). *없음*은 그 아래에 있습니다. 적용 중인 레벨에는 *✓ 현재*가 표시되며, 청록색 테두리는 포커스가 있는 곳에만 있습니다. 레벨이 제한하는 것(연령 제한, 게시, 커뮤니케이션)은 설정하기 전에 다시 알려 줍니다. *없음*은 모든 제한을 해제하므로 산호색으로 확인합니다.
 - **레벨의 설정:** 연령 등급, SNS 게시, 다른 사람과의 커뮤니케이션. 프리셋 레벨에서는 그 레벨 자체의 설정이며, 하나를 바꾸면 프리셋의 설정에 그 변경을 더한 상태로 레벨이 *사용자 설정*이 됩니다. 그 전에 확인합니다(설정 목록 표시).
@@ -303,7 +303,7 @@ PlayGuard가 애플리케이션으로 실행되는 동안에는 PlayGuard 자체
 
 ## 보안 — PIN, 해제, Homebrew 메뉴, 스마트폰 앱
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **맨 위**에는 타일 4개가 있습니다. PIN, 제한, 일시 해제, Homebrew 메뉴이며, 각각 제대로 되어 있으면(PIN 설정됨, 제한 켜짐, 잠김) 청록색 체크, 확인이 필요하면 호박색 경고 표시가 붙습니다. Homebrew 메뉴는 *열림* 또는 *잠김*으로 표시됩니다(잠그면 체크. 포워더가 없으면 열려 있어도 괜찮습니다).
 - **PIN 설정 또는 변경**(시스템 PIN 화면).
@@ -349,7 +349,7 @@ PlayGuard 자체의 PIN입니다.
 
 ## 변경 기록 — PlayGuard가 바꾼 것과 백업
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **맨 위**에는 기록된 변경의 수와 마지막 백업 날짜가 타일로 표시됩니다. 청록색 체크, 또는 백업이 없거나 30일 동안 없으면 호박색 경고입니다.
 
@@ -369,7 +369,7 @@ PlayGuard 자체의 PIN입니다.
 
 ## 본체 — 네트워크 시계, 설치된 게임, 본체에서 실행되는 것
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **맨 위**에는 본체에서 실행되는 것이 *시스템* 아래에 타일로 표시됩니다(펌웨어, Atmosphère, SD 카드에 있으면 hekate, 설치되어 있으면 sys-patch. Ⓐ로 릴리스 노트 열기). 그다음 도구가 *도구* 아래에 타일로(*네트워크 시계*, *설치된 게임*, *포워더*. 처음 두 개는 확인이 필요한 것을 모서리에 표시. 이어서 *원격 접속*과 *추가 모듈*), 그다음 본체의 각 줄이 호환성부터 표시됩니다(이 펌웨어에서 PlayGuard가 확인되었으면 청록색 체크만, 아니면 경고와 무엇이 문제인지).
 
@@ -479,7 +479,7 @@ PlayGuard 자체의 PIN입니다.
 
 ## 환경 설정
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - PlayGuard 자체를 설정하는 것:
   - 먼저 타일로: 언어(본체의 모든 언어, 또는 본체 언어 따르기), 테마(기본은 어둡게, 밝게, 또는 시스템), 글자 크기(자동 / 보통 / 크게), 시작할 탭.
@@ -494,7 +494,7 @@ PlayGuard 자체의 PIN입니다.
 
 ## 정보
 
-*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[시뮬레이터에서 체험하기 ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### 버전과 업데이트
 

@@ -9,7 +9,7 @@
 - **支援的韌體。** 21.0.0 到 23.0.1 可以使用所有功能；更早的版本，除了遊玩時間限制以外都可用；更新的版本會以唯讀方式開啟，直到有版本支援它為止（[相容性](compatibility.md)）。
 - **整台主機一個上限。** 遊玩時間限制是主機的：所有使用者都一樣。每個孩子需要不同的上限，就要用其他工具（[原因](compatibility.md#playguard-還是替代型-sysmodule)）。
 
-想先看看？[在瀏覽器中試用 PlayGuard](https://guard.boreale.dev/simulator/?not_set_up=1)，對著一台第一次啟動的模擬主機。
+想先看看？[在瀏覽器中試用 PlayGuard](https://guard.boreale.dev/simulator/?not_set_up=1&utm_source=github&utm_medium=docs)，對著一台第一次啟動的模擬主機。
 
 ## 1. 安裝
 

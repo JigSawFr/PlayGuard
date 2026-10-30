@@ -988,6 +988,10 @@ function translatePage() {
 
 // The website's pages in the page's language (tools/build_site.py's
 // folders): its home, and the header's links as on the website.
+// A link to another of Boréale's sites says where the visit comes from, for
+// Umami (workbench's "Mesure d'audience"); the simulator is part of guard.boreale.dev.
+const SITE_TAGS = 'utm_source=guard&utm_medium=nav';
+
 function homeLink() {
   const home = `${SITE_UP}${language === 'en-US' ? '' : `${language.toLowerCase()}/`}`;
   $('home-link').href = home;
@@ -997,10 +1001,10 @@ function homeLink() {
   // Boréale's other sites in the page's language (the four share the 15
   // folders, the website's: English at the root).
   for (const link of document.querySelectorAll('#sites [data-site]')) {
-    link.href = link.dataset.site + (language === 'en-US' ? '' : `${language.toLowerCase()}/`);
+    link.href = `${link.dataset.site}${language === 'en-US' ? '' : `${language.toLowerCase()}/`}?${SITE_TAGS}`;
   }
   // The privacy and legal notice, boreale.dev's, in the same folder.
-  $('legal-link').href = `https://boreale.dev/${language === 'en-US' ? '' : `${language.toLowerCase()}/`}legal/`;
+  $('legal-link').href = `https://boreale.dev/${language === 'en-US' ? '' : `${language.toLowerCase()}/`}legal/?${SITE_TAGS}`;
   $('sites-button').setAttribute('aria-label', `PlayGuard · ${t('sites_label')}`);
 }
 

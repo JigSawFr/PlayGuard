@@ -115,7 +115,7 @@ Those for information: a build gone back from, a firmware not tested with this v
 
 ## Today — the day at a glance
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### The ring and the line
 
@@ -192,7 +192,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 ## Play timer — the week is the editor
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### Editing the week
 
@@ -251,7 +251,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 ## Activity — who played what, and how long
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 Time per game **today**, in the **last 7 days** and **in all**, from the console's own activity log — for every account or **one user account** (the accounts as chips at the top, when the console has several). PlayGuard starts on the account shown last, or on the one set under *Account shown first* (every account, or one; at the bottom of the tab, with *All games*).
 
@@ -289,7 +289,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 ## Restrictions — level, age rating, communication
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **The restriction level:** Young child, Child, Teen and Custom side by side as tiles, each with what it restricts (a coral padlock for restricted, a green check otherwise, and the installed games it blocks; Ⓐ sets it; on *Custom* in force, Ⓐ goes to its settings below); *None* under them. The level in force says *✓ Current*; the teal ring is only where the focus is. What a level restricts (age limit, posting, communication) is said again before it is set; *None* asks in coral, as it lifts every restriction.
 - **The level's settings:** age rating, social-media posting, communication with others. Under a preset, they are its own: changing one makes the level *Custom*, from the preset's settings with that change, asked first (the settings listed).
@@ -302,7 +302,7 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 ## Security — the PIN, unlocking, the homebrew menu, companion app
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **At the top**, four tiles: the PIN, the restrictions, the temporary unlock and the homebrew menu, each with a teal check when it is as it should be (a PIN set, restrictions on, locked) or an amber warning when it needs you; the homebrew menu says *Open* or *Locked* (a check once locked: open is fine without forwarders).
 - **Set / change the PIN** (system PIN screen).
@@ -348,7 +348,7 @@ Last in the tab: the optional recovery module, for a forgotten PIN with a 0-minu
 
 ## History — what PlayGuard changed, and the backups
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **At the top**, how many changes are recorded and the day of the last backup as tiles: a teal check, or an amber warning when there is none or none for 30 days.
 
@@ -368,7 +368,7 @@ Last in the tab: the optional recovery module, for a forgotten PIN with a 0-minu
 
 ## Console — the network clock, the installed games, what the console runs
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles, under *Tools* (*Network clock*, *Installed games* and *Forwarders*; the first two show what needs a look in their corner; then *Remote access* and *Optional modules*), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
@@ -478,7 +478,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ## Preferences
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - What sets PlayGuard itself up:
   - As tiles first: language (every console language, or the console's own), theme (dark by default, light, or the console's), text size (automatic / normal / larger) and the tab to start on.
@@ -493,7 +493,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ## About
 
-*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### Version and updates
 

@@ -62,6 +62,9 @@ FIGURES = {
 }
 # The website (tools/build_site.py): the latest release's documentation at docs/.
 SITE_URL = "https://guard.boreale.dev/"
+# Its links say where the visit comes from, for the site's audience (Umami's
+# UTM report): the release notes, of this release.
+UTM = "?utm_source=release&utm_medium=release-notes&utm_campaign={tag}"
 HIDE, SHOW = "<!-- console:hide -->", "<!-- /console -->"
 
 INSTALL = """## 📦 Install
@@ -71,12 +74,12 @@ INSTALL = """## 📦 Install
 
 2. **Already installed?** Update from PlayGuard itself (*About › Update*), sphaira or the Homebrew App Store. The app alone: [`playguard.nro`]({dl}/playguard.nro){size_nro}.
 
-3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({site}docs/troubleshooting/#locked-out).
+3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({site}docs/troubleshooting/{utm}#locked-out).
 
 4. **Home Assistant?** [`playguard-agent.zip`]({dl}/playguard-agent.zip){size_agent} is the optional remote link's sysmodule, which keeps the [link to MQTT and Home Assistant]({repo}/blob/main/docs/home-assistant.md) going while PlayGuard is closed. PlayGuard also installs it from *Console › Optional modules*.
 
 > [!NOTE]
-> Requires custom firmware (**Atmosphère**).{firmware} [Compatibility]({site}docs/compatibility/)"""
+> Requires custom firmware (**Atmosphère**).{firmware} [Compatibility]({site}docs/compatibility/{utm})"""
 
 
 def strip_emoji(s: str) -> str:
@@ -292,7 +295,7 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
     if section:
         out.append(section)
 
-    out.append(INSTALL.format(dl=dl, site=SITE_URL, repo=repo, firmware=firmware, size_zip=size("playguard.zip"),
+    out.append(INSTALL.format(dl=dl, site=SITE_URL, utm=UTM.format(tag=tag), repo=repo, firmware=firmware, size_zip=size("playguard.zip"),
                               size_nro=size("playguard.nro"), size_rescue=size("playguard-rescue.zip"),
                               size_agent=size("playguard-agent.zip")))
 

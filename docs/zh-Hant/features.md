@@ -116,7 +116,7 @@ PlayGuard 的外觀名為 Cadran：分頁以圖示側欄呈現，配色為海軍
 
 ## 今天——一眼看懂這一天
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### 圓環和時間線
 
@@ -193,7 +193,7 @@ PlayGuard 以應用程式的方式執行時，它自己的時間也會被計算�
 
 ## 遊玩時間限制——一週就是編輯器
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### 修改一週
 
@@ -252,7 +252,7 @@ PlayGuard 以應用程式的方式執行時，它自己的時間也會被計算�
 
 ## 活動紀錄——誰玩了什麼、玩了多久
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 每款遊戲**今天**、**過去 7 天**和**全部期間**的時間，來自主機本身的活動記錄——可以看所有帳號，或**單一使用者帳號**（主機有多個帳號時，帳號會以標籤按鈕顯示在最上方）。PlayGuard 會開在上次顯示的帳號，或*首先顯示的帳號*中設定的帳號（所有帳號，或其中一個；在分頁最下方，和*所有遊戲*在一起）。
 
@@ -290,7 +290,7 @@ PlayGuard 以應用程式的方式執行時，它自己的時間也會被計算�
 
 ## 限制——等級、年齡分級、交流
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **限制等級：** 幼兒、兒童、青少年和自訂以方塊並排顯示，每個都寫出它會限制的內容（受限的顯示珊瑚色鎖頭，允許的則顯示綠色勾號，並列出它會封鎖的已安裝遊戲；按 Ⓐ 設定；*自訂*已套用時，按 Ⓐ 會前往下方它的設定）；*無*在它們下方。已套用的等級會顯示*✓ 目前*；青綠色外框只會出現在焦點所在之處。設定某個等級之前，會再說明一次它會限制的內容（年齡上限、發文、交流）；*無*會以珊瑚色詢問，因為它會解除所有限制。
 - **等級的設定：** 年齡分級、在社群網站上發文、與他人交流。在預設等級下，這些是它自己的設定：變更其中一項會讓等級變成*自訂*，以該預設等級的設定加上這項變更為起點，變更前會先詢問（列出各項設定）。
@@ -303,7 +303,7 @@ PlayGuard 以應用程式的方式執行時，它自己的時間也會被計算�
 
 ## 安全——PIN碼、解除、Homebrew 選單、手機應用程式
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **最上方**有四個方塊：PIN碼、限制、暫時解除和 Homebrew 選單，狀態正常時（已設定PIN碼、限制已開啟、已鎖定）各附青綠色勾號，需要處理時附琥珀色警告標誌；Homebrew 選單會顯示*已開放*或*已鎖定*（鎖定後附勾號：沒有轉發器時，開放也沒有問題）。
 - **設定或變更PIN碼**（系統的PIN碼畫面）。
@@ -349,7 +349,7 @@ PlayGuard 本身的PIN碼：
 
 ## 紀錄——PlayGuard 變更了什麼，以及備份
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **最上方**以方塊顯示記錄了多少項變更，以及最近一次備份的日期：青綠色勾號；沒有備份或 30 天內都沒有備份時，顯示琥珀色警告。
 
@@ -369,7 +369,7 @@ PlayGuard 本身的PIN碼：
 
 ## 主機——網路時鐘、已安裝的遊戲、主機執行的內容
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **最上方**在*系統*下以方塊顯示主機執行的內容（韌體、Atmosphère、SD 卡上有 hekate 時的 hekate，以及已安裝 sys-patch 時的 sys-patch；按 Ⓐ 開啟它的版本說明），接著在*工具*下以方塊顯示工具（*網路時鐘*、*已安裝的遊戲*和*轉發器*；前兩個會在角落顯示需要留意的事項；接著是*遠端存取*和*選用模組*），再來是主機的各行資訊，相容性排在最前面（PlayGuard 已在這個韌體上驗證過時只顯示青綠色勾號，否則會顯示警告和問題所在）。
 
@@ -479,7 +479,7 @@ PlayGuard 本身的PIN碼：
 
 ## 偏好設定
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - PlayGuard 本身的設定：
   - 先以方塊顯示：語言（主機的所有語言，或跟隨主機）、主題（預設為深色，也可選淺色或依系統）、文字大小（自動 / 標準 / 較大）以及啟動時開啟的分頁。
@@ -494,7 +494,7 @@ PlayGuard 本身的PIN碼：
 
 ## 關於
 
-*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[在模擬器中試用 ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### 版本與更新
 

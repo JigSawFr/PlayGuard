@@ -9,7 +9,7 @@ Von der SD-Karte zu einer Konsole, die für dein Kind eingerichtet ist, in etwa 
 - **Eine unterstützte Firmware.** 21.0.0 bis 23.0.1 für alle Funktionen; ältere: alles außer dem Timer; eine neuere öffnet schreibgeschützt, bis eine Version sie unterstützt ([Kompatibilität](compatibility.md)).
 - **Ein Limit für die ganze Konsole.** Der Timer ist der der Konsole: Er ist für jeden Benutzer derselbe. Unterschiedliche Limits pro Kind brauchen ein anderes Werkzeug ([warum](compatibility.md#playguard-oder-ein-ersatz-sysmodul)).
 
-Willst du dich erst einmal umsehen? [Probiere PlayGuard im Browser aus](https://guard.boreale.dev/simulator/?not_set_up=1), mit einer simulierten Konsole bei ihrem ersten Start.
+Willst du dich erst einmal umsehen? [Probiere PlayGuard im Browser aus](https://guard.boreale.dev/simulator/?not_set_up=1&utm_source=github&utm_medium=docs), mit einer simulierten Konsole bei ihrem ersten Start.
 
 ## 1. Installieren
 

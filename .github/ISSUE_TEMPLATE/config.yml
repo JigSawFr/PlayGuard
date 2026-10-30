@@ -4,7 +4,7 @@ contact_links:
     url: https://github.com/JigSawFr/PlayGuard/security/advisories/new
     about: Privately, never as a public issue — a way around the PIN must not be readable by everyone before it is fixed.
   - name: Locked out? Read this first
-    url: https://guard.boreale.dev/docs/troubleshooting/#locked-out
+    url: https://guard.boreale.dev/docs/troubleshooting/?utm_source=github&utm_medium=docs#locked-out
     about: Second-hand console or forgotten PIN — most cases are solved by the steps in the troubleshooting guide.
   - name: Questions and ideas
     url: https://github.com/JigSawFr/PlayGuard/discussions
