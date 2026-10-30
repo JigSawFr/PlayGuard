@@ -29,7 +29,8 @@ extern "C" {
 
 // titles.txt as read: one "<16 hex digits>=<kind>[:<name>]" line per title
 // that is not a game ("homebrew", "playguard", "system"; "game" for one the
-// ID would misplace), "#" lines and anything else ignored.
+// ID would misplace; a kind this version does not know is read as
+// "homebrew": never published by its ID), "#" lines and anything else ignored.
 typedef struct {
     size_t   n;
     uint64_t ids[SYNC_TITLES_MAX];

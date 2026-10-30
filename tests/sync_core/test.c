@@ -1351,11 +1351,14 @@ static void test_titles(void)
                        "broken line\n"
                        "0100000000030000=homebrews\n";
     sync_titles_parse(&t, text, strlen(text));
-    CHECK(t.n == 3);
+    CHECK(t.n == 5);
     CHECK(sync_titles_kind(&t, 0x0100ABCDEF012000ULL) == SyncTitle_Homebrew);
     CHECK(sync_titles_kind(&t, 0x052EB87E6426D000ULL) == SyncTitle_Homebrew);
     CHECK(sync_titles_kind(&t, 0x0500000000001000ULL) == SyncTitle_Game);      // the record over the ID
-    CHECK(sync_titles_kind(&t, 0x0100000000020000ULL) == SyncTitle_Game);      // not understood: the ID
+    // A kind a newer PlayGuard wrote: not a game, whatever its ID says.
+    CHECK(sync_titles_kind(&t, 0x0100000000020000ULL) == SyncTitle_Homebrew);
+    CHECK(sync_titles_kind(&t, 0x0100000000030000ULL) == SyncTitle_Homebrew);
+    CHECK(sync_titles_kind(&t, 0x0100000000040000ULL) == SyncTitle_Game);      // no record: the ID
     CHECK(sync_titles_kind(NULL, 0x05446530ACA7E000ULL) == SyncTitle_Homebrew); // no record: the ID
     CHECK(!strcmp(sync_title_kind_name(SyncTitle_Homebrew), "homebrew") && !strcmp(sync_title_kind_name(SyncTitle_Game), "game"));
 
