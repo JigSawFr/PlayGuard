@@ -37,6 +37,7 @@
             <aurore:DetailCell id="pf_palette" title="@i18n/cadran/tools/palette"/>
             <aurore:DetailCell id="pf_effects" title="@i18n/playguard/prefs/effects"/>
             <aurore:DetailCell id="pf_rail" title="@i18n/cadran/prefs/rail"/>
+            <aurore:BooleanCell id="pf_look_shared"/>
             <aurore:BooleanCell id="pf_intro"/>
             <aurore:Header title="@i18n/playguard/prefs/section_notices" marginTop="24" marginBottom="8"/>
             <aurore:BooleanCell id="pf_notices_system"/>

@@ -1318,6 +1318,7 @@
         "notices_reminders": "Avisos: backups, segundo sistema do console, jogos bloqueados",
         "notices_ack_remind": "Contar de novo os avisos ignorados após 30 dias",
         "notices_others": "As notificações dos outros homebrews Boréale",
+        "look_shared": "Mesma aparência dos outros homebrews Boréale",
         "help": "Ajuda e diagnóstico",
         "effects": "Efeitos visuais",
         "effects_values": {

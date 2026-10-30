@@ -1009,7 +1009,7 @@ function homeLink() {
 }
 
 // Boréale's site switcher: the menu of Boréale's sites opens under the name, as
-// on the website (site/assets/site.js' "site switcher" block). Without
+// on the website (boreale-site's boreale.js). Without
 // popovers (an old browser), the menu stays closed.
 function setUpSites() {
   const menu = $('sites');
@@ -1025,13 +1025,14 @@ function setUpSites() {
   });
 }
 
-// The header's languages, as on the website (tools/build_site.py, site.js):
-// a button with the page's flag and name (its code on a phone), and under it
-// their menu (a popover: the browser closes it on Esc or a click elsewhere,
-// and gives the focus back to the button), each with its flag, the page's
-// marked. Each is a link to this page in it (the URL's settings kept), which
-// a click applies (PlayGuard starts again in it); the arrows move through
-// them. Without popovers (an old browser), the button does nothing.
+// The header's languages, as on the website (boreale-site's
+// Site.languages() and boreale.js): a button with the page's flag and name
+// (its code on a phone), and under it their menu (a popover: the browser
+// closes it on Esc or a click elsewhere, and gives the focus back to the
+// button), each with its flag, the page's marked. Each is a link to this
+// page in it (the URL's settings kept), which a click applies (PlayGuard
+// starts again in it); the arrows move through them. Without popovers (an
+// old browser), the button does nothing.
 function setUpLanguages() {
   const button = $('language-button');
   const menu = $('languages');
@@ -1059,7 +1060,7 @@ function setUpLanguages() {
     if (event.newState !== 'open') return;
     // The settings as they are now (a live change, the theme): the links follow.
     for (const link of links) link.href = linkFor(values(link.dataset.lang));
-    // Under the button, its right edge on the button's (site.js), within the
+    // Under the button, its right edge on the button's (boreale.js), within the
     // screen (the settings' button is right of it).
     const box = button.getBoundingClientRect();
     const screen = document.documentElement.clientWidth;

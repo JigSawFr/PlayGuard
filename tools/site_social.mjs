@@ -24,9 +24,9 @@ const LANGUAGES = ['en-US', 'fr', 'fr-CA', 'de', 'es', 'es-419', 'it', 'nl', 'pt
 const escape = (s) => s.replace(/\{\{[^}]*\}\}/g, '').replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 // The page is set, not loaded: its files as data: URLs.
 const data = (file, type) => `data:${type};base64,${readFileSync(file).toString('base64')}`;
-const sora = data(join(root, 'site/assets/fonts/sora.woff2'), 'font/woff2');
-const figtree = data(join(root, 'site/assets/fonts/figtree.woff2'), 'font/woff2');
-const mono = data(join(root, 'site/assets/fonts/jetbrains-mono.woff2'), 'font/woff2');
+const sora = data(join(root, 'library/boreale-site/assets/fonts/sora.woff2'), 'font/woff2');
+const figtree = data(join(root, 'library/boreale-site/assets/fonts/figtree.woff2'), 'font/woff2');
+const mono = data(join(root, 'library/boreale-site/assets/fonts/jetbrains-mono.woff2'), 'font/woff2');
 const mark = data(join(root, 'branding/mark.svg'), 'image/svg+xml');
 // The night's stars, the same at each run.
 let seed = 7;

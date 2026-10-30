@@ -14,11 +14,17 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   as [Aurore's site](https://aurore.boreale.dev/) and
   [boreale.dev](https://boreale.dev/); the web simulator keeps its own theme.
 - **The header**: the mark and name open the menu of Boréale's sites
-  (`switcher()`, a popover; its CSS and script are boreale.dev's "site
-  switcher" blocks, the marks boreale's, the versions boreale.dev's
-  `versions.json` read at the build; each site in the page's language, the
-  sites sharing the 15 folders: the homebrew, Aurore, Atlas and Lantern), and a button opens the 15 languages,
-  each with its flag (a popover too). The footer has a Boréale column: the
+  (boreale-site's `Site.switcher()` and `sites.json`, a popover placed by its
+  `boreale.js`, styled by its `boreale.css`; the marks boreale-site's, the
+  versions boreale.dev's `versions.json` read at the build; each site in the
+  page's language, the sites sharing the 15 folders: the homebrew, Aurore,
+  Atlas and Lantern), and a button opens the 15 languages, each with its
+  flag (boreale-site's `Site.languages()`, a popover too). The language
+  chosen there is kept by `site.js` (`pg-site-lang`), not boreale-site's
+  `lang.js`: a visit to the root from elsewhere goes to the language chosen
+  (`lang.js`: only to the browser's, when none was), the page opens at the
+  same place (`#…`), and the page not found is one page holding every
+  language (`lang.js` sends to a `404.html` in each language's folder). The footer has a Boréale column: the
   other sites and the privacy and legal notice in the page's language.
   The page not found
   stands under the aurora, as the home page's hero.
@@ -151,14 +157,25 @@ pages; no framework, nothing to install but that.
   their dark ones), links between the docs and to the README become the
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
-- `site/assets/` — `site.css` (Boréale's colours), `site.js` (the home
-  page's aurora, boreale.dev's own, still when less motion is asked; the
-  language menu; on a phone, the gallery's dots, the way back to the top)
-  and the fonts (Sora for the headings, Figtree for the text, JetBrains Mono
-  for code and labels, their Latin letters; SIL Open Font License,
-  `fonts/OFL-*.txt`; the language menu's 15 flags cut out of Twemoji's,
-  CC-BY 4.0, `fonts/LICENSE-twemoji-flags.txt`), served with the site so that no visitor's browser
-  loads anything from Google Fonts or anyone else.
+- `site/assets/` — `site.css` (the site's look, over boreale-site's
+  `boreale.css`), `site.js` (the home page's aurora, boreale.dev's own,
+  still when less motion is asked; the language kept; on a phone, the
+  gallery's dots, the way back to the top) and `reading.js`.
+- **What Boréale's sites share** is
+  [boreale-site](https://github.com/JigSawFr/boreale-site), the submodule
+  `library/boreale-site` (`git submodule update --init`): the languages, the
+  header's two menus and their texts (its `i18n/`, which `site/i18n/` does
+  not repeat: the build stops if it does), the links out and their UTM
+  tags, the audience, the checks every site passes, and the assets copied
+  into `assets/` at the build (`boreale.copy_assets()`): `boreale.css`
+  (Boréale's colours and fonts, the two menus), `boreale.js` (where the
+  menus open), the sites' marks, Umami's tracker and the fonts (Sora for the
+  headings, Figtree for the text, JetBrains Mono for code and labels, their
+  Latin letters; SIL Open Font License, `fonts/OFL-*.txt`; the language
+  menu's 15 flags cut out of Twemoji's, CC-BY 4.0,
+  `fonts/LICENSE-twemoji-flags.txt`), served with the site so that no
+  visitor's browser loads anything from Google Fonts or anyone else. Its
+  `lang.js` is copied too, not loaded (the header, above).
 - **The screenshots**: `tools/site_screenshots.mjs <simulator> <out-dir>
   [version]` (Node and Playwright) runs the web simulator in a headless
   Chromium and saves each screen of the home page's gallery in each language,
@@ -192,19 +209,22 @@ pages; no framework, nothing to install but that.
   one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
   `SITE_NOINDEX=1` for a preview.
 - **The audience**, counted by Umami Cloud (<https://cloud.umami.is>):
-  `assets/umami.js` is its tracker, served with the site, that sends each
-  page seen to `gateway.umami.is`, without cookie, and only from the site's
-  own address (`SITE_URL`'s, not a local copy); a preview has none. It is a
-  copy: take it again from <https://cloud.umami.is/script.js> when Umami
-  changes it. Its site in Umami (`UMAMI_WEBSITE` in `build_site.py`) is
+  `assets/umami.js` (boreale-site's copy) is its tracker, served with the
+  site, that sends each page seen to `gateway.umami.is`, without cookie, and
+  only from the site's own address (`SITE_URL`'s, not a local copy); a
+  preview has none. Its site in Umami (boreale-site's `UMAMI_WEBSITE`) is
   Boréale's, shared with the other projects' sites: Umami's *Hostname*
   filter tells them apart.
   A link to another of our sites (boreale.dev, its other sub-domains) says
-  where the visit comes from, for Umami's *UTM* report: `build_site.py`
-  (`utm()`) adds `utm_source=guard` and `utm_medium=nav` (header), `footer`
-  or `link` (the page's text); a link to guard.boreale.dev itself loses the
-  tags a documentation page was written with for GitHub
-  (`utm_source=github`), and `tools/check_site_links.py` checks both. The
+  where the visit comes from, for Umami's *UTM* report: boreale-site's
+  `Site.links_out()`, over every page, adds `utm_source=guard` and
+  `utm_medium=nav` (header), `footer` or `link` (the page's text); a link to
+  guard.boreale.dev itself loses the tags a documentation page was written
+  with for GitHub (`utm_source=github`, `Site.untagged()` in the Markdown and
+  `llms.txt` too), and `tools/check_site_links.py` checks both, with
+  boreale-site's checks (`boreale_site.check.pages()`, `check_catalogs()`)
+  beside its own walk of the links (which knows the simulator is built
+  apart, and where `404.html` is served). The
   app's QR codes to the documentation carry `utm_source=playguard&utm_medium=qr`
   (`app::doc_url()`), the release notes `utm_source=release`.
 - **A Content-Security-Policy** on every page (a `<meta>`: GitHub Pages sends
@@ -217,7 +237,8 @@ pages; no framework, nothing to install but that.
   tour (`images/video/playguard-tour.mp4`), muted until its sound button
   (site.js) turns its music on.
 
-To look at it locally: `python3 tools/build_site.py /tmp/site` then
+To look at it locally: `git submodule update --init library/boreale-site`
+(once), `python3 tools/build_site.py /tmp/site` then
 `python3 web/serve.py /tmp/site`, with `make web` and `cp -r build-web/simulator /tmp/site/simulator`
 for the simulator. With the screenshots in each language: `node tools/site_screenshots.mjs build-web/simulator /tmp/shots`
 (after `npm install --no-save playwright`; a few languages: `… /tmp/shots 1.2.0 fr ja`),
@@ -236,7 +257,11 @@ takes a few minutes. A pull request that changes the site, its documentation or 
 also has its layout checked (`tools/site_layout.py`, under a minute): no
 page wider than the screen on a phone, a tablet or a desktop, no field iOS
 zooms into, no script that throws, and nothing axe-core finds against WCAG 2.2
-AA (contrast, names, labels, keyboard; `SITE_AXE=<axe.min.js>` locally). main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
+AA (contrast, names, labels, keyboard; `SITE_AXE=<axe.min.js>` locally). It is
+the site's own, not boreale-site's `tools/site_layout.py`, which opens every
+page on every screen one at a time (some 2,500 loads here, against a sample
+in parallel), measures a page that sends its visitor on (`docs/`'s) after it
+has moved, and has no check of the fields iOS zooms into. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
 Actions as the source of GitHub Pages: main's at the root, each open pull
 request's in `pr-<number>/` (not a fork's: its pages would be served from this
 site), then edits the pull request's comment with the links. It runs where

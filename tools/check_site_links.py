@@ -4,105 +4,68 @@ image of its pages that stays on the site must reach a file of it, and every
 #anchor an id of the page it points to. Links to the simulator (built apart,
 web/README.md) and to other sites are not followed.
 
-Links out follow the rule "liens sortants anonymes": every page sends no
-referrer (<meta name="referrer" content="no-referrer">), a link to a third
-party has rel="noreferrer", one to boreale.dev, *.boreale.dev or a repository
-of github.com/JigSawFr/ has referrerpolicy="strict-origin" (the origin alone,
-for GitHub's traffic insights) and no noreferrer. A link to another of our
-sites carries utm_source=guard and a utm_medium (workbench's "Mesure
-d'audience"); no other link has utm_ parameters.
+Then boreale-site's checks, the same for each of Boréale's sites
+(boreale_site.check.pages(), library/boreale-site/README.md): links out by
+the rule "liens sortants anonymes" (no referrer sent; rel="noreferrer" to a
+third party; referrerpolicy="strict-origin" to *.boreale.dev and
+github.com/JigSawFr), utm_source=guard and a utm_medium on a link to another
+of our sites and on no other, the Content-Security-Policy and what it
+blocks, Umami's tracker, no {{key}} left, no e-mail address, the pages' data;
+and the catalogs (check_catalogs(): site/i18n/ and boreale-site's i18n/).
 
 Usage: tools/check_site_links.py <site-dir> [site-url]
 (site-url: the site's own address, whose absolute links are checked too)
 """
 import os
-import re
 import sys
 from html.parser import HTMLParser
-from urllib.parse import parse_qsl, unquote, urlparse, urlsplit
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
+
+# What Boréale's sites share (library/boreale-site, a submodule): the checks
+# every built site passes, and the common catalogs.
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "library" / "boreale-site"))
+import boreale_site as boreale  # noqa: E402
+from boreale_site import check as boreale_check  # noqa: E402
+
+# boreale-site's page checks this site does otherwise: where links lead (the
+# walk below knows the simulator is built apart and where 404.html is
+# served, SITE_BASE), and the policy and the tracker of docs/'s pages that
+# send their visitor on at once (build_site.py's redirect_page(): no script,
+# counted at the page they send to). A preview (SITE_NOINDEX=1) has no
+# tracker. A boreale-site option for paths built apart, the 404's base and
+# such pages would replace this list (see site/README.md).
+NOT_HERE = (" leads nowhere", " is not on the page")
+SENDS_ON = ("no Content-Security-Policy", "no Umami tracker (assets/umami.js)")
 
 
-
-
-# No real e-mail address on the site, ours or anyone's: contact goes through
-# the repository's issues, a security flaw through a private advisory.
-EMAIL = re.compile(r"[\w.+-]+@(?:[\w-]+\.)+[a-z]{2,}", re.IGNORECASE)
-RESERVED = re.compile(r"@(?:[\w-]+\.)*(?:example\.(?:org|com|net)|[\w-]+\.example)$", re.IGNORECASE)
-
-
-def emails(text: str) -> list:
-    return [f"an e-mail address ({m.group(0)}), contact goes through GitHub"
-            for m in EMAIL.finditer(text) if not RESERVED.search(m.group(0))]
-
-
-def own_site(url: str) -> bool:
-    """boreale.dev, its subdomains, and the repositories of github.com/JigSawFr/
-    (that account's alone: another owner, a gist or GitHub's own pages are
-    third parties)."""
-    u = urlparse(url)
-    host = (u.hostname or "").lower()
-    return u.scheme == "https" and (host == "boreale.dev" or host.endswith(".boreale.dev") or
-                                    (host == "github.com" and u.path.lower().startswith("/jigsawfr/")))
-
-
-def check_own_site() -> None:
-    """own_site() against look-alikes, at each run (the site has no unit tests)."""
-    for url in ("https://boreale.dev/", "https://shelf.boreale.dev/fr/", "https://github.com/JigSawFr/PlayShelf",
-                "https://github.com/jigsawfr/boreale/releases"):
-        assert own_site(url), url
-    for url in ("https://store.example.com/app/1", "https://github.com/JigSawFr", "https://github.com/jigsawfrx/x",
-                "https://github.com/someone/JigSawFr", "https://gist.github.com/JigSawFr/1",
-                "https://boreale.dev.example.com/", "https://notboreale.dev/", "http://boreale.dev/"):
-        assert not own_site(url), url
-
-
-# This site's address (build_site.py's SITE_URL) and its name in the UTM tags
-# of its links to our other sites.
-SITE_HOST = (urlparse(os.environ.get("SITE_URL", "https://guard.boreale.dev/")).hostname or "").lower()
-UTM_SOURCE = "guard"
-
-
-def link_problem(attrs: dict) -> str:
-    """What a link out does wrong by the rule "liens sortants anonymes": a
-    third party gets rel="noreferrer"; *.boreale.dev and github.com/JigSawFr
-    keep the origin alone (referrerpolicy="strict-origin", no noreferrer)."""
-    href = attrs.get("href") or ""
-    if urlparse(href).scheme not in ("http", "https"):
-        return ""
-    rel = (attrs.get("rel") or "").split()
-    if own_site(href):
-        if "noreferrer" in rel or attrs.get("referrerpolicy") != "strict-origin":
-            return f'link to {href} needs referrerpolicy="strict-origin" and no noreferrer'
-    elif "noreferrer" not in rel:
-        return f'link to {href} without rel="noreferrer"'
-    # UTM tags (workbench's "Mesure d'audience"): a link to another of our
-    # sites (*.boreale.dev) says where it comes from, utm_source='guard' and
-    # a utm_medium; one to this site itself or to anyone else carries none.
-    u = urlparse(href)
-    host = (u.hostname or "").lower()
-    query = dict(parse_qsl(u.query))
-    if u.scheme == "https" and (host == "boreale.dev" or host.endswith(".boreale.dev")) and host != SITE_HOST:
-        if query.get("utm_source") != UTM_SOURCE or not query.get("utm_medium"):
-            return f"link to {href} without utm_source={UTM_SOURCE} and a utm_medium"
-    elif any(k.startswith("utm_") for k in query):
-        return f"link to {href} with utm_ parameters: only a link to another of our sites has them"
-    return ""
+def shared_problems(root: str, site: str) -> list:
+    """boreale-site's checks (boreale_site.check.pages(), its catalogs'
+    check_catalogs()) on the built site, but for what this one does itself."""
+    errors, _ = boreale_check.pages(Path(root), boreale.Site("playguard", site))
+    kept = []
+    for error in errors:
+        name, _, problem = error.partition(": ")
+        if problem.endswith(NOT_HERE):
+            continue
+        if problem in SENDS_ON and 'http-equiv="refresh"' in (Path(root) / name).read_text(encoding="utf-8"):
+            continue
+        if problem == SENDS_ON[1] and os.environ.get("SITE_NOINDEX") == "1":
+            continue
+        kept.append(error)
+    return kept + boreale.check_catalogs(ROOT / "site" / "i18n")
 
 
 class Page(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.links, self.ids, self.problems = [], set(), []
-        self.no_referrer = False
+        self.links, self.ids = [], set()
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if "id" in a:
             self.ids.add(a["id"])
-        if tag == "meta" and a.get("name") == "referrer" and a.get("content") == "no-referrer":
-            self.no_referrer = True
-        if tag == "a" and link_problem(a):
-            self.problems.append(link_problem(a))
         for key in ("href", "src", "poster"):
             # <link rel="alternate|canonical|sitemap"> name pages by address: checked as links too.
             if a.get(key):
@@ -115,9 +78,6 @@ def main():
         return 2
     root = os.path.abspath(sys.argv[1])
     site = sys.argv[2].rstrip("/") + "/" if len(sys.argv) > 2 else None
-    if site:
-        global SITE_HOST
-        SITE_HOST = (urlparse(site).hostname or "").lower()
     pages = {}
     for folder, _, files in os.walk(root):
         for name in files:
@@ -127,7 +87,6 @@ def main():
                 with open(path, encoding="utf-8") as f:
                     html = f.read()
                 page.feed(html)
-                page.problems += emails(html)
                 pages[path] = page
 
     def target(path):
@@ -136,11 +95,10 @@ def main():
         return path
 
     errors = 0
-    check_own_site()
+    for problem in shared_problems(root, site or os.environ.get("SITE_URL")):
+        print(problem)
+        errors += 1
     for path, page in sorted(pages.items()):
-        for problem in page.problems + ([] if page.no_referrer else ['no <meta name="referrer" content="no-referrer">']):
-            print(f"{os.path.relpath(path, root)}: {problem}")
-            errors += 1
         if os.path.basename(path) == "404.html":
             continue   # served at any path: its links start from the site's root, elsewhere
         for link in page.links:

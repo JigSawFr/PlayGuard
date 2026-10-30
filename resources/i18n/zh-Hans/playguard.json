@@ -1318,6 +1318,7 @@
         "notices_reminders": "提醒：备份、主机的第二个系统、阻止游戏",
         "notices_ack_remind": "30 天后重新计入已忽略的警告",
         "notices_others": "其他 Boréale homebrew 的通知",
+        "look_shared": "与其他 Boréale 自制软件外观相同",
         "help": "帮助与诊断",
         "effects": "视觉效果",
         "effects_values": {
