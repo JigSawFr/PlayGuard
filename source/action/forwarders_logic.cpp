@@ -9,6 +9,7 @@
 #include <aurore/cadran/util/text.hpp>
 
 #include "core/calendar.h"
+#include "util/date.hpp"
 
 namespace forwarders_logic
 {
@@ -171,7 +172,6 @@ bool writes_sd(const std::string& nro)
 
 std::string hours_text(int days, int from, int to, const std::vector<std::string>& day_names)
 {
-    const auto hm = [](int m) { return std::format("{:02}:{:02}", m / 60, m % 60); };
     std::string d;
     if (day_names.size() == 7) {
         if ((days & 0x7F) == 0x7F) d = day_names[1] + "–" + day_names[0];   // Monday to Sunday
@@ -181,7 +181,7 @@ std::string hours_text(int days, int from, int to, const std::vector<std::string
             for (int i = 1; i <= 7; i++)
                 if (days >> (i % 7) & 1) d += (d.empty() ? "" : ", ") + day_names[i % 7];
     }
-    return d + " " + hm(from) + "–" + hm(to);
+    return d + " " + date::hh_mm(from) + "–" + date::hh_mm(to);
 }
 
 bool stale_loader(const std::string& made, const std::string& current)

@@ -21,6 +21,7 @@
 #include "app.hpp"
 #include "ui/ui.hpp"
 #include "util/config.hpp"
+#include "util/date.hpp"
 #include "util/perf.hpp"
 #include "util/profiles.hpp"
 
@@ -287,11 +288,11 @@ void PlayTimerTab::refresh()
     PtBedtime same;
     if (pt_logic::bedtime_layout_ok(this->pt, wd)) {
         const bool uniform = pt_logic::bedtime_uniform(this->pt, &same);
-        ui::set_detail(bedtime_reset, uniform && same.on ? std::format("{:02d}:{:02d}", same.end_hour, same.end_minute)
+        ui::set_detail(bedtime_reset, uniform && same.on ? date::hh_mm(same.end_hour, same.end_minute)
                                       : uniform ? "—" : "playguard/play_timer/bedtime_varies"_i18n);
     } else {
         ui::set_detail(bedtime_reset, this->pt.bedtime_reset_valid
-            ? std::format("{:02d}:{:02d}", this->pt.bedtime_reset_hour, this->pt.bedtime_reset_minute) : na);
+            ? date::hh_mm(this->pt.bedtime_reset_hour, this->pt.bedtime_reset_minute) : na);
     }
 
     this->list.sync();
@@ -470,16 +471,16 @@ void PlayTimerTab::rerender()
         if (!pt_logic::bedtime_uniform(timer, &same)) start = pt_flow::bedtime_days_text(timer);
         else if (!same.on) start = "playguard/common/off"_i18n;
         else {
-            start = std::format("{:02d}:{:02d}", same.hour, same.minute);
-            end = std::format("{:02d}:{:02d}", same.end_hour, same.end_minute);
+            start = date::hh_mm(same.hour, same.minute);
+            end = date::hh_mm(same.end_hour, same.end_minute);
         }
     } else if (timer.bedtime_valid) {
-        start = timer.bedtime_enabled ? std::format("{:02d}:{:02d}", timer.bedtime_hour, timer.bedtime_minute) : "playguard/common/off"_i18n;
+        start = timer.bedtime_enabled ? date::hh_mm(timer.bedtime_hour, timer.bedtime_minute) : "playguard/common/off"_i18n;
     }
     // Each day's under the week, when they differ.
     std::string beds[7];
     if (pt_logic::bedtime_layout_ok(timer, ui::today_weekday()) && timer.valid && !pt_logic::bedtime_uniform(timer, nullptr))
-        for (int d = 0; d < 7; d++) beds[d] = timer.bed[d].on ? std::format("{:02d}:{:02d}", timer.bed[d].hour, timer.bed[d].minute) : "—";
+        for (int d = 0; d < 7; d++) beds[d] = timer.bed[d].on ? date::hh_mm(timer.bed[d].hour, timer.bed[d].minute) : "—";
     week_editor->show_bedtimes(beds);
     bed_value->setText(start);
     bed_end->setText(end);
