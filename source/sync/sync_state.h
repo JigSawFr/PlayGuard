@@ -132,6 +132,13 @@ size_t sync_names_build(uint64_t ts, const SyncAppName *apps, size_t n_apps, con
 size_t sync_event_build(const char *source, uint64_t ts, const char *event_type, const char *entity,
                         const char *payload, SyncReason reason, bool rc_set, uint32_t rc, char *out, size_t cap);
 
+// What the console is and which homebrews publish on it, retained on
+// <base>/capabilities (docs/sync-protocol.md): the platform, and PlayGuard
+// with the schema of its documents and its version.
+#define SYNC_PLATFORM "switch"
+#define SYNC_CAPABILITIES_SCHEMA 1
+size_t sync_capabilities_build(const char *sw_version, char *out, size_t cap);
+
 // Minutes played today by the console timer's own count (today's limit minus
 // 1454), or -1 when it does not say (pt_logic::played_today_min).
 int sync_played_today_min(const PtState *pt, int weekday);

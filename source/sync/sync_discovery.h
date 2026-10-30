@@ -42,8 +42,22 @@ typedef struct {
 size_t sync_discovery_topic(const SyncConf *conf, char *out, size_t cap);
 size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap);
 
-// `<topic_prefix>/<device id>` (sync_conf_device_id; no trailing slash).
+// `<topic_prefix>/<device id>` (sync_conf_device_id; no trailing slash): the
+// console's own topics are under it, PlayGuard's under SYNC_MODULE/.
 size_t sync_topic_base(const SyncConf *conf, char *out, size_t cap);
+
+// PlayGuard's subtree under the console's (docs/sync-protocol.md).
+#define SYNC_MODULE "playguard"
+// What the console is, whatever homebrew publishes it: its availability, the
+// capabilities, the system document, the game icons and the integration's
+// document stay at the console's level; the rest is PlayGuard's.
+bool sync_topic_is_device(const char *sub);
+// `sub` under the base, at the console's level or under SYNC_MODULE/ as
+// sync_topic_is_device says: the state under playguard/, the system document
+// at the base.
+size_t sync_topic_sub(const char *sub, char *out, size_t cap);
+// The whole topic: sync_topic_base, then sync_topic_sub.
+size_t sync_topic(const SyncConf *conf, const char *sub, char *out, size_t cap);
 
 #ifdef __cplusplus
 }

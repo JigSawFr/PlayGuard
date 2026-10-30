@@ -39,6 +39,7 @@ struct Job
 {
     SyncConf conf{};
     std::string base, target;
+    std::string old_base, old_target;   // the tree before Boréale's, on the same broker
     char client_id[24] = "";
     Plan plan;
 
@@ -47,7 +48,7 @@ struct Job
     bool abort = false, finished = false;
     // Done: (app id, bytes; 0 none to publish), and the ones cleared.
     std::vector<std::pair<uint64_t, uint32_t>> sent;
-    std::vector<uint64_t> cleared;
+    std::vector<uint64_t> cleared, cleared_old;
     size_t too_large = 0;
     std::string error;   // could not connect, or the connection was lost ("" neither)
     bool resend = false, last_batch = true;
@@ -96,9 +97,10 @@ int connect(MqttClient& c, Job& j)
     return rc;
 }
 
-void publish(MqttClient& c, Job& j, const std::string& sub, const void* bytes, size_t len, bool& ok)
+void publish(MqttClient& c, const std::string& base, const std::string& sub, const void* bytes, size_t len,
+             bool& ok)
 {
-    const std::string topic = j.base + "/" + sub;
+    const std::string topic = base + "/" + sub;
     ok = mqtt_client_publish(&c, topic.c_str(), bytes, len, true) == 0;
 }
 
@@ -116,13 +118,21 @@ void run(std::shared_ptr<Job> job)
     MqttClient c;
     mqtt_client_init(&c, io, rx, sizeof(rx), bl_now_ms, noop, nullptr);
     std::vector<std::pair<uint64_t, uint32_t>> sent;
-    std::vector<uint64_t> cleared;
+    std::vector<uint64_t> cleared, cleared_old;
     size_t too_large = 0;
     std::string error;
     if (connect(c, j) < 0) {
         error = c.error[0] ? c.error : "cannot reach the broker";
         mqtt_client_close(&c, false);
     } else {
+        // The old tree's first: those are recorded under its target, before
+        // the first icon sent moves the record to the new one.
+        for (const uint64_t id : j.plan.clear_old) {
+            if (aborted(j) || !c.connected) break;
+            bool ok = false;
+            publish(c, j.old_base, topic(id), "", 0, ok);
+            if (ok) cleared_old.push_back(id);
+        }
         for (const uint64_t id : j.plan.send) {
             if (aborted(j) || !c.connected) break;
             PlayIcon icon{ id, nullptr, 0 };
@@ -130,7 +140,7 @@ void run(std::shared_ptr<Job> job)
             bool ok = true;
             const uint32_t before = c.too_large;
             const uint32_t bytes = icon.jpeg ? (uint32_t)icon.size : 0;   // 0: the game has none
-            if (bytes) publish(c, j, topic(id), icon.jpeg, bytes, ok);
+            if (bytes) publish(c, j.base, topic(id), icon.jpeg, bytes, ok);
             std::free(icon.jpeg);
             if (ok) sent.push_back({ id, bytes });
             else if (c.connected && c.too_large != before) {
@@ -141,7 +151,7 @@ void run(std::shared_ptr<Job> job)
         for (const uint64_t id : j.plan.clear) {
             if (aborted(j) || !c.connected) break;
             bool ok = false;
-            publish(c, j, topic(id), "", 0, ok);
+            publish(c, j.base, topic(id), "", 0, ok);
             if (ok) cleared.push_back(id);
         }
         if (!c.connected) error = c.error;
@@ -150,6 +160,7 @@ void run(std::shared_ptr<Job> job)
     std::lock_guard<std::mutex> lk(j.m);
     j.sent = std::move(sent);
     j.cleared = std::move(cleared);
+    j.cleared_old = std::move(cleared_old);
     j.too_large = too_large;
     j.error = error;
     j.finished = true;
@@ -174,9 +185,10 @@ void collect()
     }
     if (s.thread.joinable()) s.thread.join();
     Job& j = *s.job;
+    for (const uint64_t id : j.cleared_old) record(s.sent, j.old_target, id, 0, true);
     for (const auto& e : j.sent) record(s.sent, j.target, e.first, e.second, false);
     for (const uint64_t id : j.cleared) record(s.sent, j.target, id, 0, true);
-    if (!j.sent.empty() || !j.cleared.empty()) sync_files::write_icons(text(s.sent));
+    if (!j.sent.empty() || !j.cleared.empty() || !j.cleared_old.empty()) sync_files::write_icons(text(s.sent));
     if (!j.error.empty()) {
         s.retry_at = Clock::now() + RETRY_AFTER;
         // The session file goes into reports, which are public: not the broker's name.
@@ -192,7 +204,8 @@ void collect()
         }
     }
     if (!j.sent.empty() || !j.cleared.empty() || j.error.empty())
-        aurore::Logger::info("sync: game icons: {} published, {} cleared{}", j.sent.size(), j.cleared.size(),
+        aurore::Logger::info("sync: game icons: {} published, {} cleared{}", j.sent.size(),
+                             j.cleared.size() + j.cleared_old.size(),
                        j.too_large ? std::format(", {} larger than the broker takes", j.too_large) : "");
     s.job.reset();
 }
@@ -224,6 +237,10 @@ void step(const SyncConf& conf, bool online)
     job->conf = conf;
     job->base = std::string(conf.topic_prefix) + "/" + id;
     job->target = target_of(conf.host, conf.port, job->base);
+    // An earlier version's tree (playguard/<id>, or the prefix sync.conf had):
+    // its icons are cleared there once this console publishes under the new one.
+    job->old_base = std::string(conf.legacy_prefix[0] ? conf.legacy_prefix : "playguard") + "/" + id;
+    if (job->old_base != job->base) job->old_target = target_of(conf.host, conf.port, job->old_base);
     if (!s.agent.icons.empty()) {
         if (merge(s.sent, s.agent, job->target)) sync_files::write_icons(text(s.sent));
         s.agent = Sent{};
@@ -241,7 +258,7 @@ void step(const SyncConf& conf, bool online)
     for (const Played& p : s.played)
         if (title_names::kind(p.app_id) == SyncTitle_Game) played.push_back(p);
     const std::vector<uint64_t> want = conf.publish_icons ? wanted(played, installed) : std::vector<uint64_t>{};
-    job->plan = plan(want, s.sent, job->target);
+    job->plan = plan(want, s.sent, job->target, job->old_target);
     if (conf.publish_icons && !checked) job->plan.clear.clear();
     if (s.resend) {
         // Those not sent again yet: a batch at a time, as the others.

@@ -42,6 +42,7 @@ size_t sync_system_build(const SyncSystem *s, char *out, size_t cap)
     bl_json_init(&j, out, cap);
     bl_json_obj(&j);
     bl_json_kint(&j, "schema", SYNC_SCHEMA);
+    bl_json_kstr(&j, "platform", SYNC_PLATFORM);   // what the console is, whatever is published
     bl_json_kint_or_null(&j, "ts", s->ts != 0, (int64_t)s->ts);
 
     bl_json_key(&j, "versions");

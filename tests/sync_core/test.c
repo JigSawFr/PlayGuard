@@ -98,7 +98,7 @@ static void test_connect_encoding(void)
     c.client_id = "pg-a1b2c3d4-app";
     c.username = "user";
     c.password = "pass";
-    c.will_topic = "playguard/a1b2c3d4/availability";
+    c.will_topic = "boreale/a1b2c3d4/availability";
     c.will_payload = "offline";
     c.will_len = 7;
     c.will_retain = true;
@@ -270,7 +270,7 @@ static void test_mqtt5(void)
     c.client_id = "pg-a1b2c3d4-app";
     c.username = "user";
     c.password = "pass";
-    c.will_topic = "playguard/a1b2c3d4/availability";
+    c.will_topic = "boreale/a1b2c3d4/availability";
     c.will_payload = "offline";
     c.will_len = 7;
     c.will_retain = true;
@@ -395,7 +395,7 @@ static void test_conf(void)
     SyncConf c;
     sync_conf_defaults(&c);
     CHECK(c.port == 1883 && c.policy == SyncPolicy_Ask && c.ha_discovery && !c.remote_timer_writes);
-    CHECK(!strcmp(c.topic_prefix, "playguard") && !strcmp(c.discovery_prefix, "homeassistant"));
+    CHECK(!strcmp(c.topic_prefix, "boreale") && !strcmp(c.discovery_prefix, "homeassistant") && !c.legacy_prefix[0]);
     CHECK(c.publish_icons && c.publish_games && !c.publish_serial);   // the icons on by default, as the games
     CHECK(c.mqtt_version == SyncMqtt_Auto);
     CHECK(sync_conf_problem(&c) != NULL);   // no host
@@ -439,7 +439,7 @@ static void test_conf(void)
     CHECK(!sync_conf_publishes(&c, SyncPublish_Serial));   // with the hardware only
     c.publish_hardware = true;
     c.publish_serial = false;
-    CHECK(c.poll_s == 30 && !strcmp(c.topic_prefix, "playguard"));
+    CHECK(c.poll_s == 30 && !strcmp(c.topic_prefix, "boreale"));
     CHECK(contains(c.extra, "future_key=keep me\n"));
     CHECK(sync_conf_problem(&c) == NULL);
 
@@ -454,15 +454,42 @@ static void test_conf(void)
     CHECK(sync_conf_parse(&back, out, n));
     CHECK(!memcmp(&back, &c, sizeof(c)));
     CHECK(sync_conf_write(&c, out, 64) == 0);
-    CHECK(sync_conf_unwritable(&c) == NULL && c.schema == SYNC_CONF_SCHEMA);   // none in the file: 1
+    CHECK(sync_conf_unwritable(&c) == NULL && c.schema == SYNC_CONF_SCHEMA);   // none in the file: the current one
+
+    // Schema 1 published under playguard/<id>/: the default prefix moves to
+    // boreale, the old tree is to clear (legacy_prefix), written as schema 2
+    // until the engine has cleared it.
+    const char v1[] = "schema=1\nhost=broker.lan\ntopic_prefix=playguard\n";
+    SyncConf old;
+    sync_conf_defaults(&old);
+    CHECK(sync_conf_parse(&old, v1, strlen(v1)));
+    CHECK(!strcmp(old.topic_prefix, "boreale") && !strcmp(old.legacy_prefix, "playguard"));
+    CHECK(sync_conf_unwritable(&old) == NULL);
+    const size_t on = sync_conf_write(&old, out, sizeof(out));
+    CHECK(on > 0 && contains(out, "schema=2\n") && contains(out, "topic_prefix=boreale\n") && contains(out, "legacy_prefix=playguard\n"));
+    SyncConf again;
+    sync_conf_defaults(&again);
+    CHECK(sync_conf_parse(&again, out, on) && again.schema == 2 && !strcmp(again.legacy_prefix, "playguard"));
+    old.legacy_prefix[0] = '\0';   // cleared: the line goes
+    CHECK(sync_conf_write(&old, out, sizeof(out)) > 0 && !contains(out, "legacy_prefix"));
+    // A prefix of one's own stays; its old tree (no module level) is cleared.
+    const char v1own[] = "schema=1\nhost=broker.lan\ntopic_prefix=home_switch\n";
+    sync_conf_defaults(&old);
+    CHECK(sync_conf_parse(&old, v1own, strlen(v1own)));
+    CHECK(!strcmp(old.topic_prefix, "home_switch") && !strcmp(old.legacy_prefix, "home_switch"));
+    // No prefix in it: the old default's tree.
+    const char v1bare[] = "schema=1\nhost=broker.lan\n";
+    sync_conf_defaults(&old);
+    CHECK(sync_conf_parse(&old, v1bare, strlen(v1bare)));
+    CHECK(!strcmp(old.topic_prefix, "boreale") && !strcmp(old.legacy_prefix, "playguard"));
 
     // A newer version's file: what this one knows is read, the file is not
     // written over (by PlayGuard nor the agent).
-    const char newer[] = "schema=2\nhost=broker.lan\nport=8884\nlater=1\n";
+    const char newer[] = "schema=3\nhost=broker.lan\nport=8884\nlater=1\n";
     SyncConf nc;
     sync_conf_defaults(&nc);
     CHECK(sync_conf_parse(&nc, newer, strlen(newer)));
-    CHECK(nc.schema == 2 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.extra, "later=1\n"));
+    CHECK(nc.schema == 3 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.extra, "later=1\n"));
     CHECK(sync_conf_unwritable(&nc) != NULL);
     // More unknown lines than SYNC_EXTRA_MAX keeps: not written either.
     char many[SYNC_EXTRA_MAX * 2];
@@ -661,7 +688,7 @@ static void test_discovery(void)
     strcpy(c.console_name, "Salon \"Léa\"");
     char topic[128];
     CHECK(sync_discovery_topic(&c, topic, sizeof(topic)) > 0);
-    CHECK(!strcmp(topic, "homeassistant/device/playguard_a1b2c3d4/config"));
+    CHECK(!strcmp(topic, "homeassistant/device/boreale_a1b2c3d4/config"));
 
     static char buf[SYNC_SCRATCH_SIZE];
     const char profiles[2][SYNC_PROFILE_MAX] = { "School week", "Holidays" };
@@ -671,43 +698,43 @@ static void test_discovery(void)
     // each sent as its platform alone, which removes it from Home Assistant.
     size_t n = sync_discovery_build(&d, buf, sizeof(buf));
     CHECK(n > 0 && n < sizeof(buf));
-    CHECK(contains(buf, "\"ids\":[\"playguard_a1b2c3d4\"]"));
+    CHECK(contains(buf, "\"ids\":[\"boreale_a1b2c3d4\"]"));
     CHECK(contains(buf, "\"name\":\"Salon \\\"Léa\\\"\""));
     // The console unknown: a Nintendo Switch, no model number nor system.
     CHECK(contains(buf, "\"mf\":\"Nintendo\",\"mdl\":\"Nintendo Switch\"},\"o\":{\"name\":\"PlayGuard\",\"sw\":\"1.1.0\""));
-    CHECK(contains(buf, "\"avty_t\":\"playguard/a1b2c3d4/availability\""));
-    CHECK(contains(buf, "\"used_screen_time\":{\"p\":\"sensor\""));
-    CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/vr_restricted/set\""));
-    CHECK(contains(buf, "\"limit_mon\":{\"p\":\"number\"}"));
-    CHECK(contains(buf, "\"bedtime_alarm\":{\"p\":\"time\"}"));
+    CHECK(contains(buf, "\"avty_t\":\"boreale/a1b2c3d4/availability\""));
+    CHECK(contains(buf, "\"playguard_used_screen_time\":{\"p\":\"sensor\""));
+    CHECK(contains(buf, "\"cmd_t\":\"boreale/a1b2c3d4/playguard/vr_restricted/set\""));
+    CHECK(contains(buf, "\"playguard_limit_mon\":{\"p\":\"number\"}"));
+    CHECK(contains(buf, "\"playguard_bedtime_alarm\":{\"p\":\"time\"}"));
     // The lock, offered even so (locking again is always allowed); what it
     // replaced is removed.
-    CHECK(contains(buf, "\"parental_controls\":{\"p\":\"lock\",\"name\":\"Parental controls\",\"uniq_id\":"
-                        "\"playguard_a1b2c3d4_parental_controls\",\"stat_t\":\"playguard/a1b2c3d4/state\",\"val_tpl\":"
+    CHECK(contains(buf, "\"playguard_parental_controls\":{\"p\":\"lock\",\"name\":\"Parental controls\",\"uniq_id\":"
+                        "\"boreale_a1b2c3d4_playguard_parental_controls\",\"stat_t\":\"boreale/a1b2c3d4/playguard/state\",\"val_tpl\":"
                         "\"{{ 'LOCKED' if value_json.controls.enabled and not value_json.controls.temp_unlocked else "
-                        "'UNLOCKED' }}\",\"cmd_t\":\"playguard/a1b2c3d4/parental_controls/set\",\"ret\":true,\"opt\":true}"));
-    CHECK(contains(buf, "\"unlocked\":{\"p\":\"switch\"}") && contains(buf, "\"lock_now\":{\"p\":\"button\"}"));
-    CHECK(contains(buf, "\"temp_unlocked\":{\"p\":\"binary_sensor\"}"));
+                        "'UNLOCKED' }}\",\"cmd_t\":\"boreale/a1b2c3d4/playguard/parental_controls/set\",\"ret\":true,\"opt\":true}"));
+    CHECK(contains(buf, "\"playguard_unlocked\":{\"p\":\"switch\"}") && contains(buf, "\"playguard_lock_now\":{\"p\":\"button\"}"));
+    CHECK(contains(buf, "\"playguard_temp_unlocked\":{\"p\":\"binary_sensor\"}"));
     // Why play is blocked, as an attribute read from the state.
     CHECK(contains(buf, "\"name\":\"Playing blocked\""));
-    CHECK(contains(buf, "\"json_attr_t\":\"playguard/a1b2c3d4/state\",\"pl_on\":\"True\",\"pl_off\":\"False\","
+    CHECK(contains(buf, "\"json_attr_t\":\"boreale/a1b2c3d4/playguard/state\",\"pl_on\":\"True\",\"pl_off\":\"False\","
                         "\"ic\":\"mdi:block-helper\",\"json_attr_tpl\":\"{{ {'reason': value_json.timer.blocked_by} | tojson }}\""));
-    CHECK(contains(buf, "\"add_bonus_time_15\":{\"p\":\"button\"}"));
-    CHECK(contains(buf, "\"profile\":{\"p\":\"select\"}"));
+    CHECK(contains(buf, "\"playguard_add_bonus_time_15\":{\"p\":\"button\"}"));
+    CHECK(contains(buf, "\"playguard_profile\":{\"p\":\"select\"}"));
     CHECK(!contains(buf, "limit_mon/set"));
     // The restriction level's "none" is the option "unrestricted" (HA reads
     // a select's "None" as unknown), sent back as "none".
     CHECK(contains(buf, "\"ops\":[\"unrestricted\",\"young_child\",\"child\",\"teen\",\"custom\"]"));
     CHECK(contains(buf, "\"cmd_tpl\":\"{{ 'none' if value == 'unrestricted' else value }}\""));
     // The day's totals restart at midnight; the time left is a measurement.
-    CHECK(contains(buf, "\"used_screen_time\":{\"p\":\"sensor\""));
+    CHECK(contains(buf, "\"playguard_used_screen_time\":{\"p\":\"sensor\""));
     CHECK(contains(buf, "\"stat_cla\":\"total_increasing\""));
     CHECK(contains(buf, "\"stat_cla\":\"measurement\""));
-    CHECK(contains(buf, "\"stat_t\":\"playguard/a1b2c3d4/event\",\"evt_typ\":["));
+    CHECK(contains(buf, "\"stat_t\":\"boreale/a1b2c3d4/playguard/event\",\"evt_typ\":["));
     const size_t without = n;
 
     // The serial number is off by default: its entity removed.
-    CHECK(contains(buf, "\"serial\":{\"p\":\"sensor\"}"));
+    CHECK(contains(buf, "\"playguard_serial\":{\"p\":\"sensor\"}"));
 
     // On: the timer entities appear, retained and optimistic, with the
     // profiles (and the profile in effect); with the serial number.
@@ -716,25 +743,25 @@ static void test_discovery(void)
     n = sync_discovery_build(&d, buf, sizeof(buf));
     CHECK(contains(buf, "\"val_tpl\":\"{{ value_json.timer.profile }}\""));
     CHECK(n > without);
-    CHECK(contains(buf, "\"limit_mon\":{\"p\":\"number\""));
-    CHECK(contains(buf, "\"cmd_t\":\"playguard/a1b2c3d4/limit_mon/set\",\"ret\":true,\"opt\":true"));
+    CHECK(contains(buf, "\"playguard_limit_mon\":{\"p\":\"number\""));
+    CHECK(contains(buf, "\"cmd_t\":\"boreale/a1b2c3d4/playguard/limit_mon/set\",\"ret\":true,\"opt\":true"));
     CHECK(contains(buf, "\"ops\":[\"School week\",\"Holidays\"]"));
-    CHECK(contains(buf, "\"bedtime_alarm\":{\"p\":\"time\""));
+    CHECK(contains(buf, "\"playguard_bedtime_alarm\":{\"p\":\"time\""));
     // The console's own entities read the system and games documents; the
     // serial number, the Wi-Fi network's name and what few dashboards need
     // (the model, the battery's not) are off in Home Assistant.
-    CHECK(contains(buf, "\"battery\":{\"p\":\"sensor\",\"name\":\"Battery\",\"uniq_id\":\"playguard_a1b2c3d4_battery\","
-                        "\"stat_t\":\"playguard/a1b2c3d4/system\",\"val_tpl\":\"{{ value_json.power.battery_pct }}\""));
-    CHECK(contains(buf, "\"stat_t\":\"playguard/a1b2c3d4/games\",\"val_tpl\":\"{{ value_json.installed }}\""));
+    CHECK(contains(buf, "\"playguard_battery\":{\"p\":\"sensor\",\"name\":\"Battery\",\"uniq_id\":\"boreale_a1b2c3d4_playguard_battery\","
+                        "\"stat_t\":\"boreale/a1b2c3d4/system\",\"val_tpl\":\"{{ value_json.power.battery_pct }}\""));
+    CHECK(contains(buf, "\"stat_t\":\"boreale/a1b2c3d4/playguard/games\",\"val_tpl\":\"{{ value_json.installed }}\""));
     CHECK(contains(buf, "\"val_tpl\":\"{{ value_json.hardware.serial }}\",\"ent_cat\":\"diagnostic\",\"en\":false"));
     CHECK(contains(buf, "\"oled\",\"other\"],\"ent_cat\":\"diagnostic\",\"en\":false"));
-    CHECK(contains(buf, "\"stat_cla\":\"measurement\"},\"charging\""));
+    CHECK(contains(buf, "\"stat_cla\":\"measurement\"},\"playguard_charging\""));
     CHECK(contains(buf, "\"unit_of_meas\":\"\xc2\xb0" "C\",\"dev_cla\":\"temperature\""));
     CHECK(n < SYNC_SCRATCH_SIZE * 3 / 4);   // room to grow
     // Every component has a unique id and the device's availability.
     size_t total = 0;
     const SyncEntity *list = sync_entities(&total);
-    CHECK(count(buf, "\"uniq_id\":\"playguard_a1b2c3d4_") == total);
+    CHECK(count(buf, "\"uniq_id\":\"boreale_a1b2c3d4_playguard_") == total);
     (void)list;
     save("discovery.json", buf);
     printf("discovery: %zu bytes, %zu components\n", n, total);
@@ -744,12 +771,12 @@ static void test_discovery(void)
         bool       *flag;
         const char *gone, *kept;
     } cats[] = {
-        { &c.publish_activity, "\"used_screen_time_log\":{\"p\":\"sensor\"}", "\"used_screen_time\":{\"p\":\"sensor\"," },
-        { &c.publish_games, "\"games_installed\":{\"p\":\"sensor\"}", "\"battery\":{\"p\":\"sensor\"," },
-        { &c.publish_console, "\"battery\":{\"p\":\"sensor\"}", "\"ip_address\":{\"p\":\"sensor\"," },
-        { &c.publish_network, "\"ip_address\":{\"p\":\"sensor\"}", "\"model\":{\"p\":\"sensor\"," },
-        { &c.publish_hardware, "\"firmware\":{\"p\":\"sensor\"}", "\"battery\":{\"p\":\"sensor\"," },
-        { &c.publish_serial, "\"serial\":{\"p\":\"sensor\"}", "\"model\":{\"p\":\"sensor\"," },
+        { &c.publish_activity, "\"playguard_used_screen_time_log\":{\"p\":\"sensor\"}", "\"playguard_used_screen_time\":{\"p\":\"sensor\"," },
+        { &c.publish_games, "\"playguard_games_installed\":{\"p\":\"sensor\"}", "\"playguard_battery\":{\"p\":\"sensor\"," },
+        { &c.publish_console, "\"playguard_battery\":{\"p\":\"sensor\"}", "\"playguard_ip_address\":{\"p\":\"sensor\"," },
+        { &c.publish_network, "\"playguard_ip_address\":{\"p\":\"sensor\"}", "\"playguard_model\":{\"p\":\"sensor\"," },
+        { &c.publish_hardware, "\"playguard_firmware\":{\"p\":\"sensor\"}", "\"playguard_battery\":{\"p\":\"sensor\"," },
+        { &c.publish_serial, "\"playguard_serial\":{\"p\":\"sensor\"}", "\"playguard_model\":{\"p\":\"sensor\"," },
     };
     for (size_t i = 0; i < sizeof(cats) / sizeof(cats[0]); i++) {
         *cats[i].flag = false;
@@ -760,8 +787,8 @@ static void test_discovery(void)
     // Versions and hardware off: the serial number and the model go too.
     c.publish_hardware = false;
     CHECK(sync_discovery_build(&d, buf, sizeof(buf)) > 0);
-    CHECK(contains(buf, "\"serial\":{\"p\":\"sensor\"}") && contains(buf, "\"model\":{\"p\":\"sensor\"}"));
-    CHECK(contains(buf, "\"atmosphere\":{\"p\":\"sensor\"}") && contains(buf, "\"hekate\":{\"p\":\"sensor\"}"));
+    CHECK(contains(buf, "\"playguard_serial\":{\"p\":\"sensor\"}") && contains(buf, "\"playguard_model\":{\"p\":\"sensor\"}"));
+    CHECK(contains(buf, "\"playguard_atmosphere\":{\"p\":\"sensor\"}") && contains(buf, "\"playguard_hekate\":{\"p\":\"sensor\"}"));
     c.publish_hardware = true;
     CHECK(sync_conf_publishes(&c, SyncPublish_Controls) && !strcmp(sync_publish_name(SyncPublish_Network), "network"));
 
@@ -807,7 +834,7 @@ static void test_discovery(void)
     // Without profiles, no profile select (nothing to choose from): removed.
     d.n_profiles = 0;
     n = sync_discovery_build(&d, buf, sizeof(buf));
-    CHECK(contains(buf, "\"profile\":{\"p\":\"select\"}"));
+    CHECK(contains(buf, "\"playguard_profile\":{\"p\":\"select\"}"));
     // Read-only: sensors only.
     d.read_only = true;
     n = sync_discovery_build(&d, buf, sizeof(buf));
@@ -826,11 +853,11 @@ static void test_discovery(void)
     sync_conf_device_name(&c, "Switch de Léa", name, sizeof(name));   // sync.conf's name first
     CHECK(!strcmp(name, "Salon \"Léa\" (emuMMC)"));
     CHECK(sync_discovery_topic(&c, topic, sizeof(topic)) > 0);
-    CHECK(!strcmp(topic, "homeassistant/device/playguard_21b2c3d4/config"));
+    CHECK(!strcmp(topic, "homeassistant/device/boreale_21b2c3d4/config"));
     n = sync_discovery_build(&d, buf, sizeof(buf));
-    CHECK(n > 0 && contains(buf, "\"ids\":[\"playguard_21b2c3d4\"]") && !contains(buf, "a1b2c3d4"));
+    CHECK(n > 0 && contains(buf, "\"ids\":[\"boreale_21b2c3d4\"]") && !contains(buf, "a1b2c3d4"));
     CHECK(contains(buf, "\"name\":\"Salon \\\"Léa\\\" (emuMMC)\""));
-    CHECK(contains(buf, "\"cmd_t\":\"playguard/21b2c3d4/parental_controls/set\""));
+    CHECK(contains(buf, "\"cmd_t\":\"boreale/21b2c3d4/playguard/parental_controls/set\""));
     strcpy(c.console_id, "f0000000");   // every digit flips both ways
     sync_conf_device_id(&c, id);
     CHECK(!strcmp(id, "70000000"));

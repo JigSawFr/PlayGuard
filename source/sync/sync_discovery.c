@@ -17,11 +17,32 @@ size_t sync_topic_base(const SyncConf *conf, char *out, size_t cap)
     return n < 0 || (size_t)n >= cap ? 0 : (size_t)n;
 }
 
+bool sync_topic_is_device(const char *sub)
+{
+    return !strcmp(sub, "availability") || !strcmp(sub, "capabilities") || !strcmp(sub, "system") ||
+           !strcmp(sub, "integration") || !strncmp(sub, "icon/", 5);
+}
+
+size_t sync_topic_sub(const char *sub, char *out, size_t cap)
+{
+    const int n = sync_topic_is_device(sub) ? snprintf(out, cap, "%s", sub)
+                                             : snprintf(out, cap, SYNC_MODULE "/%s", sub);
+    return n < 0 || (size_t)n >= cap ? 0 : (size_t)n;
+}
+
+size_t sync_topic(const SyncConf *conf, const char *sub, char *out, size_t cap)
+{
+    char base[96], rel[96];
+    if (!sync_topic_base(conf, base, sizeof(base)) || !sync_topic_sub(sub, rel, sizeof(rel))) return 0;
+    const int n = snprintf(out, cap, "%s/%s", base, rel);
+    return n < 0 || (size_t)n >= cap ? 0 : (size_t)n;
+}
+
 size_t sync_discovery_topic(const SyncConf *conf, char *out, size_t cap)
 {
     char id[SYNC_ID_LEN + 1];
     sync_conf_device_id(conf, id);
-    const int n = snprintf(out, cap, "%s/device/playguard_%s/config", conf->discovery_prefix, id);
+    const int n = snprintf(out, cap, "%s/device/boreale_%s/config", conf->discovery_prefix, id);
     return n < 0 || (size_t)n >= cap ? 0 : (size_t)n;
 }
 
@@ -76,8 +97,7 @@ static bool announced(const SyncEntity *e, const SyncDiscovery *d)
 size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
 {
     const SyncConf *c = d->conf;
-    char base[96], topic[160], uid[96], id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX], system[48];
-    if (!sync_topic_base(c, base, sizeof(base))) return 0;
+    char topic[160], uid[96], key[64], sub[64], id[SYNC_ID_LEN + 1], name[SYNC_DEVICE_NAME_MAX], system[48];
     sync_conf_device_id(c, id);
     sync_conf_device_name(c, d->device ? d->device->nickname : NULL, name, sizeof(name));
     const char *version = d->sw_version && *d->sw_version ? d->sw_version : "unknown";
@@ -88,7 +108,7 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
 
     bl_json_key(&j, "dev");
     bl_json_obj(&j);
-    snprintf(uid, sizeof(uid), "playguard_%s", id);
+    snprintf(uid, sizeof(uid), "boreale_%s", id);
     bl_json_key(&j, "ids");
     bl_json_arr(&j);
     bl_json_str(&j, uid);
@@ -112,7 +132,7 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     bl_json_kstr(&j, "url", REPO_URL);
     bl_json_obj_end(&j);
 
-    snprintf(topic, sizeof(topic), "%s/availability", base);
+    sync_topic(c, "availability", topic, sizeof(topic));
     bl_json_kstr(&j, "avty_t", topic);
 
     bl_json_key(&j, "cmps");
@@ -121,7 +141,10 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     const SyncEntity *list = sync_entities(&n);
     for (size_t i = 0; i < n; i++) {
         const SyncEntity *e = &list[i];
-        bl_json_key(&j, e->id);
+        // Each module's components under its name: a console with more
+        // than one homebrew is still one device.
+        snprintf(key, sizeof(key), SYNC_MODULE "_%s", e->id);
+        bl_json_key(&j, key);
         bl_json_obj(&j);
         bl_json_kstr(&j, "p", e->platform);
         // Not offered now (remote_timer_writes off, read-only, no profile):
@@ -133,10 +156,10 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
             continue;
         }
         bl_json_kstr(&j, "name", e->name);
-        snprintf(uid, sizeof(uid), "playguard_%s_%s", id, e->id);
+        snprintf(uid, sizeof(uid), "boreale_%s_" SYNC_MODULE "_%s", id, e->id);
         bl_json_kstr(&j, "uniq_id", uid);
         if (!strcmp(e->platform, "event")) {
-            snprintf(topic, sizeof(topic), "%s/event", base);
+            sync_topic(c, "event", topic, sizeof(topic));
             bl_json_kstr(&j, "stat_t", topic);
             bl_json_key(&j, "evt_typ");
             bl_json_arr(&j);
@@ -148,12 +171,13 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
             for (size_t t = 0; t < sizeof(types) / sizeof(types[0]); t++) bl_json_str(&j, types[t]);
             bl_json_arr_end(&j);
         } else if (e->value_template) {
-            snprintf(topic, sizeof(topic), "%s/%s", base, e->topic ? e->topic : "state");
+            sync_topic(c, e->topic ? e->topic : "state", topic, sizeof(topic));
             bl_json_kstr(&j, "stat_t", topic);
             bl_json_kstr(&j, "val_tpl", e->value_template);
         }
         if (e->write != SyncWrite_None) {
-            snprintf(topic, sizeof(topic), "%s/%s/set", base, e->id);
+            snprintf(sub, sizeof(sub), "%s/set", e->id);
+            sync_topic(c, sub, topic, sizeof(topic));
             bl_json_kstr(&j, "cmd_t", topic);
             // Retained: an order sent while the console sleeps waits on the
             // broker. Optimistic: the entity keeps the value asked meanwhile.
@@ -168,7 +192,7 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
         }
         // Attributes from the same document as the state.
         if (e->extra && strstr(e->extra, "\"json_attr_tpl\"")) {
-            snprintf(topic, sizeof(topic), "%s/%s", base, e->topic ? e->topic : "state");
+            sync_topic(c, e->topic ? e->topic : "state", topic, sizeof(topic));
             bl_json_kstr(&j, "json_attr_t", topic);
         }
         if (e->extra && *e->extra) bl_json_members(&j, e->extra);
@@ -176,7 +200,8 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     }
     const SyncRetired *gone = sync_entities_retired(&n);
     for (size_t i = 0; i < n; i++) {
-        bl_json_key(&j, gone[i].id);
+        snprintf(key, sizeof(key), SYNC_MODULE "_%s", gone[i].id);
+        bl_json_key(&j, key);
         bl_json_obj(&j);
         bl_json_kstr(&j, "p", gone[i].platform);
         bl_json_obj_end(&j);

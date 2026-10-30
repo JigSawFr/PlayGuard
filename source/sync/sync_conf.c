@@ -18,7 +18,7 @@ void sync_conf_defaults(SyncConf *c)
     c->publish_activity = c->publish_games = c->publish_icons = c->publish_console = c->publish_network = c->publish_hardware = true;
     c->ha_discovery = true;
     c->poll_s = 30;
-    copy(c->topic_prefix, sizeof(c->topic_prefix), "playguard");
+    copy(c->topic_prefix, sizeof(c->topic_prefix), "boreale");
     copy(c->discovery_prefix, sizeof(c->discovery_prefix), "homeassistant");
     c->log_level = 1;
 }
@@ -84,6 +84,7 @@ const char *sync_policy_name(SyncPolicy p)
 typedef struct {
     SyncConf *c;
     int read;
+    bool prefix_read;   // topic_prefix was in the file
 } ParseCtx;
 
 static void keep_extra(SyncConf *c, const char *key, const char *value)
@@ -162,7 +163,13 @@ static void on_kv(void *vctx, const char *key, const char *value)
     } else if (!strcmp(key, "poll_s")) {
         if (bl_parse_uint(value, 10, 300, &u)) c->poll_s = (uint16_t)u;
     } else if (!strcmp(key, "topic_prefix")) {
-        if (strlen(value) < sizeof(c->topic_prefix) && prefix_valid(value)) copy(c->topic_prefix, sizeof(c->topic_prefix), value);
+        if (strlen(value) < sizeof(c->topic_prefix) && prefix_valid(value)) {
+            copy(c->topic_prefix, sizeof(c->topic_prefix), value);
+            p->prefix_read = true;
+        }
+    } else if (!strcmp(key, "legacy_prefix")) {
+        if (strlen(value) < sizeof(c->legacy_prefix) && prefix_valid(value))
+            copy(c->legacy_prefix, sizeof(c->legacy_prefix), value);
     } else if (!strcmp(key, "discovery_prefix")) {
         if (strlen(value) < sizeof(c->discovery_prefix) && prefix_valid(value))
             copy(c->discovery_prefix, sizeof(c->discovery_prefix), value);
@@ -175,10 +182,17 @@ static void on_kv(void *vctx, const char *key, const char *value)
 
 bool sync_conf_parse(SyncConf *c, const char *text, size_t len)
 {
-    ParseCtx p = { c, 0 };
+    ParseCtx p = { c, 0, false };
     c->extra[0] = '\0';
     c->extra_lost = false;
     bl_kv_each(text, len, on_kv, &p);
+    // Schema 1 published under <prefix>/<id>/ with "playguard" by default:
+    // the default moves to "boreale", and the old tree is cleared once.
+    if (p.read > 0 && c->schema == 1) {
+        const char *old = p.prefix_read ? c->topic_prefix : "playguard";
+        if (!c->legacy_prefix[0]) copy(c->legacy_prefix, sizeof(c->legacy_prefix), old);
+        if (!strcmp(old, "playguard")) copy(c->topic_prefix, sizeof(c->topic_prefix), "boreale");
+    }
     return p.read > 0 || len == 0;
 }
 
@@ -215,13 +229,15 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         "topic_prefix=%s\n"
         "discovery_prefix=%s\n"
         "log_level=%d\n"
+        "%s%s%s"
         "%s",
         SYNC_CONF_SCHEMA, c->enabled, c->host, (unsigned)c->port, c->tls, c->ca_file,
         sync_mqtt_version_name(c->mqtt_version), c->username, c->password,
         c->allow_anonymous, c->console_id, c->console_name, sync_policy_name(c->policy), c->remote_timer_writes,
         c->publish_report, c->publish_activity, c->publish_games, c->publish_icons, c->publish_console, c->publish_network,
         c->publish_hardware, c->publish_serial, c->ha_discovery, (unsigned)c->poll_s, c->topic_prefix,
-        c->discovery_prefix, c->log_level, c->extra);
+        c->discovery_prefix, c->log_level, c->legacy_prefix[0] ? "legacy_prefix=" : "", c->legacy_prefix,
+        c->legacy_prefix[0] ? "\n" : "", c->extra);
     if (n < 0 || (size_t)n >= cap) return 0;
     return (size_t)n;
 }

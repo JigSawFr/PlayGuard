@@ -21,23 +21,29 @@ is `null`, never a default. JSON consumers ignore unknown fields.
 
 ## Topics
 
+Every Boréale homebrew shares one tree per device: `boreale/<id>/` holds
+what belongs to the device (`availability`, `capabilities`, `system`,
+`icon/…`, `integration`), and each homebrew publishes under its own module
+name, `playguard/` here. `boreale` is `topic_prefix`'s default; the same
+tree goes under another prefix.
+
 | Topic | Retained | Direction | Content |
 |---|---|---|---|
-| `playguard/<id>/availability` | yes | console → | `online` or `offline`. Last will (`offline`), and `offline` published before a clean disconnect. |
-| `playguard/<id>/state` | yes | console → | The state snapshot (below). |
-| `playguard/<id>/system` | yes | console → | The console itself: versions, model, name, storage, power, network (below). With the state, every `poll_s`. |
-| `playguard/<id>/games` | yes | console (app) → | The games installed and played, each with its play time in all, and the homebrews as counts only (below), published by PlayGuard after a read of the play log. |
-| `playguard/<id>/icon/<APP_ID>` | yes | console (app; agent: the game played) → | A game's icon: the raw JPEG of its control data, for every game installed or played (below). An empty retained message clears it. |
-| `playguard/<id>/activity` | yes | console → | Today's play time from the play log: each game's, the homebrews' as one total. |
-| `playguard/<id>/activity/<YYYY-MM-DD>` | yes | console → | A finished day's totals, published at the first cycle after local midnight. The console keeps the last 14 and clears older ones (empty retained publish). |
-| `playguard/<id>/names` | yes | console (app) → | Game and account names (games only), published by PlayGuard when it runs. |
-| `playguard/<id>/week` | yes | console (app) → | The 7-day table per game, for the homebrews together and per account, published by PlayGuard when it runs. |
-| `playguard/<id>/<entity>/set` | yes (by the publisher) | → console | An order. Cleared by the console once handled. |
-| `playguard/<id>/event` | **no** | console → | One event per order handled: `command_applied`, `command_rejected`, `command_waiting` (an order waiting for PlayGuard or the parent); and what the console does on its own (the agent): `play_started`, `play_stopped`, `time_warning`, `play_blocked` |
-| `playguard/<id>/report` | yes | console → | The last diagnostic report, plain text, at most 128 KiB. Only when `publish_report` is on. |
-| `homeassistant/device/playguard_<id>/config` | yes | console → | HA native discovery. Only when `ha_discovery` is on; cleared when it is turned off. |
+| `boreale/<id>/availability` | yes | console → | `online` or `offline`. Last will (`offline`), and `offline` published before a clean disconnect. |
+| `boreale/<id>/playguard/state` | yes | console → | The state snapshot (below). |
+| `boreale/<id>/system` | yes | console → | The console itself: versions, model, name, storage, power, network (below). With the state, every `poll_s`. |
+| `boreale/<id>/playguard/games` | yes | console (app) → | The games installed and played, each with its play time in all, and the homebrews as counts only (below), published by PlayGuard after a read of the play log. |
+| `boreale/<id>/icon/<APP_ID>` | yes | console (app; agent: the game played) → | A game's icon: the raw JPEG of its control data, for every game installed or played (below). An empty retained message clears it. |
+| `boreale/<id>/playguard/activity` | yes | console → | Today's play time from the play log: each game's, the homebrews' as one total. |
+| `boreale/<id>/playguard/activity/<YYYY-MM-DD>` | yes | console → | A finished day's totals, published at the first cycle after local midnight. The console keeps the last 14 and clears older ones (empty retained publish). |
+| `boreale/<id>/playguard/names` | yes | console (app) → | Game and account names (games only), published by PlayGuard when it runs. |
+| `boreale/<id>/playguard/week` | yes | console (app) → | The 7-day table per game, for the homebrews together and per account, published by PlayGuard when it runs. |
+| `boreale/<id>/playguard/<entity>/set` | yes (by the publisher) | → console | An order. Cleared by the console once handled. |
+| `boreale/<id>/playguard/event` | **no** | console → | One event per order handled: `command_applied`, `command_rejected`, `command_waiting` (an order waiting for PlayGuard or the parent); and what the console does on its own (the agent): `play_started`, `play_stopped`, `time_warning`, `play_blocked` |
+| `boreale/<id>/playguard/report` | yes | console → | The last diagnostic report, plain text, at most 128 KiB. Only when `publish_report` is on. |
+| `homeassistant/device/boreale_<id>/config` | yes | console → | HA native discovery. Only when `ha_discovery` is on; cleared when it is turned off. |
 | `homeassistant/status` | — | ← HA | Subscribed: on `online`, the console republishes discovery, state and activity. |
-| `playguard/<id>/integration` | yes | ← the HA integration | Which version of the integration (and of Home Assistant) runs (below), at each set-up of the integration's entry; cleared when the entry is removed. Never cleared by the console. |
+| `boreale/<id>/integration` | yes | ← the HA integration | Which version of the integration (and of Home Assistant) runs (below), at each set-up of the integration's entry; cleared when the entry is removed. Never cleared by the console. |
 
 MQTT version: **5.0, or 3.1.1** (`mqtt_version` in `sync.conf`: `auto`, the
 default, connects in 5.0 and, when the broker refuses it, answering in 3.1.1
@@ -58,9 +64,9 @@ Beside it, PlayGuard publishes the game icons over a short connection of its
 own, `pg-<id>-icons`, whichever of the two holds the link (`icon/<APP_ID>`
 below): no last will, nothing subscribed, closed once its icons are sent.
 Outbound publishes use QoS 0 (retained state heals itself at the next cycle);
-the subscription to `playguard/<id>/+/set` uses QoS 1, the one to
+the subscription to `boreale/<id>/playguard/+/set` uses QoS 1, the one to
 `homeassistant/status` (Home Assistant's birth topic, whatever the discovery
-prefix) QoS 0, the one to `playguard/<id>/integration` QoS 1. That last one
+prefix) QoS 0, the one to `boreale/<id>/integration` QoS 1. That last one
 is optional: a broker whose access list refuses it keeps the link up (the
 integration's version stays unknown, and the log says so). Keep-alive is 30 s, so a console that falls asleep is marked offline
 within 45 s. The console sends a PINGREQ whenever the broker has said nothing
@@ -166,6 +172,19 @@ Every object is always there; a value the console could not read is `null`
   `<entity>: <reason>`.
 - `profiles`: the saved profiles' names, the choices of the `profile` order
   (at most 16; `[]` when there are none).
+
+## `capabilities`
+
+What the device is and which homebrews publish on it, retained, at each
+connection (and with each *Sync now*), so one integration serves every
+platform:
+
+```json
+{"schema": 1, "platform": "switch", "modules": {"playguard": {"schema": 1, "version": "1.4.0"}}}
+```
+
+`platform` (`switch`) is also in the `system` document. Each module gives
+the `schema` of its documents (`state`'s) and its version.
 
 ## `system`
 
@@ -505,19 +524,20 @@ agent starts says nothing: no event for what was already so.
 ## Home Assistant native discovery
 
 One retained, device-based payload on
-`homeassistant/device/playguard_<id>/config` (about 13 KiB with every
+`homeassistant/device/boreale_<id>/config` (about 13 KiB with every
 entity), which needs **Home Assistant 2026.5 or later** (the MQTT `time`
 platform; an older one refuses the whole payload): `dev` (identifiers
-`playguard_<id>`, the console's name as `console.name` says it, else `Nintendo Switch`, manufacturer
+`boreale_<id>`, the console's name as `console.name` says it, else `Nintendo Switch`, manufacturer
 `Nintendo`, the model as Nintendo names it (`Nintendo Switch`, `Nintendo
 Switch Lite`, `Nintendo Switch – OLED Model`) and `mdl_id` its model number
 (`HAC-001`, `HAC-001(-01)`, `HDH-001`, `HEG-001`), `sw` the system
 (`23.0.1 · Atmosphère 1.10.1`; read again with each system document, the
 discovery following a change)), `o` (origin `PlayGuard`,
-version, support URL), `avty_t`, and `cmps` keyed by object id. Every
+version, support URL), `avty_t`, and `cmps` keyed by module and object id
+(`playguard_limit_mon`; `uniq_id` `boreale_<id>_playguard_limit_mon`). Every
 component but the buttons and the event reads the shared state
-(`stat_t` `playguard/<id>/state`) through a `val_tpl`; writable ones have
-`cmd_t` `playguard/<id>/<entity>/set` and `ret: true`. The entities that need
+(`stat_t` `boreale/<id>/playguard/state`) through a `val_tpl`; writable ones have
+`cmd_t` `boreale/<id>/playguard/<entity>/set` and `ret: true`. The entities that need
 `remote_timer_writes` are not offered while it is off, nor any writable one in
 read-only mode, nor the profile select without profiles: each is then sent as
 its platform alone (`"limit_mon": {"p": "number"}`), which removes it from
@@ -562,7 +582,7 @@ Assistant: `temp_unlocked`, `unlocked` and `lock_now` (the lock
 
 ## `integration`
 
-What the HA integration (JigSawFr/playguard-ha) publishes about itself,
+What the HA integration (JigSawFr/boreale-ha) publishes about itself,
 retained, at each set-up of a console's entry (so at each start of Home
 Assistant), and clears (empty retained publish) when the entry is removed:
 
@@ -611,7 +631,7 @@ an online upload; the report's *Remote link* section has the switches and the
 session's counters, never the broker's address, the user name or the
 password.
 
-`sync.conf` keys: `schema=1`, `enabled`, `host`, `port` (1883; 8883 turns
+`sync.conf` keys: `schema=2`, `enabled`, `host`, `port` (1883; 8883 turns
 `tls` on by default), `tls`, `ca_file`, `mqtt_version` (`auto` / `5` /
 `3.1.1`), `username`, `password`,
 `allow_anonymous`, `console_id`, `console_name`, `policy` (`ask` / `auto` /
@@ -620,13 +640,26 @@ password.
 `publish_network`, `publish_hardware`, `publish_serial` (0: the serial number
 stays off the broker; it needs `publish_hardware` too) (see *What is
 published* below), `ha_discovery`, `poll_s` (30, 10–300),
-`topic_prefix` (`playguard`), `discovery_prefix` (`homeassistant`),
+`topic_prefix` (`boreale`), `discovery_prefix` (`homeassistant`),
+`legacy_prefix` (below),
 `log_level`. A value out of range keeps its default; unknown keys are kept
 when PlayGuard writes the file again. A file with a higher `schema` (a newer
 version's) is read for the keys this one knows and never written again, by
 PlayGuard or the agent; nor is one with more unknown lines than fit (1 KB of
 them). Anonymous brokers need
 `allow_anonymous=1`; without a user name the link otherwise stays off.
+
+A `schema=1` file (an earlier version's) is read the same way: its
+`topic_prefix`, when it is the old default `playguard`, becomes `boreale`,
+and the prefix it had is kept as `legacy_prefix`. At its next connection,
+the console clears (empty retained publish) what it left on the old tree:
+`<legacy_prefix>/<id>/{state, activity, week, names, games, report}`, each
+`<entity>/set`, the finished days around today (`activity/<date>`),
+`availability` and `system` when the prefix changed, and
+`homeassistant/device/playguard_<id>/config`; then it writes the file again
+as `schema=2`, without `legacy_prefix`. The icons are PlayGuard's: when
+`icons.txt` says they went to `playguard/<id>` on the same broker, its next
+batch clears them there and publishes them again under the new tree.
 
 ### What is published
 

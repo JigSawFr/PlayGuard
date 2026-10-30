@@ -17,7 +17,10 @@
 extern "C" {
 #endif
 
-#define SYNC_CONF_SCHEMA   1
+// 2: the topics moved under boreale/<id>/ (docs/sync-protocol.md); a file of
+// schema 1 is read with its default prefix "playguard" taken to "boreale", and
+// the old tree to clear once (legacy_prefix).
+#define SYNC_CONF_SCHEMA   2
 #define SYNC_HOST_MAX      254
 #define SYNC_USER_MAX      65
 #define SYNC_PASS_MAX      129
@@ -82,8 +85,11 @@ typedef struct {
     bool       publish_serial;          // the serial number, with publish_hardware (off by default)
     bool       ha_discovery;            // Home Assistant MQTT discovery
     uint16_t   poll_s;                  // state refresh, 10..300
-    char       topic_prefix[SYNC_PREFIX_MAX];      // "playguard"
+    char       topic_prefix[SYNC_PREFIX_MAX];      // "boreale"
     char       discovery_prefix[SYNC_PREFIX_MAX];  // "homeassistant"
+    // The prefix of the tree a schema-1 file published under, until the
+    // engine has cleared what is left of it on the broker ("" none).
+    char       legacy_prefix[SYNC_PREFIX_MAX];
     int        log_level;               // 0 errors, 1 info, 2 debug
     char       extra[SYNC_EXTRA_MAX];   // lines with unknown keys, as read
     bool       extra_lost;              // some did not fit in `extra`

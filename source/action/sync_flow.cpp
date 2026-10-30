@@ -998,8 +998,10 @@ void pump()
     if (wanted) s_dirty = true;
     if (integration_got) ha_update_flow::received(integration);
     if (saved) {
-        // Only what an order may change: Home Assistant's discovery switch.
+        // Only what the link may change: Home Assistant's discovery switch,
+        // and the old tree once cleared.
         s_conf.ha_discovery = conf.ha_discovery;
+        std::memcpy(s_conf.legacy_prefix, conf.legacy_prefix, sizeof(s_conf.legacy_prefix));
         const SyncConf c = s_conf;
         ui::write_later("sync.conf", [c]() {
             std::string error;

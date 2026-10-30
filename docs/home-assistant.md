@@ -110,11 +110,11 @@ you turn off is cleared from the broker and its entities go from Home
 Assistant (the integration below follows too); turn it on again and they
 come back.
 
-The console's own entities read `playguard/<id>/system`, which the agent
+The console's own entities read `boreale/<id>/system`, which the agent
 keeps fresh while PlayGuard is closed; the games ones read
-`playguard/<id>/games`, which PlayGuard publishes after each read of the play
+`boreale/<id>/playguard/games`, which PlayGuard publishes after each read of the play
 log. Every game's icon (installed or played) goes to
-`playguard/<id>/icon/<game id>`, each sent once by PlayGuard while it is open
+`boreale/<id>/icon/<game id>`, each sent once by PlayGuard while it is open
 and the link online; the agent adds the one of the game being played when
 PlayGuard has read it but not sent it. A game installed since PlayGuard last
 ran gets its icon the next time PlayGuard is opened. Only games are listed
@@ -133,7 +133,7 @@ timer only appear once *Orders may change the play timer* is on (below), and
 go again when it is turned off.
 
 The play log's figures (time per game today, the last 7 days, the finished
-days) are also on the broker (`playguard/<id>/activity`, `…/week`,
+days) are also on the broker (`boreale/<id>/playguard/activity`, `…/week`,
 `…/activity/<date>`), for your own templates or the integration below.
 
 ## The PlayGuard integration (optional)
@@ -163,7 +163,7 @@ then shows up by itself in *Settings › Devices & services*. The second adds it
 by hand when it does not, with the console id shown under it.
 
 Once installed, the integration tells the console which version runs (retained
-on `playguard/<id>/integration`, at each start of Home Assistant): the same
+on `boreale/<id>/integration`, at each start of Home Assistant): the same
 cell then reads *PlayGuard integration* with that version. PlayGuard checks
 the integration's latest release with its own updates (*Check for updates
 every day*, or *Check for updates* in About); a newer one is in the
@@ -291,12 +291,17 @@ Entity ids depend on the console's name; check them on the device's page.
 
   ```
   user playguard
-  topic readwrite playguard/#
+  topic readwrite boreale/#
   topic readwrite homeassistant/device/#
   topic read homeassistant/status
   ```
 
-- Anyone who can publish on `playguard/<id>/…/set` can send orders. Keep the
+  The topics were under `playguard/` before Boréale's shared tree: an
+  access list written then needs `boreale/#`, and keeps `playguard/#` and
+  `homeassistant/device/#` until the console has cleared its old topics
+  (at its first connection after the update).
+
+- Anyone who can publish on `boreale/<id>/playguard/…/set` can send orders. Keep the
   broker on your local network, and leave *Orders may change the play timer*
   off unless you need it.
 - The settings, password included, are in `sd:/config/playguard/sync.conf`,

@@ -183,7 +183,7 @@ are) stays under both.
   is worded for what it really does.
 - An anonymous broker is refused unless `allow_anonymous` is set. The
   documentation sets up a dedicated broker user with an ACL on
-  `playguard/<id>/#`. Whoever can publish on that topic can lock the console
+  `boreale/<id>/#`. Whoever can publish on that topic can lock the console
   or, with `remote_timer_writes`, change the limits: the broker's access
   control is the fence, and `SECURITY.md` says so.
 - Never remote: 1043 `DeleteSettings`, 1941 `DeletePairing`, the PIN. The
@@ -215,7 +215,7 @@ Who does what, by situation:
 | open, agent not installed | PlayGuard | PlayGuard | PlayGuard, with its own broker client |
 
 The life of an order: HA publishes a retained scalar on
-`playguard/<id>/<entity>/set` → whoever owns pctl parses it (`sync_apply`),
+`boreale/<id>/playguard/<entity>/set` → whoever owns pctl parses it (`sync_apply`),
 applies it through the ordinary guarded path (`sync_exec` mirrors
 `pt_flow`: unlock if needed, write, lock again, also on failure) → an
 `/event` says applied or rejected and why → the retained order is **cleared**

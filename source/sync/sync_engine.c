@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "sync_discovery.h"
+#include "sync_entities.h"
 #include "sync_state.h"
 
 #define ACTIVITY_PERIOD_MS   60000ULL
@@ -135,6 +136,7 @@ size_t sync_engine_pending(const SyncEngine *e)
 void sync_engine_sync_now(SyncEngine *e)
 {
     e->want_state = e->want_activity = e->want_discovery = e->want_names = e->want_clear = true;
+    e->want_capabilities = true;
     // "online" again: another client of the same console (PlayGuard's own
     // session, handing over to the agent) may have left "offline" behind.
     e->want_online = true;
@@ -157,14 +159,18 @@ void sync_engine_discovery_changed(SyncEngine *e)
 
 int sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, size_t len, bool retained)
 {
-    const int rc = bl_session_publish(&e->session, sub, payload, len, retained);
+    char rel[96];
+    if (!sync_topic_sub(sub, rel, sizeof(rel))) return -1;
+    const int rc = bl_session_publish(&e->session, rel, payload, len, retained);
     mirror(e);
     return rc;
 }
 
 int sync_engine_publish_stream(SyncEngine *e, const char *sub, size_t len, bool retained, SyncReadFn read, void *ctx)
 {
-    const int rc = bl_session_publish_stream(&e->session, sub, len, retained, read, ctx, e->scratch, sizeof(e->scratch));
+    char rel[96];
+    if (!sync_topic_sub(sub, rel, sizeof(rel))) return -1;
+    const int rc = bl_session_publish_stream(&e->session, rel, len, retained, read, ctx, e->scratch, sizeof(e->scratch));
     mirror(e);
     return rc;
 }
@@ -247,13 +253,16 @@ static void on_message(void *user, const MqttPublish *msg)
         return;
     }
 
-    // <base>/<entity>/set
-    if (msg->topic_len < bl + 6 || memcmp(msg->topic, e->base, bl) || msg->topic[bl] != '/') return;
+    // <base>/playguard/<entity>/set
+    const size_t ml = sizeof(SYNC_MODULE "/") - 1;
+    if (msg->topic_len < bl + 1 + ml + 5 || memcmp(msg->topic, e->base, bl) || msg->topic[bl] != '/' ||
+        memcmp(msg->topic + bl + 1, SYNC_MODULE "/", ml))
+        return;
     if (memcmp(msg->topic + msg->topic_len - 4, "/set", 4)) return;
-    const size_t en = msg->topic_len - bl - 1 - 4;
+    const size_t en = msg->topic_len - bl - 1 - ml - 4;
     if (en == 0 || en >= SYNC_ENTITY_MAX) return;
     char entity[SYNC_ENTITY_MAX];
-    memcpy(entity, msg->topic + bl + 1, en);
+    memcpy(entity, msg->topic + bl + 1 + ml, en);
     entity[en] = '\0';
     for (size_t i = 0; i < en; i++)
         if (!entity_char(entity[i])) return;
@@ -589,6 +598,75 @@ static void clear_unpublished(SyncEngine *e)
         if (!sync_conf_publishes(&e->conf, DOCS[i].what)) sync_engine_publish(e, DOCS[i].sub, "", 0, true);
 }
 
+// "YYYY-MM-DD" of the UTC day `days` after 1970-01-01 (H. Hinnant's
+// civil_from_days).
+static void date_of(int64_t days, char out[32])
+{
+    days += 719468;
+    const int64_t era = (days >= 0 ? days : days - 146096) / 146097;
+    const unsigned doe = (unsigned)(days - era * 146097);
+    const unsigned yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    const unsigned doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    const unsigned mp = (5 * doy + 2) / 153;
+    const unsigned d = doy - (153 * mp + 2) / 5 + 1;
+    const unsigned m = mp < 10 ? mp + 3 : mp - 9;
+    const int64_t y = (int64_t)yoe + era * 400 + (m <= 2);
+    snprintf(out, 32, "%04d-%02u-%02u", (int)y, m, d);
+}
+
+static void clear_topic(SyncEngine *e, const char *topic)
+{
+    bl_session_publish_topic(&e->session, topic, "", 0, true);
+}
+
+// A schema-1 settings file published under <legacy>/<id>/ with no module
+// level, and the discovery's device was playguard_<id>: what is left of
+// that tree is cleared once (empty retained publishes), then the settings
+// saved without it. The icons are left to PlayGuard, which knows which it
+// sent (icons.txt).
+static void clear_legacy(SyncEngine *e)
+{
+    char id[SYNC_ID_LEN + 1], old[96], topic[160];
+    sync_conf_device_id(&e->conf, id);
+    snprintf(old, sizeof(old), "%s/%s", e->conf.legacy_prefix, id);
+    static const char *const DOCS[] = { "state", "activity", "week", "names", "games", "report" };
+    for (size_t i = 0; i < sizeof(DOCS) / sizeof(DOCS[0]); i++) {
+        snprintf(topic, sizeof(topic), "%s/%s", old, DOCS[i]);
+        clear_topic(e, topic);
+    }
+    // At the same prefix, the availability and the system document are
+    // where they were; under another one, they go too.
+    if (strcmp(e->conf.legacy_prefix, e->conf.topic_prefix)) {
+        snprintf(topic, sizeof(topic), "%s/availability", old);
+        clear_topic(e, topic);
+        snprintf(topic, sizeof(topic), "%s/system", old);
+        clear_topic(e, topic);
+    }
+    // Orders still retained on the old topics would never be read again.
+    size_t n = 0;
+    const SyncEntity *list = sync_entities(&n);
+    for (size_t i = 0; i < n; i++) {
+        if (list[i].write == SyncWrite_None) continue;
+        snprintf(topic, sizeof(topic), "%s/%s/set", old, list[i].id);
+        clear_topic(e, topic);
+    }
+    // The finished days (the console keeps 14), a day either side for the
+    // time zone.
+    const uint64_t t = now_posix(e);
+    for (int d = 0; t && d < 16; d++) {
+        char date[32];
+        date_of((int64_t)(t / 86400) + 1 - d, date);
+        snprintf(topic, sizeof(topic), "%s/activity/%s", old, date);
+        clear_topic(e, topic);
+    }
+    snprintf(topic, sizeof(topic), "%s/device/playguard_%s/config", e->conf.discovery_prefix, id);
+    clear_topic(e, topic);
+    if (!bl_session_online(&e->session)) return;   // cut short: tried again at the next connection
+    logf_(e, "remote link: cleared the topics under %s/ (before %s)", old, e->conf.topic_prefix);
+    e->conf.legacy_prefix[0] = '\0';
+    if (e->host.conf_changed) e->host.conf_changed(e->host.ctx, &e->conf);
+}
+
 static void publish_due(SyncEngine *e)
 {
     const uint64_t now = e->now_ms();
@@ -602,6 +680,11 @@ static void publish_due(SyncEngine *e)
         clear_unpublished(e);
     }
     if (e->want_online && bl_session_announce(&e->session) >= 0) e->want_online = false;
+    if (e->want_capabilities) {
+        const size_t n = sync_capabilities_build(e->sw_version, e->scratch, sizeof(e->scratch));
+        if (n && sync_engine_publish(e, "capabilities", e->scratch, n, true) == 0) e->want_capabilities = false;
+    }
+    if (e->conf.legacy_prefix[0]) clear_legacy(e);
     if (e->want_state || now >= e->next_state_ms) {
         if (now >= e->next_state_ms || e->want_state) {
             size_t n = e->host.state ? e->host.state(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
@@ -632,7 +715,7 @@ static void publish_due(SyncEngine *e)
 static int subscribe(SyncEngine *e)
 {
     char orders[160], integration[160];
-    snprintf(orders, sizeof(orders), "%s/+/set", e->base);
+    snprintf(orders, sizeof(orders), "%s/" SYNC_MODULE "/+/set", e->base);
     snprintf(integration, sizeof(integration), "%s/" INTEGRATION_TOPIC, e->base);
     const char *topics[3] = { orders, HA_STATUS_TOPIC, integration };
     const uint8_t qos[3] = { 1, 0, 1 };

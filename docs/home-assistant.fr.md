@@ -119,11 +119,11 @@ activé par défaut sauf les rapports. Ce que vous désactivez est effacé du
 broker et ses entités quittent Home Assistant (l'intégration ci-dessous
 suit aussi) ; réactivé, elles reviennent.
 
-Les entités de la console lisent `playguard/<id>/system`, que l'agent tient à
+Les entités de la console lisent `boreale/<id>/system`, que l'agent tient à
 jour quand PlayGuard est fermé ; celles des jeux lisent
-`playguard/<id>/games`, que PlayGuard publie après chaque lecture du journal
+`boreale/<id>/playguard/games`, que PlayGuard publie après chaque lecture du journal
 de jeu. L'icône de chaque jeu (installé ou joué) va
-sur `playguard/<id>/icon/<id du jeu>`, envoyée une fois par PlayGuard quand
+sur `boreale/<id>/icon/<id du jeu>`, envoyée une fois par PlayGuard quand
 il est ouvert et le lien en ligne ; l'agent ajoute celle du jeu en cours
 quand PlayGuard l'a lue sans l'envoyer. Un jeu installé depuis la dernière
 ouverture de PlayGuard a son icône à la prochaine. Seuls les jeux sont
@@ -147,7 +147,7 @@ quand il est désactivé.
 
 Les chiffres du journal de jeu (temps par jeu aujourd'hui, les 7 derniers
 jours, les jours terminés) sont aussi sur le broker
-(`playguard/<id>/activity`, `…/week`, `…/activity/<date>`), pour vos propres
+(`boreale/<id>/playguard/activity`, `…/week`, `…/activity/<date>`), pour vos propres
 modèles ou l'intégration ci-dessous.
 
 ## L'intégration PlayGuard (facultative)
@@ -181,7 +181,7 @@ redémarrez Home Assistant ; la console apparaît alors d'elle-même dans
 avec l'identifiant de la console affiché dessous.
 
 Une fois installée, l'intégration indique à la console la version qui tourne
-(retenue sur `playguard/<id>/integration`, à chaque démarrage de Home
+(retenue sur `boreale/<id>/integration`, à chaque démarrage de Home
 Assistant) : la même cellule devient *Intégration PlayGuard*, avec cette
 version. PlayGuard cherche la dernière version de l'intégration avec ses
 propres mises à jour (*Rechercher les mises à jour chaque jour*, ou
@@ -314,12 +314,17 @@ la page de l'appareil.
 
   ```
   user playguard
-  topic readwrite playguard/#
+  topic readwrite boreale/#
   topic readwrite homeassistant/device/#
   topic read homeassistant/status
   ```
 
-- Quiconque peut publier sur `playguard/<id>/…/set` peut envoyer des ordres.
+  Les topics étaient sous `playguard/` avant l'arbre commun de Boréale :
+  une liste d'accès écrite alors a besoin de `boreale/#`, et garde
+  `playguard/#` et `homeassistant/device/#` jusqu'à ce que la console ait
+  effacé ses anciens topics (à sa première connexion après la mise à jour).
+
+- Quiconque peut publier sur `boreale/<id>/playguard/…/set` peut envoyer des ordres.
   Gardez le broker sur votre réseau local, et laissez *Les ordres peuvent
   changer le temps de jeu* désactivé si vous n'en avez pas besoin.
 - Les réglages, mot de passe compris, sont dans
