@@ -11,7 +11,7 @@ Two minutes, if your console is still linked to the phone app: *Security › Bef
 ```sh
 git clone --recursive https://github.com/JigSawFr/PlayGuard && cd PlayGuard
 make test        # the host tests: gcc, g++, zlib headers, no devkitPro
-make desktop     # the real UI against a simulated console: GLFW, X11 and D-Bus dev packages
+make desktop     # the real UI against a simulated console: X11, Wayland and D-Bus dev packages
 make dist        # playguard.zip for the SD card: devkitPro's switch-dev
 ```
 

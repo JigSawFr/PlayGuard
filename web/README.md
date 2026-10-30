@@ -163,8 +163,8 @@ it). The flags are the website's `site/assets/fonts/twemoji-flags.woff2`
 builds `build-web/simulator/`; `make web-serve` serves it at <http://localhost:8000>.
 
 - `CMakeLists.txt`, under `emcmake` (`PLAYGUARD_WEB`): the desktop build on
-  Aurore's SDL2 platform with OpenGL ES 3, which Emscripten maps to WebGL 2;
-  SDL2 and zlib from Emscripten's ports; no libcurl; the resources packaged at
+  Aurore's SDL3 platform with OpenGL ES 3, which Emscripten maps to WebGL 2;
+  SDL3 and zlib from Emscripten's ports; no libcurl; the resources packaged at
   `/app/resources` and `web/samples/` at `/app/samples` (`playguard.data`); a
   pool of 16 threads started with the page (a thread asked for later waits
   for the browser, which a busy main thread never lets it have); memory

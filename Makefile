@@ -4,7 +4,7 @@
 #   make dist         -> ./playguard.zip            (unzip onto the SD card root)
 #   make rescue       -> sysmodule/out/playguard-rescue.nsp (the recovery sysmodule; needs devkitPro)
 #   make dist-rescue  -> ./playguard-rescue.zip     (the recovery sysmodule, SD card layout)
-#   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; needs GLFW)
+#   make desktop      -> ./build-desktop/playguard  (UI with a simulated backend; SDL3, built with it)
 #   make web          -> ./build-web/simulator/          (the same in a browser; needs Emscripten's emcmake)
 #   make web-serve    -> serves it at http://localhost:8000 (with the headers its threads need)
 #   make test         -> host unit tests (plain gcc/g++, ASan + UBSan + libstdc++'s assertions; parallel, all suites)

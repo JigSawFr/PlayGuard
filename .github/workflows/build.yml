@@ -362,8 +362,10 @@ jobs:
         with:
           ref: ${{ inputs.tag || github.ref }}
           submodules: true
-      - name: Borealis GLFW fork
-        run: git -C library/aurore submodule update --init --depth 1 library/lib/extern/glfw
+      # Aurore builds SDL3 from its submodule (the desktop's window), GLFW
+      # for -DAURORE_WINDOW=GLFW
+      - name: Aurore's SDL3 and GLFW
+        run: git -C library/aurore submodule update --init --depth 1 library/lib/extern/SDL3 library/lib/extern/glfw
       - name: Compiler messages as annotations
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
       # The packages below as downloaded by the last run (29 MB, 6 s to
@@ -509,7 +511,7 @@ jobs:
       KEEP: ${{ github.event_name != 'pull_request' && github.event_name != 'merge_group' && '1' || '0' }}
     steps:
       # The program comes built; borealis for the font the visual check
-      # draws the footer's clock with (tools/visual_check.py), not its GLFW.
+      # draws the footer's clock with (tools/visual_check.py), not its SDL3.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tag || github.ref }}
@@ -525,7 +527,7 @@ jobs:
           key: apt-desktop-${{ github.sha }}
           restore-keys: apt-desktop-
       # What the program needs to run, from desktop-build's package cache:
-      # the libraries it links (curl, zlib, dbus) and those GLFW opens (X11,
+      # the libraries it links (curl, zlib, dbus) and those SDL3 opens (X11,
       # Wayland, xkbcommon, GL, EGL), not their -dev packages, which brought
       # 40 more and systemd upgraded with them (15 to 36 s of each shard).
       # libgl1-mesa-dri is llvmpipe (LIBGL_ALWAYS_SOFTWARE=1), the same mesa
