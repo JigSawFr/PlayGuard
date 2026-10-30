@@ -172,11 +172,11 @@ ModuleTab::ModuleTab(modules::Id which) : TabBase("xml/tab/module.xml"), id(whic
     });
     boot->init("playguard/modules/at_boot"_i18n, false, [this](bool on) {
         const modules::Module& mod = modules::get(this->id);
-        std::string err;
-        if (!allowed() || !modules::set_at_boot(paths::sd_root(), mod, on, &err)) {
-            if (!err.empty()) ui::error("playguard/modules/error"_i18n + " — " + err);
-        } else {
-            record(mod, on ? "boot_on" : "boot_off");
+        if (allowed()) {
+            if (const auto done = modules::set_at_boot(paths::sd_root(), mod, on); !done)
+                ui::error("playguard/modules/error"_i18n + " — " + done.error());
+            else
+                record(mod, on ? "boot_on" : "boot_off");
         }
         this->refresh();
     });
@@ -241,20 +241,19 @@ void ModuleTab::install()
         }
         // The recovery module only acts at boot: nothing to stop or start.
         const std::string sd = paths::sd_root();
-        std::string err, warning;
-        const bool ok = modules::install(sd, target, b, false, &err, &warning);
-        if (!ok) {
-            ui::error("playguard/modules/error"_i18n + " — " + err);
+        const auto done = modules::install(sd, target, b, false);
+        if (!done) {
+            ui::error("playguard/modules/error"_i18n + " — " + done.error());
         } else {
-            if (!warning.empty()) {
-                aurore::Logger::warning("modules: {} installed, {}", target.name, warning);
+            if (!done->warning.empty()) {
+                aurore::Logger::warning("modules: {} installed, {}", target.name, done->warning);
                 ui::notify("playguard/modules/meta_err"_i18n, ui::Toast::Refused);
             }
             modules::confirm(sd, target);
             // Which PlayGuard it comes with, as the release's zip says: the
             // bell's "out of date" entry goes.
-            if (!modules::write_rescue_note(sd, app::version(), rescue::revision(), &err))
-                aurore::Logger::warning("modules: playguard-rescue.txt not written: {}", err);
+            if (const auto noted = modules::write_rescue_note(sd, app::version(), rescue::revision()); !noted)
+                aurore::Logger::warning("modules: playguard-rescue.txt not written: {}", noted.error());
             rescue::note_version();
             record(target, update ? "updated" : "installed");
             ui::notify(aurore::getStr(key(target, update ? "updated" : "installed")));
@@ -279,9 +278,8 @@ void ModuleTab::uninstall()
                 module_terminate(gone.tid);
                 sync_flow::reload();
             }
-            std::string err;
-            if (!modules::uninstall(paths::sd_root(), gone, &err)) {
-                ui::error("playguard/modules/error"_i18n + " — " + err);
+            if (const auto done = modules::uninstall(paths::sd_root(), gone); !done) {
+                ui::error("playguard/modules/error"_i18n + " — " + done.error());
             } else {
                 record(gone, "removed");
                 if (gone.id == modules::Id::Rescue) rescue::note_version();
