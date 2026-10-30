@@ -248,7 +248,8 @@ endif ()
 # simulated GitHub and switchbrew at /app/samples (web/samples/), ENV and FS
 # for the page to set the PLAYGUARD_SIM_* variables and write config.json
 # before main() (and run dependencies to make main() wait for the data folder
-# or the CJK font), IDBFS to keep the data folder in the browser, and ccall
+# or the CJK font), IDBFS to keep the data folder in the browser (exported:
+# Emscripten 6.0.13 dropped FS.filesystems), and ccall
 # for what the page calls while PlayGuard runs (source/sim/web_page.cpp,
 # web/simulator.js).
 if (PLAYGUARD_WEB)
@@ -261,7 +262,7 @@ if (PLAYGUARD_WEB)
         -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=128MB -sSTACK_SIZE=1MB -sDEFAULT_PTHREAD_STACK_SIZE=1MB
         -sPTHREAD_POOL_SIZE=16
         -sEXIT_RUNTIME=0
-        -sEXPORTED_RUNTIME_METHODS=ENV,FS,ccall,addRunDependency,removeRunDependency
+        -sEXPORTED_RUNTIME_METHODS=ENV,FS,IDBFS,ccall,addRunDependency,removeRunDependency
         -lidbfs.js
         # SHELL: keeps each pair together (CMake drops a repeated option).
         "SHELL:--preload-file ${CMAKE_BINARY_DIR}/resources@/app/resources"
