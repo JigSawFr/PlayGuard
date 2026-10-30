@@ -2,6 +2,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <cstring>
 
+#include "app_id.h"
 #ifndef __SWITCH__
 #include "sim/sim_net.hpp"
 #endif
@@ -28,7 +29,7 @@ Result check(uint32_t console_fw)
 #ifndef __SWITCH__
     // Desktop simulation: "1.1.0:24.0.0" (latest version : firmware it supports),
     // "none" (no release published) or "offline".
-    if (const char* sim = sim_net::value("PLAYGUARD_SIM_LATEST")) {
+    if (const char* sim = sim_net::value(APP_ENV "_SIM_LATEST")) {
         if (std::strcmp(sim, "none") == 0) {
             r.verdict = Verdict::NoRelease;
             r.error = "HTTP 404";
