@@ -151,10 +151,12 @@ void MainActivity::onContentAvailable()
     this->update_notice_hint();
 
     // Preferences › Start on: that tab rather than Today (first, so the
-    // questions below keep the focus they take).
+    // questions below keep the focus they take); the one another Boréale
+    // homebrew's bell opened PlayGuard at, if any.
+    const std::string start_tab = app::open_route().empty() ? config::get().start_tab : app::open_route();
     int start = 0;
     for (const char* t : config::START_TABS) {
-        if (config::get().start_tab == t) break;
+        if (start_tab == t) break;
         start++;
     }
     if (start > 0 && start < (int)(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]))) {   // ui::tab::of knows them all
@@ -189,6 +191,7 @@ void MainActivity::onContentAvailable()
     data_notice::at_start();
     rollback_flow::note_went_back();
     notices::note_crash();
+    notices::publish();
     rescue::note_version();
     // The homebrew menu's lock and the forwarders made here (the bell).
     hbmenu_lock::at_start([]() { aurore::Application::pushActivity(new ForwardersActivity()); });

@@ -95,6 +95,12 @@ void sweep_if_stale();
 // only remembers the newest, so an old crash is not told as new.
 void note_crash();
 
+// MainActivity, once per start: the bell written for the other Boréale
+// homebrews (sd:/config/boreale/notices/playguard.json), as it is now,
+// even when nothing changes after it (what the last start left goes). It is
+// written again at each change of what the bell shows.
+void publish();
+
 // A file PlayGuard could not write to the SD card (`what`: "config",
 // "history"), or wrote again after that (`ok`): an entry to do until then.
 void note_write(const char* what, bool ok, const std::string& error = "");
