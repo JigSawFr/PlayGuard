@@ -565,7 +565,7 @@ html:not(.game) .fs-exit { display: none; }
 
 
 /* ---- Boréale's site switcher: the name, a button that opens the menu of
-   the four sites (a popover: the browser closes it on Esc or a click
+   Boréale's sites (a popover: the browser closes it on Esc or a click
    elsewhere), PlayGuard's leading to the website. The website's block
    (site/assets/site.css), its marks copied by CMake into marks/. */
 .switcher { display: flex; flex-shrink: 0; align-items: center; }

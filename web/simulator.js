@@ -998,7 +998,7 @@ function homeLink() {
   $('nav-features').href = `${home}#features`;
   $('nav-install').href = `${home}#install`;
   $('nav-docs').href = `${home}docs/getting-started/`;
-  // Boréale's other sites in the page's language (the four share the 15
+  // Boréale's other sites in the page's language (they share the 15
   // folders, the website's: English at the root).
   for (const link of document.querySelectorAll('#sites [data-site]')) {
     link.href = `${link.dataset.site}${language === 'en-US' ? '' : `${language.toLowerCase()}/`}?${SITE_TAGS}`;
@@ -1008,7 +1008,7 @@ function homeLink() {
   $('sites-button').setAttribute('aria-label', `PlayGuard · ${t('sites_label')}`);
 }
 
-// Boréale's site switcher: the menu of the four sites opens under the name, as
+// Boréale's site switcher: the menu of Boréale's sites opens under the name, as
 // on the website (site/assets/site.js' "site switcher" block). Without
 // popovers (an old browser), the menu stays closed.
 function setUpSites() {
