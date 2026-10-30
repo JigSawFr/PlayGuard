@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/sys_notes_activity.hpp"
 
+#include <utility>
+
 #include <aurore/cadran/ui/cadran_kit.hpp>
 #include <aurore/cadran/ui/cadran_modal.hpp>
 #include <aurore/cadran/ui/live_prefs.hpp>
@@ -31,7 +33,7 @@ std::string title_of(Which which)
 
 void SysNotesActivity::show(Which which)
 {
-    s_failed[(int)which] = false;
+    s_failed[std::to_underlying(which)] = false;
     aurore::Application::pushActivity(new SysNotesActivity(which));
 }
 
@@ -42,7 +44,7 @@ void SysNotesActivity::changed(Which which)
 
 void SysNotesActivity::fetched(Which which, bool ok)
 {
-    s_failed[(int)which] = !ok;
+    s_failed[std::to_underlying(which)] = !ok;
     if (!s_open || s_open->which != which) return;
     s_open->set_loading(false);
     s_open->fill();
@@ -276,9 +278,9 @@ void SysNotesActivity::fill()
     // When they were fetched; offline, the notes kept.
     std::string when;
     if (!list.fetched.empty())
-        when = aurore::getStr(s_failed[(int)this->which] ? "playguard/sys_notes/offline" : "playguard/sys_notes/fetched",
+        when = aurore::getStr(s_failed[std::to_underlying(this->which)] ? "playguard/sys_notes/offline" : "playguard/sys_notes/fetched",
                             list.fetched);
-    else if (s_failed[(int)this->which] && !this->shown.empty())
+    else if (s_failed[std::to_underlying(this->which)] && !this->shown.empty())
         when = "playguard/sys_notes/failed"_i18n;
     checked->setText(when.empty() ? " " : when);
 
