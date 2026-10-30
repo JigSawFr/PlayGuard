@@ -71,6 +71,10 @@ SyncConf load()
 
 bool save(const SyncConf& c, std::string* error)
 {
+    if (const char* why = sync_conf_unwritable(&c)) {
+        if (error) *error = std::string("sync.conf left as it is: ") + why;
+        return false;
+    }
     std::string text(8192, '\0');
     const size_t n = sync_conf_write(&c, &text[0], text.size());
     if (n == 0) {

@@ -614,7 +614,10 @@ stays off the broker; it needs `publish_hardware` too) (see *What is
 published* below), `ha_discovery`, `poll_s` (30, 10–300),
 `topic_prefix` (`playguard`), `discovery_prefix` (`homeassistant`),
 `log_level`. A value out of range keeps its default; unknown keys are kept
-when PlayGuard writes the file again. Anonymous brokers need
+when PlayGuard writes the file again. A file with a higher `schema` (a newer
+version's) is read for the keys this one knows and never written again, by
+PlayGuard or the agent; nor is one with more unknown lines than fit (1 KB of
+them). Anonymous brokers need
 `allow_anonymous=1`; without a user name the link otherwise stays off.
 
 ### What is published

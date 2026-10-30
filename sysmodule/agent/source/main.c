@@ -806,6 +806,9 @@ static void host_conf_changed(void *ctx, const SyncConf *conf)
     (void)ctx;
     // Only Home Assistant's discovery switch changes this way.
     g_conf.ha_discovery = conf->ha_discovery;
+    // A newer version's file, or one whose unknown lines did not all fit:
+    // the switch holds until the agent restarts, the file is left as it is.
+    if (sync_conf_unwritable(&g_conf)) return;
     const size_t n = sync_conf_write(&g_conf, g_text, sizeof(g_text));
     if (n && write_file(CONF_PATH, g_text, n)) g_conf_mtime = mtime_of(CONF_PATH);
 }

@@ -86,6 +86,7 @@ typedef struct {
     char       discovery_prefix[SYNC_PREFIX_MAX];  // "homeassistant"
     int        log_level;               // 0 errors, 1 info, 2 debug
     char       extra[SYNC_EXTRA_MAX];   // lines with unknown keys, as read
+    bool       extra_lost;              // some did not fit in `extra`
     // Not in the file: set by the host, which runs on an emuMMC. sync.conf is
     // shared by every system on the SD card, and each has its own parental
     // controls: an emuMMC is a device of its own (sync_conf_device_id).
@@ -99,6 +100,12 @@ void sync_conf_defaults(SyncConf *c);
 bool sync_conf_parse(SyncConf *c, const char *text, size_t len);
 // The file's content; the length written, 0 when `cap` is too small.
 size_t sync_conf_write(const SyncConf *c, char *out, size_t cap);
+// Whether what was read may be written back: NULL yes, else an English
+// reason. A file a newer version wrote (its schema above SYNC_CONF_SCHEMA)
+// is read for the keys this one knows but never written over, by PlayGuard
+// or the agent; nor is one whose unknown lines did not all fit in `extra`
+// (writing it would lose them).
+const char *sync_conf_unwritable(const SyncConf *c);
 // What is still missing before connecting: NULL when ready, else an English
 // reason ("no broker host" …). The UI shows its own words.
 const char *sync_conf_problem(const SyncConf *c);

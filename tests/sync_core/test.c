@@ -454,6 +454,24 @@ static void test_conf(void)
     CHECK(sync_conf_parse(&back, out, n));
     CHECK(!memcmp(&back, &c, sizeof(c)));
     CHECK(sync_conf_write(&c, out, 64) == 0);
+    CHECK(sync_conf_unwritable(&c) == NULL && c.schema == SYNC_CONF_SCHEMA);   // none in the file: 1
+
+    // A newer version's file: what this one knows is read, the file is not
+    // written over (by PlayGuard nor the agent).
+    const char newer[] = "schema=2\nhost=broker.lan\nport=8884\nlater=1\n";
+    SyncConf nc;
+    sync_conf_defaults(&nc);
+    CHECK(sync_conf_parse(&nc, newer, strlen(newer)));
+    CHECK(nc.schema == 2 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.extra, "later=1\n"));
+    CHECK(sync_conf_unwritable(&nc) != NULL);
+    // More unknown lines than SYNC_EXTRA_MAX keeps: not written either.
+    char many[SYNC_EXTRA_MAX * 2];
+    size_t at = 0;
+    for (int i = 0; at + 40 < sizeof(many); i++) at += (size_t)snprintf(many + at, sizeof(many) - at, "later_%03d=value\n", i);
+    sync_conf_defaults(&nc);
+    CHECK(sync_conf_parse(&nc, many, at));
+    CHECK(nc.extra_lost && sync_conf_unwritable(&nc) != NULL);
+    CHECK(sync_conf_parse(&nc, "host=x\n", 7) && !nc.extra_lost);   // read again: it starts over
     // The MQTT version's spellings; anything else keeps the setting.
     const struct { const char *text; SyncMqttVersion v; } versions[] = {
         { "mqtt_version=5\n", SyncMqtt_V5 }, { "mqtt_version=5.0\n", SyncMqtt_V5 },

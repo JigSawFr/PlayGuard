@@ -90,7 +90,10 @@ static void keep_extra(SyncConf *c, const char *key, const char *value)
 {
     const size_t used = strlen(c->extra);
     const size_t need = strlen(key) + 1 + strlen(value) + 1;
-    if (used + need + 1 > sizeof(c->extra)) return;   // too many: dropped
+    if (used + need + 1 > sizeof(c->extra)) {
+        c->extra_lost = true;   // too many: the file is not written again
+        return;
+    }
     snprintf(c->extra + used, sizeof(c->extra) - used, "%s=%s\n", key, value);
 }
 
@@ -107,7 +110,7 @@ static void on_kv(void *vctx, const char *key, const char *value)
     bool b = false;
     p->read++;
     if (!strcmp(key, "schema")) {
-        if (bl_parse_uint(value, 1, 1000, &u)) c->schema = (int)u;
+        if (bl_parse_uint(value, 1, 0x7FFFFFFF, &u)) c->schema = (int)u;
     } else if (!strcmp(key, "enabled")) {
         if (bl_parse_bool(value, &b)) c->enabled = b;
     } else if (!strcmp(key, "host")) {
@@ -174,6 +177,7 @@ bool sync_conf_parse(SyncConf *c, const char *text, size_t len)
 {
     ParseCtx p = { c, 0 };
     c->extra[0] = '\0';
+    c->extra_lost = false;
     bl_kv_each(text, len, on_kv, &p);
     return p.read > 0 || len == 0;
 }
@@ -220,6 +224,13 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         c->discovery_prefix, c->log_level, c->extra);
     if (n < 0 || (size_t)n >= cap) return 0;
     return (size_t)n;
+}
+
+const char *sync_conf_unwritable(const SyncConf *c)
+{
+    if (c->schema > SYNC_CONF_SCHEMA) return "written by a newer version";
+    if (c->extra_lost) return "too many unknown settings to keep";
+    return NULL;
 }
 
 bool sync_conf_publishes(const SyncConf *c, SyncPublish p)

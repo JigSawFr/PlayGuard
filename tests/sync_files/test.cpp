@@ -54,6 +54,17 @@ static void test_conf()
     CHECK(paths::read_file(sync_files::conf_file(), text));
     CHECK(text.find("future_key=42") != std::string::npos);
 
+    // A newer version's file: read for what this one knows, never saved over.
+    const std::string newer = "schema=2\nenabled=1\nhost=broker.lan\n";
+    CHECK(paths::atomic_write(sync_files::conf_file(), newer));
+    SyncConf later = sync_files::load();
+    CHECK(later.enabled && !std::strcmp(later.host, "broker.lan"));
+    later.enabled = false;
+    err.clear();
+    CHECK(!sync_files::save(later, &err) && !err.empty());
+    CHECK(paths::read_file(sync_files::conf_file(), text) && text == newer);
+    CHECK(sync_files::save(back));
+
     // One sync.conf for every system on the SD card; each system's files in
     // its own folder, and on an emuMMC a device of its own: the id and the
     // name differ, the file keeps the console's.
