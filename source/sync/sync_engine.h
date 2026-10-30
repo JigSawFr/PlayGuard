@@ -90,6 +90,10 @@ typedef struct {
     // again with each system document, the discovery following a change. May
     // be NULL (unknown).
     void (*device)(void *ctx, SyncDevice *out);
+    // The notices document (sync_notices_build): every Boréale homebrew's
+    // shared bell, published with the state when it changed, and at each
+    // connection. 0: nothing now. May be NULL.
+    size_t (*notices)(void *ctx, char *out, size_t cap);
 } SyncHost;
 
 typedef struct {
@@ -115,6 +119,7 @@ typedef struct {
     bool        want_state, want_activity, want_discovery, want_names, want_online;
     bool        want_clear;      // the documents of what is not published, cleared
     bool        want_capabilities;
+    uint32_t    notices_hash;    // the notices document last published (0: publish the next one)
     uint64_t    next_state_ms, next_activity_ms;
     bool        discovery_published;
     SyncDevice  device;          // as the last discovery said it

@@ -405,6 +405,7 @@ static struct {
     SyncDevice device;        // what device() gives
     unsigned devices;         // device() calls
     SyncNotice notice;        // what state() finds, as the agent's sync_watch would (event_type NULL: nothing)
+    char bell[128];           // what notices() gives ("" nothing)
 } host;
 
 static size_t h_state(void *ctx, char *out, size_t cap)
@@ -490,6 +491,12 @@ static size_t h_system(void *ctx, char *out, size_t cap)
     return (size_t)snprintf(out, cap, "{\"schema\":1,\"n\":%u}", host.systems);
 }
 
+static size_t h_notices(void *ctx, char *out, size_t cap)
+{
+    (void)ctx;
+    return host.bell[0] ? (size_t)snprintf(out, cap, "%s", host.bell) : 0;
+}
+
 static void h_device(void *ctx, SyncDevice *out)
 {
     (void)ctx;
@@ -527,7 +534,7 @@ static void setup(bool timer_writes, SyncPolicy policy)
     BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
-                   h_device };
+                   h_device,       h_notices };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
 }
 
@@ -647,6 +654,28 @@ static void test_notices(void)
     const Message *disc = find_retained("homeassistant/device/boreale_a1b2c3d4/config");
     CHECK(disc && strstr(disc->payload, "\"command_waiting\",\"play_started\",\"play_stopped\",\"time_warning\","
                                         "\"play_blocked\""));
+}
+
+// Every homebrew's shared bell: retained at the device's level, published
+// again only when it changed, and at each connection.
+static void test_shared_bell(void)
+{
+    setup(false, SyncPolicy_Auto);
+    strcpy(host.bell, "{\"schema\":1,\"homebrews\":[],\"todo\":0,\"error\":0}");
+    turns(3);
+    const Message *m = find_retained("boreale/a1b2c3d4/notices");
+    CHECK(m && m->retain && strstr(m->payload, "\"todo\":0") && count_on("boreale/a1b2c3d4/notices") == 1);
+    sync_engine_state_changed(&engine);
+    turns(2);
+    CHECK(count_on("boreale/a1b2c3d4/notices") == 1);   // the same: not sent again
+    strcpy(host.bell, "{\"schema\":1,\"homebrews\":[],\"todo\":1,\"error\":0}");
+    sync_engine_state_changed(&engine);
+    turns(2);
+    CHECK(count_on("boreale/a1b2c3d4/notices") == 2 && strstr(find_retained("boreale/a1b2c3d4/notices")->payload, "\"todo\":1"));
+    // Home Assistant back: everything published again, the bell too.
+    broker_publish("homeassistant/status", "online", 6, false);
+    turns(3);
+    CHECK(count_on("boreale/a1b2c3d4/notices") == 3);
 }
 
 static void test_orders_applied_and_refused(void)
@@ -969,7 +998,7 @@ static void test_custom_discovery_prefix(void)
     BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
-                   h_device };
+                   h_device,       h_notices };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
     turns(3);
     CHECK(sync_engine_online(&engine) && find_retained("ha/device/boreale_a1b2c3d4/config"));
@@ -1360,6 +1389,7 @@ int main(void)
     broker.log = log;
     test_connect_and_publish();
     test_notices();
+    test_shared_bell();
     test_orders_applied_and_refused();
     test_policy_off();
     test_limits_merged();

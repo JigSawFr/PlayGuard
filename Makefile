@@ -54,6 +54,7 @@ JSON_HPP := library/aurore/library/include/aurore/extern/nlohmann/json.hpp
 SYNC_PURE := library/boreale-link/source/bl_json.c library/boreale-link/source/mqtt_packet.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
              source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c source/sync/sync_icons.c source/sync/sync_titles.c \
+             source/sync/sync_notices.c library/boreale-link/source/bl_jread.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_notices.c \
              source/core/console_info_pure.c
 
 .PHONY: all clean dist nxlink desktop web web-serve test fuzz check rescue dist-rescue agent dist-agent gate-preview FORCE

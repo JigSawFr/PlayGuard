@@ -49,8 +49,9 @@ size_t sync_topic_base(const SyncConf *conf, char *out, size_t cap);
 // PlayGuard's subtree under the console's (docs/sync-protocol.md).
 #define SYNC_MODULE "playguard"
 // What the console is, whatever homebrew publishes it: its availability, the
-// capabilities, the system document, the game icons and the integration's
-// document stay at the console's level; the rest is PlayGuard's.
+// capabilities, the system document, the game icons, the integration's
+// document and every homebrew's shared bell (notices) stay at the console's
+// level; the rest is PlayGuard's.
 bool sync_topic_is_device(const char *sub);
 // `sub` under the base, at the console's level or under SYNC_MODULE/ as
 // sync_topic_is_device says: the state under playguard/, the system document

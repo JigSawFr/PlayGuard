@@ -40,6 +40,7 @@
 #include "sync_icons.h"
 #include "sync_state.h"
 #include "sync_system.h"
+#include "sync_notices.h"
 #include "sync_titles.h"
 #include "sync_watch.h"
 #include "sysinfo.h"
@@ -929,9 +930,18 @@ static void host_integration(void *ctx, const char *doc, size_t len)
     write_file(INTEGRATION, doc, len);
 }
 
+// Every Boréale homebrew's shared bell, from their files on the SD card.
+static size_t host_notices(void *ctx, char *out, size_t cap)
+{
+    (void)ctx;
+    u64 now = 0;
+    time_local_now(&now, NULL);
+    return sync_notices_build("sdmc:/", (int64_t)now, out, cap);
+}
+
 static const SyncHost HOST = {
     NULL, host_state, host_activity, host_order, host_report, host_profiles, host_conf_changed,
-    host_read_only, host_now_posix, host_log, host_integration, host_system, host_device,
+    host_read_only, host_now_posix, host_log, host_integration, host_system, host_device, host_notices,
 };
 
 // ---- the loop ----

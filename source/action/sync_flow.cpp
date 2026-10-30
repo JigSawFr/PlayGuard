@@ -9,6 +9,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstring>
+#include <ctime>
 #include <deque>
 #include <map>
 #include <memory>
@@ -32,6 +33,7 @@
 #include "bl_net.h"
 #include "bl_tls.h"
 #include "sync/sync_games.h"
+#include "sync/sync_notices.h"
 #include "sync/sync_state.h"
 #include "sync/sync_system.h"
 #include "ui/app_hooks.hpp"
@@ -144,6 +146,15 @@ size_t host_system(void* ctx, char* out, size_t cap)
     auto* sh = (Shared*)ctx;
     std::lock_guard<std::mutex> lk(sh->m);
     return copy_out(sh->system, out, cap);
+}
+
+// Every Boréale homebrew's shared bell, from their files on the SD card
+// (the link's thread: sync_notices_build's buffers are its own).
+std::string s_sd_root;
+
+size_t host_notices(void*, char* out, size_t cap)
+{
+    return sync_notices_build(s_sd_root.c_str(), (int64_t)std::time(nullptr), out, cap);
 }
 
 void host_device(void* ctx, SyncDevice* out)
@@ -262,6 +273,8 @@ void worker(std::shared_ptr<Shared> sh, SyncConf conf, std::string version)
     host.integration = host_integration;
     host.system = host_system;
     host.device = host_device;
+    host.notices = host_notices;
+    s_sd_root = paths::sd_root();
 
     // About 40 KiB: on the heap, not on this thread's stack.
     std::unique_ptr<Link> link(new Link());

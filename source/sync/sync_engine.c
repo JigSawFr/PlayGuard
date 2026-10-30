@@ -137,6 +137,7 @@ void sync_engine_sync_now(SyncEngine *e)
 {
     e->want_state = e->want_activity = e->want_discovery = e->want_names = e->want_clear = true;
     e->want_capabilities = true;
+    e->notices_hash = 0;
     // "online" again: another client of the same console (PlayGuard's own
     // session, handing over to the agent) may have left "offline" behind.
     e->want_online = true;
@@ -667,6 +668,18 @@ static void clear_legacy(SyncEngine *e)
     if (e->host.conf_changed) e->host.conf_changed(e->host.ctx, &e->conf);
 }
 
+// Every homebrew's shared bell (the host's sync_notices), when it changed.
+static void publish_shared_bell(SyncEngine *e)
+{
+    const size_t n = e->host.notices && bl_session_online(&e->session)
+                         ? e->host.notices(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
+    if (!n) return;
+    uint32_t h = 2166136261u;
+    for (size_t i = 0; i < n; i++) h = (h ^ (uint8_t)e->scratch[i]) * 16777619u;
+    h = h ? h : 1;
+    if (h != e->notices_hash && sync_engine_publish(e, "notices", e->scratch, n, true) == 0) e->notices_hash = h;
+}
+
 static void publish_due(SyncEngine *e)
 {
     const uint64_t now = e->now_ms();
@@ -692,6 +705,7 @@ static void publish_due(SyncEngine *e)
             publish_notices(e);   // what building the state found (the host's sync_watch)
             n = e->host.system && bl_session_online(&e->session) ? e->host.system(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "system", e->scratch, n, true);
+            publish_shared_bell(e);
             if (n && e->host.device && e->conf.ha_discovery) {
                 SyncDevice dev;
                 e->host.device(e->host.ctx, &dev);
