@@ -1,5 +1,5 @@
 // PlayGuard's website (site/README.md): the aurora of the home page, the
-// language menu of the header, and the home page's first visit in the
+// language chosen in the header's menu, and the home page's first visit in the
 // browser's language. One dark look, Boréale's, as Aurore's and boreale.dev.
 'use strict';
 
@@ -521,8 +521,12 @@
     search.hidden = false;
   }
 
-  // The header's languages (a popover): the one chosen is kept, and the
-  // page opens at the same place in it.
+  // The header's languages (boreale-site's menu, placed by its boreale.js):
+  // the one chosen is kept, and the page opens at the same place in it.
+  // Here rather than boreale-site's lang.js, which sends a first visit to
+  // the browser's language only, not to the one chosen, loses the place
+  // (#hash) and wants a 404.html in each language's folder (data-lost)
+  // where this site has one page holding them all (site/README.md).
   const languages = [...document.querySelectorAll('#languages a')];
   for (const link of languages) {
     link.addEventListener('click', (e) => {
@@ -576,41 +580,6 @@
   if (document.referrer && new URL(document.referrer).origin === location.origin) return;
   const target = visitor();
   if (target && target[0] !== 'en-US') location.replace(target[1] + location.hash);
-})();
-
-// Boréale's site switcher: the menu of Boréale's sites opens under the name
-// beside its button, wherever the header is. The same block in boreale.dev's,
-// PlayGuard's, PlayShelf's and Aurore's site.js; boreale's is the reference.
-// Without popovers (an old browser), the name still leads home.
-(function () {
-  const menu = document.getElementById('sites');
-  const anchor = menu && menu.closest('.switcher');
-  if (!anchor || !menu.showPopover) return;
-  menu.addEventListener('beforetoggle', (event) => {
-    if (event.newState !== 'open') return;
-    const box = anchor.getBoundingClientRect();
-    const screen = document.documentElement.clientWidth;
-    const width = Math.min(400, screen - 24); // site.css's width
-    menu.style.top = `${box.bottom + window.scrollY + 6}px`;
-    menu.style.left = `${Math.max(12, Math.min(box.left, screen - width - 12)) + window.scrollX}px`;
-  });
-})();
-
-// The header's languages: their menu opens under its button, its right edge
-// on the button's.
-(function () {
-  const menu = document.getElementById('languages');
-  const button = document.querySelector('.lang-button');
-  if (!menu || !button || !menu.showPopover) return;
-  menu.addEventListener('beforetoggle', (event) => {
-    if (event.newState !== 'open') return;
-    const box = button.getBoundingClientRect();
-    const screen = document.documentElement.clientWidth;
-    menu.style.top = `${box.bottom + window.scrollY + 6}px`;
-    menu.style.right = `${Math.max(12, screen - box.right)}px`;
-    // The language in use in view, in a long list on a short screen.
-    requestAnimationFrame(() => menu.querySelector('[aria-current]')?.scrollIntoView({ block: 'nearest' }));
-  });
 })();
 
 // The documentation: once the header is scrolled away, a slim bar at the top

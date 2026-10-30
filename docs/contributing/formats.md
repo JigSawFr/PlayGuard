@@ -49,7 +49,7 @@ behind all meet files from another version. The rule:
 | Game and play-time caches (`cache/*.bin`) | `util/game_cache.cpp`, `util/play_cache.cpp` | magic + `VERSION` + structure size | made again | — | `tests/game_cache/`, `tests/play_cache/` |
 | `play_timer/log.csv` | `util/pt_log.cpp` | its header | rotated | — | `tests/pt_log/` |
 | Recovery reports and proof | `sysmodule/rescue` → `core/rescue.c` | label `playguard-rescue/2` | an older proof read as none | — | `tests/rescue/` |
-| boreale.dev's `versions.json` (the site's menu of Boréale's sites) | `JigSawFr/boreale` → `tools/build_site.py` `versions_of()` | `VERSIONS_SCHEMA` (1); the flat shape of before is read too | another schema or shape: no versions in the menu | — | — |
+| boreale.dev's `versions.json` (the site's menu of Boréale's sites) | `JigSawFr/boreale` → boreale-site's `read_versions()` (`library/boreale-site`) | `VERSIONS_SCHEMA` (1) | another schema or shape: no versions in the menu | — | boreale-site's `tests/` |
 
 A format that changes meaning: bump its constant, keep reading the previous
 schema where installed versions still write it, and update this table and the
