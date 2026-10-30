@@ -9,7 +9,7 @@ De la carte SD à une console réglée pour votre enfant, en une dizaine de minu
 - **Un firmware pris en charge.** De 21.0.0 à 23.0.1 pour toutes les fonctions ; les plus anciens, tout sauf le minuteur ; un plus récent s'ouvre en lecture seule jusqu'à ce qu'une version le prenne en charge ([compatibilité](compatibility.md)).
 - **Une seule limite pour toute la console.** Le minuteur est celui de la console : il est le même pour tous les comptes. Des limites différentes pour chaque enfant demandent un autre outil ([pourquoi](compatibility.md#playguard-ou-un-sysmodule-de-remplacement-)).
 
-Envie de faire le tour d'abord ? [Essayez PlayGuard dans votre navigateur](https://guard.boreale.dev/simulator/?not_set_up=1), face à une console simulée à son premier lancement.
+Envie de faire le tour d'abord ? [Essayez PlayGuard dans votre navigateur](https://guard.boreale.dev/simulator/?not_set_up=1&utm_source=github&utm_medium=docs), face à une console simulée à son premier lancement.
 
 ## 1. L'installer
 

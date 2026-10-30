@@ -5,7 +5,7 @@ place that fits, and you will get an answer sooner.
 
 | You want to… | Go to |
 |---|---|
-| Get back into a console: second-hand, forgotten PIN, locked out | [Locked out?](https://guard.boreale.dev/docs/troubleshooting/#locked-out) first, then a [Locked out](https://github.com/JigSawFr/PlayGuard/issues/new?template=2-locked-out.yml) issue if it does not solve it |
+| Get back into a console: second-hand, forgotten PIN, locked out | [Locked out?](https://guard.boreale.dev/docs/troubleshooting/?utm_source=github&utm_medium=docs#locked-out) first, then a [Locked out](https://github.com/JigSawFr/PlayGuard/issues/new?template=2-locked-out.yml) issue if it does not solve it |
 | Ask how to do something, or talk an idea through | [Discussions](https://github.com/JigSawFr/PlayGuard/discussions) |
 | Report something PlayGuard gets wrong | A [bug report](https://github.com/JigSawFr/PlayGuard/issues/new?template=1-bug.yml), with the diagnostic report (*About › Help & diagnostics › Export a diagnostic report*) |
 | Say a new firmware works, or does not | A [new firmware](https://github.com/JigSawFr/PlayGuard/issues/new?template=3-firmware.yml) issue |

@@ -116,7 +116,7 @@ Ter informatie: een build waarvan is teruggegaan, een firmware die niet met deze
 
 ## Vandaag — de dag in één oogopslag
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### De ring en de lijn
 
@@ -193,7 +193,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 ## Speeltijdtimer — de week is de editor
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### De week bewerken
 
@@ -252,7 +252,7 @@ Met grotere tekst past *Vandaag* nog steeds op één scherm: de regel boven de k
 
 ## Activiteit — wie wat speelde, en hoe lang
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het activiteitenlog van de console zelf — voor alle accounts of voor **één gebruikersaccount** (de accounts als chips bovenaan, als de console er meerdere heeft). PlayGuard start op het laatst getoonde account, of op het account dat bij *Account dat eerst wordt getoond* is gekozen (alle accounts, of één; onderaan het tabblad, bij *Alle games*).
 
@@ -290,7 +290,7 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 ## Beperkingen — niveau, leeftijdsclassificatie, communicatie
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **Het beperkingsniveau:** Jong kind, Kind, Tiener en Aangepast naast elkaar als tegels, elk met wat het beperkt (een koraalrood hangslot voor beperkt, anders een groen vinkje, en de geïnstalleerde games die het blokkeert; Ⓐ stelt het in; geldt *Aangepast* al, dan gaat Ⓐ naar de instellingen eronder); *Geen* eronder. Het geldende niveau zegt *✓ Huidig*; de blauwgroene rand staat alleen waar de focus is. Wat een niveau beperkt (leeftijdsgrens, berichten plaatsen, communicatie), wordt nog eens gemeld voordat het wordt ingesteld; *Geen* vraagt het in koraalrood, omdat het elke beperking opheft.
 - **De instellingen van het niveau:** leeftijdsclassificatie, berichten plaatsen op sociale media, communicatie met anderen. Bij een vooraf ingesteld niveau zijn het diens eigen instellingen: er één wijzigen maakt het niveau *Aangepast*, vanuit de instellingen van dat niveau met die wijziging, na een vraag (met de instellingen op een rij).
@@ -303,7 +303,7 @@ Tijd per game **vandaag**, in de **afgelopen 7 dagen** en **in totaal**, uit het
 
 ## Beveiliging — de pincode, ontgrendelen, het homebrewmenu, smartphone-app
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **Bovenaan** vier tegels: de pincode, de beperkingen, het tijdelijk ontgrendelen en het homebrewmenu, elk met een blauwgroen vinkje als het is zoals het hoort (een pincode ingesteld, beperkingen aan, vergrendeld) of een oranje waarschuwingsteken als er iets moet gebeuren; het homebrewmenu zegt *Open* of *Vergrendeld* (een vinkje zodra het vergrendeld is: open is prima zonder forwarders).
 - **Pincode instellen of wijzigen** (pincodescherm van het systeem).
@@ -349,7 +349,7 @@ Als laatste op het tabblad: de optionele herstelmodule, voor een vergeten pincod
 
 ## Geschiedenis — wat PlayGuard veranderde, en de back-ups
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **Bovenaan** als tegels hoeveel wijzigingen er zijn vastgelegd en de dag van de laatste back-up: een blauwgroen vinkje, of een oranje waarschuwing als er geen is of al 30 dagen geen.
 
@@ -369,7 +369,7 @@ Als laatste op het tabblad: de optionele herstelmodule, voor een vergeten pincod
 
 ## Console — de netwerkklok, de geïnstalleerde games, wat de console draait
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **Bovenaan** wat de console draait, als tegels, onder *Systeem* (de firmware, Atmosphère, hekate als het op de SD-kaart staat en sys-patch als het is geïnstalleerd; Ⓐ opent de release-opmerkingen), dan de hulpmiddelen als tegels, onder *Hulpmiddelen* (*Netwerkklok*, *Games* en *Forwarders*; de eerste twee tonen in hun hoek wat aandacht nodig heeft; dan *Toegang op afstand* en *Optionele modules*), dan de regels van de console, compatibiliteit eerst (alleen een blauwgroen vinkje als PlayGuard op deze firmware is gecontroleerd, anders een waarschuwing en wat er mis is).
 
@@ -479,7 +479,7 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 
 ## Voorkeuren
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - Wat PlayGuard zelf instelt:
   - Eerst als tegels: taal (elke taal van de console, of die van de console zelf), thema (standaard donker, licht of dat van de console), tekstgrootte (automatisch / normaal / groter) en het tabblad om mee te starten.
@@ -494,7 +494,7 @@ Op een console zonder internet wordt *Consoleklok gebruiken* aangeboden in het d
 
 ## Info
 
-*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[Probeer het in de simulator ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### Versie en updates
 

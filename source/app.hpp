@@ -33,6 +33,7 @@ const char* repo_url();
 // The website (https://guard.boreale.dev/, tools/build_site.py) and a page of its
 // documentation in the console's language ("troubleshooting", "locked-out"):
 // a release's as published (docs/), main's for a development build (docs/dev/).
+// Tagged for the site's audience (utm_source=playguard, utm_medium=qr).
 const char* site_url();
 std::string doc_url(const std::string& page, const std::string& anchor = "");
 // Funding links (.github/FUNDING.yml), shown in About.

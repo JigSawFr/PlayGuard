@@ -104,6 +104,9 @@ std::string doc_url(const std::string& page, const std::string& anchor)
     for (const char* folder : FOLDERS)
         if (lang == folder) url += lang + "/";
     url += (is_release() ? "docs/" : "docs/dev/") + page + "/";
+    // Where the visit comes from, for the site's audience (Umami's UTM
+    // report): PlayGuard, by a QR code, the only way the console shows it.
+    url += "?utm_source=playguard&utm_medium=qr";
     if (!anchor.empty()) url += "#" + anchor;
     return url;
 }

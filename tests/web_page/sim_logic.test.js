@@ -57,6 +57,8 @@ test('the URL: only what is set, in the panel\'s order, flags as 1', () => {
   const values = new Map([['zzz', 'x'], ['fw', '20.5.0'], ['unlocked', 'yes'], ['restricted', '0'], ['skip', '']]);
   assert.equal(L.toQuery(values, known), '?unlocked=1&fw=20.5.0&zzz=x');
   assert.equal(L.toQuery(new Map(), known), '');
+  // A visit's UTM tags stay out of the links the page makes.
+  assert.equal(L.toQuery(new Map([['fw', '20.5.0'], ['utm_source', 'boreale'], ['utm_medium', 'nav']]), known), '?fw=20.5.0');
   // Read back: names in lower case, the others left out.
   const read = L.readQuery('?UNLOCKED=1&fw=20.5.0&bad-name=1&x%20y=2');
   assert.deepEqual([...read], [['unlocked', '1'], ['fw', '20.5.0']]);

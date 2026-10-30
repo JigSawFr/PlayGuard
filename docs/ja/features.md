@@ -116,7 +116,7 @@ PlayGuard の見た目は Cadran と呼ばれます。タブを並べたアイ�
 
 ## 今日 — 1 日のようすをひと目で
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs)*
 
 ### リングと線
 
@@ -193,7 +193,7 @@ PlayGuard 自身の時間も、アプリケーションとして動いている�
 
 ## プレイ時間 — 週がそのまま編集画面
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=play_timer)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=play_timer&utm_source=github&utm_medium=docs)*
 
 ### 週の編集
 
@@ -252,7 +252,7 @@ PlayGuard 自身の時間も、アプリケーションとして動いている�
 
 ## プレイ記録 — 誰が、何を、どれだけ遊んだか
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=activity)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=activity&utm_source=github&utm_medium=docs)*
 
 ゲームごとの時間を、**今日**、**過去7日間**、**これまでの合計** で、本体自身のプレイ記録から表示します。すべてのユーザーでも、**1 人のユーザー** でも表示できます（本体に複数のユーザーがいる場合は、上部のチップでユーザーを選びます）。PlayGuard は、最後に表示したユーザーか、*最初に表示するアカウント* で設定したもの（すべてのユーザー、または 1 人。タブのいちばん下、*すべてのゲーム* と同じ場所にあります）で開きます。
 
@@ -290,7 +290,7 @@ PlayGuard 自身の時間も、アプリケーションとして動いている�
 
 ## 制限 — レベル、年齢区分、コミュニケーション
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=restrictions)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=restrictions&utm_source=github&utm_medium=docs)*
 
 - **制限レベル：** 小学生、中学生、高校生、カスタムがタイルで横に並び、それぞれ何を制限するかが表示されます（制限されるものにはコーラル色の錠前、許可されるものには緑のチェックマーク、そしてそのレベルでブロックされるインストール済みのゲーム。Ⓐ で設定。適用中の *カスタム* では、Ⓐ で下にあるその設定に移動します）。*なし* はその下にあります。適用中のレベルには *✓ 現在* と表示されます。青緑の枠は、フォーカスのある場所だけに付きます。レベルが何を制限するか（年齢、投稿、コミュニケーション）は、設定する前にもう一度伝えます。*なし* はすべての制限を解除するため、コーラルで確認します。
 - **レベルの設定：** 年齢区分、SNS への投稿、他の人とのコミュニケーション。プリセットのレベルでは、そのレベル自身の設定です。1 つを変えると、プリセットの設定にその変更を加えた状態でレベルが *カスタム* になります。その前に確認します（設定を一覧で表示）。
@@ -303,7 +303,7 @@ PlayGuard 自身の時間も、アプリケーションとして動いている�
 
 ## セキュリティ — 暗証番号、一時解除、Homebrewメニュー、スマホアプリ
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=security)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
 - **上部** には 4 つのタイルが並びます：暗証番号、制限、一時解除、Homebrewメニュー。それぞれ、あるべき状態（暗証番号が設定済み、制限がオン、ロック中）なら青緑のチェック、対応が必要ならオレンジの警告マークが付きます。Homebrewメニューは *オープン* か *ロック中* と表示します（ロックするとチェックが付きます。フォワーダーがなければ、オープンのままで問題ありません）。
 - **暗証番号の設定・変更**（本体の暗証番号画面）。
@@ -349,7 +349,7 @@ PlayGuard 自体の暗証番号です。
 
 ## 履歴 — PlayGuard が変えたことと、バックアップ
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=history)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
 **上部** には、記録されている変更の数と最後のバックアップの日がタイルで並びます。青緑のチェック、またはバックアップがないか 30 日間ないときはオレンジの警告が付きます。
 
@@ -369,7 +369,7 @@ PlayGuard 自体の暗証番号です。
 
 ## 本体 — ネットワーク時計、インストール済みのゲーム、本体で動いているもの
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=console)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
 **上部** には、本体で動いているものが *システム* の下にタイルで並びます（ファームウェア、Atmosphère、SD カードにあれば hekate、インストールされていれば sys-patch。Ⓐ でそのリリースノートを開きます）。続いてツールが *ツール* の下にタイルで並び（*ネットワーク時計*、*インストール済み*、*フォワーダー*。最初の 2 つは、確認が必要なことを隅に表示します。続いて *リモートアクセス* と *追加モジュール*）、そして本体の各行が、互換性から順に並びます（この本体のファームウェアで PlayGuard が確認済みなら青緑のチェックだけ、そうでなければ警告と何が問題か）。
 
@@ -479,7 +479,7 @@ PlayGuard 自体の暗証番号です。
 
 ## オプション
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=preferences)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=preferences&utm_source=github&utm_medium=docs)*
 
 - PlayGuard 自体の設定：
   - まずタイルで：言語（本体のすべての言語、または本体の言語に従う）、テーマ（初期設定はベーシックブラック、ほかにベーシックホワイト、本体の設定）、文字の大きさ（自動 / 標準 / 大きめ）、起動時のタブ。
@@ -494,7 +494,7 @@ PlayGuard 自体の暗証番号です。
 
 ## 情報
 
-*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=about)*
+*[シミュレーターで試す ›](https://guard.boreale.dev/simulator/?tab=about&utm_source=github&utm_medium=docs)*
 
 ### バージョンとアップデート
 
