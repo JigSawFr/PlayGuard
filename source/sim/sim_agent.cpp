@@ -18,7 +18,7 @@
 #include "util/paths.hpp"
 
 #include "agent_core.h"
-#include "link/bl_net.h"
+#include "bl_net.h"
 
 namespace agent_client
 {

@@ -48,9 +48,10 @@ SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindepth 1 | LC_ALL=C sort | TZ=UTC zip -X -@
 CMAKE_ARGS ?=
 JSON_HPP := library/aurore/library/include/aurore/extern/nlohmann/json.hpp
-# The remote link's console-free C (source/link/ the transport, source/sync/
-# PlayGuard's documents and orders), shared by its host tests.
-SYNC_PURE := source/link/bl_json.c source/link/mqtt_packet.c source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_apply.c \
+# The remote link's console-free C (library/boreale-link/source/: the
+# transport; source/sync/: PlayGuard's documents and orders), shared by its
+# host tests.
+SYNC_PURE := library/boreale-link/source/bl_json.c library/boreale-link/source/mqtt_packet.c library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
              source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c source/sync/sync_icons.c source/sync/sync_titles.c \
              source/core/console_info_pure.c
@@ -196,7 +197,7 @@ playstats_LIBS  := -lz
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 # util/date stands on core/calendar.c: a suite that links it builds that C
 # file too (its <name>_CSRC, without having to say so).
-TEST_CXXFLAGS   := -std=c++23 -Isource -isystem library/aurore/library/include
+TEST_CXXFLAGS   := -std=c++23 -Isource -Ilibrary/boreale-link/source -isystem library/aurore/library/include
 CALENDAR_C      := source/core/calendar.c
 # Aurore's Cadran (library/aurore): the look's helpers PlayGuard tests here.
 C := library/aurore/library/lib/cadran
@@ -244,10 +245,10 @@ games_logic_SRC   := source/action/games_logic.cpp tests/games_logic/test.cpp
 system_titles_SRC   := source/util/system_titles.cpp tests/system_titles/test.cpp
 titles_SRC   := source/util/titles.cpp tests/titles/test.cpp
 titles_CSRC  := source/sync/sync_titles.c
-titles_CFLAGS := -std=gnu11 -Isource/sync
+titles_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source
 sync_icons_logic_SRC   := source/action/sync_icons_logic.cpp tests/sync_icons_logic/test.cpp
 sync_icons_logic_CSRC  := source/sync/sync_icons.c
-sync_icons_logic_CFLAGS := -std=gnu11 -Isource/sync
+sync_icons_logic_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
 write_queue_logic_LIBS  := -pthread
 worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
@@ -344,20 +345,20 @@ modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/module
 # The remote link's files on the SD card, with its C parts (built by $(CC):
 # g++ would build a .c as C++).
 sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
-sync_files_CSRC  := $(CALENDAR_C) source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c
-sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
+sync_files_CSRC  := $(CALENDAR_C) library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c
+sync_files_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
 
 # C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
 # writes the documents it builds (_ARGS: where) for tools/check_sync_json.py.
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
-sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
+sync_core_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
-sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c source/link/bl_json.c tests/sync_exec/test.c
-sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync -Isource/link
-sync_engine_SRC   := $(SYNC_PURE) source/link/mqtt_client.c source/link/bl_session.c source/sync/sync_engine.c tests/sync_engine/test.c
-sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
-agent_SRC   := sysmodule/agent/source/agent_core.c source/link/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
-agent_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core -Isysmodule/agent/source
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c library/boreale-link/source/bl_json.c tests/sync_exec/test.c
+sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync -Ilibrary/boreale-link/source
+sync_engine_SRC   := $(SYNC_PURE) library/boreale-link/source/mqtt_client.c library/boreale-link/source/bl_session.c source/sync/sync_engine.c tests/sync_engine/test.c
+sync_engine_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
+agent_SRC   := sysmodule/agent/source/agent_core.c library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
+agent_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -Isysmodule/agent/source
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))

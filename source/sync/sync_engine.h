@@ -15,7 +15,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
-#include "../link/bl_session.h"
+#include "bl_session.h"
 #include "sync_apply.h"
 #include "sync_conf.h"
 #include "sync_discovery.h"

@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../link/bl_json.h"
+#include "bl_json.h"
 #include "sync_state.h"   // SYNC_SCHEMA
 
 static void kversion(BlJson *j, const char *key, bool ok, unsigned a, unsigned b, unsigned c)

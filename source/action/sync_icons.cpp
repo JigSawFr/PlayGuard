@@ -15,8 +15,8 @@
 
 #include "action/game_scan.hpp"
 #include "action/title_names.hpp"
-#include "link/bl_net.h"
-#include "link/bl_tls.h"
+#include "bl_net.h"
+#include "bl_tls.h"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sync_files.hpp"

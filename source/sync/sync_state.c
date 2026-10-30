@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../link/bl_json.h"
+#include "bl_json.h"
 #include "sync_titles.h"
 
 #define NOLIMIT PT_DAY_NOLIMIT

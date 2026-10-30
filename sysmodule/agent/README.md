@@ -24,7 +24,7 @@ started again (`source/action/agent_update.cpp`, the steps host-tested in
 
 - Connects to the broker set in `sd:/config/playguard/sync.conf` (the same
   settings as PlayGuard, same session engine: `source/sync/sync_engine.c` on
-  `source/link/bl_session.c`),
+  boreale-link's `bl_session.c`),
   as the client `pg-<id>-agent`, with `offline` as its last will. `<id>` is
   this system's: on an emuMMC it differs from the sysMMC's, so the two are
   two devices ([`docs/sync-protocol.md`](../../docs/sync-protocol.md)).
