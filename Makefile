@@ -290,10 +290,10 @@ perf_SRC   := source/util/perf.cpp tests/perf/test.cpp
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
 diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
 # PlayGuard's text helpers that only translate, over
-# Cadran's ui/tr.hpp stand-in for Aurore's getStr and fmt header-only (the
+# Cadran's ui/tr.hpp stand-in for Aurore's getStr (the
 # catalogs read by the test).
 format_text_SRC   := source/ui/play_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
-format_text_FLAGS := $(TEST_CXXFLAGS) -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY -DAURORE_CADRAN_HOST_I18N
+format_text_FLAGS := $(TEST_CXXFLAGS) -DAURORE_CADRAN_HOST_I18N
 contrast_SRC      := tests/contrast/test.cpp
 forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp source/action/forwarders_text.cpp tests/forwarders_text/test.cpp
 forwarders_text_FLAGS := $(format_text_FLAGS)
@@ -304,7 +304,6 @@ forwarders_text_CFLAGS := -std=gnu11 -Isource/core
 i18n_threads_SRC   := library/aurore/library/lib/core/i18n.cpp library/aurore/library/lib/core/util.cpp \
                       tests/i18n_threads/test.cpp
 i18n_threads_FLAGS := -std=c++23 -isystem library/aurore/library/include \
-                      -isystem library/aurore/library/lib/extern/fmt/include -DFMT_HEADER_ONLY \
                       $(addprefix -isystem library/aurore/library/,include/aurore/extern include/aurore/extern/nanovg \
                         include/aurore/extern/tinyxml2 lib/extern/tweeny/include lib/extern/yoga) \
                       -DAURORE_RESOURCES='"./"'
