@@ -373,6 +373,41 @@ static void test_link()
     std::remove(sync_files::conf_file().c_str());
 }
 
+static void test_app()
+{
+    const std::string file = sync_files::app_file();
+    std::remove(file.c_str());
+    const std::string tail = "/config/boreale/apps/playguard.conf";
+    CHECK(file.size() > tail.size() && file.compare(file.size() - tail.size(), tail.size(), tail) == 0);
+    // Registered at its first start, its folder made.
+    CHECK(sync_files::register_app("1.4.0", "/switch/PlayGuard/PlayGuard.nro"));
+    std::string text;
+    CHECK(paths::read_file(file, text));
+    CHECK(text.find("name=PlayGuard\n") != std::string::npos && text.find("version=1.4.0\n") != std::string::npos);
+    CHECK(text.find("nro=switch/PlayGuard/PlayGuard.nro\n") != std::string::npos);
+    CHECK(text.find("repo=JigSawFr/PlayGuard\n") != std::string::npos);
+
+    // Nothing changed: not written again (a file in its place stays).
+    CHECK(paths::atomic_write(file, text + "future_key=1\n"));
+    CHECK(sync_files::register_app("1.4.0", "/switch/PlayGuard/PlayGuard.nro"));
+    std::string again;
+    CHECK(paths::read_file(file, again) && again == text + "future_key=1\n");
+
+    // A new version, from where nxlink started it (no path): the version
+    // follows, the .nro and the unknown key stay.
+    CHECK(sync_files::register_app("1.5.0", ""));
+    CHECK(paths::read_file(file, text) && text.find("version=1.5.0\n") != std::string::npos);
+    CHECK(text.find("nro=switch/PlayGuard/PlayGuard.nro\n") != std::string::npos);
+    CHECK(text.find("future_key=1\n") != std::string::npos);
+
+    // A newer version's file: left as it is.
+    const std::string newer = "schema=2\nname=PlayGuard\nversion=9.0.0\n";
+    CHECK(paths::atomic_write(file, newer));
+    CHECK(sync_files::register_app("1.5.0", "/switch/PlayGuard/PlayGuard.nro"));
+    CHECK(paths::read_file(file, text) && text == newer);
+    std::remove(file.c_str());
+}
+
 int main()
 {
     char dir[] = "/tmp/playguard_sync_files_XXXXXX";
@@ -382,6 +417,7 @@ int main()
 
     test_conf();
     test_link();
+    test_app();
     test_records();
     test_nro_state();
     test_failure_said();
@@ -391,5 +427,5 @@ int main()
 
     const std::string cleanup = std::string("rm -rf '") + dir + "'";
     CHECK(std::system(cleanup.c_str()) == 0);
-    return CHECK_DONE("sync_files: sync.conf, records, nro_state.txt, profiles, names, a refused write told, the integration, agent records and events assertions passed");
+    return CHECK_DONE("sync_files: sync.conf, the registry, records, nro_state.txt, profiles, names, a refused write told, the integration, agent records and events assertions passed");
 }

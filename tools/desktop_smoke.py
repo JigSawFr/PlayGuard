@@ -395,6 +395,10 @@ if os.path.exists(sync_conf):
 link_conf = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "link.conf")
 if os.path.exists(link_conf):
     os.remove(link_conf)
+# PlayGuard in the Boréale homebrews' registry, written at each start.
+app_conf = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "apps", "playguard.conf")
+if os.path.exists(app_conf):
+    os.remove(app_conf)
 SYNC_ID = "5a0c3e11"
 mqtt_port = 0
 mqtt_broker = None
@@ -1607,6 +1611,8 @@ if SYNC:
              and "\nhost=" not in open(sync_conf).read(), 10)
     if f"\nport={mqtt_port}\n" not in open(link_conf).read():
         fail("link.conf does not hold the broker's settings")
+    wait_for("PlayGuard in the Boréale homebrews' registry",
+             lambda: os.path.exists(app_conf) and "name=PlayGuard\n" in open(app_conf).read(), 10)
     # The version the client spoke, as Mosquitto logs it: "as pg-<id>-app (p5, …"
     # (its own numbering: p2 is 3.1.1, p5 is 5.0).
     level = "p2" if MQTT311 else "p5"
