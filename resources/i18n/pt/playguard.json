@@ -1316,6 +1316,7 @@
         "notices_summary": "O tempo de jogo da semana",
         "notices_reminders": "Avisos: cópias, segundo sistema da consola, jogos bloqueados",
         "notices_ack_remind": "Voltar a contar os avisos ignorados após 30 dias",
+        "notices_others": "As notificações dos outros homebrews Boréale",
         "help": "Ajuda e diagnóstico",
         "effects": "Efeitos visuais",
         "effects_values": {

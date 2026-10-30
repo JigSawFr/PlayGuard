@@ -139,6 +139,7 @@ settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)
 | `notices_reminders` | boolean | the bell reminds of a settings backup to make, the other system's parental controls and *Block all games* on for a week | `true` |
 | `notices_read` | array of strings | the bell's entries for information marked as read, `"id:hash"` of their text, the newest last, at most 48 (one longer than 96 characters is dropped); a read entry comes back when its text changes | `[]` |
 | `notices_acked` | array of strings | the bell's entries to do the parent chose to ignore (a weak PIN, PlayGuard open without the PIN, the "time's up" alarm off, the SD card nearly full), `"id:print:YYYY-MM-DD"`: what it was about (the PIN's length for a weak PIN, never the PIN; empty otherwise) and the day; at most 16 (one longer than 96 characters is dropped); an entry comes back once what it says is fixed and then seen again, or when what it was about changes | `[]` |
+| `notices_others` | boolean | the notification bell lists the other Boréale homebrews' notices and counts those to do or failed (*Preferences › Notifications*) | `true` |
 | `notices_ack_remind` | boolean | an ignored entry is counted again 30 days after it was ignored (*Preferences › Notifications*); off, it stays ignored | `true` |
 | `summary_seen` | string | `"YYYY-MM-DD"` the weekly summary was last read; it comes back 7 days later; anything else is cleared | `""` |
 | `crash_seen` | string | the newest crash file (`logs/crashes/`) the notification bell told about; at most 64 characters | `""` |

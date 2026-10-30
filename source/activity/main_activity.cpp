@@ -240,7 +240,7 @@ MainActivity::~MainActivity()
 
 void MainActivity::update_notice_hint()
 {
-    const int n = notices::action_count();
+    const int n = notices::action_count() + notices::others_count();
     this->getContentView()->updateActionHint(aurore::BUTTON_Y, n > 0 ? aurore::getStr("playguard/notices/hint_count", n)
                                                                     : "playguard/notices/hint"_i18n);
     aurore::Application::getGlobalHintsUpdateEvent()->fire();

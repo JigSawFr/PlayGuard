@@ -1316,6 +1316,7 @@
         "notices_summary": "이번 주 플레이 시간",
         "notices_reminders": "알림: 백업, 본체의 두 번째 시스템, 소프트웨어 차단",
         "notices_ack_remind": "무시한 경고를 30일 후 다시 표시",
+        "notices_others": "다른 Boréale 홈브루의 알림",
         "help": "도움말 및 진단",
         "effects": "시각 효과",
         "effects_values": {

@@ -1316,6 +1316,7 @@
         "notices_summary": "Die Spielzeit der Woche",
         "notices_reminders": "Erinnerungen: Sicherungen, zweites System der Konsole, Spielsperre",
         "notices_ack_remind": "Ignorierte Warnungen nach 30 Tagen wieder zählen",
+        "notices_others": "Benachrichtigungen der anderen Boréale-Homebrews",
         "help": "Hilfe & Diagnose",
         "effects": "Visuelle Effekte",
         "effects_values": {
