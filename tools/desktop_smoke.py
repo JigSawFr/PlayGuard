@@ -115,7 +115,8 @@ The "sync" scenario starts a local Mosquitto (needs mosquitto and
 mosquitto-clients) and sets the remote link up in an earlier version's
 sync.conf (schema 1): PlayGuard must come online on Boréale's tree, publish
 the capabilities, clear what the earlier version left retained under
-playguard/<id> and its discovery, save sync.conf as schema 2, publish the
+playguard/<id> and its discovery, move the broker's settings to
+config/boreale/link.conf and save sync.conf as schema 3 without them, publish the
 Home Assistant discovery, the state, today's
 activity and the names, carry out a limit order (event, retained order
 cleared, new state, change history), refuse one out of range, publish the
@@ -1599,8 +1600,13 @@ if SYNC:
     # The tree an earlier version left (seeded before PlayGuard started), cleared.
     for topic in OLD_TREE:
         wait_for(f"{topic} cleared", lambda topic=topic: mqtt_get(topic, 1) is None, 20)
-    wait_for("sync.conf written as schema 2, without legacy_prefix",
-             lambda: "schema=2\n" in open(sync_conf).read() and "legacy_prefix" not in open(sync_conf).read(), 10)
+    # Then written again as schema 3, without legacy_prefix and without the
+    # broker's keys, which moved to link.conf: nothing of the old left.
+    wait_for("sync.conf written as schema 3, without legacy_prefix nor the broker's keys",
+             lambda: "schema=3\n" in open(sync_conf).read() and "legacy_prefix" not in open(sync_conf).read()
+             and "\nhost=" not in open(sync_conf).read(), 10)
+    if f"\nport={mqtt_port}\n" not in open(link_conf).read():
+        fail("link.conf does not hold the broker's settings")
     # The version the client spoke, as Mosquitto logs it: "as pg-<id>-app (p5, …"
     # (its own numbering: p2 is 3.1.1, p5 is 5.0).
     level = "p2" if MQTT311 else "p5"

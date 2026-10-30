@@ -443,22 +443,35 @@ static void test_conf(void)
     CHECK(contains(c.extra, "future_key=keep me\n"));
     CHECK(sync_conf_problem(&c) == NULL);
 
-    // Round trip, unknown keys kept.
+    // Its broker keys (schema 2) are to move to link.conf.
+    CHECK(c.broker_keys);
+    // Round trip, unknown keys kept; the broker's keys are link.conf's, not
+    // written here any more.
     char out[2048];
     const size_t n = sync_conf_write(&c, out, sizeof(out));
-    CHECK(n > 0 && contains(out, "future_key=keep me\n") && contains(out, "policy=auto\n"));
-    CHECK(contains(out, "mqtt_version=3.1.1\n"));
+    CHECK(n > 0 && contains(out, "future_key=keep me\n") && contains(out, "policy=auto\n") && contains(out, "schema=3\n"));
+    CHECK(!contains(out, "mqtt_version") && !contains(out, "host=") && !contains(out, "password") && !contains(out, "console_id"));
+    CHECK(!contains(out, "topic_prefix") && !contains(out, "enabled="));
     CHECK(contains(out, "publish_activity=1\npublish_games=0\npublish_icons=0\npublish_console=1\npublish_network=0\npublish_hardware=1\n"));
     SyncConf back;
     sync_conf_defaults(&back);
     CHECK(sync_conf_parse(&back, out, n));
+    CHECK(!back.broker_keys && back.policy == c.policy && back.remote_timer_writes == c.remote_timer_writes);
+    CHECK(back.publish_games == c.publish_games && !strcmp(back.extra, c.extra));
+    // The broker's part, through link.conf.
+    BlLinkConf link;
+    bl_link_conf_defaults(&link);
+    sync_conf_to_link(&c, &link);
+    sync_conf_from_link(&back, &link);
+    back.broker_keys = c.broker_keys;
+    back.schema = c.schema;
     CHECK(!memcmp(&back, &c, sizeof(c)));
     CHECK(sync_conf_write(&c, out, 64) == 0);
     CHECK(sync_conf_unwritable(&c) == NULL && c.schema == SYNC_CONF_SCHEMA);   // none in the file: the current one
 
     // Schema 1 published under playguard/<id>/: the default prefix moves to
-    // boreale, the old tree is to clear (legacy_prefix), written as schema 2
-    // until the engine has cleared it.
+    // boreale (into link.conf), the old tree is to clear (legacy_prefix),
+    // written until the engine has cleared it.
     const char v1[] = "schema=1\nhost=broker.lan\ntopic_prefix=playguard\n";
     SyncConf old;
     sync_conf_defaults(&old);
@@ -466,10 +479,10 @@ static void test_conf(void)
     CHECK(!strcmp(old.topic_prefix, "boreale") && !strcmp(old.legacy_prefix, "playguard"));
     CHECK(sync_conf_unwritable(&old) == NULL);
     const size_t on = sync_conf_write(&old, out, sizeof(out));
-    CHECK(on > 0 && contains(out, "schema=2\n") && contains(out, "topic_prefix=boreale\n") && contains(out, "legacy_prefix=playguard\n"));
+    CHECK(on > 0 && contains(out, "schema=3\n") && contains(out, "legacy_prefix=playguard\n") && !contains(out, "topic_prefix"));
     SyncConf again;
     sync_conf_defaults(&again);
-    CHECK(sync_conf_parse(&again, out, on) && again.schema == 2 && !strcmp(again.legacy_prefix, "playguard"));
+    CHECK(sync_conf_parse(&again, out, on) && again.schema == 3 && !strcmp(again.legacy_prefix, "playguard"));
     old.legacy_prefix[0] = '\0';   // cleared: the line goes
     CHECK(sync_conf_write(&old, out, sizeof(out)) > 0 && !contains(out, "legacy_prefix"));
     // A prefix of one's own stays; its old tree (no module level) is cleared.
@@ -485,11 +498,11 @@ static void test_conf(void)
 
     // A newer version's file: what this one knows is read, the file is not
     // written over (by PlayGuard nor the agent).
-    const char newer[] = "schema=3\nhost=broker.lan\nport=8884\nlater=1\n";
+    const char newer[] = "schema=4\nhost=broker.lan\nport=8884\nlater=1\n";
     SyncConf nc;
     sync_conf_defaults(&nc);
     CHECK(sync_conf_parse(&nc, newer, strlen(newer)));
-    CHECK(nc.schema == 3 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.extra, "later=1\n"));
+    CHECK(nc.schema == 4 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.extra, "later=1\n"));
     CHECK(sync_conf_unwritable(&nc) != NULL);
     // More unknown lines than SYNC_EXTRA_MAX keeps: not written either.
     char many[SYNC_EXTRA_MAX * 2];

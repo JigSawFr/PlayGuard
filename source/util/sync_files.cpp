@@ -110,26 +110,8 @@ bool save_link(const SyncConf& c, std::string* error)
     paths::ensure_dir(file.substr(0, file.rfind('/')));
     return paths::atomic_write(file, text, error);
 }
-}   // namespace
-
-SyncConf load()
-{
-    SyncConf c;
-    sync_conf_defaults(&c);
-    std::string text;
-    const bool conf = paths::read_file(conf_file(), text);
-    if (conf) sync_conf_parse(&c, text.data(), text.size());
-    // The broker's settings are link.conf's, shared with every Boréale
-    // homebrew; a sync.conf from before it gives them to it, once.
-    bool found = false;
-    const BlLinkConf l = read_link(found);
-    if (found) sync_conf_from_link(&c, &l);
-    else if (conf) save_link(c, nullptr);
-    c.emummc = paths::nand_key() == "emummc";
-    return c;
-}
-
-bool save(const SyncConf& c, std::string* error)
+// sync.conf, PlayGuard's own keys.
+bool save_conf(const SyncConf& c, std::string* error)
 {
     if (const char* why = sync_conf_unwritable(&c)) {
         if (error) *error = std::string("sync.conf left as it is: ") + why;
@@ -143,9 +125,34 @@ bool save(const SyncConf& c, std::string* error)
     }
     text.resize(n);
     paths::ensure_dir(paths::data_dir());
-    // sync.conf keeps a copy of the broker's settings, for a PlayGuard from
-    // before link.conf.
-    return paths::atomic_write(conf_file(), text, error) && save_link(c, error);
+    return paths::atomic_write(conf_file(), text, error);
+}
+}   // namespace
+
+SyncConf load()
+{
+    SyncConf c;
+    sync_conf_defaults(&c);
+    std::string text;
+    const bool conf = paths::read_file(conf_file(), text);
+    if (conf) sync_conf_parse(&c, text.data(), text.size());
+    // The broker's settings are link.conf's, shared with every Boréale
+    // homebrew. A sync.conf from before it (schema 1 or 2) gives them to it
+    // when there is none, then loses them: written again without them, so
+    // that nothing is left of them there. (The agent does the same, whoever
+    // reads them first.)
+    bool found = false;
+    const BlLinkConf l = read_link(found);
+    if (found) sync_conf_from_link(&c, &l);
+    else if (c.broker_keys) found = save_link(c, nullptr);
+    if (found && c.broker_keys && !sync_conf_unwritable(&c) && save_conf(c, nullptr)) c.broker_keys = false;
+    c.emummc = paths::nand_key() == "emummc";
+    return c;
+}
+
+bool save(const SyncConf& c, std::string* error)
+{
+    return save_conf(c, error) && save_link(c, error);
 }
 
 bool ensure_id(SyncConf& c, const uint8_t random[4])

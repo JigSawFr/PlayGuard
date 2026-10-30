@@ -113,28 +113,39 @@ static void on_kv(void *vctx, const char *key, const char *value)
     if (!strcmp(key, "schema")) {
         if (bl_parse_uint(value, 1, 0x7FFFFFFF, &u)) c->schema = (int)u;
     } else if (!strcmp(key, "enabled")) {
+        c->broker_keys = true;
         if (bl_parse_bool(value, &b)) c->enabled = b;
     } else if (!strcmp(key, "host")) {
+        c->broker_keys = true;
         str_field(c->host, sizeof(c->host), value);
     } else if (!strcmp(key, "port")) {
+        c->broker_keys = true;
         if (bl_parse_uint(value, 1, 65535, &u)) c->port = (uint16_t)u;
     } else if (!strcmp(key, "tls")) {
+        c->broker_keys = true;
         if (bl_parse_bool(value, &b)) c->tls = b;
     } else if (!strcmp(key, "ca_file")) {
+        c->broker_keys = true;
         str_field(c->ca_file, sizeof(c->ca_file), value);
     } else if (!strcmp(key, "mqtt_version")) {
+        c->broker_keys = true;
         if (!strcmp(value, "auto")) c->mqtt_version = SyncMqtt_Auto;
         else if (!strcmp(value, "5") || !strcmp(value, "5.0")) c->mqtt_version = SyncMqtt_V5;
         else if (!strcmp(value, "3.1.1") || !strcmp(value, "4")) c->mqtt_version = SyncMqtt_V311;
     } else if (!strcmp(key, "username")) {
+        c->broker_keys = true;
         str_field(c->username, sizeof(c->username), value);
     } else if (!strcmp(key, "password")) {
+        c->broker_keys = true;
         str_field(c->password, sizeof(c->password), value);
     } else if (!strcmp(key, "allow_anonymous")) {
+        c->broker_keys = true;
         if (bl_parse_bool(value, &b)) c->allow_anonymous = b;
     } else if (!strcmp(key, "console_id")) {
+        c->broker_keys = true;
         if (sync_conf_id_valid(value)) copy(c->console_id, sizeof(c->console_id), value);
     } else if (!strcmp(key, "console_name")) {
+        c->broker_keys = true;
         str_field(c->console_name, sizeof(c->console_name), value);
     } else if (!strcmp(key, "policy")) {
         if (!strcmp(value, "ask")) c->policy = SyncPolicy_Ask;
@@ -163,6 +174,7 @@ static void on_kv(void *vctx, const char *key, const char *value)
     } else if (!strcmp(key, "poll_s")) {
         if (bl_parse_uint(value, 10, 300, &u)) c->poll_s = (uint16_t)u;
     } else if (!strcmp(key, "topic_prefix")) {
+        c->broker_keys = true;
         if (strlen(value) < sizeof(c->topic_prefix) && prefix_valid(value)) {
             copy(c->topic_prefix, sizeof(c->topic_prefix), value);
             p->prefix_read = true;
@@ -171,6 +183,7 @@ static void on_kv(void *vctx, const char *key, const char *value)
         if (strlen(value) < sizeof(c->legacy_prefix) && prefix_valid(value))
             copy(c->legacy_prefix, sizeof(c->legacy_prefix), value);
     } else if (!strcmp(key, "discovery_prefix")) {
+        c->broker_keys = true;
         if (strlen(value) < sizeof(c->discovery_prefix) && prefix_valid(value))
             copy(c->discovery_prefix, sizeof(c->discovery_prefix), value);
     } else if (!strcmp(key, "log_level")) {
@@ -185,6 +198,7 @@ bool sync_conf_parse(SyncConf *c, const char *text, size_t len)
     ParseCtx p = { c, 0, false };
     c->extra[0] = '\0';
     c->extra_lost = false;
+    c->broker_keys = false;
     bl_kv_each(text, len, on_kv, &p);
     // Schema 1 published under <prefix>/<id>/ with "playguard" by default:
     // the default moves to "boreale", and the old tree is cleared once.
@@ -199,21 +213,10 @@ bool sync_conf_parse(SyncConf *c, const char *text, size_t len)
 size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
 {
     const int n = snprintf(out, cap,
-        "# PlayGuard remote link (MQTT / Home Assistant). Written by PlayGuard's\n"
-        "# Sync screen; see docs/sync-protocol.md. Keep this file private: it\n"
-        "# holds the broker password.\n"
+        "# PlayGuard's remote link settings (MQTT / Home Assistant), the broker's\n"
+        "# being in config/boreale/link.conf. Written by PlayGuard's Remote access\n"
+        "# screen; see docs/sync-protocol.md.\n"
         "schema=%d\n"
-        "enabled=%d\n"
-        "host=%s\n"
-        "port=%u\n"
-        "tls=%d\n"
-        "ca_file=%s\n"
-        "mqtt_version=%s\n"
-        "username=%s\n"
-        "password=%s\n"
-        "allow_anonymous=%d\n"
-        "console_id=%s\n"
-        "console_name=%s\n"
         "policy=%s\n"
         "remote_timer_writes=%d\n"
         "publish_report=%d\n"
@@ -226,18 +229,13 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         "publish_serial=%d\n"
         "ha_discovery=%d\n"
         "poll_s=%u\n"
-        "topic_prefix=%s\n"
-        "discovery_prefix=%s\n"
         "log_level=%d\n"
         "%s%s%s"
         "%s",
-        SYNC_CONF_SCHEMA, c->enabled, c->host, (unsigned)c->port, c->tls, c->ca_file,
-        sync_mqtt_version_name(c->mqtt_version), c->username, c->password,
-        c->allow_anonymous, c->console_id, c->console_name, sync_policy_name(c->policy), c->remote_timer_writes,
+        SYNC_CONF_SCHEMA, sync_policy_name(c->policy), c->remote_timer_writes,
         c->publish_report, c->publish_activity, c->publish_games, c->publish_icons, c->publish_console, c->publish_network,
-        c->publish_hardware, c->publish_serial, c->ha_discovery, (unsigned)c->poll_s, c->topic_prefix,
-        c->discovery_prefix, c->log_level, c->legacy_prefix[0] ? "legacy_prefix=" : "", c->legacy_prefix,
-        c->legacy_prefix[0] ? "\n" : "", c->extra);
+        c->publish_hardware, c->publish_serial, c->ha_discovery, (unsigned)c->poll_s, c->log_level,
+        c->legacy_prefix[0] ? "legacy_prefix=" : "", c->legacy_prefix, c->legacy_prefix[0] ? "\n" : "", c->extra);
     if (n < 0 || (size_t)n >= cap) return 0;
     return (size_t)n;
 }
