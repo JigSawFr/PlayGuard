@@ -94,8 +94,11 @@ struct Integration
     std::string version;         // "0.2.0"; "" when unknown
     std::string homeassistant;   // "2026.10.1"; "" when unknown
 };
+// The integration document's "schema" this version reads.
+constexpr int INTEGRATION_SCHEMA = 1;
 // Its two versions; each "" when missing or not a version (digits first, then
-// at most 24 of [0-9A-Za-z.+-]). A document that is not JSON gives both "".
+// at most 24 of [0-9A-Za-z.+-]). A document that is not JSON, or of a newer
+// schema than INTEGRATION_SCHEMA, gives both "".
 Integration parse_integration(const std::string& doc);
 // Writes `doc` as it came, or removes the file when "" (through the writer).
 void write_integration(const std::string& doc);
@@ -118,10 +121,13 @@ struct AgentEvent
     std::vector<int> before, after;
     int              console_lock_after = -1;
 };
-// The lines that parse, oldest first.
-std::vector<AgentEvent> parse_agent_events(const std::string& text);
+// The lines that parse, oldest first (a line with more fields than this
+// version knows is read for the ones it knows). The others go to `rejected`,
+// one per line, when given.
+std::vector<AgentEvent> parse_agent_events(const std::string& text, std::string* rejected = nullptr);
 // Takes the file (renamed first, so a line the agent appends meanwhile waits
-// for the next time), parses it, and removes it.
+// for the next time), parses it, and removes it once the lines it could not
+// read are kept aside in agent_events.log.rejected.
 std::vector<AgentEvent> take_agent_events();
 
 }   // namespace sync_files

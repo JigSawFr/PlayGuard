@@ -59,13 +59,19 @@ bool values_ok(const std::string& kind, const std::vector<int>& v)
 
 // The entries in the file, and whether there is a file at all: one that is
 // there but cannot be read or parsed is damaged, which is not the same as
-// none (a new history must not silently replace it).
-bool load_array(nlohmann::json& entries)
+// none (a new history must not silently replace it). *newer: a newer
+// version wrote it (no entries, not damaged, never written over).
+bool load_array(nlohmann::json& entries, bool* newer = nullptr)
 {
     entries = nlohmann::json::array();
+    if (newer) *newer = false;
     std::string text;
     if (!paths::read_file(paths::history_file(), text)) return !paths::exists_or_pending(paths::history_file());   // missing: fine
-    return json_util::parse_with(text, [&entries](const nlohmann::json& j) {
+    return json_util::parse_with(text, [&entries, newer](const nlohmann::json& j) {
+        if (json_util::newer_schema(j, SCHEMA)) {
+            if (newer) *newer = true;
+            return true;
+        }
         const nlohmann::json* in = json_util::array_at(j, "entries");
         if (!in) return false;
         entries = *in;
@@ -120,7 +126,8 @@ bool append(const Entry& e, std::string* error, bool* put_aside)
 {
     if (put_aside) *put_aside = false;
     nlohmann::json entries;
-    if (!load_array(entries)) {
+    bool newer = false;
+    if (!load_array(entries, &newer)) {
         // Should putting it aside fail, write nothing: it would overwrite the old file.
         if (check() != Damage::PutAside) {
             if (error) *error = "the change history could not be read, nor put aside";
@@ -128,6 +135,7 @@ bool append(const Entry& e, std::string* error, bool* put_aside)
         }
         if (put_aside) *put_aside = true;
     }
+    if (newer) return true;   // a newer version's: left as it is
     nlohmann::json j;
     j["when"]   = e.when;
     j["kind"]   = e.kind;
@@ -143,7 +151,7 @@ bool append(const Entry& e, std::string* error, bool* put_aside)
     entries.push_back(j);
     while (entries.size() > MAX_ENTRIES) entries.erase(entries.begin());
     // One change per line: 500 of them stay small (about 50 KB) and readable.
-    std::string text = "{\n \"schema\": 1,\n \"entries\": [";
+    std::string text = "{\n \"schema\": " + std::to_string(SCHEMA) + ",\n \"entries\": [";
     for (size_t i = 0; i < entries.size(); i++)
         text += (i ? ",\n  " : "\n  ") + entries[i].dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);
     text += entries.empty() ? "]\n}\n" : "\n ]\n}\n";

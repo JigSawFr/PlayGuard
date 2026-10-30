@@ -115,9 +115,12 @@ uint32_t agent_dispatch(AgentShared *s, uint32_t cmd, AgentCall *c)
         return AGENT_RC_NO_SESSION;
     switch (cmd) {
     case AgentCmd_Hello: {
-        if (c->in_len < sizeof(AgentHello) || c->out_cap < sizeof(AgentHelloReply)) return AGENT_RC_BAD_INPUT;
+        // A Hello of another size (another protocol) still gets its reply,
+        // with accepted 0: only its protocol is read.
+        if (c->in_len < sizeof(uint32_t) || c->out_cap < sizeof(AgentHelloReply)) return AGENT_RC_BAD_INPUT;
         AgentHello h;
-        memcpy(&h, c->in, sizeof(h));
+        memset(&h, 0, sizeof(h));
+        memcpy(&h, c->in, c->in_len < sizeof(h) ? c->in_len : sizeof(h));
         h.version[AGENT_VERSION_MAX - 1] = '\0';
         AgentHelloReply r;
         memset(&r, 0, sizeof(r));
@@ -127,7 +130,7 @@ uint32_t agent_dispatch(AgentShared *s, uint32_t cmd, AgentCall *c)
         r.online = s->status.link.state == SyncLink_Online;
         // A PlayGuard of another protocol gets the reply (it offers to update
         // the agent) but no session: the agent stays on its own.
-        r.accepted = h.protocol == AGENT_PROTOCOL;
+        r.accepted = h.protocol == AGENT_PROTOCOL && c->in_len >= sizeof(h);
         memcpy(c->out, &r, sizeof(r));
         c->out_len = sizeof(r);
         if (!r.accepted) return 0;

@@ -80,4 +80,12 @@ inline int64_t integer_or(const nlohmann::json& j, const char* key, int64_t fall
     return v;
 }
 
+// The document's "schema" is newer than `known` (a missing one counts as 1):
+// a later version wrote it, so a reader takes it as absent and never writes
+// over it (docs/contributing/formats.md).
+inline bool newer_schema(const nlohmann::json& j, int64_t known)
+{
+    return j.is_object() && integer_or(j, "schema", 1) > known;
+}
+
 }   // namespace json_util

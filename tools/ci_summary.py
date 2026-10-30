@@ -799,7 +799,7 @@ def main():
     p.add_argument("--repo-url", required=True)
     p.add_argument("--dir", default="dist")
     p.add_argument("--files", nargs="+", default=["playguard.nro", "playguard.zip", "playguard-rescue.zip",
-                                                  "playguard-agent.zip", "compat.json",
+                                                  "playguard-agent.zip", "compat.json", "compat-1.json",
                                                   "build-info.txt", "SHA256SUMS.txt"])
     p.set_defaults(func=cmd_release)
 
