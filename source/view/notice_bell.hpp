@@ -29,6 +29,7 @@ class NoticeBell : public aurore::View
     int actions  = 0;
     int infos    = 0;
     bool counted = false;        // update() ran once: a change after that moves
+    char label[3] = {};          // the number on the disc, written by update(), not at each frame
     aurore::Time swing_since = 0;  // a new entry to do: the bell swings (µs; 0 at rest)
     aurore::Time pop_since   = 0;  // the number changed: its disc pops
 
