@@ -51,7 +51,7 @@ JSON_HPP := library/aurore/library/include/aurore/extern/nlohmann/json.hpp
 # The remote link's console-free C (library/boreale-link/source/: the
 # transport; source/sync/: PlayGuard's documents and orders), shared by its
 # host tests.
-SYNC_PURE := library/boreale-link/source/bl_json.c library/boreale-link/source/mqtt_packet.c library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_apply.c \
+SYNC_PURE := library/boreale-link/source/bl_json.c library/boreale-link/source/mqtt_packet.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
              source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c source/sync/sync_icons.c source/sync/sync_titles.c \
              source/core/console_info_pure.c
@@ -342,7 +342,7 @@ modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/module
 # The remote link's files on the SD card, with its C parts (built by $(CC):
 # g++ would build a .c as C++).
 sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
-sync_files_CSRC  := $(CALENDAR_C) library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c
+sync_files_CSRC  := $(CALENDAR_C) library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_records.c
 sync_files_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
 
 # C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
@@ -350,11 +350,11 @@ sync_files_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Iso
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
 sync_core_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
-sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c library/boreale-link/source/bl_json.c tests/sync_exec/test.c
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c library/boreale-link/source/bl_json.c tests/sync_exec/test.c
 sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync -Ilibrary/boreale-link/source
 sync_engine_SRC   := $(SYNC_PURE) library/boreale-link/source/mqtt_client.c library/boreale-link/source/bl_session.c source/sync/sync_engine.c tests/sync_engine/test.c
 sync_engine_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
-agent_SRC   := sysmodule/agent/source/agent_core.c library/boreale-link/source/bl_kv.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
+agent_SRC   := sysmodule/agent/source/agent_core.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
 agent_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -Isysmodule/agent/source
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))

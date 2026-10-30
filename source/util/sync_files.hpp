@@ -26,11 +26,13 @@ namespace sync_files
 {
 
 std::string conf_file();    // data_dir()/sync.conf
+std::string link_file();    // sd:/config/boreale/link.conf, the broker's settings every Boréale homebrew shares
 std::string dir();          // data_dir()/sync: shared by every system
 std::string system_dir();   // nand_dir()/sync: this system's
 bool exists();              // sync.conf is there: the link was set up once
 
-// The defaults, then what sync.conf holds; `emummc` set from the system
+// The defaults, then what sync.conf holds, the broker's settings from
+// link.conf (made from sync.conf the first time); `emummc` set from the system
 // PlayGuard runs on (paths::nand_key()), for its own device id.
 SyncConf load();
 bool save(const SyncConf& c, std::string* error = nullptr);
