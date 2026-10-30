@@ -29,6 +29,11 @@ int         pr();
 // as hbloader gave it in argv[0]; empty when unknown (nxlink, desktop).
 std::string self_path();
 void        set_self_path(const char* argv0);
+// The screen another Boréale homebrew opened PlayGuard at (a click in its
+// bell: --open=<route>, boreale-link's bl_open_route): one of
+// config::START_TABS, "" none or one PlayGuard does not know.
+std::string open_route();
+void        set_open_route(int argc, char** argv);
 const char* repo_url();
 // The website (https://guard.boreale.dev/, tools/build_site.py) and a page of its
 // documentation in the console's language ("troubleshooting", "locked-out"):

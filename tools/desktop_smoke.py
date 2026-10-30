@@ -399,6 +399,10 @@ if os.path.exists(link_conf):
 app_conf = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "apps", "playguard.conf")
 if os.path.exists(app_conf):
     os.remove(app_conf)
+# Its bell as the other Boréale homebrews read it, written when it changes.
+bell_file = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "notices", "playguard.json")
+if os.path.exists(bell_file):
+    os.remove(bell_file)
 SYNC_ID = "5a0c3e11"
 mqtt_port = 0
 mqtt_broker = None
@@ -1613,6 +1617,10 @@ if SYNC:
         fail("link.conf does not hold the broker's settings")
     wait_for("PlayGuard in the Boréale homebrews' registry",
              lambda: os.path.exists(app_conf) and "name=PlayGuard\n" in open(app_conf).read(), 10)
+    bell = wait_for("PlayGuard's bell for the other Boréale homebrews",
+                    lambda: os.path.exists(bell_file) and json.load(open(bell_file)), 10)
+    if bell.get("schema") != 1 or bell.get("module") != "playguard" or not isinstance(bell.get("notices"), list):
+        fail(f"the shared bell's file: {bell}")
     # The version the client spoke, as Mosquitto logs it: "as pg-<id>-app (p5, …"
     # (its own numbering: p2 is 3.1.1, p5 is 5.0).
     level = "p2" if MQTT311 else "p5"

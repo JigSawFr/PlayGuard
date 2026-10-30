@@ -5,6 +5,7 @@
 #include <aurore.hpp>
 #include <chrono>
 #include <cstdio>
+#include <ctime>
 #include <map>
 #include <sys/statvfs.h>
 
@@ -20,6 +21,7 @@
 #include "action/play_data.hpp"
 #include "action/pt_flow.hpp"
 #include "action/session_pause.hpp"
+#include "action/shared_bell_logic.hpp"
 #include "action/upload_flow.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
@@ -53,8 +55,30 @@ std::map<std::string, std::string> s_prints;
 std::map<int, std::function<void()>> s_listeners;
 int s_next_listener = 1;
 
+// The bell as the other Boréale homebrews see it, written off the UI thread
+// when it changed (action/shared_bell_logic).
+void write_shared_bell()
+{
+    std::vector<shared_bell_logic::Entry> entries;
+    for (const auto& item : s_store.visible())
+        entries.push_back({ item.id, item.level == Level::Action, item.title, item.detail, notice_logic::tab_of(item.id) });
+    const std::string file = shared_bell_logic::file(paths::sd_root());
+    const std::string lang = aurore::Application::getLocale();
+    const std::string nro = app::self_path();
+    ui::write_later("shared bell", [entries, lang, nro, file]() {
+        std::string before;
+        paths::read_file(file, before);
+        const std::string text = shared_bell_logic::text(entries, lang, nro, before, (int64_t)std::time(nullptr));
+        if (text.empty()) return;
+        std::string why = "cannot make its folder";
+        if (!paths::ensure_dir(file.substr(0, file.rfind('/'))) || !paths::atomic_write(file, text, &why))
+            aurore::Logger::warning("shared bell: {} not saved: {}", file, why);
+    }, file);
+}
+
 void changed()
 {
+    write_shared_bell();
     // A copy: a listener may unlisten (a screen closing).
     const auto listeners = s_listeners;
     for (const auto& l : listeners) l.second();
@@ -609,6 +633,11 @@ void sweep()
     outside_watch::observe(pt);
     refresh_status(s, pt, si, accuracy_rc, accurate);
     note_pin_strength(s);
+}
+
+void publish()
+{
+    write_shared_bell();
 }
 
 void open_tab(int position, const std::string& row)

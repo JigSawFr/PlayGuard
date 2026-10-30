@@ -421,6 +421,7 @@ int main(int argc, char* argv[])
     keep_log_lines();
     std::set_terminate(on_terminate);
     app::set_self_path(argc > 0 ? argv[0] : nullptr);
+    app::set_open_route(argc, argv);
 
     migration_flow::at_start();
     startup_mark(StartupStep_Migrations);

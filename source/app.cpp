@@ -7,6 +7,7 @@
 #include <aurore/cadran/ui/live_prefs.hpp>
 #include <aurore/cadran/util/text.hpp>
 
+#include "bl_notices.h"
 #include "core/platform.h"
 #include "core/sim_env.h"
 #include "ui/ui.hpp"
@@ -89,6 +90,22 @@ void set_self_path(const char* argv0)
         text::ends_with(path, suffix))
         s_self_path = path.substr(prefix.size() - 1);
 }
+namespace
+{
+std::string s_open_route;
+}
+
+std::string open_route() { return s_open_route; }
+
+void set_open_route(int argc, char** argv)
+{
+    char route[BL_NOTICE_ROUTE_MAX];
+    s_open_route.clear();
+    if (!bl_open_route(argc, argv, route, sizeof(route))) return;
+    for (const char* tab : config::START_TABS)
+        if (std::string(route) == tab) s_open_route = route;
+}
+
 const char* repo_url()         { return "https://github.com/JigSawFr/PlayGuard"; }
 const char* site_url()         { return "https://guard.boreale.dev/"; }
 
