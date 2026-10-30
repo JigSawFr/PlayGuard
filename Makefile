@@ -48,8 +48,9 @@ SOURCE_DATE_EPOCH ?= $(shell git log -1 --format=%ct 2>/dev/null || echo 0)
 ZIP_TREE = find . -exec touch -h -d @$(SOURCE_DATE_EPOCH) {} + && find . -mindepth 1 | LC_ALL=C sort | TZ=UTC zip -X -@
 CMAKE_ARGS ?=
 JSON_HPP := library/aurore/library/include/aurore/extern/nlohmann/json.hpp
-# The remote link's console-free C (source/sync/), shared by its host tests.
-SYNC_PURE := source/sync/sync_json.c source/sync/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
+# The remote link's console-free C (source/link/ the transport, source/sync/
+# PlayGuard's documents and orders), shared by its host tests.
+SYNC_PURE := source/link/bl_json.c source/link/mqtt_packet.c source/sync/sync_conf.c source/sync/sync_apply.c \
              source/sync/sync_records.c source/sync/sync_entities.c source/sync/sync_discovery.c source/sync/sync_state.c \
              source/sync/sync_system.c source/sync/sync_games.c source/sync/sync_watch.c source/sync/sync_icons.c source/sync/sync_titles.c \
              source/core/console_info_pure.c
@@ -347,12 +348,12 @@ sync_files_CFLAGS := -std=gnu11 -Isource/sync -Isource/core
 # C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
 # writes the documents it builds (_ARGS: where) for tools/check_sync_json.py.
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
-sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/core
+sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
-sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c source/sync/sync_json.c tests/sync_exec/test.c
-sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync
-sync_engine_SRC   := $(SYNC_PURE) source/sync/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
-sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/core
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c source/link/bl_json.c tests/sync_exec/test.c
+sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync -Isource/link
+sync_engine_SRC   := $(SYNC_PURE) source/link/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
+sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
 agent_SRC   := sysmodule/agent/source/agent_core.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
 agent_FLAGS := -std=gnu11 -Isource/sync -Isource/core -Isysmodule/agent/source
 

@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../link/bl_json.h"
 #include "sync_entities.h"
-#include "sync_json.h"
 
 #define REPO_URL "https://github.com/JigSawFr/PlayGuard"
 
@@ -82,106 +82,106 @@ size_t sync_discovery_build(const SyncDiscovery *d, char *out, size_t cap)
     sync_conf_device_name(c, d->device ? d->device->nickname : NULL, name, sizeof(name));
     const char *version = d->sw_version && *d->sw_version ? d->sw_version : "unknown";
 
-    SyncJson j;
-    sync_json_init(&j, out, cap);
-    sync_json_obj(&j);
+    BlJson j;
+    bl_json_init(&j, out, cap);
+    bl_json_obj(&j);
 
-    sync_json_key(&j, "dev");
-    sync_json_obj(&j);
+    bl_json_key(&j, "dev");
+    bl_json_obj(&j);
     snprintf(uid, sizeof(uid), "playguard_%s", id);
-    sync_json_key(&j, "ids");
-    sync_json_arr(&j);
-    sync_json_str(&j, uid);
-    sync_json_arr_end(&j);
-    sync_json_kstr(&j, "name", name);
+    bl_json_key(&j, "ids");
+    bl_json_arr(&j);
+    bl_json_str(&j, uid);
+    bl_json_arr_end(&j);
+    bl_json_kstr(&j, "name", name);
     // The model and the system are versions and hardware: unknown while not published.
     const SyncDevice *dev = c->publish_hardware ? d->device : NULL;
     const char *model, *number;
     model_of(dev ? dev->model : ConsoleModel_Unknown, &model, &number);
-    sync_json_kstr(&j, "mf", "Nintendo");
-    sync_json_kstr(&j, "mdl", model);
-    if (number) sync_json_kstr(&j, "mdl_id", number);
+    bl_json_kstr(&j, "mf", "Nintendo");
+    bl_json_kstr(&j, "mdl", model);
+    if (number) bl_json_kstr(&j, "mdl_id", number);
     system_of(dev, system, sizeof(system));
-    if (system[0]) sync_json_kstr(&j, "sw", system);
-    sync_json_obj_end(&j);
+    if (system[0]) bl_json_kstr(&j, "sw", system);
+    bl_json_obj_end(&j);
 
-    sync_json_key(&j, "o");
-    sync_json_obj(&j);
-    sync_json_kstr(&j, "name", "PlayGuard");
-    sync_json_kstr(&j, "sw", version);
-    sync_json_kstr(&j, "url", REPO_URL);
-    sync_json_obj_end(&j);
+    bl_json_key(&j, "o");
+    bl_json_obj(&j);
+    bl_json_kstr(&j, "name", "PlayGuard");
+    bl_json_kstr(&j, "sw", version);
+    bl_json_kstr(&j, "url", REPO_URL);
+    bl_json_obj_end(&j);
 
     snprintf(topic, sizeof(topic), "%s/availability", base);
-    sync_json_kstr(&j, "avty_t", topic);
+    bl_json_kstr(&j, "avty_t", topic);
 
-    sync_json_key(&j, "cmps");
-    sync_json_obj(&j);
+    bl_json_key(&j, "cmps");
+    bl_json_obj(&j);
     size_t n = 0;
     const SyncEntity *list = sync_entities(&n);
     for (size_t i = 0; i < n; i++) {
         const SyncEntity *e = &list[i];
-        sync_json_key(&j, e->id);
-        sync_json_obj(&j);
-        sync_json_kstr(&j, "p", e->platform);
+        bl_json_key(&j, e->id);
+        bl_json_obj(&j);
+        bl_json_kstr(&j, "p", e->platform);
         // Not offered now (remote_timer_writes off, read-only, no profile):
         // its platform alone, which removes it from Home Assistant if an
         // earlier discovery had it, rather than leaving it there to refuse
         // every order.
         if (!announced(e, d)) {
-            sync_json_obj_end(&j);
+            bl_json_obj_end(&j);
             continue;
         }
-        sync_json_kstr(&j, "name", e->name);
+        bl_json_kstr(&j, "name", e->name);
         snprintf(uid, sizeof(uid), "playguard_%s_%s", id, e->id);
-        sync_json_kstr(&j, "uniq_id", uid);
+        bl_json_kstr(&j, "uniq_id", uid);
         if (!strcmp(e->platform, "event")) {
             snprintf(topic, sizeof(topic), "%s/event", base);
-            sync_json_kstr(&j, "stat_t", topic);
-            sync_json_key(&j, "evt_typ");
-            sync_json_arr(&j);
+            bl_json_kstr(&j, "stat_t", topic);
+            bl_json_key(&j, "evt_typ");
+            bl_json_arr(&j);
             // The events the engine sends: the orders' (sync_engine.c's
             // event_type()), and what the console did on its own (sync_watch.c).
             static const char *const types[] = { "command_applied", "command_rejected", "command_waiting",
                                                  "play_started",    "play_stopped",     "time_warning",
                                                  "play_blocked" };
-            for (size_t t = 0; t < sizeof(types) / sizeof(types[0]); t++) sync_json_str(&j, types[t]);
-            sync_json_arr_end(&j);
+            for (size_t t = 0; t < sizeof(types) / sizeof(types[0]); t++) bl_json_str(&j, types[t]);
+            bl_json_arr_end(&j);
         } else if (e->value_template) {
             snprintf(topic, sizeof(topic), "%s/%s", base, e->topic ? e->topic : "state");
-            sync_json_kstr(&j, "stat_t", topic);
-            sync_json_kstr(&j, "val_tpl", e->value_template);
+            bl_json_kstr(&j, "stat_t", topic);
+            bl_json_kstr(&j, "val_tpl", e->value_template);
         }
         if (e->write != SyncWrite_None) {
             snprintf(topic, sizeof(topic), "%s/%s/set", base, e->id);
-            sync_json_kstr(&j, "cmd_t", topic);
+            bl_json_kstr(&j, "cmd_t", topic);
             // Retained: an order sent while the console sleeps waits on the
             // broker. Optimistic: the entity keeps the value asked meanwhile.
-            sync_json_kbool(&j, "ret", true);
-            if (e->value_template) sync_json_kbool(&j, "opt", true);
+            bl_json_kbool(&j, "ret", true);
+            if (e->value_template) bl_json_kbool(&j, "opt", true);
         }
         if (!strcmp(e->id, "profile")) {
-            sync_json_key(&j, "ops");
-            sync_json_arr(&j);
-            for (size_t p = 0; p < d->n_profiles; p++) sync_json_str(&j, d->profiles[p]);
-            sync_json_arr_end(&j);
+            bl_json_key(&j, "ops");
+            bl_json_arr(&j);
+            for (size_t p = 0; p < d->n_profiles; p++) bl_json_str(&j, d->profiles[p]);
+            bl_json_arr_end(&j);
         }
         // Attributes from the same document as the state.
         if (e->extra && strstr(e->extra, "\"json_attr_tpl\"")) {
             snprintf(topic, sizeof(topic), "%s/%s", base, e->topic ? e->topic : "state");
-            sync_json_kstr(&j, "json_attr_t", topic);
+            bl_json_kstr(&j, "json_attr_t", topic);
         }
-        if (e->extra && *e->extra) sync_json_members(&j, e->extra);
-        sync_json_obj_end(&j);
+        if (e->extra && *e->extra) bl_json_members(&j, e->extra);
+        bl_json_obj_end(&j);
     }
     const SyncRetired *gone = sync_entities_retired(&n);
     for (size_t i = 0; i < n; i++) {
-        sync_json_key(&j, gone[i].id);
-        sync_json_obj(&j);
-        sync_json_kstr(&j, "p", gone[i].platform);
-        sync_json_obj_end(&j);
+        bl_json_key(&j, gone[i].id);
+        bl_json_obj(&j);
+        bl_json_kstr(&j, "p", gone[i].platform);
+        bl_json_obj_end(&j);
     }
-    sync_json_obj_end(&j);
-    sync_json_obj_end(&j);
-    return sync_json_end(&j);
+    bl_json_obj_end(&j);
+    bl_json_obj_end(&j);
+    return bl_json_end(&j);
 }

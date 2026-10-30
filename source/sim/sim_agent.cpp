@@ -18,7 +18,7 @@
 #include "util/paths.hpp"
 
 #include "agent_core.h"
-#include "sync_net.h"
+#include "link/bl_net.h"
 
 namespace agent_client
 {
@@ -61,7 +61,7 @@ AgentShared& agent()
         agent_shared_init(s_agent, "9.9.9-sim");
         std::snprintf(s_agent->console_id, sizeof(s_agent->console_id), "5a0c3e11");
         s_agent->status.link.state = SyncLink_Online;
-        s_agent->status.link.online_since_ms = sync_now_ms();
+        s_agent->status.link.online_since_ms = bl_now_ms();
         s_agent->status.configured = 1;
         agent_log(s_agent, "simulated agent started");
     }

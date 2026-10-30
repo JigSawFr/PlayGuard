@@ -1,5 +1,5 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include "sync_tls.h"
+#include "bl_tls.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -10,8 +10,8 @@
 #include <switch.h>
 #include <unistd.h>
 
-_Static_assert(sizeof(SslContext) <= sizeof(((SyncTls *)0)->ctx), "SslContext does not fit");
-_Static_assert(sizeof(SslConnection) <= sizeof(((SyncTls *)0)->conn), "SslConnection does not fit");
+_Static_assert(sizeof(SslContext) <= sizeof(((BlTls *)0)->ctx), "SslContext does not fit");
+_Static_assert(sizeof(SslConnection) <= sizeof(((BlTls *)0)->conn), "SslConnection does not fit");
 
 #define CTX(t)  ((SslContext *)(void *)(t)->ctx)
 #define CONN(t) ((SslConnection *)(void *)(t)->conn)
@@ -19,7 +19,7 @@ _Static_assert(sizeof(SslConnection) <= sizeof(((SyncTls *)0)->conn), "SslConnec
 
 static void tls_close(void *vctx)
 {
-    SyncTls *t = (SyncTls *)vctx;
+    BlTls *t = (BlTls *)vctx;
     if (t->conn_open) sslConnectionClose(CONN(t));
     if (t->ctx_open) sslContextClose(CTX(t));
     t->conn_open = t->ctx_open = false;
@@ -30,7 +30,7 @@ static void tls_close(void *vctx)
     t->ssl_open = false;
 }
 
-static int tls_fail(SyncTls *t, char *err, size_t err_size, const char *what, Result rc)
+static int tls_fail(BlTls *t, char *err, size_t err_size, const char *what, Result rc)
 {
     snprintf(err, err_size, "%s (TLS, 0x%08X)", what, (unsigned)rc);
     tls_close(t);
@@ -39,8 +39,8 @@ static int tls_fail(SyncTls *t, char *err, size_t err_size, const char *what, Re
 
 static int tls_open(void *vctx, const char *host, uint16_t port, int timeout_ms, char *err, size_t err_size)
 {
-    SyncTls *t = (SyncTls *)vctx;
-    SyncIo tcp = sync_tcp_io(&t->tcp);
+    BlTls *t = (BlTls *)vctx;
+    BlIo tcp = bl_tcp_io(&t->tcp);
     if (tcp.open(&t->tcp, host, port, timeout_ms, err, err_size) < 0) return -1;
     // The ssl service works on a blocking socket.
     const int flags = fcntl(t->tcp.fd, F_GETFL, 0);
@@ -86,7 +86,7 @@ static int tls_open(void *vctx, const char *host, uint16_t port, int timeout_ms,
 
 static int tls_write(void *vctx, const void *buf, size_t len, int timeout_ms)
 {
-    SyncTls *t = (SyncTls *)vctx;
+    BlTls *t = (BlTls *)vctx;
     (void)timeout_ms;
     const uint8_t *p = (const uint8_t *)buf;
     while (len > 0) {
@@ -100,7 +100,7 @@ static int tls_write(void *vctx, const void *buf, size_t len, int timeout_ms)
 
 static long tls_read(void *vctx, void *buf, size_t len, int timeout_ms)
 {
-    SyncTls *t = (SyncTls *)vctx;
+    BlTls *t = (BlTls *)vctx;
     if (len == 0) return 0;
     s32 pending = 0;
     if (R_FAILED(sslConnectionPending(CONN(t), &pending))) return -1;
@@ -116,12 +116,12 @@ static long tls_read(void *vctx, void *buf, size_t len, int timeout_ms)
     return (long)n;
 }
 
-SyncIo sync_tls_io(SyncTls *tls, const char *ca_file)
+BlIo bl_tls_io(BlTls *tls, const char *ca_file)
 {
     memset(tls, 0, sizeof(*tls));
     tls->tcp.fd = -1;
     tls->ca_file = ca_file;
-    SyncIo io = { tls, tls_open, tls_write, tls_read, tls_close };
+    BlIo io = { tls, tls_open, tls_write, tls_read, tls_close };
     return io;
 }
 
@@ -160,12 +160,12 @@ static void no_close(void *ctx)
     (void)ctx;
 }
 
-SyncIo sync_tls_io(SyncTls *tls, const char *ca_file)
+BlIo bl_tls_io(BlTls *tls, const char *ca_file)
 {
     memset(tls, 0, sizeof(*tls));
     tls->tcp.fd = -1;
     tls->ca_file = ca_file;
-    SyncIo io = { tls, no_tls_open, no_write, no_read, no_close };
+    BlIo io = { tls, no_tls_open, no_write, no_read, no_close };
     return io;
 }
 

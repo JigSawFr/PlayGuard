@@ -1,4 +1,4 @@
-// sync_net — the plain TCP stream under the MQTT client (POSIX sockets: libnx
+// bl_net — the plain TCP stream under the MQTT client (POSIX sockets: libnx
 // on the Switch, the host's on desktop), and a monotonic clock. The socket
 // service itself must already be up (Aurore starts it in the app; the
 // agent sysmodule calls socketInitialize).
@@ -13,13 +13,13 @@ extern "C" {
 
 typedef struct {
     int fd;
-} SyncTcp;
+} BlTcp;
 
-// A SyncIo over `tcp` (which must outlive it).
-SyncIo sync_tcp_io(SyncTcp *tcp);
+// A BlIo over `tcp` (which must outlive it).
+BlIo bl_tcp_io(BlTcp *tcp);
 
 // Milliseconds from an arbitrary start, never going back.
-uint64_t sync_now_ms(void);
+uint64_t bl_now_ms(void);
 
 #ifdef __cplusplus
 }

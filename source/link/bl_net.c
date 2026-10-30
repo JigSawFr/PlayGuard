@@ -1,5 +1,5 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
-#include "sync_net.h"
+#include "bl_net.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -23,7 +23,7 @@
 #define MSG_NOSIGNAL 0
 #endif
 
-uint64_t sync_now_ms(void)
+uint64_t bl_now_ms(void)
 {
 #ifdef __SWITCH__
     return armTicksToNs(armGetSystemTick()) / 1000000ULL;
@@ -83,7 +83,7 @@ static int connect_one(const struct addrinfo *ai, int timeout_ms, char *err, siz
 
 static int tcp_open(void *ctx, const char *host, uint16_t port, int timeout_ms, char *err, size_t err_size)
 {
-    SyncTcp *t = (SyncTcp *)ctx;
+    BlTcp *t = (BlTcp *)ctx;
     t->fd = -1;
     char service[8];
     snprintf(service, sizeof(service), "%u", (unsigned)port);
@@ -116,11 +116,11 @@ static int tcp_open(void *ctx, const char *host, uint16_t port, int timeout_ms, 
 // console slept) gives up at the deadline rather than trying forever.
 static int tcp_write(void *ctx, const void *buf, size_t len, int timeout_ms)
 {
-    SyncTcp *t = (SyncTcp *)ctx;
+    BlTcp *t = (BlTcp *)ctx;
     const uint8_t *p = (const uint8_t *)buf;
-    const uint64_t deadline = sync_now_ms() + (uint64_t)(timeout_ms > 0 ? timeout_ms : 0);
+    const uint64_t deadline = bl_now_ms() + (uint64_t)(timeout_ms > 0 ? timeout_ms : 0);
     while (len > 0) {
-        const uint64_t now = sync_now_ms();
+        const uint64_t now = bl_now_ms();
         if (now >= deadline) return -1;
         struct pollfd pf = { .fd = t->fd, .events = POLLOUT, .revents = 0 };
         const int r = poll(&pf, 1, (int)(deadline - now));
@@ -138,7 +138,7 @@ static int tcp_write(void *ctx, const void *buf, size_t len, int timeout_ms)
 
 static long tcp_read(void *ctx, void *buf, size_t len, int timeout_ms)
 {
-    SyncTcp *t = (SyncTcp *)ctx;
+    BlTcp *t = (BlTcp *)ctx;
     if (len == 0) return 0;
     struct pollfd pf = { .fd = t->fd, .events = POLLIN, .revents = 0 };
     const int r = poll(&pf, 1, timeout_ms < 0 ? 0 : timeout_ms);
@@ -153,14 +153,14 @@ static long tcp_read(void *ctx, void *buf, size_t len, int timeout_ms)
 
 static void tcp_close(void *ctx)
 {
-    SyncTcp *t = (SyncTcp *)ctx;
+    BlTcp *t = (BlTcp *)ctx;
     if (t->fd >= 0) close(t->fd);
     t->fd = -1;
 }
 
-SyncIo sync_tcp_io(SyncTcp *tcp)
+BlIo bl_tcp_io(BlTcp *tcp)
 {
     tcp->fd = -1;
-    SyncIo io = { tcp, tcp_open, tcp_write, tcp_read, tcp_close };
+    BlIo io = { tcp, tcp_open, tcp_write, tcp_read, tcp_close };
     return io;
 }
