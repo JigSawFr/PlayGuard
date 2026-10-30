@@ -87,7 +87,8 @@
   "tour_activity": "活动：根据主机自己的记录，谁玩了什么、玩了多久。",
   "tour_console": "主机：网络时钟、已安装的游戏以及主机运行的内容。",
   "tour_time": "时间流逝：玩了一个小时后，今天的时间用完了。",
-  "tour_end": "轮到你了：方向键移动，Enter 为 A，Esc 为 B。面板可设置任意状态。"
+  "tour_end": "轮到你了：方向键移动，Enter 为 A，Esc 为 B。面板可设置任意状态。",
+  "sites_legal": "隐私与法律声明"
  },
  "groups": {
   "app": "PlayGuard",

@@ -87,7 +87,8 @@
   "tour_activity": "Activity: who played what, and how long, from the console's own log.",
   "tour_console": "Console: the network clock, the installed games and what the console runs.",
   "tour_time": "Time passes: an hour of play later, today's time is used up.",
-  "tour_end": "Your turn: the arrows move, Enter is A, Esc is B. The panel sets any state."
+  "tour_end": "Your turn: the arrows move, Enter is A, Esc is B. The panel sets any state.",
+  "sites_legal": "Privacy and legal notice"
  },
  "groups": {
   "app": "PlayGuard",

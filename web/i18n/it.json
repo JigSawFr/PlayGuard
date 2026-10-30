@@ -87,7 +87,8 @@
   "tour_activity": "Attività: chi ha giocato a cosa, e per quanto, dal registro della console.",
   "tour_console": "Console: l'orologio di rete, i giochi installati e ciò che esegue la console.",
   "tour_time": "Il tempo passa: un'ora di gioco dopo, il tempo di oggi è esaurito.",
-  "tour_end": "Tocca a te: le frecce spostano, Invio è A, Esc è B. Il pannello imposta qualsiasi stato."
+  "tour_end": "Tocca a te: le frecce spostano, Invio è A, Esc è B. Il pannello imposta qualsiasi stato.",
+  "sites_legal": "Privacy e note legali"
  },
  "groups": {
   "app": "PlayGuard",

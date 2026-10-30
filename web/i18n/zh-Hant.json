@@ -87,7 +87,8 @@
   "tour_activity": "活動：根據主機自己的記錄，誰玩了什麼、玩了多久。",
   "tour_console": "主機：網路時鐘、已安裝的遊戲以及主機執行的內容。",
   "tour_time": "時間流逝：玩了一個小時後，今天的時間用完了。",
-  "tour_end": "輪到你了：方向鍵移動，Enter 為 A，Esc 為 B。面板可設定任何狀態。"
+  "tour_end": "輪到你了：方向鍵移動，Enter 為 A，Esc 為 B。面板可設定任何狀態。",
+  "sites_legal": "隱私與法律聲明"
  },
  "groups": {
   "app": "PlayGuard",

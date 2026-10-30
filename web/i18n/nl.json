@@ -87,7 +87,8 @@
   "tour_activity": "Activiteit: wie wat speelde, en hoe lang, uit het logboek van de console.",
   "tour_console": "Console: de netwerkklok, de geïnstalleerde games en wat de console draait.",
   "tour_time": "De tijd verstrijkt: een uur spelen later is de tijd van vandaag op.",
-  "tour_end": "Nu jij: de pijlen bewegen, Enter is A, Esc is B. Het paneel stelt elke staat in."
+  "tour_end": "Nu jij: de pijlen bewegen, Enter is A, Esc is B. Het paneel stelt elke staat in.",
+  "sites_legal": "Privacy en juridische informatie"
  },
  "groups": {
   "app": "PlayGuard",
