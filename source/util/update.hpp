@@ -1,9 +1,10 @@
-// update — is there a newer PlayGuard, and does it support this firmware?
+// update — is there a newer build of the app, and does it support this firmware?
 //
-// Every release publishes compat-<COMPAT_SCHEMA>.json next to playguard.nro,
+// Every release publishes compat-<COMPAT_SCHEMA>.json next to the app's .nro,
 // and compat.json in schema 1 for the versions before it (written by
 // tools/gen_compat.py from CMakeLists.txt and core/sysinfo.h):
-//   {"schema": 1, "version": "1.1.0", "fw_tested_max": "24.0.0", "fw_min_play_timer": "21.0.0"}
+//   {"schema": 1, "version": "1.1.0", "fw_tested_max": "24.0.0"}
+// (an app may add its own fields: they are read where it reads them).
 // Parsing and the decision are plain C++ (host-tested); check() fetches the
 // file of the latest release over HTTPS (update_check.cpp).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -72,7 +73,7 @@ bool offer_at_start(const std::string& latest, const std::string& running, const
 
 // Fetches compat-<COMPAT_SCHEMA>.json of the latest release (compat.json
 // when the release has none, or one this version cannot read) and decides. Blocking (network):
-// run it with aurore::async. On the desktop build PLAYGUARD_SIM_LATEST
+// run it with aurore::async. On the desktop build <APP_ENV>_SIM_LATEST
 // ("1.1.0:24.0.0", "none" or "offline") replaces the network.
 Result      check(uint32_t console_fw);
 

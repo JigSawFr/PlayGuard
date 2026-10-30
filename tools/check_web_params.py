@@ -55,6 +55,8 @@ def main():
                 with open(os.path.join(folder, name), encoding="utf-8", errors="replace") as f:
                     text = f.read()
                 read |= set(re.findall(r"PLAYGUARD_SIM_([A-Z0-9_]+)", text))
+                # The shared code (app_id.h) names them APP_ENV "_SIM_<name>".
+                read |= set(re.findall(r'APP_ENV\s*"_SIM_([A-Z0-9_]+)"', text))
                 # Read once: into a static, or into the console's first state.
                 once |= set(re.findall(r"static\s+const\s+[\w:*\s]+=\s*sim_env\w*\(\s*\"PLAYGUARD_SIM_([A-Z0-9_]+)", text))
                 m = re.search(r"\nstatic void sim_defaults\([^)]*\)\n\{(.*?)\n\}", text, re.S)
