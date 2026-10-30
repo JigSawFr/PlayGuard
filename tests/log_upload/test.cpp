@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "util/log_upload.hpp"
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 #include "util/pt_log.hpp"
 

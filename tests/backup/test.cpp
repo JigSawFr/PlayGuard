@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "util/backup.hpp"
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 
 static backup::Snapshot full()

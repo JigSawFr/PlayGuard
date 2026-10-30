@@ -7,6 +7,7 @@
 #include <ctime>
 
 #include "util/json_util.hpp"
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 
 namespace backup

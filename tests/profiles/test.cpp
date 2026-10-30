@@ -8,6 +8,7 @@
 #include <string>
 #include <unistd.h>
 
+#include "util/app_paths.hpp"
 #include "util/paths.hpp"
 #include "util/profiles.hpp"
 

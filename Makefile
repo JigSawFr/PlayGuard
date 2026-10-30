@@ -263,14 +263,14 @@ worker_threads_LIBS  := -pthread
 data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
 outside_change_logic_SRC   := source/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
-backup_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/forwarders.cpp tests/backup/test.cpp
-backup_logic_SRC   := source/util/paths.cpp source/util/backup.cpp source/util/forwarders.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
+backup_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/backup.cpp source/util/forwarders.cpp tests/backup/test.cpp
+backup_logic_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/backup.cpp source/util/forwarders.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
 http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
 table_export_SRC   := source/util/paths.cpp source/util/zip_write.cpp source/util/table_export.cpp source/util/table_export_csv.cpp source/util/table_export_json.cpp source/util/table_export_xlsx.cpp source/util/table_export_pdf.cpp tests/table_export/test.cpp
 table_export_LIBS  := -lz
 update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
-config_SRC   := source/util/paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
-profiles_SRC   := source/util/paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
+config_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
+profiles_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
 forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_library.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
 forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
@@ -279,13 +279,13 @@ forwarders_LIBS   := -lm
 forwarder_rules_logic_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/util/date.cpp source/util/gate_tally.cpp source/action/forwarders_logic.cpp source/action/forwarder_rules_logic.cpp tests/forwarder_rules_logic/test.cpp
 forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
 forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core
-pt_block_SRC   := source/util/paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
+pt_block_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
 launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
 launcher_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_json.c library/boreale-link/source/bl_jread.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_notices.c
 launcher_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
 history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
-log_upload_SRC   := source/util/paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
+log_upload_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp tests/log_upload/test.cpp
 # A secret sealed for this console: AES and HMAC, and the console's key
 # (the desktop build's random one: sim/sim_device_key.cpp).
 SECRET_BOX := source/util/secret_box.cpp source/util/aes.cpp source/sim/sim_device_key.cpp
@@ -326,7 +326,7 @@ game_check_text_CSRC   := source/core/gamecheck_rules.c
 game_check_text_CFLAGS := -std=gnu11 -Isource/core
 rating_logic_SRC   := source/action/rating_logic.cpp tests/rating_logic/test.cpp
 schedule_logic_SRC   := source/action/schedule_logic.cpp source/util/date.cpp tests/schedule_logic/test.cpp
-pt_log_SRC   := source/util/paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
+pt_log_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp
 # A C source a C++ suite links (clang++ refuses to build a .c as C++).
 session_log_CSRC  := source/util/crash_dump.c
@@ -354,7 +354,7 @@ migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/updat
 modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/modules.cpp tests/modules/test.cpp
 # The remote link's files on the SD card, with its C parts (built by $(CC):
 # g++ would build a .c as C++).
-sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
+sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/app_paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
 sync_files_CSRC  := $(CALENDAR_C) library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c library/boreale-link/source/bl_app.c source/sync/sync_conf.c source/sync/sync_records.c
 sync_files_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
 
