@@ -19,8 +19,8 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   `versions.json` read at the build; each site in the page's language, the
   sites sharing the 15 folders: the homebrew, Aurore, Atlas and Lantern), and a button opens the 15 languages,
   each with its flag (a popover too). The footer has a Boréale column: the
-  other sites and the privacy and legal notice in the page's language,
-  `contact@boreale.dev`. The page not found
+  other sites and the privacy and legal notice in the page's language.
+  The page not found
   stands under the aurora, as the home page's hero.
 - **Reading the documentation**: once the header is scrolled away, a slim
   bar at the top (the way home, the page's name, the search, the light
