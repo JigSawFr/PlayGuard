@@ -352,7 +352,7 @@ sync_core_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
 sync_core_ARGS  := $(TESTOUT)/sync
 sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c source/link/bl_json.c tests/sync_exec/test.c
 sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync -Isource/link
-sync_engine_SRC   := $(SYNC_PURE) source/link/mqtt_client.c source/sync/sync_engine.c tests/sync_engine/test.c
+sync_engine_SRC   := $(SYNC_PURE) source/link/mqtt_client.c source/link/bl_session.c source/sync/sync_engine.c tests/sync_engine/test.c
 sync_engine_FLAGS := -std=gnu11 -Isource/sync -Isource/link -Isource/core
 agent_SRC   := sysmodule/agent/source/agent_core.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
 agent_FLAGS := -std=gnu11 -Isource/sync -Isource/core -Isysmodule/agent/source

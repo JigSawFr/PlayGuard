@@ -7,9 +7,6 @@
 #include "sync_discovery.h"
 #include "sync_state.h"
 
-#define CONNECT_TIMEOUT_MS   8000
-#define BACKOFF_MIN_MS       5000ULL
-#define BACKOFF_MAX_MS       300000ULL
 #define ACTIVITY_PERIOD_MS   60000ULL
 #define STATE_SOON_MS        300ULL
 // Home Assistant's birth and last-will topic (its MQTT integration's default).
@@ -29,27 +26,19 @@ static uint64_t now_posix(SyncEngine *e)
     return e->host.now_posix ? e->host.now_posix(e->host.ctx) : 0;
 }
 
-static void lost(SyncEngine *e);
-
-// The console slept: the wall clock moved on further than the broker keeps a
-// silent connection (one keep-alive and a half), so the broker has dropped
-// this one and said "offline" for it, while the socket may still look open
-// and take what is written, for nowhere. Closed without a word, at once:
-// the next step connects again. Every call that writes asks first (a clock
-// set forward by as much costs one connection more, nothing else).
-static bool woke(SyncEngine *e)
+// The session's side of the status, copied into the engine's after each
+// call that may change it.
+static void mirror(SyncEngine *e)
 {
-    const uint64_t t = now_posix(e);
-    const uint64_t last = e->seen_posix;
-    if (t) e->seen_posix = t;
-    if (!t || !last || t <= last || !e->mqtt.connected) return false;
-    const uint64_t keepalive = e->mqtt.keepalive_s ? e->mqtt.keepalive_s : SYNC_KEEPALIVE_S;
-    if (t - last <= keepalive * 3 / 2) return false;
-    mqtt_client_close(&e->mqtt, false);
-    snprintf(e->mqtt.error, sizeof(e->mqtt.error), "the console slept, connecting again");
-    e->backoff_ms = 0;
-    lost(e);
-    return true;
+    const BlStatus *b = &e->session.status;
+    e->status.state = (SyncLinkState)b->state;
+    e->status.protocol = b->protocol;
+    memcpy(e->status.error, b->error, sizeof(e->status.error));
+    e->status.online_since_ms = b->online_since_ms;
+    e->status.last_publish_ms = b->last_publish_ms;
+    e->status.next_attempt_ms = b->next_attempt_ms;
+    e->status.connects = b->connects;
+    e->status.publishes = b->publishes;
 }
 
 static bool read_only(SyncEngine *e)
@@ -58,6 +47,7 @@ static bool read_only(SyncEngine *e)
 }
 
 static void on_message(void *user, const MqttPublish *msg);
+static int subscribe(SyncEngine *e);
 
 static void identity(SyncEngine *e)
 {
@@ -65,6 +55,48 @@ static void identity(SyncEngine *e)
     sync_conf_device_id(&e->conf, id);   // this system's: a sysMMC and an emuMMC are two devices
     snprintf(e->base, sizeof(e->base), "%s/%s", e->conf.topic_prefix, id);
     snprintf(e->client_id, sizeof(e->client_id), "pg-%s-%s", id, e->source);
+}
+
+static BlSessionConf session_conf(const SyncEngine *e)
+{
+    BlSessionConf c;
+    memset(&c, 0, sizeof(c));
+    c.host = e->conf.host;
+    c.port = e->conf.port;
+    c.username = e->conf.username;
+    c.password = e->conf.password;
+    c.version = e->conf.mqtt_version == SyncMqtt_V5     ? MQTT_V5
+                : e->conf.mqtt_version == SyncMqtt_V311 ? MQTT_V311
+                                                        : 0;
+    c.base = e->base;
+    c.client_id = e->client_id;
+    return c;
+}
+
+static int session_subscribe(void *ctx)
+{
+    return subscribe((SyncEngine *)ctx);
+}
+
+// Orders not yet handed to the host go with the connection: still retained,
+// they come back at the next one.
+static void session_lost(void *ctx)
+{
+    SyncEngine *e = (SyncEngine *)ctx;
+    for (size_t i = 0; i < SYNC_QUEUE_MAX; i++)
+        if (e->queue[i].id && !e->queue[i].in_flight) memset(&e->queue[i], 0, sizeof(e->queue[i]));
+    mirror(e);
+}
+
+static uint64_t session_now_posix(void *ctx)
+{
+    return now_posix((SyncEngine *)ctx);
+}
+
+static void session_log(void *ctx, const char *line)
+{
+    SyncEngine *e = (SyncEngine *)ctx;
+    if (e->host.log) e->host.log(e->host.ctx, line);
 }
 
 void sync_engine_init(SyncEngine *e, const SyncConf *conf, BlIo io, const SyncHost *host, uint64_t (*now_ms)(void),
@@ -78,12 +110,14 @@ void sync_engine_init(SyncEngine *e, const SyncConf *conf, BlIo io, const SyncHo
     e->sw_version = sw_version;
     e->next_id = 1;
     identity(e);
-    mqtt_client_init(&e->mqtt, io, e->rx, sizeof(e->rx), now_ms, on_message, e);
+    const BlSessionConf sc = session_conf(e);
+    const BlSessionHost sh = { e, session_subscribe, session_lost, session_now_posix, session_log };
+    bl_session_init(&e->session, &sc, io, &sh, now_ms, on_message, e);
 }
 
 bool sync_engine_online(const SyncEngine *e)
 {
-    return e->mqtt.connected;
+    return bl_session_online(&e->session);
 }
 
 const SyncStatus *sync_engine_status(const SyncEngine *e)
@@ -123,70 +157,23 @@ void sync_engine_discovery_changed(SyncEngine *e)
 
 int sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, size_t len, bool retained)
 {
-    woke(e);
-    if (!e->mqtt.connected) return -1;
-    char topic[160];
-    snprintf(topic, sizeof(topic), "%s/%s", e->base, sub);
-    const int rc = mqtt_client_publish(&e->mqtt, topic, payload, len, retained);
-    if (rc == 0) {
-        e->status.publishes++;
-        e->status.last_publish_ms = e->now_ms();
-    }
+    const int rc = bl_session_publish(&e->session, sub, payload, len, retained);
+    mirror(e);
     return rc;
 }
 
 int sync_engine_publish_stream(SyncEngine *e, const char *sub, size_t len, bool retained, SyncReadFn read, void *ctx)
 {
-    woke(e);
-    if (!e->mqtt.connected) return -1;
-    char topic[160];
-    snprintf(topic, sizeof(topic), "%s/%s", e->base, sub);
-    if (mqtt_client_publish_begin(&e->mqtt, topic, len, retained) < 0) {
-        if (!e->mqtt.connected) lost(e);
-        return -1;
-    }
-    for (size_t sent = 0; sent < len;) {
-        const size_t want = len - sent < sizeof(e->scratch) ? len - sent : sizeof(e->scratch);
-        const size_t got = read(ctx, e->scratch, want);
-        if (got == 0 || got > want || mqtt_client_publish_more(&e->mqtt, e->scratch, got) < 0) {
-            // Half a packet went out: the broker would read what comes next
-            // as its end. Closed, connected again at the next step.
-            if (e->mqtt.connected) {
-                mqtt_client_close(&e->mqtt, false);
-                snprintf(e->mqtt.error, sizeof(e->mqtt.error), "%s cut short, connecting again", sub);
-            }
-            e->backoff_ms = 0;
-            lost(e);
-            return -1;
-        }
-        sent += got;
-    }
-    e->status.publishes++;
-    e->status.last_publish_ms = e->now_ms();
-    return 0;
-}
-
-static void lost(SyncEngine *e)
-{
-    snprintf(e->status.error, sizeof(e->status.error), "%s", e->mqtt.error[0] ? e->mqtt.error : "connection lost");
-    e->status.state = SyncLink_Waiting;
-    e->status.next_attempt_ms = e->now_ms() + e->backoff_ms;
-    for (size_t i = 0; i < SYNC_QUEUE_MAX; i++)
-        if (e->queue[i].id && !e->queue[i].in_flight) memset(&e->queue[i], 0, sizeof(e->queue[i]));
-    logf_(e, "remote link: %s%s", e->status.error, NULL);
+    const int rc = bl_session_publish_stream(&e->session, sub, len, retained, read, ctx, e->scratch, sizeof(e->scratch));
+    mirror(e);
+    return rc;
 }
 
 void sync_engine_stop(SyncEngine *e)
 {
-    woke(e);
-    if (e->mqtt.connected) {
-        char topic[160];
-        snprintf(topic, sizeof(topic), "%s/availability", e->base);
-        mqtt_client_publish(&e->mqtt, topic, "offline", 7, true);
-    }
-    mqtt_client_close(&e->mqtt, true);
-    e->status.state = SyncLink_Off;
+    bl_session_stop(&e->session);
     e->discovery_published = false;
+    mirror(e);
 }
 
 void sync_engine_reconfigure(SyncEngine *e, const SyncConf *conf)
@@ -199,27 +186,26 @@ void sync_engine_reconfigure(SyncEngine *e, const SyncConf *conf)
                            conf->allow_anonymous != e->conf.allow_anonymous || conf->enabled != e->conf.enabled ||
                            conf->mqtt_version != e->conf.mqtt_version;
     const bool discovery_off = e->conf.ha_discovery && !conf->ha_discovery;
-    woke(e);
+    bl_session_woke(&e->session);
     if (reconnect || discovery_off) {
         // Clear the old discovery while still connected under the old identity.
-        if (e->mqtt.connected && e->conf.ha_discovery && (discovery_off || !conf->enabled ||
+        if (bl_session_online(&e->session) && e->conf.ha_discovery && (discovery_off || !conf->enabled ||
                                                           strcmp(conf->console_id, e->conf.console_id) ||
                                                           conf->emummc != e->conf.emummc ||
                                                           strcmp(conf->discovery_prefix, e->conf.discovery_prefix))) {
             char topic[160];
-            if (sync_discovery_topic(&e->conf, topic, sizeof(topic))) mqtt_client_publish(&e->mqtt, topic, "", 0, true);
+            if (sync_discovery_topic(&e->conf, topic, sizeof(topic)))
+                bl_session_publish_topic(&e->session, topic, "", 0, true);
             e->discovery_published = false;
         }
     }
-    if (reconnect) {
-        sync_engine_stop(e);
-        e->proto_ok = 0;   // another broker, or another version asked: "auto" tries 5.0 again
-    }
+    if (reconnect) sync_engine_stop(e);
     e->conf = *conf;
     identity(e);
-    e->backoff_ms = 0;
-    e->status.next_attempt_ms = 0;
-    if (e->status.state != SyncLink_Online) e->status.state = SyncLink_Waiting;
+    const BlSessionConf sc = session_conf(e);
+    bl_session_configure(&e->session, &sc, reconnect);   // another broker, or another version asked: "auto" tries 5.0 again
+    bl_session_retry_now(&e->session);
+    mirror(e);
     sync_engine_sync_now(e);
 }
 
@@ -442,7 +428,8 @@ static void handle_engine_order(SyncEngine *e, SyncQueued *q, const SyncIntent *
         if (e->conf.ha_discovery != in->on) {
             if (!in->on && e->discovery_published) {
                 char topic[160];
-                if (sync_discovery_topic(&e->conf, topic, sizeof(topic))) mqtt_client_publish(&e->mqtt, topic, "", 0, true);
+                if (sync_discovery_topic(&e->conf, topic, sizeof(topic)))
+                    bl_session_publish_topic(&e->session, topic, "", 0, true);
                 e->discovery_published = false;
             }
             e->conf.ha_discovery = in->on;
@@ -483,7 +470,7 @@ static void process_orders(SyncEngine *e)
 
     for (int guard = 0; guard < SYNC_QUEUE_MAX; guard++) {
         SyncQueued *q = next_order(e);
-        if (!q || !e->mqtt.connected) return;
+        if (!q || !bl_session_online(&e->session)) return;
         SyncIntent in;
         const SyncReason parsed = sync_apply_parse(q->entity, q->payload, strlen(q->payload), &in);
         if (parsed != SyncReason_None) {
@@ -576,8 +563,8 @@ static void publish_discovery(SyncEngine *e)
         logf_(e, "remote link: the discovery does not fit%s%s", NULL, NULL);
         return;
     }
-    if (mqtt_client_publish(&e->mqtt, topic, e->scratch, n, true) == 0) {
-        e->status.publishes++;
+    if (bl_session_publish_topic(&e->session, topic, e->scratch, n, true) == 0) {
+        e->session.status.publishes++;
         e->discovery_published = true;
     }
 }
@@ -609,22 +596,18 @@ static void publish_due(SyncEngine *e)
         e->want_discovery = false;
         if (e->conf.ha_discovery) publish_discovery(e);
     }
-    if (!e->mqtt.connected) return;
+    if (!bl_session_online(&e->session)) return;
     if (e->want_clear) {
         e->want_clear = false;
         clear_unpublished(e);
     }
-    if (e->want_online) {
-        char topic[160];
-        snprintf(topic, sizeof(topic), "%s/availability", e->base);
-        if (mqtt_client_publish(&e->mqtt, topic, "online", 6, true) >= 0) e->want_online = false;
-    }
+    if (e->want_online && bl_session_announce(&e->session) >= 0) e->want_online = false;
     if (e->want_state || now >= e->next_state_ms) {
         if (now >= e->next_state_ms || e->want_state) {
             size_t n = e->host.state ? e->host.state(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "state", e->scratch, n, true);
             publish_notices(e);   // what building the state found (the host's sync_watch)
-            n = e->host.system && e->mqtt.connected ? e->host.system(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
+            n = e->host.system && bl_session_online(&e->session) ? e->host.system(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "system", e->scratch, n, true);
             if (n && e->host.device && e->conf.ha_discovery) {
                 SyncDevice dev;
@@ -637,7 +620,7 @@ static void publish_due(SyncEngine *e)
             e->next_state_ms = now + (uint64_t)e->conf.poll_s * 1000ULL;
         }
     }
-    if (!e->mqtt.connected) return;
+    if (!bl_session_online(&e->session)) return;
     if (e->conf.publish_activity && e->host.activity && (e->want_activity || now >= e->next_activity_ms)) {
         const size_t n = e->host.activity(e->host.ctx, e->scratch, sizeof(e->scratch));
         if (n) sync_engine_publish(e, "activity", e->scratch, n, true);
@@ -655,7 +638,7 @@ static int subscribe(SyncEngine *e)
     const uint8_t qos[3] = { 1, 0, 1 };
     // The integration's version is optional: a broker's access list that
     // leaves it out does not keep the link down.
-    const int refused = mqtt_client_subscribe(&e->mqtt, topics, qos, 3, 2, CONNECT_TIMEOUT_MS);
+    const int refused = bl_session_subscribe(&e->session, topics, qos, 3, 2);
     if (refused > 0)
         logf_(e, "remote link: the broker refused %s%s, the integration's version stays unknown", integration, NULL);
     return refused < 0 ? -1 : 0;
@@ -663,94 +646,40 @@ static int subscribe(SyncEngine *e)
 
 void sync_engine_replay_orders(SyncEngine *e)
 {
-    woke(e);
-    if (!e->mqtt.connected) return;
-    if (subscribe(e) < 0) lost(e);
-}
-
-static int connect_now(SyncEngine *e)
-{
-    e->status.state = SyncLink_Connecting;
-    char will[160];
-    snprintf(will, sizeof(will), "%s/availability", e->base);
-    MqttConnect c;
-    memset(&c, 0, sizeof(c));
-    c.client_id = e->client_id;
-    c.username = e->conf.username[0] ? e->conf.username : NULL;
-    c.password = e->conf.username[0] && e->conf.password[0] ? e->conf.password : NULL;
-    c.will_topic = will;
-    c.will_payload = "offline";
-    c.will_len = 7;
-    c.will_retain = true;
-    c.keepalive_s = SYNC_KEEPALIVE_S;
-    c.clean_session = true;
-    // "auto": 5.0, else 3.1.1 when the broker refuses 5.0 (or the other way
-    // round once 3.1.1 worked), and the one that worked from then on.
-    uint8_t other = 0;
-    switch (e->conf.mqtt_version) {
-        case SyncMqtt_V5: c.version = MQTT_V5; break;
-        case SyncMqtt_V311: c.version = MQTT_V311; break;
-        default:
-            c.version = e->proto_ok ? e->proto_ok : MQTT_V5;
-            other = c.version == MQTT_V5 ? MQTT_V311 : MQTT_V5;
-            break;
-    }
-    int rc = mqtt_client_connect(&e->mqtt, e->conf.host, e->conf.port, &c, CONNECT_TIMEOUT_MS);
-    if (rc < 0 && other && e->mqtt.version_refused) {
-        logf_(e, "remote link: MQTT %s refused (%s), trying the other version", c.version == MQTT_V5 ? "5.0" : "3.1.1",
-              e->mqtt.error);
-        c.version = other;
-        rc = mqtt_client_connect(&e->mqtt, e->conf.host, e->conf.port, &c, CONNECT_TIMEOUT_MS);
-    }
-    if (rc < 0) return -1;
-    if (other) e->proto_ok = e->mqtt.version;
-    e->status.protocol = e->mqtt.version;
-    if (mqtt_client_publish(&e->mqtt, will, "online", 6, true) < 0) return -1;
-    if (subscribe(e) < 0) return -1;
-    return 0;
+    bl_session_woke(&e->session);
+    if (bl_session_online(&e->session) && subscribe(e) < 0) bl_session_lost(&e->session);
+    mirror(e);
 }
 
 int sync_engine_step(SyncEngine *e, int max_wait_ms)
 {
-    woke(e);
-    const uint64_t now = e->now_ms();
+    bl_session_woke(&e->session);
     if (!e->conf.enabled || sync_conf_problem(&e->conf)) {
-        if (e->mqtt.open) sync_engine_stop(e);
-        e->status.state = SyncLink_Off;
-        snprintf(e->status.error, sizeof(e->status.error), "%s",
+        if (e->session.mqtt.open) sync_engine_stop(e);
+        e->session.status.state = BlLink_Off;
+        snprintf(e->session.status.error, sizeof(e->session.status.error), "%s",
                  e->conf.enabled ? sync_conf_problem(&e->conf) : "");
+        mirror(e);
         return max_wait_ms;
     }
 
-    if (!e->mqtt.connected) {
-        if (now < e->status.next_attempt_ms) {
-            e->status.state = SyncLink_Waiting;
-            const uint64_t left = e->status.next_attempt_ms - now;
-            return (int)(left < (uint64_t)max_wait_ms ? left : (uint64_t)max_wait_ms);
-        }
-        e->status.connects++;
-        if (connect_now(e) < 0) {
-            e->backoff_ms = e->backoff_ms ? e->backoff_ms * 2 : BACKOFF_MIN_MS;
-            if (e->backoff_ms > BACKOFF_MAX_MS) e->backoff_ms = BACKOFF_MAX_MS;
-            lost(e);
-            return 0;
-        }
-        e->backoff_ms = 0;
-        e->status.state = SyncLink_Online;
-        e->status.error[0] = '\0';
-        e->status.online_since_ms = e->now_ms();
+    bool connected = false;
+    const int sleep = bl_session_connect_due(&e->session, max_wait_ms, &connected);
+    mirror(e);
+    if (sleep >= 0) return sleep;
+    if (connected) {
         memset(e->waiting, 0, sizeof(e->waiting));
         sync_engine_sync_now(e);
         e->next_state_ms = 0;
         e->next_activity_ms = 0;
-        logf_(e, "remote link: online (%s, MQTT %s)", e->conf.host, e->mqtt.version == MQTT_V5 ? "5.0" : "3.1.1");
+        logf_(e, "remote link: online (%s, MQTT %s)", e->conf.host,
+              e->session.mqtt.version == MQTT_V5 ? "5.0" : "3.1.1");
     }
 
     process_orders(e);
-    if (e->mqtt.connected) publish_due(e);
-    if (!e->mqtt.connected) {
-        if (!e->backoff_ms) e->backoff_ms = BACKOFF_MIN_MS;
-        lost(e);
+    if (bl_session_online(&e->session)) publish_due(e);
+    if (!bl_session_check(&e->session)) {
+        mirror(e);
         return 0;
     }
 
@@ -761,9 +690,7 @@ int sync_engine_step(SyncEngine *e, int max_wait_ms)
     if (e->want_state || e->want_discovery || e->want_activity) wait = 0;
     for (size_t i = 0; i < SYNC_QUEUE_MAX; i++)
         if (e->queue[i].id && !e->queue[i].in_flight) wait = wait > 100 ? 100 : wait;
-    if (mqtt_client_poll(&e->mqtt, (int)wait) < 0) {
-        e->backoff_ms = BACKOFF_MIN_MS;
-        lost(e);
-    }
+    bl_session_poll(&e->session, (int)wait);
+    mirror(e);
     return 0;
 }

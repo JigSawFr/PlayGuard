@@ -1016,11 +1016,11 @@ static void test_connection_failures(void)
         now += 400000;
         turns(1);
     }
-    CHECK(engine.backoff_ms == 300000);
+    CHECK(engine.session.backoff_ms == 300000);
     broker.up = true;
     now += 400000;
     turns(3);
-    CHECK(sync_engine_online(&engine) && engine.backoff_ms == 0);
+    CHECK(sync_engine_online(&engine) && engine.session.backoff_ms == 0);
 
     // A clean stop: offline, DISCONNECT, no last will.
     const unsigned disconnects = broker.disconnects;
@@ -1112,7 +1112,7 @@ static void test_oversized_and_reconfigure(void)
     big[sizeof(big) - 1] = '\0';
     ha_order("vr_restricted", big);
     turns(3);
-    CHECK(sync_engine_online(&engine) && engine.mqtt.dropped == 1 && host.orders == 0);
+    CHECK(sync_engine_online(&engine) && engine.session.mqtt.dropped == 1 && host.orders == 0);
     ha_order("vr_restricted", "ON");
     turns(2);
     CHECK(host.orders == 1);
@@ -1215,7 +1215,7 @@ static void test_mqtt_versions(void)
     conf.mqtt_version = SyncMqtt_Auto;
     sync_engine_reconfigure(&engine, &conf);
     turns(3);
-    CHECK(sync_engine_online(&engine) && broker.version == MQTT_V5 && engine.proto_ok == MQTT_V5);
+    CHECK(sync_engine_online(&engine) && broker.version == MQTT_V5 && engine.session.proto_ok == MQTT_V5);
 }
 
 // What a 5.0 broker says in its CONNACK and DISCONNECT.
@@ -1225,7 +1225,7 @@ static void test_mqtt5_properties(void)
     setup(false, SyncPolicy_Auto);
     broker.server_keepalive = 10;
     turns(3);
-    CHECK(sync_engine_online(&engine) && engine.mqtt.keepalive_s == 10);
+    CHECK(sync_engine_online(&engine) && engine.session.mqtt.keepalive_s == 10);
     const unsigned pings = broker.pings;
     for (int i = 0; i < 9 && broker.pings == pings; i++) {
         now += 1000;
@@ -1252,7 +1252,7 @@ static void test_mqtt5_properties(void)
     setup(false, SyncPolicy_Auto);
     broker.max_packet = 2048;
     turns(3);
-    CHECK(sync_engine_online(&engine) && engine.mqtt.too_large >= 1);
+    CHECK(sync_engine_online(&engine) && engine.session.mqtt.too_large >= 1);
     CHECK(!find_retained("homeassistant/device/playguard_a1b2c3d4/config") && find_retained("playguard/a1b2c3d4/state"));
 
     // The broker ends the session, saying why.
