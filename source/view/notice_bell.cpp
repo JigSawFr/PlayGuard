@@ -1,9 +1,9 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/notice_bell.hpp"
 
-#include <string>
-
+#include <charconv>
 #include <cmath>
+#include <cstring>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 #include <aurore/cadran/ui/effects.hpp>
@@ -61,6 +61,12 @@ void NoticeBell::update()
     this->actions = to_do;
     this->infos   = said;
     this->counted = true;
+    if (to_do > 9) {
+        std::memcpy(this->label, "9+", 3);
+    } else {
+        const auto end = std::to_chars(this->label, this->label + sizeof(this->label) - 1, to_do < 0 ? 0 : to_do).ptr;
+        *end = '\0';
+    }
 }
 
 void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float height, aurore::Style style,
@@ -116,7 +122,6 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
         }
     }
     if (this->actions > 0) {
-        const std::string n = this->actions > 9 ? "9+" : std::to_string(this->actions);
         const float r = height * 0.24f;
         nvgBeginPath(vg);
         nvgCircle(vg, bx, by, r);
@@ -126,7 +131,7 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
         nvgFontSize(vg, r * 1.45f);
         nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
         nvgFillColor(vg, aurore::Application::getTheme()["aurore/background"]);
-        nvgText(vg, bx, by + r * 0.06f, n.c_str(), nullptr);
+        nvgText(vg, bx, by + r * 0.06f, this->label, nullptr);
     } else if (this->infos > 0) {
         nvgBeginPath(vg);
         nvgCircle(vg, bx, by, height * 0.12f);
