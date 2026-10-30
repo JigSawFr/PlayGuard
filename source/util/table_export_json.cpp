@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "util/table_export_parts.hpp"
 
+#include <charconv>
+
 #include <aurore/extern/nlohmann/json.hpp>
 
 namespace table_export
@@ -19,8 +21,12 @@ std::string render_json(const Table& t)
         for (size_t i = 0; i < t.columns.size(); i++) {
             const std::string v = cell(row, i);
             if (!t.columns[i].numeric) o[t.columns[i].key] = v;
-            else if (is_integer(v)) o[t.columns[i].key] = std::stoll(v);
-            else o[t.columns[i].key] = nullptr;
+            else if (is_integer(v)) {
+                long long n = 0;
+                std::from_chars(v.data(), v.data() + v.size(), n);   // 18 digits at most: no overflow
+                o[t.columns[i].key] = n;
+            } else
+                o[t.columns[i].key] = nullptr;
         }
         rows.push_back(o);
     }

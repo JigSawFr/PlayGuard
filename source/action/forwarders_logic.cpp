@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <charconv>
 #include <cstdio>
 
 #include <aurore/cadran/util/text.hpp>
@@ -315,7 +316,11 @@ bool shot_time(const std::string& path, ShotTime& out)
     if (n.size() < 14) return false;
     for (size_t i = 0; i < 14; i++)
         if (n[i] < '0' || n[i] > '9') return false;
-    auto num = [&n](size_t at, size_t len) { return std::stoi(n.substr(at, len)); };
+    auto num = [&n](size_t at, size_t len) {
+        int v = 0;
+        std::from_chars(n.data() + at, n.data() + at + len, v);   // digits only, checked above
+        return v;
+    };
     ShotTime t;
     t.year = num(0, 4);
     t.month = num(4, 2);

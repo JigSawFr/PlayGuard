@@ -83,6 +83,16 @@ static void test_json()
     CHECK(j["rows"][0].begin().key() == "game");
 }
 
+// A numeric cell of more than 18 digits is null, as a text that is no number.
+static void test_json_overflow()
+{
+    table_export::Table t = sample();
+    t.rows[0][1] = "99999999999999999999";
+    const auto j = nlohmann::json::parse(table_export::render(t, Format::Json));
+    CHECK(j["rows"][0]["today_min"].is_null());
+    CHECK(j["rows"][0]["week_min"] == 310);
+}
+
 // Walks the central directory; returns the stored files by name.
 static std::vector<std::pair<std::string, std::string>> unzip(const std::string& z)
 {
@@ -205,6 +215,7 @@ int main()
 {
     test_csv();
     test_json();
+    test_json_overflow();
     test_xlsx();
     test_pdf();
     test_save();

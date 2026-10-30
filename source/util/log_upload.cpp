@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <charconv>
 #include <dirent.h>
 #include <utility>
 
@@ -150,7 +151,8 @@ std::vector<Part> atmosphere_crashes(std::time_t now, int days, size_t limit)
             if (sep == std::string::npos || sep == 0 || sep > 12 || !name.ends_with(".log") ||
                 !std::all_of(name.begin(), name.begin() + sep, [](char c) { return c >= '0' && c <= '9'; }))
                 continue;
-            const long long t = std::stoll(name.substr(0, sep));
+            long long t = 0;
+            std::from_chars(name.data(), name.data() + sep, t);   // 12 digits at most: no overflow
             if (t <= (long long)now && (long long)now - t <= (long long)days * 86400) found.push_back({ t, name });
         }
         closedir(d);
