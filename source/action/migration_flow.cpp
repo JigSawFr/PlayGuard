@@ -79,7 +79,9 @@ const std::vector<Known>& known()
         // again from the console as they are needed. Goes with the releases
         // that still had cache/icons/ (after April 2027).
         { { SharedIcons, "own icon cache",
-            []() { return data_cleanup::remove_folder(paths::cache_dir() + "/icons").removed; } },
+            []() { return data_cleanup::remove_folder(paths::cache_dir() + "/icons").removed; },
+            // Nothing to put back: 1.3.0 reads the icons again from the console as it needs them.
+            []() -> size_t { return 0; } },
           "playguard/dev/migration_icons", "playguard/dev/migration_icons_detail" },
     };
     return all;
@@ -178,6 +180,34 @@ void going_back(int level, const migrations::Log& log)
         migrations::undo_to(paths::migrations_file(), all, level, log);
     }
     migrations::earlier_build_next(paths::migrations_file(), log);
+}
+
+int release_level(const std::string& label)
+{
+    // The builds that did not write their level in previous_build.json
+    // (1.4.0 does): the steps each knew. Only releases that had migrations.
+    if (label == "1.3.0") return NandDirs;
+    return -1;
+}
+
+bool undoable(int from, int to)
+{
+    for (const Known& k : known())
+        if (k.step.level > to && k.step.level <= from && !k.step.undo) return false;
+    return true;
+}
+
+void verify_all()
+{
+    ui::write_later("migrations", []() {
+        auto moved = std::make_shared<size_t>(0);
+        const size_t ran = migrations::run(paths::migrations_file(), steps({}, moved), app::version(),
+                                           log_to("verify"), true);
+        if (*moved)
+            aurore::Logger::warning("verify: {} entries still to move: the migration of the build that crashed was not complete", *moved);
+        else
+            aurore::Logger::info("verify: {} step(s) checked, nothing left to move: the migration was complete", ran);
+    });
 }
 
 void replay()

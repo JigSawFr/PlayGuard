@@ -31,6 +31,20 @@ std::string check_file() { return paths::data_dir() + "/boot_check.json"; }
 // finish (0: asked for). Read and removed by the build gone back to.
 std::string back_file() { return paths::data_dir() + "/went_back.json"; }
 
+// The start that crashed after a version change: its build's name, kept until
+// another build reaches its first screen and checks the migration (started()).
+std::string recheck_file() { return paths::data_dir() + "/migration_recheck.json"; }
+
+// The level the previous build knows: previous_build.json's, else its
+// release's (builds before 1.4.0 did not write it); -1 when not known.
+int previous_level()
+{
+    int known = -1;
+    if (rollback::read_level(label_file(), &known)) return known;
+    std::string label;
+    return rollback::read_label(label_file(), &label) ? migration_flow::release_level(label) : -1;
+}
+
 // Whether the data is in a newer layout than the previous build knows (its
 // migration level, kept at install: util/rollback.hpp layout_newer()). To be
 // asked before going back: the swap sets the level to 0.
@@ -39,8 +53,9 @@ bool data_layout_newer()
     migrations::State state;
     int known = -1;
     if (!migrations::read(paths::migrations_file(), &state)) return false;
-    if (!rollback::read_level(label_file(), &known)) return false;
-    return rollback::layout_newer(state.level, known);
+    known = previous_level();
+    // A cache that is read again, or steps that undo, are no loss.
+    return rollback::layout_newer(state.level, known) && !migration_flow::undoable(state.level, known);
 }
 
 // util/migrations.hpp's lines, in the log.
@@ -58,9 +73,7 @@ bool swap(const std::string& nro, std::string* error, bool crashed)
 {
     // The previous build may write the data in an earlier layout: the
     // migrations run again when this one is back (util/migrations.hpp).
-    int known = -1;
-    rollback::read_level(label_file(), &known);
-    migration_flow::going_back(known, log_migration);
+    migration_flow::going_back(previous_level(), log_migration);
     platform_romfs_release();
     const bool ok = rollback::swap(nro, error);
     platform_romfs_mount();
@@ -102,6 +115,11 @@ bool at_start()
     if (newer_layout)
         text += "\n  The data is in a newer layout than " + previous +
                 " knows: it may not find its settings and caches (A goes back anyway).\n";
+    // The crash followed a version change: the first other build that starts
+    // well checks the migration from A to Z (started()).
+    rollback::Check crashed;
+    crashed.label = running_label();
+    rollback::write_check(recheck_file(), crashed);
     aurore::Logger::info("rollback: offered (crashed){}", newer_layout ? ", the data is in a newer layout" : "");
     if (!platform_boot_choice(text.c_str())) return false;
 
@@ -141,6 +159,13 @@ void started()
                      aurore::getStr("playguard/notices/installed_detail", previous));
     }
     std::remove(check_file().c_str());
+    rollback::Check crashed;
+    if (rollback::read_check(recheck_file(), &crashed) && rollback::recheck_due(crashed.label, running_label())) {
+        std::remove(recheck_file().c_str());
+        aurore::Logger::info("rollback: {} crashed after a version change, this build started well: migrations checked",
+                           crashed.label);
+        migration_flow::verify_all();
+    }
 }
 
 void note_went_back()

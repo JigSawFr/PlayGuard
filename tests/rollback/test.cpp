@@ -68,6 +68,8 @@ static void test_files()
     CHECK(!rollback::read_level(label, &level));
 
     // Data in a newer layout than the previous build knows (unknown: no claim).
+    CHECK(rollback::recheck_due("1.4.0", "1.3.0") && rollback::recheck_due("1.4.0 (abc)", "1.4.0"));
+    CHECK(!rollback::recheck_due("1.4.0", "1.4.0") && !rollback::recheck_due("", "1.4.0"));
     CHECK(rollback::layout_newer(4, 3));
     CHECK(!rollback::layout_newer(4, 4));
     CHECK(!rollback::layout_newer(3, 4));

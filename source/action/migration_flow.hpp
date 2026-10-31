@@ -29,6 +29,21 @@ void for_system();
 // that moves something brings its own.
 void going_back(int level, const migrations::Log& log);
 
+// The level (the highest step) a release knew, for those that did not write
+// it in previous_build.json: `label` is its name ("1.3.0"); -1 when not known.
+int release_level(const std::string& label);
+
+// Whether every step above `to` and up to `from` can be undone: going back to
+// a build that knows up to `to`, on data at level `from`, leaves nothing in a
+// layout it cannot read.
+bool undoable(int from, int to);
+
+// Every step again, whatever migrations.json records, to check that the
+// migration was complete (what is left to move is logged as a warning). Run
+// by the first build that starts well after a crash that followed a version
+// change (rollback_flow::started).
+void verify_all();
+
 // Developer tools › Run the migrations again: a line per step to check or
 // uncheck (all checked at first), then one that runs those checked,
 // whatever migrations.json records (it is never lowered); a dialog then says

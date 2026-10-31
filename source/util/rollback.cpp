@@ -65,6 +65,11 @@ bool layout_newer(int data_level, int previous_level)
     return previous_level >= 0 && data_level > previous_level;
 }
 
+bool recheck_due(const std::string& crashed, const std::string& running)
+{
+    return !crashed.empty() && crashed != running;
+}
+
 bool read_check(const std::string& json_file, Check* out)
 {
     json j;

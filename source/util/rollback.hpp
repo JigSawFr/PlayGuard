@@ -40,6 +40,13 @@ bool read_level(const std::string& json_file, int* level);
 // known. Its settings and caches may then not be found where it looks.
 bool layout_newer(int data_level, int previous_level);
 
+// After a crash that followed a version change (`crashed`: the build that
+// crashed, "" when none is noted), whether the migrations are to be checked
+// from A to Z: this start is another build's (`running`) and it reached its
+// first screen. The same build starting again is not enough: it may be what
+// crashes.
+bool recheck_due(const std::string& crashed, const std::string& running);
+
 // The start of a build just installed, under way (boot_check.json):
 // `starts` is how many starts began without reaching the first screen.
 struct Check
