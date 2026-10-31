@@ -716,8 +716,11 @@ jobs:
     needs: [ meta, changes ]
     if: needs.changes.outputs.switch == 'true'
     runs-on: ubuntu-26.04
-    # A release builds twice from scratch (no ccache, below): longer.
-    timeout-minutes: ${{ inputs.tag && 45 || 20 }}
+    # A release builds twice from scratch (no ccache, below): longer. On main
+    # the build also runs twice (the reproducibility check), and its ccache is
+    # saved only once it ends: a build cut short leaves the next one cold, so
+    # the limit leaves a cold build room to finish and warm the cache.
+    timeout-minutes: ${{ inputs.tag && 45 || 35 }}
     container:
       image: devkitpro/devkita64@sha256:1fc388c3a0d34bd2045a6dadcb1020e069d5f876a187fd705de14b4440c00282
       credentials: ${{ (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKERHUB_USERNAME), toJSON(secrets.DOCKERHUB_TOKEN))) || fromJSON('{}') }}
