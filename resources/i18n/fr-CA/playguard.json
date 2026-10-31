@@ -1541,6 +1541,7 @@
         "back": "Revenir au build précédent : {}",
         "back_body": "Remplacer PlayGuard {} par le build installé avant lui, {} ? PlayGuard redémarre dessus.\n\nSi un build plante avant son premier écran, PlayGuard le propose au lancement suivant.",
         "back_confirm": "Revenir",
+        "back_newer": "Les données sont dans une disposition plus récente que celle que connaît {} : cette version risque de ne pas retrouver ses réglages et ses caches. Revenir en arrière garde les données telles quelles.",
         "back_failed": "Impossible de revenir au build précédent : {}\n\nLe PlayGuard installé n'a pas changé.",
         "kind_release": "Version",
         "kind_prerelease": "Préversion",

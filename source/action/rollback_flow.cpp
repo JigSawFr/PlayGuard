@@ -30,6 +30,18 @@ std::string check_file() { return paths::data_dir() + "/boot_check.json"; }
 // finish (0: asked for). Read and removed by the build gone back to.
 std::string back_file() { return paths::data_dir() + "/went_back.json"; }
 
+// Whether the data is in a newer layout than the previous build knows (its
+// migration level, kept at install: util/rollback.hpp layout_newer()). To be
+// asked before going back: the swap sets the level to 0.
+bool data_layout_newer()
+{
+    migrations::State state;
+    int known = -1;
+    if (!migrations::read(paths::migrations_file(), &state)) return false;
+    if (!rollback::read_level(label_file(), &known)) return false;
+    return rollback::layout_newer(state.level, known);
+}
+
 // util/migrations.hpp's lines, in the log.
 void log_migration(bool warning, const std::string& line)
 {
@@ -50,7 +62,7 @@ bool swap(const std::string& nro, std::string* error, bool crashed)
     const bool ok = rollback::swap(nro, error);
     platform_romfs_mount();
     if (!ok) return false;
-    rollback::write_label(label_file(), running_label());
+    rollback::write_label(label_file(), running_label(), migrations::latest());
     std::remove(check_file().c_str());
     rollback::Check back;
     back.label  = running_label();
@@ -79,11 +91,15 @@ bool at_start()
 
     std::string previous;
     if (!rollback::read_label(label_file(), &previous)) previous = "the previous build";
+    const bool newer_layout = data_layout_newer();
     // Plain ASCII, in English: Aurore (and the translations) are not up yet.
-    const std::string text = "\n  PlayGuard " + running_label() +
-                             "\n\n  Its last start did not finish (it may have crashed).\n\n  (A)  Go back to " +
-                             previous + "\n  (B)  Start " + running_label() + "\n";
-    aurore::Logger::info("rollback: offered (crashed)");
+    std::string text = "\n  PlayGuard " + running_label() +
+                       "\n\n  Its last start did not finish (it may have crashed).\n\n  (A)  Go back to " + previous +
+                       "\n  (B)  Start " + running_label() + "\n";
+    if (newer_layout)
+        text += "\n  The data is in a newer layout than " + previous +
+                " knows: it may not find its settings and caches (A goes back anyway).\n";
+    aurore::Logger::info("rollback: offered (crashed){}", newer_layout ? ", the data is in a newer layout" : "");
     if (!platform_boot_choice(text.c_str())) return false;
 
     // Going back replaces PlayGuard, as Install another build does: the
@@ -151,17 +167,18 @@ std::string running_label()
 
 void installed(const std::string& installed_label)
 {
-    rollback::write_label(label_file(), running_label());
+    rollback::write_label(label_file(), running_label(), migrations::latest());
     rollback::Check check;
     check.label = installed_label;
     rollback::write_check(check_file(), check);
 }
 
-bool previous(std::string* label)
+bool previous(std::string* label, bool* newer_layout)
 {
     const std::string nro = dev_build_flow::nro_file();
     if (nro.empty() || !paths::file_exists(rollback::previous_file(nro))) return false;
     if (!rollback::read_label(label_file(), label)) *label = "?";
+    if (newer_layout) *newer_layout = data_layout_newer();
     return true;
 }
 

@@ -34,7 +34,9 @@ std::string running_label();
 void installed(const std::string& installed_label);
 
 // The previous build's name, when there is one to go back to.
-bool previous(std::string* label);
+// `newer_layout`, when given: the data is in a newer layout than that build
+// knows (its settings may not be found): said before going back.
+bool previous(std::string* label, bool* newer_layout = nullptr);
 
 // Goes back to it now: swaps the files, then restarts on it through
 // hbloader (or says to restart by hand). On the UI thread; the caller asked

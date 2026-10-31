@@ -419,9 +419,12 @@ void sign_in()
 void go_back()
 {
     std::string previous;
-    if (s_busy || !rollback_flow::previous(&previous)) return;
+    bool newer_layout = false;
+    if (s_busy || !rollback_flow::previous(&previous, &newer_layout)) return;
     const std::string running = rollback_flow::running_label();
-    ui::confirm(aurore::getStr("playguard/dev_build/back_body", running, previous), "playguard/dev_build/back_confirm"_i18n,
+    std::string body = aurore::getStr("playguard/dev_build/back_body", running, previous);
+    if (newer_layout) body += "\n\n" + aurore::getStr("playguard/dev_build/back_newer", previous);
+    ui::confirm(body, "playguard/dev_build/back_confirm"_i18n,
                 []() {
                     // As for an install: whatever Protect PlayGuard with the PIN says.
                     if (!pin_lock::confirm()) {

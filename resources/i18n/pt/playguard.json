@@ -1541,6 +1541,7 @@
         "back": "Voltar à compilação anterior: {}",
         "back_body": "Substituir o PlayGuard {} pela compilação instalada antes, {}? O PlayGuard reinicia com ela.\n\nSe uma compilação falhar antes do primeiro ecrã, o PlayGuard propõe isto no arranque seguinte.",
         "back_confirm": "Voltar",
+        "back_newer": "Os dados estão numa disposição mais recente do que a que {} conhece: pode não encontrar as suas definições e caches. Voltar atrás deixa os dados como estão.",
         "back_failed": "Não foi possível voltar à compilação anterior: {}\n\nO PlayGuard instalado não foi alterado.",
         "kind_release": "Versão",
         "kind_prerelease": "Pré-lançamento",

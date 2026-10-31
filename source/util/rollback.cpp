@@ -41,10 +41,28 @@ bool read_label(const std::string& json_file, std::string* label)
     return true;
 }
 
-bool write_label(const std::string& json_file, const std::string& label)
+bool write_label(const std::string& json_file, const std::string& label, int level)
 {
     std::string err;
-    return paths::atomic_write(json_file, json{ { "schema", SCHEMA }, { "label", label } }.dump() + "\n", &err);
+    json j{ { "schema", SCHEMA }, { "label", label } };
+    if (level >= 0) j["level"] = level;
+    return paths::atomic_write(json_file, j.dump() + "\n", &err);
+}
+
+bool read_level(const std::string& json_file, int* level)
+{
+    json j;
+    if (!read_json(json_file, &j)) return false;
+    if (!j.contains("level") || !j["level"].is_number_integer()) return false;
+    const int l = j["level"].get<int>();
+    if (l < 0) return false;
+    *level = l;
+    return true;
+}
+
+bool layout_newer(int data_level, int previous_level)
+{
+    return previous_level >= 0 && data_level > previous_level;
 }
 
 bool read_check(const std::string& json_file, Check* out)

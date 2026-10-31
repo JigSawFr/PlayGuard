@@ -1541,6 +1541,7 @@
         "back": "Zurück zum vorherigen Build: {}",
         "back_body": "PlayGuard {} durch den davor installierten Build {} ersetzen? PlayGuard startet damit neu.\n\nStürzt ein Build vor seinem ersten Bildschirm ab, bietet PlayGuard dies beim nächsten Start an.",
         "back_confirm": "Zurück",
+        "back_newer": "Die Daten liegen in einem neueren Aufbau vor, als {} kennt: Der Build findet seine Einstellungen und Caches eventuell nicht. Beim Zurückgehen bleiben die Daten unverändert.",
         "back_failed": "Zurück zum vorherigen Build nicht möglich: {}\n\nDas installierte PlayGuard ist unverändert.",
         "kind_release": "Version",
         "kind_prerelease": "Vorabversion",

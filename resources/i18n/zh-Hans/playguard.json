@@ -1541,6 +1541,7 @@
         "back": "回到上一个构建：{}",
         "back_body": "将 PlayGuard {} 替换为之前安装的构建 {}？PlayGuard 将以它重新启动。\n\n如果某个构建在第一个界面之前崩溃，PlayGuard 会在下次启动时提出此操作。",
         "back_confirm": "回到上一个",
+        "back_newer": "数据采用的结构比 {} 所了解的更新：它可能找不到自己的设置和缓存。返回时数据保持原样。",
         "back_failed": "无法回到上一个构建：{}\n\n已安装的 PlayGuard 未改变。",
         "kind_release": "正式版本",
         "kind_prerelease": "预发布",
