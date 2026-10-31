@@ -1,5 +1,145 @@
 # Changelog
 
+## [1.4.0](https://github.com/JigSawFr/PlayGuard/compare/v1.3.0...v1.4.0) (2026-10-31)
+
+
+### 🚀 Features
+
+* **about:** see the other Boréale homebrews on the console and open them ([#498](https://github.com/JigSawFr/PlayGuard/issues/498)) ([d57d362](https://github.com/JigSawFr/PlayGuard/commit/d57d362e5e43f8b255f430afe307ed3b04bc9965))
+* **about:** the credits say PlayGuard is part of Boréale ([#434](https://github.com/JigSawFr/PlayGuard/issues/434)) ([7732303](https://github.com/JigSawFr/PlayGuard/commit/7732303bd8ef22711bf85c4bcba83beb3793b117))
+* **agent:** each account's play time, from the play log ([#423](https://github.com/JigSawFr/PlayGuard/issues/423)) ([4acaf4e](https://github.com/JigSawFr/PlayGuard/commit/4acaf4e22014d89dbb755a92d2ff3666b7743a4a))
+* **branding:** Aurore's aurora, and a new icon: a shield around its night ([#422](https://github.com/JigSawFr/PlayGuard/issues/422)) ([c4720df](https://github.com/JigSawFr/PlayGuard/commit/c4720dfc216a74ccb4e66e21f8fb9e678184d5db))
+* **forwarders:** PlayGuard's own icons for forwarders, and a badge on the protected ones ([#404](https://github.com/JigSawFr/PlayGuard/issues/404)) ([1c74258](https://github.com/JigSawFr/PlayGuard/commit/1c742580431bebf904043da270a645959ac5ace8))
+* **home-assistant:** Firmware and Atmosphère off by default ([#424](https://github.com/JigSawFr/PlayGuard/issues/424)) ([a7688d3](https://github.com/JigSawFr/PlayGuard/commit/a7688d3c2a83e0b73bbc2beca768787c5fc118f7))
+* **icons:** game icons and names shared with the other Boréale homebrews ([#502](https://github.com/JigSawFr/PlayGuard/issues/502)) ([fb8d88a](https://github.com/JigSawFr/PlayGuard/commit/fb8d88acb24e456f061037b37a98939692a70a5b))
+* **migrations:** going back undoes the migration steps, and a crash after a version change has them checked once another build starts well ([#520](https://github.com/JigSawFr/PlayGuard/issues/520)) ([d32376c](https://github.com/JigSawFr/PlayGuard/commit/d32376cf2c6e5eb1c8e024a3c69c557a5ad5a020))
+* **notices:** PlayGuard's bell shared with the other Boréale homebrews, and --open to a tab ([#491](https://github.com/JigSawFr/PlayGuard/issues/491)) ([84feec3](https://github.com/JigSawFr/PlayGuard/commit/84feec3b60c5cfb18149fefe4bc1b527d11b649d))
+* **notices:** the bell counts what the other Boréale homebrews have to do, with a preference to hide them ([#494](https://github.com/JigSawFr/PlayGuard/issues/494)) ([8a2e31a](https://github.com/JigSawFr/PlayGuard/commit/8a2e31a2e35a8bf6551236d1fe69dd3a0b4a031d))
+* **notices:** the other Boréale homebrews' notices in PlayGuard's bell, each opening its homebrew ([#493](https://github.com/JigSawFr/PlayGuard/issues/493)) ([fe24f4b](https://github.com/JigSawFr/PlayGuard/commit/fe24f4b0f5b513b8c91922447b78a813800c6a71))
+* **prefs:** keep the same look as the other Boréale homebrews ([#505](https://github.com/JigSawFr/PlayGuard/issues/505)) ([4a448ba](https://github.com/JigSawFr/PlayGuard/commit/4a448ba357539cb71945b801e090659a743703fd))
+* **remote:** an optional link to MQTT and Home Assistant ([#54](https://github.com/JigSawFr/PlayGuard/issues/54)) ([481ffe6](https://github.com/JigSawFr/PlayGuard/commit/481ffe67cc61412177ec37f352a866f35bb98fa6))
+* **remote:** events when a game starts or stops, 10 minutes before the end, and when games are blocked ([#420](https://github.com/JigSawFr/PlayGuard/issues/420)) ([2c7d2ef](https://github.com/JigSawFr/PlayGuard/commit/2c7d2efc57c1e80041934fc82f67a28fad963780))
+* **remote:** every game's icon on the broker, and the system titles by their name ([#430](https://github.com/JigSawFr/PlayGuard/issues/430)) ([4043e55](https://github.com/JigSawFr/PlayGuard/commit/4043e55e8e7220e51d753c41311cf0c3091ffe40))
+* **remote:** only games listed on the broker, and what the console is doing ([#431](https://github.com/JigSawFr/PlayGuard/issues/431)) ([96e6850](https://github.com/JigSawFr/PlayGuard/commit/96e68502e858fadca0323a3f3fdac69e6d4c6b80))
+* **remote:** the console's nickname names it in Home Assistant when no name is set ([#421](https://github.com/JigSawFr/PlayGuard/issues/421)) ([00d8421](https://github.com/JigSawFr/PlayGuard/commit/00d842171f95d687d459e48deb9a61f3863e5132))
+* **rollback:** going back says when the data is in a newer layout than the previous build knows ([#519](https://github.com/JigSawFr/PlayGuard/issues/519)) ([9f32538](https://github.com/JigSawFr/PlayGuard/commit/9f3253885c16ee3165d8fad34fcf580ce8f66d3b))
+* **security:** keep the GitHub sign-in sealed for this console ([#503](https://github.com/JigSawFr/PlayGuard/issues/503)) ([c424e26](https://github.com/JigSawFr/PlayGuard/commit/c424e26ab7d808dfafd875a2a6b119c3dc31100e))
+* **sidebar:** the rail folds on its icons, and opens over the tab to choose one ([#410](https://github.com/JigSawFr/PlayGuard/issues/410)) ([60a3a8f](https://github.com/JigSawFr/PlayGuard/commit/60a3a8f5d16e4d755dcf4f9414762313439b8b76))
+* **simulator:** Boréale's night header and menu of sites ([#442](https://github.com/JigSawFr/PlayGuard/issues/442)) ([c13f715](https://github.com/JigSawFr/PlayGuard/commit/c13f7153a723df732b4fc4c28d8b6cb031aec926))
+* **simulator:** count the published simulator's visits with Umami, without cookies ([#472](https://github.com/JigSawFr/PlayGuard/issues/472)) ([92b5d5a](https://github.com/JigSawFr/PlayGuard/commit/92b5d5a208de9d193c4bc59c08c6011e77b30e8f))
+* **simulator:** key art for the made-up games' icons and the album's screenshots ([#453](https://github.com/JigSawFr/PlayGuard/issues/453)) ([c003fbc](https://github.com/JigSawFr/PlayGuard/commit/c003fbcfe46146aab40d502b83976f308170712c))
+* **simulator:** the language menu of the websites, with flags ([#449](https://github.com/JigSawFr/PlayGuard/issues/449)) ([d68d30c](https://github.com/JigSawFr/PlayGuard/commit/d68d30cedb33b522437e0acb82f45c518ce91bfc))
+* **site:** a console around the tour, the night down the page and livelier features ([#443](https://github.com/JigSawFr/PlayGuard/issues/443)) ([b1dc879](https://github.com/JigSawFr/PlayGuard/commit/b1dc879a6543a2e8512dc9f12d9e44ef21939606))
+* **site:** Atlas and Lantern in the menu of Boréale's sites ([#482](https://github.com/JigSawFr/PlayGuard/issues/482)) ([47a95d9](https://github.com/JigSawFr/PlayGuard/commit/47a95d94b6820bb1da2787ff649b629e246622c2))
+* **site:** Boréale's menu, a languages menu and easier reading of the documentation ([#440](https://github.com/JigSawFr/PlayGuard/issues/440)) ([ca05dcd](https://github.com/JigSawFr/PlayGuard/commit/ca05dcd8a12adb1b404b95701defefe6251a033e))
+* **site:** Boréale's other sites open in the page's language ([#446](https://github.com/JigSawFr/PlayGuard/issues/446)) ([de4ff01](https://github.com/JigSawFr/PlayGuard/commit/de4ff0116c3c7ab85b14c97385a0a975fb9f68a2))
+* **site:** count the audience with Umami Cloud ([#435](https://github.com/JigSawFr/PlayGuard/issues/435)) ([68b7e07](https://github.com/JigSawFr/PlayGuard/commit/68b7e07b1b1f309dfc9e94e12d2cdb8de75822f0))
+* **site:** flags in the language menu, and no comparison with Nintendo's app ([#444](https://github.com/JigSawFr/PlayGuard/issues/444)) ([835a460](https://github.com/JigSawFr/PlayGuard/commit/835a460e2099b67ea8ec447ae4b96694ca321b92))
+* **site:** tag links to our sites with UTM parameters for Umami ([#474](https://github.com/JigSawFr/PlayGuard/issues/474)) ([8f1303e](https://github.com/JigSawFr/PlayGuard/commit/8f1303e3460fe9efba476e18785b8a34d6122ff8))
+* **site:** the preview images in Boréale's look ([#441](https://github.com/JigSawFr/PlayGuard/issues/441)) ([e19d815](https://github.com/JigSawFr/PlayGuard/commit/e19d815b236a23af1b811ed62939805e3855f879))
+* **site:** the website moves to guard.boreale.dev ([#433](https://github.com/JigSawFr/PlayGuard/issues/433)) ([56fffa7](https://github.com/JigSawFr/PlayGuard/commit/56fffa70192dac6be6df94806cb83eb23aebe6f3))
+* **site:** the website takes Boréale's look, as Aurore's and boreale.dev ([#438](https://github.com/JigSawFr/PlayGuard/issues/438)) ([9ce86f1](https://github.com/JigSawFr/PlayGuard/commit/9ce86f1d7bca078168caeb12d014e85c16ad3428))
+* **sync:** every Boréale homebrew's shared bell on boreale/{id}/notices ([#495](https://github.com/JigSawFr/PlayGuard/issues/495)) ([4dfdbd4](https://github.com/JigSawFr/PlayGuard/commit/4dfdbd428b3f8ac876ab5a2d87f268f225aca808))
+* **sync:** PlayGuard registers itself in config/boreale/apps/, for the other Boréale homebrews ([#489](https://github.com/JigSawFr/PlayGuard/issues/489)) ([1730b78](https://github.com/JigSawFr/PlayGuard/commit/1730b780f7ff8f91a91531ae9ff67bc252a8463e))
+* **sync:** publish under Boréale's shared topic tree ([#485](https://github.com/JigSawFr/PlayGuard/issues/485)) ([273b2e3](https://github.com/JigSawFr/PlayGuard/commit/273b2e37acbf81af0fc9ef6711dbcb899c2a9484))
+* **sync:** the broker's settings in config/boreale/link.conf, shared with every Boréale homebrew ([#488](https://github.com/JigSawFr/PlayGuard/issues/488)) ([1f7a106](https://github.com/JigSawFr/PlayGuard/commit/1f7a106dff6ebcc71d07facbaec81e4e2060429c))
+* **themes:** a palette for each season and feast, and one that follows the calendar ([#427](https://github.com/JigSawFr/PlayGuard/issues/427)) ([851df4a](https://github.com/JigSawFr/PlayGuard/commit/851df4a8b53c54308bb6920ec7b5348622cb75b2))
+* **themes:** pick a palette or your own theme file in Preferences ([#426](https://github.com/JigSawFr/PlayGuard/issues/426)) ([8cab130](https://github.com/JigSawFr/PlayGuard/commit/8cab1305fe86f50ca8d4ca8222b2cb9bfb546d41))
+* **themes:** theme folders with pictures, a logo and the loading screen's picture ([#428](https://github.com/JigSawFr/PlayGuard/issues/428)) ([5c41008](https://github.com/JigSawFr/PlayGuard/commit/5c410083ed10004e85262f1d2944304422983d14))
+* **updates:** the bell tells when another Boréale homebrew has a newer release ([#511](https://github.com/JigSawFr/PlayGuard/issues/511)) ([187f72b](https://github.com/JigSawFr/PlayGuard/commit/187f72b691ab08bca6728fcfaea8226263875bf9))
+
+
+### 🐞 Bug Fixes
+
+* **changelog:** a bullet with nothing left once cleaned no longer breaks the next line ([#417](https://github.com/JigSawFr/PlayGuard/issues/417)) ([099b369](https://github.com/JigSawFr/PlayGuard/commit/099b3690b01029ce59592f8b5f921d3a20798187))
+* **ci:** clang-tidy checks nothing when a pull request changes no source ([#411](https://github.com/JigSawFr/PlayGuard/issues/411)) ([2681f76](https://github.com/JigSawFr/PlayGuard/commit/2681f76158b8727e62f73d2f69f50355772dddc2))
+* **console:** a check or a warning by the version on the system tiles, not a pill ([#409](https://github.com/JigSawFr/PlayGuard/issues/409)) ([5103c44](https://github.com/JigSawFr/PlayGuard/commit/5103c44ecff1b369684d5ff880a0cf868a217702))
+* **data:** files and messages from another version are read safely and never overwritten ([#473](https://github.com/JigSawFr/PlayGuard/issues/473)) ([d267c47](https://github.com/JigSawFr/PlayGuard/commit/d267c4775f2ae651100e6f84df0a45add91f9a71))
+* **dev-build:** the installed and new marks sit beside a build's title ([#407](https://github.com/JigSawFr/PlayGuard/issues/407)) ([3fe6e2b](https://github.com/JigSawFr/PlayGuard/commit/3fe6e2b46ac848f3e14c392b6debf364a5f75a57))
+* **fonts:** free fonts in place of the console's in the simulators and desktop builds ([#436](https://github.com/JigSawFr/PlayGuard/issues/436)) ([6039000](https://github.com/JigSawFr/PlayGuard/commit/6039000a8f238c21bddd0a3dd8634bfdd2435f94))
+* **forwarders:** a forwarder's new icon shows in the lists at once ([#406](https://github.com/JigSawFr/PlayGuard/issues/406)) ([543f501](https://github.com/JigSawFr/PlayGuard/commit/543f501f791d54e6204b4297d9aa4201918b7ee5))
+* **modules:** say when a remote link file or a module's version could not be written ([#471](https://github.com/JigSawFr/PlayGuard/issues/471)) ([a93135b](https://github.com/JigSawFr/PlayGuard/commit/a93135be3fbc8cdc5da75376602aacb5f3304659))
+* **rollback:** going back to the previous build no longer crashes at start-up ([#517](https://github.com/JigSawFr/PlayGuard/issues/517)) ([dcd9436](https://github.com/JigSawFr/PlayGuard/commit/dcd9436b99392c4aa17e31eebd2ea5417d3f3877))
+* **site:** Japanese, Korean and Chinese lines break where their readers expect ([#445](https://github.com/JigSawFr/PlayGuard/issues/445)) ([59850ca](https://github.com/JigSawFr/PlayGuard/commit/59850ca61c29fbd4095d9d86658931544fa860c8))
+* **site:** links to other sites no longer say where the visit came from ([#470](https://github.com/JigSawFr/PlayGuard/issues/470)) ([da58d37](https://github.com/JigSawFr/PlayGuard/commit/da58d375c2c507739a491b6fdc7203e5e93ffb4d))
+* **site:** no e-mail address in the footer, contact goes through GitHub ([#492](https://github.com/JigSawFr/PlayGuard/issues/492)) ([3390f7d](https://github.com/JigSawFr/PlayGuard/commit/3390f7deb4f4749b772432e05f7e9067bdb3ca88))
+* **site:** read boreale.dev's versions.json in its coming schema too ([#475](https://github.com/JigSawFr/PlayGuard/issues/475)) ([80dc4b3](https://github.com/JigSawFr/PlayGuard/commit/80dc4b3694044ed3cf3444ee9d3647dd9da9eb73))
+* **sys-notes:** the installed and new marks sit beside the version in the release notes ([#408](https://github.com/JigSawFr/PlayGuard/issues/408)) ([b9d444b](https://github.com/JigSawFr/PlayGuard/commit/b9d444bde52be6a08515722265dba560905de784))
+* **test:** the gate's rules compared field by field, not with their padding ([#416](https://github.com/JigSawFr/PlayGuard/issues/416)) ([eea3d23](https://github.com/JigSawFr/PlayGuard/commit/eea3d23e5c441641f53a562d6f1c18ebfeff489d))
+* **themes:** warning cards and status pills let a theme's background picture show through ([#429](https://github.com/JigSawFr/PlayGuard/issues/429)) ([a41e3f0](https://github.com/JigSawFr/PlayGuard/commit/a41e3f02ea4feeef2632757aeeaee9b1c565d8c3))
+* **updates:** the latest firmware is read from switchbrew, not from a firmware mirror ([#437](https://github.com/JigSawFr/PlayGuard/issues/437)) ([a64bac7](https://github.com/JigSawFr/PlayGuard/commit/a64bac77166c692da2e9fdefc5fb81f4228ac476))
+* **web:** the console's Restart in the web smoke test ([#425](https://github.com/JigSawFr/PlayGuard/issues/425)) ([9ceab9d](https://github.com/JigSawFr/PlayGuard/commit/9ceab9dded7b30fda4a57e3ea65c4652bb03bc48))
+
+
+### ✨ Polish
+
+* **backup:** std::optional in place of the snapshot's *_ok flags ([#490](https://github.com/JigSawFr/PlayGuard/issues/490)) ([a5742a3](https://github.com/JigSawFr/PlayGuard/commit/a5742a3fb4ea512b702849b2efbec663bdac4f99))
+* **dev-builds:** return std::expected from the build fetch and install steps ([#486](https://github.com/JigSawFr/PlayGuard/issues/486)) ([5da7e25](https://github.com/JigSawFr/PlayGuard/commit/5da7e2575f68e26849163b745a68934de0113698))
+* **header:** the bell writes its number when it changes, not at each frame ([#479](https://github.com/JigSawFr/PlayGuard/issues/479)) ([3536233](https://github.com/JigSawFr/PlayGuard/commit/3536233474ea87e4e2e9568a9c0eb928b7503f96))
+* **modules:** return std::expected from install, rollback and removal ([#487](https://github.com/JigSawFr/PlayGuard/issues/487)) ([7893e87](https://github.com/JigSawFr/PlayGuard/commit/7893e87e12d06a546d3c52fa9e0752168cc14595))
+* **site:** build on boreale-site, the sites' shared base ([#508](https://github.com/JigSawFr/PlayGuard/issues/508)) ([f1c3727](https://github.com/JigSawFr/PlayGuard/commit/f1c37277ecafef734b3c0cad196abb22f9ec423d))
+* **site:** language memory, checks and layout from boreale-site v3 ([#512](https://github.com/JigSawFr/PlayGuard/issues/512)) ([7d1d256](https://github.com/JigSawFr/PlayGuard/commit/7d1d256c1086e47cd8c5776f0a182346cf4b6c28))
+* **site:** the header and page chrome come from boreale-site ([#516](https://github.com/JigSawFr/PlayGuard/issues/516)) ([5d6bd7b](https://github.com/JigSawFr/PlayGuard/commit/5d6bd7be8adbedc4fe9027533ded6b849c4fbe5c))
+* **source:** [[nodiscard]] on the functions that return an error, and the ignored results said so ([#459](https://github.com/JigSawFr/PlayGuard/issues/459)) ([9c129bb](https://github.com/JigSawFr/PlayGuard/commit/9c129bb5b4f9f1bb86660603c5f1134fd09dcc11))
+* **source:** C++23 string and container idioms instead of find, compare and sizeof ([#456](https://github.com/JigSawFr/PlayGuard/issues/456)) ([a40a394](https://github.com/JigSawFr/PlayGuard/commit/a40a394a5e20cdc0373429ea07b3976c1aa0c195))
+* **source:** constant string tables as constexpr string_view, not vectors built at start-up ([#462](https://github.com/JigSawFr/PlayGuard/issues/462)) ([d8cdf17](https://github.com/JigSawFr/PlayGuard/commit/d8cdf179550f340c4a06480a128bd117b97f41b1))
+* **source:** number::parse with std::from_chars in place of the C parsers ([#466](https://github.com/JigSawFr/PlayGuard/issues/466)) ([8937445](https://github.com/JigSawFr/PlayGuard/commit/89374451fed4ff71fc49b66babb7343120276aa3))
+* **source:** one title_id::text instead of nine copies of the 16-digit id ([#457](https://github.com/JigSawFr/PlayGuard/issues/457)) ([1918f68](https://github.com/JigSawFr/PlayGuard/commit/1918f684249d30d0f01c4871147b5419e6c2e729))
+* **source:** std::format in place of fmt::format ([#476](https://github.com/JigSawFr/PlayGuard/issues/476)) ([552deae](https://github.com/JigSawFr/PlayGuard/commit/552deae60f80724b4bd566c06bb9b6b3b0cf3a17))
+* **source:** std::from_chars instead of std::sto*, no exception to catch ([#460](https://github.com/JigSawFr/PlayGuard/issues/460)) ([25645a7](https://github.com/JigSawFr/PlayGuard/commit/25645a7046d9c691243954c3ec5e65ff3b159767))
+* **source:** std::to_underlying for scoped enums used as numbers ([#464](https://github.com/JigSawFr/PlayGuard/issues/464)) ([076e210](https://github.com/JigSawFr/PlayGuard/commit/076e2100011373bbfb494b60c65f4499e182a01d))
+* **sync:** the broker session in source/link/bl_session, apart from PlayGuard's orders ([#465](https://github.com/JigSawFr/PlayGuard/issues/465)) ([3e777dc](https://github.com/JigSawFr/PlayGuard/commit/3e777dc59b5a429dcb96f964cbf0b675b7f7d5aa))
+* **sync:** the flat files' key=value reader in source/link/bl_kv ([#467](https://github.com/JigSawFr/PlayGuard/issues/467)) ([d716803](https://github.com/JigSawFr/PlayGuard/commit/d7168032117d3181d14230c43640dd225a4e15de))
+* **sync:** the remote link's transport in source/link/, named for boreale-link ([#463](https://github.com/JigSawFr/PlayGuard/issues/463)) ([ecc32c2](https://github.com/JigSawFr/PlayGuard/commit/ecc32c2241e860b0d792ba2a0b21e5f1acadbdd1))
+* **ui:** one date::hh_mm for the "HH:MM" clocks ([#483](https://github.com/JigSawFr/PlayGuard/issues/483)) ([429c9c9](https://github.com/JigSawFr/PlayGuard/commit/429c9c9ec0e19e4078fc9031818cc899d160cd31))
+* **ui:** the Cadran look comes from Aurore ([#415](https://github.com/JigSawFr/PlayGuard/issues/415)) ([dada533](https://github.com/JigSawFr/PlayGuard/commit/dada5339836cf100a0d813d6ecd76862d8400ac3))
+* **util:** data_cleanup and startup, the same as PlayShelf's ([#501](https://github.com/JigSawFr/PlayGuard/issues/501)) ([a86f97d](https://github.com/JigSawFr/PlayGuard/commit/a86f97d9e1cca0abea0734dee2953919f22cb74d))
+* **util:** dev_builds, the same as PlayShelf's ([#510](https://github.com/JigSawFr/PlayGuard/issues/510)) ([0ea1617](https://github.com/JigSawFr/PlayGuard/commit/0ea16179be0dd074322b8cb38eef4822e63bea6c))
+* **util:** diagnostics, the same as PlayShelf's ([#507](https://github.com/JigSawFr/PlayGuard/issues/507)) ([a8f6294](https://github.com/JigSawFr/PlayGuard/commit/a8f6294c5a3b33fc036d88a1109fbec132875ac7))
+* **util:** http answers with std::expected ([#484](https://github.com/JigSawFr/PlayGuard/issues/484)) ([6fa53da](https://github.com/JigSawFr/PlayGuard/commit/6fa53dab08a7380a950697bf55f77becd96c7786))
+* **util:** http, the same as PlayShelf's ([#509](https://github.com/JigSawFr/PlayGuard/issues/509)) ([7d148f7](https://github.com/JigSawFr/PlayGuard/commit/7d148f7261dc7e7f72f3a56a0333e0c1ea736a03))
+* **util:** launcher, the same as PlayShelf's ([#500](https://github.com/JigSawFr/PlayGuard/issues/500)) ([b568536](https://github.com/JigSawFr/PlayGuard/commit/b568536769df32061ea497a4f021f4a17d33e60f))
+* **util:** log_files and log_upload, the same as PlayShelf's ([#506](https://github.com/JigSawFr/PlayGuard/issues/506)) ([79da3fe](https://github.com/JigSawFr/PlayGuard/commit/79da3fe8b7368f0a3cd6218febe7ddc6b9ccfc03))
+* **util:** paths and migrations, the same as PlayShelf's ([#504](https://github.com/JigSawFr/PlayGuard/issues/504)) ([0e9e11d](https://github.com/JigSawFr/PlayGuard/commit/0e9e11dcb819bd014f724264c001f5044fd0acf5))
+* **util:** std::format in place of snprintf into a buffer ([#481](https://github.com/JigSawFr/PlayGuard/issues/481)) ([a0edb18](https://github.com/JigSawFr/PlayGuard/commit/a0edb1864f5d6d180dc85dbf03ff79755eb821c7))
+* **util:** std::span for SHA-256 and HMAC ([#478](https://github.com/JigSawFr/PlayGuard/issues/478)) ([231dbbe](https://github.com/JigSawFr/PlayGuard/commit/231dbbe99f929e81201233268878d63f098d03b5))
+* **util:** the files shared with PlayShelf, made the same ([#496](https://github.com/JigSawFr/PlayGuard/issues/496)) ([1c4645e](https://github.com/JigSawFr/PlayGuard/commit/1c4645e31a6650011859e49f1aac66ca58169633))
+* **util:** update and changelog, the same as PlayShelf's ([#497](https://github.com/JigSawFr/PlayGuard/issues/497)) ([e675cc7](https://github.com/JigSawFr/PlayGuard/commit/e675cc76a04e172db7fdabaed1c3dc2bc4493cb9))
+* **view:** the play timer's timeline writes its times on the stack, not through a format at every frame ([#461](https://github.com/JigSawFr/PlayGuard/issues/461)) ([5c581bb](https://github.com/JigSawFr/PlayGuard/commit/5c581bb360e232860c383e06d2d067f687de174b))
+* **view:** weekday names and hour labels drawn without a format at every frame ([#458](https://github.com/JigSawFr/PlayGuard/issues/458)) ([13f06a1](https://github.com/JigSawFr/PlayGuard/commit/13f06a1a34d8732a509e28d98975287d95647b12))
+
+
+### 🧰 Other
+
+* **aurore:** Aurore without fmt ([#477](https://github.com/JigSawFr/PlayGuard/issues/477)) ([f70d3d0](https://github.com/JigSawFr/PlayGuard/commit/f70d3d0765b321ef6d8bd3ed522e6d6beddf56de))
+* **aurore:** Aurore's compiled shaders kept, for the same Switch build twice ([#515](https://github.com/JigSawFr/PlayGuard/issues/515)) ([110772d](https://github.com/JigSawFr/PlayGuard/commit/110772dc92bd8efa04b9b4b4b7263835e3c16325))
+* **aurore:** Aurore's own names, its density setting and compact screens ([#450](https://github.com/JigSawFr/PlayGuard/issues/450)) ([e5a9e55](https://github.com/JigSawFr/PlayGuard/commit/e5a9e55fc7318c2a8926d274171a72b762a1631a))
+* **aurore:** Aurore's video context null until it is built, for the start-up crash of 1.4.0 ([#518](https://github.com/JigSawFr/PlayGuard/issues/518)) ([af77bc8](https://github.com/JigSawFr/PlayGuard/commit/af77bc86767aba14588504b5d8ac5b67c52ac7b1))
+* **aurore:** steadier reference screens, without the scroll indicator caught mid-fade ([#499](https://github.com/JigSawFr/PlayGuard/issues/499)) ([4ba53cf](https://github.com/JigSawFr/PlayGuard/commit/4ba53cf61236697bc52d107cc8424ba52daa0e45))
+* **aurore:** the library lives in library/aurore, no longer extern/borealis ([#418](https://github.com/JigSawFr/PlayGuard/issues/418)) ([5c9cb77](https://github.com/JigSawFr/PlayGuard/commit/5c9cb775d598db0ea39c4948e86e6ae59a960123))
+* **borealis:** built from our fork, which carries PlayGuard's fixes ([#412](https://github.com/JigSawFr/PlayGuard/issues/412)) ([476f5b9](https://github.com/JigSawFr/PlayGuard/commit/476f5b9c824328193df59dd0aebe41bbbdde46bc))
+* **borealis:** follow Aurore, the fork's new name, on main ([#413](https://github.com/JigSawFr/PlayGuard/issues/413)) ([0d579a1](https://github.com/JigSawFr/PlayGuard/commit/0d579a11731d751eb61a387efdadb1520d220d39))
+* **cmake:** C++23 for the app, its tests and its fuzzers ([#454](https://github.com/JigSawFr/PlayGuard/issues/454)) ([1497109](https://github.com/JigSawFr/PlayGuard/commit/14971091df281869ff4a2789066dae0b3665d8cb))
+* **desktop:** SDL3 for the desktop and web simulators, Aurore's default ([#468](https://github.com/JigSawFr/PlayGuard/issues/468)) ([ce97042](https://github.com/JigSawFr/PlayGuard/commit/ce97042d61c95bc56ac0636c7ddf6204aceadd77))
+* **link:** the remote link's transport from the boreale-link submodule ([#469](https://github.com/JigSawFr/PlayGuard/issues/469)) ([847de19](https://github.com/JigSawFr/PlayGuard/commit/847de198361e7292af45328e988a43594205d2ac))
+
+
+### 🧪 Tests
+
+* **smoke:** each pause ends as soon as the screen has settled ([#455](https://github.com/JigSawFr/PlayGuard/issues/455)) ([919b0bb](https://github.com/JigSawFr/PlayGuard/commit/919b0bb32e9b593a725e1bca659c0a85ee094533))
+* **smoke:** presses released by the X server, the simulator's debugging aids, and Aurore's code left to Aurore's tests ([#451](https://github.com/JigSawFr/PlayGuard/issues/451)) ([27b3af7](https://github.com/JigSawFr/PlayGuard/commit/27b3af75587afc7da7b7f0c6b8bca9801111de40))
+* **visual:** the larger text's footer clock told apart again with Inter ([#439](https://github.com/JigSawFr/PlayGuard/issues/439)) ([4f1dbef](https://github.com/JigSawFr/PlayGuard/commit/4f1dbef163b6bd2faa177d949e048e1613485b4e))
+
+
+### 📚 Documentation
+
+* **features:** the features page caught up in every language ([#448](https://github.com/JigSawFr/PlayGuard/issues/448)) ([c793750](https://github.com/JigSawFr/PlayGuard/commit/c79375068bd42fcad548d1c686ed1c94d4f1ef7c))
+* **guide:** the documentation caught up with the last two weeks ([#452](https://github.com/JigSawFr/PlayGuard/issues/452)) ([e82ec73](https://github.com/JigSawFr/PlayGuard/commit/e82ec738a505e55aaf3505100394dcce6f848411))
+* **release:** the summary of 1.4.0 ([#521](https://github.com/JigSawFr/PlayGuard/issues/521)) ([4259ce6](https://github.com/JigSawFr/PlayGuard/commit/4259ce6b33c378cd011e726659314c829f87dc89))
+* **site:** say PlayGuard is part of Boréale, with PlayShelf and Aurore ([#432](https://github.com/JigSawFr/PlayGuard/issues/432)) ([aeddce8](https://github.com/JigSawFr/PlayGuard/commit/aeddce875c83f9953ab7628914536df7842218ac))
+* **site:** the website's README after the comparison's removal, and the compatibility page caught up in every language ([#447](https://github.com/JigSawFr/PlayGuard/issues/447)) ([53fdcc4](https://github.com/JigSawFr/PlayGuard/commit/53fdcc481a55a15ea039b61ecd0cd483d2bd32fd))
+* **sync:** the Home Assistant integration is done, in its own repository ([#419](https://github.com/JigSawFr/PlayGuard/issues/419)) ([826dc2c](https://github.com/JigSawFr/PlayGuard/commit/826dc2cae8d4d5307b077a969249566e51e9bf68))
+
 ## [1.3.0](https://github.com/JigSawFr/PlayGuard/compare/v1.2.0...v1.3.0) (2026-10-24)
 
 

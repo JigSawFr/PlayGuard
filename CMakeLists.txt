@@ -64,7 +64,7 @@ message(STATUS "PlayGuard build type: ${CMAKE_BUILD_TYPE}; C++ flags: ${CMAKE_CX
 # App metadata. The NACP version must match the release tag (CI checks it).
 # release-please bumps these three lines (see release-please-config.json).
 set(VERSION_MAJOR "1") # x-release-please-major
-set(VERSION_MINOR "3") # x-release-please-minor
+set(VERSION_MINOR "4") # x-release-please-minor
 set(VERSION_ALTER "0") # x-release-please-patch
 set(APP_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_ALTER}")
 set(PROJECT_TITLEID "")
