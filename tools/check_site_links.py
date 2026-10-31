@@ -17,6 +17,10 @@ library/boreale-site/README.md):
   page (not a preview's, SITE_NOINDEX=1, counted by no one); a page that
   sends its visitor on at once (docs/'s, build_site.py's redirect_page())
   needs neither;
+- the page chrome (library/boreale-site, "The page chrome (v4)"): one header
+  with the name's menu and the nav, the call to action (the simulator) before
+  GitHub, the footer linking to every other of Boréale's sites, chrome.css and
+  chrome.js loaded;
 - no {{key}} left, no e-mail address, the pages' data;
 
 then the catalogs (check_catalogs(): site/i18n/ and boreale-site's i18n/).
@@ -44,7 +48,7 @@ def main():
     out = Path(sys.argv[1])
     site = boreale.Site("playguard", sys.argv[2] if len(sys.argv) > 2 else os.environ.get("SITE_URL"))
     errors, count = check.pages(out, site, apart=("simulator",), tracker=os.environ.get("SITE_NOINDEX") != "1",
-                                base=os.environ.get("SITE_BASE"))
+                                base=os.environ.get("SITE_BASE"), chrome=True)
     errors += boreale.check_catalogs(ROOT / "site" / "i18n")
     for error in errors:
         print(error)

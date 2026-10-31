@@ -13,6 +13,14 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   [boreale/branding](https://github.com/JigSawFr/boreale/tree/main/branding)),
   as [Aurore's site](https://aurore.boreale.dev/) and
   [boreale.dev](https://boreale.dev/); the web simulator keeps its own theme.
+- **The page chrome** (the skip link, the sky, the header and the footer,
+  with the buttons, sections and cards of the home page) is boreale-site's
+  v4: `Site.skip()`, `Site.sky()`, `Site.header()` and `Site.footer()`
+  write it, `chrome.css` and `chrome.js` style and move it (the aurora, the
+  header's row of links on a phone, the cards' glow, the reveal), and
+  `check.pages(..., chrome=True)` keeps it. `site.css` and `site.js` keep
+  what is PlayGuard's own: the hero and its console, the documentation, the
+  gallery, the FAQ, the featured and small cards.
 - **The header**: the mark and name open the menu of Boréale's sites
   (boreale-site's `Site.switcher()` and `sites.json`, a popover placed by its
   `boreale.js`, styled by its `boreale.css`; the marks boreale-site's, the
@@ -29,8 +37,9 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   `404.html` holding every language (`.not-found[data-lang]`), shown in the
   address' language, else the one chosen, else the browser's. A choice
   kept before as `pg-site-lang` moves to `boreale-lang` once (`reading.js`,
-  until 2027-01-31). The footer has a Boréale column: the
-  other sites and the privacy and legal notice in the page's language.
+  until 2027-01-31). The footer's Boréale column
+  (`Site.footer()`, read from `sites.json`): the other sites and the privacy
+  and legal notice in the page's language.
   The page not found
   stands under the aurora, as the home page's hero.
 - **Reading the documentation**: once the header is scrolled away, a slim
@@ -163,9 +172,10 @@ pages; no framework, nothing to install but that.
   site's pages, and any other file of the repository links to GitHub. A
   change to `docs/` is a change to the site.
 - `site/assets/` — `site.css` (the site's look, over boreale-site's
-  `boreale.css`), `site.js` (the home page's aurora, boreale.dev's own,
-  still when less motion is asked; on a phone, the gallery's dots, the way
-  back to the top) and `reading.js` (the light reading before the first
+  `boreale.css`), `site.js` (the tour, the gallery, the
+  documentation's search; on a phone, the gallery's dots, the way back to
+  the top; the home page's aurora is boreale-site's `chrome.js`, still when
+  less motion is asked) and `reading.js` (the light reading before the first
   paint; the old language key's move).
 - **What Boréale's sites share** is
   [boreale-site](https://github.com/JigSawFr/boreale-site), the submodule
@@ -174,8 +184,8 @@ pages; no framework, nothing to install but that.
   not repeat: the build stops if it does), the links out and their UTM
   tags, the audience, the checks every site passes, and the assets copied
   into `assets/` at the build (`boreale.copy_assets()`): `boreale.css`
-  (Boréale's colours and fonts, the two menus), `boreale.js` (where the
-  menus open), `lang.js` (the language chosen, the header, above), the
+  (Boréale's colours and fonts, the two menus), `chrome.css` and `chrome.js`
+  (the page chrome, above), `boreale.js` (where the menus open), `lang.js` (the language chosen, the header, above), the
   sites' marks, Umami's tracker and the fonts (Sora for the
   headings, Figtree for the text, JetBrains Mono for code and labels, their
   Latin letters; SIL Open Font License, `fonts/OFL-*.txt`; the language
