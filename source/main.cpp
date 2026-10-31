@@ -467,6 +467,15 @@ int main(int argc, char* argv[])
     });
     config::set_saved_hook(sync_files::export_nro_state);
 
+#ifdef PLAYGUARD_DEKO3D_DEBUG
+    // Diagnostic build: deko3d's debug library writes why it aborts (a GPU
+    // page fault and its address, a bad call) to stderr, unbuffered so the
+    // lines are there even when the app stops on the next one.
+    if (std::FILE* f = std::freopen("sdmc:/config/playguard/logs/deko3d.txt", "w", stderr)) {
+        std::setvbuf(f, nullptr, _IONBF, 0);
+        std::fprintf(f, "deko3d debug library: PlayGuard %s\n", APP_VERSION);
+    }
+#endif
     if (!aurore::Application::init()) {
         aurore::Logger::error("Unable to init Aurore Application");
         session_log::end("exit: Aurore could not start");

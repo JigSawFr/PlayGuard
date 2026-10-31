@@ -11,6 +11,11 @@ set(AURORE_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/library/aurore/library)
 if (AURORE_PLATFORM STREQUAL "SWITCH" AND NOT AURORE_GRAPHICS)
     set(AURORE_GRAPHICS DEKO3D CACHE STRING "" FORCE)
 endif ()
+# Diagnostic build: deko3d's debug library, its messages in
+# logs/deko3d.txt (main.cpp).
+if (AURORE_PLATFORM STREQUAL "SWITCH")
+    set(AURORE_DEKO3D_DEBUG ON CACHE BOOL "" FORCE)
+endif ()
 
 # The web simulator (web/README.md): the desktop build, compiled by
 # Emscripten for a browser, with SDL3 and OpenGL ES 3 (WebGL 2) from
@@ -215,6 +220,9 @@ set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/app.cpp APPEND PROPERTY C
 set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source/action/rescue.cpp APPEND PROPERTY COMPILE_DEFINITIONS
              APP_RESCUE_REV="${RESCUE_REV}")
 target_link_libraries(${PROJECT_NAME} PRIVATE Aurore::aurore ${APP_PLATFORM_LIB})
+if (AURORE_DEKO3D_DEBUG)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PLAYGUARD_DEKO3D_DEBUG)
+endif ()
 # On the desktop: Aurore and the standard headers most files include,
 # parsed once (a precompiled header) instead of in each of the 200-odd C++
 # files: a change to a header many include (ui/ui.hpp, app.hpp) rebuilds in
