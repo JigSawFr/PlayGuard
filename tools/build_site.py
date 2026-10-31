@@ -519,6 +519,17 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
                    f'{reading_toggle(t)}</div></div>\n')
     full_title = full_title or ("PlayGuard" if not title else f"{title} · PlayGuard")
     head_extra = "\n".join(head)
+    nav_links = [("nav_features", f"{home}#features"), ("nav_install", f"{home}#install"),
+                 ("nav_docs", f"{home}docs/getting-started/")]
+    brand = f'<img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span>'
+    footer = PLAYGUARD.footer(
+        lang, t, to_root,
+        columns=[(t("docs_title"), [(t(f"doc_{p}"), f"{home}docs/{p}/") for p, s in DOCS if s == "guide"]),
+                 ("PlayGuard", [("GitHub", REPO_URL), (t("footer_changelog"), f"{home}changelog/"),
+                                (t("releases_feed"), f"{SITE_URL}releases.atom"),
+                                (t("report_bug"), f"{REPO_URL}/issues/new/choose")])],
+        about=[t("footer_license")], fine=t("footer_nintendo"),
+        brand=f'<img src="{to_root}assets/mark.svg" alt="" width="20" height="20"> <strong>PlayGuard</strong>')
     umami = "" if NOINDEX else f"  {PLAYGUARD.audience(to_root)}\n"
     # The English home page, the site's root: a first visit goes on to the
     # browser's language from there, a returning one to the language chosen
@@ -559,63 +570,20 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <script src="{to_root}assets/reading.js"></script>
   <script src="{to_root}assets/lang.js"></script>
   <link rel="stylesheet" href="{to_root}assets/boreale.css">
+  <link rel="stylesheet" href="{to_root}assets/chrome.css">
   <link rel="stylesheet" href="{to_root}assets/site.css">
+  <script src="{to_root}assets/chrome.js" defer></script>
 {umami}</head>
 <body class="{body_class}">
-  <a class="skip" href="#main">{t('skip')}</a>
-{doc_bar}  <div class="sky{' sky-home' if aurora else ''}">
-  {'<canvas id="sky" aria-hidden="true"></canvas>' if aurora else ''}
-  <header class="top">
-    {PLAYGUARD.switcher(lang, t, to_root, VERSIONS, home=home,
-                        brand=f'<img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span>')}
-    <nav class="nav" aria-label="PlayGuard">
-      <a href="{home}#features">{t('nav_features')}</a>
-      <a href="{home}#install">{t('nav_install')}</a>
-      <a href="{home}docs/getting-started/">{t('nav_docs')}</a>
-      <a href="{to_root}simulator/?lang={code}" class="nav-try">{t('nav_simulator')}</a>
-      <a href="{REPO_URL}" class="nav-gh">GitHub</a>
-    </nav>
-    {PLAYGUARD.languages(lang, t, to_root, path)}
-  </header>
+  {PLAYGUARD.skip(t)}
+{doc_bar}  {PLAYGUARD.sky(home=aurora)}
+  {PLAYGUARD.header(lang, t, to_root, path, links=nav_links, cta=("nav_simulator", f"{to_root}simulator/?lang={code}"),
+                    github=REPO_URL, label="PlayGuard", latest=VERSIONS, home=home, brand=brand)}
 {hero}  </div>
   <main id="main">
 {body}
   </main>
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-cols">
-        <div>
-          <p><img src="{to_root}assets/mark.svg" alt="" width="20" height="20"> <strong>PlayGuard</strong></p>
-          <p>{t('footer_license')}</p>
-          <p><a class="boreale" href="https://boreale.dev/{boreale.folder(code)}">{t('footer_boreale')}</a></p>
-        </div>
-        <div>
-          <h2>{t('docs_title')}</h2>
-          <ul>{"".join(f'<li><a href="{home}docs/{p}/">{t(f"doc_{p}")}</a></li>' for p, s in DOCS if s == "guide")}</ul>
-        </div>
-        <div>
-          <h2>PlayGuard</h2>
-          <ul><li><a href="{REPO_URL}">GitHub</a></li><li><a href="{home}changelog/">{t('footer_changelog')}</a></li>
-            <li><a href="{SITE_URL}releases.atom">{t('releases_feed')}</a></li>
-            <li><a href="{REPO_URL}/issues/new/choose">{t('report_bug')}</a></li></ul>
-        </div>
-        <div>
-          <h2>Boréale</h2>
-          <ul><li><a href="https://boreale.dev/{boreale.folder(code)}">boreale.dev</a></li>
-            <li><a href="https://shelf.boreale.dev/{boreale.folder(code)}">PlayShelf</a></li>
-            <li><a href="https://aurore.boreale.dev/{boreale.folder(code)}">Aurore</a></li>
-            <li><a href="https://atlas.boreale.dev/{boreale.folder(code)}">Atlas</a></li>
-            <li><a href="https://lantern.boreale.dev/{boreale.folder(code)}">Lantern</a></li>
-            <li><a href="https://boreale.dev/{boreale.folder(code)}legal/">{t('sites_legal')}</a></li></ul>
-        </div>
-        <div>
-          <h2>{t('support')}</h2>
-          <ul><li><a href="https://github.com/sponsors/JigSawFr">GitHub Sponsors</a></li><li><a href="https://ko-fi.com/jigsawfr">Ko-fi</a></li></ul>
-        </div>
-      </div>
-      <p class="fine">{t('footer_nintendo')}</p>
-    </div>
-  </footer>
+  {footer}
   <dialog class="lightbox" aria-label="{t('screens_title')}">
     <figure><img alt=""><figcaption></figcaption></figure>
     <button type="button" class="lightbox-close" aria-label="{t('close')}"></button>
@@ -664,7 +632,7 @@ def home_body(t, lang, to_root):
     home = f"{to_root}{boreale.folder(lang)}"
     return f"""    <section class="hero">
       <div class="hero-text">
-        <p class="release-pill"><a href="{home}changelog/#v{version}">v{version}
+        <p class="pill-eyebrow"><a href="{home}changelog/#v{version}">v{version}
           · <time class="release-date" datetime="{date}">{date}</time></a></p>
         <p class="eyebrow">{t('hero_eyebrow')}</p>
         <h1>{hero_title(t)}</h1>
