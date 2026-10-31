@@ -27,7 +27,18 @@ std::string previous_file(const std::string& nro);
 // What previous_build.json names ("1.2.0", "1.2.0 (abc1234)"); false when
 // there is no such file, or it is damaged.
 bool read_label(const std::string& json_file, std::string* label);
-bool write_label(const std::string& json_file, const std::string& label);
+// `level`: the last migration step that build knows (util/migrations.hpp
+// latest()), kept so a way back can tell the data is in a newer layout than
+// it reads; -1 when unknown (the key is then left out).
+bool write_label(const std::string& json_file, const std::string& label, int level = -1);
+// The level previous_build.json holds; false when there is none (a file
+// written before the key existed, or no file): the layout is then not known.
+bool read_level(const std::string& json_file, int* level);
+
+// Whether going back would put a build on data in a layout newer than it
+// knows: the data's migration level is above the previous build's, which is
+// known. Its settings and caches may then not be found where it looks.
+bool layout_newer(int data_level, int previous_level);
 
 // The start of a build just installed, under way (boot_check.json):
 // `starts` is how many starts began without reaching the first screen.

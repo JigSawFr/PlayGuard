@@ -1541,6 +1541,7 @@
         "back": "Terug naar de vorige build: {}",
         "back_body": "PlayGuard {} vervangen door de build die ervoor geïnstalleerd was, {}? PlayGuard start ermee opnieuw.\n\nAls een build crasht vóór zijn eerste scherm, biedt PlayGuard dit bij de volgende start aan.",
         "back_confirm": "Terug",
+        "back_newer": "De gegevens hebben een nieuwere indeling dan {} kent: die build vindt zijn instellingen en caches mogelijk niet. Teruggaan laat de gegevens ongewijzigd.",
         "back_failed": "Kan niet terug naar de vorige build: {}\n\nDe geïnstalleerde PlayGuard is niet gewijzigd.",
         "kind_release": "Versie",
         "kind_prerelease": "Voorlopige versie",

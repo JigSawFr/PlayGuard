@@ -1541,6 +1541,7 @@
         "back": "回到上一個建置：{}",
         "back_body": "將 PlayGuard {} 取代為之前安裝的建置 {}？PlayGuard 將以它重新啟動。\n\n如果某個建置在第一個畫面之前當機，PlayGuard 會在下次啟動時提出此操作。",
         "back_confirm": "回到上一個",
+        "back_newer": "資料採用的結構比 {} 所了解的更新：它可能找不到自己的設定和快取。返回時資料保持原樣。",
         "back_failed": "無法回到上一個建置：{}\n\n已安裝的 PlayGuard 未改變。",
         "kind_release": "正式版本",
         "kind_prerelease": "預先發布",

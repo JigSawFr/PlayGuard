@@ -1541,6 +1541,7 @@
         "back": "Go back to the previous build: {}",
         "back_body": "Replace PlayGuard {} with the build installed before it, {}? PlayGuard restarts on it.\n\nIf a build crashes before its first screen, PlayGuard offers this at its next start.",
         "back_confirm": "Go back",
+        "back_newer": "The data is in a newer layout than {} knows: it may not find its settings and caches. Going back keeps the data as it is.",
         "back_failed": "Could not go back to the previous build: {}\n\nThe installed PlayGuard is unchanged.",
         "kind_release": "Release",
         "kind_prerelease": "Pre-release",
