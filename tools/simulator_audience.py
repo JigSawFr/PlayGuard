@@ -4,7 +4,9 @@ audience"): adds Umami's tracker, served by the site (../assets/umami.js), to
 the published simulator's page, and lets that page send to Umami
 (connect-src). Run on the site being published, after the simulator is copied
 in; a pull request's preview (SITE_NOINDEX=1) is left without it, as its
-pages are, and the tracker only counts on the site's own address.
+pages are, and the tracker only counts on the site's own address. A page it
+already went through is left as it is (main's simulator, when a build does not
+make its own).
 
     python3 tools/simulator_audience.py <site-dir>/simulator
 """
@@ -24,7 +26,13 @@ def main() -> None:
     page = Path(sys.argv[1]) / "index.html"
     html = page.read_text(encoding="utf-8")
     csp = "connect-src 'self';"
+    counted = f"connect-src 'self' {build_site.boreale.UMAMI_GATEWAY};"
     tag = f"  {build_site.PLAYGUARD.audience('../')}\n</head>"
+    # A build that does not make its own simulator publishes main's, which
+    # went through this already: leave it as it is.
+    if html.count(counted) == 1 and html.count("</head>") == 1:
+        print(f"simulator_audience: {page} is already counted")
+        return
     if html.count(csp) != 1 or html.count("</head>") != 1:
         sys.exit(f"simulator_audience: {page} has not the one connect-src and </head> expected")
     html = html.replace(csp, f"connect-src 'self' {build_site.boreale.UMAMI_GATEWAY};").replace("</head>", tag)
