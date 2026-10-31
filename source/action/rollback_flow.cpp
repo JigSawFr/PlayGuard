@@ -6,6 +6,7 @@
 #include <format>
 
 #include "action/dev_build_flow.hpp"
+#include "action/migration_flow.hpp"
 #include "action/notices.hpp"
 #include "action/upload_flow.hpp"
 #include "app.hpp"
@@ -57,7 +58,9 @@ bool swap(const std::string& nro, std::string* error, bool crashed)
 {
     // The previous build may write the data in an earlier layout: the
     // migrations run again when this one is back (util/migrations.hpp).
-    migrations::earlier_build_next(paths::migrations_file(), log_migration);
+    int known = -1;
+    rollback::read_level(label_file(), &known);
+    migration_flow::going_back(known, log_migration);
     platform_romfs_release();
     const bool ok = rollback::swap(nro, error);
     platform_romfs_mount();

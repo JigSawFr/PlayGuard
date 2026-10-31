@@ -161,6 +161,28 @@ size_t run(const std::string& file, const std::vector<Step>& steps, const std::s
     return ran;
 }
 
+size_t undo_to(const std::string& file, const std::vector<Step>& steps, int target, const Log& log)
+{
+    State s;
+    if (read_state(file, &s) != Found::Read) return 0;
+    size_t undone = 0;
+    for (auto it = steps.rbegin(); it != steps.rend(); ++it) {
+        if (it->level > s.level || it->level <= target) continue;
+        if (!it->undo) {
+            if (log)
+                log(true, "migrations: step " + std::to_string(it->level) + " (" + it->name +
+                              ") cannot be undone: the steps below it stay as they are");
+            break;
+        }
+        const size_t moved = it->undo();
+        if (log)
+            log(false, "migrations: step " + std::to_string(it->level) + " (" + it->name + ") undone: " +
+                           std::to_string(moved) + " entries moved back");
+        undone++;
+    }
+    return undone;
+}
+
 bool earlier_build_next(const std::string& file, const Log& log)
 {
     State s;

@@ -63,6 +63,10 @@ struct Step
     int                     level;
     const char*             name;   // for the log
     std::function<size_t()> run;    // how many entries it moved
+    // Puts the data back as the build before this step reads it (how many
+    // entries it moved); empty when it cannot, or when nothing needs it (a
+    // step that only cleaned). Used by undo_to() when going back.
+    std::function<size_t()> undo = nullptr;
 };
 
 // Each step of `steps` (in ascending order) above the level `file` records,
@@ -84,6 +88,17 @@ size_t run(const std::string& file, const std::vector<Step>& steps, const std::s
 // run anyway). Logged, when `log` is given. False when the file could not be
 // written.
 bool earlier_build_next(const std::string& file, const Log& log = nullptr);
+
+// Going back to a build that knows up to `target` (previous_build.json keeps
+// it): the `undo` of each step of `steps` done (up to the level `file`
+// records) and above `target`, from the highest down, so the data is in the
+// layout that build reads. It stops at the first step without an `undo`
+// (the layers below it stay as they are): the data may then be in a newer
+// layout than that build knows, which the caller says (rollback::layout_newer).
+// Logged, when `log` is given. Returns how many steps were undone. Does not
+// write `file`: earlier_build_next() follows, so every step runs again at the
+// next start of a later build (each moves only what it finds).
+size_t undo_to(const std::string& file, const std::vector<Step>& steps, int target, const Log& log = nullptr);
 
 // Whether installing `version` (a release's, "1.2.0"; "" for a build of a
 // branch, a pull request or a commit) replaces `running` with an earlier

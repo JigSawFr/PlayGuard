@@ -170,6 +170,16 @@ void for_system()
                     log_to("start-up"));
 }
 
+void going_back(int level, const migrations::Log& log)
+{
+    if (level >= 0) {
+        std::vector<migrations::Step> all;
+        for (const Known& k : known()) all.push_back(k.step);
+        migrations::undo_to(paths::migrations_file(), all, level, log);
+    }
+    migrations::earlier_build_next(paths::migrations_file(), log);
+}
+
 void replay()
 {
     choose(std::vector<bool>(known().size(), true), 0);
