@@ -473,7 +473,7 @@ int main(int argc, char* argv[])
     // lines are there even when the app stops on the next one.
     if (std::FILE* f = std::freopen("sdmc:/config/playguard/logs/deko3d.txt", "w", stderr)) {
         std::setvbuf(f, nullptr, _IONBF, 0);
-        std::fprintf(f, "deko3d debug library: PlayGuard %s\n", APP_VERSION);
+        std::fputs("deko3d debug library\n", f);
     }
 #endif
     if (!aurore::Application::init()) {
