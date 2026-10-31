@@ -5,9 +5,9 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
 - **A home page and the documentation in the console's 15 languages**:
   English at the root, the others in `/fr/`, `/fr-ca/`, `/de/`, `/es/`,
   `/es-419/`, `/it/`, `/nl/`, `/pt/`, `/pt-br/`, `/ru/`, `/ja/`, `/ko/`,
-  `/zh-hans/`, `/zh-hant/`. A first visit to the root from elsewhere goes to
-  the browser's language when the site has it; the header's language menu changes it
-  (and is remembered). Japanese, Korean and Chinese lines break where their
+  `/zh-hans/`, `/zh-hant/`. A first visit to the root goes to the browser's
+  language when the site has it; the header's language menu changes it (and
+  is remembered). Japanese, Korean and Chinese lines break where their
   readers expect (`site.css`: between phrases, between words, no punctuation
   opening a line). One dark look, Boréale's (the night, the aurora:
   [boreale/branding](https://github.com/JigSawFr/boreale/tree/main/branding)),
@@ -17,14 +17,19 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   (boreale-site's `Site.switcher()` and `sites.json`, a popover placed by its
   `boreale.js`, styled by its `boreale.css`; the marks boreale-site's, the
   versions boreale.dev's `versions.json` read at the build; each site in the
-  page's language, the sites sharing the 15 folders: the homebrew, Aurore,
-  Atlas and Lantern), and a button opens the 15 languages, each with its
-  flag (boreale-site's `Site.languages()`, a popover too). The language
-  chosen there is kept by `site.js` (`pg-site-lang`), not boreale-site's
-  `lang.js`: a visit to the root from elsewhere goes to the language chosen
-  (`lang.js`: only to the browser's, when none was), the page opens at the
-  same place (`#…`), and the page not found is one page holding every
-  language (`lang.js` sends to a `404.html` in each language's folder). The footer has a Boréale column: the
+  page's language, the sites sharing the 15 folders: the homebrew, the
+  integrations, Aurore, Atlas and Lantern), and a button opens the 15
+  languages, each with its flag (boreale-site's `Site.languages()`, a
+  popover too). The language chosen there is kept by boreale-site's
+  `lang.js` (`boreale-lang`: the folder, `en-US` for English), loaded in
+  each page's `<head>` after `reading.js`: an English page goes to the
+  language chosen, at the same place, the root (`data-first-visit`) to the
+  browser's on a first visit, nothing chosen; the menu opens the page at
+  the same place (`#…`) in the language chosen; the page not found is one
+  `404.html` holding every language (`.not-found[data-lang]`), shown in the
+  address' language, else the one chosen, else the browser's. A choice
+  kept before as `pg-site-lang` moves to `boreale-lang` once (`reading.js`,
+  until 2027-01-31). The footer has a Boréale column: the
   other sites and the privacy and legal notice in the page's language.
   The page not found
   stands under the aurora, as the home page's hero.
@@ -159,8 +164,9 @@ pages; no framework, nothing to install but that.
   change to `docs/` is a change to the site.
 - `site/assets/` — `site.css` (the site's look, over boreale-site's
   `boreale.css`), `site.js` (the home page's aurora, boreale.dev's own,
-  still when less motion is asked; the language kept; on a phone, the
-  gallery's dots, the way back to the top) and `reading.js`.
+  still when less motion is asked; on a phone, the gallery's dots, the way
+  back to the top) and `reading.js` (the light reading before the first
+  paint; the old language key's move).
 - **What Boréale's sites share** is
   [boreale-site](https://github.com/JigSawFr/boreale-site), the submodule
   `library/boreale-site` (`git submodule update --init`): the languages, the
@@ -169,13 +175,16 @@ pages; no framework, nothing to install but that.
   tags, the audience, the checks every site passes, and the assets copied
   into `assets/` at the build (`boreale.copy_assets()`): `boreale.css`
   (Boréale's colours and fonts, the two menus), `boreale.js` (where the
-  menus open), the sites' marks, Umami's tracker and the fonts (Sora for the
+  menus open), `lang.js` (the language chosen, the header, above), the
+  sites' marks, Umami's tracker and the fonts (Sora for the
   headings, Figtree for the text, JetBrains Mono for code and labels, their
   Latin letters; SIL Open Font License, `fonts/OFL-*.txt`; the language
   menu's 15 flags cut out of Twemoji's, CC-BY 4.0,
   `fonts/LICENSE-twemoji-flags.txt`), served with the site so that no
   visitor's browser loads anything from Google Fonts or anyone else. Its
-  `lang.js` is copied too, not loaded (the header, above).
+  checks (`boreale_site.check.pages()`) are `tools/check_site_links.py`'s:
+  the simulator built apart (`apart`), 404.html's links from `SITE_BASE`,
+  no tracker on a preview.
 - **The screenshots**: `tools/site_screenshots.mjs <simulator> <out-dir>
   [version]` (Node and Playwright) runs the web simulator in a headless
   Chromium and saves each screen of the home page's gallery in each language,
@@ -206,7 +215,8 @@ pages; no framework, nothing to install but that.
   screenshots (a release, or by hand), else main's.
 - **The site's address**: `SITE_URL` (`https://guard.boreale.dev/`
   by default). CI asks GitHub Pages for it (its custom domain, when it has
-  one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html;
+  one) and adds a preview's folder; `SITE_BASE` is its path, for 404.html
+  (the address' path by default);
   `SITE_NOINDEX=1` for a preview.
 - **The audience**, counted by Umami Cloud (<https://cloud.umami.is>):
   `assets/umami.js` (boreale-site's copy) is its tracker, served with the
@@ -254,14 +264,15 @@ about ten minutes) when the app, its resources, the simulator or the workflow
 changed; the screenshots and tours by hand, or for a release in a run after its site (above); the
 website itself, every time, in seconds. A change to the docs or the site
 takes a few minutes. A pull request that changes the site, its documentation or its texts
-also has its layout checked (`tools/site_layout.py`, under a minute): no
-page wider than the screen on a phone, a tablet or a desktop, no field iOS
-zooms into, no script that throws, and nothing axe-core finds against WCAG 2.2
-AA (contrast, names, labels, keyboard; `SITE_AXE=<axe.min.js>` locally). It is
-the site's own, not boreale-site's `tools/site_layout.py`, which opens every
-page on every screen one at a time (some 2,500 loads here, against a sample
-in parallel), measures a page that sends its visitor on (`docs/`'s) after it
-has moved, and has no check of the fields iOS zooms into. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
+also has its layout checked (boreale-site's `tools/site_layout.py`, a few
+minutes): no page wider than the screen on a phone, a tablet or a desktop, no
+target under 24px, no field iOS zooms into, no script that throws, and
+nothing axe-core finds against WCAG 2.2 AA (contrast, names, labels,
+keyboard; `SITE_AXE=<axe.min.js>` locally). A sample, chosen by its options
+in `web.yml`: every page on an iPhone but the documentation's versions
+(`docs/dev/`, `docs/v<x>/`) outside English and French; the home page, the
+documentation's widest and the changelog in each language on the four other
+screens; axe on the English pages and each language's home page. main's builds run one at a time, each from the last. `.github/workflows/pages.yml` publishes them, with GitHub
 Actions as the source of GitHub Pages: main's at the root, each open pull
 request's in `pr-<number>/` (not a fork's: its pages would be served from this
 site), then edits the pull request's comment with the links. It runs where

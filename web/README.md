@@ -6,22 +6,29 @@ against a simulated console, to click through a change, try a state or show
 a screen without a build on the console. Its games are the desktop
 simulator's made-up ones, with their key art for icons and in the album
 ([docs/contributing/simulator.md](../docs/contributing/simulator.md)).
-In the website's look (`site/assets/site.css` over boreale-site's
-`boreale.css`): its colours, its header in
-Boréale's night whatever the theme (the name opening the menu of Boréale's
-sites, the links to the website, the website's language menu, the theme's
-menu, a short face of them on a phone) and Sora for the name
-(boreale-site's `library/boreale-site/assets/fonts/sora.woff2`, with
-`branding/mark.svg` and the sites' marks of `library/boreale-site/assets/marks/`,
-copied by CMake). The language menu is the website's (boreale-site's
-`Site.languages()` and `boreale.js`, `site/assets/site.js`): a button with the page's flag
-and language (its flag and code on a phone, its flag alone under 380px), and
-under it the 15 languages in a popover, each with its flag, the page's marked
-(Esc or a click elsewhere closes it, the focus back on the button; ↓ on the
-button opens it at the language in use, the arrows, Home and End move through
-it). The flags are boreale-site's `assets/fonts/twemoji-flags.woff2`
-(Twemoji's 15, CC-BY 4.0), copied by CMake next to the page with
-`LICENSE-twemoji-flags.txt`, so Windows shows them too.
+In the website's look, over boreale-site's `boreale.css` and `boreale.js`
+(copied by CMake with its `fonts/`, the sites' marks into `marks/`, and
+`branding/mark.svg`): its colours, its header in Boréale's night whatever the
+theme (the name opening the menu of Boréale's sites, the links to the
+website, the website's language menu, the theme's menu, a short face of them
+on a phone) and Sora for the name. The two menus and where they open are
+boreale-site's; `simulator.css` keeps the page's own: its light and dark
+themes on `:root`, its header, the language button as tall as the theme's
+select beside it, and the privacy and legal notice under the sites
+(`.sites-legal`). The language menu is the website's (boreale-site's
+`Site.languages()`): a button with the page's flag and language (its flag
+and code on a phone, its flag alone under 380px), and under it the 15
+languages in a popover, each with its flag, the page's marked (Esc or a click
+elsewhere closes it, the focus back on the button; ↓ on the button opens it
+at the language in use, the arrows, Home and End move through it). Its links
+are the simulator's own (`simulator.js`' `setUpLanguages()`: this page with
+the same settings in the language, `lang=`), not boreale-site's `lang.js`,
+which the page does not load. The menu of Boréale's sites is a copy of
+`Site.switcher()` in `index.html`, its texts (`sites_*`) in `web/i18n/`:
+the page has no loader for boreale-site's catalogs, so a site added to
+`sites.json` is added here too. The flags are boreale-site's
+`fonts/twemoji-flags.woff2` (Twemoji's 15, CC-BY 4.0,
+`fonts/LICENSE-twemoji-flags.txt`), so Windows shows them too.
 
 - **main**: [guard.boreale.dev/simulator/](https://guard.boreale.dev/simulator/?utm_source=github&utm_medium=docs), on PlayGuard's
   website ([`site/README.md`](../site/README.md)).
