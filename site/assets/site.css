@@ -394,11 +394,6 @@ pre.has-copy { position: relative; padding-right: 76px; }
   .doc-results a { padding: 10px; }
   /* The lightbox's arrows under the screenshot, beside its name. */
   .lightbox-prev, .lightbox-next { top: auto; bottom: calc(14px + env(safe-area-inset-bottom)); }
-  /* The features: each one's icon beside its title (chrome.css does so from
-     600px down; PlayGuard's up to 860px, where its subgrid rows take over). */
-  .cards { gap: 12px; }
-  .card { grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; padding: 16px; }
-  .card .icon { grid-row: span 2; }
   .doc { grid-template-columns: minmax(0, 1fr); }
   /* The documentation's pages at the top, in a row to scroll. */
   .doc { gap: 20px; padding-top: 16px; }

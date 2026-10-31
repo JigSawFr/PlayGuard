@@ -511,7 +511,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
     doc_bar = ""
     if '<div class="doc">' in body:
         doc_bar = (f'  <div class="doc-bar" hidden><div class="doc-bar-inner">'
-                   f'<a class="doc-bar-home" href="{home}" aria-label="PlayGuard"><img src="{to_root}assets/mark.svg" alt="" width="24" height="24"><span>PlayGuard</span></a>'
+                   f'<a class="doc-bar-home" href="{home}" aria-label="PlayGuard"><img src="{to_root}assets/marks/playguard.svg" alt="" width="24" height="24"><span>PlayGuard</span></a>'
                    f'<span class="doc-bar-title">{html.escape(title)}</span>'
                    f'<button class="doc-bar-search" type="button" aria-label="{t("search_placeholder")}">'
                    f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">'
@@ -521,15 +521,14 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
     head_extra = "\n".join(head)
     nav_links = [("nav_features", f"{home}#features"), ("nav_install", f"{home}#install"),
                  ("nav_docs", f"{home}docs/getting-started/")]
-    brand = f'<img src="{to_root}assets/mark.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span>'
+    brand = f'<img src="{to_root}assets/marks/playguard.svg" alt="" width="34" height="34"><span>Play<b>Guard</b></span>'
     footer = PLAYGUARD.footer(
         lang, t, to_root,
         columns=[(t("docs_title"), [(t(f"doc_{p}"), f"{home}docs/{p}/") for p, s in DOCS if s == "guide"]),
                  ("PlayGuard", [("GitHub", REPO_URL), (t("footer_changelog"), f"{home}changelog/"),
                                 (t("releases_feed"), f"{SITE_URL}releases.atom"),
                                 (t("report_bug"), f"{REPO_URL}/issues/new/choose")])],
-        about=[t("footer_license")], fine=t("footer_nintendo"),
-        brand=f'<img src="{to_root}assets/mark.svg" alt="" width="20" height="20"> <strong>PlayGuard</strong>')
+        about=[t("footer_license")], fine=t("footer_nintendo"))
     umami = "" if NOINDEX else f"  {PLAYGUARD.audience(to_root)}\n"
     # The English home page, the site's root: a first visit goes on to the
     # browser's language from there, a returning one to the language chosen
@@ -576,7 +575,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
 {umami}</head>
 <body class="{body_class}">
   {PLAYGUARD.skip(t)}
-{doc_bar}  {PLAYGUARD.sky(home=aurora)}
+{doc_bar}  {PLAYGUARD.sky(home=aurora, veils=body_class != 'not-found-page')}
   {PLAYGUARD.header(lang, t, to_root, path, links=nav_links, cta=("nav_simulator", f"{to_root}simulator/?lang={code}"),
                     github=REPO_URL, label="PlayGuard", latest=VERSIONS, home=home, brand=brand)}
 {hero}  </div>
@@ -1380,8 +1379,7 @@ def main():
     # boreale-site's: the fonts, the marks, Umami's tracker, boreale.css,
     # boreale.js and lang.js (the language chosen, README.md).
     boreale.copy_assets(Path(out))
-    for name in ("icon.svg", "mark.svg"):
-        shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
+    shutil.copy(os.path.join(ROOT, "branding", "icon.svg"), os.path.join(out, "assets", "icon.svg"))
     # An iPhone's home screen takes a PNG, not the SVG (tools/render_branding.mjs).
     touch = os.path.join(ROOT, "images", "apple-touch-icon.png")
     shutil.copy(touch, os.path.join(out, "assets", "apple-touch-icon.png"))
