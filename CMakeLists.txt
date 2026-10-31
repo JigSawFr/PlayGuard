@@ -378,7 +378,9 @@ else ()
 endif ()
 
 # The web simulator's site, ready to serve (web/README.md): the page from
-# web/, PlayGuard and its packaged resources, in <build>/simulator/.
+# web/, PlayGuard and its packaged resources, in <build>/simulator/; from
+# boreale-site, the header's look and menus (boreale.css, boreale.js), their
+# fonts (fonts/) and the sites' marks (marks/).
 if (PLAYGUARD_WEB)
     set(PLAYGUARD_SITE ${CMAKE_BINARY_DIR}/simulator)
     add_custom_target(${PROJECT_NAME}_simulator ALL DEPENDS ${PROJECT_NAME}
@@ -395,9 +397,9 @@ if (PLAYGUARD_WEB)
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/icon.svg ${PLAYGUARD_SITE}/icon.svg
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/branding/mark.svg ${PLAYGUARD_SITE}/mark.svg
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-site/assets/marks ${PLAYGUARD_SITE}/marks
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-site/assets/fonts/sora.woff2 ${PLAYGUARD_SITE}/sora.woff2
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-site/assets/fonts/twemoji-flags.woff2
-                ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-site/assets/fonts/LICENSE-twemoji-flags.txt ${PLAYGUARD_SITE}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-site/assets/fonts ${PLAYGUARD_SITE}/fonts
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-site/assets/boreale.css
+                ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-site/assets/boreale.js ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/apple-touch-icon.png ${PLAYGUARD_SITE}/apple-touch-icon.png
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/icon-192.png ${CMAKE_CURRENT_SOURCE_DIR}/images/icon-512.png ${PLAYGUARD_SITE}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/images/splash ${PLAYGUARD_SITE}/splash

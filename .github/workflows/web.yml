@@ -44,8 +44,9 @@ env:
   # Playwright, pinned, for the simulator's smoke test (Python) and the
   # website's screenshots (Node): one version, one Chromium for both.
   PLAYWRIGHT_VERSION: 1.64.0
-  # axe-core, for the website's accessibility (tools/site_layout.py): its
-  # npm package, checked against the hash it had when pinned.
+  # axe-core, for the website's accessibility (boreale-site's
+  # tools/site_layout.py): its npm package, checked against the hash it had
+  # when pinned.
   AXE_VERSION: 4.13.0
   AXE_SHA256: 096912f6e77b4b695fc9304b7be65091db42d98de054da674ae222a11cb33f70
 
@@ -117,7 +118,7 @@ jobs:
           fi
           [ "$FORCE" = true ] && changed=all
           simulator='^(source|resources|web|extern|library)/|^(CMakeLists\.txt|Makefile|\.release-please-manifest\.json|\.github/workflows/web\.yml)$|^tools/web_'
-          site='^(site|docs|images|branding)/|^resources/i18n/|^library/boreale-site$|^tools/(build_site|site_layout|check_site_links)\.py$|^CHANGELOG\.md$|^\.github/workflows/web\.yml$'
+          site='^(site|docs|images|branding)/|^resources/i18n/|^library/boreale-site$|^tools/(build_site|check_site_links)\.py$|^CHANGELOG\.md$|^\.github/workflows/web\.yml$'
           build=0; screens=0; layout=0; release=0
           if [[ "$changed" == all* ]] || grep -qE "$simulator" <<< "$changed"; then build=1; fi
           if [[ "$changed" == all* ]] || grep -qE "$site" <<< "$changed"; then layout=1; fi
@@ -387,11 +388,19 @@ jobs:
             cat build-web/shots/timings.json
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-      # The website's layout (tools/site_layout.py): no page wider than the
-      # screen on a phone, a tablet or a desktop, no field iOS zooms into, no
-      # script that throws, nothing axe finds against WCAG 2.2 AA (about 15 s
-      # of it). For a pull request (or by hand) that changes the site, its
-      # documentation or its texts; main has had it. In the Playwright of the
+      # The website's layout (boreale-site's tools/site_layout.py, the same
+      # for each of Boréale's sites): no page wider than the screen on a
+      # phone, a tablet or a desktop, no target under 24px, no field iOS
+      # zooms into, no script that throws, nothing axe finds against WCAG 2.2
+      # AA (about 15 s of it). Every page on an iPhone; the widest (the home
+      # page, the documentation's widest, the changelog) in each language on
+      # the four other screens; axe on the English pages and each other
+      # language's home page. The documentation's versions (docs/dev/,
+      # docs/v<x>/) in English and French only: in the other languages, the
+      # same pages as docs/ or the same English page. 404.html is built for
+      # SITE_BASE, and loads unstyled from the root. For a pull request (or
+      # by hand) that changes the site, its documentation or its texts; main
+      # has had it. In the Playwright of the
       # simulator's smoke test when this build made it, else Chromium's
       # headless shell alone.
       # Playwright and its system packages first, apart: a slow Ubuntu mirror
@@ -423,7 +432,11 @@ jobs:
           # flags each step after it. That artifact is main's own (above).
           python3 -c 'import sys, tarfile; open(sys.argv[2], "wb").write(tarfile.open(sys.argv[1]).extractfile("package/axe.min.js").read())' \
             "$RUNNER_TEMP/axe.tgz" "$RUNNER_TEMP/axe.min.js"
-          SITE_AXE="$RUNNER_TEMP/axe.min.js" "$py" -u tools/site_layout.py out
+          SITE_AXE="$RUNNER_TEMP/axe.min.js" "$py" -u library/boreale-site/tools/site_layout.py out \
+            --skip simulator --skip-page 404.html --axe-english \
+            --wide '' --wide docs/config/ --wide docs/parental-controls/ --wide docs/features/ --wide changelog/ \
+            --skip-page '[!f]*/docs/dev/*' --skip-page '[!f]*/docs/v[0-9]*' \
+            --skip-page 'fr-*/docs/dev/*' --skip-page 'fr-*/docs/v[0-9]*'
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site

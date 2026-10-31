@@ -520,8 +520,12 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
     full_title = full_title or ("PlayGuard" if not title else f"{title} · PlayGuard")
     head_extra = "\n".join(head)
     umami = "" if NOINDEX else f"  {PLAYGUARD.audience(to_root)}\n"
+    # The English home page, the site's root: a first visit goes on to the
+    # browser's language from there, a returning one to the language chosen
+    # (boreale-site's lang.js).
+    first_visit = " data-first-visit" if lang == "en-US" and body_class == "home" else ""
     return f"""<!doctype html>
-<html lang="{html_lang}" data-lang="{code}">
+<html lang="{html_lang}" data-lang="{code}"{first_visit}>
 <head>
   <meta charset="utf-8">
   <meta name="referrer" content="no-referrer">
@@ -553,6 +557,7 @@ def page(t, lang, to_root, path, title, body, description=None, body_class="", f
   <link rel="preload" href="{to_root}assets/fonts/sora.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{to_root}assets/fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
   <script src="{to_root}assets/reading.js"></script>
+  <script src="{to_root}assets/lang.js"></script>
   <link rel="stylesheet" href="{to_root}assets/boreale.css">
   <link rel="stylesheet" href="{to_root}assets/site.css">
 {umami}</head>
@@ -1382,11 +1387,14 @@ def main():
     # search engines' and AI assistants' alike, is welcome.
     if urlsplit(SITE_URL).path == "/":
         write(out, "robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}sitemap.xml\n")
-    # GitHub Pages serves 404.html at any path: its links start from the site's root.
+    # GitHub Pages serves 404.html at any path: its links start from the site's
+    # root (SITE_BASE, the site's address' path by default, as
+    # check_site_links.py's).
     t = Texts("en-US", version)
-    base_url = os.environ.get("SITE_BASE", "/PlayGuard/")
-    # Its text in every language, the English one shown: site.js shows the
-    # one of the address' folder (/fr/…), else the visitor's.
+    base_url = os.environ.get("SITE_BASE") or urlsplit(SITE_URL).path
+    # Its text in every language, the English one shown: boreale-site's
+    # lang.js shows the one of the address' folder (/fr/…), else the one
+    # chosen, else the browser's.
     blocks = []
     for lang, folder, _, html_lang in LANGUAGES:
         tl = Texts(lang, version)
@@ -1401,9 +1409,8 @@ def main():
     # the screenshots of tools/site_screenshots.mjs.
     os.makedirs(os.path.join(out, "assets"), exist_ok=True)
     shutil.copytree(os.path.join(ROOT, "site", "assets"), os.path.join(out, "assets"), dirs_exist_ok=True)
-    # boreale-site's: the fonts, the marks, Umami's tracker, boreale.css and
-    # boreale.js (and its lang.js, which this site does not load: site.js
-    # keeps the language, README.md).
+    # boreale-site's: the fonts, the marks, Umami's tracker, boreale.css,
+    # boreale.js and lang.js (the language chosen, README.md).
     boreale.copy_assets(Path(out))
     for name in ("icon.svg", "mark.svg"):
         shutil.copy(os.path.join(ROOT, "branding", name), os.path.join(out, "assets", name))
