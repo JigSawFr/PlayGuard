@@ -277,6 +277,18 @@ void NoticesActivity::rebuild()
     // The other Boréale homebrews', each under its name.
     for (const shared_bell_logic::Other& o : from_others) {
         header(o.name);
+        // Its newer release, found by the update check made for all: Ⓐ opens
+        // it on its About, where it updates.
+        if (!o.update.empty()) {
+            shared_bell_logic::Notice update;
+            update.id = "update";
+            update.title = aurore::getStr("playguard/notices/update_available", o.name, o.update);
+            update.route = "about";
+            aurore::DetailCell* cell = this->other_cell(o, update);
+            mark(cell);
+            box->addView(cell);
+            if (!first) first = cell;
+        }
         for (const shared_bell_logic::Notice& n : o.notices) {
             aurore::DetailCell* cell = this->other_cell(o, n);
             mark(cell);

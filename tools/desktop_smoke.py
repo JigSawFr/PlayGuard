@@ -406,13 +406,16 @@ if os.path.exists(bell_file):
 # Another Boréale homebrew's notices, for the bell's list (cadran): a
 # fictional one, its .nro, its registry file and its bell.
 other_dir = os.path.join(run_dir, "playguard_data", "sd")
-for rel in ("switch/Lantern/Lantern.nro", "config/boreale/apps/lantern.conf", "config/boreale/notices/lantern.json"):
+for rel in ("switch/Lantern/Lantern.nro", "config/boreale/apps/lantern.conf", "config/boreale/notices/lantern.json",
+            "config/boreale/updates.conf"):
     if os.path.exists(os.path.join(other_dir, rel)):
         os.remove(os.path.join(other_dir, rel))
 if CADRAN:
     for rel, text in (
         ("switch/Lantern/Lantern.nro", "NRO0"),
         ("config/boreale/apps/lantern.conf", "schema=1\nname=Lantern\nversion=0.3.0\n"),
+        # The update check made for all found a newer Lantern: the bell says so.
+        ("config/boreale/updates.conf", "schema=1\nchecked=1\nlatest.lantern=0.4.0\n"),
         ("config/boreale/notices/lantern.json", json.dumps({
             "schema": 1, "module": "lantern", "nro": "switch/Lantern/Lantern.nro", "notices": [
                 {"id": "dl", "level": "progress", "title": "Downloading Star Kart Racers", "detail": "2 of 3 files",

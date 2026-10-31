@@ -251,14 +251,14 @@ sync_icons_logic_SRC   := source/action/sync_icons_logic.cpp tests/sync_icons_lo
 sync_icons_logic_CSRC  := source/sync/sync_icons.c
 sync_icons_logic_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
-shared_bell_logic_SRC   := source/action/shared_bell_logic.cpp tests/shared_bell_logic/test.cpp
-shared_bell_logic_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_json.c library/boreale-link/source/bl_jread.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_notices.c
-shared_bell_logic_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
+shared_bell_logic_SRC   := source/action/shared_bell_logic.cpp source/util/date.cpp source/util/update.cpp tests/shared_bell_logic/test.cpp
+shared_bell_logic_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_json.c library/boreale-link/source/bl_jread.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_notices.c library/boreale-link/source/bl_updates.c $(CALENDAR_C)
+shared_bell_logic_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source -Isource/core
 shared_look_SRC   := source/action/shared_look.cpp tests/shared_look/test.cpp
 shared_look_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_prefs.c
 shared_look_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 boreale_apps_logic_SRC   := source/action/boreale_apps_logic.cpp tests/boreale_apps_logic/test.cpp
-boreale_apps_logic_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_app.c
+boreale_apps_logic_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_updates.c
 boreale_apps_logic_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 write_queue_logic_LIBS  := -pthread
 worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
