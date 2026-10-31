@@ -44,11 +44,6 @@ env:
   # Playwright, pinned, for the simulator's smoke test (Python) and the
   # website's screenshots (Node): one version, one Chromium for both.
   PLAYWRIGHT_VERSION: 1.64.0
-  # axe-core, for the website's accessibility (boreale-site's
-  # tools/site_layout.py): its npm package, checked against the hash it had
-  # when pinned.
-  AXE_VERSION: 4.13.0
-  AXE_SHA256: 096912f6e77b4b695fc9304b7be65091db42d98de054da674ae222a11cb33f70
 
 jobs:
   build:
@@ -59,6 +54,7 @@ jobs:
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 30 || 300 }}
     outputs:
       release: ${{ steps.what.outputs.release }}
+      layout: ${{ steps.what.outputs.layout }}
     permissions:
       contents: read
       pages: read     # the site's address (its custom domain)
@@ -127,11 +123,13 @@ jobs:
           # site goes out now with main's screenshots; its own are taken by
           # the run the release-screens job starts.
           if [ "$changed" != all ] && [ "$IS_PR" != true ] && grep -qx '\.release-please-manifest\.json' <<< "$changed"; then release=1; fi
-          echo "release=$release" >> "$GITHUB_OUTPUT"
+          {
+            echo "release=$release"
+            echo "layout=$layout"
+          } >> "$GITHUB_OUTPUT"
           {
             echo "BUILD_SIMULATOR=$build"
             echo "TAKE_SCREENS=$screens"
-            echo "CHECK_LAYOUT=$layout"
           } | tee -a "$GITHUB_ENV"
       # Emscripten's cache: its system libraries and ports (SDL3, zlib), built
       # for threads and exceptions on first use, which takes minutes. A hit is
@@ -186,7 +184,7 @@ jobs:
           mkdir -p .apt-archives/partial
           sudo apt-get update -q
           sudo apt-get install -y -q --no-install-recommends fonts-noto-cjk python3-fonttools python3-markdown imagemagick ccache
-          if [ "$GITHUB_REF" = refs/heads/main ] || [ "$BUILD_SIMULATOR$CHECK_LAYOUT$TAKE_SCREENS" != 000 ]; then
+          if [ "$GITHUB_REF" = refs/heads/main ] || [ "$BUILD_SIMULATOR$TAKE_SCREENS" != 00 ]; then
             python3 -m venv "$RUNNER_TEMP/playwright"
             "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
             sudo "$RUNNER_TEMP/playwright/bin/python" -m playwright install-deps chromium
@@ -388,61 +386,44 @@ jobs:
             cat build-web/shots/timings.json
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-      # The website's layout (boreale-site's tools/site_layout.py, the same
-      # for each of Boréale's sites): no page wider than the screen on a
-      # phone, a tablet or a desktop, no target under 24px, no field iOS
-      # zooms into, no script that throws, nothing axe finds against WCAG 2.2
-      # AA (about 15 s of it). Every page on an iPhone; the widest (the home
-      # page, the documentation's widest, the changelog) in each language on
-      # the four other screens; axe on the English pages and each other
-      # language's home page. The documentation's versions (docs/dev/,
-      # docs/v<x>/) in English and French only: in the other languages, the
-      # same pages as docs/ or the same English page. 404.html is built for
-      # SITE_BASE, and loads unstyled from the root. For a pull request (or
-      # by hand) that changes the site, its documentation or its texts; main
-      # has had it. In the Playwright of the
-      # simulator's smoke test when this build made it, else Chromium's
-      # headless shell alone.
-      # Playwright and its system packages first, apart: a slow Ubuntu mirror
-      # can take minutes over the fonts alone, which is not the check's time.
-      # The venv can be there without a browser (the system packages' step
-      # makes it for install-deps alone, the simulator not built): the headless
-      # shell is installed whatever, a no-op when the smoke test's Chromium
-      # brought it.
-      - name: Playwright for the website's layout
-        if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
-        timeout-minutes: 20
-        run: |
-          py="$RUNNER_TEMP/playwright/bin/python"
-          if [ ! -x "$py" ]; then
-            python3 -m venv "$RUNNER_TEMP/playwright"
-            "$RUNNER_TEMP/playwright/bin/pip" install -q "playwright==$PLAYWRIGHT_VERSION"
-          fi
-          "$py" -m playwright install --only-shell chromium
-      - name: The website on a phone, a tablet and a desktop
-        if: github.event_name != 'push' && env.CHECK_LAYOUT == '1'
-        timeout-minutes: 5
-        run: |
-          py="$RUNNER_TEMP/playwright/bin/python"
-          curl -sfL --retry 3 -o "$RUNNER_TEMP/axe.tgz" "https://registry.npmjs.org/axe-core/-/axe-core-$AXE_VERSION.tgz"
-          echo "$AXE_SHA256  $RUNNER_TEMP/axe.tgz" | sha256sum -c --quiet
-          # axe.min.js alone, read out of the package by Python rather than
-          # tar: CodeQL takes a tar after "What to build"'s `gh run download`
-          # for that artifact's extraction (its cache poisoning query), and
-          # flags each step after it. That artifact is main's own (above).
-          python3 -c 'import sys, tarfile; open(sys.argv[2], "wb").write(tarfile.open(sys.argv[1]).extractfile("package/axe.min.js").read())' \
-            "$RUNNER_TEMP/axe.tgz" "$RUNNER_TEMP/axe.min.js"
-          SITE_AXE="$RUNNER_TEMP/axe.min.js" "$py" -u library/boreale-site/tools/site_layout.py out \
-            --skip simulator --skip-page 404.html --axe-english \
-            --wide '' --wide docs/config/ --wide docs/parental-controls/ --wide docs/features/ --wide changelog/ \
-            --skip-page '[!f]*/docs/dev/*' --skip-page '[!f]*/docs/v[0-9]*' \
-            --skip-page 'fr-*/docs/dev/*' --skip-page 'fr-*/docs/v[0-9]*'
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site
           path: out
           include-hidden-files: true   # .nojekyll
           retention-days: 30
+
+  # The website's layout (boreale-site's tools/site_layout.py, run by its
+  # reusable workflow, which pins Playwright and axe-core, on the `site`
+  # artifact above): no page wider than the screen on a phone, a tablet or a
+  # desktop, no target under 24px, no field iOS zooms into, no script that
+  # throws, nothing axe finds against WCAG 2.2 AA (about 15 s of it). Every
+  # page on an iPhone; the widest (the home page, the documentation's widest,
+  # the changelog) in each language on the four other screens; axe on the
+  # English pages and each other language's home page. The documentation's
+  # versions (docs/dev/, docs/v<x>/) in English and French only: in the other
+  # languages, the same pages as docs/ or the same English page. 404.html is
+  # built for SITE_BASE, and loads unstyled from the root. For a pull request
+  # (or by hand) that changes the site, its documentation or its texts; main
+  # has had it. A failure fails the run, so pages.yml (which publishes the
+  # runs that succeeded) leaves the site out.
+  layout:
+    needs: build
+    if: github.event_name != 'push' && needs.build.outputs.layout == '1'
+    permissions:
+      contents: read
+      pages: read   # asked by the reusable workflow
+    uses: JigSawFr/boreale-site/.github/workflows/site.yml@49844b1a733f738afdabcc1c903bbf8696028d96 # v1.0.0
+    with:
+      library_only: true
+      download_artifact: site
+      download_path: out
+      directory: out
+      layout_timeout_minutes: 5
+      skip: '["simulator"]'
+      skip_page: '["404.html", "[!f]*/docs/dev/*", "[!f]*/docs/v[0-9]*", "fr-*/docs/dev/*", "fr-*/docs/v[0-9]*"]'
+      axe_english: true
+      wide: '["", "docs/config/", "docs/parental-controls/", "docs/features/", "changelog/"]'
 
   # A release's screenshots, tours and preview images, once its site is out
   # (pages.yml publishes this run's as soon as it ends): this workflow again,
