@@ -4,6 +4,7 @@
 
 #include <malloc.h>
 #include <stdio.h>
+#include <sys/iosupport.h>
 
 bool platform_in_focus(void)
 {
@@ -61,6 +62,12 @@ bool platform_region(int *region)
 
 bool platform_boot_choice(const char *text)
 {
+    // consoleInit() points stdout and stderr at the console and consoleExit()
+    // leaves them there: every later log line (Aurore's logger writes to
+    // stdout) then wrote to a console whose framebuffer was closed, and
+    // crashed. They are put back as they were.
+    const devoptab_t *const old_stdout = devoptab_list[STD_OUT];
+    const devoptab_t *const old_stderr = devoptab_list[STD_ERR];
     consoleInit(NULL);
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     PadState pad;
@@ -81,6 +88,8 @@ bool platform_boot_choice(const char *text)
     }
     // The screen goes back to Aurore, which sets up its own.
     consoleExit(NULL);
+    devoptab_list[STD_OUT] = old_stdout;
+    devoptab_list[STD_ERR] = old_stderr;
     return a;
 }
 
