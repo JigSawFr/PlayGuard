@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
   <!-- Forwarder icon: a globe: browsers and online tools. -->
-  <rect width="256" height="256" fill="#FFB547"/>
-  <circle cx="128" cy="128" r="100" fill="#0B1424"/>
-  <circle cx="128" cy="128" r="88" fill="none" stroke="#1F3355" stroke-width="10"/>
-  <circle cx="128" cy="128" r="88" fill="none" stroke="#2EC4A6" stroke-width="10" stroke-linecap="round" stroke-dasharray="415 553" transform="rotate(-90 128 128)"/>
+  <defs><linearGradient id="fi-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00FFCC"/><stop offset="0.65" stop-color="#33BBFF"/><stop offset="1" stop-color="#8A5CFF"/></linearGradient></defs>
+  <rect width="256" height="256" fill="#0A1020"/>
+  <circle cx="128" cy="128" r="102" fill="#0E1A33" stroke="url(#fi-ring)" stroke-width="12"/>
   <circle cx="128" cy="128" r="48" fill="none" stroke="#E8EEF7" stroke-width="9"/>
-  <ellipse cx="128" cy="128" rx="20" ry="48" fill="none" stroke="#2EC4A6" stroke-width="8"/>
+  <ellipse cx="128" cy="128" rx="20" ry="48" fill="none" stroke="#00FFCC" stroke-width="8"/>
   <line x1="80" y1="128" x2="176" y2="128" stroke="#E8EEF7" stroke-width="7"/>
   <path d="M88 104 H168 M88 152 H168" stroke="#E8EEF7" stroke-width="6"/>
 </svg>
