@@ -96,6 +96,21 @@ The Markdown sources live in [`docs/`](docs/), with the reference pages: [`confi
 
 AI coding assistants help with development; every change is reviewed, unit-tested and checked on a real console before release.
 
+## 🧭 How it's made
+
+[![Human-led, AI-assisted](https://raw.githubusercontent.com/JigSawFr/boreale/main/branding/badge-ai.svg)](https://boreale.dev/how/?utm_source=github&utm_medium=readme)
+
+PlayGuard is built by [JigSawFr](https://github.com/JigSawFr), a full-stack
+engineer who has shipped production software for years, with AI coding
+assistants as part of the toolbox.
+
+- **I decide**: architecture, scope, what ships and what doesn't.
+- **AI helps write**: first drafts of code and tests, docs, and the translations.
+- **I review everything**: every change is read, tested (on a real console when it touches
+  the console) and signed before it reaches `main`.
+
+Nothing in the app or its sysmodule calls an AI service. More on [boreale.dev](https://boreale.dev/how/?utm_source=github&utm_medium=readme).
+
 ## 📜 License and credits
 
 **GPLv3**, see [`LICENSE`](LICENSE). Maintained by [JigSawFr](https://github.com/JigSawFr), part of [Boréale](https://boreale.dev/?utm_source=github&utm_medium=readme) with [PlayShelf](https://github.com/JigSawFr/PlayShelf) and [Aurore](https://github.com/JigSawFr/Aurore).
