@@ -64,12 +64,12 @@ static void draw(GateScreenState state, const unsigned char *icon, size_t icon_n
 static void test_rules(void)
 {
     draw_look(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, 0, 0);
-    const int none = count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40);
+    const int none = count_near(380, 424, 900, 454, 0x00, 0xFF, 0xCC, 40);
     draw_look(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0,
               GATE_RULE_FREE | GATE_RULE_CLOSED | GATE_RULE_LIMIT, 0);
-    const int three = count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40);
+    const int three = count_near(380, 424, 900, 454, 0x00, 0xFF, 0xCC, 40);
     draw_look(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, NULL, 0, GATE_RULE_LIMIT, 0);
-    const int one = count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40);
+    const int one = count_near(380, 424, 900, 454, 0x00, 0xFF, 0xCC, 40);
     CHECK(none > 300);
     CHECK(one > none + 40 && three > one + 80);
 }
@@ -87,7 +87,7 @@ static void test_screen(void)
     CHECK(r < 0x14 && g < 0x1C && b < 0x2C);
     CHECK(px[W] == 0x12345678u && px[(size_t)(H - 1) * STRIDE + W + 15] == 0x12345678u);
     // The badge's teal, the name's light text, the icon's own colours.
-    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 300);
+    CHECK(count_near(380, 424, 900, 454, 0x00, 0xFF, 0xCC, 40) > 300);
     CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);
     CHECK(count_near(548, 130, 732, 314, 0x0B, 0x14, 0x24, 6) < 2000);   // not the empty mark's navy
     CHECK(count_near(0, 0, 400, H, 0xEE, 0xF2, 0xF8, 30) == 0);          // nothing on the left any more
@@ -103,7 +103,7 @@ static void test_screen(void)
     draw_note(GateScreen_Refused, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Refused today: 3", 1);
     CHECK(count_near(380, 574, 900, 604, 0xFF, 0xB5, 0x47, 40) > 100);
     draw_note(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Without the PIN: Sat-Sun", 0);
-    CHECK(count_near(380, 574, 900, 604, 0x2E, 0xC4, 0xA6, 40) > 100);
+    CHECK(count_near(380, 574, 900, 604, 0x00, 0xFF, 0xCC, 40) > 100);
     draw(GateScreen_Error, NULL, 0, font);
     // No icon: PlayGuard's mark in its place (its shield in the aurora's teal and violet).
     CHECK(count_near(548, 130, 732, 314, 0x00, 0xFF, 0xCC, 40) > 300);
@@ -155,12 +155,12 @@ static void test_wrap(void)
     CHECK(count_near(330, 530, 950, 558, 0xFF, 0x7A, 0x7A, 40) > 150);   // its second one
     CHECK(count_near(945, 400, W, 640, 0xFF, 0x7A, 0x7A, 40) == 0);      // none over the dial
     CHECK(count_near(0, 400, 320, 640, 0xFF, 0x7A, 0x7A, 40) == 0);      // nor far left
-    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 300);   // the badge
+    CHECK(count_near(380, 424, 900, 454, 0x00, 0xFF, 0xCC, 40) > 300);   // the badge
     // Letters Sora has not: drawn all the same (the console's font, here Sora too).
     s.badge = "\xE5\x8F\x97 PlayGuard \xE4\xBF\x9D\xE6\x8A\xA4";
     s.status = "\xE8\xAF\xB7\xE8\xBE\x93\xE5\x85\xA5\xE5\xAE\xB6\xE9\x95\xBF\xE6\x8E\xA7\xE5\x88\xB6PIN\xE4\xBB\xA5\xE5\x90\xAF\xE5\x8A\xA8\xE3\x80\x82";
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 100);   // the badge, its padlock
+    CHECK(count_near(380, 424, 900, 454, 0x00, 0xFF, 0xCC, 40) > 100);   // the badge, its padlock
 }
 
 // Once refused: Ⓐ and Ⓑ bottom right, level with the mark; the icon's
@@ -195,19 +195,19 @@ static void test_opening(void)
     CHECK(px[W] == 0x12345678u);                                          // the stride's margin left alone
     CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);   // the name, centred
     CHECK(count_near(0, 0, 400, H, 0xEE, 0xF2, 0xF8, 30) == 0);          // no text on the left
-    CHECK(count_near(380, 424, 900, 454, 0x2E, 0xC4, 0xA6, 40) > 200);   // the badge
-    CHECK(count_near(960, 100, W, 600, 0x2E, 0xC4, 0xA6, 40) == 0);      // no text over the dial
+    CHECK(count_near(380, 424, 900, 454, 0x00, 0xFF, 0xCC, 40) > 200);   // the badge
+    CHECK(count_near(960, 100, W, 600, 0x00, 0xFF, 0xCC, 40) == 0);      // no text over the dial
     CHECK(count_near(1000, 100, W, 600, 0x1F, 0x33, 0x55, 30) > 2000);   // the dial's track, behind
-    const int half = count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30);
+    const int half = count_near(432, 508, 628, 516, 0x00, 0xFF, 0xCC, 30);
     CHECK(half > 1200);                                                   // the bar's first half filled
-    CHECK(count_near(652, 508, 848, 516, 0x2E, 0xC4, 0xA6, 30) == 0);    // its second not yet
+    CHECK(count_near(652, 508, 848, 516, 0x00, 0xFF, 0xCC, 30) == 0);    // its second not yet
     const size_t bytes = sizeof(uint32_t) * STRIDE * H;
     uint32_t *whole = (uint32_t *)malloc(bytes);
     memcpy(whole, px, bytes);
 
     // The still: the bar's track alone; with the motion over it, the same as the whole.
     gate_screen_draw_still(px, W, H, STRIDE, &s);
-    CHECK(count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30) == 0);
+    CHECK(count_near(432, 508, 628, 516, 0x00, 0xFF, 0xCC, 30) == 0);
     gate_screen_draw_motion(px, W, H, STRIDE, &s);
     CHECK(memcmp(px, whole, bytes) == 0);
 
@@ -215,12 +215,12 @@ static void test_opening(void)
     // same screen; no motion in the other states, no bar either.
     s.state = GateScreen_Loading;
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(count_near(432, 508, 628, 516, 0x2E, 0xC4, 0xA6, 30) == half);
+    CHECK(count_near(432, 508, 628, 516, 0x00, 0xFF, 0xCC, 30) == half);
     CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);
     s.progress = 1.0f;
     s.state = GateScreen_Free;
     gate_screen_draw(px, W, H, STRIDE, &s);
-    CHECK(count_near(652, 508, 848, 516, 0x2E, 0xC4, 0xA6, 30) > 1200);
+    CHECK(count_near(652, 508, 848, 516, 0x00, 0xFF, 0xCC, 30) > 1200);
     s.state = GateScreen_Refused;
     gate_screen_draw_still(px, W, H, STRIDE, &s);
     memcpy(whole, px, bytes);
