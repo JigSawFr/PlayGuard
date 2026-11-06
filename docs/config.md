@@ -112,12 +112,13 @@ settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreal
 
 ## Updates
 
-`update_via` and `update_daily` are set in *Preferences › Updates*; *About › Check for updates* checks at once.
+`update_via`, `update_daily` and `sphaira_entry` are set in *Preferences › Updates*; *About › Check for updates* checks at once.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
 | `update_via` | string | how an update is installed: `""` (not chosen yet: asked on the first update), `"inplace"` (PlayGuard downloads the release, checks it, replaces itself and restarts), `"auto"` (Sphaira if installed, else the Homebrew App Store), `"sphaira"`, `"appstore"`, `"manual"` (only say how) | `""` |
 | `update_daily` | boolean | checks for an update at start-up, once a day | `false` |
+| `sphaira_entry` | boolean | keeps `/config/sphaira/github/playguard.json` (PlayGuard in sphaira's *GitHub* menu) at start-up when sphaira is on the SD card; `false` removes it | `true` |
 | `update_checked` | string | `"YYYY-MM-DD"` of the last check; anything else is cleared | `""` |
 | `update_latest` | string | the latest release the last check found; while newer than the running version, start-up checks again and opens the update screen | `""` |
 | `sys_latest` | string | the latest Atmosphère, hekate, firmware and sys-patch the last check found (`"atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1;syspatch=1.6.3.0"`); the notification bell says which of the first three are newer than what the console runs; at most 96 characters | `""` |
@@ -285,6 +286,7 @@ line; the order does not matter when it reads them:
   "custom_servers": [],
   "update_via": "",
   "update_daily": false,
+  "sphaira_entry": true,
   "update_checked": "",
   "update_latest": "",
   "sys_latest": "",

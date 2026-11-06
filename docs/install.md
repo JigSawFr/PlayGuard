@@ -8,7 +8,7 @@ Pick one:
 
 - **Homebrew App Store** / **sphaira's App Store** (same catalogue) — Search for *PlayGuard* and install it. New releases are picked up automatically, after a review: often a few days after GitHub. PlayGuard knows it was installed from there and recommends updating through the store.
 - **Manual** — Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`.
-- **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira.
+- **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira. Installed another way (the Homebrew App Store leaves the entry out), PlayGuard writes it at start-up when sphaira is on the SD card, so sphaira offers each release as soon as it is on GitHub; *Preferences › Entry in sphaira's GitHub menu* (on by default) turns that off and removes it.
 
 The optional **recovery sysmodule** is installed from PlayGuard (*Console › Optional modules*, or *Security › Locked out?*), or by hand from its own download (`playguard-rescue.zip`): extract it to the root of the SD card too, then restart the console. It lands in `atmosphere/contents/4200000000505247/` and only acts when a `RESCUE` file asks it to — see [Locked out?](troubleshooting.md#locked-out).
 

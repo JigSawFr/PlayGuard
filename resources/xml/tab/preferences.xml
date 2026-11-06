@@ -49,6 +49,7 @@
             <aurore:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
             <aurore:BooleanCell id="pf_update_daily"/>
             <aurore:DetailCell id="pf_update_via" title="@i18n/kit/tools/update_via"/>
+            <aurore:BooleanCell id="pf_sphaira_entry"/>
             <aurore:Header title="@i18n/playguard/tools/section_start" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="pf_first_steps" title="@i18n/playguard/onboarding/open"/>
 

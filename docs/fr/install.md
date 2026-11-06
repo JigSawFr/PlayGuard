@@ -9,7 +9,7 @@ Au choix :
 
 - **Homebrew App Store** / **App Store de sphaira** (même catalogue) — Cherchez *PlayGuard* et installez-le. Les nouvelles versions sont reprises automatiquement, après une vérification : souvent quelques jours après GitHub. PlayGuard sait qu'il a été installé par là et recommande de se mettre à jour par le store.
 - **Manuellement** — Téléchargez `playguard.zip` dans la [dernière version](https://github.com/JigSawFr/PlayGuard/releases/latest) et extrayez-le à la **racine** de la carte SD. L'application arrive dans `sd:/switch/playguard/`, ses fichiers dans `sd:/config/playguard/`.
-- **sphaira › GitHub** — Le zip de la version contient déjà l'entrée (`/config/sphaira/github/playguard.json`) : après une première installation, mettez à jour depuis *GitHub* dans sphaira.
+- **sphaira › GitHub** — Le zip de la version contient déjà l'entrée (`/config/sphaira/github/playguard.json`) : après une première installation, mettez à jour depuis *GitHub* dans sphaira. Installé autrement (le Homebrew App Store laisse l'entrée de côté), PlayGuard l'écrit au lancement quand sphaira est sur la carte SD : sphaira propose alors chaque version dès qu'elle est sur GitHub. *Préférences › Entrée dans le menu GitHub de sphaira* (activé par défaut) le désactive et la retire.
 
 Le **sysmodule de récupération** optionnel s'installe depuis PlayGuard (*Console › Modules facultatifs*, ou *Sécurité › Bloqué ?*), ou à la main depuis son propre téléchargement (`playguard-rescue.zip`) : extrayez-le lui aussi à la racine de la carte SD, puis redémarrez la console. Il arrive dans `atmosphere/contents/4200000000505247/` et n'agit que quand un fichier `RESCUE` le demande — voir [Console bloquée ?](troubleshooting.md#console-bloquée-).
 
