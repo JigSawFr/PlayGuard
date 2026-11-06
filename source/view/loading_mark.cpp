@@ -29,7 +29,7 @@ NVGcolor with_alpha(NVGcolor c, float a)
 // The image slot of the loading screen's picture (ui/palette.hpp).
 constexpr const char* ART_SLOT = "playguard/loading/art";
 
-// The app's icon without its name (images/icon-512.png, img/loading_icon.png
+// The app's icon without its name (images/icon-512.png, img/app_icon.png
 // in the resources: icon.jpg carries the name for the HOME menu, and the
 // wordmark says it here) as a texture, made once; 0 when it cannot be read.
 int icon_texture(NVGcontext* vg)
@@ -37,7 +37,7 @@ int icon_texture(NVGcontext* vg)
     static int texture = -1;
     if (texture < 0) {
         std::string bytes;
-        texture = paths::read_file(AURORE_ASSET("img/loading_icon.png"), bytes) && !bytes.empty()
+        texture = paths::read_file(AURORE_ASSET("img/app_icon.png"), bytes) && !bytes.empty()
                       ? nvgCreateImageMem(vg, NVG_IMAGE_GENERATE_MIPMAPS, (unsigned char*)bytes.data(), (int)bytes.size())
                       : 0;
     }

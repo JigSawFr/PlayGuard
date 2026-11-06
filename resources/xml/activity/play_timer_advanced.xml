@@ -10,7 +10,7 @@
 
     <ScrollView
         title="@i18n/playguard/play_timer/section_advanced"
-        icon="@res/img/app_icon.jpg"
+        icon="@res/img/app_icon.png"
         width="auto"
         height="auto"
         axis="column"

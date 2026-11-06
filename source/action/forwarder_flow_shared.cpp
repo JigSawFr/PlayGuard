@@ -70,7 +70,7 @@ bool assets_of(const std::string& sdmc, bool self, nro::Info& info, std::string&
         info.icon = forwarder_icon::normalize(info.icon);
         if (info.icon.empty()) {
             std::string icon;
-            if (paths::read_file(AURORE_ASSET("img/app_icon.jpg"), icon))
+            if (paths::read_file(AURORE_ASSET("img/home_icon.jpg"), icon))
                 info.icon = forwarder_icon::normalize(std::vector<uint8_t>(icon.begin(), icon.end()));
         }
         // Its version, as the HOME menu's data management shows it.

@@ -11,7 +11,7 @@
 
     <aurore:Box
         title="@i18n/playguard/library/title"
-        icon="@res/img/app_icon.jpg"
+        icon="@res/img/app_icon.png"
         width="auto"
         height="auto"
         axis="column"

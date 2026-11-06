@@ -12,6 +12,6 @@
     <aurore:TabFrame
         id="md_tabs"
         title="@i18n/playguard/modules/title"
-        icon="@res/img/app_icon.jpg"/>
+        icon="@res/img/app_icon.png"/>
 
 </aurore:AppletFrame>

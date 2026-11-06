@@ -11,7 +11,7 @@
     <aurore:Box
         id="child_root"
         title="@i18n/playguard/title"
-        icon="@res/img/app_icon.jpg"
+        icon="@res/img/app_icon.png"
         focusable="true"
         width="auto"
         height="auto"
