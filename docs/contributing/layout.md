@@ -26,7 +26,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `branding/` | SVG sources of the icon and banners |
 | `docs/` | [`parental-controls.md`](../../docs/parental-controls.md): what is known of the parental-control service, the play-timer block and the clocks, and how sure each fact is; [`companion-app.md`](../../docs/companion-app.md): what PlayGuard covers of Nintendo's phone app, and the gaps still to close; [`sync-design.md`](../../docs/sync-design.md) and [`sync-protocol.md`](../../docs/sync-protocol.md): the design and the wire contract of the optional remote link (MQTT, Home Assistant), PlayGuard's side and the agent sysmodule; [`home-assistant.md`](../../docs/home-assistant.md) (and `.fr.md`): the user guide |
 
-**Branding:** `branding/*.svg` are rendered to `icon.jpg`, `images/store/*.png`, `images/social-preview.png` (the repository's social preview) and `resources/img/wordmark.png` / `wordmark-light.png` (the loading screen's, dark and light theme) by `node tools/render_branding.mjs` (Node + Playwright).
+**Branding:** the icon, the mark, `icon.jpg`, the loading screen's wordmarks (`resources/img/wordmark.png` / `wordmark-light.png`), the site's and the simulator's icons (`images/apple-touch-icon.png`, `icon-192.png`, `icon-512.png`), the social preview (`images/social-preview.png`) and the README's banner come from Boréale's brand kit (`branding/playguard/` in [JigSawFr/boreale](https://github.com/JigSawFr/boreale/tree/main/branding), copied by its `tools/sync_branding.py`): change them there. What PlayGuard draws for itself, the app store's pictures (`branding/store-icon.svg`, `banner.svg`) and the splash screens, is rendered by `node tools/render_branding.mjs` (Node + Playwright).
 
 ## The Cadran look
 

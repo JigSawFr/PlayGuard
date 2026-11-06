@@ -118,8 +118,8 @@ the page has no loader for boreale-site's catalogs, so a site added to
   landscape there, only the screen and the pad too, everything back when
   turned upright. An iPhone takes `apple-touch-icon.png`, Android
   `icon-192.png` and `icon-512.png` (maskable: the logo stays inside the
-  part Android may crop), both from `tools/render_branding.mjs`, which also
-  renders what an iPhone shows while it starts (`images/splash/`: each
+  part Android may crop), both from Boréale's brand kit;
+  `tools/render_branding.mjs` renders what an iPhone shows while it starts (`images/splash/`: each
   iPhone since iOS 16 in both orientations, linked with its media query,
   checked by `tests/web_page/splash.test.js`; Android makes its own from
   the manifest's icon and background); a long
