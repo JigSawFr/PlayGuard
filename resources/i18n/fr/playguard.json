@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "Accès à distance",
-        "intro": "Relie cette console à un broker MQTT (l'application Mosquitto de Home Assistant, ou un autre) : Home Assistant affiche alors son état et son temps de jeu, et peut lui envoyer des ordres. Le lien fonctionne tant que PlayGuard est ouvert, ou en permanence avec l'agent facultatif (Console › Modules facultatifs). Les réglages sont gardés dans {}.",
+        "intro": "Relie cette console à un broker MQTT (l'application Mosquitto de Home Assistant, ou un autre) : Home Assistant affiche alors son état et son temps de jeu, et peut lui envoyer des ordres. Le lien fonctionne tant que PlayGuard est ouvert, ou en permanence avec l'agent facultatif (Console › Modules facultatifs). Les réglages du broker sont gardés dans {}, le reste dans {}.",
         "section_status": "Lien",
         "status": "État",
         "sync_now": "Synchroniser maintenant",

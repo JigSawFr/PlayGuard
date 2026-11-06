@@ -355,7 +355,7 @@ bool SyncActivity::commit(SyncConf next)
 
 void SyncActivity::refresh()
 {
-    intro->setText(aurore::getStr("playguard/sync/intro", sync_files::conf_file()));
+    intro->setText(aurore::getStr("playguard/sync/intro", sync_files::link_file(), sync_files::conf_file()));
     enabled->setOn(conf.enabled, false);
     host->setDetailText(or_none(conf.host));
     port->setDetailText(std::to_string(conf.port));

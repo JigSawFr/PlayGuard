@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "远程访问",
-        "intro": "把这台主机连接到 MQTT broker（Home Assistant 的 Mosquitto 应用，或其他任何 broker）：Home Assistant 随后会显示它的状态和游戏时间，并可以向它发送指令。连接在 PlayGuard 打开期间运行，安装可选的代理程序后则始终运行（主机 › 可选模块）。设置保存在 {} 中。",
+        "intro": "把这台主机连接到 MQTT broker（Home Assistant 的 Mosquitto 应用，或其他任何 broker）：Home Assistant 随后会显示它的状态和游戏时间，并可以向它发送指令。连接在 PlayGuard 打开期间运行，安装可选的代理程序后则始终运行（主机 › 可选模块）。Broker 的设置保存在 {} 中，其余保存在 {} 中。",
         "section_status": "连接",
         "status": "状态",
         "sync_now": "立即同步",

@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "원격 접속",
-        "intro": "이 본체를 MQTT 브로커(Home Assistant의 Mosquitto 앱 또는 다른 브로커)에 연결합니다. 그러면 Home Assistant에서 본체의 상태와 플레이 시간을 보고 명령을 보낼 수 있습니다. 연결은 PlayGuard가 열려 있는 동안 작동하며, 선택 사항인 에이전트(본체 › 추가 모듈)가 있으면 항상 작동합니다. 설정은 {}에 저장됩니다.",
+        "intro": "이 본체를 MQTT 브로커(Home Assistant의 Mosquitto 앱 또는 다른 브로커)에 연결합니다. 그러면 Home Assistant에서 본체의 상태와 플레이 시간을 보고 명령을 보낼 수 있습니다. 연결은 PlayGuard가 열려 있는 동안 작동하며, 선택 사항인 에이전트(본체 › 추가 모듈)가 있으면 항상 작동합니다. 브로커 설정은 {}에, 나머지는 {}에 저장됩니다.",
         "section_status": "연결",
         "status": "상태",
         "sync_now": "지금 동기화",
