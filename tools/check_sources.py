@@ -10,13 +10,17 @@ Errors:
   CONSOLE_ONLY ones below) missing from the desktop build's list
   (CMakeLists.txt, which leaves source/core/*.c out and adds those back by
   hand: the simulator shares them) unless NOT_ON_DESKTOP says why, or from
-  the host tests' sources (Makefile); a name below that is no file any more.
+  the host tests' sources (Makefile); a name below that is no file any more;
+- library/aurore pointing at a commit that is no `vX.Y.Z` tag of Aurore (an
+  app follows a release, never a commit of main). Skipped, with a note, when
+  the tags cannot be listed (no network).
 
 Usage: tools/check_sources.py [repo-root]
 """
 import glob
 import os
 import re
+import subprocess
 import sys
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
@@ -112,6 +116,36 @@ for name in sorted(core - set(CONSOLE_ONLY)):
 for name in sorted(cmake & set(CONSOLE_ONLY)):
     errors.append(f"CMakeLists.txt adds source/core/{name} to the desktop build, which "
                   f"tools/check_sources.py says is the console's ({CONSOLE_ONLY[name]})")
+
+# ------------------------------------------------------------ aurore's tag
+def git(*args):
+    return subprocess.run(["git", "-C", ROOT, *args], capture_output=True, text=True, timeout=60)
+
+
+def check_aurore_tag():
+    pin = git("ls-tree", "HEAD", "library/aurore")
+    fields = pin.stdout.split()
+    if pin.returncode != 0 or len(fields) < 3 or fields[0] != "160000":
+        return  # not a git checkout, or no such submodule
+    sha = fields[2]
+    url = git("config", "-f", ".gitmodules", "--get", "submodule.library/aurore.url").stdout.strip()
+    if not url:
+        errors.append(".gitmodules has no submodule.library/aurore.url")
+        return
+    try:
+        tags = subprocess.run(["git", "ls-remote", "--tags", url], capture_output=True, text=True, timeout=60)
+    except subprocess.TimeoutExpired:
+        tags = None
+    if tags is None or tags.returncode != 0:
+        print("sources check: Aurore's tags could not be listed, library/aurore's pin not checked")
+        return
+    release = re.compile(r"^refs/tags/v\d+\.\d+\.\d+(\^\{\})?$")
+    if not any(line.split()[0] == sha for line in tags.stdout.splitlines() if release.match(line.split()[1])):
+        errors.append(f"library/aurore points at {sha[:12]}, which is no vX.Y.Z tag of Aurore: "
+                      "an app follows a release of Aurore, never a commit of main")
+
+
+check_aurore_tag()
 
 for e in errors:
     print("ERROR:", e)
