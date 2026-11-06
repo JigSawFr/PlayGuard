@@ -4,6 +4,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
 #include "core/calendar.h"
+#include "core/local_time.h"
 #include "core/nx_types.h"
 
 #ifdef __cplusplus
@@ -42,24 +43,14 @@ void time_clock_apply(u64 utc_seconds, TimeApply *out);
 void time_clock_set_to_user(TimeApply *out);
 void time_clock_dump(char *buf, size_t size);
 
-// The console's time-zone rule (Settings > Time Zone), daylight saving included.
-const TimeRule *time_console_rule(void);
+// The console's time-zone rule, the user clock now and its local time, and
+// a time formatted in the console's time zone are the kit's (core/local_time.h).
 
 // The standard steady clock: seconds since the console's RTC was set up,
 // kept through sleep mode and restarts; changing the console clock does not
 // move it. `source_id` (16 bytes, may be NULL) names its source: values from
 // two sources do not compare. Read only.
 Result time_steady_now(u64 *seconds, u8 source_id[16]);
-
-// The user clock now (what the HOME menu shows), read live, and the same in
-// local time. False when the local time is unknown (`posix` is still set).
-// Use this rather than time()/localtime(): see calendar.h.
-bool time_local_now(u64 *posix, LocalTime *local);
-
-// Formats a POSIX time in the console's configured time zone
-// ("2026-10-07 14:03:12"). Falls back to UTC (with a " UTC" suffix) on failure.
-// time_format_utc is in calendar.h.
-void time_format_local(u64 posix, char *buf, size_t size);
 
 #ifdef __cplusplus
 }

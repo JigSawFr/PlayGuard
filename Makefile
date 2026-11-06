@@ -160,7 +160,7 @@ web-serve: web
 # suite (-DNX_HOST_TEST), and the C helpers of source/util.
 pctl_SRC   := source/core/pctl_ops.c source/core/pctl_dump.c source/core/pure.c source/core/rescue.c $(KIT)/core/write_guard.c tests/pctl_session/test.c
 pctl_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -I$(KIT)/core -I$(KIT)
-time_SRC   := source/core/time_ops.c $(KIT)/core/calendar.c $(KIT)/core/write_guard.c tests/time_ops/test.c
+time_SRC   := source/core/time_ops.c $(KIT)/core/local_time.c $(KIT)/core/calendar.c $(KIT)/core/write_guard.c tests/time_ops/test.c
 time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core -I$(KIT)/core -I$(KIT)
 sysinfo_SRC   := $(KIT)/core/sysinfo.c source/core/pure.c tests/sysinfo/test.c
 sysinfo_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/sysinfo -Isource/core -I$(KIT)/core -I$(KIT)
@@ -312,7 +312,7 @@ pt_log_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/pt_l
 # their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
 # parts of the service layer they share with the console.
 sim_backend_SRC    := source/sim/sim_hmac.cpp $(KIT)/sim/sim_env.cpp $(KIT)/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp $(KIT)/util/paths.cpp $(KIT)/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
-sim_backend_CSRC   := $(KIT)/sim/sim_sysinfo.c $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
+sim_backend_CSRC   := $(KIT)/sim/sim_sysinfo.c $(KIT)/sim/sim_local_time.c $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
                       $(addprefix source/core/,pure.c forwarder_pack.c rescue.c) $(KIT)/core/calendar.c $(KIT)/core/write_guard.c source/util/playlog.c \
                       tests/forwarders/stb.c extern/stb/stb_image_write.c
 # Atomic coverage counters: the suite runs the same code from several threads
