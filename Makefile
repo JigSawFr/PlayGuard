@@ -311,15 +311,15 @@ pt_log_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/pt_l
 # The desktop and web simulators' console (source/sim/*.c, sim_state.h) and
 # their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
 # parts of the service layer they share with the console.
-sim_backend_SRC    := $(KIT)/sim/sim_env.cpp $(KIT)/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp $(KIT)/util/paths.cpp $(KIT)/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
-sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
-                      $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c rescue.c) source/util/playlog.c \
+sim_backend_SRC    := source/sim/sim_hmac.cpp $(KIT)/sim/sim_env.cpp $(KIT)/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp $(KIT)/util/paths.cpp $(KIT)/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
+sim_backend_CSRC   := $(KIT)/sim/sim_sysinfo.c $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
+                      $(addprefix source/core/,pure.c forwarder_pack.c rescue.c) $(KIT)/core/calendar.c $(KIT)/core/write_guard.c source/util/playlog.c \
                       tests/forwarders/stb.c extern/stb/stb_image_write.c
 # Atomic coverage counters: the suite runs the same code from several threads
 # at once, and gcov's plain counters then come out wrong (negative ones, that
 # gcovr refuses).
 sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
-sim_backend_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT) -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
+sim_backend_CFLAGS := -std=gnu11 -Isource -Isource/core -I$(KIT)/core -I$(KIT) -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 sim_backend_LIBS   := -pthread -lm
 # A whole text read as a number (header only).
 log_files_SRC   := $(KIT)/util/paths.cpp source/util/nand.cpp $(KIT)/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
