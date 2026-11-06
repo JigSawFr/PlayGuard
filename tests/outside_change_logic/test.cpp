@@ -176,6 +176,10 @@ static void test_file()
     CHECK(serialize(Record()).find("\"schema\": 1") != std::string::npos);
     r = parse(R"({"date": "2026-10-08", "spent_s": 60, "later": 1})");
     CHECK(r.date == "2026-10-08" && r.spent_s == 60 && !r.newer);
+    // An unknown key of the same schema survives a read and a save.
+    const Record again = parse(serialize(r));
+    CHECK(serialize(r).find("\"later\": 1") != std::string::npos && again.extra == r.extra);
+    CHECK(serialize(parse(R"({"date": "2026-10-08", "later": {"a": [1]}})")).find("\"a\"") != std::string::npos);
     r = parse(R"({"schema": 2, "date": "2026-10-08", "spent_s": 60})");
     CHECK(r.newer && r.date.empty() && r.spent_s == -1);
 }

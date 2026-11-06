@@ -1,6 +1,8 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "util/config.hpp"
 
+#include "core/gate.h"
+
 #include <aurore/extern/nlohmann/json.hpp>
 #include <initializer_list>
 #include <iterator>
@@ -9,6 +11,8 @@
 #include "util/json_util.hpp"
 #include "util/app_paths.hpp"
 #include "util/paths.hpp"
+
+static_assert(config::SCHEMA == GATE_CONFIG_SCHEMA, "core/gate.h reads the schema of config.json");
 
 namespace config
 {

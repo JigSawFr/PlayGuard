@@ -230,12 +230,28 @@ Record parse(const std::string& text)
                                      json_util::flag_at(a, "new") });
         }
     }
+    // Keys a later version added to this schema: kept, so a save does not drop them.
+    static const char* const KNOWN[] = { "schema", "date", "spent_s", "offset_s", "steady_id", "limits",
+                                         "notice", "notice_date", "reset_at", "accounts" };
+    nlohmann::json extra = nlohmann::json::object();
+    for (const auto& item : j.items()) {
+        bool known = false;
+        for (const char* k : KNOWN) known = known || item.key() == k;
+        if (!known) extra[item.key()] = item.value();
+    }
+    if (!extra.empty()) rec.extra = extra.dump();
     return rec;
 }
 
 std::string serialize(const Record& rec)
 {
     nlohmann::json j = { { "schema", SCHEMA } };
+    // Keys read but not known to this version go back as they were.
+    if (!rec.extra.empty()) {
+        nlohmann::json extra;
+        if (json_util::parse(rec.extra, &extra) && extra.is_object())
+            for (const auto& item : extra.items()) j[item.key()] = item.value();
+    }
     if (!rec.date.empty()) j["date"] = rec.date;
     if (!rec.date.empty() && rec.spent_s >= 0) j["spent_s"] = rec.spent_s;
     if (rec.offset_known) {

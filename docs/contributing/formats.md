@@ -28,11 +28,12 @@ behind all meet files from another version. The rule:
 
 | Format | Written by → read by | Version | Newer | Unknown fields | Tests |
 |---|---|---|---|---|---|
-| `config.json` | `util/config.cpp` → itself; `core/gate.c` (language and theme only), the web simulator | `config::SCHEMA` 1 | defaults in memory, never written | kept on save | `tests/config/` |
+| `config.json` | `util/config.cpp` → itself; `core/gate.c` (language and theme only), the web simulator | `config::SCHEMA` 1 (the gate's copy: `GATE_CONFIG_SCHEMA`) | defaults in memory, never written; the gate reads it as absent | kept on save | `tests/config/`, `tests/gate/` |
 | `nand/<system>/state.json` | `util/config.cpp` | `config::SCHEMA` 1 | defaults in memory, never written | kept on save | `tests/config/` |
 | `nand/<system>/history.json` | `util/history.cpp` | `history::SCHEMA` 1 | read as empty, not put aside, never written (changes not recorded) | an entry's skipped | `tests/history/` |
-| `nand/<system>/watch.json` | `action/outside_change_logic.cpp` | `outside_change_logic::SCHEMA` 1 | a fresh record, never saved | skipped | `tests/outside_change_logic/` |
+| `nand/<system>/watch.json` | `action/outside_change_logic.cpp` | `outside_change_logic::SCHEMA` 1 | a fresh record, never saved | kept on save | `tests/outside_change_logic/` |
 | `nand/<system>/forwarders.json` | `util/forwarders.cpp` | `forwarders::SCHEMA` 1 (none before: 1) | read as none, never written | kept on save (the file's and each entry's) | `tests/forwarders/` |
+| web simulator's kept folder (IndexedDB, `keep=1`), file `web_schema` | `web/simulator.js` | `SimLogic.KEPT_SCHEMA` 1 (none before: 1) | read as empty, nothing saved | the files inside keep their own schema | `tests/web_page/` |
 | `github_token` | `util/github_auth.cpp` | the `v1:` prefix of `util/secret_box` | another console's box, or one this version cannot open: signed out, the file left as it is | a plain token (an older version's) sealed where it lies | `tests/secret_box/` |
 | `migrations.json` | `util/migrations.cpp` | `migrations::SCHEMA` 1 + `level` | a higher `level` brought back, nothing runs | skipped | `tests/migrations/` |
 | `nand/<system>/backups/*.json` | `util/backup.cpp` | `FORMAT` 1 (`format`), strict | refused | skipped | `tests/backup/` |

@@ -103,6 +103,17 @@
   }
   const envName = (name) => `PLAYGUARD_SIM_${name.toUpperCase()}`;
 
+  // The kept data folder (keep=1) carries its own "schema", in the file
+  // KEPT_FILE: what a newer page wrote there is read as empty and never
+  // written over (the files inside have their own schema, as on the console).
+  const KEPT_SCHEMA = 1;
+  const KEPT_FILE = 'web_schema';
+  const keptState = (text) => {
+    if (text == null) return 'absent';
+    const n = Number(String(text).trim());
+    return Number.isInteger(n) && n > KEPT_SCHEMA ? 'newer' : 'ok';
+  };
+
   // The variables and the config.json PlayGuard starts with: the page's
   // language and theme, whatever else `values` sets.
   function startEnvironment(values, known, language, theme) {
@@ -218,7 +229,7 @@
 
   const SimLogic = {
     LANGUAGES, FLAGS, flag, FALSY, STEP_BUTTONS, isOn, consoleLanguage, firstConsoleLanguage, readQuery, toQuery, changedNames,
-    envValue, envName, startEnvironment, skipText, durationText, consoleLine, parseSteps, stepValue, stepsText, ownSite, linkOutAttributes,
+    envValue, envName, KEPT_SCHEMA, KEPT_FILE, keptState, startEnvironment, skipText, durationText, consoleLine, parseSteps, stepValue, stepsText, ownSite, linkOutAttributes,
   };
   if (typeof module === 'object' && module.exports) module.exports = SimLogic;
   else root.SimLogic = SimLogic;

@@ -289,6 +289,9 @@ void gate_look_parse(const char *json, size_t len, GateLook *out)
     out->language = -1;
     out->theme = GateTheme_Dark;
     if (!json) return;
+    // A "schema" above GATE_CONFIG_SCHEMA is a newer PlayGuard's file: read as
+    // absent, whatever order its keys come in.
+    long schema = 0;
     // A key of the top-level object: a string at depth 1 followed by ':';
     // its value read when it is a string. Nested objects' keys are skipped.
     int depth = 0;
@@ -307,6 +310,11 @@ void gate_look_parse(const char *json, size_t len, GateLook *out)
             while (v < len && (json[v] == ' ' || json[v] == '\t' || json[v] == '\r' || json[v] == '\n')) v++;
             if (v >= len || json[v] != ':') continue;   // a value, not a key
             for (v++; v < len && (json[v] == ' ' || json[v] == '\t' || json[v] == '\r' || json[v] == '\n');) v++;
+            if (key_len == 6 && memcmp(json + key, "schema", 6) == 0) {
+                for (; v < len && json[v] >= '0' && json[v] <= '9' && schema < 1000000; v++) schema = schema * 10 + (json[v] - '0');
+                i = v;
+                continue;
+            }
             if (v >= len || json[v] != '"') continue;
             const size_t val = v + 1, val_end = past_string(json, len, v);
             if (val_end == 0) return;
@@ -318,6 +326,10 @@ void gate_look_parse(const char *json, size_t len, GateLook *out)
                              : val_len == 6 && memcmp(json + val, "system", 6) == 0 ? GateTheme_System
                                                                                     : GateTheme_Dark;
         }
+    }
+    if (schema > GATE_CONFIG_SCHEMA) {
+        out->language = -1;
+        out->theme = GateTheme_Dark;
     }
 }
 
