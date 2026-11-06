@@ -2,6 +2,7 @@
 #include "action/rollback_hooks.hpp"
 
 #include <format>
+#include <aurore.hpp>
 #include <string>
 
 #include "action/migration_flow.hpp"
@@ -25,6 +26,7 @@ void install()
     h.boot_gate = [](const std::string& previous) -> std::string {
         const Result pin = pctl_ask_pin();
         if (rollback::go_back_allowed(R_SUCCEEDED(pin), pin == NXM_RC_NO_PIN)) return "";
+        aurore::Logger::info("rollback: not gone back, the PIN not entered (0x{:08X})", (unsigned)pin);
         // Left with B: said plainly; another failure with its code.
         const std::string why =
             pin == NXM_RC_CANCELLED ? std::string() : " (" + std::format("0x{:08X}", (unsigned)pin) + ")";

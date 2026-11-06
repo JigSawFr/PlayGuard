@@ -1308,7 +1308,7 @@ if GATE:
         fail("no migrations line in the log; messages: " + repr(messages()))
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 12)              # past Install another build, the self-test, the cleanup cells, the glow and statistics switches and the recorder: Read-only mode
+    key("Up", 14)              # past Install another build, the self-test, the cleanup cells, the glow switch, the two encryption cells, the statistics switch and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -1316,7 +1316,7 @@ if GATE:
     key("Return")
     shot("06b_dev_mode_off")
     key("Escape")
-    key("Down", 7)             # Read-only, the recorder, the statistics and glow switches, the two cleanup cells: Show the diagnostic report
+    key("Down", 9)             # Read-only, the recorder, the statistics switch, the two encryption cells, the glow switch, the two cleanup cells: Show the diagnostic report
     key("Return")
     shot("06_dev_report")
     key("Escape")
