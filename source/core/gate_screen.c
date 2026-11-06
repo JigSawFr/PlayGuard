@@ -257,8 +257,9 @@ static void mark_glint(Canvas *cv, float cx, float cy, float r, float turn)
     fill_circle(cv, x, y, 6 * k, WHITE, 0.9f);
 }
 
-// A padlock, `s` high, its body's top left at (x, y).
-static void padlock(Canvas *cv, float x, float y, float s, Rgb c)
+// A padlock, `s` high, its body's top left at (x, y); `hole`: its keyhole's
+// colour (what is behind the padlock).
+static void padlock_on(Canvas *cv, float x, float y, float s, Rgb c, Rgb hole)
 {
     const float w = s * 0.86f, body = s * 0.6f;
     arc(cv, x + w / 2, y + s - body, w * 0.3f, s * 0.12f, -1.5707963f, 3.1415927f, c, 1);
@@ -268,19 +269,29 @@ static void padlock(Canvas *cv, float x, float y, float s, Rgb c)
         blend(cv, (int)(x + w / 2 + w * 0.3f) - 1, py, c, 1);
     }
     fill_rrect(cv, x, y + s - body, w, body, s * 0.12f, c, 1);
-    fill_circle(cv, x + w / 2, y + s - body * 0.55f, s * 0.08f, cv->pal->bg_top, 1);
+    fill_circle(cv, x + w / 2, y + s - body * 0.55f, s * 0.08f, hole, 1);
+}
+
+static void padlock(Canvas *cv, float x, float y, float s, Rgb c)
+{
+    padlock_on(cv, x, y, s, c, cv->pal->bg_top);
 }
 
 // The rules' icons (GATE_RULE_*), each `s` square, its top left at (x, y),
 // drawn as the app's (view/cadran_icon.cpp): an open padlock, a square, a timer.
-static void open_padlock(Canvas *cv, float x, float y, float s, Rgb c)
+static void open_padlock_on(Canvas *cv, float x, float y, float s, Rgb c, Rgb hole)
 {
     const float w = s * 0.78f, body = s * 0.5f, bx = x + (s - w) / 2, top = y + s - body;
     // The shackle up and to the left, its right leg out of the body: open.
     arc(cv, bx + w * 0.35f, top - s * 0.12f, w * 0.26f, s * 0.11f, -3.1415927f, 3.1415927f, c, 1);
     fill_rrect(cv, bx + w * 0.35f - w * 0.26f - s * 0.055f, top - s * 0.12f, s * 0.11f, s * 0.14f, s * 0.03f, c, 1);
     fill_rrect(cv, bx, top, w, body, s * 0.1f, c, 1);
-    fill_circle(cv, bx + w / 2, top + body * 0.48f, s * 0.07f, cv->pal->bg_top, 1);
+    fill_circle(cv, bx + w / 2, top + body * 0.48f, s * 0.07f, hole, 1);
+}
+
+static void open_padlock(Canvas *cv, float x, float y, float s, Rgb c)
+{
+    open_padlock_on(cv, x, y, s, c, cv->pal->bg_top);
 }
 
 static void stop_square(Canvas *cv, float x, float y, float s, Rgb c)
@@ -294,6 +305,67 @@ static void timer(Canvas *cv, float x, float y, float s, Rgb c)
     arc(cv, cx, cy, r, s * 0.1f, 0, 6.2831853f, c, 1);
     fill_rrect(cv, cx - s * 0.04f, cy - r * 0.72f, s * 0.08f, r * 0.8f, s * 0.04f, c, 1);   // the hand, at 12
     fill_rrect(cv, cx - s * 0.12f, y + s * 0.02f, s * 0.24f, s * 0.08f, s * 0.04f, c, 1);   // the button
+}
+
+// A line from (x0, y0) to (x1, y1), `t` wide, with round ends.
+static void capsule(Canvas *cv, float x0, float y0, float x1, float y1, float t, Rgb c)
+{
+    const float ex = x1 - x0, ey = y1 - y0, len2 = ex * ex + ey * ey;
+    for (int py = (int)(fminf(y0, y1) - t) - 1; py <= (int)(fmaxf(y0, y1) + t) + 1; py++)
+        for (int px = (int)(fminf(x0, x1) - t) - 1; px <= (int)(fmaxf(x0, x1) + t) + 1; px++) {
+            const float wx = px + 0.5f - x0, wy = py + 0.5f - y0;
+            const float u = len2 > 0 ? clampf((wx * ex + wy * ey) / len2, 0.0f, 1.0f) : 0.0f;
+            const float dx = wx - ex * u, dy = wy - ey * u;
+            blend(cv, px, py, c, cover(sqrtf(dx * dx + dy * dy) - t / 2));
+        }
+}
+
+// The state a screen says on its icon's corner, as the shield with a padlock
+// that a protected forwarder's icon carries on the HOME menu (branding/
+// forwarder-icons/badge.svg): the shield in the state's colour, cut out of
+// the background, its sign in the dark (the light theme's white) inside.
+typedef enum { Emblem_Locked, Emblem_Open, Emblem_Stop, Emblem_Timer, Emblem_Pause, Emblem_Error } Emblem;
+
+static void emblem(Canvas *cv, float cx, float cy, float r, Rgb fill, Emblem kind)
+{
+    shield_points();
+    const Rgb ink = cv->pal->key_ink;
+    const float k = r / 88.0f, cut = 5.0f;
+    for (int py = (int)(cy - r) - 8; py <= (int)(cy + r) + 8; py++)
+        for (int px = (int)(cx - 80 * k) - 8; px <= (int)(cx + 80 * k) + 8; px++) {
+            const float d = shield_sd(px + 0.5f, py + 0.5f, cx, cy, k);
+            blend(cv, px, py, cv->pal->bg_top, cover(d - cut));
+            blend(cv, px, py, fill, cover(d));
+        }
+    const float g = r * 0.9f, gx = cx - g / 2, gy = cy - g / 2 + r * 0.06f;
+    switch (kind) {
+    case Emblem_Locked: padlock_on(cv, cx - g * 0.43f, gy, g, ink, fill); break;
+    case Emblem_Open: open_padlock_on(cv, gx, gy, g, ink, fill); break;
+    case Emblem_Stop: stop_square(cv, gx, gy, g, ink); break;
+    case Emblem_Timer: timer(cv, gx, gy, g, ink); break;
+    case Emblem_Pause:
+        fill_rrect(cv, cx - g * 0.27f, gy + g * 0.2f, g * 0.19f, g * 0.6f, g * 0.05f, ink, 1);
+        fill_rrect(cv, cx + g * 0.08f, gy + g * 0.2f, g * 0.19f, g * 0.6f, g * 0.05f, ink, 1);
+        break;
+    case Emblem_Error:
+        capsule(cv, cx, gy + g * 0.18f, cx, gy + g * 0.56f, g * 0.17f, ink);
+        fill_circle(cv, cx, gy + g * 0.82f, g * 0.1f, ink, 1);
+        break;
+    }
+}
+
+// The emblem of a state: what it says on the icon.
+static Emblem emblem_of(GateScreenState state)
+{
+    switch (state) {
+    case GateScreen_Opening:
+    case GateScreen_Free: return Emblem_Open;
+    case GateScreen_Closed: return Emblem_Stop;
+    case GateScreen_Limit: return Emblem_Timer;
+    case GateScreen_Paused: return Emblem_Pause;
+    case GateScreen_Error: return Emblem_Error;
+    default: return Emblem_Locked;   // asking, loading, refused: still closed
+    }
 }
 
 // ---------------------------------------------------------------- text
@@ -675,6 +747,7 @@ static void screen_still(Canvas *cv, const GateScreen *s)
     }
     if (settled) stroke_rrect(cv, ix - 6, iy - 6, OPEN_ICON + 12, OPEN_ICON + 12, 45, 4, fill, 0.85f);
     else stroke_rrect(cv, ix - 5, iy - 5, OPEN_ICON + 10, OPEN_ICON + 10, 44, 2, fill, 0.35f);
+    emblem(cv, ix + OPEN_ICON - 6, iy + OPEN_ICON - 4, 36, fill, emblem_of(s->state));
 
     // Its name; the badge under it.
     centred(cv, s->text_font, 50, cx, 400, s->name, p->text, TEXT_MAX);

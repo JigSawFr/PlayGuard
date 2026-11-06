@@ -96,14 +96,19 @@ static void test_screen(void)
     draw(GateScreen_Refused, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font);
     CHECK(count_near(380, 495, 900, 530, 0xFF, 0x7A, 0x7A, 40) > 150);
     CHECK(count_near(560, 350, 720, 405, 0xEE, 0xF2, 0xF8, 30) > 400);   // the name where the opening has it
+    // The state's emblem on the icon's corner: a shield in the state's colour, its sign in the dark.
+    CHECK(count_near(700, 280, 752, 336, 0xFF, 0x7A, 0x7A, 40) > 600);
+    CHECK(count_near(700, 280, 752, 336, 0x0B, 0x14, 0x24, 40) > 80);
     draw(GateScreen_Error, NULL, 0, font);
     CHECK(count_near(380, 495, 900, 530, 0xFF, 0xB5, 0x47, 40) > 150);
+    CHECK(count_near(700, 280, 752, 336, 0xFF, 0xB5, 0x47, 40) > 600);
     // A note under the hint: amber for the day's refusals, teal for the free hours; none, nothing there.
     CHECK(count_near(380, 574, 900, 604, 0xFF, 0xB5, 0x47, 40) == 0);
     draw_note(GateScreen_Refused, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Refused today: 3", 1);
     CHECK(count_near(380, 574, 900, 604, 0xFF, 0xB5, 0x47, 40) > 100);
     draw_note(GateScreen_Asking, SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS), font, "Without the PIN: Sat-Sun", 0);
     CHECK(count_near(380, 574, 900, 604, 0x2E, 0xC4, 0xA6, 40) > 100);
+    CHECK(count_near(700, 280, 752, 336, 0x2E, 0xC4, 0xA6, 40) > 600);   // asking: the closed padlock, in teal
     draw(GateScreen_Error, NULL, 0, font);
     // No icon: PlayGuard's mark in its place (its shield in the aurora's teal and violet).
     CHECK(count_near(548, 130, 732, 314, 0x00, 0xFF, 0xCC, 40) > 300);
