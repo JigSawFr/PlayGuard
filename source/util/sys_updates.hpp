@@ -2,7 +2,7 @@
 // the Switch firmware and sys-patch; and of PlayGuard's Home Assistant
 // integration. The latest of each is the tag GitHub's releases/latest page
 // redirects to (no API call, so no rate limit): Atmosphere-NX/Atmosphere,
-// CTCaer/hekate, impeeza/sys-patch and JigSawFr/playguard-ha; the firmware's
+// CTCaer/hekate, impeeza/sys-patch and JigSawFr/boreale-ha; the firmware's
 // is the newest version in switchbrew's System_Versions table (its wikitext),
 // which lists each Nintendo release (nothing to download). Parsing is plain
 // C++ (host-tested); fetch() goes to the network (sys_updates_net.cpp).
@@ -58,7 +58,7 @@ Latest      from_text(const std::string& text);
 // fourth colon) replaces the network, and without it nothing is fetched.
 Latest fetch(std::string* error);
 
-// PlayGuard's Home Assistant integration (JigSawFr/playguard-ha): its latest
+// PlayGuard's Home Assistant integration (JigSawFr/boreale-ha): its latest
 // release ("" when its page could not be read), and the CHANGELOG.md of a
 // release (raw.githubusercontent.com, at its tag; release-please's format,
 // util/changelog.hpp). Blocking, as fetch(). On the desktop build,

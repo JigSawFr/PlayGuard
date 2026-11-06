@@ -475,7 +475,7 @@ if SYNC:
     ha_changelog = os.path.join(OUT, "ha_changelog.md")
     open(ha_changelog, "w").write(
         "# Changelog\n\n"
-        "## [0.2.0](https://github.com/JigSawFr/playguard-ha/compare/v0.1.0...v0.2.0) (2026-10-20)\n\n\n"
+        "## [0.2.0](https://github.com/JigSawFr/boreale-ha/compare/v0.1.0...v0.2.0) (2026-10-20)\n\n\n"
         "### \U0001F680 Features\n\n"
         "* **coordinator:** tell the console which version runs ([#4](https://github.com/x/y/issues/4))\n\n"
         "### \U0001F41B Bug Fixes\n\n"

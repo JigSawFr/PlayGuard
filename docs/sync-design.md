@@ -7,7 +7,7 @@ local Mosquitto; the optional modules screen; the agent sysmodule, its
 PlayGuard with its roll-back, with a simulated agent in CI;
 user guide in [`home-assistant.md`](home-assistant.md); the Home Assistant
 integration, in its own repository,
-[JigSawFr/playguard-ha](https://github.com/JigSawFr/playguard-ha)). Not yet
+[JigSawFr/boreale-ha](https://github.com/JigSawFr/boreale-ha)). Not yet
 tried on a console: the agent itself (its IPC server, TLS, its start without a
 reboot). This document records the decisions
 behind an optional link between PlayGuard and a home-automation setup, so that

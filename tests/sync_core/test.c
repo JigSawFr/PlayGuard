@@ -1220,7 +1220,7 @@ static void test_watch(void)
 }
 
 // The entity table as entities.json, for the Home Assistant integration's
-// parity test (it carries a copy: JigSawFr/playguard-ha).
+// parity test (it carries a copy: JigSawFr/boreale-ha).
 // The system document: every field, then nothing read (every key still
 // there, null), and the serial number only when given.
 static void test_system_document(void)

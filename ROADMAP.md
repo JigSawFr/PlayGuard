@@ -70,7 +70,7 @@ access*, [guide](docs/home-assistant.md)): the console pushes its state and
 statistics and takes orders (extra time, no more play today, limits, a
 profile, the lock), the optional agent sysmodule keeps the link up while
 PlayGuard is closed, and the
-[PlayGuard integration](https://github.com/JigSawFr/playguard-ha) adds the
+[PlayGuard integration](https://github.com/JigSawFr/boreale-ha) adds the
 game names, each account's play time, long-term statistics and blueprints.
 The design and its reasons are in [docs/sync-design.md](docs/sync-design.md);
 the wire contract is in [docs/sync-protocol.md](docs/sync-protocol.md).

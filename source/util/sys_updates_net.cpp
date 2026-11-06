@@ -81,7 +81,7 @@ Latest fetch(std::string* error)
 
 namespace
 {
-[[maybe_unused]] constexpr const char* HA_REPO = "JigSawFr/playguard-ha";
+[[maybe_unused]] constexpr const char* HA_REPO = "JigSawFr/boreale-ha";
 [[maybe_unused]] constexpr size_t CHANGELOG_MAX = 256 * 1024;
 }   // namespace
 
