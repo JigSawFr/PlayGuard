@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "Acesso remoto",
-        "intro": "Conecta este console a um broker MQTT (o app Mosquitto do Home Assistant, ou qualquer outro): o Home Assistant passa a mostrar o estado e o tempo de jogo dele, e pode enviar ordens a ele. A conexão funciona enquanto o PlayGuard está aberto, ou o tempo todo com o agente opcional (Console › Módulos opcionais). As configurações ficam salvas em {}.",
+        "intro": "Conecta este console a um broker MQTT (o app Mosquitto do Home Assistant, ou qualquer outro): o Home Assistant passa a mostrar o estado e o tempo de jogo dele, e pode enviar ordens a ele. A conexão funciona enquanto o PlayGuard está aberto, ou o tempo todo com o agente opcional (Console › Módulos opcionais). As configurações do broker ficam salvas em {}, o restante em {}.",
         "section_status": "Conexão",
         "status": "Status",
         "sync_now": "Sincronizar agora",

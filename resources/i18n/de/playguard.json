@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "Fernzugriff",
-        "intro": "Verbindet diese Konsole mit einem MQTT-Broker (der Mosquitto-App von Home Assistant oder einem anderen): Home Assistant zeigt dann ihren Status und ihre Spielzeit an und kann ihr Befehle senden. Die Verbindung läuft, solange PlayGuard geöffnet ist, oder ständig mit dem optionalen Agenten (Konsole › Optionale Module). Die Einstellungen werden in {} gespeichert.",
+        "intro": "Verbindet diese Konsole mit einem MQTT-Broker (der Mosquitto-App von Home Assistant oder einem anderen): Home Assistant zeigt dann ihren Status und ihre Spielzeit an und kann ihr Befehle senden. Die Verbindung läuft, solange PlayGuard geöffnet ist, oder ständig mit dem optionalen Agenten (Konsole › Optionale Module). Die Einstellungen des Brokers werden in {} gespeichert, die übrigen in {}.",
         "section_status": "Verbindung",
         "status": "Status",
         "sync_now": "Jetzt synchronisieren",

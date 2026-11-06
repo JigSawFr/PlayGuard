@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "Remote access",
-        "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the optional agent (Console › Optional modules). The settings are kept in {}.",
+        "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the optional agent (Console › Optional modules). The broker's settings are kept in {}, the rest in {}.",
         "section_status": "Link",
         "status": "Status",
         "sync_now": "Sync now",

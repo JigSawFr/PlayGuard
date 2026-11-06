@@ -10,7 +10,7 @@ set from the app; the file is only worth editing by hand to get back in (see
 
 The code is the reference: `source/util/config.hpp` (fields and defaults) and
 `source/util/config.cpp` (reading, checks, writing). The remote link's
-settings are not here but in `sync.conf` ([`sync-protocol.md`](sync-protocol.md)).
+settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreale/link.conf` ([`sync-protocol.md`](sync-protocol.md)).
 
 ## How the file is read
 

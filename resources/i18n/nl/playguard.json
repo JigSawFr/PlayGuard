@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "Toegang op afstand",
-        "intro": "Verbindt deze console met een MQTT-broker (de Mosquitto-app van Home Assistant, of een andere): Home Assistant toont dan de status en speeltijd ervan, en kan er opdrachten naartoe sturen. De verbinding werkt terwijl PlayGuard open is, of altijd met de optionele agent (Console › Optionele modules). De instellingen worden bewaard in {}.",
+        "intro": "Verbindt deze console met een MQTT-broker (de Mosquitto-app van Home Assistant, of een andere): Home Assistant toont dan de status en speeltijd ervan, en kan er opdrachten naartoe sturen. De verbinding werkt terwijl PlayGuard open is, of altijd met de optionele agent (Console › Optionele modules). De instellingen van de broker worden bewaard in {}, de rest in {}.",
         "section_status": "Verbinding",
         "status": "Status",
         "sync_now": "Nu synchroniseren",

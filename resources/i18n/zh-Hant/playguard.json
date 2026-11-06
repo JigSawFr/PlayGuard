@@ -1537,7 +1537,7 @@
     },
     "sync": {
         "title": "遠端存取",
-        "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（主機 › 選用模組）。設定儲存在 {} 中。",
+        "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（主機 › 選用模組）。Broker 的設定儲存在 {} 中，其餘儲存在 {} 中。",
         "section_status": "連線",
         "status": "狀態",
         "sync_now": "立即同步",
