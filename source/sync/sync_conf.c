@@ -12,7 +12,8 @@ static void copy(char *dst, size_t cap, const char *src)
 void sync_conf_defaults(SyncConf *c)
 {
     memset(c, 0, sizeof(*c));
-    c->schema = SYNC_CONF_SCHEMA;
+    bl_kv_file_init(&c->file, c->kept, sizeof(c->kept));
+    c->file.schema = SYNC_CONF_SCHEMA;
     c->port = 1883;
     c->policy = SyncPolicy_Ask;
     c->publish_activity = c->publish_games = c->publish_icons = c->publish_console = c->publish_network = c->publish_hardware = true;
@@ -87,15 +88,13 @@ typedef struct {
     bool prefix_read;   // topic_prefix was in the file
 } ParseCtx;
 
-static void keep_extra(SyncConf *c, const char *key, const char *value)
+// Whether the file has a `schema` line: bl_kv_read() reads none as schema 1,
+// but this file's rule is that none is the current one (a file written by hand
+// without it is not an old one, and must not be moved to the new prefix).
+static void on_schema_line(void *ctx, const char *key, const char *value)
 {
-    const size_t used = strlen(c->extra);
-    const size_t need = strlen(key) + 1 + strlen(value) + 1;
-    if (used + need + 1 > sizeof(c->extra)) {
-        c->extra_lost = true;   // too many: the file is not written again
-        return;
-    }
-    snprintf(c->extra + used, sizeof(c->extra) - used, "%s=%s\n", key, value);
+    (void)value;
+    if (!strcmp(key, "schema")) *(bool *)ctx = true;
 }
 
 static void str_field(char *dst, size_t cap, const char *value)
@@ -110,9 +109,7 @@ static void on_kv(void *vctx, const char *key, const char *value)
     uint32_t u = 0;
     bool b = false;
     p->read++;
-    if (!strcmp(key, "schema")) {
-        if (bl_parse_uint(value, 1, 0x7FFFFFFF, &u)) c->schema = (int)u;
-    } else if (!strcmp(key, "enabled")) {
+    if (!strcmp(key, "enabled")) {
         c->broker_keys = true;
         if (bl_parse_bool(value, &b)) c->enabled = b;
     } else if (!strcmp(key, "host")) {
@@ -189,20 +186,23 @@ static void on_kv(void *vctx, const char *key, const char *value)
     } else if (!strcmp(key, "log_level")) {
         if (bl_parse_uint(value, 0, 2, &u)) c->log_level = (int)u;
     } else {
-        keep_extra(c, key, value);
+        bl_kv_keep(&c->file, key, value);
     }
 }
 
 bool sync_conf_parse(SyncConf *c, const char *text, size_t len)
 {
     ParseCtx p = { c, 0, false };
-    c->extra[0] = '\0';
-    c->extra_lost = false;
+    bl_kv_file_init(&c->file, c->kept, sizeof(c->kept));   // its own buffer, even in a copy
     c->broker_keys = false;
-    bl_kv_each(text, len, on_kv, &p);
+    bool has_schema = false;
+    bl_kv_each(text, len, on_schema_line, &has_schema);
+    bl_kv_read(&c->file, text, len, on_kv, &p);
+    if (!has_schema) c->file.schema = SYNC_CONF_SCHEMA;
+    else p.read++;   // the schema line is a line read, though bl_kv_read() keeps it from on_kv
     // Schema 1 published under <prefix>/<id>/ with "playguard" by default:
     // the default moves to "boreale", and the old tree is cleared once.
-    if (p.read > 0 && c->schema == 1) {
+    if (p.read > 0 && c->file.schema == 1) {
         const char *old = p.prefix_read ? c->topic_prefix : "playguard";
         if (!c->legacy_prefix[0]) copy(c->legacy_prefix, sizeof(c->legacy_prefix), old);
         if (!strcmp(old, "playguard")) copy(c->topic_prefix, sizeof(c->topic_prefix), "boreale");
@@ -230,20 +230,21 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap)
         "ha_discovery=%d\n"
         "poll_s=%u\n"
         "log_level=%d\n"
-        "%s%s%s"
-        "%s",
+        "%s%s%s",
         SYNC_CONF_SCHEMA, sync_policy_name(c->policy), c->remote_timer_writes,
         c->publish_report, c->publish_activity, c->publish_games, c->publish_icons, c->publish_console, c->publish_network,
         c->publish_hardware, c->publish_serial, c->ha_discovery, (unsigned)c->poll_s, c->log_level,
-        c->legacy_prefix[0] ? "legacy_prefix=" : "", c->legacy_prefix, c->legacy_prefix[0] ? "\n" : "", c->extra);
+        c->legacy_prefix[0] ? "legacy_prefix=" : "", c->legacy_prefix, c->legacy_prefix[0] ? "\n" : "");
     if (n < 0 || (size_t)n >= cap) return 0;
-    return (size_t)n;
+    BlKvFile kept = c->file;
+    kept.kept = (char *)c->kept;   // this SyncConf's lines, even copied from another one
+    return bl_kv_write_kept(&kept, out, cap, (size_t)n);
 }
 
 const char *sync_conf_unwritable(const SyncConf *c)
 {
-    if (c->schema > SYNC_CONF_SCHEMA) return "written by a newer version";
-    if (c->extra_lost) return "too many unknown settings to keep";
+    if (c->file.schema > SYNC_CONF_SCHEMA || c->file.schema == 0) return "written by a newer version";
+    if (!bl_kv_may_rewrite(&c->file, SYNC_CONF_SCHEMA)) return "a line that cannot be read or kept";
     return NULL;
 }
 
