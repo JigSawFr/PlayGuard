@@ -408,7 +408,7 @@ FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefi
 FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(FUZZ_SAN) -Itests/fuzz -Isource -I$(KIT) -isystem library/aurore/library/include
 zip_read_FUZZ      := $(KIT)/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
-changelog_FUZZ     := $(filter-out tests/%,$(changelog_SRC)) tests/fuzz/changelog/fuzz.cpp
+changelog_FUZZ     := $(KIT)/util/date.cpp $(KIT)/util/changelog.cpp $(KIT)/util/update.cpp tests/fuzz/changelog/fuzz.cpp
 changelog_FUZZ_CSRC := $(CALENDAR_C)
 rescue_FUZZ        := $(filter-out tests/%,$(rescue_SRC)) tests/fuzz/rescue/fuzz.c
 config_FUZZ        := $(filter-out tests/%,$(config_SRC)) tests/fuzz/config/fuzz.cpp
