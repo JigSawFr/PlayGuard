@@ -1,4 +1,4 @@
-// ha_update_flow — PlayGuard's Home Assistant integration (playguard-ha): the
+// ha_update_flow — PlayGuard's Home Assistant integration (boreale-ha): the
 // version Home Assistant runs, as the integration says it on the broker
 // (docs/sync-protocol.md; kept in sync_files::integration_file() by the link
 // that got it, PlayGuard's or the agent's), and its newer releases: in the
