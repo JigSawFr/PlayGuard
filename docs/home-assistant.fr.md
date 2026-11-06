@@ -171,7 +171,7 @@ Marketplace intégrée (*Paramètres › Marketplace*) ; HACS, qu'elle a remplac
 n'est plus nécessaire.
 
 [![Ouvrez votre instance Home Assistant et ouvrez un dépôt dans la Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=JigSawFr&repository=boreale-ha&category=integration)
-[![Ouvrez votre instance Home Assistant et commencez à configurer une nouvelle intégration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard)
+[![Ouvrez votre instance Home Assistant et commencez à configurer une nouvelle intégration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=boreale)
 
 Depuis la console : **Accès à distance › Home Assistant › Installer
 l'intégration Home Assistant** affiche les deux mêmes liens en QR codes, pour

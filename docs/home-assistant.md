@@ -154,7 +154,7 @@ needs Home Assistant 2026.11 or later, which has the Marketplace built in
 (*Settings › Marketplace*); HACS, which it replaced, is no longer needed.
 
 [![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=JigSawFr&repository=boreale-ha&category=integration)
-[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard)
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=boreale)
 
 From the console: **Remote access › Home Assistant › Install the Home Assistant
 integration** shows the same two links as QR codes, for a phone where Home
