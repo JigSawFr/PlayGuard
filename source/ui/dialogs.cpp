@@ -1,7 +1,7 @@
 // ui — PlayGuard's own dialogs: a duration chosen with the stick and the PIN
 // shown, in Aurore's Cadran look (Aurore/cadran/ui/ui.hpp has the rest).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 #include <algorithm>
 #include <memory>

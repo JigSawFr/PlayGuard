@@ -17,7 +17,7 @@
 #include "action/sync_flow.hpp"
 #include "app.hpp"
 #include "tab/tab_base.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 

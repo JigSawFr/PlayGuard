@@ -12,7 +12,7 @@
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
 #include "bl_net.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sync_files.hpp"

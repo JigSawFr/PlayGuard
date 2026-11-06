@@ -10,7 +10,7 @@
 #include "action/rating_flow.hpp"
 #include "action/session_pause.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 

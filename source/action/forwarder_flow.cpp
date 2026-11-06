@@ -15,9 +15,10 @@
 #include "action/sigpatch_flow.hpp"
 #include "action/forwarders_logic.hpp"
 #include "app.hpp"
+#include "kit_text.hpp"
 #include "core/forwarder.h"
 #include "core/pctl_ops.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "core/gate.h"
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
@@ -451,10 +452,10 @@ void remove(const forwarders_logic::Row& row, std::function<void(bool)> done)
     // One of the ways back while locked: its own warning stands for the
     // usual question.
     if (forwarders_logic::way_back_guard(rows(), r, hbmenu_lock::locked()) != forwarders_logic::Guard::Allowed) {
-        guard_way_back(r, "playguard/common/delete"_i18n, go, stop);
+        guard_way_back(r, kit_text::str("common/delete"), go, stop);
         return;
     }
-    ui::confirm(aurore::getStr("playguard/forwarders/delete_body", r.name), "playguard/common/delete"_i18n, go, stop, true);
+    ui::confirm(aurore::getStr("playguard/forwarders/delete_body", r.name), kit_text::str("common/delete"), go, stop, true);
 }
 
 void forget(const forwarders_logic::Row& row, std::function<void(bool)> done)

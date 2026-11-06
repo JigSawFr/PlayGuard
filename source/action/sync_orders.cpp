@@ -10,7 +10,7 @@
 #include "action/pt_flow.hpp"
 #include "action/session_pause.hpp"
 #include "action/session_pause_logic.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
 #include "util/profiles.hpp"

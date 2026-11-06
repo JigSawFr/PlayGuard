@@ -23,7 +23,7 @@
 #include "action/pt_log_flow.hpp"
 #include "action/sync_flow.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
 

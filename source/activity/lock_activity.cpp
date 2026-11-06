@@ -4,7 +4,7 @@
 #include "action/pin_lock.hpp"
 #include "activity/main_activity.hpp"
 #include "activity/rescue_activity.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 

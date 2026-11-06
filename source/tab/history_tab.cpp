@@ -10,7 +10,7 @@
 #include "action/notice_logic.hpp"
 #include "activity/history_activity.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/app_paths.hpp"
 #include "util/paths.hpp"

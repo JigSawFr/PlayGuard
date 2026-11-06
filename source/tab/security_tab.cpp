@@ -15,7 +15,7 @@
 #include "activity/forwarders_activity.hpp"
 #include "activity/modules_activity.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/perf.hpp"
 

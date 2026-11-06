@@ -27,6 +27,7 @@
 #include <aurore/cadran/view/loading_bar.hpp>
 #include <aurore/cadran/view/scroll_view.hpp>
 
+#include "action/crypto_flow.hpp"
 #include "action/frame_stats_flow.hpp"
 #include "action/fw_gate.hpp"
 #include "action/log_prune_flow.hpp"
@@ -37,6 +38,7 @@
 #include "action/report_sections.hpp"
 #include "action/rescue.hpp"
 #include "action/rollback_flow.hpp"
+#include "action/rollback_hooks.hpp"
 #include "action/session_pause.hpp"
 #include "action/sync_flow.hpp"
 #include "activity/init_error_activity.hpp"
@@ -46,6 +48,7 @@
 #include "activity/rescue_activity.hpp"
 #include "activity/screen_hooks.hpp"
 #include "app.hpp"
+#include "kit_text.hpp"
 #include "core/gate_nx.h"
 #include "core/platform.h"
 #include "core/sim_env.h"
@@ -58,7 +61,7 @@
 #include "tab/preferences_tab.hpp"
 #include "tab/restrictions_tab.hpp"
 #include "tab/security_tab.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/crash_dump.h"
 #include "util/crash_report.hpp"
@@ -205,6 +208,7 @@ void show_first(aurore::Activity* first)
     aurore::Application::pushActivity(first, aurore::TransitionAnimation::NONE);
     pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
     frame_stats_flow::apply();  // Help & diagnostics › Developer › Frame statistics, when on
+    crypto_flow::apply();       // Help & diagnostics › Developer › Encryption: which AES and SHA-256 the sealed secrets run on
     log_prune_flow::run();  // the reports and crashes past the limits of About › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);
     rollback_flow::started();   // this build starts: nothing to go back from
@@ -434,6 +438,7 @@ int main(int argc, char* argv[])
     // Before anything that could crash: the last start of a build just
     // installed never reached its first screen? Then the previous build is
     // offered (action/rollback_flow.hpp).
+    rollback_hooks::install();
     if (rollback_flow::at_start()) {
         session_log::end("exit at start-up (the start-up screen of the previous build)");
         return EXIT_SUCCESS;
@@ -463,7 +468,7 @@ int main(int argc, char* argv[])
     });
     sync_files::set_on_failure([](const std::string& file, const std::string& why) {
         aurore::Logger::error("remote link: {} not saved: {}", file, why);
-        aurore::sync([]() { ui::notify("playguard/toast/save_err"_i18n, ui::Toast::Refused); });
+        aurore::sync([]() { ui::notify(kit_text::str("toast/save_err"), ui::Toast::Refused); });
     });
     config::set_saved_hook(sync_files::export_nro_state);
 

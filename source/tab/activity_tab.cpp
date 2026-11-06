@@ -16,7 +16,7 @@
 #include "action/play_data.hpp"
 #include "activity/game_activity.hpp"
 #include "activity/games_activity.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/config.hpp"
 

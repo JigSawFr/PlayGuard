@@ -5,7 +5,7 @@
 #include <aurore/cadran/view/qr_view.hpp>
 
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 

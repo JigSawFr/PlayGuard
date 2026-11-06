@@ -8,9 +8,10 @@
 #include "action/sys_notes_flow.hpp"
 #include "action/update_flow.hpp"
 #include "app.hpp"
+#include "kit_text.hpp"
 #include "tab/boreale_tab.hpp"
 #include "tab/help_tab.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "view/funding.hpp"
 
@@ -48,7 +49,7 @@ AboutTab::AboutTab()
 
     help->setDetailText(ui::opens());
     help->registerClickAction([](aurore::View*) {
-        ui::open_screen(new HelpTab(), "playguard/prefs/help"_i18n);
+        ui::open_screen(new HelpTab(), kit_text::str("prefs/help"));
         return true;
     });
 
@@ -133,7 +134,7 @@ void AboutTab::count_version_press()
     }
     this->version_presses = 0;
     app::set_dev_mode(true, true, "playguard/dev/enabled"_i18n,
-                      "playguard/dev/enabled"_i18n + " " + "playguard/toast/config_err"_i18n);
+                      "playguard/dev/enabled"_i18n + " " + kit_text::str("toast/config_err"));
     ui::on_mode_changed();
 }
 

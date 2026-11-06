@@ -37,7 +37,7 @@
 #include "sync/sync_state.h"
 #include "sync/sync_system.h"
 #include "ui/app_hooks.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
