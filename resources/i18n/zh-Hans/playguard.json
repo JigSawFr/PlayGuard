@@ -1609,6 +1609,7 @@
         "no_random": "主机没有为 ID 提供随机数。请重试。",
         "save_err": "无法保存设置",
         "state_off": "关闭",
+        "state_newer": "设置由较新版本的 PlayGuard 写入，保持原样。请更新 PlayGuard 以修改。",
         "state_online": "在线",
         "state_online_since": "自 {} 起在线",
         "state_offline": "未连接",

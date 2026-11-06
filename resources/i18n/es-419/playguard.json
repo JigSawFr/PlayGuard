@@ -1609,6 +1609,7 @@
         "no_random": "La consola no dio ningún número aleatorio para el identificador. Vuelve a intentarlo.",
         "save_err": "No se pudo guardar la configuración",
         "state_off": "Desactivado",
+        "state_newer": "Ajustes escritos por un PlayGuard más reciente: se dejan como están. Actualiza PlayGuard para cambiarlos.",
         "state_online": "Conectado",
         "state_online_since": "Conectado desde {}",
         "state_offline": "Sin conexión",

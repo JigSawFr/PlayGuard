@@ -165,6 +165,20 @@ bool save_conf(const SyncConf& c, std::string* error)
 }
 }   // namespace
 
+bool written_by_newer()
+{
+    std::string text;
+    if (paths::read_file(conf_file(), text)) {
+        SyncConf c;
+        sync_conf_defaults(&c);
+        sync_conf_parse(&c, text.data(), text.size());
+        if (c.file.schema > SYNC_CONF_SCHEMA) return true;
+    }
+    bool found = false;
+    const BlLinkConf l = read_link(found);
+    return found && !bl_link_conf_may_write(&l);
+}
+
 SyncConf load()
 {
     SyncConf c;

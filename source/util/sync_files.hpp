@@ -37,6 +37,9 @@ bool exists();              // sync.conf is there: the link was set up once
 // link.conf (made from sync.conf the first time); `emummc` set from the system
 // PlayGuard runs on (paths::nand_key()), for its own device id.
 SyncConf load();
+// sync.conf or link.conf was written by a newer version: it is read as far as
+// it is understood and never written over (save() refuses), so the screen says it.
+bool written_by_newer();
 bool save(const SyncConf& c, std::string* error = nullptr);
 // Gives the console its id ("a1b2c3d4", from 4 random bytes) when it has
 // none. True when it changed.

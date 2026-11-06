@@ -66,7 +66,9 @@ static void test_conf()
     err.clear();
     CHECK(!sync_files::save(later, &err) && !err.empty());
     CHECK(paths::read_file(sync_files::conf_file(), text) && text == newer);
+    CHECK(sync_files::written_by_newer());
     CHECK(sync_files::save(back));
+    CHECK(!sync_files::written_by_newer());
 
     // One sync.conf for every system on the SD card; each system's files in
     // its own folder, and on an emuMMC a device of its own: the id and the
@@ -368,6 +370,7 @@ static void test_link()
     CHECK(!std::strcmp(c.host, "future.lan"));
     std::string err;
     CHECK(!sync_files::save(c, &err) && err.find("link.conf") != std::string::npos);
+    CHECK(sync_files::written_by_newer());
     CHECK(paths::read_file(sync_files::link_file(), text) && text == newer);
     std::remove(sync_files::link_file().c_str());
     std::remove(sync_files::conf_file().c_str());

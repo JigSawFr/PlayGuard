@@ -414,7 +414,10 @@ void SyncActivity::refresh_status()
     const sync_flow::Status st = sync_flow::status();
     std::string text;
     const char* color = "cadran/text2";
-    if (!conf.enabled) {
+    if (sync_files::written_by_newer()) {
+        text = "playguard/sync/state_newer"_i18n;
+        color = "cadran/amber";
+    } else if (!conf.enabled) {
         text = "playguard/sync/state_off"_i18n;
     } else if (!st.ready) {
         text = aurore::getStr("playguard/sync/state_incomplete", problem_text(conf));
