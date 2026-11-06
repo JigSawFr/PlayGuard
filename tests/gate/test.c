@@ -462,6 +462,16 @@ static void test_look(void)
                                  "\"language\":\"pt-BR\"}";
     gate_look_parse(NESTED, sizeof(NESTED) - 1, &l);
     CHECK(l.language == 17 && l.theme == GateTheme_Dark);
+    // A newer schema is read as absent, whichever side of the keys it stands.
+    static const char NEWER[] = "{\"schema\": 2, \"language\": \"fr\", \"theme\": \"light\"}";
+    gate_look_parse(NEWER, sizeof(NEWER) - 1, &l);
+    CHECK(l.language == -1 && l.theme == GateTheme_Dark);
+    static const char NEWER_LAST[] = "{\"language\": \"fr\", \"theme\": \"light\", \"schema\": 2}";
+    gate_look_parse(NEWER_LAST, sizeof(NEWER_LAST) - 1, &l);
+    CHECK(l.language == -1 && l.theme == GateTheme_Dark);
+    static const char SAME[] = "{\"language\": \"fr\", \"schema\": 1}";
+    gate_look_parse(SAME, sizeof(SAME) - 1, &l);
+    CHECK(l.language == 2);
     // Cut short, unknown values: the defaults.
     static const char CUT[] = "{\"theme\": \"light\", \"language\": \"fr";
     gate_look_parse(CUT, sizeof(CUT) - 1, &l);

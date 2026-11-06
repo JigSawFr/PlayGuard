@@ -142,8 +142,12 @@ typedef struct {
     int language;
     int theme;
 } GateLook;
+// The "schema" of config.json this reads (config::SCHEMA, checked in config.cpp).
+#define GATE_CONFIG_SCHEMA 1
+
 // The top-level "language" and "theme" of `json` (`len` bytes, NULL for
-// none); what it cannot read keeps its default.
+// none); what it cannot read keeps its default, and a file whose "schema" is
+// newer than GATE_CONFIG_SCHEMA is read as none.
 void gate_look_parse(const char *json, size_t len, GateLook *out);
 // "fr-CA" (config::LANGUAGES) as a SetLanguage number; -1 for "system" or
 // one it does not know.
