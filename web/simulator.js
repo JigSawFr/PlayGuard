@@ -33,7 +33,7 @@ const THEMES = ['auto', 'light', 'dark'];
 // waited for before it starts; fetched once it runs in the others.
 const CJK = new Set(['ja', 'ko', 'zh-Hans', 'zh-Hant']);
 const CJK_FILE = '/app/resources/font/cjk.otf';
-// The data folder (source/util/paths.cpp), kept in IndexedDB under that name with `keep`.
+// The data folder (library/boreale-kit/source/util/paths.cpp), kept in IndexedDB under that name with `keep`.
 const DATA = '/playguard_data';
 // What the time buttons add to `skip`, in minutes.
 const SKIPS = [5, 15, 60];

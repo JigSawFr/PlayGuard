@@ -8,8 +8,8 @@
 # TOPDIR: this folder, in both passes (the second runs from build/).
 TOPDIR      ?= $(CURDIR)
 TARGET      := playguard-agent
-SOURCES     := source ../../source/core ../../source/sync ../../library/boreale-link/source ../../source/util
-INCLUDES    := source ../../source/core ../../source/sync ../../library/boreale-link/source ../../source/util
+SOURCES     := source ../../source/core ../../library/boreale-kit/source/core ../../source/sync ../../library/boreale-link/source ../../source/util
+INCLUDES    := source ../../library/boreale-kit/source ../../library/boreale-kit/source/core ../../source/core ../../source/sync ../../library/boreale-link/source ../../source/util
 APP_JSON    := $(TOPDIR)/playguard-agent.json
 
 # The version PlayGuard shows for it (the app's, from CMakeLists.txt).

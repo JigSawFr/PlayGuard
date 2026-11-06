@@ -888,7 +888,7 @@ jobs:
           [ "$mark" = ✅ ]
       # One artifact per component, named after the build (playguard-<label>-…):
       # -nro is what Developer › Install another build downloads on the
-      # console (source/util/dev_builds.hpp: the raw .nro and the small text
+      # console (library/boreale-kit/source/util/dev_builds.hpp: the raw .nro and the small text
       # files only, never the zip too); -rescue the recovery sysmodule, as the
       # zip the release attaches (SD-card layout) and the raw .nsp; -agent the
       # remote link's sysmodule, the same way; -sdcard the

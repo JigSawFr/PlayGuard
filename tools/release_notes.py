@@ -30,7 +30,7 @@ then, for a computer:
 
 What is for GitHub only is HTML, or Markdown inside "<!-- console:hide -->" …
 "<!-- /console -->"; what the console reads instead is in a
-"<!-- console: … -->" comment (source/util/changelog.cpp). The console keeps
+"<!-- console: … -->" comment (library/boreale-kit/source/util/changelog.cpp). The console keeps
 the notes' first 16 KB only, hence the summary first.
 
 assets.json is `gh release view --json assets`; compare.json the GitHub API's
