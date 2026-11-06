@@ -8,7 +8,7 @@ TOPDIR      ?= $(CURDIR)
 TARGET      := playguard-rescue
 # main.c lives here; rescue.c is the pure core shared with the app.
 SOURCES     := source ../../source/core
-INCLUDES    := ../../source/core
+INCLUDES    := ../../source/core ../../library/boreale-kit/source
 APP_JSON    := $(TOPDIR)/playguard-rescue.json
 
 # Only these sources — ../../source/core also holds the app's libnx service
