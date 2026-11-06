@@ -1128,7 +1128,7 @@
         "patches_anyway": "仍然新增（修補就位後即可啟動）",
         "patches_mixed": "sys-patch已啟用，但SD卡上還有Sigpatch檔案（{}）：這是轉發器無法啟動的已知原因。請將它們移到一旁（「主機」›「遊戲修補」），然後重新啟動主機。",
         "refresh": "用此載入器重新製作轉發器",
-        "refresh_confirm": "用新的載入器重新製作這些轉發器？{}：重新製作後，它們會用此版本的載入器啟動各自的Homebrew，並保留名稱、圖示和PIN碼規則。",
+        "refresh_confirm": "用此版本重新製作這些轉發器？{}：重新製作後，它們會用此版本的載入器啟動各自的Homebrew，受保護的會帶上它的徽章，並且都保留名稱、圖示和PIN碼規則。",
         "refresh_title": "用舊載入器製作的轉發器",
         "refresh_detail": "{}：由舊版PlayGuard製作。重新製作後，它們會用此版本的載入器啟動各自的Homebrew。"
     },

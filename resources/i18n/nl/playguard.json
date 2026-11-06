@@ -1128,7 +1128,7 @@
         "patches_anyway": "Toch toevoegen (hij start zodra de patches er zijn)",
         "patches_mixed": "sys-patch is actief, maar er staan ook sigpatch-bestanden ({}) op de SD-kaart: een bekende oorzaak van forwarders die niet konden worden gestart. Zet ze opzij (Console › Gamepatches) en start de console opnieuw op.",
         "refresh": "De forwarders opnieuw maken met deze loader",
-        "refresh_confirm": "Deze forwarders opnieuw maken met de nieuwe loader? {}: opnieuw gemaakt starten ze hun homebrew met de loader van deze build en behouden ze hun naam, pictogram en pincoderegels.",
+        "refresh_confirm": "Deze forwarders opnieuw maken met deze versie? {}: opnieuw gemaakt starten ze hun homebrew met haar loader, dragen de beveiligde haar badge en behouden ze allemaal hun naam, pictogram en pincoderegels.",
         "refresh_title": "Forwarders gemaakt met een oudere loader",
         "refresh_detail": "{}: gemaakt door een oudere PlayGuard. Opnieuw gemaakt starten ze hun homebrew met de loader van deze build."
     },

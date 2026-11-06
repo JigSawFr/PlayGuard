@@ -320,9 +320,9 @@ static void capsule(Canvas *cv, float x0, float y0, float x1, float y1, float t,
         }
 }
 
-// The state a screen says on its icon's corner, as the shield with a padlock
-// that a protected forwarder's icon carries on the HOME menu (branding/
-// forwarder-icons/badge.svg): the shield in the state's colour, cut out of
+// The state a screen says on its icon's corner, as the shield a protected
+// forwarder's icon carries on the HOME menu (branding/forwarder-icons/
+// badge.svg): the shield in the state's colour, cut out of
 // the background, its sign in the dark (the light theme's white) inside.
 typedef enum { Emblem_Locked, Emblem_Open, Emblem_Stop, Emblem_Timer, Emblem_Pause, Emblem_Error } Emblem;
 

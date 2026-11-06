@@ -67,6 +67,11 @@ struct Made
     // built with another loader is offered to be made again
     // (forwarders_logic::stale_loader).
     std::string loader;
+    // The badge over its icon, protected (forwarder_flow::badge_id: 16 hex
+    // digits of its PNG's SHA-256); empty when it has none, or made before it
+    // was kept. Another badge is offered to be made again
+    // (forwarders_logic::stale_badge).
+    std::string badge;
     // Where its square sits along the screenshot: 0 its left edge, 100 its
     // right one (forwarder_icon::from_screenshot).
     int         icon_x = ICON_X_MIDDLE;

@@ -198,6 +198,7 @@ bool install(const forwarders::Made& m, bool self, const char* kind, const std::
     }
     forwarders::Made made = m;
     made.loader = loader_id();   // the loader it is built with now
+    made.badge = m.pin ? badge_id() : "";   // and the badge it carries
     std::string gate_argv;
     Gate gate;
     if (made.pin) {

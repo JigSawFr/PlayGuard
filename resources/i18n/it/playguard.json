@@ -1128,7 +1128,7 @@
         "patches_anyway": "Aggiungilo comunque (si avvierà quando le patch saranno a posto)",
         "patches_mixed": "sys-patch è attivo, ma sulla scheda SD ci sono anche file sigpatch ({}): una causa nota di forwarder che non è stato possibile avviare. Mettili da parte (Console › Patch dei giochi), poi riavvia la console.",
         "refresh": "Rifai i forwarder con questo loader",
-        "refresh_confirm": "Rifare questi forwarder con il nuovo loader? {}: una volta rifatti, avviano il loro homebrew con il loader di questa build e mantengono nome, icona e regole del PIN.",
+        "refresh_confirm": "Rifare questi forwarder con questa versione? {}: una volta rifatti, avviano il loro homebrew con il suo loader, quelli protetti portano il suo badge e tutti mantengono nome, icona e regole del PIN.",
         "refresh_title": "Forwarder creati con un loader precedente",
         "refresh_detail": "{}: creati da un PlayGuard precedente. Una volta rifatti, avviano il loro homebrew con il loader di questa build."
     },
