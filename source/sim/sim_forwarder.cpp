@@ -59,7 +59,7 @@ const Homebrew HOMEBREW[] = {
     { "/switch/StarAtlas.nro", "Star Atlas", "Orbit Lab", "0.9.4", SIM_HB_ICON_ATLAS, sizeof(SIM_HB_ICON_ATLAS) },
     { "/switch/QuickNotes/QuickNotes.nro", "Quick Notes", "Paper Fox", "1.3.0", SIM_HB_ICON_NOTES, sizeof(SIM_HB_ICON_NOTES) },
     { "/switch/SaveKeeper/SaveKeeper.nro", "Save Keeper", "Hollow Tools", "3.10.1", SIM_HB_ICON_KEEPER, sizeof(SIM_HB_ICON_KEEPER) },
-    { "/switch/playguard/playguard.nro", "PlayGuard", "JigSawFr", "", nullptr, 0 },
+    { "/switch/playguard/playguard.nro", "PlayGuard", "JigSawFr", "", SIM_HB_ICON_PLAYGUARD, sizeof(SIM_HB_ICON_PLAYGUARD) },
     { "/switch/sphaira/sphaira.nro", "sphaira", "ITotalJustice", "1.0.0", SIM_HB_ICON_NOTES, sizeof(SIM_HB_ICON_NOTES) },
 };
 const Homebrew& KEPT = HOMEBREW[3];
