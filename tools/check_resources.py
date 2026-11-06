@@ -513,7 +513,7 @@ for path in sorted(glob.glob(f"{ROOT}/resources/img/**/*", recursive=True)):
 
 
 def is_emoji(cp):
-    """The pictographs source/util/changelog.cpp draws as images."""
+    """The pictographs library/boreale-kit/source/util/changelog.cpp draws as images."""
     return cp >= 0x1F000 or 0x2600 <= cp <= 0x27BF or 0x2B00 <= cp <= 0x2BFF or \
         0x231A <= cp <= 0x231B or 0x23E9 <= cp <= 0x23FA
 

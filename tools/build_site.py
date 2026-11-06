@@ -744,7 +744,7 @@ def home_body(t, lang, to_root):
 
 def firmware(macro):
     """A firmware version of source/core/fw_policy.h ('21.0.0'), as tools/gen_compat.py reads it."""
-    with open(os.path.join(ROOT, "source", "core", "sysinfo.h"), encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "source", "core", "fw_policy.h"), encoding="utf-8") as f:
         m = re.search(rf"#define {macro}\s+MAKEHOSVERSION\((\d+),\s*(\d+),\s*(\d+)\)", f.read())
     if not m:
         raise SystemExit(f"site: {macro} not found in source/core/fw_policy.h")
