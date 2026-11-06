@@ -239,7 +239,7 @@ games_logic_SRC   := source/action/games_logic.cpp tests/games_logic/test.cpp
 system_titles_SRC   := source/util/system_titles.cpp tests/system_titles/test.cpp
 titles_SRC   := source/util/titles.cpp tests/titles/test.cpp
 titles_CSRC  := source/sync/sync_titles.c
-titles_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source
+titles_CFLAGS := -std=gnu11 -Isource/sync -I$(KIT) -I$(KIT)/core -Isource/core -Ilibrary/boreale-link/source
 sync_icons_logic_SRC   := source/action/sync_icons_logic.cpp tests/sync_icons_logic/test.cpp
 sync_icons_logic_CSRC  := source/sync/sync_icons.c
 sync_icons_logic_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source
