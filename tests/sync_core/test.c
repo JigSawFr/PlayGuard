@@ -441,7 +441,7 @@ static void test_conf(void)
     c.publish_hardware = true;
     c.publish_serial = false;
     CHECK(c.poll_s == 30 && !strcmp(c.topic_prefix, "boreale"));
-    CHECK(contains(c.extra, "future_key=keep me\n"));
+    CHECK(contains(c.kept, "future_key=keep me\n"));
     CHECK(sync_conf_problem(&c) == NULL);
 
     // Its broker keys (schema 2) are to move to link.conf.
@@ -458,17 +458,31 @@ static void test_conf(void)
     sync_conf_defaults(&back);
     CHECK(sync_conf_parse(&back, out, n));
     CHECK(!back.broker_keys && back.policy == c.policy && back.remote_timer_writes == c.remote_timer_writes);
-    CHECK(back.publish_games == c.publish_games && !strcmp(back.extra, c.extra));
+    CHECK(back.publish_games == c.publish_games && !strcmp(back.kept, c.kept));
+    // A copy writes its own lines, not the ones its `file.kept` still points at.
+    SyncConf copy = c;
+    char copied[2048];
+    CHECK(sync_conf_write(&copy, copied, sizeof(copied)) == n && !memcmp(copied, out, n));
     // The broker's part, through link.conf.
     BlLinkConf link;
     bl_link_conf_defaults(&link);
     sync_conf_to_link(&c, &link);
     sync_conf_from_link(&back, &link);
     back.broker_keys = c.broker_keys;
-    back.schema = c.schema;
+    back.file.schema = c.file.schema;
+    back.file.kept = c.file.kept;   // each one's own buffer: the pointer is all that differs
     CHECK(!memcmp(&back, &c, sizeof(c)));
     CHECK(sync_conf_write(&c, out, 64) == 0);
-    CHECK(sync_conf_unwritable(&c) == NULL && c.schema == SYNC_CONF_SCHEMA);   // none in the file: the current one
+    CHECK(sync_conf_unwritable(&c) == NULL && c.file.schema == SYNC_CONF_SCHEMA);   // none in the file: the current one
+    // A hand-written file without `schema` is the current one, not schema 1: no prefix move.
+    SyncConf bare;
+    sync_conf_defaults(&bare);
+    CHECK(sync_conf_parse(&bare, "host=broker.lan\n", 17));
+    CHECK(bare.file.schema == SYNC_CONF_SCHEMA && !bare.legacy_prefix[0] && !strcmp(bare.topic_prefix, "boreale"));
+    CHECK(sync_conf_unwritable(&bare) == NULL);
+    // An explicit schema=1 still is the old one.
+    sync_conf_defaults(&bare);
+    CHECK(sync_conf_parse(&bare, "schema=1\nhost=broker.lan\n", 25) && bare.file.schema == 1 && !strcmp(bare.legacy_prefix, "playguard"));
 
     // Schema 1 published under playguard/<id>/: the default prefix moves to
     // boreale (into link.conf), the old tree is to clear (legacy_prefix),
@@ -483,7 +497,7 @@ static void test_conf(void)
     CHECK(on > 0 && contains(out, "schema=3\n") && contains(out, "legacy_prefix=playguard\n") && !contains(out, "topic_prefix"));
     SyncConf again;
     sync_conf_defaults(&again);
-    CHECK(sync_conf_parse(&again, out, on) && again.schema == 3 && !strcmp(again.legacy_prefix, "playguard"));
+    CHECK(sync_conf_parse(&again, out, on) && again.file.schema == 3 && !strcmp(again.legacy_prefix, "playguard"));
     old.legacy_prefix[0] = '\0';   // cleared: the line goes
     CHECK(sync_conf_write(&old, out, sizeof(out)) > 0 && !contains(out, "legacy_prefix"));
     // A prefix of one's own stays; its old tree (no module level) is cleared.
@@ -503,7 +517,7 @@ static void test_conf(void)
     SyncConf nc;
     sync_conf_defaults(&nc);
     CHECK(sync_conf_parse(&nc, newer, strlen(newer)));
-    CHECK(nc.schema == 4 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.extra, "later=1\n"));
+    CHECK(nc.file.schema == 4 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.kept, "later=1\n"));
     CHECK(sync_conf_unwritable(&nc) != NULL);
     // More unknown lines than SYNC_EXTRA_MAX keeps: not written either.
     char many[SYNC_EXTRA_MAX * 2];
@@ -511,8 +525,8 @@ static void test_conf(void)
     for (int i = 0; at + 40 < sizeof(many); i++) at += (size_t)snprintf(many + at, sizeof(many) - at, "later_%03d=value\n", i);
     sync_conf_defaults(&nc);
     CHECK(sync_conf_parse(&nc, many, at));
-    CHECK(nc.extra_lost && sync_conf_unwritable(&nc) != NULL);
-    CHECK(sync_conf_parse(&nc, "host=x\n", 7) && !nc.extra_lost);   // read again: it starts over
+    CHECK(nc.file.overflow && sync_conf_unwritable(&nc) != NULL);
+    CHECK(sync_conf_parse(&nc, "host=x\n", 7) && !nc.file.overflow);   // read again: it starts over
     // The MQTT version's spellings; anything else keeps the setting.
     const struct { const char *text; SyncMqttVersion v; } versions[] = {
         { "mqtt_version=5\n", SyncMqtt_V5 }, { "mqtt_version=5.0\n", SyncMqtt_V5 },

@@ -65,7 +65,6 @@ typedef enum {
 } SyncPublish;
 
 typedef struct {
-    int        schema;
     bool       enabled;
     char       host[SYNC_HOST_MAX];
     uint16_t   port;                    // 1883; 8883 turns tls on by default
@@ -98,8 +97,12 @@ typedef struct {
     // engine has cleared what is left of it on the broker ("" none).
     char       legacy_prefix[SYNC_PREFIX_MAX];
     int        log_level;               // 0 errors, 1 info, 2 debug
-    char       extra[SYNC_EXTRA_MAX];   // lines with unknown keys, as read
-    bool       extra_lost;              // some did not fit in `extra`
+    // The file's schema (bl_kv: absent in the file is the current one, not
+    // 1), the lines it could not read, and the lines with unknown keys, kept
+    // in `kept` to be written back. `file.kept` points into this struct: a
+    // copy has to point it at its own `kept` (sync_conf_write does).
+    BlKvFile   file;
+    char       kept[SYNC_EXTRA_MAX];
     // The file had broker keys (schema 1 or 2): they go to link.conf, and the
     // file is written again without them.
     bool       broker_keys;
@@ -119,8 +122,8 @@ size_t sync_conf_write(const SyncConf *c, char *out, size_t cap);
 // Whether what was read may be written back: NULL yes, else an English
 // reason. A file a newer version wrote (its schema above SYNC_CONF_SCHEMA)
 // is read for the keys this one knows but never written over, by PlayGuard
-// or the agent; nor is one whose unknown lines did not all fit in `extra`
-// (writing it would lose them).
+// or the agent; nor is one with a line that could not be read or kept
+// (writing it would lose it).
 const char *sync_conf_unwritable(const SyncConf *c);
 // What is still missing before connecting: NULL when ready, else an English
 // reason ("no broker host" …). The UI shows its own words.
