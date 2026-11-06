@@ -1302,9 +1302,9 @@
         "title": "Actualización disponible"
     },
     "ha_update": {
-        "body": "Home Assistant tiene la versión {}. Escanea el código con un móvil en el que se abra Home Assistant: en HACS, actualiza PlayGuard y luego reinicia Home Assistant.",
-        "hacs": "PlayGuard en HACS",
-        "hacs_caption": "Actualizar y luego reiniciar",
+        "body": "Home Assistant tiene la versión {}. Escanea el código con un móvil en el que se abra Home Assistant: en el Marketplace, actualiza PlayGuard y luego reinicia Home Assistant.",
+        "marketplace": "PlayGuard en el Marketplace",
+        "marketplace_caption": "Actualizar y luego reiniciar",
         "changes": "Lo que ha cambiado desde la {}",
         "note": "Todas las versiones: {}",
         "no_notes": "No se han podido leer los cambios; están en {}."
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "Permitir",
         "section_ha": "Home Assistant",
         "ha_install": "Instalar la integración de Home Assistant",
-        "ha_install_body": "Escanea con un móvil en el que se abra Home Assistant (My Home Assistant pide su dirección una vez). 1: descarga PlayGuard en HACS y luego reinicia Home Assistant: la consola aparece entonces sola. 2: si no aparece, añádela.",
-        "ha_hacs": "1. PlayGuard en HACS",
-        "ha_hacs_caption": "Descargar y luego reiniciar",
+        "ha_install_body": "Escanea con un móvil en el que se abra Home Assistant (My Home Assistant pide su dirección una vez). 1: instala PlayGuard desde el Marketplace: la consola aparece entonces sola. 2: si no aparece, añádela.",
+        "ha_marketplace": "1. PlayGuard en el Marketplace",
+        "ha_marketplace_caption": "Instalar",
         "ha_add": "2. Añadir la consola",
         "ha_add_caption": "ID de la consola: {}",
         "ha_add_caption_none": "Si Home Assistant no la ofrece",

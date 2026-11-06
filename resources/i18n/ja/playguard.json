@@ -1302,9 +1302,9 @@
         "title": "アップデートがあります"
     },
     "ha_update": {
-        "body": "Home Assistant に入っているバージョンは {} です。Home Assistant を開けるスマホでコードを読み取り、HACS で PlayGuard をアップデートしてから、Home Assistant を再起動してください。",
-        "hacs": "HACS の PlayGuard",
-        "hacs_caption": "アップデートして再起動",
+        "body": "Home Assistant に入っているバージョンは {} です。Home Assistant を開けるスマホでコードを読み取り、Marketplace で PlayGuard をアップデートしてから、Home Assistant を再起動してください。",
+        "marketplace": "Marketplace の PlayGuard",
+        "marketplace_caption": "アップデートして再起動",
         "changes": "{} からの変更点",
         "note": "すべてのリリース：{}",
         "no_notes": "変更点を読み込めませんでした。{} で確認できます。"
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "許可する",
         "section_ha": "Home Assistant",
         "ha_install": "Home Assistant 統合をインストール",
-        "ha_install_body": "Home Assistant を開けるスマホで読み取ってください（My Home Assistant が一度だけアドレスを尋ねます）。1：HACS で PlayGuard をダウンロードし、Home Assistant を再起動します。本体は自動で表示されます。2：表示されない場合は追加してください。",
-        "ha_hacs": "1. HACS の PlayGuard",
-        "ha_hacs_caption": "ダウンロードして再起動",
+        "ha_install_body": "Home Assistant を開けるスマホで読み取ってください（My Home Assistant が一度だけアドレスを尋ねます）。1：Marketplace で PlayGuard をインストールします。本体は自動で表示されます。2：表示されない場合は追加してください。",
+        "ha_marketplace": "1. Marketplace の PlayGuard",
+        "ha_marketplace_caption": "インストール",
         "ha_add": "2. 本体を追加",
         "ha_add_caption": "本体 ID：{}",
         "ha_add_caption_none": "Home Assistant が提案しない場合",

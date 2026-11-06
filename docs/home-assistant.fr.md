@@ -152,8 +152,8 @@ modèles ou l'intégration ci-dessous.
 
 ## L'intégration PlayGuard (facultative)
 
-L'[intégration PlayGuard](https://github.com/JigSawFr/playguard-ha), un dépôt
-personnalisé HACS, remplace l'appareil MQTT de la console par les mêmes
+L'[intégration PlayGuard](https://github.com/JigSawFr/boreale-ha), un dépôt
+personnalisé de la Marketplace de Home Assistant, remplace l'appareil MQTT de la console par les mêmes
 entités et ajoute : *En ligne*, *Agent actif*, *Vu pour la dernière fois*,
 *Temps de jeu cette semaine*, *Fin de partie prévue*, *Activité*, *Homebrews*
 et *Forwarders* ; les noms des jeux ; le temps de jeu de chaque compte
@@ -165,19 +165,19 @@ déclencheurs et conditions dans l'éditeur d'automatisations ; Assist (le temps
 de jeu du jour, du temps en plus, plus de jeu aujourd'hui, à la voix ou par
 écrit) ; des blueprints prêts à l'emploi ; des corrections ; en 14 langues.
 Son
-[README](https://github.com/JigSawFr/playguard-ha/blob/main/README.fr.md) les
-détaille. Elle demande [HACS](https://hacs.xyz/) et Home Assistant 2026.10 ou
-plus récent.
+[README](https://github.com/JigSawFr/boreale-ha/blob/main/README.fr.md) les
+détaille. Elle demande Home Assistant 2026.11 ou plus récent, qui a la
+Marketplace intégrée (*Paramètres › Marketplace*) ; HACS, qu'elle a remplacé,
+n'est plus nécessaire.
 
-[![Ouvrez votre instance Home Assistant et ouvrez un dépôt dans le Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration)
+[![Ouvrez votre instance Home Assistant et ouvrez un dépôt dans la Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=JigSawFr&repository=boreale-ha&category=integration)
 [![Ouvrez votre instance Home Assistant et commencez à configurer une nouvelle intégration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard)
 
 Depuis la console : **Accès à distance › Home Assistant › Installer
 l'intégration Home Assistant** affiche les deux mêmes liens en QR codes, pour
 un téléphone où Home Assistant s'ouvre (My Home Assistant demande une fois son
-adresse). Le premier ouvre le dépôt dans HACS : *Télécharger*, puis
-redémarrez Home Assistant ; la console apparaît alors d'elle-même dans
-*Paramètres › Appareils et services*. Le second l'ajoute à la main sinon,
+adresse). Le premier ouvre le dépôt dans la Marketplace : *Installer* ; la console
+apparaît alors d'elle-même dans *Paramètres › Appareils et services*. Le second l'ajoute à la main sinon,
 avec l'identifiant de la console affiché dessous.
 
 Une fois installée, l'intégration indique à la console la version qui tourne
@@ -188,7 +188,7 @@ propres mises à jour (*Rechercher les mises à jour chaque jour*, ou
 *Rechercher les mises à jour* dans À propos) ; une version plus récente est
 dans la cloche des notifications et sur cette cellule (*0.1.0 · 0.2.0
 disponible*). *Nouveautés* montre ce qui a changé depuis la version installée
-et le QR code qui ouvre l'intégration dans HACS : *Mettre à jour*, puis
+et le QR code qui ouvre l'intégration dans la Marketplace : *Mettre à jour*, puis
 redémarrez Home Assistant. Rien ne passe par Internet pour elle tant que
 l'intégration n'est pas installée.
 

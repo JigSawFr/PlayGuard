@@ -625,7 +625,7 @@ not read (no version known). PlayGuard shows the version in
 integration's latest release with its other updates (*Check for updates
 every day*, *Check for updates*), only once the integration is known: a
 newer one is in the notification bell, with what changed since (the
-release's `CHANGELOG.md`) and the QR code that opens it in HACS.
+release's `CHANGELOG.md`) and the QR code that opens it in the Marketplace.
 
 ## Files on the SD card
 

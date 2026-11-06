@@ -1302,9 +1302,9 @@
         "title": "有可用更新"
     },
     "ha_update": {
-        "body": "Home Assistant 中的版本为 {}。请用能打开 Home Assistant 的手机扫描二维码：在 HACS 中更新 PlayGuard，然后重启 Home Assistant。",
-        "hacs": "HACS 中的 PlayGuard",
-        "hacs_caption": "更新，然后重启",
+        "body": "Home Assistant 中的版本为 {}。请用能打开 Home Assistant 的手机扫描二维码：在 Marketplace 中更新 PlayGuard，然后重启 Home Assistant。",
+        "marketplace": "Marketplace 中的 PlayGuard",
+        "marketplace_caption": "更新，然后重启",
         "changes": "自 {} 以来的更新内容",
         "note": "所有版本：{}",
         "no_notes": "无法读取更新内容；可在 {} 查看。"
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "允许",
         "section_ha": "Home Assistant",
         "ha_install": "安装 Home Assistant 集成",
-        "ha_install_body": "用能打开 Home Assistant 的手机扫描（My Home Assistant 会询问一次它的地址）。1：在 HACS 中下载 PlayGuard，然后重启 Home Assistant：主机随后会自动出现。2：如果没有出现，请手动添加。",
-        "ha_hacs": "1. HACS 中的 PlayGuard",
-        "ha_hacs_caption": "下载，然后重启",
+        "ha_install_body": "用能打开 Home Assistant 的手机扫描（My Home Assistant 会询问一次它的地址）。1：在 Marketplace 中安装 PlayGuard：主机随后会自动出现。2：如果没有出现，请手动添加。",
+        "ha_marketplace": "1. Marketplace 中的 PlayGuard",
+        "ha_marketplace_caption": "安装",
         "ha_add": "2. 添加主机",
         "ha_add_caption": "主机 ID：{}",
         "ha_add_caption_none": "如果 Home Assistant 没有提示添加",

@@ -1302,9 +1302,9 @@
         "title": "Update available"
     },
     "ha_update": {
-        "body": "Home Assistant has {}. Scan the code with a phone where Home Assistant opens: in HACS, update PlayGuard, then restart Home Assistant.",
-        "hacs": "PlayGuard in HACS",
-        "hacs_caption": "Update, then restart",
+        "body": "Home Assistant has {}. Scan the code with a phone where Home Assistant opens: in the Marketplace, update PlayGuard, then restart Home Assistant.",
+        "marketplace": "PlayGuard in the Marketplace",
+        "marketplace_caption": "Update, then restart",
         "changes": "What changed since {}",
         "note": "Every release: {}",
         "no_notes": "What changed could not be read; it is on {}."
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "Allow",
         "section_ha": "Home Assistant",
         "ha_install": "Install the Home Assistant integration",
-        "ha_install_body": "Scan with a phone where Home Assistant opens (My Home Assistant asks once for its address). 1: Download PlayGuard in HACS, then restart Home Assistant: the console then shows up by itself. 2: if it does not, add it.",
-        "ha_hacs": "1. PlayGuard in HACS",
-        "ha_hacs_caption": "Download, then restart",
+        "ha_install_body": "Scan with a phone where Home Assistant opens (My Home Assistant asks once for its address). 1: Install PlayGuard from the Marketplace: the console then shows up by itself. 2: if it does not, add it.",
+        "ha_marketplace": "1. PlayGuard in the Marketplace",
+        "ha_marketplace_caption": "Install",
         "ha_add": "2. Add the console",
         "ha_add_caption": "Console id: {}",
         "ha_add_caption_none": "If Home Assistant does not offer it",

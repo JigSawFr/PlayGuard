@@ -101,7 +101,7 @@ As entradas sobre o console, e não sobre o controle parental, vêm por último,
 - o sysmodule de recuperação desatualizado (não é o que vem com esta versão, ou foi instalado antes de informar a própria versão; *Atualizar* instala o que esta versão traz), depois o console a reiniciar para usá-lo, até ele ser reiniciado;
 - uma compilação que não terminou de abrir e da qual o PlayGuard voltou (*Enviar um relatório*).
 
-As para informação: uma volta para a compilação anterior, um firmware não testado com esta versão, um Atmosphère, hekate ou firmware mais novo (verificado com *Procurar atualizações todos os dias*; a entrada do firmware diz para esperar até o Atmosphère oferecer suporte), uma versão mais nova da integração do Home Assistant (depois que ela informou qual versão o Home Assistant tem: *Novidades* mostra o que mudou desde então e o QR code que a abre no HACS), o número de série não mascarado no emuMMC, o controle parental próprio do outro sistema, um dos arquivos do próprio PlayGuard encontrado danificado e posto de lado (uma mensagem rápida na abertura aponta para ele).
+As para informação: uma volta para a compilação anterior, um firmware não testado com esta versão, um Atmosphère, hekate ou firmware mais novo (verificado com *Procurar atualizações todos os dias*; a entrada do firmware diz para esperar até o Atmosphère oferecer suporte), uma versão mais nova da integração do Home Assistant (depois que ela informou qual versão o Home Assistant tem: *Novidades* mostra o que mudou desde então e o QR code que a abre no Marketplace), o número de série não mascarado no emuMMC, o controle parental próprio do outro sistema, um dos arquivos do próprio PlayGuard encontrado danificado e posto de lado (uma mensagem rápida na abertura aponta para ele).
 
 ### Como as entradas se comportam
 
@@ -463,7 +463,7 @@ Em um console sem internet, *Usar o relógio do console* é oferecido na caixa d
 
 ### Acesso remoto
 
-*Acesso remoto ›*, um bloco em *Ferramentas* — uma conexão opcional com um broker MQTT e o Home Assistant na sua rede local, desativada por padrão ([o guia do Home Assistant](../home-assistant.md), em inglês). O broker e a versão MQTT dele, o nome do console, o que fazer com as ordens (perguntar no console, executá-las, recusá-las), se elas podem alterar o tempo de jogo (desativado por padrão), a descoberta do Home Assistant, as informações do próprio console (modelo, versões, armazenamento, bateria, rede, jogos e o ícone de cada um; o número de série só com *Publicar o número de série*), QR codes que instalam a integração PlayGuard pelo HACS e adicionam o console (depois de instalada, a versão dela e a versão mais nova), o status em tempo real, *Sincronizar agora* e o log.
+*Acesso remoto ›*, um bloco em *Ferramentas* — uma conexão opcional com um broker MQTT e o Home Assistant na sua rede local, desativada por padrão ([o guia do Home Assistant](../home-assistant.md), em inglês). O broker e a versão MQTT dele, o nome do console, o que fazer com as ordens (perguntar no console, executá-las, recusá-las), se elas podem alterar o tempo de jogo (desativado por padrão), a descoberta do Home Assistant, as informações do próprio console (modelo, versões, armazenamento, bateria, rede, jogos e o ícone de cada um; o número de série só com *Publicar o número de série*), QR codes que instalam a integração PlayGuard pelo Marketplace e adicionam o console (depois de instalada, a versão dela e a versão mais nova), o status em tempo real, *Sincronizar agora* e o log.
 
 ### Módulos opcionais
 

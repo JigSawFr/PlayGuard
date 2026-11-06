@@ -1302,9 +1302,9 @@
         "title": "Update beschikbaar"
     },
     "ha_update": {
-        "body": "Home Assistant heeft versie {}. Scan de code met een telefoon waarop Home Assistant opent: werk PlayGuard bij in HACS en start Home Assistant daarna opnieuw op.",
-        "hacs": "PlayGuard in HACS",
-        "hacs_caption": "Bijwerken, dan herstarten",
+        "body": "Home Assistant heeft versie {}. Scan de code met een telefoon waarop Home Assistant opent: werk PlayGuard bij in de Marketplace en start Home Assistant daarna opnieuw op.",
+        "marketplace": "PlayGuard in de Marketplace",
+        "marketplace_caption": "Bijwerken, dan herstarten",
         "changes": "Wat er veranderd is sinds {}",
         "note": "Alle versies: {}",
         "no_notes": "Wat er veranderd is, kon niet worden gelezen; het staat op {}."
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "Toestaan",
         "section_ha": "Home Assistant",
         "ha_install": "De Home Assistant-integratie installeren",
-        "ha_install_body": "Scan met een telefoon waarop Home Assistant opent (My Home Assistant vraagt één keer om het adres). 1: download PlayGuard in HACS en start Home Assistant opnieuw op: de console verschijnt dan vanzelf. 2: zo niet, voeg hem toe.",
-        "ha_hacs": "1. PlayGuard in HACS",
-        "ha_hacs_caption": "Downloaden, dan herstarten",
+        "ha_install_body": "Scan met een telefoon waarop Home Assistant opent (My Home Assistant vraagt één keer om het adres). 1: installeer PlayGuard via de Marketplace: de console verschijnt dan vanzelf. 2: zo niet, voeg hem toe.",
+        "ha_marketplace": "1. PlayGuard in de Marketplace",
+        "ha_marketplace_caption": "Installeren",
         "ha_add": "2. Console toevoegen",
         "ha_add_caption": "Console-ID: {}",
         "ha_add_caption_none": "Als Home Assistant hem niet aanbiedt",

@@ -398,7 +398,7 @@ void SyncActivity::refresh_ha_install()
     const std::string installed = ha_update_flow::installed();
     if (installed.empty()) {
         ha_install->setText("playguard/sync/ha_install"_i18n);
-        ha_install->setDetailText("HACS");
+        ha_install->setDetailText("Marketplace");
         ha_install->detail->setThemeColor("textColor", "cadran/text2");
         return;
     }
