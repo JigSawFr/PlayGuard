@@ -49,7 +49,8 @@ void show(const std::string& device)
     auto* row = new aurore::Box(aurore::Axis::ROW);
     row->setJustifyContent(aurore::JustifyContent::SPACE_EVENLY);
     row->setMarginTop(14);
-    row->addView(qr_card("playguard/sync/ha_hacs"_i18n, app::HA_HACS_URL, "playguard/sync/ha_hacs_caption"_i18n));
+    row->addView(qr_card("playguard/sync/ha_marketplace"_i18n, app::HA_MARKETPLACE_URL,
+                         "playguard/sync/ha_marketplace_caption"_i18n));
     row->addView(qr_card("playguard/sync/ha_add"_i18n, app::HA_ADD_URL,
                          device.empty() ? "playguard/sync/ha_add_caption_none"_i18n
                                         : aurore::getStr("playguard/sync/ha_add_caption", device)));

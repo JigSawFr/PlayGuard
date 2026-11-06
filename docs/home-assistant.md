@@ -138,8 +138,8 @@ days) are also on the broker (`boreale/<id>/playguard/activity`, `…/week`,
 
 ## The PlayGuard integration (optional)
 
-The [PlayGuard integration](https://github.com/JigSawFr/playguard-ha), a HACS
-custom repository, replaces the console's own MQTT device with the same
+The [PlayGuard integration](https://github.com/JigSawFr/boreale-ha), a custom
+repository of Home Assistant's Marketplace, replaces the console's own MQTT device with the same
 entities and adds: *Online*, *Agent running*, *Last seen*, *Play time this
 week*, *Play ends*, *Activity*, *Homebrews* and *Forwarders*; the game names;
 each account's play time today and this week; the play sessions as a
@@ -149,17 +149,18 @@ actions; an event entity for every order handled; triggers and conditions of
 its own in the automation editor; Assist (today's play time, extra time, no
 more play today, by voice or chat); ready-made blueprints; repairs; in 14
 languages. Its
-[README](https://github.com/JigSawFr/playguard-ha#readme) has them all. It
-needs [HACS](https://hacs.xyz/) and Home Assistant 2026.10 or later.
+[README](https://github.com/JigSawFr/boreale-ha#readme) has them all. It
+needs Home Assistant 2026.11 or later, which has the Marketplace built in
+(*Settings › Marketplace*); HACS, which it replaced, is no longer needed.
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration)
+[![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=JigSawFr&repository=boreale-ha&category=integration)
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard)
 
 From the console: **Remote access › Home Assistant › Install the Home Assistant
 integration** shows the same two links as QR codes, for a phone where Home
 Assistant opens (My Home Assistant asks once for its address). The first opens
-the repository in HACS: *Download*, then restart Home Assistant; the console
-then shows up by itself in *Settings › Devices & services*. The second adds it
+the repository in the Marketplace: *Install*; the console then shows up by
+itself in *Settings › Devices & services*. The second adds it
 by hand when it does not, with the console id shown under it.
 
 Once installed, the integration tells the console which version runs (retained
@@ -169,7 +170,7 @@ the integration's latest release with its own updates (*Check for updates
 every day*, or *Check for updates* in About); a newer one is in the
 notification bell and on that cell (*0.1.0 · 0.2.0 available*). *What's new*
 shows what changed since the installed version and the QR code that opens the
-integration in HACS: *Update*, then restart Home Assistant. Nothing goes
+integration in the Marketplace: *Update*, then restart Home Assistant. Nothing goes
 online for it before the integration is installed.
 
 ## Orders

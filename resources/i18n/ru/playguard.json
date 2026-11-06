@@ -1302,9 +1302,9 @@
         "title": "Доступно обновление"
     },
     "ha_update": {
-        "body": "В Home Assistant установлена версия {}. Отсканируйте код телефоном, на котором открывается Home Assistant: в HACS обновите PlayGuard, затем перезапустите Home Assistant.",
-        "hacs": "PlayGuard в HACS",
-        "hacs_caption": "Обновить, затем перезапустить",
+        "body": "В Home Assistant установлена версия {}. Отсканируйте код телефоном, на котором открывается Home Assistant: в Marketplace обновите PlayGuard, затем перезапустите Home Assistant.",
+        "marketplace": "PlayGuard в Marketplace",
+        "marketplace_caption": "Обновить, затем перезапустить",
         "changes": "Что изменилось с версии {}",
         "note": "Все выпуски: {}",
         "no_notes": "Не удалось прочитать, что изменилось; это есть на {}."
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "Разрешить",
         "section_ha": "Home Assistant",
         "ha_install": "Установить интеграцию Home Assistant",
-        "ha_install_body": "Отсканируйте телефоном, на котором открывается Home Assistant (My Home Assistant один раз спросит его адрес). 1: скачайте PlayGuard в HACS, затем перезапустите Home Assistant — консоль появится сама. 2: если нет, добавьте её.",
-        "ha_hacs": "1. PlayGuard в HACS",
-        "ha_hacs_caption": "Скачать, затем перезапустить",
+        "ha_install_body": "Отсканируйте телефоном, на котором открывается Home Assistant (My Home Assistant один раз спросит его адрес). 1: установите PlayGuard из Marketplace — консоль появится сама. 2: если нет, добавьте её.",
+        "ha_marketplace": "1. PlayGuard в Marketplace",
+        "ha_marketplace_caption": "Установить",
         "ha_add": "2. Добавить консоль",
         "ha_add_caption": "ID консоли: {}",
         "ha_add_caption_none": "Если Home Assistant её не предложит",

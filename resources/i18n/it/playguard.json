@@ -1302,9 +1302,9 @@
         "title": "Aggiornamento disponibile"
     },
     "ha_update": {
-        "body": "Home Assistant ha la versione {}. Scansiona il codice con un telefono su cui si apre Home Assistant: in HACS aggiorna PlayGuard, poi riavvia Home Assistant.",
-        "hacs": "PlayGuard in HACS",
-        "hacs_caption": "Aggiorna, poi riavvia",
+        "body": "Home Assistant ha la versione {}. Scansiona il codice con un telefono su cui si apre Home Assistant: nel Marketplace aggiorna PlayGuard, poi riavvia Home Assistant.",
+        "marketplace": "PlayGuard nel Marketplace",
+        "marketplace_caption": "Aggiorna, poi riavvia",
         "changes": "Cosa è cambiato dalla {}",
         "note": "Tutte le versioni: {}",
         "no_notes": "Non è stato possibile leggere le novità; sono su {}."
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "Consenti",
         "section_ha": "Home Assistant",
         "ha_install": "Installa l'integrazione Home Assistant",
-        "ha_install_body": "Scansiona con un telefono su cui si apre Home Assistant (My Home Assistant chiede una volta il suo indirizzo). 1: scarica PlayGuard in HACS, poi riavvia Home Assistant: la console compare allora da sola. 2: se non compare, aggiungila.",
-        "ha_hacs": "1. PlayGuard in HACS",
-        "ha_hacs_caption": "Scarica, poi riavvia",
+        "ha_install_body": "Scansiona con un telefono su cui si apre Home Assistant (My Home Assistant chiede una volta il suo indirizzo). 1: installa PlayGuard dal Marketplace: la console compare allora da sola. 2: se non compare, aggiungila.",
+        "ha_marketplace": "1. PlayGuard nel Marketplace",
+        "ha_marketplace_caption": "Installa",
         "ha_add": "2. Aggiungi la console",
         "ha_add_caption": "ID della console: {}",
         "ha_add_caption_none": "Se Home Assistant non la propone",

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- A newer release of PlayGuard's Home Assistant integration: the version
-     Home Assistant runs, the QR code that opens the integration in HACS on a
+     Home Assistant runs, the QR code that opens the integration in the Marketplace on a
      phone, and what changed since. Opened from the notification bell and
      Remote access › Home Assistant; filled by ha_update_activity.cpp. -->
 

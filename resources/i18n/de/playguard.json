@@ -1302,9 +1302,9 @@
         "title": "Update verfügbar"
     },
     "ha_update": {
-        "body": "Home Assistant hat Version {}. Scannen Sie den Code mit einem Smartphone, auf dem sich Home Assistant öffnet: Aktualisieren Sie PlayGuard in HACS und starten Sie Home Assistant dann neu.",
-        "hacs": "PlayGuard in HACS",
-        "hacs_caption": "Aktualisieren, dann neu starten",
+        "body": "Home Assistant hat Version {}. Scannen Sie den Code mit einem Smartphone, auf dem sich Home Assistant öffnet: Aktualisieren Sie PlayGuard im Marketplace und starten Sie Home Assistant dann neu.",
+        "marketplace": "PlayGuard im Marketplace",
+        "marketplace_caption": "Aktualisieren, dann neu starten",
         "changes": "Änderungen seit {}",
         "note": "Alle Versionen: {}",
         "no_notes": "Die Änderungen konnten nicht gelesen werden; sie stehen auf {}."
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "Zulassen",
         "section_ha": "Home Assistant",
         "ha_install": "Home-Assistant-Integration installieren",
-        "ha_install_body": "Scannen Sie mit einem Smartphone, auf dem sich Home Assistant öffnet (My Home Assistant fragt einmal nach seiner Adresse). 1: Laden Sie PlayGuard in HACS herunter und starten Sie Home Assistant neu: Die Konsole erscheint dann von selbst. 2: Falls nicht, fügen Sie sie hinzu.",
-        "ha_hacs": "1. PlayGuard in HACS",
-        "ha_hacs_caption": "Herunterladen, dann neu starten",
+        "ha_install_body": "Scannen Sie mit einem Smartphone, auf dem sich Home Assistant öffnet (My Home Assistant fragt einmal nach seiner Adresse). 1: Installieren Sie PlayGuard aus dem Marketplace: Die Konsole erscheint dann von selbst. 2: Falls nicht, fügen Sie sie hinzu.",
+        "ha_marketplace": "1. PlayGuard im Marketplace",
+        "ha_marketplace_caption": "Installieren",
         "ha_add": "2. Konsole hinzufügen",
         "ha_add_caption": "Konsolen-ID: {}",
         "ha_add_caption_none": "Falls Home Assistant sie nicht anbietet",

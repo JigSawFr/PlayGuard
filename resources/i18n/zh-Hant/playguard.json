@@ -1302,9 +1302,9 @@
         "title": "有可用更新"
     },
     "ha_update": {
-        "body": "Home Assistant 中的版本為 {}。請用能開啟 Home Assistant 的手機掃描 QR 碼：在 HACS 中更新 PlayGuard，然後重新啟動 Home Assistant。",
-        "hacs": "HACS 中的 PlayGuard",
-        "hacs_caption": "更新，然後重新啟動",
+        "body": "Home Assistant 中的版本為 {}。請用能開啟 Home Assistant 的手機掃描 QR 碼：在 Marketplace 中更新 PlayGuard，然後重新啟動 Home Assistant。",
+        "marketplace": "Marketplace 中的 PlayGuard",
+        "marketplace_caption": "更新，然後重新啟動",
         "changes": "自 {} 以來的更新內容",
         "note": "所有版本：{}",
         "no_notes": "無法讀取更新內容；可在 {} 查看。"
@@ -1587,9 +1587,9 @@
         "timer_writes_confirm": "允許",
         "section_ha": "Home Assistant",
         "ha_install": "安裝 Home Assistant 整合",
-        "ha_install_body": "用能開啟 Home Assistant 的手機掃描（My Home Assistant 會詢問一次它的位址）。1：在 HACS 中下載 PlayGuard，然後重新啟動 Home Assistant：主機隨後會自動出現。2：若沒有出現，請手動新增。",
-        "ha_hacs": "1. HACS 中的 PlayGuard",
-        "ha_hacs_caption": "下載，然後重新啟動",
+        "ha_install_body": "用能開啟 Home Assistant 的手機掃描（My Home Assistant 會詢問一次它的位址）。1：在 Marketplace 中安裝 PlayGuard：主機隨後會自動出現。2：若沒有出現，請手動新增。",
+        "ha_marketplace": "1. Marketplace 中的 PlayGuard",
+        "ha_marketplace_caption": "安裝",
         "ha_add": "2. 新增主機",
         "ha_add_caption": "主機 ID：{}",
         "ha_add_caption_none": "如果 Home Assistant 沒有提示新增",

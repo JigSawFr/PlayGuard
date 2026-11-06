@@ -1,6 +1,6 @@
 // HaUpdateActivity — a newer release of PlayGuard's Home Assistant integration
 // (action/ha_update_flow): the version Home Assistant runs, the QR code that
-// opens the integration in HACS on a phone (Update, then restart Home
+// opens the integration in the Marketplace on a phone (Update, then restart Home
 // Assistant), and what changed since. B closes it.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once

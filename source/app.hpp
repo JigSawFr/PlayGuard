@@ -31,11 +31,12 @@ void        set_open_route(int argc, char** argv);
 // Tagged for the site's audience (utm_source=playguard, utm_medium=qr).
 const char* site_url();
 std::string doc_url(const std::string& page, const std::string& anchor = "");
-// The Home Assistant integration (JigSawFr/playguard-ha), through My Home
+// The Home Assistant integration (JigSawFr/boreale-ha), through My Home
 // Assistant's redirects (it asks once for the user's own instance, then opens
-// the page there): the repository in HACS, and adding the integration.
-constexpr const char* HA_HACS_URL =
-    "https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration";
+// the page there): the repository in the Marketplace (Home Assistant 2026.11
+// and later: marketplace_repository), and adding the integration.
+constexpr const char* HA_MARKETPLACE_URL =
+    "https://my.home-assistant.io/redirect/marketplace_repository/?owner=JigSawFr&repository=boreale-ha&category=integration";
 constexpr const char* HA_ADD_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard";
 // Its releases, with what changed in each.
 constexpr const char* HA_RELEASES_URL = "https://github.com/JigSawFr/playguard-ha/releases";
