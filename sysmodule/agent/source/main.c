@@ -32,7 +32,7 @@
 #include "bl_cache.h"
 #include "bl_net.h"
 #include "bl_tls.h"
-#include "calendar.h"
+#include "core/calendar.h"
 #include "console_info.h"
 #include "nand_key.h"
 #include "pctl_ops.h"
@@ -44,9 +44,9 @@
 #include "sync_notices.h"
 #include "sync_titles.h"
 #include "sync_watch.h"
-#include "sysinfo.h"
+#include "core/sysinfo.h"
 #include "time_ops.h"
-#include "write_guard.h"
+#include "core/write_guard.h"
 
 #ifndef AGENT_VERSION
 #define AGENT_VERSION "0.0.0"

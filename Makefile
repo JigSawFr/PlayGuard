@@ -27,6 +27,8 @@
 
 TARGET  := playguard
 BUILD   := build
+# The kit (library/boreale-kit, a submodule): its sources are built by the suites that need them; its own suites run in its repository.
+KIT     := library/boreale-kit/source
 DESKTOP := build-desktop
 WEB     := build-web
 CC      ?= gcc
@@ -95,7 +97,7 @@ rescue:
 # The PIN gate's screen as PNG files, one per state (tools/gate_preview.c).
 gate-preview:
 	@mkdir -p build/gate-preview
-	@$(CC) -std=gnu11 -O2 -Isource/core -Iextern/stb -isystem library/aurore/library/include tools/gate_preview.c source/core/gate.c \
+	@$(CC) -std=gnu11 -O2 -Isource/core -I$(KIT)/core -I$(KIT) -Iextern/stb -isystem library/aurore/library/include tools/gate_preview.c source/core/gate.c \
 		source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c extern/stb/stb_image_write.c -lm \
 		-o build/gate-preview/gate_preview
 	@build/gate-preview/gate_preview build/gate-preview $(or $(GATE_LANG),1) $(or $(GATE_THEME),dark)
@@ -156,40 +158,36 @@ web-serve: web
 
 # C: the service layer (source/core) against the fake <switch.h> of each
 # suite (-DNX_HOST_TEST), and the C helpers of source/util.
-pctl_SRC   := source/core/pctl_ops.c source/core/pctl_dump.c source/core/pure.c source/core/rescue.c source/core/write_guard.c tests/pctl_session/test.c
-pctl_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core
-time_SRC   := source/core/time_ops.c source/core/calendar.c source/core/write_guard.c tests/time_ops/test.c
-time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core
-sysinfo_SRC   := source/core/sysinfo.c source/core/pure.c tests/sysinfo/test.c
-sysinfo_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/sysinfo -Isource/core
-gamecheck_SRC   := source/core/gamecheck.c source/core/gamecheck_rules.c source/core/nacp.c source/core/nacp_read.c source/core/write_guard.c tests/gamecheck/test.c
-gamecheck_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/gamecheck -Isource/core
+pctl_SRC   := source/core/pctl_ops.c source/core/pctl_dump.c source/core/pure.c source/core/rescue.c $(KIT)/core/write_guard.c tests/pctl_session/test.c
+pctl_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -I$(KIT)/core -I$(KIT)
+time_SRC   := source/core/time_ops.c $(KIT)/core/calendar.c $(KIT)/core/write_guard.c tests/time_ops/test.c
+time_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/time_ops -Isource/core -I$(KIT)/core -I$(KIT)
+sysinfo_SRC   := $(KIT)/core/sysinfo.c source/core/pure.c tests/sysinfo/test.c
+sysinfo_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/sysinfo -Isource/core -I$(KIT)/core -I$(KIT)
+gamecheck_SRC   := source/core/gamecheck.c source/core/gamecheck_rules.c $(KIT)/core/nacp.c $(KIT)/core/nacp_read.c $(KIT)/core/write_guard.c tests/gamecheck/test.c
+gamecheck_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/gamecheck -Isource/core -I$(KIT)/core -I$(KIT)
 gamecheck_LIBS  := -lz
-calendar_SRC   := source/core/calendar.c tests/calendar/test.c
-calendar_FLAGS := -std=gnu11 -Isource/core
 console_info_SRC   := source/core/console_info_pure.c tests/console_info/test.c
-console_info_FLAGS := -std=gnu11 -Isource/core
+console_info_FLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 rescue_SRC   := source/core/rescue.c tests/rescue/test.c
-rescue_FLAGS := -std=c11 -Isource/core
+rescue_FLAGS := -std=c11 -Isource/core -I$(KIT)/core -I$(KIT)
 gate_screen_SRC   := source/core/gate_screen.c source/core/gate_text.c extern/stb/pg_stb.c tests/gate_screen/test.c
-gate_screen_FLAGS := -std=gnu11 -Isource/core -Iextern/stb -isystem library/aurore/library/include
+gate_screen_FLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT) -Iextern/stb -isystem library/aurore/library/include
 gate_screen_LIBS  := -lm
 rescue_page_SRC   := source/util/rescue_page.cpp extern/qrcodegen/qrcodegen.cpp tests/rescue_page/test.cpp
 rescue_page_FLAGS := $(TEST_CXXFLAGS) -Isource -isystem extern/qrcodegen
 gate_SRC   := source/core/gate.c tests/gate/test.c
-gate_FLAGS := -std=gnu11 -Isource/core
+gate_FLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 hbl_lock_SRC   := source/core/hbl_lock.c tests/hbl_lock/test.c
-hbl_lock_FLAGS := -std=gnu11 -Isource/core
+hbl_lock_FLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 forwarder_pack_SRC   := source/core/forwarder_pack.c tests/forwarder_pack/test.c
-forwarder_pack_FLAGS := -std=c11 -Isource/core
+forwarder_pack_FLAGS := -std=c11 -Isource/core -I$(KIT)/core -I$(KIT)
 ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
-ntp_FLAGS := -std=c11 -Isource/util
+ntp_FLAGS := -std=c11 -Isource/util -I$(KIT)/util -I$(KIT)
 playlog_SRC   := source/util/playlog.c tests/playlog/test.c
-playlog_FLAGS := -std=c11 -Isource/util
-startup_SRC   := source/util/startup.c tests/startup/test.c
-startup_FLAGS := -std=gnu11 -Isource/util
-playstats_SRC   := source/core/playstats_logic.c source/core/nacp.c tests/playstats/test.c
-playstats_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/playstats -Isource/core
+playlog_FLAGS := -std=c11 -Isource/util -I$(KIT)/util -I$(KIT)
+playstats_SRC   := source/core/playstats_logic.c $(KIT)/core/nacp.c tests/playstats/test.c
+playstats_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/playstats -Isource/core -I$(KIT)/core -I$(KIT)
 playstats_LIBS  := -lz
 
 # C++: the UI-free helpers and flow logic (source/util, source/action), by
@@ -198,45 +196,40 @@ playstats_LIBS  := -lz
 # PlayGuard's (clang 22 deprecates json.hpp's literal operators, under -Werror).
 # util/date stands on core/calendar.c: a suite that links it builds that C
 # file too (its <name>_CSRC, without having to say so).
-TEST_CXXFLAGS   := -std=c++23 -Isource -Ilibrary/boreale-link/source -isystem library/aurore/library/include
-CALENDAR_C      := source/core/calendar.c
+TEST_CXXFLAGS   := -std=c++23 -Isource -I$(KIT) -Ilibrary/boreale-link/source -isystem library/aurore/library/include
+CALENDAR_C      := $(KIT)/core/calendar.c
 # Aurore's Cadran (library/aurore): the look's helpers PlayGuard tests here.
 C := library/aurore/library/lib/cadran
-CALENDAR_CFLAGS := -std=gnu11 -Isource/core
-date_SRC    := source/util/date.cpp tests/date/test.cpp
+CALENDAR_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 # The header-only helpers: utf8, emoji, text, json_util.
-text_util_SRC   := tests/text_util/test.cpp
-patches_SRC   := source/util/paths.cpp source/util/patches.cpp tests/patches/test.cpp
-prodinfo_SRC   := source/util/paths.cpp source/util/prodinfo.cpp tests/prodinfo/test.cpp
-changelog_SRC   := source/util/date.cpp source/util/changelog.cpp source/util/update.cpp tests/changelog/test.cpp
-support_SRC   := source/util/date.cpp source/util/support.cpp tests/support/test.cpp
-pt_logic_SRC   := source/action/pt_logic.cpp source/util/date.cpp tests/pt_logic/test.cpp
+prodinfo_SRC   := $(KIT)/util/paths.cpp source/util/prodinfo.cpp tests/prodinfo/test.cpp
+pt_logic_SRC   := source/action/pt_logic.cpp $(KIT)/util/date.cpp tests/pt_logic/test.cpp
 pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/test.cpp
 session_pause_logic_SRC   := source/action/session_pause_logic.cpp tests/session_pause_logic/test.cpp
 console_lock_logic_SRC   := source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp
-history_logic_SRC   := source/util/date.cpp source/action/history_logic.cpp tests/history_logic/test.cpp
+history_logic_SRC   := $(KIT)/util/date.cpp source/action/history_logic.cpp tests/history_logic/test.cpp
 self_test_logic_SRC   := source/action/self_test_logic.cpp tests/self_test_logic/test.cpp
-gate_tally_SRC   := source/util/date.cpp source/util/gate_tally.cpp tests/gate_tally/test.cpp
+gate_tally_SRC   := $(KIT)/util/date.cpp source/util/gate_tally.cpp tests/gate_tally/test.cpp
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp
-notice_logic_SRC   := source/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp
+notice_logic_SRC   := $(KIT)/util/date.cpp source/action/notice_logic.cpp tests/notice_logic/test.cpp
 sys_updates_SRC   := source/util/sys_updates.cpp tests/sys_updates/test.cpp
-sys_updates_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_updates_FLAGS := $(TEST_CXXFLAGS) -Isource/core -I$(KIT)/core -I$(KIT)
 sys_updates_CSRC  := source/core/console_info_pure.c
-sys_updates_CFLAGS := -std=gnu11 -Isource/core
+sys_updates_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 # The network half twice from one test: -D__SWITCH__ for the console's path
 # (a fake http::redirect in the test), without it for the desktop's simulation.
 sys_updates_net_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp tests/sys_updates_net/test.cpp
-sys_updates_net_FLAGS := -std=c++23 -Isource -Isource/core -Itests/sysinfo -D__SWITCH__
+sys_updates_net_FLAGS := -std=c++23 -Isource -Isource/core -I$(KIT)/core -I$(KIT) -Itests/sysinfo -D__SWITCH__
 sys_updates_net_CSRC  := source/core/console_info_pure.c
-sys_updates_net_CFLAGS := -std=gnu11 -Isource/core
-sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/paths.cpp tests/sys_updates_net/test.cpp
-sys_updates_sim_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_updates_net_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
+sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net.cpp $(KIT)/sim/sim_net.cpp $(KIT)/sim/sim_env.cpp $(KIT)/util/paths.cpp tests/sys_updates_net/test.cpp
+sys_updates_sim_FLAGS := $(TEST_CXXFLAGS) -Isource/core -I$(KIT)/core -I$(KIT)
 sys_updates_sim_CSRC  := source/core/console_info_pure.c
-sys_updates_sim_CFLAGS := -std=gnu11 -Isource/core
+sys_updates_sim_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 dns_hosts_SRC   := source/util/dns_hosts.cpp tests/dns_hosts/test.cpp
-sys_notes_SRC   := source/util/date.cpp $(C)/util/safe_text.cpp $(C)/util/markdown.cpp source/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
-sys_notes_FLAGS := $(TEST_CXXFLAGS) -Isource/core
+sys_notes_SRC   := $(KIT)/util/date.cpp $(C)/util/safe_text.cpp $(C)/util/markdown.cpp $(KIT)/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp
+sys_notes_FLAGS := $(TEST_CXXFLAGS) -Isource/core -I$(KIT)/core -I$(KIT)
 sys_notes_CSRC  := $(CALENDAR_C) source/core/console_info_pure.c
 sys_notes_CFLAGS := $(CALENDAR_CFLAGS)
 offline_clock_logic_SRC   := source/action/offline_clock_logic.cpp tests/offline_clock_logic/test.cpp
@@ -251,9 +244,9 @@ sync_icons_logic_SRC   := source/action/sync_icons_logic.cpp tests/sync_icons_lo
 sync_icons_logic_CSRC  := source/sync/sync_icons.c
 sync_icons_logic_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source
 write_queue_logic_SRC   := source/action/write_queue_logic.cpp tests/write_queue_logic/test.cpp
-shared_bell_logic_SRC   := source/action/shared_bell_logic.cpp source/util/date.cpp source/util/update.cpp tests/shared_bell_logic/test.cpp
+shared_bell_logic_SRC   := source/action/shared_bell_logic.cpp $(KIT)/util/date.cpp $(KIT)/util/update.cpp tests/shared_bell_logic/test.cpp
 shared_bell_logic_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_json.c library/boreale-link/source/bl_jread.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_notices.c library/boreale-link/source/bl_updates.c $(CALENDAR_C)
-shared_bell_logic_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source -Isource/core
+shared_bell_logic_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT)
 shared_look_SRC   := source/action/shared_look.cpp tests/shared_look/test.cpp
 shared_look_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_prefs.c
 shared_look_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
@@ -261,60 +254,44 @@ boreale_apps_logic_SRC   := source/action/boreale_apps_logic.cpp tests/boreale_a
 boreale_apps_logic_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_updates.c
 boreale_apps_logic_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 write_queue_logic_LIBS  := -pthread
-worker_threads_SRC   := source/util/worker_threads.cpp tests/worker_threads/test.cpp
-worker_threads_LIBS  := -pthread
-data_cleanup_SRC   := source/util/data_cleanup.cpp tests/data_cleanup/test.cpp
 error_hint_logic_SRC   := source/action/error_hint_logic.cpp tests/error_hint_logic/test.cpp
-outside_change_logic_SRC   := source/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
-backup_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/backup.cpp source/util/forwarders.cpp tests/backup/test.cpp
-backup_logic_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/backup.cpp source/util/forwarders.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
-http_logic_SRC   := source/util/http_logic.cpp tests/http_logic/test.cpp
-table_export_SRC   := source/util/paths.cpp source/util/zip_write.cpp source/util/table_export.cpp source/util/table_export_csv.cpp source/util/table_export_json.cpp source/util/table_export_xlsx.cpp source/util/table_export_pdf.cpp tests/table_export/test.cpp
+outside_change_logic_SRC   := $(KIT)/util/date.cpp source/action/outside_change_logic.cpp tests/outside_change_logic/test.cpp
+backup_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/backup.cpp source/util/forwarders.cpp tests/backup/test.cpp
+backup_logic_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/backup.cpp source/util/forwarders.cpp source/util/pt_block.cpp source/action/backup_logic.cpp tests/backup_logic/test.cpp
+table_export_SRC   := $(KIT)/util/paths.cpp $(KIT)/util/zip_write.cpp source/util/table_export.cpp source/util/table_export_csv.cpp source/util/table_export_json.cpp source/util/table_export_xlsx.cpp source/util/table_export_pdf.cpp tests/table_export/test.cpp
 table_export_LIBS  := -lz
-update_SRC   := source/util/date.cpp source/util/update.cpp tests/update/test.cpp
-config_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/date.cpp source/util/config.cpp tests/config/test.cpp
-profiles_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
-forwarders_SRC    := source/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_library.cpp source/util/forwarder_gate.cpp source/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
+config_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp $(KIT)/util/date.cpp source/util/config.cpp tests/config/test.cpp
+profiles_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/profiles.cpp tests/profiles/test.cpp
+forwarders_SRC    := $(KIT)/util/paths.cpp source/util/nro.cpp source/util/forwarders.cpp source/util/forwarder_icon.cpp source/util/forwarder_library.cpp source/util/forwarder_gate.cpp $(KIT)/util/patches.cpp source/action/forwarders_logic.cpp tests/forwarders/test.cpp
 forwarders_FLAGS  := $(TEST_CXXFLAGS) -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
-forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c source/core/calendar.c
-forwarders_CFLAGS := -std=gnu11 -w -Isource/core -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
+forwarders_CSRC   := tests/forwarders/stb.c extern/stb/stb_image_write.c source/core/gate.c $(KIT)/core/calendar.c
+forwarders_CFLAGS := -std=gnu11 -w -Isource/core -I$(KIT)/core -I$(KIT) -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 forwarders_LIBS   := -lm
-forwarder_rules_logic_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/util/date.cpp source/util/gate_tally.cpp source/action/forwarders_logic.cpp source/action/forwarder_rules_logic.cpp tests/forwarder_rules_logic/test.cpp
-forwarder_rules_logic_CSRC   := source/core/gate.c source/core/calendar.c
-forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core
-pt_block_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
-launcher_SRC   := source/util/paths.cpp source/util/launcher.cpp tests/launcher/test.cpp
-launcher_CSRC  := library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_json.c library/boreale-link/source/bl_jread.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_notices.c
-launcher_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
-rollback_SRC   := source/util/paths.cpp source/util/rollback.cpp tests/rollback/test.cpp
-history_SRC   := source/util/paths.cpp source/util/history.cpp tests/history/test.cpp
-log_upload_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp source/util/log_files.cpp source/util/log_upload.cpp source/util/pt_upload.cpp tests/log_upload/test.cpp
+forwarder_rules_logic_SRC   := $(KIT)/util/paths.cpp source/util/forwarders.cpp $(KIT)/util/patches.cpp $(KIT)/util/date.cpp source/util/gate_tally.cpp source/action/forwarders_logic.cpp source/action/forwarder_rules_logic.cpp tests/forwarder_rules_logic/test.cpp
+forwarder_rules_logic_CSRC   := source/core/gate.c $(KIT)/core/calendar.c
+forwarder_rules_logic_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
+pt_block_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/pt_block.cpp tests/pt_block/test.cpp
+history_SRC   := $(KIT)/util/paths.cpp source/util/history.cpp tests/history/test.cpp
+log_upload_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp source/util/pt_block.cpp $(KIT)/util/log_files.cpp $(KIT)/util/log_upload.cpp source/util/pt_upload.cpp tests/log_upload/test.cpp
 # A secret sealed for this console: AES and HMAC, and the console's key
 # (the desktop build's random one: sim/sim_device_key.cpp).
-SECRET_BOX := source/util/secret_box.cpp source/util/aes.cpp source/sim/sim_device_key.cpp
-secret_box_SRC := $(SECRET_BOX) source/util/sha256.cpp source/util/paths.cpp tests/secret_box/test.cpp
-dev_builds_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/date.cpp source/util/update.cpp $(C)/util/safe_text.cpp source/util/dev_builds.cpp source/util/zip_read.cpp source/util/github_auth.cpp $(SECRET_BOX) tests/dev_builds/test.cpp
-dev_builds_LIBS  := -lz
+SECRET_BOX := $(KIT)/util/secret_box.cpp $(KIT)/util/aes.cpp $(KIT)/sim/sim_device_key.cpp
 # The download and its resume: without PLAYGUARD_SIM_DEV_BUILDS the desktop
 # build takes the console's path, here against a fake http::download and
 # http::redirect in the test (-D__SWITCH__ would reach date.cpp's switch.h).
-dev_builds_net_SRC   := $(filter-out tests/%,$(dev_builds_SRC)) source/util/http_logic.cpp source/util/zip_write.cpp source/sim/sim_net.cpp source/sim/sim_env.cpp source/util/dev_builds_net.cpp tests/dev_builds_net/test.cpp
-dev_builds_net_LIBS  := -lz
 play_cache_SRC   := source/util/play_cache.cpp tests/play_cache/test.cpp
 game_cache_SRC   := source/util/game_cache.cpp tests/game_cache/test.cpp
-perf_SRC   := source/util/perf.cpp tests/perf/test.cpp
 activity_summary_SRC   := source/util/activity_summary.cpp tests/activity_summary/test.cpp
-diagnostics_logic_SRC   := source/util/paths.cpp source/util/patches.cpp source/util/diagnostics_logic.cpp tests/diagnostics_logic/test.cpp
 # PlayGuard's text helpers that only translate, over
 # Cadran's ui/tr.hpp stand-in for Aurore's getStr (the
 # catalogs read by the test).
 format_text_SRC   := source/ui/play_text.cpp $(C)/ui/format_text.cpp tests/format_text/test.cpp
 format_text_FLAGS := $(TEST_CXXFLAGS) -DAURORE_CADRAN_HOST_I18N
 contrast_SRC      := tests/contrast/test.cpp
-forwarders_text_SRC   := source/util/paths.cpp source/util/forwarders.cpp source/util/patches.cpp source/action/forwarders_logic.cpp source/action/forwarders_text.cpp tests/forwarders_text/test.cpp
+forwarders_text_SRC   := $(KIT)/util/paths.cpp source/util/forwarders.cpp $(KIT)/util/patches.cpp source/action/forwarders_logic.cpp source/action/forwarders_text.cpp tests/forwarders_text/test.cpp
 forwarders_text_FLAGS := $(format_text_FLAGS)
-forwarders_text_CSRC   := source/core/calendar.c
-forwarders_text_CFLAGS := -std=gnu11 -Isource/core
+forwarders_text_CSRC   := $(KIT)/core/calendar.c
+forwarders_text_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 # Aurore's own string tables (core/i18n.cpp), read from other threads while
 # the language changes: built from the submodule as it is.
 i18n_threads_SRC   := library/aurore/library/lib/core/i18n.cpp library/aurore/library/lib/core/util.cpp \
@@ -326,20 +303,15 @@ i18n_threads_FLAGS := -std=c++23 -isystem library/aurore/library/include \
 i18n_threads_LIBS  := -pthread
 game_check_text_SRC   := source/action/game_check_text.cpp tests/game_check_text/test.cpp
 game_check_text_CSRC   := source/core/gamecheck_rules.c
-game_check_text_CFLAGS := -std=gnu11 -Isource/core
+game_check_text_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT)
 rating_logic_SRC   := source/action/rating_logic.cpp tests/rating_logic/test.cpp
-schedule_logic_SRC   := source/action/schedule_logic.cpp source/util/date.cpp tests/schedule_logic/test.cpp
-pt_log_SRC   := source/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
-session_log_SRC   := source/util/paths.cpp source/util/log_files.cpp source/util/session_log.cpp source/util/crash_report.cpp tests/session_log/test.cpp
+schedule_logic_SRC   := source/action/schedule_logic.cpp $(KIT)/util/date.cpp tests/schedule_logic/test.cpp
+pt_log_SRC   := $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/pt_log.cpp tests/pt_log/test.cpp
 # A C source a C++ suite links (clang++ refuses to build a .c as C++).
-session_log_CSRC  := source/util/crash_dump.c
-session_log_CFLAGS := -std=c11 -Isource/util -Isource
-crash_dump_SRC   := source/util/crash_dump.c tests/crash_dump/test.c
-crash_dump_FLAGS := -std=c11 -Isource/util -Isource
 # The desktop and web simulators' console (source/sim/*.c, sim_state.h) and
 # their PLAYGUARD_SIM_* variables (core/sim_env.h), with the console-free
 # parts of the service layer they share with the console.
-sim_backend_SRC    := source/sim/sim_env.cpp source/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp source/util/paths.cpp source/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
+sim_backend_SRC    := $(KIT)/sim/sim_env.cpp $(KIT)/sim/sim_platform.cpp source/sim/sim_forwarder.cpp source/sim/sim_album.cpp source/util/forwarder_icon.cpp source/util/forwarders.cpp $(KIT)/util/paths.cpp $(KIT)/util/sha256.cpp source/util/nro.cpp tests/sim_backend/test.cpp
 sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c sim_time.c sim_playstats.c sim_gamecheck.c) \
                       $(addprefix source/core/,pure.c calendar.c write_guard.c forwarder_pack.c rescue.c) source/util/playlog.c \
                       tests/forwarders/stb.c extern/stb/stb_image_write.c
@@ -347,31 +319,28 @@ sim_backend_CSRC   := $(addprefix source/sim/,sim_state.c sim_games.c sim_pctl.c
 # at once, and gcov's plain counters then come out wrong (negative ones, that
 # gcovr refuses).
 sim_backend_FLAGS  := $(TEST_CXXFLAGS) -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
-sim_backend_CFLAGS := -std=gnu11 -Isource/core -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
+sim_backend_CFLAGS := -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT) -fprofile-update=atomic -isystem library/aurore/library/include/aurore/extern/nanovg -isystem extern/stb
 sim_backend_LIBS   := -pthread -lm
-frame_stats_SRC   := source/util/paths.cpp source/util/frame_stats.cpp tests/frame_stats/test.cpp
 # A whole text read as a number (header only).
-number_SRC := tests/number/test.cpp
-log_files_SRC   := source/util/paths.cpp source/util/nand.cpp source/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
-migrations_SRC   := source/util/paths.cpp source/util/date.cpp source/util/update.cpp source/util/migrations.cpp tests/migrations/test.cpp
-modules_SRC   := source/util/paths.cpp source/util/sha256.cpp source/util/modules.cpp tests/modules/test.cpp
+log_files_SRC   := $(KIT)/util/paths.cpp source/util/nand.cpp $(KIT)/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
+modules_SRC   := $(KIT)/util/paths.cpp $(KIT)/util/sha256.cpp source/util/modules.cpp tests/modules/test.cpp
 # The remote link's files on the SD card, with its C parts (built by $(CC):
 # g++ would build a .c as C++).
-sync_files_SRC   := source/util/date.cpp source/util/paths.cpp source/util/app_paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
+sync_files_SRC   := $(KIT)/util/date.cpp $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
 sync_files_CSRC  := $(CALENDAR_C) library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c library/boreale-link/source/bl_app.c source/sync/sync_conf.c source/sync/sync_records.c
-sync_files_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
+sync_files_CFLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT)
 
 # C: the remote link (source/sync/) and the agent sysmodule's core. sync_core
 # writes the documents it builds (_ARGS: where) for tools/check_sync_json.py.
 sync_core_SRC   := $(SYNC_PURE) tests/sync_core/test.c
-sync_core_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
+sync_core_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT)
 sync_core_ARGS  := $(TESTOUT)/sync
-sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c source/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c library/boreale-link/source/bl_json.c tests/sync_exec/test.c
-sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -Isource/sync -Ilibrary/boreale-link/source
+sync_exec_SRC   := source/core/pctl_ops.c source/core/pure.c source/core/rescue.c $(KIT)/core/write_guard.c source/sync/sync_exec.c source/sync/sync_records.c source/sync/sync_apply.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_state.c source/sync/sync_titles.c library/boreale-link/source/bl_json.c tests/sync_exec/test.c
+sync_exec_FLAGS := -std=gnu11 -DNX_HOST_TEST -Itests/pctl_session -Isource/core -I$(KIT)/core -I$(KIT) -Isource/sync -Ilibrary/boreale-link/source
 sync_engine_SRC   := $(SYNC_PURE) library/boreale-link/source/mqtt_client.c library/boreale-link/source/bl_session.c source/sync/sync_engine.c tests/sync_engine/test.c
-sync_engine_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core
+sync_engine_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT)
 agent_SRC   := sysmodule/agent/source/agent_core.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
-agent_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -Isysmodule/agent/source
+agent_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT) -Isysmodule/agent/source
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
@@ -397,7 +366,7 @@ FORCE:
 # into <name>.<file>.o each and linked into a C++ suite; one that links
 # util/date.cpp gets CALENDAR_C (with CALENDAR_CFLAGS) when it names none.
 test_flags  = $(or $($1_FLAGS),$(if $(filter %.cpp,$($1_SRC)),$(TEST_CXXFLAGS)))
-test_csrc   = $(or $($1_CSRC),$(if $(filter source/util/date.cpp,$($1_SRC)),$(CALENDAR_C)))
+test_csrc   = $(or $($1_CSRC),$(if $(filter $(KIT)/util/date.cpp,$($1_SRC)),$(CALENDAR_C)))
 test_cflags = $(if $($1_CSRC),$($1_CFLAGS),$(CALENDAR_CFLAGS))
 test_cobj   = $(TESTOUT)/$1.$(basename $(notdir $2)).o
 test_cobjs  = $(foreach c,$(call test_csrc,$1),$(call test_cobj,$1,$c))
@@ -436,8 +405,8 @@ FUZZ_SECONDS ?= 30
 FUZZ_CC      ?= clang
 FUZZ_CXX     ?= clang++
 FUZZ_SAN     := -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -g -O1
-FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(FUZZ_SAN) -Itests/fuzz -Isource -isystem library/aurore/library/include
-zip_read_FUZZ      := source/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
+FUZZ_CFLAGS  := -Wall -Wextra -Wshadow -Werror -D_GLIBCXX_ASSERTIONS $(FUZZ_SAN) -Itests/fuzz -Isource -I$(KIT) -isystem library/aurore/library/include
+zip_read_FUZZ      := $(KIT)/util/zip_read.cpp tests/fuzz/zip_read/fuzz.cpp
 zip_read_FUZZ_LIBS := -lz
 changelog_FUZZ     := $(filter-out tests/%,$(changelog_SRC)) tests/fuzz/changelog/fuzz.cpp
 changelog_FUZZ_CSRC := $(CALENDAR_C)
@@ -457,7 +426,7 @@ $(FUZZOUT):
 # Rebuilt when the Makefile changes too (the flags above).
 $(FUZZ_PROGRAMS): $(FUZZOUT)/%: $$($$*_FUZZ) $$($$*_FUZZ_CSRC) tests/fuzz/fuzz.h $(TEST_HEADERS) Makefile | $(FUZZOUT)
 	$(if $($*_FUZZ_CSRC),$(FUZZ_CC) -std=gnu11 $(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) -c $($*_FUZZ_CSRC) -o $@.c.o)
-	$(if $(filter %.c,$(lastword $($*_FUZZ))),$(FUZZ_CC) -std=gnu11 -Isource/core,$(FUZZ_CXX) -std=c++23) \
+	$(if $(filter %.c,$(lastword $($*_FUZZ))),$(FUZZ_CC) -std=gnu11 -Isource/core -I$(KIT)/core -I$(KIT),$(FUZZ_CXX) -std=c++23) \
 		$(FUZZ_CFLAGS) $($*_FUZZ_FLAGS) $($*_FUZZ) $(if $($*_FUZZ_CSRC),$@.c.o) $($*_FUZZ_LIBS) -o $@
 
 # A run: its output in <name>.log, its final figures on the terminal (tagged

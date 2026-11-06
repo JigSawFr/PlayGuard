@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "pctl_ops.h"
-#include "write_guard.h"
+#include "core/write_guard.h"
 
 enum { MOCK_ERROR = 0x701 };
 static Service service;

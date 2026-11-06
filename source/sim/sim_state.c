@@ -3,6 +3,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #define _POSIX_C_SOURCE 200809L
 #include "sim_state.h"
+#include "core/fw_policy.h"
 
 #include <fcntl.h>
 #include <limits.h>
@@ -13,8 +14,8 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "../core/sim_env.h"
-#include "../core/sysinfo.h"
+#include "core/sim_env.h"
+#include "core/sysinfo.h"
 
 static pthread_mutex_t s_lock = PTHREAD_MUTEX_INITIALIZER;
 static SimState s_state;

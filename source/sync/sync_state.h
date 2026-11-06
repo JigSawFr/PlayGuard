@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../core/pctl_ops.h"
-#include "../core/sysinfo.h"
+#include "core/sysinfo.h"
 #include "sync_conf.h"
 #include "sync_exec.h"
 

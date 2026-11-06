@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 
 #include "../core/modules_nx.h"
-#include "../core/sim_env.h"
+#include "core/sim_env.h"
 
 #define SIM_MAX 4
 #define SIM_RC_NOT_INSTALLED ((Result)0x0610)   // ldr: program not found

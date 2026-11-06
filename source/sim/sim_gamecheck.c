@@ -12,8 +12,8 @@
 #include <time.h>
 
 #include "../core/gamecheck.h"
-#include "../core/sim_env.h"
-#include "../core/write_guard.h"
+#include "core/sim_env.h"
+#include "core/write_guard.h"
 #include "sim_games.h"
 #include "sim_state.h"
 

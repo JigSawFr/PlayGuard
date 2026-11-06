@@ -7,7 +7,7 @@
 // fake <switch.h>.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
-#include "nacp.h"
+#include "core/nacp.h"
 #include "playstats.h"
 
 #ifdef __cplusplus

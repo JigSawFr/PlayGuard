@@ -7,9 +7,9 @@
 #include <string.h>
 #include <time.h>
 
-#include "../core/sim_env.h"
+#include "core/sim_env.h"
 #include "../core/time_ops.h"
-#include "../core/write_guard.h"
+#include "core/write_guard.h"
 #include "sim_state.h"
 
 void time_clock_snapshot(TimeSnapshot *o)

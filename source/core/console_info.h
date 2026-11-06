@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "sysinfo.h"
+#include "core/sysinfo.h"
 
 #ifdef __cplusplus
 extern "C" {

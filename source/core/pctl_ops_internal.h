@@ -4,7 +4,7 @@
 // inline`, so nothing more is exported. The caller holds the session it passes.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #pragma once
-#include "nx_types.h"
+#include "core/nx_types.h"
 #include <string.h>
 
 // Small typed readers. Reading a bool through a u8 keeps the transfer size at

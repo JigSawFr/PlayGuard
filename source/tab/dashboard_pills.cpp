@@ -2,6 +2,7 @@
 // what it says.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/dashboard_tab.hpp"
+#include "core/fw_policy.h"
 
 #include <utility>
 

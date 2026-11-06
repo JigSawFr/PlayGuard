@@ -1,8 +1,9 @@
 // PlayGuard — console-free part of the service layer (see pure.h).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "pure.h"
+#include "fw_policy.h"
 #include "pctl_ops.h"
-#include "sysinfo.h"
+#include "core/sysinfo.h"
 #include <string.h>
 
 // The block as bytes, whatever the host's byte order: byte 2i is the low

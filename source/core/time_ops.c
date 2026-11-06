@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "time_ops.h"
-#include "calendar.h"
-#include "write_guard.h"
+#include "core/calendar.h"
+#include "core/write_guard.h"
 #include <stdio.h>
 #include <string.h>
 #include <time.h>

@@ -9,9 +9,9 @@
 #include <string.h>
 
 #include "forwarder_pack.h"
-#include "nacp.h"
-#include "sysinfo.h"
-#include "write_guard.h"
+#include "core/nacp.h"
+#include "core/sysinfo.h"
+#include "core/write_guard.h"
 
 #define RECORD_CHUNK 64
 #define LOADER_MAIN  "romfs:/forwarder/main"

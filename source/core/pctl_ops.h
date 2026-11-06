@@ -10,7 +10,7 @@
 // General Public License v3 or later; it comes with NO WARRANTY. See the
 // LICENSE file or <https://www.gnu.org/licenses/gpl-3.0.html> for details.
 #pragma once
-#include "nx_types.h"
+#include "core/nx_types.h"
 #include "pure.h"
 
 #ifdef __cplusplus

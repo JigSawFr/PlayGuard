@@ -2,9 +2,10 @@
 // and PRODINFO-blank detection, the serial number, session release, applet
 // detection and the compatibility policy.
 #include "check.h"
+#include "fw_policy.h"
 #include <stdio.h>
 #include <string.h>
-#include "sysinfo.h"
+#include "core/sysinfo.h"
 
 void sysinfo_reset_cache(void);
 
