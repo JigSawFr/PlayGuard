@@ -39,5 +39,6 @@ class PreferencesTab : public TabBase
     AURORE_BIND(aurore::BooleanCell, look_shared, "pf_look_shared");
     AURORE_BIND(aurore::BooleanCell, update_daily,   "pf_update_daily");
     AURORE_BIND(aurore::DetailCell,  update_via,     "pf_update_via");
+    AURORE_BIND(aurore::BooleanCell, sphaira_entry,  "pf_sphaira_entry");
     AURORE_BIND(aurore::DetailCell,  first_steps,    "pf_first_steps");
 };

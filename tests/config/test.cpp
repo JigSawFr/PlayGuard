@@ -290,6 +290,7 @@ static void test_preferences()
     CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
     CHECK(d.look.effects == "auto");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
+    CHECK(d.sphaira_entry);
     CHECK(d.agent_update_skipped.empty());
     write_config(R"({"support_reminder": false, "support_reminded": "2026-10-09", "seen_version": "1.1.0"})");
     config::load();
@@ -321,7 +322,7 @@ static void test_preferences()
     // Values from the lists are kept.
     write_config(R"({"start_tab": "activity", "extra_amounts": [30, 60, 90], "activity_period": 3, "effects": "full", "rail": "icons",
                     "activity_account": "0123456789ABCDEF0123456789ABCDEF", "activity_account_last": "",
-                    "games_grid": false, "check_grid": true, "export_format": 3, "backup_keep": 10, "update_daily": true,
+                    "games_grid": false, "check_grid": true, "export_format": 3, "backup_keep": 10, "update_daily": true, "sphaira_entry": false,
                     "update_checked": "2026-10-07", "clock_check_at_start": true, "intro": false,
                     "logs_keep": 0, "logs_keep_days": 30, "logs_keep_mb": 5, "dev_builds_order": "number",
                     "update_via": "inplace", "update_latest": "1.2.0", "update_snooze_version": "1.2.0",
@@ -344,6 +345,7 @@ static void test_preferences()
     config::load();
     CHECK(config::get().look.rail == "open");
     CHECK(c.update_daily && c.update_checked == "2026-10-07" && c.clock_check_at_start);
+    CHECK(!c.sphaira_entry);
 
     // Anything else goes back to the default: no 7-minute keep, no 999-minute
     // extra time, no tab that does not exist.
