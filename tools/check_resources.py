@@ -5,6 +5,10 @@
   playguard.json) defines exactly the keys of en-US, with as many "{}";
 - Aurore's ui::LANGUAGES (library/aurore, the language picker's list that
   config::LANGUAGES names) lists exactly those languages;
+- every forwarder icon of the library (source/util/forwarder_library.cpp's IDS,
+  and the badge) has its source SVG (branding/forwarder-icons/) and its PNG
+  (resources/img/forwarder/), and the SVGs use only the colours of Boréale's
+  kit (branding/tokens.json in JigSawFr/boreale; the icon's deep night too);
 - every "playguard/..." key referenced from C++ or XML exists in en-US (but
   the theme keys source/ui/palette.hpp declares: colours);
 - a key built at runtime ("playguard/days_short/{}",
@@ -675,6 +679,18 @@ for folder, dirs, files in os.walk(ROOT):
             errors.append(f"{rel}: a game package or a part of one, which the repository never carries")
         if KEY_FILES.search(name):
             errors.append(f"{rel}: a console's key file, which the repository never carries")
+
+# Forwarder icons: a source and a PNG each, in the kit's colours only.
+KIT_COLOURS = {"#0B1424", "#0E1A33", "#E8EEF7", "#A9B6CC", "#00FFCC", "#33BBFF", "#8A5CFF",
+               "#0A1020"}   # the last is the deep night of the kit's icons, not a token
+for icon in array_of("source/util/forwarder_library.cpp", "IDS") + ["badge"]:
+    for folder, ext in (("branding/forwarder-icons", "svg"), ("resources/img/forwarder", "png")):
+        if not os.path.exists(f"{ROOT}/{folder}/{icon}.{ext}"):
+            errors.append(f"forwarder icon {icon}: {folder}/{icon}.{ext} is missing (tools/forwarder_icons.py)")
+for svg in sorted(glob.glob(f"{ROOT}/branding/forwarder-icons/*.svg")):
+    for colour in sorted(set(c.upper() for c in re.findall(r"#[0-9a-fA-F]{6}\b", read(svg)))):
+        if colour not in KIT_COLOURS:
+            errors.append(f"{os.path.relpath(svg, ROOT)}: {colour} is not a colour of the kit")
 
 for w in warnings:
     print("WARNING:", w)
