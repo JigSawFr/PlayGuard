@@ -13,7 +13,7 @@
 #include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
 #include "action/session_pause.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 

@@ -30,7 +30,7 @@
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "tab/tab_base.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "view/title_state.hpp"

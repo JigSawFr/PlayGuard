@@ -31,7 +31,7 @@
             <aurore:Label id="hp_upload_note" text="@i18n/playguard/tools/upload_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <aurore:Header title="@i18n/playguard/tools/section_diag" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="hp_export" title="@i18n/playguard/tools/export"/>
-            <aurore:DetailCell id="hp_github" title="@i18n/playguard/github/account"/>
+            <aurore:DetailCell id="hp_github" title="@i18n/kit/github/account"/>
             <aurore:DetailCell id="hp_mode" focusable="false" title="@i18n/playguard/tools/mode"/>
             <aurore:DetailCell id="hp_data" focusable="false" title="@i18n/playguard/tools/data"/>
             <aurore:Label id="hp_export_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
@@ -48,6 +48,8 @@
             <aurore:BooleanCell id="hp_dev_frame_stats"/>
             <aurore:Label id="hp_dev_frame_stats_note" text="@i18n/playguard/dev/frame_stats_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <aurore:Label id="hp_dev_frame_stats_last" fontSize="18" marginBottom="10" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="hp_dev_crypto" title="Encryption (AES, SHA-256)"/>
+            <aurore:DetailCell id="hp_dev_crypto_bench" title="Encryption benchmark"/>
             <aurore:BooleanCell id="hp_dev_glow"/>
             <aurore:DetailCell id="hp_dev_clear_cache" title="@i18n/playguard/dev/clear_cache"/>
             <aurore:DetailCell id="hp_dev_clear_logs" title="@i18n/playguard/dev/clear_logs"/>

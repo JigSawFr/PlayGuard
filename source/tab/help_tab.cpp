@@ -15,6 +15,7 @@
 #include "action/pairing_state.hpp"
 #include "action/pt_block_flow.hpp"
 #include "action/pt_flow.hpp"
+#include "action/crypto_flow.hpp"
 #include "action/frame_stats_flow.hpp"
 #include "action/pt_log_flow.hpp"
 #include "action/upload_flow.hpp"
@@ -22,8 +23,9 @@
 #include "activity/firmware_gate_activity.hpp"
 #include "activity/onboarding_activity.hpp"
 #include "app.hpp"
+#include "kit_text.hpp"
 #include "core/sysinfo.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
 #include "util/github_auth.hpp"
@@ -46,7 +48,7 @@ std::string logs_days_text(int n)
 }
 std::string logs_mb_text(int n)
 {
-    return n == 0 ? "playguard/common/no_limit"_i18n : aurore::getStr("playguard/dev/size_mb", n);
+    return n == 0 ? "playguard/common/no_limit"_i18n : kit_text::str("dev/size_mb", n);
 }
 
 // A picker over `values` for `field`; the limits apply at once.
@@ -84,8 +86,8 @@ HelpTab::HelpTab()
     export_cell->registerClickAction([](aurore::View*) {
         std::string err;
         std::string path = diagnostic::save(diagnostic::current_report(), &err);
-        if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
-        else ui::notify(aurore::getStr("playguard/toast/diag_saved", path));
+        if (path.empty()) ui::error(kit_text::str("toast/diag_err"), err);
+        else ui::notify(kit_text::str("toast/diag_saved", path));
         return true;
     });
 
@@ -177,6 +179,14 @@ HelpTab::HelpTab()
     });
     this->stats_timer.setPeriod(1000);
     this->stats_timer.setCallback([this]() { this->update_frame_stats(); });
+    dev_crypto->registerClickAction([this](aurore::View*) {
+        crypto_flow::choose([this]() { this->refresh(); });
+        return true;
+    });
+    dev_crypto_bench->registerClickAction([](aurore::View*) {
+        crypto_flow::benchmark();
+        return true;
+    });
     dev_clear_cache->registerClickAction([](aurore::View*) {
         cleanup_flow::clear_cache();
         return true;
@@ -226,6 +236,7 @@ HelpTab::HelpTab()
                  { "hp_logs_keep", "folder" }, { "hp_logs_keep_days", "calendar" },
                  { "hp_logs_keep_mb", "save" }, { "hp_dev_mode", "code" }, { "hp_dev_read_only", "eye" },
                  { "hp_dev_pt_log", "list" }, { "hp_dev_frame_stats", "activity" }, { "hp_dev_glow", "sparkle" },
+                 { "hp_dev_crypto", "lock" }, { "hp_dev_crypto_bench", "activity" },
                  { "hp_dev_clear_cache", "trash" }, { "hp_dev_clear_logs", "trash" },
                  { "hp_dev_report", "file" }, { "hp_dev_self_test", "check" }, { "hp_dev_pt_block", "timer" }, { "hp_dev_gate", "shield" },
                  { "hp_dev_forget", "refresh" }, { "hp_dev_build", "download" },
@@ -251,6 +262,7 @@ void HelpTab::refresh()
     dev_read_only->setOn(ro, false);
     dev_pt_log->setOn(cfg.pt_log, false);
     dev_frame_stats->setOn(cfg.frame_stats, false);
+    dev_crypto->setDetailText(crypto_flow::text());
     dev_glow->setOn(cfg.look.glow, false);
     this->update_frame_stats();
     const bool signed_in = !github_auth::token().empty();
@@ -269,6 +281,8 @@ void HelpTab::refresh()
                           { dev_pt_log.getView(), dev },
                           { dev_pt_log_note.getView(), dev },
                           { dev_frame_stats.getView(), dev },
+                          { dev_crypto.getView(), dev },
+                          { dev_crypto_bench.getView(), dev },
                           { dev_frame_stats_note.getView(), dev },
                           { dev_frame_stats_last.getView(), dev && frame_stats_flow::running() },
                           { dev_glow.getView(), dev },

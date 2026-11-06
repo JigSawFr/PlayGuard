@@ -8,7 +8,7 @@
 
 #include "action/notices.hpp"
 #include "action/sys_notes_flow.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"

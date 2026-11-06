@@ -14,7 +14,7 @@
 #include "core/hbl_lock.h"
 #include "core/pctl_ops.h"
 #include "core/sysinfo.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 #include "util/paths.hpp"

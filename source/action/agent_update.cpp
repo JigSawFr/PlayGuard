@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/agent_update.hpp"
+#include "kit_text.hpp"
 
 #include <aurore.hpp>
 #include <format>
@@ -9,7 +10,7 @@
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
 #include "action/update_flow.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
@@ -221,7 +222,7 @@ void offer_when_free(aurore::Activity* main, const std::string& bundle_dir, int 
     if (sync_flow::status().agent_refused) body += "\n\n" + "playguard/modules/agent/offer_refused"_i18n;
     const std::string sha = b.sha256;
     aurore::Dialog* dialog = ui::dialog(body);
-    dialog->addButton("playguard/common/later"_i18n, [sha]() {
+    dialog->addButton(kit_text::str("common/later"), [sha]() {
         // Not at start again for this build (Console › Optional modules
         // still offers it).
         config::get().agent_update_skipped = sha;

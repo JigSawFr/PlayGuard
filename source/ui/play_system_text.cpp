@@ -1,17 +1,13 @@
-// ui — firmware, compatibility, storage, serial and game-patch lines as text.
+// ui — compatibility, serial and game-patch lines as text (PlayGuard only: the
+// kit's ui/system_text.cpp has the firmware and storage ones).
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
-#include "ui/ui.hpp"
 #include "core/fw_policy.h"
+#include "ui/play_ui.hpp"
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 
-#include "util/diagnostics.hpp"
 #include "util/paths.hpp"
 #include "util/prodinfo.hpp"
-#ifndef __SWITCH__
-#include "core/sim_env.h"
-#include "sim/sim_homebrew.hpp"
-#endif
 
 #include <format>
 
@@ -19,21 +15,6 @@ using namespace aurore::literals;
 
 namespace ui
 {
-
-std::string hos_text(u32 version)
-{
-    char buf[16];
-    sysinfo_version_string(version, buf, sizeof(buf));
-    return buf;
-}
-
-std::string fw_text(const SysInfo& info)
-{
-    const std::string fw = hos_text(info.hos_version);
-    std::string ams = info.ams_valid ? std::format("{}.{}.{}", info.ams_major, info.ams_minor, info.ams_micro)
-                                     : std::string("?");
-    return std::format("{} · Atmosphère {}", fw, ams);
-}
 
 std::string compat_text(const SysInfo& info, const char** color)
 {
@@ -52,21 +33,6 @@ std::string compat_text(const SysInfo& info, const char** color)
             if (color) *color = "cadran/coral";
             return "playguard/compat/not_ams"_i18n;
     }
-}
-
-std::string storage_text(const SysInfo& info)
-{
-    switch (sysinfo_storage(&info)) {
-        case SysStorage_EmuMMC: return "playguard/tools/storage_emummc"_i18n;
-        case SysStorage_SysMMC: return "playguard/tools/storage_sysmmc"_i18n;
-        default:                return "playguard/tools/storage_unknown"_i18n;
-    }
-}
-
-std::string storage_short(const SysInfo& info)
-{
-    const char* name = diagnostic::storage_name(sysinfo_storage(&info));
-    return name ? name : "—";
 }
 
 std::string other_storage_note(const SysInfo& info)
@@ -144,36 +110,6 @@ std::string serial_text(const SysInfo& info)
     std::string masked = s.substr(0, 7);
     for (size_t i = 7; i + 2 < s.size(); i++) masked += "•";
     return masked + s.substr(s.size() - 2);
-}
-
-namespace
-{
-bool            s_patches_read = false;
-patches::Report s_patches;
-}   // namespace
-
-void reread_patch_report()
-{
-    s_patches_read = false;
-}
-
-const patches::Report& patch_report()
-{
-    bool& read = s_patches_read;
-    patches::Report& report = s_patches;
-    if (!read) {
-        SysInfo si;
-        sysinfo_get(&si);
-        const std::string fw = hos_text(si.hos_version);
-#ifndef __SWITCH__
-        // The simulated SD card's files first (PLAYGUARD_SIM_FORWARDERS
-        // puts the patches forwarders need there).
-        if (sim_env_flag("PLAYGUARD_SIM_FORWARDERS")) sim_homebrew::seed(paths::sd_root());
-#endif
-        report = patches::detect(paths::sd_root(), fw, si.emummc);
-        read = true;
-    }
-    return report;
 }
 
 bool patches_warning(const patches::Report& report)

@@ -16,7 +16,7 @@
 #include "core/album.h"
 #include "core/calendar.h"
 #include "ui/play_text.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/date.hpp"
 #include "util/forwarder_icon.hpp"
 #include "util/forwarder_library.hpp"

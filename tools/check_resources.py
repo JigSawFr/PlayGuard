@@ -314,7 +314,6 @@ DYNAMIC_KEYS = {
     # sidebars are Aurore's Cadran's, in its own cadran.json).
     "clock/region_names/": re.findall(r'^\s*\{\s*"(\w+)",\s*\{', read(f"{ROOT}/source/util/ntp_servers.cpp"), re.M) +
     ["custom"],   # clock_tab.cpp: the servers the parent typed
-    "error/": strings_of(re.sub(r"//[^\n]*", "", function_of("source/action/error_hint_logic.cpp", "hint_key"))),
     "games/group_note/": returned_by("source/action/game_check_text.cpp", "category_key"),
     "games/groups/": returned_by("source/action/game_check_text.cpp", "category_key"),
     "games/issues/": issue_suffixes(),
@@ -328,7 +327,6 @@ DYNAMIC_KEYS = {
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
     "prefs/effects_values/": array_of(PREFS_HPP, "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
-    "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
     "forwarders/icon_lib/": array_of("source/util/forwarder_library.cpp", "IDS"),   # icon_sheet.cpp: the library's icons
     # notices::reason_of: what a row's badge is for, the ids its tab marks
     # (TabBase::mark(row, { "id", ... })).
@@ -366,8 +364,29 @@ def dynamic(k):
     return any(k.startswith(p) and k[len(p):] in vs for p, vs in DYNAMIC_KEYS.items())
 
 
+# playguard/kit/<key>: PlayGuard's own wording of a text of the kit's catalog
+# (library/boreale-kit/resources/i18n/en-US/kit.json, kit_text.hpp reads it in
+# place of the kit's): it must name a key the kit has, with the same arguments.
+KIT_EN = {}
+try:
+    def _flat(d, pre=""):
+        for k, v in d.items():
+            if isinstance(v, dict):
+                yield from _flat(v, pre + k + "/")
+            else:
+                yield pre + k, v
+    KIT_EN = dict(_flat(json.load(open(f"{ROOT}/library/boreale-kit/resources/i18n/en-US/kit.json", encoding="utf-8"))))
+except (OSError, ValueError):
+    errors.append("library/boreale-kit/resources/i18n/en-US/kit.json is missing (git submodule update --init)")
+ARGS = re.compile(r"\{([2-9]\d*)(?::[^{}]*)?\}")
 for k in sorted(en_keys):
-    if k not in used_exact and not dynamic(k):
+    if k.startswith("kit/"):
+        kit_key = k[len("kit/"):]
+        if kit_key not in KIT_EN:
+            errors.append(f"playguard/{k} words a text the kit does not have ({kit_key})")
+        elif sorted(set(ARGS.findall(base[k]))) != sorted(set(ARGS.findall(KIT_EN[kit_key]))):
+            errors.append(f"playguard/{k} has other arguments than the kit's text")
+    elif k not in used_exact and not dynamic(k):
         errors.append(f"unused i18n key playguard/{k} (remove it from every language)")
 
 # The kinds and sources of the history the code writes, against those the

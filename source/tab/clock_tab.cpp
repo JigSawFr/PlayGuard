@@ -14,7 +14,7 @@
 #include "action/offline_clock_logic.hpp"
 #include "app.hpp"
 #include "core/sim_env.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/ntp_servers.hpp"
 #include "util/paths.hpp"

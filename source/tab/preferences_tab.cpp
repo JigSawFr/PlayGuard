@@ -9,7 +9,7 @@
 #include "action/sys_update_flow.hpp"
 #include "action/update_flow.hpp"
 #include "activity/onboarding_activity.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 
 using namespace aurore::literals;

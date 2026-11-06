@@ -31,17 +31,13 @@ UPWARD = re.compile(r'^\s*#\s*include\s+"((?:activity|tab)/[^"]+)"', re.M)
 # in); nothing else of source/action includes a screen.
 ACTION_SCREENS = {
     "source/action/clock_check.cpp": {"tab/clock_tab.hpp"},                     # opens the network clock's screen
-    "source/action/dev_build_flow.cpp": {"activity/dev_build_activity.hpp",     # the development builds' screens
-                                         "activity/dev_builds_activity.hpp"},
     "source/action/fw_gate.cpp": {"activity/firmware_gate_activity.hpp"},       # the firmware screen
     "source/action/game_notice.cpp": {"activity/game_check_activity.hpp"},      # the installed games check
     "source/action/ha_update_flow.cpp": {"activity/ha_update_activity.hpp"},    # the integration's What's new
     "source/action/notices.cpp": {"activity/onboarding_activity.hpp",           # what the bell's entries open:
                                   "tab/clock_tab.hpp"},                         # First steps, the network clock
     "source/action/profile_flow.cpp": {"activity/profiles_activity.hpp"},       # the profiles' screen
-    "source/action/support_flow.cpp": {"activity/whats_new_activity.hpp"},      # What's new
     "source/action/sys_notes_flow.cpp": {"activity/sys_notes_activity.hpp"},    # the release notes' screen
-    "source/action/update_flow.cpp": {"activity/update_activity.hpp"},          # the update screen
 }
 
 

@@ -15,7 +15,7 @@
 #include "action/notices.hpp"
 #include "action/pt_flow.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/pt_block.hpp"

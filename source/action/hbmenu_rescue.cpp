@@ -25,7 +25,7 @@
 #include "core/gate.h"
 #include "core/hbl_lock.h"
 #include "core/rescue.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/diagnostics.hpp"
 #include "util/forwarders.hpp"
 #include "util/paths.hpp"

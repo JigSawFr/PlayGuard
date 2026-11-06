@@ -3,7 +3,8 @@
 
 #include "action/pt_flow.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "kit_text.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
 
@@ -38,8 +39,8 @@ void PlayTimerAdvancedActivity::onContentAvailable()
     diag->registerClickAction([](aurore::View*) {
         std::string err;
         const std::string path = diagnostic::save(diagnostic::current_report(), &err);
-        if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
-        else ui::notify(aurore::getStr("playguard/toast/diag_saved", path));
+        if (path.empty()) ui::error(kit_text::str("toast/diag_err"), err);
+        else ui::notify(kit_text::str("toast/diag_saved", path));
         return true;
     });
     this->refresh();

@@ -9,7 +9,7 @@
 #include "action/game_scan.hpp"
 #include "action/play_data.hpp"
 #include "action/rating_logic.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 

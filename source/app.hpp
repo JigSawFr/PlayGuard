@@ -18,14 +18,7 @@ void shutdown();
 
 uint32_t    pctl_init_result();   // 0 if the probe succeeded
 
-// True for a published release (built from its vX.Y.Z tag), false for any
-// other build (main, a pull request, a local one): a development build.
-bool        is_release();
-// The pull request this build was made for by CI (306), 0 for any other build.
-int         pr();
-// Where the running .nro is, from the SD card root ("/switch/playguard/playguard.nro"),
-// as hbloader gave it in argv[0]; empty when unknown (nxlink, desktop).
-std::string self_path();
+// is_release(), pr() and self_path() (kit_app.hpp) are defined here.
 void        set_self_path(const char* argv0);
 // The screen another Boréale homebrew opened PlayGuard at (a click in its
 // bell: --open=<route>, boreale-link's bl_open_route): one of
@@ -38,9 +31,6 @@ void        set_open_route(int argc, char** argv);
 // Tagged for the site's audience (utm_source=playguard, utm_medium=qr).
 const char* site_url();
 std::string doc_url(const std::string& page, const std::string& anchor = "");
-// Funding links (.github/FUNDING.yml), shown in About.
-constexpr const char* SPONSORS_URL = "https://github.com/sponsors/JigSawFr";
-constexpr const char* KOFI_URL     = "https://ko-fi.com/jigsawfr";
 // The Home Assistant integration (JigSawFr/playguard-ha), through My Home
 // Assistant's redirects (it asks once for the user's own instance, then opens
 // the page there): the repository in HACS, and adding the integration.

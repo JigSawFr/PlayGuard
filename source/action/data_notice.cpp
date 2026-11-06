@@ -6,7 +6,7 @@
 
 #include "action/history_flow.hpp"
 #include "action/notices.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/history.hpp"
 

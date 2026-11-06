@@ -18,7 +18,7 @@
 #include "activity/sync_activity.hpp"
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/modules.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"

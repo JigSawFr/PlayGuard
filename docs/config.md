@@ -154,6 +154,7 @@ Set in *About › Help & diagnostics › Developer*, shown once developer mode i
 | `dev_mode` | boolean | the developer tools at the end of *About › Help & diagnostics* (seven presses of Ⓨ on *About › Version* turn them on, *Developer mode* there turns them off) | `false` |
 | `pt_log` | boolean | *Record the play timer* (`logs/play_timer/log.csv`) | `false` |
 | `dev_builds_order` | string | how *Install another build* orders the pull requests (A on their tab when it is shown): `"newest"` (the newest build first) or `"number"` (the highest number first); main's commits are always newest first | `"newest"` |
+| `crypto` | `auto`, `software`, `hardware` | `auto` | *About › Help & diagnostics › Developer › Encryption (AES, SHA-256)*: what the sealed secrets (the GitHub sign-in) are encrypted and hashed with. The console's CPU has instructions for both: `auto` and `hardware` use them once they have answered known test values the way the portable code does (a CPU that fails them is left aside, said in the log); `software` never does. *Encryption benchmark* measures both in MB/s. |
 | `frame_stats` | boolean | *About › Help & diagnostics › Developer › Frame statistics* (`logs/frame_stats.txt`: one line per second, the UI thread's time per frame and the late frames, to weigh one screen against another on the console) | `false` |
 | `cadran_glow` | boolean | *About › Help & diagnostics › Developer › Background glow*: the screens' soft light behind the top left (or the child screen's ring); off, the frame statistics' mode says `docked-noglow` (`handheld-noglow`), to weigh what it costs | `true` |
 
@@ -303,6 +304,7 @@ line; the order does not matter when it reads them:
   "summary_seen": "",
   "dev_mode": false,
   "pt_log": false,
+  "crypto": "auto",
   "frame_stats": false,
   "cadran_glow": true,
   "dev_builds_order": "newest",

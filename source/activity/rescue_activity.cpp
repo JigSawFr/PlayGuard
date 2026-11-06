@@ -8,7 +8,7 @@
 #include "activity/lock_activity.hpp"
 #include "activity/main_activity.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
 using namespace aurore::literals;
