@@ -37,7 +37,7 @@ std::string doc_url(const std::string& page, const std::string& anchor = "");
 // and later: marketplace_repository), and adding the integration.
 constexpr const char* HA_MARKETPLACE_URL =
     "https://my.home-assistant.io/redirect/marketplace_repository/?owner=JigSawFr&repository=boreale-ha&category=integration";
-constexpr const char* HA_ADD_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard";
+constexpr const char* HA_ADD_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=boreale";
 // Its releases, with what changed in each.
 constexpr const char* HA_RELEASES_URL = "https://github.com/JigSawFr/playguard-ha/releases";
 
