@@ -12,7 +12,7 @@
 // read-only mode, the PIN asked before a change). Listing only reads.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
-#include "nx_types.h"
+#include "core/nx_types.h"
 
 #ifdef __cplusplus
 extern "C" {

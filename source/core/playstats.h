@@ -13,7 +13,7 @@
 // yet (up to ~0.5 s each on 20.0.0+), so the UI runs it off the main thread.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
-#include "nx_types.h"
+#include "core/nx_types.h"
 #include "../util/playlog.h"
 
 #ifdef __cplusplus

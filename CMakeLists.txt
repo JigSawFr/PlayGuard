@@ -112,7 +112,10 @@ endif ()
 # Sources: UI (C++) + service layer. The real service layer (source/core/*.c)
 # talks to libnx and is Switch-only; the desktop build swaps in the simulated
 # backend from source/sim/ so the UI can be run and screenshotted on a PC.
-file(GLOB_RECURSE PLAYGUARD_SRC CONFIGURE_DEPENDS source/*.cpp source/*.c)
+# The kit (JigSawFr/boreale-kit, a submodule in library/boreale-kit) is built from
+# its sources with PlayGuard's toolchain and flags.
+set(BOREALE_KIT ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-kit/source)
+file(GLOB_RECURSE PLAYGUARD_SRC CONFIGURE_DEPENDS source/*.cpp source/*.c ${BOREALE_KIT}/*.cpp ${BOREALE_KIT}/*.c)
 if (PLATFORM_SWITCH)
     list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/sim/.*")
     list(APPEND PLAYGUARD_SRC ${AURORE_LIBRARY}/lib/platforms/switch/switch_wrapper.c)
@@ -126,14 +129,14 @@ else ()
     # The console-free parts are shared with the simulator: one implementation
     # (tools/check_sources.py fails on one left out).
     list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
+                              ${BOREALE_KIT}/core/calendar.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/console_info_pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gate.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/hbl_lock.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c
+                              ${BOREALE_KIT}/core/write_guard.c
                               # The simulated agent runs the agent's own command dispatch.
                               ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/agent/source/agent_core.c)
 endif ()
@@ -155,7 +158,11 @@ endif ()
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 23)
 
-target_include_directories(${PROJECT_NAME} PRIVATE source library/boreale-link/source extern/qrcodegen extern/stb)
+if (PLATFORM_SWITCH)
+    # The console's CPU has the ARMv8 crypto extensions (util/crypto_hw): that one file asks for them, whatever the toolchain's default.
+    set_source_files_properties(${BOREALE_KIT}/util/crypto_hw.cpp PROPERTIES COMPILE_OPTIONS "-march=armv8-a+crc+crypto")
+endif ()
+target_include_directories(${PROJECT_NAME} PRIVATE source library/boreale-kit/source library/boreale-link/source extern/qrcodegen extern/stb)
 if (NOT PLATFORM_SWITCH)
     target_include_directories(${PROJECT_NAME} PRIVATE source/sync sysmodule/agent/source)
 endif ()

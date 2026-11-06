@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/notices.hpp"
+#include "core/fw_policy.h"
 
 #include <algorithm>
 #include <aurore.hpp>

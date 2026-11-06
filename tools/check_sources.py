@@ -68,31 +68,24 @@ for rel, allowed in sorted(ACTION_SCREENS.items()):
         errors.append(f'tools/check_sources.py: ACTION_SCREENS lists "{inc}" for {rel}, which does not include it')
 
 # ------------------------------------------------------------ source/core
-# The console's own: the simulator stands in for them on the desktop
+# The console's own that are PlayGuard's (the kit's are checked by its own CI): the simulator stands in for them on the desktop
 # (source/sim/), or the desktop has no use for them.
 CONSOLE_ONLY = {
     "album.c": "sim_album.cpp",
     "console_info.c": "sim_console.c",
-    "crash_handler.c": "the console's exception handler",
-    "device_key.c": "sim_device_key.cpp",
     "forwarder.c": "sim_forwarder.cpp",
     "gamecheck.c": "sim_gamecheck.c",
     "gate_nx.c": "the PIN gate's .nro",
     "modules_nx.c": "sim_modules.c",
-    "nacp_read.c": "sim_games.c",
     "pctl_dump.c": "sim_pctl.c",
     "pctl_ops.c": "sim_pctl.c",
-    "platform.c": "sim_platform.cpp",
     "playstats.c": "sim_playstats.c",
-    "startup_hook.c": "libnx's userAppInit",
-    "sysinfo.c": "sim_pctl.c",
     "time_ops.c": "sim_time.c",
 }
 # Console-free, host-tested, but not in the desktop build.
 NOT_ON_DESKTOP = {
     "gate_screen.c": "the PIN gate's screen (stb, built for the console only)",
     "gate_text.c": "the PIN gate's texts",
-    "nacp.c": "a game's control data: the made-up games have their names",
     "playstats_logic.c": "the raw play log: sim_playstats.c makes the figures themselves",
 }
 

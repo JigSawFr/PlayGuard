@@ -1,6 +1,7 @@
 // ui — firmware, compatibility, storage, serial and game-patch lines as text.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "ui/ui.hpp"
+#include "core/fw_policy.h"
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 

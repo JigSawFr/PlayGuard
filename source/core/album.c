@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nacp.h"
+#include "core/nacp.h"
 
 // What is read of the album at most: far past the screenshots an SD card
 // holds (0x20 bytes each).

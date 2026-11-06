@@ -13,7 +13,7 @@
 #include "pctl_ops.h"
 #include "sync_apply.h"
 #include "sync_exec.h"
-#include "write_guard.h"
+#include "core/write_guard.h"
 
 enum { MOCK_ERROR = 0x701 };
 static Service service;

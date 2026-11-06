@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <string>
 
+#include "kit_app.hpp"   // version(), commit(), repo_url(), read_only(), dev_mode(): the kit asks for them
+
 namespace app
 {
 
@@ -16,10 +18,6 @@ void shutdown();
 
 uint32_t    pctl_init_result();   // 0 if the probe succeeded
 
-std::string version();            // "1.0.0"
-// The commit this build comes from ("1a2b3c4"), empty when unknown (built
-// outside a git checkout). Tells which development build is installed.
-std::string commit();
 // True for a published release (built from its vX.Y.Z tag), false for any
 // other build (main, a pull request, a local one): a development build.
 bool        is_release();
@@ -34,7 +32,6 @@ void        set_self_path(const char* argv0);
 // config::START_TABS, "" none or one PlayGuard does not know.
 std::string open_route();
 void        set_open_route(int argc, char** argv);
-const char* repo_url();
 // The website (https://guard.boreale.dev/, tools/build_site.py) and a page of its
 // documentation in the console's language ("troubleshooting", "locked-out"):
 // a release's as published (docs/), main's for a development build (docs/dev/).
@@ -57,14 +54,12 @@ constexpr const char* HA_RELEASES_URL = "https://github.com/JigSawFr/playguard-h
 // and the tabs hide their write controls. On at launch when the firmware is
 // newer than the checked one, until the firmware screen says otherwise.
 // After a change, call ui::on_mode_changed() to update what is on screen.
-bool        read_only();
 void        set_read_only(bool on);
 
 // Developer mode: the developer tools at the end of About › Help & diagnostics, and the
 // full diagnostic of Play timer › Advanced.
 // Saved in the preferences, or on for this session only (firmware screen,
 // "read-only + developer mode").
-bool        dev_mode();
 // Saved off the UI thread, with ui::save_config's toasts.
 void        set_dev_mode(bool on, bool persist, const std::string& saved_text = "", const std::string& failed_text = "");
 

@@ -12,7 +12,7 @@
 #include <string.h>
 
 #include "gamecheck.h"
-#include "write_guard.h"
+#include "core/write_guard.h"
 
 // ------------------------------------------------------------ the console
 

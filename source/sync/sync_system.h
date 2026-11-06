@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 #include "../core/console_info.h"
-#include "../core/sysinfo.h"
+#include "core/sysinfo.h"
 #include "sync_conf.h"
 
 #ifdef __cplusplus

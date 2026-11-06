@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../core/write_guard.h"
+#include "core/write_guard.h"
 #include "sync_conf.h"
 
 #define NOLIMIT PT_DAY_NOLIMIT

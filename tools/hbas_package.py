@@ -5,8 +5,8 @@ packaging/hb-appstore/pkgbuild.json is the listing's source: a pkgbuild as
 switch-hbas-repo takes it, with these filled in so it never disagrees with
 the build:
   {version}            CMakeLists.txt  VERSION_MAJOR / MINOR / ALTER
-  {fw_min_play_timer}  source/core/sysinfo.h  PCTL_FW_MIN_PLAYTIMER
-  {fw_tested_max}      source/core/sysinfo.h  PCTL_FW_TESTED_MAX
+  {fw_min_play_timer}  source/core/fw_policy.h  PCTL_FW_MIN_PLAYTIMER
+  {fw_tested_max}      source/core/fw_policy.h  PCTL_FW_TESTED_MAX
   {changelog}          .github/release-notes/<version>.md, else the version's
                        section of CHANGELOG.md, then a link to the release
 and two keys of its own, taken out of what it writes: an asset's "from" (the
@@ -73,9 +73,9 @@ def version(root):
 
 def firmware(root, macro):
     m = re.search(rf"#define {macro}\s+MAKEHOSVERSION\((\d+),\s*(\d+),\s*(\d+)\)",
-                  read(f"{root}/source/core/sysinfo.h"))
+                  read(f"{root}/source/core/fw_policy.h"))
     if not m:
-        fail(f"{macro} not found in source/core/sysinfo.h")
+        fail(f"{macro} not found in source/core/fw_policy.h")
     return ".".join(m.groups())
 
 

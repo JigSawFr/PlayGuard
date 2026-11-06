@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/fw_gate.hpp"
+#include "core/fw_policy.h"
 
 #include <utility>
 

@@ -57,7 +57,7 @@ body:
       required: true
 
   # Text fields, not lists: GitHub fills only text fields from the link the
-  # QR code of *Send a report online* opens (source/util/log_upload.hpp).
+  # QR code of *Send a report online* opens (library/boreale-kit/source/util/log_upload.hpp).
   - type: input
     id: launcher
     attributes:

@@ -4,7 +4,7 @@
 // (source/sim/) and for the host tests, so all three share one implementation.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
-#include "nx_types.h"
+#include "core/nx_types.h"
 
 #ifdef __cplusplus
 extern "C" {

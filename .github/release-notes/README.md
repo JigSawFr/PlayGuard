@@ -34,7 +34,7 @@ settings › Permissions, then accept it on the installation).
 
 The console's update screen shows the summary and the lists: it skips HTML
 lines and comments and stops at the screens, and reads the release page's
-own comments (`source/util/changelog.cpp`): `<!-- console: a line -->` is
+own comments (`library/boreale-kit/source/util/changelog.cpp`): `<!-- console: a line -->` is
 shown there only, the lines of a `<!-- console:only` … `-->` comment too, and
 those between `<!-- console:hide -->` and `<!-- /console -->` are not (the
 *Important* box: the console shows its words as a plain line). It keeps the
