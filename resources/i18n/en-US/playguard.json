@@ -1609,6 +1609,7 @@
         "no_random": "The console gave no random number for the id. Try again.",
         "save_err": "The settings could not be saved",
         "state_off": "Off",
+        "state_newer": "Settings written by a newer PlayGuard: left as they are. Update PlayGuard to change them.",
         "state_online": "Online",
         "state_online_since": "Online since {}",
         "state_offline": "Not connected",

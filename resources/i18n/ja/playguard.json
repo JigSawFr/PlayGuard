@@ -1609,6 +1609,7 @@
         "no_random": "本体から ID 用の乱数を取得できませんでした。もう一度お試しください。",
         "save_err": "設定を保存できませんでした",
         "state_off": "OFF",
+        "state_newer": "新しいバージョンの PlayGuard が書いた設定のため、そのままにしています。変更するには PlayGuard を更新してください。",
         "state_online": "オンライン",
         "state_online_since": "{} からオンライン",
         "state_offline": "未接続",

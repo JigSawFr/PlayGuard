@@ -1609,6 +1609,7 @@
         "no_random": "De console gaf geen willekeurig getal voor de id. Probeer het opnieuw.",
         "save_err": "De instellingen konden niet worden opgeslagen",
         "state_off": "Uit",
+        "state_newer": "Instellingen geschreven door een nieuwere PlayGuard: blijven zoals ze zijn. Werk PlayGuard bij om ze te wijzigen.",
         "state_online": "Verbonden",
         "state_online_since": "Verbonden sinds {}",
         "state_offline": "Niet verbonden",

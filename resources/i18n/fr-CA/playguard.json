@@ -1609,6 +1609,7 @@
         "no_random": "La console n'a pas fourni de nombre aléatoire pour l'identifiant. Réessayez.",
         "save_err": "Les réglages n'ont pas pu être enregistrés",
         "state_off": "Désactivé",
+        "state_newer": "Réglages écrits par un PlayGuard plus récent : laissés tels quels. Mettez PlayGuard à jour pour les modifier.",
         "state_online": "En ligne",
         "state_online_since": "En ligne depuis {}",
         "state_offline": "Non connecté",

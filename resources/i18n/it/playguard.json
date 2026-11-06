@@ -1609,6 +1609,7 @@
         "no_random": "La console non ha fornito un numero casuale per l'ID. Riprova.",
         "save_err": "Impossibile salvare le impostazioni",
         "state_off": "Disattivato",
+        "state_newer": "Impostazioni scritte da un PlayGuard più recente: lasciate com'erano. Aggiorna PlayGuard per modificarle.",
         "state_online": "Connesso",
         "state_online_since": "Connesso da {}",
         "state_offline": "Non connesso",

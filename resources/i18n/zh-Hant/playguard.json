@@ -1609,6 +1609,7 @@
         "no_random": "主機沒有為 ID 提供亂數。請再試一次。",
         "save_err": "無法儲存設定",
         "state_off": "關閉",
+        "state_newer": "設定由較新版本的 PlayGuard 寫入，保持原樣。請更新 PlayGuard 以修改。",
         "state_online": "線上",
         "state_online_since": "自 {} 起上線",
         "state_offline": "未連線",

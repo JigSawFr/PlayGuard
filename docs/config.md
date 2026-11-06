@@ -37,7 +37,8 @@ settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreal
 - **A file a newer version wrote** (`schema` above PlayGuard's, `1`) is read
   as missing: the defaults are used, and the file is never written over;
   what is changed meanwhile lasts until PlayGuard closes. The same for
-  `state.json`. A file without `schema` is read as `1`.
+  `state.json`. A file without `schema` is read as `1`. For `sync.conf` and
+  `link.conf`, the *Remote access* screen says so on its status line.
 - Some groups of keys are all-or-nothing: the [firmware choice](#firmware-not-supported-yet)
   and the [extra time of the day](#extra-time-today). One key refused, and the
   whole group is cleared.

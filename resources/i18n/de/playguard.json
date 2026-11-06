@@ -1609,6 +1609,7 @@
         "no_random": "Die Konsole hat keine Zufallszahl für die ID geliefert. Versuchen Sie es erneut.",
         "save_err": "Einstellungen konnten nicht gespeichert werden",
         "state_off": "Aus",
+        "state_newer": "Einstellungen von einem neueren PlayGuard geschrieben: bleiben unverändert. PlayGuard aktualisieren, um sie zu ändern.",
         "state_online": "Verbunden",
         "state_online_since": "Verbunden seit {}",
         "state_offline": "Nicht verbunden",
