@@ -1128,7 +1128,7 @@
         "patches_anyway": "Trotzdem hinzufügen (er startet, sobald die Patches vorhanden sind)",
         "patches_mixed": "sys-patch ist aktiv, aber auf der SD-Karte liegen auch Sigpatch-Dateien ({}): eine bekannte Ursache für Forwarder, die nicht gestartet werden konnten. Legen Sie sie beiseite (Konsole › Spiel-Patches) und starten Sie die Konsole neu.",
         "refresh": "Die Forwarder mit diesem Loader neu erstellen",
-        "refresh_confirm": "Diese Forwarder mit dem neuen Loader neu erstellen? {}: Neu erstellt starten sie ihre Homebrew-App mit dem Loader dieses Builds und behalten ihren Namen, ihr Symbol und ihre Geheimzahl-Regeln.",
+        "refresh_confirm": "Diese Forwarder mit dieser Version neu erstellen? {}: Neu erstellt starten sie ihre Homebrew-App mit ihrem Loader, die geschützten tragen ihr Abzeichen, und alle behalten ihren Namen, ihr Symbol und ihre Geheimzahl-Regeln.",
         "refresh_title": "Mit einem älteren Loader erstellte Forwarder",
         "refresh_detail": "{}: von einem älteren PlayGuard erstellt. Neu erstellt starten sie ihre Homebrew-App mit dem Loader dieses Builds."
     },

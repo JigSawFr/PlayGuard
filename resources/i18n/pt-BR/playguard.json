@@ -1128,7 +1128,7 @@
         "patches_anyway": "Adicionar mesmo assim (ele inicia assim que os patches estiverem no lugar)",
         "patches_mixed": "O sys-patch está ativo, mas também há arquivos de sigpatch ({}) no cartão SD: uma causa conhecida de forwarders que não puderam ser iniciados. Deixe-os de lado (Console › Patches de jogos) e reinicie o console.",
         "refresh": "Refazer os forwarders com este carregador",
-        "refresh_confirm": "Refazer estes forwarders com o novo carregador? {}: depois de refeitos, eles abrem seu homebrew com o carregador desta compilação e mantêm o nome, o ícone e as regras de PIN.",
+        "refresh_confirm": "Refazer estes forwarders com esta versão? {}: depois de refeitos, eles abrem seu homebrew com o carregador dela, os protegidos exibem seu selo e todos mantêm o nome, o ícone e as regras de PIN.",
         "refresh_title": "Forwarders feitos com um carregador anterior",
         "refresh_detail": "{}: feitos por um PlayGuard anterior. Depois de refeitos, eles abrem seu homebrew com o carregador desta compilação."
     },

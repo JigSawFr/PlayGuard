@@ -102,6 +102,11 @@ bool stale_loader(const std::string& made, const std::string& current);
 // new PlayGuard's gate is another file the forwarder does not start.
 bool stale_gate(bool pin, const std::string& made, const std::string& current, bool pinned);
 
+// Whether a forwarder protected with the PIN (`pin`) carries another badge,
+// `made` (forwarder_flow::badge_id; empty: made before it was kept), than
+// the one this build draws, `current` (empty: unknown here, none).
+bool stale_badge(bool pin, const std::string& made, const std::string& current);
+
 // Whether `nro` ("sdmc:/…") is a homebrew menu, which starts any other
 // .nro: hbmenu (sdmc:/hbmenu.nro, the one the album starts, or a copy of
 // it elsewhere) or sphaira, by their file names.

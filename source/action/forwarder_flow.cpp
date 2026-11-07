@@ -22,6 +22,7 @@
 #include "core/gate.h"
 #include "util/forwarder_gate.hpp"
 #include "util/forwarder_icon.hpp"
+#include "util/forwarder_library.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 #include "util/patches.hpp"
@@ -116,6 +117,22 @@ std::string loader_id()
 #else
     return "";
 #endif
+}
+
+std::string badge_id()
+{
+    static std::string id;
+    static bool read = false;
+    if (!read) {
+        read = true;
+        std::string png;
+        if (paths::read_file(std::string(AURORE_ASSET("")) + forwarder_library::BADGE, png)) {
+            Sha256 hash;
+            hash.update(png);
+            id = hash.hex().substr(0, 16);
+        }
+    }
+    return id;
 }
 
 namespace
@@ -506,12 +523,14 @@ std::vector<forwarders_logic::Row> to_refresh()
     const std::string current = loader_id();
     if (current.empty()) return out;
     const Gate gate = gate_nro();
+    const std::string badge = badge_id();
     for (const auto& r : made_rows(true)) {
         forwarders::Made m;
         if (r.state != forwarders_logic::State::NotInstalled && r.state != forwarders_logic::State::Elsewhere &&
             forwarders::find(r.id, &m) &&
             (forwarders_logic::stale_loader(m.loader, current) ||
-             forwarders_logic::stale_gate(m.pin, m.gate, gate.path, gate.pinned)))
+             forwarders_logic::stale_gate(m.pin, m.gate, gate.path, gate.pinned) ||
+             forwarders_logic::stale_badge(m.pin, m.badge, badge)))
             out.push_back(r);
     }
     return out;

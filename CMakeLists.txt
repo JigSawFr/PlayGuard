@@ -328,7 +328,11 @@ set(ASSEMBLE_RESOURCES
     # (view/release_notes.cpp), the full list a press away.
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/.github/release-notes ${MERGED_RESOURCES}/release-notes
     COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/release-notes/README.md ${MERGED_RESOURCES}/img/emoji/README.md
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg
+    # The HOME menu's icon (icon.jpg, with the name under the mark), for
+    # PlayGuard's own forwarder when its .nro cannot be read; inside the app,
+    # the icon without the name (images/icon-512.png): the screens say it.
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/home_icon.jpg
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/icon-512.png ${MERGED_RESOURCES}/img/app_icon.png
     # The optional sysmodules, when built (make rescue / make agent).
     COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DDEST=${MERGED_RESOURCES}/sysmodules
             -DAPP_VERSION=${APP_VERSION} -DAPP_COMMIT=${APP_COMMIT}
