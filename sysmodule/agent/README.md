@@ -110,6 +110,13 @@ Static heap 1.5 MiB, 256 KiB of it the network service's room for the socket
 buffers; one TCP socket, on two `bsd` sessions (the watchdog shuts it down
 when a call on it hangs); TLS through the console's `ssl` service.
 
+`make test` also runs `tests/agent_e2e/`: the session engine and the relay
+service, assembled as `main.c` does without libnx, against a real MQTT broker
+(mosquitto, its command-line clients watching and driving it). It covers the
+console's documents on connection, a relayed homebrew, PlayGuard's orders, and
+the module going off and on. Without mosquitto it skips itself; CI installs it
+and sets `REQUIRE_MOSQUITTO`, which makes that a failure.
+
 ## Not tested on a console yet
 
 Everything here builds and its logic is host-tested, but the IPC server, the

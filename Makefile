@@ -331,6 +331,9 @@ agent_SRC   := sysmodule/agent/source/agent_core.c library/boreale-link/source/b
 agent_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT) -Isysmodule/agent/source
 agent_relay_SRC   := sysmodule/agent/source/agent_relay.c library/boreale-link/source/bl_relay.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_kv.c tests/agent_relay/test.c
 agent_relay_FLAGS := $(agent_FLAGS)
+# The agent's link against a real broker (mosquitto; skipped without it, REQUIRE_MOSQUITTO makes that a failure).
+agent_e2e_SRC   := $(SYNC_PURE) library/boreale-link/source/mqtt_client.c library/boreale-link/source/bl_session.c library/boreale-link/source/bl_net.c library/boreale-link/source/bl_relay.c source/sync/sync_engine.c sysmodule/agent/source/agent_relay.c tests/agent_e2e/test.c
+agent_e2e_FLAGS := $(agent_FLAGS) -D_GNU_SOURCE
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
