@@ -68,7 +68,7 @@ for rel, allowed in sorted(ACTION_SCREENS.items()):
         errors.append(f'tools/check_sources.py: ACTION_SCREENS lists "{inc}" for {rel}, which does not include it')
 
 # ------------------------------------------------------------ source/core
-# The console's own that are PlayGuard's (the kit's are checked by its own CI): the simulator stands in for them on the desktop
+# The console's own that are PlayGuard's, here or in its module (the kit's are checked by its own CI): the simulator stands in for them on the desktop
 # (source/sim/), or the desktop has no use for them.
 CONSOLE_ONLY = {
     "album.c": "sim_album.cpp",
@@ -98,9 +98,12 @@ def read(path):
         return ""
 
 
-cmake = set(re.findall(r"\$\{CMAKE_CURRENT_SOURCE_DIR\}/source/core/(\w+\.c)\b", read("CMakeLists.txt")))
-make = set(re.findall(r"\bsource/core/(\w+\.c)\b", read("Makefile")))
-core = {os.path.basename(p) for p in glob.glob(f"{ROOT}/source/core/*.c")}
+# PlayGuard's service layer is in two folders: the app's (source/core) and its module of the shared agent
+# (library/boreale-link/modules/playguard/core, $(PG) in the Makefile, ${PLAYGUARD_MODULE} in CMakeLists.txt).
+MODULE_CORE = "library/boreale-link/modules/playguard/core"
+cmake = set(re.findall(r"\$\{(?:CMAKE_CURRENT_SOURCE_DIR\}/source|PLAYGUARD_MODULE\})/core/(\w+\.c)\b", read("CMakeLists.txt")))
+make = set(re.findall(r"(?:\bsource|\$\(PG\))/core/(\w+\.c)\b", read("Makefile")))
+core = {os.path.basename(p) for p in glob.glob(f"{ROOT}/source/core/*.c") + glob.glob(f"{ROOT}/{MODULE_CORE}/*.c")}
 if not cmake or not make or not core:
     errors.append("no source/core/*.c found in CMakeLists.txt, the Makefile or source/core")
 for name in sorted(set(CONSOLE_ONLY) | set(NOT_ON_DESKTOP)):

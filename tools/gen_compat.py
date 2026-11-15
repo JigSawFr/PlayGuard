@@ -7,10 +7,10 @@ the "firmware not supported yet" screen) to know whether updating would make
 the console's firmware supported. Values come from the sources, so they can
 never disagree with the build:
   version            CMakeLists.txt  VERSION_MAJOR / MINOR / ALTER
-  fw_tested_max      source/core/fw_policy.h  PCTL_FW_TESTED_MAX (verified on a console:
+  fw_tested_max      library/boreale-link/modules/playguard/core/fw_policy.h  PCTL_FW_TESTED_MAX (verified on a console:
                      above it the app asks first, so a newer release "supports"
                      a firmware only once it was verified there)
-  fw_min_play_timer  source/core/fw_policy.h  PCTL_FW_MIN_PLAYTIMER
+  fw_min_play_timer  library/boreale-link/modules/playguard/core/fw_policy.h  PCTL_FW_MIN_PLAYTIMER
 
 compat.json stays at schema 1 forever: every installed PlayGuard before
 compat-<N>.json existed reads that name. A version reads
@@ -43,13 +43,13 @@ for name in ("MAJOR", "MINOR", "ALTER"):
         fail(f"VERSION_{name} not found in CMakeLists.txt")
     parts.append(m.group(1))
 
-sysinfo = open(f"{ROOT}/source/core/fw_policy.h", encoding="utf-8").read()
+sysinfo = open(f"{ROOT}/library/boreale-link/modules/playguard/core/fw_policy.h", encoding="utf-8").read()
 
 
 def firmware(macro):
     m = re.search(rf"#define {macro}\s+MAKEHOSVERSION\((\d+),\s*(\d+),\s*(\d+)\)", sysinfo)
     if not m:
-        fail(f"{macro} not found in source/core/fw_policy.h")
+        fail(f"{macro} not found in library/boreale-link/modules/playguard/core/fw_policy.h")
     return ".".join(m.groups())
 
 

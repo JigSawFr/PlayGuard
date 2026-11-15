@@ -6,7 +6,7 @@ optional agent), the MQTT broker, Home Assistant and the `playguard` HA
 integration. The design and its reasons are in
 [`sync-design.md`](sync-design.md); the user guide is
 [`home-assistant.md`](home-assistant.md). The documents below are what
-`source/sync/` writes (its host tests save examples that
+`library/boreale-link/modules/playguard/sync/` writes (its host tests save examples that
 `tools/check_sync_json.py` validates); a change that breaks a consumer bumps
 `schema`.
 
@@ -367,7 +367,7 @@ forwarder on the HOME menu: PlayGuard's own, those PlayGuard made, those
 another app made, sphaira's for instance) is told as totals (`homebrew_s`,
 `homebrew_min`) and counts (`homebrews`, `forwarders`); the one in front is
 named, game or homebrew (`now_playing`, the events, `now`). What a title is
-(`source/sync/sync_titles.h`, shared by PlayGuard and the agent):
+(`library/boreale-link/modules/playguard/sync/sync_titles.h`, shared by PlayGuard and the agent):
 
 | Signal | Says | How sure |
 |---|---|---|
@@ -548,7 +548,7 @@ agent keeps an order for PlayGuard to confirm under *ask*). `rc` is
 was away misses them on purpose; the state carries `link.last_result`.
 
 What the console does on its own, found by comparing each state snapshot with
-the last one (`source/sync/sync_watch.c`), is published the same way, right
+the last one (`library/boreale-link/modules/playguard/sync/sync_watch.c`), is published the same way, right
 after the state that shows it:
 
 ```json
@@ -625,7 +625,7 @@ Assistant: `clock_accurate`, `used_screen_time`, `limit_sun` …
 `accounts`, and those of the
 `system` topic but `sd_free`, `nand_free`, `battery`, `charging` and `docked`.
 Ids and names follow HA's `nintendo_parental_controls` integration where the
-meaning matches. The table is `source/sync/sync_entities.c`.
+meaning matches. The table is `library/boreale-link/modules/playguard/sync/sync_entities.c`.
 
 The HA integration, when installed, publishes `discovery/set = OFF`, and
 creates its own entities with the same object ids.
@@ -748,10 +748,10 @@ published, for the integration to follow.
 
 ## IPC service `pg:agent` (PlayGuard ↔ agent)
 
-Hosted by the agent (`sysmodule/agent/source/agent_ipc.c`); PlayGuard's
+Hosted by the agent (`library/boreale-link/agent/source/agent_ipc.c`); PlayGuard's
 client is `source/util/agent_client_nx.cpp` (`source/action/sync_flow.cpp`
 drives it). Command ids, structures and result codes are in
-`source/sync/agent_ipc.h` (protocol 3). The IPC message holds 256 bytes, so
+`library/boreale-link/modules/playguard/sync/agent_ipc.h` (protocol 3). The IPC message holds 256 bytes, so
 documents, the log, an order and the status travel in mapped buffers.
 
 PlayGuard looks for the service when the link is on, at start-up and every
@@ -806,11 +806,11 @@ updated and `AGENT_PROTOCOL` goes up.
 
 ## IPC service `bl:link` (another homebrew ↔ agent)
 
-Hosted by the same thread as `pg:agent` (`sysmodule/agent/source/agent_ipc.c`),
+Hosted by the same thread as `pg:agent` (`library/boreale-link/agent/source/agent_ipc.c`),
 registered next to it: if the console refuses the name, the agent logs it and
 serves PlayGuard as before, and the other homebrews keep their own connection.
 The sessions, what a module may publish and the orders handed back are
-`sysmodule/agent/source/agent_relay.c`; the rules shared with the homebrews
+`library/boreale-link/agent/source/agent_relay.c`; the rules shared with the homebrews
 (protocol 1, which modules and topics may relay, the queue of orders) are
 boreale-link's `bl_relay`. The commands are `BlRelayCmd`: Hello (protocol,
 module, version; the reply says `accepted`), Publish, PopOrder, Status, Close.
@@ -846,6 +846,6 @@ Not yet: the homebrews' own use of it beyond PlayShelf's `state` and pause butto
   there what it accepts (see *Orders* above).
 - The HA integration pins the schema it understands and raises a repair issue
   on a newer one.
-- The entity table (`source/sync/sync_entities.h`) is exported by a host test
+- The entity table (`library/boreale-link/modules/playguard/sync/sync_entities.h`) is exported by a host test
   as `entities.json`; the integration carries a copy and its tests fail when
   the two diverge.

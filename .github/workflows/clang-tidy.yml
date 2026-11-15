@@ -92,7 +92,7 @@ jobs:
       # The files to check, one a line in files.txt: a pull request's changed
       # sources (a changed header: its source file), else every file of
       # source/; only those the desktop build compiles (a file the Switch
-      # alone builds, source/core/pctl_ops.c for one, has no compile command).
+      # alone builds, library/boreale-link/modules/playguard/core/pctl_ops.c for one, has no compile command).
       - name: Files
         env:
           GH_TOKEN: ${{ github.token }}

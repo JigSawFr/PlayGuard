@@ -135,10 +135,17 @@ endif ()
 # The kit (JigSawFr/boreale-kit, a submodule in library/boreale-kit) is built from
 # its sources with PlayGuard's toolchain and flags.
 set(BOREALE_KIT ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-kit/source)
+# PlayGuard's module of the shared agent (library/boreale-link/modules/playguard):
+# the C service layer (core/), the remote link's documents and orders (sync/)
+# and the play log (util/), shared by the app, the agent and the recovery module.
+set(PLAYGUARD_MODULE ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-link/modules/playguard)
 file(GLOB_RECURSE PLAYGUARD_SRC CONFIGURE_DEPENDS source/*.cpp source/*.c ${BOREALE_KIT}/*.cpp ${BOREALE_KIT}/*.c)
+file(GLOB PLAYGUARD_MODULE_SRC CONFIGURE_DEPENDS ${PLAYGUARD_MODULE}/sync/*.c ${PLAYGUARD_MODULE}/util/*.c)
+list(APPEND PLAYGUARD_SRC ${PLAYGUARD_MODULE_SRC})
 if (PLATFORM_SWITCH)
     list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/sim/.*")
-    list(APPEND PLAYGUARD_SRC ${AURORE_LIBRARY}/lib/platforms/switch/switch_wrapper.c)
+    file(GLOB PLAYGUARD_MODULE_CORE_SRC CONFIGURE_DEPENDS ${PLAYGUARD_MODULE}/core/*.c)
+    list(APPEND PLAYGUARD_SRC ${PLAYGUARD_MODULE_CORE_SRC} ${AURORE_LIBRARY}/lib/platforms/switch/switch_wrapper.c)
 else ()
     list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/core/.*\\.c$")
     if (PLAYGUARD_WEB)
@@ -148,17 +155,17 @@ else ()
     endif ()
     # The console-free parts are shared with the simulator: one implementation
     # (tools/check_sources.py fails on one left out).
-    list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
+    list(APPEND PLAYGUARD_SRC ${PLAYGUARD_MODULE}/core/pure.c
                               ${BOREALE_KIT}/core/calendar.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/console_info_pure.c
+                              ${PLAYGUARD_MODULE}/core/console_info_pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gate.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/hbl_lock.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
+                              ${PLAYGUARD_MODULE}/core/rescue.c
                               ${BOREALE_KIT}/core/write_guard.c
                               # The simulated agent runs the agent's own command dispatch.
-                              ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/agent/source/agent_core.c)
+                              ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-link/agent/source/agent_core.c)
 endif ()
 
 # The remote link's transport, shared by the Boréale homebrews
@@ -182,9 +189,9 @@ if (PLATFORM_SWITCH)
     # The console's CPU has the ARMv8 crypto extensions (util/crypto_hw): that one file asks for them, whatever the toolchain's default.
     set_source_files_properties(${BOREALE_KIT}/util/crypto_hw.cpp PROPERTIES COMPILE_OPTIONS "-march=armv8-a+crc+crypto")
 endif ()
-target_include_directories(${PROJECT_NAME} PRIVATE source library/boreale-kit/source library/boreale-link/source extern/qrcodegen extern/stb)
+target_include_directories(${PROJECT_NAME} PRIVATE source library/boreale-kit/source library/boreale-link/source library/boreale-link/modules/playguard library/boreale-link/modules/playguard/core extern/qrcodegen extern/stb)
 if (NOT PLATFORM_SWITCH)
-    target_include_directories(${PROJECT_NAME} PRIVATE source/sync sysmodule/agent/source)
+    target_include_directories(${PROJECT_NAME} PRIVATE library/boreale-link/modules/playguard/sync library/boreale-link/agent/source)
 endif ()
 # -ffunction-sections / -fdata-sections come from Aurore (PUBLIC) and
 # --gc-sections from libnx's switch.specs.

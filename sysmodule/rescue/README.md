@@ -134,11 +134,11 @@ make dist-rescue           # -> playguard-rescue.zip  (SD-card layout)
 make                       # the .nro, with this module bundled in its romfs
 ```
 
-The module shares `source/core/rescue.c` with the app (the request / report
+The module shares `library/boreale-link/modules/playguard/core/rescue.c` with the app (the request / report
 file format, host-tested in `tests/rescue/`), and `source/core/hbl_lock.c`
 (the homebrew menu's lock, its state and report files, the boot decision,
 host-tested in `tests/hbl_lock/`). Its pctl calls are the app's,
-from `source/core/pctl_ops_internal.h` (the typed reads, the PIN read and the
+from `library/boreale-link/modules/playguard/core/pctl_ops_internal.h` (the typed reads, the PIN read and the
 unlock with it, all `static inline`): the sysmodule links nothing else of the
 app's service layer.
 

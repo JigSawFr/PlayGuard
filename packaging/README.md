@@ -53,7 +53,7 @@ atmosphere/contents/4200000000505247/exefs.nsp          the recovery sysmodule (
 atmosphere/contents/4200000000505247/flags/boot2.flag   started by Atmosphère at boot
 atmosphere/contents/4200000000505247/toolbox.json       its name for sysmodule managers
 atmosphere/contents/4200000000505247/LICENSE.txt        the GPLv3 text
-atmosphere/contents/4200000000504741/…                  the remote link's agent, the same files (see sysmodule/agent/README.md)
+atmosphere/contents/4200000000504741/…                  the remote link's agent, the same files (see library/boreale-link/agent/README.md)
 ```
 
 Installed from PlayGuard, each folder also has a `version.txt` (the build it is), and an update keeps the previous
