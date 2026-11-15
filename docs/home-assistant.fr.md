@@ -57,7 +57,7 @@ code PIN* vaut *Avant un changement* : le lien peut modifier la console.
 ## Garder le lien quand PlayGuard est fermé
 
 L'**agent** est un petit module facultatif en arrière-plan (un sysmodule
-Atmosphère, [`sysmodule/agent`](../sysmodule/agent/README.md)) qui tient le
+Atmosphère, [`sysmodule/agent`](https://github.com/JigSawFr/boreale-link/blob/main/agent/README.md)) qui tient le
 même lien quand PlayGuard est fermé, avec les mêmes réglages :
 
 1. PlayGuard › **Console › Modules facultatifs › Agent du lien à distance ›

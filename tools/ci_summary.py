@@ -778,7 +778,7 @@ def main():
     p.add_argument("--rescue-zip", default="playguard-rescue.zip")
     p.add_argument("--rescue-nsp", default="sysmodule/rescue/out/playguard-rescue.nsp")
     p.add_argument("--agent-zip", default="playguard-agent.zip")
-    p.add_argument("--agent-nsp", default="sysmodule/agent/out/playguard-agent.nsp")
+    p.add_argument("--agent-nsp", default="library/boreale-link/agent/out/playguard-agent.nsp")
     p.add_argument("--toolchain", default="toolchain.txt")
     p.add_argument("--build-info", default="build-info.txt")
     p.add_argument("--sums", default="SHA256SUMS.txt")

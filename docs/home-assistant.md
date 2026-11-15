@@ -51,7 +51,7 @@ set to *Before a change*: the link can change the console.
 ## Keep the link up when PlayGuard is closed
 
 The **agent** is a small optional background module (an Atmosphère
-sysmodule, [`sysmodule/agent`](../sysmodule/agent/README.md)) that holds the
+sysmodule, [`sysmodule/agent`](https://github.com/JigSawFr/boreale-link/blob/main/agent/README.md)) that holds the
 same link while PlayGuard is closed, with the same settings:
 
 1. PlayGuard › **Console › Optional modules › Remote link agent › Install**
