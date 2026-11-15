@@ -1243,7 +1243,7 @@ static void test_system_document(void)
     snprintf(l.ssid, sizeof(l.ssid), "Maison");
     l.uptime_s = 5 * 3600 + 17;
     const ConsoleSpace sd = { 21344, 59640 }, nand = { 18470, 26592 };
-    SyncSystem s = { 1790990000, &sys, &l, &sd, &nand, "6.5.4", "1.2.0", "1.2.0", NULL, NULL };
+    SyncSystem s = { 1790990000, &sys, &l, &sd, &nand, "6.5.4", "1.2.0", "1.2.0", NULL, NULL, NULL };
     static char buf[4096];
     size_t n = sync_system_build(&s, buf, sizeof(buf));
     CHECK(n > 0);
@@ -1259,6 +1259,18 @@ static void test_system_document(void)
     s.serial = "XAW10012345678";
     n = sync_system_build(&s, buf, sizeof(buf));
     CHECK(contains(buf, "\"serial\":\"XAW10012345678\""));
+    // An agent says how it is doing; an app does not.
+    CHECK(!contains(buf, "\"agent\":{"));
+    const SyncAgentHealth health = { 3725, 412000, 1572864, 1, 3, true };
+    s.health = &health;
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"agent\":{\"uptime_s\":3725,\"heap_used\":412000,\"heap_total\":1572864,"
+                        "\"protocols\":{\"relay\":1,\"ipc\":3},\"module\":true}"));
+    const SyncAgentHealth blind = { 0, -1, 0, 1, 3, false };   // heap not read
+    s.health = &blind;
+    n = sync_system_build(&s, buf, sizeof(buf));
+    CHECK(contains(buf, "\"heap_used\":null,\"heap_total\":null") && contains(buf, "\"module\":false"));
+    s.health = NULL;
     // Handheld on a low-power charger: charging; no charger: not.
     l.charger = 2;
     n = sync_system_build(&s, buf, sizeof(buf));

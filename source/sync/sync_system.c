@@ -56,6 +56,22 @@ size_t sync_system_build(const SyncSystem *s, char *out, size_t cap)
     bl_json_kstr_or_null(&j, "agent", s->agent_version);
     bl_json_obj_end(&j);
 
+    if (s->health) {
+        const SyncAgentHealth *h = s->health;
+        bl_json_key(&j, "agent");
+        bl_json_obj(&j);
+        bl_json_kint(&j, "uptime_s", h->uptime_s);
+        bl_json_kint_or_null(&j, "heap_used", h->heap_used >= 0, h->heap_used);
+        bl_json_kint_or_null(&j, "heap_total", h->heap_total > 0, h->heap_total);
+        bl_json_key(&j, "protocols");
+        bl_json_obj(&j);
+        bl_json_kint(&j, "relay", h->relay_protocol);
+        bl_json_kint(&j, "ipc", h->ipc_protocol);
+        bl_json_obj_end(&j);
+        bl_json_kbool(&j, "module", h->module);
+        bl_json_obj_end(&j);
+    }
+
     bl_json_key(&j, "hardware");
     bl_json_obj(&j);
     bl_json_kstr_or_null(&j, "model", lh ? console_model_name(lh->model) : NULL);

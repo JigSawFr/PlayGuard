@@ -19,6 +19,7 @@
 // and pruned as PlayGuard's).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include <fcntl.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -32,6 +33,7 @@
 #include "agent_relay.h"
 #include "bl_app.h"
 #include "bl_cache.h"
+#include "bl_relay.h"
 #include "bl_net.h"
 #include "bl_tls.h"
 #include "core/calendar.h"
@@ -383,10 +385,16 @@ static bool module_read(void)
     return exists(path);
 }
 
+// Off only after a few reads in a row: a card that did not answer once must
+// not clear the module's documents from the broker.
+#define MODULE_OFF_READS 3
+
 static void module_refresh(void)
 {
+    static unsigned off_reads;
     const bool on = module_read();
-    if (on == g_module_on) return;
+    off_reads = on ? 0 : off_reads + 1;
+    if (on == g_module_on || (!on && off_reads < MODULE_OFF_READS)) return;
     g_module_on = on;
     if (g_engine_on) sync_engine_set_module(&g_engine, on);
     slog(on ? "PlayGuard's module is on%s%s" : "PlayGuard's module is off%s%s", NULL, NULL);
@@ -926,8 +934,11 @@ static size_t host_system(void *ctx, char *out, size_t cap)
     mutexUnlock(&g_lock);
     u64 now = 0;
     time_local_now(&now, NULL);
+    const struct mallinfo mi = mallinfo();
+    const SyncAgentHealth health = { (uint32_t)(bl_now_ms() / 1000), (int32_t)mi.uordblks, INNER_HEAP_SIZE,
+                                     BL_RELAY_PROTOCOL, AGENT_PROTOCOL, g_module_on };
     SyncSystem s = { now, &si, &live, &sd, &nand, hekate, g_app_version[0] ? g_app_version : NULL, AGENT_VERSION,
-                     g_conf.publish_serial && g_nro.serial[0] ? g_nro.serial : NULL, &g_conf };
+                     g_conf.publish_serial && g_nro.serial[0] ? g_nro.serial : NULL, &g_conf, &health };
     return sync_system_build(&s, out, cap);
 }
 

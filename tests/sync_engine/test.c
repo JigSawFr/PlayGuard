@@ -1519,6 +1519,15 @@ static void test_module_off(void)
     CHECK(!find_retained("boreale/a1b2c3d4/playguard/state") && !find_retained("boreale/a1b2c3d4/playguard/activity"));
     CHECK(!find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
     CHECK(host.states == 0 && host.activities == 0 && host.profiles_asked == 0);
+    // What PlayGuard's module left on the broker is cleared: its documents and the discovery.
+    static const char *const cleared[] = { "boreale/a1b2c3d4/playguard/state", "boreale/a1b2c3d4/playguard/activity",
+                                           "boreale/a1b2c3d4/playguard/week", "boreale/a1b2c3d4/playguard/names",
+                                           "boreale/a1b2c3d4/playguard/games", "boreale/a1b2c3d4/playguard/report",
+                                           "homeassistant/device/boreale_a1b2c3d4/config" };
+    for (size_t i = 0; i < sizeof(cleared) / sizeof(cleared[0]); i++) {
+        const Message *gone = last_on(cleared[i]);
+        CHECK(gone && gone->retain && gone->len == 0);
+    }
     const Message *cap = find_retained("boreale/a1b2c3d4/capabilities");
     CHECK(cap && !strstr(cap->payload, "playguard") && strstr(cap->payload, "\"modules\":{\"playshelf\":{\"version\":\"1.2.0\"}}"));
     // A relayed order still goes through; one of PlayGuard's is not taken.

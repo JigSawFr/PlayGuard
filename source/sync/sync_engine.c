@@ -611,6 +611,18 @@ static void publish_discovery(SyncEngine *e)
 // clear, which knows their dates.
 static void clear_unpublished(SyncEngine *e)
 {
+    if (e->no_module) {
+        // Without PlayGuard's module nothing of its stays on the broker: its
+        // documents and the console's discovery as the agent published them.
+        // The finished days (activity/<date>) are PlayGuard's to clear, which
+        // knows their dates.
+        static const char *const OWN[] = { "state", "activity", "week", "names", "games", "report" };
+        for (size_t i = 0; i < sizeof(OWN) / sizeof(OWN[0]); i++) sync_engine_publish(e, OWN[i], "", 0, true);
+        char topic[160];
+        if (sync_discovery_topic(&e->conf, topic, sizeof(topic))) bl_session_publish_topic(&e->session, topic, "", 0, true);
+        e->discovery_published = false;
+        return;
+    }
     static const struct {
         SyncPublish what;
         const char *sub;
@@ -850,6 +862,7 @@ void sync_engine_set_module(SyncEngine *e, bool on)
     if (e->no_module == !on) return;
     e->no_module = !on;
     e->want_capabilities = true;
+    if (!on) e->want_clear = true;
     if (on) {
         // Everything of PlayGuard's again, and its orders back from the broker.
         e->want_state = e->want_activity = e->want_discovery = e->want_names = true;

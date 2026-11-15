@@ -191,7 +191,13 @@ registry file (`config/boreale/apps/playguard.conf`) has `publish=1` and
 PlayGuard's `.nro` is still on the SD card; without that the agent publishes
 the console's own documents (`availability`, `system`, `notices`,
 `capabilities`) and the relayed homebrews', and nothing under `playguard/`
-(no state, activity or discovery, no subscription to its orders).
+(no state, activity or discovery, no subscription to its orders). What its
+module left on the broker (`state`, `activity`, `week`, `names`, `games`,
+`report` and the console's native discovery) is cleared, at each connection
+and when the module goes off; the finished days (`activity/<date>`) and the
+games' icons stay for PlayGuard to clear. The agent takes the module off only
+after three reads of the registry file in a row that say so (a card that did
+not answer once clears nothing).
 
 A homebrew that relays through the agent (`bl:link`, below) is listed while
 its session is open, with its version only (its documents carry their own
@@ -246,6 +252,12 @@ with the state. Every unknown value is `null`.
  "boot_ts": 1790971980}
 ```
 
+- `agent` (only in the agent's document, absent from PlayGuard's own): how it
+  is doing: `uptime_s`, `heap_used` and `heap_total` (bytes; `null` when not
+  read), `protocols` (`relay`: `bl:link`'s, `ipc`: `pg:agent`'s: the ones it
+  serves) and `module` (PlayGuard's module runs; the same as `capabilities`
+  listing it). An integration can say that the agent is too old for a homebrew.
+  A key added to schema 1.
 - `versions.hekate`: the SD card's `bootloader/update.bin`. `app`: PlayGuard's
   (from the agent: the one its last session said). `agent`: `null` without it.
 - `hardware.model`: `erista` (the first Switch), `mariko` (its 2019
