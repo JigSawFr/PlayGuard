@@ -685,7 +685,7 @@ std::string system_doc(const SysInfo& si, uint64_t ts, SyncDevice* device)
     sync_device_of(&si, &live, device);
     const std::string version = app::version();
     SyncSystem s{ ts, &si, &live, &sd, &nand, hekate.c_str(), version.c_str(), nullptr,
-                  serial.empty() ? nullptr : serial.c_str(), &s_conf };
+                  serial.empty() ? nullptr : serial.c_str(), &s_conf, nullptr };
     std::string out(4096, '\0');
     const size_t n = sync_system_build(&s, &out[0], out.size());
     out.resize(n);
