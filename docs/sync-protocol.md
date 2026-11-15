@@ -813,7 +813,9 @@ The sessions, what a module may publish and the orders handed back are
 `library/boreale-link/agent/source/agent_relay.c`; the rules shared with the homebrews
 (protocol 1, which modules and topics may relay, the queue of orders) are
 boreale-link's `bl_relay`. The commands are `BlRelayCmd`: Hello (protocol,
-module, version; the reply says `accepted`), Publish, PopOrder, Status, Close.
+module, version; the reply says `accepted`), Publish, PopOrder, Status, Close,
+and three that manage the agent and need no session, Info, Shutdown and Resume
+(below).
 
 A homebrew that is open while the agent runs says Hello with its module name
 and publishes under `boreale/<id>/<module>/` through the agent, which keeps the
@@ -828,6 +830,15 @@ connection.
   module's level, a NUL, then the payload (4 KiB at most).
 - **PopOrder**: the order comes in the output buffer in the same shape, its
   length in the reply as a `u32` (0: none waiting).
+- **Control** (no Hello, a session of its own that the client closes after the
+  call): what an app that installs, replaces or stops the agent asks of it,
+  whichever homebrew installed it. **Info** answers `BlRelayInfo` (the agent's
+  protocol and version, whether its broker connection is up, whether it was
+  asked to leave, how many homebrews have a session open); **Shutdown** makes it
+  leave the broker (its last will says "offline") and stay away, as `pg:agent`'s
+  `PrepareShutdown`; **Resume** brings it back (a restart comes back by itself).
+  An agent from before them answers an unknown-command error: it is too old.
+  PlayGuard's update uses them first and keeps `PrepareShutdown` for such an agent.
 - **Orders**: the agent subscribes to `<base>/<module>/+/set` for each module with
   a session, one filter per module and never `+/+/set` (it would cover
   PlayGuard's own orders a second time). Retained orders come back on the next

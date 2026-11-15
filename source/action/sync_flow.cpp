@@ -38,6 +38,7 @@
 #include "sync/sync_system.h"
 #include "ui/app_hooks.hpp"
 #include "ui/play_ui.hpp"
+#include "bl_relay_nx.h"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -1363,6 +1364,19 @@ void wait_offline(int left, std::function<void()> then)
     if (then) then();
 }
 
+// The same through the agent's own control (bl:link's Info): it said "offline"
+// (or 5 s went by), PlayGuard's session on it, if there is one, ends.
+void wait_offline_control(int left, std::function<void()> then)
+{
+    BlRelayInfo info;
+    if (left > 0 && bl_relay_info(&info) == 0 && info.online) {
+        aurore::delay(AGENT_POLL_MS, [left, then]() { wait_offline_control(left - 1, then); });
+        return;
+    }
+    if (s_agent) agent_leave();
+    if (then) then();
+}
+
 // pg:agent registered (or 3 s went by): the link moves to the agent.
 void wait_agent(int left)
 {
@@ -1376,6 +1390,17 @@ void wait_agent(int left)
 
 void agent_stopping(std::function<void()> then)
 {
+    // The agent's own control (bl:link, the same for every Boréale homebrew) works
+    // whether or not PlayGuard has a session on it (another homebrew may have
+    // installed it): it leaves the broker, "offline" said, and stays away until
+    // it is stopped or told to come back (agent_update does, at its end).
+    // An agent from before the control commands does not know them: the
+    // PrepareShutdown below is for it, and goes when none is left (workbench's
+    // plans/boreale/suivi.md).
+    if (bl_relay_available() && bl_relay_shutdown() == 0) {
+        wait_offline_control(20, std::move(then));
+        return;
+    }
     if (!s_agent) {
         if (then) then();
         return;
