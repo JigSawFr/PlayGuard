@@ -217,7 +217,7 @@ jobs:
         run: echo "::add-matcher::.github/problem-matchers/gcc.json"
       - name: zlib headers (the playstats and dev_builds suites)
         run: dpkg -s zlib1g-dev > /dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y --no-install-recommends zlib1g-dev; }
-      - name: Mosquitto (the agent_e2e suite: the agent's link against a real broker)
+      - name: Mosquitto, for the agent_e2e suite (the agent's link against a real broker)
         run: dpkg -s mosquitto mosquitto-clients > /dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y --no-install-recommends mosquitto mosquitto-clients; }
       - name: Unit tests (service layer — writable and read-only — and UI-free helpers)
         env:
