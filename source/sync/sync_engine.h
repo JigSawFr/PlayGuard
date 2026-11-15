@@ -21,7 +21,7 @@
 #include "sync_discovery.h"
 #include "sync_exec.h"
 #include "sync_notice.h"
-#include "sync_state.h"
+#include "sync_relay.h"
 
 #ifdef __cplusplus
 extern "C" {

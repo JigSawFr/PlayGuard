@@ -11,6 +11,7 @@
 #include "core/sysinfo.h"
 #include "sync_conf.h"
 #include "sync_exec.h"
+#include "sync_relay.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,13 +138,6 @@ size_t sync_event_build(const char *source, uint64_t ts, const char *event_type,
 // with the schema of its documents and its version.
 #define SYNC_PLATFORM "switch"
 #define SYNC_CAPABILITIES_SCHEMA 1
-// The homebrews that relay their documents through the agent (bl:link) are
-// there too while their session is open: their module and version only, their
-// documents carry their own `schema`.
-typedef struct {
-    char name[33];       // boreale-link's BL_APP_MODULE_MAX
-    char version[24];
-} SyncRelayModule;
 size_t sync_capabilities_build(const char *sw_version, const SyncRelayModule *relayed, size_t n_relayed, char *out,
                                size_t cap);
 
