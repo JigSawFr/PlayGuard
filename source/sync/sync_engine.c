@@ -718,7 +718,15 @@ static void publish_due(SyncEngine *e)
     }
     if (e->want_online && bl_session_announce(&e->session) >= 0) e->want_online = false;
     if (e->want_capabilities) {
-        const size_t n = sync_capabilities_build(e->sw_version, e->scratch, sizeof(e->scratch));
+        SyncRelayModule relayed[SYNC_RELAY_MODULES];
+        size_t n_relayed = 0;
+        for (size_t i = 0; i < e->n_relay_modules; i++) {
+            if (!e->relay_open[i]) continue;
+            snprintf(relayed[n_relayed].name, sizeof(relayed[n_relayed].name), "%s", e->relay_modules[i]);
+            snprintf(relayed[n_relayed].version, sizeof(relayed[n_relayed].version), "%s", e->relay_versions[i]);
+            n_relayed++;
+        }
+        const size_t n = sync_capabilities_build(e->sw_version, relayed, n_relayed, e->scratch, sizeof(e->scratch));
         if (n && sync_engine_publish(e, "capabilities", e->scratch, n, true) == 0) e->want_capabilities = false;
     }
     if (e->conf.legacy_prefix[0]) clear_legacy(e);
@@ -782,25 +790,48 @@ static int subscribe(SyncEngine *e)
     return refused < 0 ? -1 : 0;
 }
 
-bool sync_engine_relay_add(SyncEngine *e, const char *module)
+// The module's place in the engine's list, adding (and subscribing to) it when
+// it is new; -1: PlayGuard's own, an unusable name, or no room.
+static int relay_slot(SyncEngine *e, const char *module)
 {
-    if (!module || !*module || strlen(module) >= SYNC_RELAY_MODULE_MAX || !strcmp(module, SYNC_MODULE)) return false;
+    if (!module || !*module || strlen(module) >= SYNC_RELAY_MODULE_MAX || !strcmp(module, SYNC_MODULE)) return -1;
     for (size_t i = 0; i < e->n_relay_modules; i++)
-        if (!strcmp(e->relay_modules[i], module)) return true;
-    if (e->n_relay_modules >= SYNC_RELAY_MODULES) return false;
-    snprintf(e->relay_modules[e->n_relay_modules], SYNC_RELAY_MODULE_MAX, "%s", module);
-    e->n_relay_modules++;
+        if (!strcmp(e->relay_modules[i], module)) return (int)i;
+    if (e->n_relay_modules >= SYNC_RELAY_MODULES) return -1;
+    const size_t at = e->n_relay_modules++;
+    snprintf(e->relay_modules[at], SYNC_RELAY_MODULE_MAX, "%s", module);
     // Connected: this module's orders now (retained ones come back with it);
     // else the next connection subscribes to them with the rest.
     if (bl_session_online(&e->session)) {
         char filter[160];
-        relay_filter(e, e->n_relay_modules - 1, filter, sizeof(filter));
+        relay_filter(e, at, filter, sizeof(filter));
         const char *topics[1] = { filter };
         const uint8_t qos[1] = { 1 };
         if (bl_session_subscribe(&e->session, topics, qos, 1, 0) > 0)
             logf_(e, "remote link: the broker refused %s", filter, NULL);
     }
-    return true;
+    return (int)at;
+}
+
+void sync_engine_relay_sync(SyncEngine *e, const SyncRelayModule *open, size_t n_open)
+{
+    bool was_open[SYNC_RELAY_MODULES];
+    char was_version[SYNC_RELAY_MODULES][24];
+    for (size_t i = 0; i < SYNC_RELAY_MODULES; i++) {
+        was_open[i] = e->relay_open[i];
+        memcpy(was_version[i], e->relay_versions[i], sizeof(was_version[i]));
+        e->relay_open[i] = false;
+    }
+    for (size_t i = 0; open && i < n_open; i++) {
+        const int at = relay_slot(e, open[i].name);
+        if (at < 0) continue;
+        e->relay_open[at] = true;
+        snprintf(e->relay_versions[at], sizeof(e->relay_versions[at]), "%s", open[i].version);
+    }
+    for (size_t i = 0; i < SYNC_RELAY_MODULES; i++) {
+        if (e->relay_open[i] != was_open[i] || (e->relay_open[i] && strcmp(was_version[i], e->relay_versions[i])))
+            e->want_capabilities = true;
+    }
 }
 
 void sync_engine_replay_orders(SyncEngine *e)

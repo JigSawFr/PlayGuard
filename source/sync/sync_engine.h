@@ -21,6 +21,7 @@
 #include "sync_discovery.h"
 #include "sync_exec.h"
 #include "sync_notice.h"
+#include "sync_relay.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -145,6 +146,8 @@ typedef struct {
 
     // The modules of other homebrews whose orders are subscribed to (relay).
     char        relay_modules[SYNC_RELAY_MODULES][SYNC_RELAY_MODULE_MAX];
+    char        relay_versions[SYNC_RELAY_MODULES][24];
+    bool        relay_open[SYNC_RELAY_MODULES];   // its session is open: it is in `capabilities`
     size_t      n_relay_modules;
 
     SyncStatus  status;
@@ -173,10 +176,14 @@ void sync_engine_order_done(SyncEngine *e, uint32_t id, const SyncOutcome *out);
 // them): the orders kept waiting for PlayGuard come back.
 void sync_engine_replay_orders(SyncEngine *e);
 // Publishes `<base>/<sub>` (retained or not). 0 or negative.
-// Subscribes to `<base>/<module>/+/set`, the orders of another homebrew's
-// module (SyncHost.relay gets them), now when connected and at each
-// connection. False: PlayGuard's own module, an unusable name, or no room.
-bool sync_engine_relay_add(SyncEngine *e, const char *module);
+// The homebrews that relay through the agent whose session is open now
+// (`open`, `n_open` of them; the module's name and its version): each one's
+// orders are subscribed to (`<base>/<module>/+/set`, now when connected and at
+// each connection; the subscription stays when the session ends), and
+// `capabilities` lists exactly these, published again when the set or a
+// version changed. PlayGuard's own module, an unusable name or no room for one
+// more leaves that module out. Called each turn, cheap when nothing changed.
+void sync_engine_relay_sync(SyncEngine *e, const SyncRelayModule *open, size_t n_open);
 // Publishes `<base>/<rel>` for another homebrew's module (`rel` is
 // `<module>/<sub>`, already checked by the relay). PlayGuard's own level and
 // the console's are refused: -1.

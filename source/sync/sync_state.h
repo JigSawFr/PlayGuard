@@ -11,6 +11,7 @@
 #include "core/sysinfo.h"
 #include "sync_conf.h"
 #include "sync_exec.h"
+#include "sync_relay.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,7 +138,8 @@ size_t sync_event_build(const char *source, uint64_t ts, const char *event_type,
 // with the schema of its documents and its version.
 #define SYNC_PLATFORM "switch"
 #define SYNC_CAPABILITIES_SCHEMA 1
-size_t sync_capabilities_build(const char *sw_version, char *out, size_t cap);
+size_t sync_capabilities_build(const char *sw_version, const SyncRelayModule *relayed, size_t n_relayed, char *out,
+                               size_t cap);
 
 // Minutes played today by the console timer's own count (today's limit minus
 // 1454), or -1 when it does not say (pt_logic::played_today_min).

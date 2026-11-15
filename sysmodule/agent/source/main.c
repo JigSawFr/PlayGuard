@@ -1235,14 +1235,17 @@ static void hand_over(void)
 // per turn so the loop is not held up.
 static void relay_pump(void)
 {
-    char module[BL_APP_MODULE_MAX];
+    SyncRelayModule open[AGENT_RELAY_SESSIONS];
+    size_t n_open = 0;
     const bool online = sync_engine_online(&g_engine);
     for (int i = 0; i < AGENT_RELAY_SESSIONS; i++) {
         mutexLock(&g_lock);
-        const bool open = agent_relay_module_at(&g_relay, i, module, sizeof(module));
+        const bool got = agent_relay_module_at(&g_relay, i, open[n_open].name, sizeof(open[n_open].name),
+                                               open[n_open].version, sizeof(open[n_open].version));
         mutexUnlock(&g_lock);
-        if (open) sync_engine_relay_add(&g_engine, module);
+        if (got) n_open++;
     }
+    sync_engine_relay_sync(&g_engine, open, n_open);
     mutexLock(&g_lock);
     agent_relay_set_link(&g_relay, g_shared.console_id, online);
     mutexUnlock(&g_lock);

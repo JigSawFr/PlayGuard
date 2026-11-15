@@ -187,6 +187,15 @@ platform:
 `platform` (`switch`) is also in the `system` document. Each module gives
 the `schema` of its documents (`state`'s) and its version.
 
+A homebrew that relays through the agent (`bl:link`, below) is listed while
+its session is open, with its version only (its documents carry their own
+`schema`), and taken out when the session ends; the document is published
+again when that set or a version changes:
+
+```json
+{"schema": 1, "platform": "switch", "modules": {"playguard": {"schema": 1, "version": "1.4.0"}, "playshelf": {"version": "1.2.0"}}}
+```
+
 ## `notices`
 
 The bell the Boréale homebrews share, as their files under
@@ -809,8 +818,7 @@ connection.
 - Publications wait on the agent while the broker is out of reach, and go out
   when it is back.
 
-Not yet: announcing a relayed module in `capabilities` (the integration has
-nothing to create for it until PlayShelf's module exists), and PlayShelf's client.
+Not yet: the homebrews' own use of it beyond PlayShelf's `state` and pause button.
 
 ## Schema and compatibility
 
