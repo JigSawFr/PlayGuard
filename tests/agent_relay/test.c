@@ -243,10 +243,53 @@ static void test_close(void)
     CHECK(!agent_relay_is_open(&R, "playshelf"));
 }
 
+// The control commands: what an app that manages the agent asks, with no session of its own.
+static void test_control(void)
+{
+    agent_relay_init(&R);
+    agent_relay_set_version(&R, "1.2.0");
+    agent_relay_set_link(&R, "a1b2c3d4", true);
+    int none = -1;
+    BlRelayInfo info;
+    memset(&info, 0xAA, sizeof(info));
+    CHECK(simple(&none, BlRelayCmd_Info, &info, sizeof(info)) == 0 && none == -1);
+    CHECK(info.protocol == BL_RELAY_PROTOCOL && !strcmp(info.version, "1.2.0") && info.online == 1 && info.leaving == 0 &&
+          info.modules == 0);
+
+    // A homebrew's session open: counted, and left alone by what follows.
+    int a = -1;
+    BlRelayHelloReply rep;
+    CHECK(hello(&a, "playshelf", BL_RELAY_PROTOCOL, &rep) == 0 && rep.accepted);
+    CHECK(simple(&none, BlRelayCmd_Info, &info, sizeof(info)) == 0 && info.modules == 1);
+
+    // Asked to leave, and said so until it is asked to come back.
+    CHECK(!agent_relay_leaving(&R));
+    CHECK(simple(&none, BlRelayCmd_Shutdown, NULL, 0) == 0 && none == -1 && agent_relay_leaving(&R));
+    CHECK(simple(&none, BlRelayCmd_Info, &info, sizeof(info)) == 0 && info.leaving == 1);
+    CHECK(agent_relay_is_open(&R, "playshelf"));
+    CHECK(simple(&none, BlRelayCmd_Shutdown, NULL, 0) == 0 && agent_relay_leaving(&R));   // again: still asked
+    CHECK(simple(&none, BlRelayCmd_Resume, NULL, 0) == 0 && !agent_relay_leaving(&R));
+    CHECK(simple(&none, BlRelayCmd_Info, &info, sizeof(info)) == 0 && info.leaving == 0);
+    CHECK(simple(&none, BlRelayCmd_Resume, NULL, 0) == 0 && !agent_relay_leaving(&R));    // again: nothing to undo
+
+    // Offline is said as it is; a reply buffer too small is a bad input and writes nothing.
+    agent_relay_set_link(&R, "a1b2c3d4", false);
+    CHECK(simple(&none, BlRelayCmd_Info, &info, sizeof(info)) == 0 && info.online == 0);
+    uint8_t small[sizeof(BlRelayInfo) - 1];
+    memset(small, 0x55, sizeof(small));
+    CHECK(simple(&none, BlRelayCmd_Info, small, sizeof(small)) == AGENT_RC_BAD_INPUT && small[0] == 0x55);
+    // A version too long for the structure is cut, still terminated.
+    agent_relay_set_version(&R, "0123456789012345678901234567890123456789");
+    CHECK(simple(&none, BlRelayCmd_Info, &info, sizeof(info)) == 0 && strlen(info.version) == sizeof(info.version) - 1);
+    agent_relay_set_version(&R, NULL);
+    CHECK(simple(&none, BlRelayCmd_Info, &info, sizeof(info)) == 0 && info.version[0] == '\0');
+}
+
 int main(void)
 {
     test_hello();
     test_no_session();
+    test_control();
     test_publish();
     test_orders();
     test_close();

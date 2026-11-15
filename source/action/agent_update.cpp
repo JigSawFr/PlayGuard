@@ -11,6 +11,7 @@
 #include "action/sync_flow.hpp"
 #include "action/update_flow.hpp"
 #include "ui/play_ui.hpp"
+#include "bl_relay_nx.h"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
@@ -69,7 +70,12 @@ sysmodule_flow::Host host()
     h.answers = answers;
     h.delay = [](long ms, std::function<void()> fn) { aurore::delay(ms, std::move(fn)); };
     h.hold = [](bool on) { sync_flow::hold(on); };
-    h.link_back = []() { sync_flow::reload(); };   // the agent's session again (or PlayGuard's own when it is gone)
+    // The agent that was asked to leave comes back (one that was stopped is a new process, back already), then
+    // its session again (or PlayGuard's own when it is gone).
+    h.link_back = []() {
+        bl_relay_resume();
+        sync_flow::reload();
+    };
     h.record = record;
     h.log = [](const std::string& line) { aurore::Logger::info("agent {}", line); };
     h.warn = [](const std::string& why) {
