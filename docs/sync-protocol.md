@@ -777,6 +777,20 @@ which they embed) is checked at build time against the values next to
 `AGENT_PROTOCOL`: a change to one fails the build until those values are
 updated and `AGENT_PROTOCOL` goes up.
 
+## IPC service `bl:link` (another homebrew ↔ agent)
+
+Not served yet: the agent's side of the relay is `sysmodule/agent/source/agent_relay.c`
+(the sessions, what a module may publish, the orders handed back; host-tested), and
+the service that exposes it comes next. The rules shared with the homebrews
+(protocol 1, which modules and topics may relay, the queue of orders) are
+boreale-link's `bl_relay`. A homebrew that is open while the agent runs says
+Hello with its module name and publishes under `boreale/<id>/<module>/` through
+the agent, which keeps the console's one broker connection; one session per
+module, a document asked for twice before the agent took it replaces the first,
+and the relay adds no right to the agent. The agent refuses a module that is one
+of the console's own levels, a topic with a wildcard or a `..`, and a second
+session of the same module; the homebrew then keeps its own connection.
+
 ## Schema and compatibility
 
 - `schema` is on every JSON document and in `sync.conf`. Adding a field does
