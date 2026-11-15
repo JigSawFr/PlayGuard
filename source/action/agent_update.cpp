@@ -26,20 +26,6 @@ namespace
 constexpr long START_DELAY_MS = 2500;   // after support_flow's offers (1.5 s)
 constexpr long FREE_STEP_MS = 2000;
 constexpr int  FREE_STEPS = 30;
-constexpr long CHECK_EVERY_MS = 500;
-constexpr int  CHECK_TRIES = 20;        // 10 s
-
-struct Run
-{
-    modules::Bundle bundle;
-    bool            was_running = false;
-    modules::Step   step = modules::Step::Failed;
-    int             tries = 0;
-    Outcome         out;
-    std::function<void(const Outcome&)> done;
-};
-
-bool s_running = false;
 
 const modules::Module& agent()
 {
@@ -51,138 +37,60 @@ void record(const char* what)
     history_flow::record_event("module", "", aurore::getStr(std::string("playguard/modules/done/") + what, agent().title));
 }
 
-void finish(std::shared_ptr<Run> r)
-{
-    s_running = false;
-    r->out.end = r->step;
-    aurore::Logger::info("agent update: {}{}{}", modules::step_name(r->step), r->out.why.empty() ? "" : " — ",
-                       r->out.why);
-    switch (r->step) {
-        case modules::Step::Done: record(r->out.update ? "updated" : "installed"); break;
-        case modules::Step::RolledBack:
-            if (r->out.update) record("rolled_back");
-            break;
-        default: record("failed"); break;
-    }
-    // The agent's session again (or PlayGuard's own when it is gone).
-    sync_flow::hold(false);
-    sync_flow::reload();
-    if (r->done) r->done(r->out);
-}
-
-void go(std::shared_ptr<Run> r);
-
-void advance(std::shared_ptr<Run> r, bool ok)
-{
-    aurore::Logger::info("agent update: {} {}", modules::step_name(r->step), ok ? "ok" : "failed");
-    r->step = modules::next_step(r->step, ok, r->was_running);
-    go(r);
-}
-
-// The new agent answers: pg:agent registered and PlayGuard's Hello accepted.
-void check(std::shared_ptr<Run> r)
+// Whether the new agent answers: pg:agent registered and PlayGuard's Hello accepted.
+sysmodule_flow::Answer answers(std::string& why)
 {
     AgentHelloReply reply{};
     Result rc = 0;
-    if (agent_client::available() && agent_client::open(&reply, &rc)) {
-        const bool ok = reply.accepted;
-        agent_client::close();
-        reply.version[sizeof(reply.version) - 1] = '\0';
-        if (ok) aurore::Logger::info("agent update: the agent {} answers", reply.version);
-        else r->out.why = aurore::getStr("playguard/modules/agent/other_protocol", (int)reply.protocol);
-        advance(r, ok);
-        return;
+    if (!agent_client::available() || !agent_client::open(&reply, &rc)) return sysmodule_flow::Answer::Waiting;
+    const bool ok = reply.accepted;
+    agent_client::close();
+    reply.version[sizeof(reply.version) - 1] = '\0';
+    if (ok) {
+        aurore::Logger::info("agent update: the agent {} answers", reply.version);
+        return sysmodule_flow::Answer::Yes;
     }
-    if (++r->tries >= CHECK_TRIES) {
-        r->out.why = "playguard/modules/agent/no_answer"_i18n;
-        advance(r, false);
-        return;
-    }
-    aurore::delay(CHECK_EVERY_MS, [r]() { check(r); });
+    why = aurore::getStr("playguard/modules/agent/other_protocol", (int)reply.protocol);
+    return sysmodule_flow::Answer::Refused;
 }
 
-void go(std::shared_ptr<Run> r)
+// What the kit's flow asks of PlayGuard: the console's services, the link's
+// hand-over (sync_flow), the change history, and its words.
+sysmodule_flow::Host host()
 {
-    using S = modules::Step;
-    const modules::Module& m = agent();
-    const std::string sd = paths::sd_root();
-    switch (r->step) {
-        case S::Shutdown:
-            // "offline" from the agent itself, then the next step.
-            sync_flow::agent_stopping([r]() { advance(r, true); });
-            return;
-        case S::Stop:
-        case S::StopNew: {
-            const Result rc = module_terminate(m.tid);
-            if (r->step == S::Stop && R_FAILED(rc)) r->out.why = ui::rc_text(rc);
-            advance(r, R_SUCCEEDED(rc));
-            return;
-        }
-        case S::Swap: {
-            const auto done = modules::install(sd, m, r->bundle, true);
-            if (!done) r->out.why = done.error();
-            if (done && !done->warning.empty()) {
-                aurore::Logger::warning("agent update: the agent is in place, {}", done->warning);
-                aurore::sync([]() { ui::notify("playguard/modules/meta_err"_i18n, ui::Toast::Refused); });
-            }
-            advance(r, done.has_value());
-            return;
-        }
-        case S::Start:
-        case S::Restart: {
-            const Result rc = module_launch(m.tid);
-            if (R_FAILED(rc) && (r->step == S::Start || r->out.why.empty())) r->out.why = ui::rc_text(rc);
-            advance(r, R_SUCCEEDED(rc));
-            return;
-        }
-        case S::Check:
-            r->tries = 0;
-            check(r);
-            return;
-        case S::Restore: {
-            // A first install that does not answer is removed; an update
-            // gets the previous agent back.
-            const auto done = r->out.update ? modules::rollback(sd, m) : modules::uninstall(sd, m);
-            if (!done) r->out.why += (r->out.why.empty() ? "" : " — ") + done.error();
-            advance(r, done.has_value());
-            return;
-        }
-        case S::Confirm:
-            modules::confirm(sd, m);
-            advance(r, true);
-            return;
-        case S::Done:
-        case S::RolledBack:
-        case S::Failed: finish(r); return;
-    }
+    sysmodule_flow::Host h;
+    h.sd_root = paths::sd_root();
+    h.running = [](uint64_t tid) { return module_running(tid, nullptr); };
+    h.launch = [](uint64_t tid) { const Result rc = module_launch(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
+    h.terminate = [](uint64_t tid) { const Result rc = module_terminate(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
+    h.rc_text = [](uint32_t rc) { return ui::rc_text((Result)rc); };
+    // "offline" from the agent itself, then the next step.
+    h.leave = [](std::function<void()> then) { sync_flow::agent_stopping(std::move(then)); };
+    h.answers = answers;
+    h.delay = [](long ms, std::function<void()> fn) { aurore::delay(ms, std::move(fn)); };
+    h.hold = [](bool on) { sync_flow::hold(on); };
+    h.link_back = []() { sync_flow::reload(); };   // the agent's session again (or PlayGuard's own when it is gone)
+    h.record = record;
+    h.log = [](const std::string& line) { aurore::Logger::info("agent {}", line); };
+    h.warn = [](const std::string& why) {
+        aurore::Logger::warning("agent update: the agent is in place, {}", why);
+        aurore::sync([]() { ui::notify("playguard/modules/meta_err"_i18n, ui::Toast::Refused); });
+    };
+    h.busy_text = "playguard/modules/agent/busy"_i18n;
+    h.not_bundled_text = "playguard/modules/details/not_bundled"_i18n;
+    h.no_answer_text = "playguard/modules/agent/no_answer"_i18n;
+    return h;
 }
 }   // namespace
 
 bool running()
 {
-    return s_running;
+    return sysmodule_flow::running();
 }
 
 void run(const std::string& bundle_dir, std::function<void(const Outcome&)> done)
 {
-    const modules::Module& m = agent();
-    auto r = std::make_shared<Run>();
-    r->bundle = modules::bundled(bundle_dir, m);
-    r->done = std::move(done);
-    if (s_running || !r->bundle.present) {
-        r->out.why = s_running ? "playguard/modules/agent/busy"_i18n : "playguard/modules/details/not_bundled"_i18n;
-        if (r->done) r->done(r->out);
-        return;
-    }
-    s_running = true;
-    r->out.update = modules::state(paths::sd_root(), m).installed;
-    r->was_running = r->out.update && module_running(m.tid, nullptr);
-    r->step = modules::first_step(r->was_running);
-    aurore::Logger::info("agent update: to {} ({}), {}", r->bundle.version, r->bundle.sha256.substr(0, 12),
-                       r->was_running ? "running" : "not running");
-    // The link leaves the agent alone until the end.
-    sync_flow::hold(true);
-    go(r);
+    sysmodule_flow::run(host(), agent(), modules::bundled(bundle_dir, agent()), std::move(done));
 }
 
 void tell(const Outcome& o)
@@ -207,7 +115,7 @@ namespace
 void offer_when_free(aurore::Activity* main, const std::string& bundle_dir, int tries_left)
 {
     auto stack = aurore::Application::getActivitiesStack();
-    if (stack.empty() || stack.back() != main || s_running) {
+    if (stack.empty() || stack.back() != main || sysmodule_flow::running()) {
         if (tries_left > 0)
             aurore::delay(FREE_STEP_MS, [main, bundle_dir, tries_left]() { offer_when_free(main, bundle_dir, tries_left - 1); });
         return;
