@@ -344,7 +344,7 @@ DYNAMIC_KEYS = {
     # "unknown": an enumerator out of range, never in an outcome.
     "sync/reasons/": [r for r in returned_by("source/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
     "modules/": [f"{name}/{what}"
-                 for name in re.findall(r'\{\s*Id::\w+,\s*"(\w+)"', read(f"{ROOT}/source/util/modules.cpp"))
+                 for name in re.findall(r'\{\s*\{\s*"(\w+)",', read(f"{ROOT}/source/util/modules.cpp"))
                  for call in re.findall(r"\bkey\(\w+,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
                  for what in strings_of(call)],
     "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp")

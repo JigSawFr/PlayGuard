@@ -311,7 +311,7 @@ sim_backend_CFLAGS := -std=gnu11 -Isource -Isource/core -I$(KIT)/core -I$(KIT) -
 sim_backend_LIBS   := -pthread -lm
 # A whole text read as a number (header only).
 log_files_SRC   := $(KIT)/util/paths.cpp source/util/nand.cpp $(KIT)/util/log_files.cpp source/util/data_move.cpp tests/log_files/test.cpp
-modules_SRC   := $(KIT)/util/paths.cpp $(KIT)/util/sha256.cpp source/util/modules.cpp tests/modules/test.cpp
+modules_SRC   := $(KIT)/util/paths.cpp $(KIT)/util/sha256.cpp $(KIT)/util/sysmodule.cpp source/util/modules.cpp tests/modules/test.cpp
 # The remote link's files on the SD card, with its C parts (built by $(CC):
 # g++ would build a .c as C++).
 sync_files_SRC   := $(KIT)/util/date.cpp $(KIT)/util/paths.cpp source/util/app_paths.cpp source/util/config.cpp source/util/profiles.cpp source/util/sync_files.cpp tests/sync_files/test.cpp
