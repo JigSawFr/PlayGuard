@@ -1,15 +1,17 @@
 // agent_update — puts the agent sysmodule PlayGuard carries in place of the
 // one on the SD card while it runs, and puts the previous one back when the
-// new one does not answer (the steps: util/modules.hpp, next_step). Each step
-// runs on the UI thread; the wait for the new agent's Hello (10 s at most)
-// does not block the screen. Also the offer at start-up, when the agent
-// installed is not the one PlayGuard carries.
+// new one does not answer: the kit's sysmodule_flow does it (the steps, the
+// rollback, the wait for the new agent's Hello, 10 s at most, without blocking
+// the screen); this is what PlayGuard gives it (the console's services, the
+// link's hand-over, the change history, its words). Also the offer at
+// start-up, when the agent installed is not the one PlayGuard carries.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
 #include <functional>
 #include <string>
 
+#include "action/sysmodule_flow.hpp"
 #include "util/modules.hpp"
 
 namespace aurore
@@ -20,12 +22,8 @@ class Activity;
 namespace agent_update
 {
 
-struct Outcome
-{
-    modules::Step end = modules::Step::Failed;   // Done, RolledBack or Failed
-    bool          update = false;                // an agent was there before
-    std::string   why;                           // when it went wrong
-};
+// Done, RolledBack or Failed; whether an agent was there before; why it went wrong.
+using Outcome = sysmodule_flow::Outcome;
 
 // Installs or updates the agent from `bundle_dir` (Console › Optional modules'
 // copy), records it in the change history, then hands the link over again;

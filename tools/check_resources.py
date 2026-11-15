@@ -347,7 +347,8 @@ DYNAMIC_KEYS = {
                  for name in re.findall(r'\{\s*\{\s*"(\w+)",', read(f"{ROOT}/source/util/modules.cpp"))
                  for call in re.findall(r"\bkey\(\w+,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
                  for what in strings_of(call)],
-    "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp")
+    "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp",
+                                      "library/boreale-kit/source/action/sysmodule_flow.cpp")
                       for call in re.findall(r"\brecord\(([^;{]*?)\);", read(f"{ROOT}/{path}"))
                       for v in strings_of(call)],
 }
