@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+_Static_assert(SYNC_ID_LEN == BL_RELAY_ID_LEN, "the console id the relay says is the one the sync engine uses");
+_Static_assert(AGENT_VERSION_MAX == BL_RELAY_VERSION_MAX, "the version a Hello carries");
+
 void agent_relay_init(AgentRelay *r)
 {
     memset(r, 0, sizeof(*r));
@@ -41,17 +44,17 @@ bool agent_relay_module_at(const AgentRelay *r, int i, char *out, size_t cap)
 
 static uint32_t hello(AgentRelay *r, int *slot, AgentCall *c)
 {
-    if (!c->out || c->out_cap < sizeof(RelayHelloReply)) return AGENT_RC_BAD_INPUT;
+    if (!c->out || c->out_cap < sizeof(BlRelayHelloReply)) return AGENT_RC_BAD_INPUT;
     // The protocol is read from a Hello of any size (the layout may change).
     uint32_t protocol = 0;
     if (c->in && c->in_len >= sizeof(protocol)) memcpy(&protocol, c->in, sizeof(protocol));
-    RelayHelloReply reply;
+    BlRelayHelloReply reply;
     memset(&reply, 0, sizeof(reply));
     reply.protocol = BL_RELAY_PROTOCOL;
     memcpy(reply.console_id, r->console_id, sizeof(reply.console_id));
     reply.online = r->online ? 1 : 0;
 
-    RelayHello in;
+    BlRelayHello in;
     if (*slot < 0 && protocol == BL_RELAY_PROTOCOL && c->in_len >= sizeof(in)) {
         memcpy(&in, c->in, sizeof(in));
         in.module[sizeof(in.module) - 1] = '\0';
@@ -132,8 +135,8 @@ static uint32_t pop_order(AgentRelaySession *s, AgentCall *c)
 
 static uint32_t status(AgentRelay *r, AgentRelaySession *s, AgentCall *c)
 {
-    if (!c->out || c->out_cap < sizeof(RelayStatus)) return AGENT_RC_BAD_INPUT;
-    RelayStatus st;
+    if (!c->out || c->out_cap < sizeof(BlRelayStatus)) return AGENT_RC_BAD_INPUT;
+    BlRelayStatus st;
     memset(&st, 0, sizeof(st));
     st.refused = s->orders.refused;
     st.online = r->online ? 1 : 0;

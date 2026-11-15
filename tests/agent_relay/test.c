@@ -10,9 +10,9 @@
 
 static AgentRelay R;
 
-static uint32_t hello(int *slot, const char *module, uint32_t protocol, RelayHelloReply *reply)
+static uint32_t hello(int *slot, const char *module, uint32_t protocol, BlRelayHelloReply *reply)
 {
-    RelayHello h;
+    BlRelayHello h;
     memset(&h, 0, sizeof(h));
     h.protocol = protocol;
     snprintf(h.module, sizeof(h.module), "%s", module);
@@ -70,7 +70,7 @@ static void test_hello(void)
     agent_relay_init(&R);
     agent_relay_set_link(&R, "a1b2c3d4", true);
     int a = -1, b = -1, c3 = -1;
-    RelayHelloReply rep;
+    BlRelayHelloReply rep;
 
     CHECK(hello(&a, "playshelf", BL_RELAY_PROTOCOL, &rep) == 0 && rep.accepted && a == 0 && rep.online);
     CHECK(rep.protocol == BL_RELAY_PROTOCOL && !strcmp(rep.console_id, "a1b2c3d4"));
@@ -93,10 +93,10 @@ static void test_hello(void)
     CHECK(hello(&c3, "third", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted && c3 == -1);     // no room
 
     // A reply buffer too small is a bad input; nothing opened.
-    RelayHelloReply small;
+    BlRelayHelloReply small;
     AgentCall c;
     memset(&c, 0, sizeof(c));
-    RelayHello h = { BL_RELAY_PROTOCOL, "late", "1", {0} };
+    BlRelayHello h = { BL_RELAY_PROTOCOL, "late", "1", {0} };
     c.in = &h;
     c.in_len = sizeof(h);
     c.out = &small;
@@ -126,13 +126,13 @@ static void test_publish(void)
     agent_relay_init(&R);
     agent_relay_set_link(&R, "a1b2c3d4", true);
     int a = -1;
-    RelayHelloReply rep;
+    BlRelayHelloReply rep;
     hello(&a, "playshelf", BL_RELAY_PROTOCOL, &rep);
 
     CHECK(publish(&a, true, "state", "{\"n\":1}", 7) == 0);
     CHECK(publish(&a, false, "downloads/12", "x", 1) == 0);
     CHECK(publish(&a, true, "state", "{\"n\":2}", 7) == 0);   // replaces the first
-    RelayStatus st;
+    BlRelayStatus st;
     CHECK(simple(&a, BlRelayCmd_Status, &st, sizeof(st)) == 0 && st.outbox == 2 && st.online == 1);
 
     char topic[96], payload[BL_RELAY_PAYLOAD_MAX];
@@ -182,7 +182,7 @@ static void test_orders(void)
 {
     agent_relay_init(&R);
     int a = -1, b = -1;
-    RelayHelloReply rep;
+    BlRelayHelloReply rep;
     hello(&a, "playshelf", BL_RELAY_PROTOCOL, &rep);
     hello(&b, "other", BL_RELAY_PROTOCOL, &rep);
 
@@ -208,7 +208,7 @@ static void test_orders(void)
     // A full queue refuses and counts.
     for (int i = 0; i < BL_RELAY_QUEUE; i++) CHECK(agent_relay_deliver(&R, "playshelf/a/set", "1", 1, false));
     CHECK(!agent_relay_deliver(&R, "playshelf/a/set", "1", 1, false));
-    RelayStatus st;
+    BlRelayStatus st;
     CHECK(simple(&a, BlRelayCmd_Status, &st, sizeof(st)) == 0 && st.orders == BL_RELAY_QUEUE && st.refused == 1);
 }
 
@@ -216,7 +216,7 @@ static void test_close(void)
 {
     agent_relay_init(&R);
     int a = -1, b = -1;
-    RelayHelloReply rep;
+    BlRelayHelloReply rep;
     hello(&a, "playshelf", BL_RELAY_PROTOCOL, &rep);
     publish(&a, false, "state", "x", 1);
     agent_relay_deliver(&R, "playshelf/a/set", "1", 1, false);
@@ -231,7 +231,7 @@ static void test_close(void)
 
     // The module may come back, to a clean session; a crash closes by slot.
     CHECK(hello(&b, "playshelf", BL_RELAY_PROTOCOL, &rep) == 0 && rep.accepted && b == 0);
-    RelayStatus st;
+    BlRelayStatus st;
     CHECK(simple(&b, BlRelayCmd_Status, &st, sizeof(st)) == 0 && st.orders == 0 && st.outbox == 0);
     agent_relay_closed(&R, b);
     agent_relay_closed(&R, b);      // twice, and an unknown slot: nothing
