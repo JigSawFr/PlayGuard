@@ -70,9 +70,9 @@ bool agent_relay_take_publish(AgentRelay *r, char *topic, size_t topic_cap, void
 // An order the broker brought on `<module>/<sub>` (below the base): handed to
 // the session of that module. False: no such session, or refused (full).
 bool agent_relay_deliver(AgentRelay *r, const char *rel_topic, const void *payload, size_t len, bool retained);
-// The module of the open session in place `i` (0 to AGENT_RELAY_SESSIONS - 1).
-// False: none there.
-bool agent_relay_module_at(const AgentRelay *r, int i, char *out, size_t cap);
+// The module (and its homebrew's version, when `version` is not NULL) of the
+// open session in place `i` (0 to AGENT_RELAY_SESSIONS - 1). False: none there.
+bool agent_relay_module_at(const AgentRelay *r, int i, char *module, size_t cap, char *version, size_t version_cap);
 // Whether a session of `module` is open (to say so in `capabilities`).
 bool agent_relay_is_open(const AgentRelay *r, const char *module);
 

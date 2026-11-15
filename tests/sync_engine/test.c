@@ -1403,6 +1403,17 @@ static void test_legacy_tree(void)
     CHECK(avail && !strcmp(avail->payload, "online") && find_retained("boreale/a1b2c3d4/system"));
 }
 
+// The sessions open now, as the agent says them each turn.
+static void relay_sessions(const char *const *names, const char *version, size_t n)
+{
+    SyncRelayModule open[8];
+    for (size_t i = 0; i < n; i++) {
+        snprintf(open[i].name, sizeof(open[i].name), "%s", names[i]);
+        snprintf(open[i].version, sizeof(open[i].version), "%s", version);
+    }
+    sync_engine_relay_sync(&engine, open, n);
+}
+
 // Another homebrew's orders, relayed: a subscription per module (never one
 // that covers PlayGuard's own orders), the order handed to the host with its
 // topic below the base, PlayGuard's own orders left to the engine, and a
@@ -1412,17 +1423,43 @@ static void test_relay(void)
     setup(false, SyncPolicy_Auto);
     memset(&relayed, 0, sizeof(relayed));
     engine.host.relay = h_relay;
-    CHECK(!sync_engine_relay_add(&engine, "playguard") && !sync_engine_relay_add(&engine, "") &&
-          !sync_engine_relay_add(&engine, NULL));
-    CHECK(sync_engine_relay_add(&engine, "playshelf") && sync_engine_relay_add(&engine, "playshelf"));   // once
+    // What cannot relay is left out: PlayGuard's own level, an empty name; nothing is subscribed or announced.
+    const char *const refused[] = { "playguard", "" };
+    relay_sessions(refused, "1.0.0", 2);
+    sync_engine_relay_sync(&engine, NULL, 0);
+    const char *const shelf[] = { "playshelf" };
+    relay_sessions(shelf, "1.2.0", 1);
+    relay_sessions(shelf, "1.2.0", 1);   // again: once
     turns(3);
     CHECK(sync_engine_online(&engine));
     CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playshelf/+/set") && broker.sub_qos[3] == 1);
+    // `capabilities` lists the open session's module, with its version only.
+    const Message *cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"modules\":{\"playguard\":{\"schema\":1,\"version\":\"1.1.0\"},\"playshelf\":{\"version\":\"1.2.0\"}}"));
 
-    // A module added while connected is subscribed at once.
-    CHECK(sync_engine_relay_add(&engine, "other"));
-    CHECK(broker.n_subs == 5 && !strcmp(broker.subs[4], "boreale/a1b2c3d4/other/+/set"));
-    CHECK(sync_engine_relay_add(&engine, "m3") && sync_engine_relay_add(&engine, "m4") && !sync_engine_relay_add(&engine, "m5"));
+    // A version that changed is announced again; a session that closed is taken out (its subscription stays).
+    relay_sessions(shelf, "1.3.0", 1);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"playshelf\":{\"version\":\"1.3.0\"}"));
+    sync_engine_relay_sync(&engine, NULL, 0);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && !strstr(cap->payload, "playshelf") && strstr(cap->payload, "\"modules\":{\"playguard\":{\"schema\":1,\"version\":\"1.1.0\"}}"));
+    CHECK(broker.n_subs == 4);
+    relay_sessions(shelf, "1.3.0", 1);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"playshelf\":{\"version\":\"1.3.0\"}") && broker.n_subs == 4);
+
+    // A module that opens while connected is subscribed at once, up to four in all.
+    const char *const many[] = { "playshelf", "other", "m3", "m4", "m5" };
+    relay_sessions(many, "1.3.0", 5);
+    CHECK(broker.n_subs == 7 && !strcmp(broker.subs[4], "boreale/a1b2c3d4/other/+/set"));   // m5 has no room
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"other\":{") && strstr(cap->payload, "\"m4\":{") && !strstr(cap->payload, "m5"));
 
     broker_publish("boreale/a1b2c3d4/playshelf/download/set", "go", 2, true);
     turns(2);
@@ -1450,7 +1487,7 @@ static void test_relay(void)
     setup(false, SyncPolicy_Auto);
     engine.host.relay = h_relay;
     memset(&relayed, 0, sizeof(relayed));
-    CHECK(sync_engine_relay_add(&engine, "playshelf"));
+    relay_sessions(shelf, "1.3.0", 1);
     broker_publish("boreale/a1b2c3d4/playshelf/download/set", "again", 5, true);   // kept for it meanwhile
     turns(3);
     CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playshelf/+/set"));

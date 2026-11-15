@@ -35,11 +35,13 @@ bool agent_relay_is_open(const AgentRelay *r, const char *module)
     return module && find_module((AgentRelay *)r, module) != NULL;
 }
 
-bool agent_relay_module_at(const AgentRelay *r, int i, char *out, size_t cap)
+bool agent_relay_module_at(const AgentRelay *r, int i, char *module, size_t cap, char *version, size_t version_cap)
 {
     if (i < 0 || i >= AGENT_RELAY_SESSIONS || !r->sessions[i].open) return false;
-    const int n = snprintf(out, cap, "%s", r->sessions[i].module);
-    return n > 0 && (size_t)n < cap;
+    const int n = snprintf(module, cap, "%s", r->sessions[i].module);
+    if (n <= 0 || (size_t)n >= cap) return false;
+    if (version) snprintf(version, version_cap, "%s", r->sessions[i].version);
+    return true;
 }
 
 static uint32_t hello(AgentRelay *r, int *slot, AgentCall *c)

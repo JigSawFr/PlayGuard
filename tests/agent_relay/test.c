@@ -86,10 +86,13 @@ static void test_hello(void)
 
     CHECK(hello(&b, "second", BL_RELAY_PROTOCOL, &rep) == 0 && rep.accepted && b == 1);
     char name[BL_APP_MODULE_MAX];
-    CHECK(agent_relay_module_at(&R, 0, name, sizeof(name)) && !strcmp(name, "playshelf"));
-    CHECK(agent_relay_module_at(&R, 1, name, sizeof(name)) && !strcmp(name, "second"));
-    CHECK(!agent_relay_module_at(&R, 2, name, sizeof(name)) && !agent_relay_module_at(&R, -1, name, sizeof(name)));
-    CHECK(!agent_relay_module_at(&R, 0, name, 4));   // too small
+    char ver[24];
+    CHECK(agent_relay_module_at(&R, 0, name, sizeof(name), ver, sizeof(ver)) && !strcmp(name, "playshelf") &&
+          !strcmp(ver, "1.0.0"));
+    CHECK(agent_relay_module_at(&R, 1, name, sizeof(name), NULL, 0) && !strcmp(name, "second"));   // the version is optional
+    CHECK(!agent_relay_module_at(&R, 2, name, sizeof(name), ver, sizeof(ver)) &&
+          !agent_relay_module_at(&R, -1, name, sizeof(name), ver, sizeof(ver)));
+    CHECK(!agent_relay_module_at(&R, 0, name, 4, ver, sizeof(ver)));   // too small
     CHECK(hello(&c3, "third", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted && c3 == -1);     // no room
 
     // A reply buffer too small is a bad input; nothing opened.
