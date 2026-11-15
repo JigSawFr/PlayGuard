@@ -71,36 +71,30 @@ static bool can_connect(int port)
     return ok;
 }
 
+// mosquitto without a configuration file: since 2.0 it then listens on the
+// loopback only and takes anonymous clients (a file under /tmp is out of reach
+// of the AppArmor profile of its Ubuntu package, which is how it first failed in CI).
 static bool start_broker(void)
 {
     g_port = free_port();
     if (!g_port) return false;
-    char conf[96];
-    snprintf(conf, sizeof(conf), "/tmp/agent_e2e_%d.conf", (int)getpid());
-    FILE *f = fopen(conf, "w");
-    if (!f) return false;
-    fprintf(f, "listener %d 127.0.0.1\nallow_anonymous true\npersistence false\n", g_port);
-    fclose(f);
-    char log[96];
+    char port[16], log[96];
+    snprintf(port, sizeof(port), "%d", g_port);
     snprintf(log, sizeof(log), "/tmp/agent_e2e_%d.log", (int)getpid());
     g_broker = fork();
     if (g_broker == 0) {
         freopen("/dev/null", "r", stdin);
         freopen(log, "w", stdout);
         freopen(log, "w", stderr);
-        execlp("mosquitto", "mosquitto", "-c", conf, (char *)NULL);
+        execlp("mosquitto", "mosquitto", "-p", port, (char *)NULL);
         _exit(127);
     }
     for (int i = 0; i < 100; i++) {
         if (can_connect(g_port)) return true;
         int status = 0;
         if (waitpid(g_broker, &status, WNOHANG) == g_broker) {   // gone before it listened: say why
-            fprintf(stderr, "agent_e2e: the broker exited (status %d) on port %d, configuration:\n", status, g_port);
-            FILE *c = fopen(conf, "r");
-            for (int ch; c && (ch = fgetc(c)) != EOF;) fputc(ch, stderr);
-            if (c) fclose(c);
+            fprintf(stderr, "agent_e2e: the broker exited (status %d) on port %d, its output:\n", status, g_port);
             FILE *l = fopen(log, "r");
-            fprintf(stderr, "its output:\n");
             for (int ch; l && (ch = fgetc(l)) != EOF;) fputc(ch, stderr);
             if (l) fclose(l);
             g_broker = -1;
@@ -119,8 +113,6 @@ static void stop_broker(void)
         waitpid(g_broker, NULL, 0);
     }
     char path[96];
-    snprintf(path, sizeof(path), "/tmp/agent_e2e_%d.conf", (int)getpid());
-    remove(path);
     snprintf(path, sizeof(path), "/tmp/agent_e2e_%d.log", (int)getpid());
     remove(path);
 }
