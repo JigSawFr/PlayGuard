@@ -49,8 +49,8 @@ static struct {
     char     client_id[64], username[64], password[64];
     Message  will;
     bool     has_will;
-    char     subs[4][160];
-    uint8_t  sub_qos[4];
+    char     subs[8][160];
+    uint8_t  sub_qos[8];
     size_t   n_subs;
     char     deny[160];       // a filter its access list refuses ("" none)
     Message  retained[MAX_RETAINED];
@@ -514,6 +514,26 @@ static void h_integration(void *ctx, const char *doc, size_t len)
     host.integration_len = len;
 }
 
+static struct {
+    unsigned calls;
+    char     rel[96];
+    char     payload[64];
+    size_t   len;
+    bool     retained;
+} relayed;
+
+static void h_relay(void *ctx, const char *rel, const void *payload, size_t len, bool retained)
+{
+    (void)ctx;
+    relayed.calls++;
+    snprintf(relayed.rel, sizeof(relayed.rel), "%s", rel);
+    REQUIRE(len < sizeof(relayed.payload));
+    memcpy(relayed.payload, payload, len);
+    relayed.payload[len] = '\0';
+    relayed.len = len;
+    relayed.retained = retained;
+}
+
 // ---------------------------------------------------------------- helpers
 
 static SyncConf conf;
@@ -534,7 +554,7 @@ static void setup(bool timer_writes, SyncPolicy policy)
     BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
-                   h_device,       h_notices };
+                   h_device,       h_notices, NULL };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
 }
 
@@ -998,7 +1018,7 @@ static void test_custom_discovery_prefix(void)
     BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
-                   h_device,       h_notices };
+                   h_device,       h_notices, NULL };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
     turns(3);
     CHECK(sync_engine_online(&engine) && find_retained("ha/device/boreale_a1b2c3d4/config"));
@@ -1383,11 +1403,70 @@ static void test_legacy_tree(void)
     CHECK(avail && !strcmp(avail->payload, "online") && find_retained("boreale/a1b2c3d4/system"));
 }
 
+// Another homebrew's orders, relayed: a subscription per module (never one
+// that covers PlayGuard's own orders), the order handed to the host with its
+// topic below the base, PlayGuard's own orders left to the engine, and a
+// publication under that module's level only.
+static void test_relay(void)
+{
+    setup(false, SyncPolicy_Auto);
+    memset(&relayed, 0, sizeof(relayed));
+    engine.host.relay = h_relay;
+    CHECK(!sync_engine_relay_add(&engine, "playguard") && !sync_engine_relay_add(&engine, "") &&
+          !sync_engine_relay_add(&engine, NULL));
+    CHECK(sync_engine_relay_add(&engine, "playshelf") && sync_engine_relay_add(&engine, "playshelf"));   // once
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playshelf/+/set") && broker.sub_qos[3] == 1);
+
+    // A module added while connected is subscribed at once.
+    CHECK(sync_engine_relay_add(&engine, "other"));
+    CHECK(broker.n_subs == 5 && !strcmp(broker.subs[4], "boreale/a1b2c3d4/other/+/set"));
+    CHECK(sync_engine_relay_add(&engine, "m3") && sync_engine_relay_add(&engine, "m4") && !sync_engine_relay_add(&engine, "m5"));
+
+    broker_publish("boreale/a1b2c3d4/playshelf/download/set", "go", 2, true);
+    turns(2);
+    // Live, to an established subscription: RETAIN 0.
+    CHECK(relayed.calls == 1 && !strcmp(relayed.rel, "playshelf/download/set") && !strcmp(relayed.payload, "go") &&
+          !relayed.retained);
+    broker_publish("boreale/a1b2c3d4/other/x/set", "1", 1, false);
+    turns(2);
+    CHECK(relayed.calls == 2 && !strcmp(relayed.rel, "other/x/set"));
+    // Not under a module we subscribed to: nothing arrives, nothing is handed over.
+    broker_publish("boreale/a1b2c3d4/stranger/x/set", "1", 1, false);
+    turns(2);
+    CHECK(relayed.calls == 2);
+
+    // Publications: below another module's level only.
+    CHECK(sync_engine_publish_relay(&engine, "playshelf/state", "{}", 2, true) == 0);
+    const Message *m = find_retained("boreale/a1b2c3d4/playshelf/state");
+    CHECK(m && m->retain && m->len == 2);
+    CHECK(sync_engine_publish_relay(&engine, "playguard/state", "{}", 2, true) < 0);
+    CHECK(sync_engine_publish_relay(&engine, "system", "{}", 2, true) < 0);
+    CHECK(sync_engine_publish_relay(&engine, "icon/0100", "{}", 2, true) < 0);
+    CHECK(sync_engine_publish_relay(&engine, NULL, "{}", 2, true) < 0);
+
+    // After a reconnection every module is subscribed again.
+    setup(false, SyncPolicy_Auto);
+    engine.host.relay = h_relay;
+    memset(&relayed, 0, sizeof(relayed));
+    CHECK(sync_engine_relay_add(&engine, "playshelf"));
+    broker_publish("boreale/a1b2c3d4/playshelf/download/set", "again", 5, true);   // kept for it meanwhile
+    turns(3);
+    CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playshelf/+/set"));
+    CHECK(relayed.calls == 1 && !strcmp(relayed.payload, "again") && relayed.retained);   // handed back with RETAIN 1
+    // Without a relay host (the app), nothing more is subscribed to.
+    setup(false, SyncPolicy_Auto);
+    turns(3);
+    CHECK(broker.n_subs == 3);
+}
+
 int main(void)
 {
     static Message log[MAX_LOG];
     broker.log = log;
     test_connect_and_publish();
+    test_relay();
     test_notices();
     test_shared_bell();
     test_orders_applied_and_refused();

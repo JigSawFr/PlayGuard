@@ -44,12 +44,15 @@ static uint32_t publish(int *slot, bool retained, const char *sub, const char *p
 
 static uint32_t pop(int *slot, uint8_t *buf, size_t cap, size_t *len)
 {
+    uint32_t n = 99;
     AgentCall c;
     memset(&c, 0, sizeof(c));
     c.buf_out = buf;
     c.buf_out_cap = cap;
+    c.out = &n;
+    c.out_cap = sizeof(n);
     const uint32_t rc = agent_relay_dispatch(&R, slot, BlRelayCmd_PopOrder, &c);
-    *len = c.buf_out_len;
+    *len = rc == 0 && c.out_len == sizeof(n) ? n : (size_t)-1;   // the length comes in the reply
     return rc;
 }
 
@@ -76,11 +79,17 @@ static void test_hello(void)
     // Refused with success (the reply must be delivered): protocol, name, taken module.
     CHECK(hello(&b, "other", BL_RELAY_PROTOCOL + 1, &rep) == 0 && !rep.accepted && b == -1);
     CHECK(hello(&b, "system", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted && b == -1);
+    CHECK(hello(&b, "playguard", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted && b == -1);   // the app's own level
     CHECK(hello(&b, "Bad Name", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted);
     CHECK(hello(&b, "playshelf", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted && b == -1);   // one session per module
     CHECK(hello(&a, "again", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted && a == 0);       // a session says Hello once
 
     CHECK(hello(&b, "second", BL_RELAY_PROTOCOL, &rep) == 0 && rep.accepted && b == 1);
+    char name[BL_APP_MODULE_MAX];
+    CHECK(agent_relay_module_at(&R, 0, name, sizeof(name)) && !strcmp(name, "playshelf"));
+    CHECK(agent_relay_module_at(&R, 1, name, sizeof(name)) && !strcmp(name, "second"));
+    CHECK(!agent_relay_module_at(&R, 2, name, sizeof(name)) && !agent_relay_module_at(&R, -1, name, sizeof(name)));
+    CHECK(!agent_relay_module_at(&R, 0, name, 4));   // too small
     CHECK(hello(&c3, "third", BL_RELAY_PROTOCOL, &rep) == 0 && !rep.accepted && c3 == -1);     // no room
 
     // A reply buffer too small is a bad input; nothing opened.
@@ -190,6 +199,11 @@ static void test_orders(void)
     CHECK(pop(&a, buf, sizeof(buf), &len) == 0 && len == 0);        // none left for playshelf
     CHECK(pop(&b, buf, sizeof(buf), &len) == 0 && len > 0 && buf[0] == 0 && !strcmp((char *)buf + 1, "x/set"));
     CHECK(pop(&a, buf, 10, &len) == AGENT_RC_BAD_INPUT);            // buffer too small for any order
+    AgentCall nolen;                                                 // no room for the length in the reply
+    memset(&nolen, 0, sizeof(nolen));
+    nolen.buf_out = buf;
+    nolen.buf_out_cap = sizeof(buf);
+    CHECK(agent_relay_dispatch(&R, &a, BlRelayCmd_PopOrder, &nolen) == AGENT_RC_BAD_INPUT);
 
     // A full queue refuses and counts.
     for (int i = 0; i < BL_RELAY_QUEUE; i++) CHECK(agent_relay_deliver(&R, "playshelf/a/set", "1", 1, false));

@@ -779,17 +779,38 @@ updated and `AGENT_PROTOCOL` goes up.
 
 ## IPC service `bl:link` (another homebrew ↔ agent)
 
-Not served yet: the agent's side of the relay is `sysmodule/agent/source/agent_relay.c`
-(the sessions, what a module may publish, the orders handed back; host-tested), and
-the service that exposes it comes next. The rules shared with the homebrews
+Hosted by the same thread as `pg:agent` (`sysmodule/agent/source/agent_ipc.c`),
+registered next to it: if the console refuses the name, the agent logs it and
+serves PlayGuard as before, and the other homebrews keep their own connection.
+The sessions, what a module may publish and the orders handed back are
+`sysmodule/agent/source/agent_relay.c`; the rules shared with the homebrews
 (protocol 1, which modules and topics may relay, the queue of orders) are
-boreale-link's `bl_relay`. A homebrew that is open while the agent runs says
-Hello with its module name and publishes under `boreale/<id>/<module>/` through
-the agent, which keeps the console's one broker connection; one session per
-module, a document asked for twice before the agent took it replaces the first,
-and the relay adds no right to the agent. The agent refuses a module that is one
-of the console's own levels, a topic with a wildcard or a `..`, and a second
-session of the same module; the homebrew then keeps its own connection.
+boreale-link's `bl_relay`. The commands are `BlRelayCmd`: Hello (protocol,
+module, version; the reply says `accepted`), Publish, PopOrder, Status, Close.
+
+A homebrew that is open while the agent runs says Hello with its module name
+and publishes under `boreale/<id>/<module>/` through the agent, which keeps the
+console's one broker connection. One session per module, room for two; a topic
+asked for twice before the agent took it replaces the first (the newest wins),
+and the relay adds no right to the agent. The agent refuses a module that is
+one of the console's own levels or `playguard`, a topic with a wildcard or a
+`..`, and a second session of the same module; the homebrew then keeps its own
+connection.
+
+- **Publish** (send buffer): a flags byte (bit 0: retained), the topic below the
+  module's level, a NUL, then the payload (4 KiB at most).
+- **PopOrder**: the order comes in the output buffer in the same shape, its
+  length in the reply as a `u32` (0: none waiting).
+- **Orders**: the agent subscribes to `<base>/<module>/+/set` for each module with
+  a session, one filter per module and never `+/+/set` (it would cover
+  PlayGuard's own orders a second time). Retained orders come back on the next
+  subscription. A session's queue holds 8 orders; a full one refuses the new
+  order and counts it in Status.
+- Publications wait on the agent while the broker is out of reach, and go out
+  when it is back.
+
+Not yet: announcing a relayed module in `capabilities` (the integration has
+nothing to create for it until PlayShelf's module exists), and PlayShelf's client.
 
 ## Schema and compatibility
 

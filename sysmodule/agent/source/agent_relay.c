@@ -32,6 +32,13 @@ bool agent_relay_is_open(const AgentRelay *r, const char *module)
     return module && find_module((AgentRelay *)r, module) != NULL;
 }
 
+bool agent_relay_module_at(const AgentRelay *r, int i, char *out, size_t cap)
+{
+    if (i < 0 || i >= AGENT_RELAY_SESSIONS || !r->sessions[i].open) return false;
+    const int n = snprintf(out, cap, "%s", r->sessions[i].module);
+    return n > 0 && (size_t)n < cap;
+}
+
 static uint32_t hello(AgentRelay *r, int *slot, AgentCall *c)
 {
     if (!c->out || c->out_cap < sizeof(RelayHelloReply)) return AGENT_RC_BAD_INPUT;
@@ -49,7 +56,8 @@ static uint32_t hello(AgentRelay *r, int *slot, AgentCall *c)
         memcpy(&in, c->in, sizeof(in));
         in.module[sizeof(in.module) - 1] = '\0';
         in.version[sizeof(in.version) - 1] = '\0';
-        if (bl_relay_module_ok(in.module) && !find_module(r, in.module)) {
+        // PlayGuard's own level is the agent's (its app talks pg:agent).
+        if (bl_relay_module_ok(in.module) && strcmp(in.module, "playguard") && !find_module(r, in.module)) {
             for (int i = 0; i < AGENT_RELAY_SESSIONS; i++) {
                 if (r->sessions[i].open) continue;
                 AgentRelaySession *s = &r->sessions[i];
@@ -102,16 +110,23 @@ static uint32_t publish(AgentRelaySession *s, const AgentCall *c)
 
 static uint32_t pop_order(AgentRelaySession *s, AgentCall *c)
 {
-    if (!c->buf_out || c->buf_out_cap < 1 + BL_RELAY_SUB_MAX + BL_RELAY_ORDER_MAX) return AGENT_RC_BAD_INPUT;
-    c->buf_out_len = 0;    // none waiting: an empty buffer
+    // The order goes in the mapped output buffer, its length in the reply
+    // (0: none waiting): the client cannot read it from the buffer.
+    if (!c->buf_out || c->buf_out_cap < 1 + BL_RELAY_SUB_MAX + BL_RELAY_ORDER_MAX || !c->out ||
+        c->out_cap < sizeof(uint32_t))
+        return AGENT_RC_BAD_INPUT;
+    uint32_t n = 0;
     BlRelayOrder o;
-    if (!bl_relay_queue_pop(&s->orders, &o)) return 0;
-    uint8_t *b = (uint8_t *)c->buf_out;
-    const size_t sub_len = strlen(o.sub);
-    b[0] = o.retained ? 1 : 0;
-    memcpy(b + 1, o.sub, sub_len + 1);
-    memcpy(b + 1 + sub_len + 1, o.payload, o.len);
-    c->buf_out_len = 1 + sub_len + 1 + o.len;
+    if (bl_relay_queue_pop(&s->orders, &o)) {
+        uint8_t *b = (uint8_t *)c->buf_out;
+        const size_t sub_len = strlen(o.sub);
+        b[0] = o.retained ? 1 : 0;
+        memcpy(b + 1, o.sub, sub_len + 1);
+        memcpy(b + 1 + sub_len + 1, o.payload, o.len);
+        n = (uint32_t)(1 + sub_len + 1 + o.len);
+    }
+    memcpy(c->out, &n, sizeof(n));
+    c->out_len = sizeof(n);
     return 0;
 }
 

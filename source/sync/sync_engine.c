@@ -167,6 +167,15 @@ int sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, siz
     return rc;
 }
 
+int sync_engine_publish_relay(SyncEngine *e, const char *rel, const void *payload, size_t len, bool retained)
+{
+    // Only another module's level: not PlayGuard's, not the console's own.
+    if (!rel || !strncmp(rel, SYNC_MODULE "/", sizeof(SYNC_MODULE)) || sync_topic_is_device(rel)) return -1;
+    const int rc = bl_session_publish(&e->session, rel, payload, len, retained);
+    mirror(e);
+    return rc;
+}
+
 int sync_engine_publish_stream(SyncEngine *e, const char *sub, size_t len, bool retained, SyncReadFn read, void *ctx)
 {
     char rel[96];
@@ -252,6 +261,21 @@ static void on_message(void *user, const MqttPublish *msg)
         if (msg->payload_len <= SYNC_INTEGRATION_MAX && e->host.integration)
             e->host.integration(e->host.ctx, (const char *)msg->payload, msg->payload_len);
         return;
+    }
+
+    // <base>/<module>/…/set for another homebrew, relayed through the agent.
+    if (e->host.relay && msg->topic_len > bl + 1 && !memcmp(msg->topic, e->base, bl) && msg->topic[bl] == '/') {
+        const char *rel = msg->topic + bl + 1;
+        const size_t rl = msg->topic_len - bl - 1;
+        const bool own = rl >= sizeof(SYNC_MODULE) && !memcmp(rel, SYNC_MODULE "/", sizeof(SYNC_MODULE));
+        if (!own && rl > 4 && !memcmp(rel + rl - 4, "/set", 4)) {
+            char topic[96];
+            if (rl >= sizeof(topic)) return;
+            memcpy(topic, rel, rl);
+            topic[rl] = '\0';
+            e->host.relay(e->host.ctx, topic, msg->payload, msg->payload_len, msg->retain);
+            return;
+        }
     }
 
     // <base>/playguard/<entity>/set
@@ -726,19 +750,57 @@ static void publish_due(SyncEngine *e)
     }
 }
 
+static void relay_filter(const SyncEngine *e, size_t i, char *out, size_t cap)
+{
+    snprintf(out, cap, "%s/%s/+/set", e->base, e->relay_modules[i]);
+}
+
 static int subscribe(SyncEngine *e)
 {
     char orders[160], integration[160];
+    char relay[SYNC_RELAY_MODULES][160];
     snprintf(orders, sizeof(orders), "%s/" SYNC_MODULE "/+/set", e->base);
     snprintf(integration, sizeof(integration), "%s/" INTEGRATION_TOPIC, e->base);
-    const char *topics[3] = { orders, HA_STATUS_TOPIC, integration };
-    const uint8_t qos[3] = { 1, 0, 1 };
-    // The integration's version is optional: a broker's access list that
-    // leaves it out does not keep the link down.
-    const int refused = bl_session_subscribe(&e->session, topics, qos, 3, 2);
-    if (refused > 0)
+    const char *topics[3 + SYNC_RELAY_MODULES] = { orders, HA_STATUS_TOPIC, integration };
+    uint8_t qos[3 + SYNC_RELAY_MODULES] = { 1, 0, 1 };
+    size_t count = 3;
+    // One filter per module relayed, never `+/+/set`: that one would cover
+    // PlayGuard's own orders a second time.
+    for (size_t i = 0; i < e->n_relay_modules; i++) {
+        relay_filter(e, i, relay[i], sizeof(relay[i]));
+        topics[count] = relay[i];
+        qos[count++] = 1;
+    }
+    // The integration's version, and the other homebrews' orders, are
+    // optional: a broker's access list that leaves them out does not keep the
+    // link down.
+    const int refused = bl_session_subscribe(&e->session, topics, qos, count, 2);
+    if (refused > 0 && count == 3)
         logf_(e, "remote link: the broker refused %s%s, the integration's version stays unknown", integration, NULL);
+    else if (refused > 0)
+        logf_(e, "remote link: the broker refused %s or an order topic of another homebrew", integration, NULL);
     return refused < 0 ? -1 : 0;
+}
+
+bool sync_engine_relay_add(SyncEngine *e, const char *module)
+{
+    if (!module || !*module || strlen(module) >= SYNC_RELAY_MODULE_MAX || !strcmp(module, SYNC_MODULE)) return false;
+    for (size_t i = 0; i < e->n_relay_modules; i++)
+        if (!strcmp(e->relay_modules[i], module)) return true;
+    if (e->n_relay_modules >= SYNC_RELAY_MODULES) return false;
+    snprintf(e->relay_modules[e->n_relay_modules], SYNC_RELAY_MODULE_MAX, "%s", module);
+    e->n_relay_modules++;
+    // Connected: this module's orders now (retained ones come back with it);
+    // else the next connection subscribes to them with the rest.
+    if (bl_session_online(&e->session)) {
+        char filter[160];
+        relay_filter(e, e->n_relay_modules - 1, filter, sizeof(filter));
+        const char *topics[1] = { filter };
+        const uint8_t qos[1] = { 1 };
+        if (bl_session_subscribe(&e->session, topics, qos, 1, 0) > 0)
+            logf_(e, "remote link: the broker refused %s", filter, NULL);
+    }
+    return true;
 }
 
 void sync_engine_replay_orders(SyncEngine *e)
