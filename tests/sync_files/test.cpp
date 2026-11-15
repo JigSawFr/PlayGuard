@@ -389,6 +389,7 @@ static void test_app()
     CHECK(text.find("name=PlayGuard\n") != std::string::npos && text.find("version=1.4.0\n") != std::string::npos);
     CHECK(text.find("nro=switch/PlayGuard/PlayGuard.nro\n") != std::string::npos);
     CHECK(text.find("repo=JigSawFr/PlayGuard\n") != std::string::npos);
+    CHECK(text.find("publish=1\n") != std::string::npos);   // the agent carries its module
 
     // Nothing changed: not written again (a file in its place stays).
     CHECK(paths::atomic_write(file, text + "future_key=1\n"));
