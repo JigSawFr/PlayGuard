@@ -278,7 +278,9 @@ static void on_message(void *user, const MqttPublish *msg)
         }
     }
 
-    // <base>/playguard/<entity>/set
+    // <base>/playguard/<entity>/set: not taken while the module is off (the
+    // broker keeps a retained order for when it is on again).
+    if (e->no_module) return;
     const size_t ml = sizeof(SYNC_MODULE "/") - 1;
     if (msg->topic_len < bl + 1 + ml + 5 || memcmp(msg->topic, e->base, bl) || msg->topic[bl] != '/' ||
         memcmp(msg->topic + bl + 1, SYNC_MODULE "/", ml))
@@ -709,7 +711,7 @@ static void publish_due(SyncEngine *e)
     const uint64_t now = e->now_ms();
     if (e->want_discovery) {
         e->want_discovery = false;
-        if (e->conf.ha_discovery) publish_discovery(e);
+        if (e->conf.ha_discovery && !e->no_module) publish_discovery(e);
     }
     if (!bl_session_online(&e->session)) return;
     if (e->want_clear) {
@@ -726,19 +728,20 @@ static void publish_due(SyncEngine *e)
             snprintf(relayed[n_relayed].version, sizeof(relayed[n_relayed].version), "%s", e->relay_versions[i]);
             n_relayed++;
         }
-        const size_t n = sync_capabilities_build(e->sw_version, relayed, n_relayed, e->scratch, sizeof(e->scratch));
+        const size_t n = sync_capabilities_build(e->sw_version, !e->no_module, relayed, n_relayed, e->scratch,
+                                                 sizeof(e->scratch));
         if (n && sync_engine_publish(e, "capabilities", e->scratch, n, true) == 0) e->want_capabilities = false;
     }
     if (e->conf.legacy_prefix[0]) clear_legacy(e);
     if (e->want_state || now >= e->next_state_ms) {
         if (now >= e->next_state_ms || e->want_state) {
-            size_t n = e->host.state ? e->host.state(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
+            size_t n = e->host.state && !e->no_module ? e->host.state(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "state", e->scratch, n, true);
-            publish_notices(e);   // what building the state found (the host's sync_watch)
+            if (!e->no_module) publish_notices(e);   // what building the state found (the host's sync_watch)
             n = e->host.system && bl_session_online(&e->session) ? e->host.system(e->host.ctx, e->scratch, sizeof(e->scratch)) : 0;
             if (n) sync_engine_publish(e, "system", e->scratch, n, true);
             publish_shared_bell(e);
-            if (n && e->host.device && e->conf.ha_discovery) {
+            if (n && e->host.device && e->conf.ha_discovery && !e->no_module) {
                 SyncDevice dev;
                 e->host.device(e->host.ctx, &dev);
                 if (dev.model != e->device.model || dev.hos_version != e->device.hos_version ||
@@ -750,7 +753,7 @@ static void publish_due(SyncEngine *e)
         }
     }
     if (!bl_session_online(&e->session)) return;
-    if (e->conf.publish_activity && e->host.activity && (e->want_activity || now >= e->next_activity_ms)) {
+    if (!e->no_module && e->conf.publish_activity && e->host.activity && (e->want_activity || now >= e->next_activity_ms)) {
         const size_t n = e->host.activity(e->host.ctx, e->scratch, sizeof(e->scratch));
         if (n) sync_engine_publish(e, "activity", e->scratch, n, true);
         e->want_activity = false;
@@ -772,6 +775,13 @@ static int subscribe(SyncEngine *e)
     const char *topics[3 + SYNC_RELAY_MODULES] = { orders, HA_STATUS_TOPIC, integration };
     uint8_t qos[3 + SYNC_RELAY_MODULES] = { 1, 0, 1 };
     size_t count = 3;
+    if (e->no_module) {   // PlayGuard's orders are not ours to take: the other two filters only
+        topics[0] = HA_STATUS_TOPIC;
+        topics[1] = integration;
+        qos[0] = 0;
+        qos[1] = 1;
+        count = 2;
+    }
     // One filter per module relayed, never `+/+/set`: that one would cover
     // PlayGuard's own orders a second time.
     for (size_t i = 0; i < e->n_relay_modules; i++) {
@@ -782,8 +792,9 @@ static int subscribe(SyncEngine *e)
     // The integration's version, and the other homebrews' orders, are
     // optional: a broker's access list that leaves them out does not keep the
     // link down.
-    const int refused = bl_session_subscribe(&e->session, topics, qos, count, 2);
-    if (refused > 0 && count == 3)
+    const size_t base_count = e->no_module ? 2 : 3;
+    const int refused = bl_session_subscribe(&e->session, topics, qos, count, e->no_module ? 1 : 2);
+    if (refused > 0 && count == base_count)
         logf_(e, "remote link: the broker refused %s%s, the integration's version stays unknown", integration, NULL);
     else if (refused > 0)
         logf_(e, "remote link: the broker refused %s or an order topic of another homebrew", integration, NULL);
@@ -831,6 +842,18 @@ void sync_engine_relay_sync(SyncEngine *e, const SyncRelayModule *open, size_t n
     for (size_t i = 0; i < SYNC_RELAY_MODULES; i++) {
         if (e->relay_open[i] != was_open[i] || (e->relay_open[i] && strcmp(was_version[i], e->relay_versions[i])))
             e->want_capabilities = true;
+    }
+}
+
+void sync_engine_set_module(SyncEngine *e, bool on)
+{
+    if (e->no_module == !on) return;
+    e->no_module = !on;
+    e->want_capabilities = true;
+    if (on) {
+        // Everything of PlayGuard's again, and its orders back from the broker.
+        e->want_state = e->want_activity = e->want_discovery = e->want_names = true;
+        if (bl_session_online(&e->session) && subscribe(e) < 0) bl_session_lost(&e->session);
     }
 }
 

@@ -79,6 +79,7 @@ bool register_app(const std::string& version, const std::string& nro, std::strin
     std::snprintf(a.name, sizeof(a.name), "PlayGuard");
     std::snprintf(a.version, sizeof(a.version), "%s", version.c_str());
     std::snprintf(a.repo, sizeof(a.repo), "JigSawFr/PlayGuard");
+    a.publish = true;   // the agent carries PlayGuard's module (a setting of its own comes with the shared screens)
     const std::string under_root = !nro.empty() && nro[0] == '/' ? nro.substr(1) : nro;
     if (!under_root.empty() && under_root.size() < sizeof(a.nro))
         std::snprintf(a.nro, sizeof(a.nro), "%s", under_root.c_str());

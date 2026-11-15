@@ -185,7 +185,13 @@ platform:
 ```
 
 `platform` (`switch`) is also in the `system` document. Each module gives
-the `schema` of its documents (`state`'s) and its version.
+the `schema` of its documents (`state`'s) and its version. `playguard` is
+listed only while its module runs: an agent carries it when PlayGuard's
+registry file (`config/boreale/apps/playguard.conf`) has `publish=1` and
+PlayGuard's `.nro` is still on the SD card; without that the agent publishes
+the console's own documents (`availability`, `system`, `notices`,
+`capabilities`) and the relayed homebrews', and nothing under `playguard/`
+(no state, activity or discovery, no subscription to its orders).
 
 A homebrew that relays through the agent (`bl:link`, below) is listed while
 its session is open, with its version only (its documents carry their own

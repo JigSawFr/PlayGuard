@@ -63,6 +63,19 @@ records and imports what the agent changed into its history. Started or
 stopped from *Console › Optional modules*, the link moves between the agent and
 PlayGuard's own session at once.
 
+## Without PlayGuard's module
+
+PlayGuard's part of the agent (reading the parental controls, the state and
+activity documents, the discovery, carrying out its orders) runs only while
+PlayGuard's registry file `sd:/config/boreale/apps/playguard.conf` has
+`publish=1` and the `.nro` it names is on the SD card (PlayGuard writes the
+file at each start). Otherwise the agent keeps to the console's own documents
+(`availability`, `system`, `notices`, `capabilities`) and the homebrews that
+relay through it, and `playguard` is not in `capabilities`. The file is read
+every few seconds: the module comes on or goes off without restarting the
+agent, and the orders the broker kept come back when it is on again. An agent
+installed by hand before PlayGuard has run once stays in this state.
+
 ## Files
 
 In `sd:/config/playguard/`, as PlayGuard's: it reads `sync.conf` and

@@ -374,8 +374,8 @@ size_t sync_names_build(uint64_t ts, const SyncAppName *apps, size_t n_apps, con
     return bl_json_end(&j);
 }
 
-size_t sync_capabilities_build(const char *sw_version, const SyncRelayModule *relayed, size_t n_relayed, char *out,
-                               size_t cap)
+size_t sync_capabilities_build(const char *sw_version, bool playguard, const SyncRelayModule *relayed,
+                               size_t n_relayed, char *out, size_t cap)
 {
     BlJson j;
     bl_json_init(&j, out, cap);
@@ -384,11 +384,13 @@ size_t sync_capabilities_build(const char *sw_version, const SyncRelayModule *re
     bl_json_kstr(&j, "platform", SYNC_PLATFORM);
     bl_json_key(&j, "modules");
     bl_json_obj(&j);
-    bl_json_key(&j, "playguard");
-    bl_json_obj(&j);
-    bl_json_kint(&j, "schema", SYNC_SCHEMA);
-    bl_json_kstr_or_null(&j, "version", sw_version && *sw_version ? sw_version : NULL);
-    bl_json_obj_end(&j);
+    if (playguard) {
+        bl_json_key(&j, "playguard");
+        bl_json_obj(&j);
+        bl_json_kint(&j, "schema", SYNC_SCHEMA);
+        bl_json_kstr_or_null(&j, "version", sw_version && *sw_version ? sw_version : NULL);
+        bl_json_obj_end(&j);
+    }
     for (size_t i = 0; relayed && i < n_relayed; i++) {
         bl_json_key(&j, relayed[i].name);
         bl_json_obj(&j);

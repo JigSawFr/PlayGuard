@@ -1498,12 +1498,64 @@ static void test_relay(void)
     CHECK(broker.n_subs == 3);
 }
 
+// An agent that runs without PlayGuard (its module off): the console's own
+// documents and the other homebrews', nothing of PlayGuard's; on again, all of
+// it, and the orders kept by the broker come back.
+static void test_module_off(void)
+{
+    setup(false, SyncPolicy_Auto);
+    memset(&relayed, 0, sizeof(relayed));
+    engine.host.relay = h_relay;
+    sync_engine_set_module(&engine, false);
+    snprintf(host.bell, sizeof(host.bell), "{\"schema\":1,\"todo\":0}");
+    const char *const shelf[] = { "playshelf" };
+    relay_sessions(shelf, "1.2.0", 1);
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    // Subscribed to Home Assistant's birth, the integration's version and the relayed module: not PlayGuard's orders.
+    CHECK(broker.n_subs == 3 && !strcmp(broker.subs[0], "homeassistant/status") &&
+          !strcmp(broker.subs[1], "boreale/a1b2c3d4/integration") && !strcmp(broker.subs[2], "boreale/a1b2c3d4/playshelf/+/set"));
+    CHECK(find_retained("boreale/a1b2c3d4/system") && find_retained("boreale/a1b2c3d4/notices"));
+    CHECK(!find_retained("boreale/a1b2c3d4/playguard/state") && !find_retained("boreale/a1b2c3d4/playguard/activity"));
+    CHECK(!find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
+    CHECK(host.states == 0 && host.activities == 0 && host.profiles_asked == 0);
+    const Message *cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && !strstr(cap->payload, "playguard") && strstr(cap->payload, "\"modules\":{\"playshelf\":{\"version\":\"1.2.0\"}}"));
+    // A relayed order still goes through; one of PlayGuard's is not taken.
+    broker_publish("boreale/a1b2c3d4/playshelf/download/set", "go", 2, false);
+    ha_order("vr_restricted", "ON");
+    turns(2);
+    CHECK(relayed.calls == 1 && host.orders == 0);
+
+    // On again: PlayGuard announced and published, its orders subscribed to (the retained one comes back).
+    sync_engine_set_module(&engine, true);
+    sync_engine_set_module(&engine, true);   // again: nothing more
+    ha_order("vr_restricted", "ON");
+    turns(4);
+    CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playguard/+/set"));
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"playguard\":{\"schema\":1,\"version\":\"1.1.0\"}") && strstr(cap->payload, "playshelf"));
+    CHECK(find_retained("boreale/a1b2c3d4/playguard/state") && find_retained("boreale/a1b2c3d4/playguard/activity"));
+    CHECK(find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
+    CHECK(host.orders == 1);
+
+    // Off again: PlayGuard is out of `capabilities` and takes no more orders.
+    sync_engine_set_module(&engine, false);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && !strstr(cap->payload, "\"playguard\"") && strstr(cap->payload, "playshelf"));
+    ha_order("vr_restricted", "OFF");
+    turns(2);
+    CHECK(host.orders == 1);
+}
+
 int main(void)
 {
     static Message log[MAX_LOG];
     broker.log = log;
     test_connect_and_publish();
     test_relay();
+    test_module_off();
     test_notices();
     test_shared_bell();
     test_orders_applied_and_refused();

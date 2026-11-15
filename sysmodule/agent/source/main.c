@@ -30,6 +30,7 @@
 
 #include "agent_core.h"
 #include "agent_relay.h"
+#include "bl_app.h"
 #include "bl_cache.h"
 #include "bl_net.h"
 #include "bl_tls.h"
@@ -359,6 +360,36 @@ static void load_conf(void)
     g_conf.emummc = g_emummc;   // this system's device (sync_conf_device_id)
     g_conf_mtime = mtime_of(CONF_PATH);
     g_link_mtime = mtime_of(LINK_PATH);
+}
+
+// PlayGuard's module: carried only while its registry file
+// (config/boreale/apps/playguard.conf, written by PlayGuard) unlocks it and
+// its .nro is still on the SD card. Without it the agent publishes the
+// console's own documents and relays, reads no parental controls, takes no
+// order of PlayGuard's and does not announce it.
+static bool g_module_on;
+
+static bool module_read(void)
+{
+    static BlApp app;
+    char rel[BL_APP_PATH_MAX], path[BL_APP_PATH_MAX + 8];
+    if (!bl_app_path("playguard", rel, sizeof(rel))) return false;
+    snprintf(path, sizeof(path), "sdmc:/%s", rel);
+    const size_t n = read_file(path, g_text, sizeof(g_text));
+    bl_app_defaults(&app);
+    if (n) bl_app_parse(&app, g_text, n);
+    if (!bl_app_unlocks(&app)) return false;
+    snprintf(path, sizeof(path), "sdmc:/%s", app.nro);
+    return exists(path);
+}
+
+static void module_refresh(void)
+{
+    const bool on = module_read();
+    if (on == g_module_on) return;
+    g_module_on = on;
+    if (g_engine_on) sync_engine_set_module(&g_engine, on);
+    slog(on ? "PlayGuard's module is on%s%s" : "PlayGuard's module is off%s%s", NULL, NULL);
 }
 
 static void save_records(void)
@@ -992,6 +1023,7 @@ static void engine_start(void)
     g_tls.tcp.fd = -1;
     const BlIo io = g_conf.tls ? bl_tls_io(&g_tls, g_conf.ca_file) : bl_tcp_io(&g_tcp);
     sync_engine_init(&g_engine, &g_conf, io, &HOST, bl_now_ms, "agent", AGENT_VERSION);
+    sync_engine_set_module(&g_engine, g_module_on);
     g_engine_on = true;
     mutexLock(&g_lock);
     sync_conf_device_id(&g_conf, g_shared.console_id);   // this system's
@@ -1080,6 +1112,7 @@ static void reload(bool force)
             save_records();
         }
     }
+    module_refresh();
     if (!conf_changed || !g_engine_on) return;
     // Another stream (TLS) needs another engine; else it reconnects if needed.
     if (before.tls != g_conf.tls || strcmp(before.ca_file, g_conf.ca_file)) {
@@ -1342,6 +1375,7 @@ int main(int argc, char **argv)
     make_dirs();
     load_conf();
     load_records();
+    g_module_on = module_read();
     agent_ipc_start();
     wall_read(bl_now_ms());
     if (R_SUCCEEDED(threadCreate(&g_watchdog, watchdog, NULL, NULL, 0x2000, 0x2D, -2))) threadStart(&g_watchdog);
@@ -1395,15 +1429,17 @@ int main(int argc, char **argv)
             continue;
         }
         if (!g_engine_on) engine_start();
-        phase("the new day");
-        new_day(session);
-        phase(PHASE_HANDOVER);
-        hand_over();
+        if (g_module_on) {
+            phase("the new day");
+            new_day(session);
+            phase(PHASE_HANDOVER);
+            hand_over();
+        }
         relay_pump();
         phase(PHASE_LINK);
         const int sleep_ms = sync_engine_step(&g_engine, 500);
         phase(PHASE_ICON);
-        publish_playing_icon();
+        if (g_module_on) publish_playing_icon();
         publish_status();
         phase("waiting");
         if (sleep_ms > 0) svcSleepThread((u64)(sleep_ms > 1000 ? 1000 : sleep_ms) * 1000000ULL);

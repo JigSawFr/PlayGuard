@@ -129,6 +129,7 @@ typedef struct {
     bool        want_state, want_activity, want_discovery, want_names, want_online;
     bool        want_clear;      // the documents of what is not published, cleared
     bool        want_capabilities;
+    bool        no_module;       // PlayGuard's module is off (sync_engine_set_module): the console's own documents only
     uint32_t    notices_hash;    // the notices document last published (0: publish the next one)
     uint64_t    next_state_ms, next_activity_ms;
     bool        discovery_published;
@@ -176,6 +177,14 @@ void sync_engine_order_done(SyncEngine *e, uint32_t id, const SyncOutcome *out);
 // them): the orders kept waiting for PlayGuard come back.
 void sync_engine_replay_orders(SyncEngine *e);
 // Publishes `<base>/<sub>` (retained or not). 0 or negative.
+// Whether PlayGuard's module runs (the default). An agent without PlayGuard
+// turns it off: it then publishes the console's own documents (`system`,
+// `notices`, `capabilities`, the relayed homebrews') but neither PlayGuard's
+// state, activity and discovery, nor does it subscribe to or act on its
+// orders, and `capabilities` does not list it. Turned on again, everything is
+// published again and the orders kept by the broker come back. Cheap when
+// nothing changed.
+void sync_engine_set_module(SyncEngine *e, bool on);
 // The homebrews that relay through the agent whose session is open now
 // (`open`, `n_open` of them; the module's name and its version): each one's
 // orders are subscribed to (`<base>/<module>/+/set`, now when connected and at
