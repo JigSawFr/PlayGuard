@@ -329,6 +329,8 @@ sync_engine_SRC   := $(SYNC_PURE) library/boreale-link/source/mqtt_client.c libr
 sync_engine_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT)
 agent_SRC   := sysmodule/agent/source/agent_core.c library/boreale-link/source/bl_kv.c library/boreale-link/source/bl_link_conf.c source/sync/sync_conf.c source/sync/sync_records.c tests/agent/test.c
 agent_FLAGS := -std=gnu11 -Isource/sync -Ilibrary/boreale-link/source -Isource/core -I$(KIT)/core -I$(KIT) -Isysmodule/agent/source
+agent_relay_SRC   := sysmodule/agent/source/agent_relay.c library/boreale-link/source/bl_relay.c library/boreale-link/source/bl_app.c library/boreale-link/source/bl_kv.c tests/agent_relay/test.c
+agent_relay_FLAGS := $(agent_FLAGS)
 
 TESTS := $(sort $(patsubst %_SRC,%,$(filter %_SRC,$(.VARIABLES))))
 TEST_PROGRAMS := $(addprefix $(TESTOUT)/,$(TESTS))
