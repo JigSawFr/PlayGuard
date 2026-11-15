@@ -81,17 +81,34 @@ static bool start_broker(void)
     if (!f) return false;
     fprintf(f, "listener %d 127.0.0.1\nallow_anonymous true\npersistence false\n", g_port);
     fclose(f);
+    char log[96];
+    snprintf(log, sizeof(log), "/tmp/agent_e2e_%d.log", (int)getpid());
     g_broker = fork();
     if (g_broker == 0) {
-        freopen("/dev/null", "w", stdout);
-        freopen("/dev/null", "w", stderr);
+        freopen("/dev/null", "r", stdin);
+        freopen(log, "w", stdout);
+        freopen(log, "w", stderr);
         execlp("mosquitto", "mosquitto", "-c", conf, (char *)NULL);
         _exit(127);
     }
     for (int i = 0; i < 100; i++) {
         if (can_connect(g_port)) return true;
+        int status = 0;
+        if (waitpid(g_broker, &status, WNOHANG) == g_broker) {   // gone before it listened: say why
+            fprintf(stderr, "agent_e2e: the broker exited (status %d) on port %d, configuration:\n", status, g_port);
+            FILE *c = fopen(conf, "r");
+            for (int ch; c && (ch = fgetc(c)) != EOF;) fputc(ch, stderr);
+            if (c) fclose(c);
+            FILE *l = fopen(log, "r");
+            fprintf(stderr, "its output:\n");
+            for (int ch; l && (ch = fgetc(l)) != EOF;) fputc(ch, stderr);
+            if (l) fclose(l);
+            g_broker = -1;
+            return false;
+        }
         usleep(50000);
     }
+    fprintf(stderr, "agent_e2e: nothing listens on port %d after 5 s\n", g_port);
     return false;
 }
 
@@ -101,9 +118,11 @@ static void stop_broker(void)
         kill(g_broker, SIGTERM);
         waitpid(g_broker, NULL, 0);
     }
-    char conf[96];
-    snprintf(conf, sizeof(conf), "/tmp/agent_e2e_%d.conf", (int)getpid());
-    remove(conf);
+    char path[96];
+    snprintf(path, sizeof(path), "/tmp/agent_e2e_%d.conf", (int)getpid());
+    remove(path);
+    snprintf(path, sizeof(path), "/tmp/agent_e2e_%d.log", (int)getpid());
+    remove(path);
 }
 
 // What the broker has retained under `filter` (one second of listening), one
