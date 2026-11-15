@@ -16,13 +16,13 @@ APP_JSON    := $(TOPDIR)/playguard-agent.json
 AGENT_VERSION ?= $(shell sed -n 's/^set(VERSION_\(MAJOR\|MINOR\|ALTER\) "\([0-9]*\)").*/\2/p' $(TOPDIR)/../../CMakeLists.txt | paste -sd.)
 EXTRA_CFLAGS := -DAGENT_VERSION=\"$(AGENT_VERSION)\"
 
-CFILES      := main.c agent_core.c agent_ipc.c \
+CFILES      := main.c agent_core.c agent_ipc.c agent_relay.c \
                pctl_ops.c pctl_dump.c pure.c rescue.c write_guard.c time_ops.c calendar.c local_time.c sysinfo.c \
                playstats.c playstats_logic.c playlog.c nacp.c nacp_read.c \
                console_info.c console_info_pure.c \
                bl_json.c mqtt_packet.c mqtt_client.c bl_kv.c bl_link_conf.c sync_conf.c sync_apply.c sync_records.c sync_exec.c \
                sync_entities.c sync_discovery.c sync_state.c sync_system.c sync_watch.c sync_engine.c \
-               bl_net.c bl_tls.c bl_session.c sync_icons.c sync_titles.c sync_notices.c bl_jread.c bl_app.c bl_notices.c
+               bl_net.c bl_tls.c bl_session.c sync_icons.c sync_titles.c sync_notices.c bl_jread.c bl_app.c bl_notices.c bl_relay.c
 # nacp.c reads compressed game titles (zlib).
 EXTRA_LIBS  := -lz
 

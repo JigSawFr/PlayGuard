@@ -94,7 +94,16 @@ typedef struct {
     // shared bell, published with the state when it changed, and at each
     // connection. 0: nothing now. May be NULL.
     size_t (*notices)(void *ctx, char *out, size_t cap);
+    // An order for another homebrew's module, relayed through this engine:
+    // `rel` is the topic below the base (`<module>/<sub>`, ending in "/set"),
+    // never one of PlayGuard's own. The host hands it on (boreale-link's
+    // bl_relay decides whether the module may relay). May be NULL: nothing
+    // of the kind is subscribed to.
+    void (*relay)(void *ctx, const char *rel, const void *payload, size_t len, bool retained);
 } SyncHost;
+
+#define SYNC_RELAY_MODULES    4
+#define SYNC_RELAY_MODULE_MAX 33   // boreale-link's BL_APP_MODULE_MAX
 
 typedef struct {
     char     entity[SYNC_ENTITY_MAX];
@@ -134,6 +143,10 @@ typedef struct {
     SyncNotice  notices[SYNC_NOTICE_MAX];
     size_t      n_notices;
 
+    // The modules of other homebrews whose orders are subscribed to (relay).
+    char        relay_modules[SYNC_RELAY_MODULES][SYNC_RELAY_MODULE_MAX];
+    size_t      n_relay_modules;
+
     SyncStatus  status;
     char        profiles[16][SYNC_PROFILE_MAX];
     char        scratch[SYNC_SCRATCH_SIZE];
@@ -160,6 +173,14 @@ void sync_engine_order_done(SyncEngine *e, uint32_t id, const SyncOutcome *out);
 // them): the orders kept waiting for PlayGuard come back.
 void sync_engine_replay_orders(SyncEngine *e);
 // Publishes `<base>/<sub>` (retained or not). 0 or negative.
+// Subscribes to `<base>/<module>/+/set`, the orders of another homebrew's
+// module (SyncHost.relay gets them), now when connected and at each
+// connection. False: PlayGuard's own module, an unusable name, or no room.
+bool sync_engine_relay_add(SyncEngine *e, const char *module);
+// Publishes `<base>/<rel>` for another homebrew's module (`rel` is
+// `<module>/<sub>`, already checked by the relay). PlayGuard's own level and
+// the console's are refused: -1.
+int  sync_engine_publish_relay(SyncEngine *e, const char *rel, const void *payload, size_t len, bool retained);
 int  sync_engine_publish(SyncEngine *e, const char *sub, const char *payload, size_t len, bool retained);
 // Publishes `<base>/<sub>`, `len` bytes that `read` gives a piece at a time
 // (into the engine's scratch: a file sent without holding it whole). A read

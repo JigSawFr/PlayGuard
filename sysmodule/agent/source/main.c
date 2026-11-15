@@ -29,6 +29,7 @@
 #include <switch.h>
 
 #include "agent_core.h"
+#include "agent_relay.h"
 #include "bl_cache.h"
 #include "bl_net.h"
 #include "bl_tls.h"
@@ -171,6 +172,7 @@ void __appExit(void)
 // ---- shared with the IPC thread (agent_ipc.c) ----
 
 AgentShared g_shared;
+AgentRelay  g_relay;     // the bl:link sessions, under g_lock as well
 Mutex       g_lock;
 void        agent_ipc_start(void);
 
@@ -940,10 +942,22 @@ static size_t host_notices(void *ctx, char *out, size_t cap)
     return sync_notices_build("sdmc:/", (int64_t)now, out, cap);
 }
 
+// An order for another homebrew's module (the broker brought it): handed to
+// the session of that module, which fetches it by bl:link.
+static void host_relay(void *ctx, const char *rel, const void *payload, size_t len, bool retained)
+{
+    (void)ctx;
+    mutexLock(&g_lock);
+    agent_relay_deliver(&g_relay, rel, payload, len, retained);
+    mutexUnlock(&g_lock);
+}
+
 static const SyncHost HOST = {
     NULL, host_state, host_activity, host_order, host_report, host_profiles, host_conf_changed,
     host_read_only, host_now_posix, host_log, host_integration, host_system, host_device, host_notices,
+    host_relay,
 };
+
 
 // ---- the loop ----
 
@@ -1216,6 +1230,35 @@ static void hand_over(void)
     }
 }
 
+// The homebrews that relay through the agent (bl:link): their modules' order
+// topics are subscribed to, and what they asked to publish goes out, a few
+// per turn so the loop is not held up.
+static void relay_pump(void)
+{
+    char module[BL_APP_MODULE_MAX];
+    const bool online = sync_engine_online(&g_engine);
+    for (int i = 0; i < AGENT_RELAY_SESSIONS; i++) {
+        mutexLock(&g_lock);
+        const bool open = agent_relay_module_at(&g_relay, i, module, sizeof(module));
+        mutexUnlock(&g_lock);
+        if (open) sync_engine_relay_add(&g_engine, module);
+    }
+    mutexLock(&g_lock);
+    agent_relay_set_link(&g_relay, g_shared.console_id, online);
+    mutexUnlock(&g_lock);
+    if (!online) return;
+    for (int n = 0; n < 4; n++) {
+        char topic[BL_APP_MODULE_MAX + BL_RELAY_SUB_MAX];
+        size_t len = 0;
+        bool retained = false;
+        mutexLock(&g_lock);
+        const bool got = agent_relay_take_publish(&g_relay, topic, sizeof(topic), g_doc, sizeof(g_doc), &len, &retained);
+        mutexUnlock(&g_lock);
+        if (!got) break;
+        sync_engine_publish_relay(&g_engine, topic, g_doc, len, retained);
+    }
+}
+
 static void publish_status(void)
 {
     mutexLock(&g_lock);
@@ -1285,6 +1328,7 @@ int main(int argc, char **argv)
     (void)argv;
     mutexInit(&g_lock);
     agent_shared_init(&g_shared, AGENT_VERSION);
+    agent_relay_init(&g_relay);
     {
         char fw[16];
         sysinfo_version_string(hosversionGet(), fw, sizeof(fw));
@@ -1352,6 +1396,7 @@ int main(int argc, char **argv)
         new_day(session);
         phase(PHASE_HANDOVER);
         hand_over();
+        relay_pump();
         phase(PHASE_LINK);
         const int sleep_ms = sync_engine_step(&g_engine, 500);
         phase(PHASE_ICON);

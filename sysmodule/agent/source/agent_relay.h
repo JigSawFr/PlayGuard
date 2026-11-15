@@ -95,7 +95,8 @@ void agent_relay_set_link(AgentRelay *r, const char *console_id, bool online);
 // A bl:link request on session `*slot` (-1: none yet; Hello sets it). The
 // publication buffer is: one byte of flags (bit 0: retained), the topic
 // below the module's level, a NUL, then the payload; an order comes back in
-// the same shape. Returns 0 or an AGENT_RC_*.
+// the same shape, in the output buffer, with its length (0: none waiting) in
+// the reply as a u32. Returns 0 or an AGENT_RC_*.
 uint32_t agent_relay_dispatch(AgentRelay *r, int *slot, uint32_t cmd, AgentCall *c);
 // The session ended (Close, exit or crash): its orders and publications go.
 void agent_relay_closed(AgentRelay *r, int slot);
@@ -108,6 +109,9 @@ bool agent_relay_take_publish(AgentRelay *r, char *topic, size_t topic_cap, void
 // An order the broker brought on `<module>/<sub>` (below the base): handed to
 // the session of that module. False: no such session, or refused (full).
 bool agent_relay_deliver(AgentRelay *r, const char *rel_topic, const void *payload, size_t len, bool retained);
+// The module of the open session in place `i` (0 to AGENT_RELAY_SESSIONS - 1).
+// False: none there.
+bool agent_relay_module_at(const AgentRelay *r, int i, char *out, size_t cap);
 // Whether a session of `module` is open (to say so in `capabilities`).
 bool agent_relay_is_open(const AgentRelay *r, const char *module);
 
