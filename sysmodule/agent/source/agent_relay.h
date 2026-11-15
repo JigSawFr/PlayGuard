@@ -24,47 +24,8 @@ extern "C" {
 #define AGENT_RELAY_SESSIONS 2
 #define AGENT_RELAY_OUTBOX   4    // publications waiting, per session
 
-// Wire format of the relay's structures (the same compiler on both sides),
-// checked at build time: a change raises BL_RELAY_PROTOCOL in boreale-link.
-#define AGENT_RELAY_SIZE_HELLO       64
-#define AGENT_RELAY_SIZE_HELLO_REPLY 16
-#define AGENT_RELAY_SIZE_STATUS      8
-
-typedef struct {
-    uint32_t protocol;
-    char     module[BL_APP_MODULE_MAX];
-    char     version[AGENT_VERSION_MAX];     // the homebrew's
-    uint8_t  pad[3];
-} RelayHello;
-
-// Always answered with success; `accepted` says whether the session opened
-// (another protocol, a module that may not relay, one already open, or no
-// room: 0, and the homebrew keeps its own connection).
-typedef struct {
-    uint32_t protocol;
-    char     console_id[SYNC_ID_LEN + 1];
-    uint8_t  online;
-    uint8_t  accepted;
-    uint8_t  pad[1];
-} RelayHelloReply;
-
-typedef struct {
-    uint32_t refused;      // orders refused, the queue being full
-    uint8_t  online;
-    uint8_t  orders;       // waiting for the homebrew
-    uint8_t  outbox;       // publications waiting for the main loop
-    uint8_t  pad;
-} RelayStatus;
-
-#ifdef __cplusplus
-#define AGENT_RELAY_SIZE_CHECK(type, size) static_assert(sizeof(type) == (size), #type ": bump BL_RELAY_PROTOCOL")
-#else
-#define AGENT_RELAY_SIZE_CHECK(type, size) _Static_assert(sizeof(type) == (size), #type ": bump BL_RELAY_PROTOCOL")
-#endif
-AGENT_RELAY_SIZE_CHECK(RelayHello, AGENT_RELAY_SIZE_HELLO);
-AGENT_RELAY_SIZE_CHECK(RelayHelloReply, AGENT_RELAY_SIZE_HELLO_REPLY);
-AGENT_RELAY_SIZE_CHECK(RelayStatus, AGENT_RELAY_SIZE_STATUS);
-#undef AGENT_RELAY_SIZE_CHECK
+// The wire structures (BlRelayHello, BlRelayHelloReply, BlRelayStatus) are
+// boreale-link's bl_relay.h, the same text the homebrews' client compiles.
 
 typedef struct {
     bool     used, retained;
