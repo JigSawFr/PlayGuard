@@ -18,6 +18,16 @@
 extern "C" {
 #endif
 
+// How the agent is doing, said in the system document (only an agent has one).
+typedef struct {
+    uint32_t uptime_s;            // since it started
+    int32_t  heap_used;           // bytes, -1 unknown
+    int32_t  heap_total;          // its heap: what the module's work and the relay must fit in
+    uint8_t  relay_protocol;      // bl:link's
+    uint8_t  ipc_protocol;        // pg:agent's
+    bool     module;              // PlayGuard's module runs (capabilities lists it)
+} SyncAgentHealth;
+
 typedef struct {
     uint64_t            ts;              // POSIX seconds; 0 unknown (then no boot_ts)
     const SysInfo      *sys;
@@ -28,6 +38,7 @@ typedef struct {
     const char         *agent_version;   // NULL: no agent
     const char         *serial;          // NULL: not published (or not known)
     const SyncConf     *conf;            // what is published (publish_*); NULL: everything
+    const SyncAgentHealth *health;       // NULL: not an agent
 } SyncSystem;
 
 size_t sync_system_build(const SyncSystem *s, char *out, size_t cap);
