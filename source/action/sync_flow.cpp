@@ -1353,17 +1353,6 @@ void changed()
 namespace
 {
 // The agent said "offline" (or 2 s went by): PlayGuard's session on it ends.
-void wait_offline(int left, std::function<void()> then)
-{
-    AgentStatus st;
-    if (left > 0 && s_agent && agent_ok(agent_client::status(&st), "status") && st.link.state == SyncLink_Online) {
-        aurore::delay(AGENT_POLL_MS, [left, then]() { wait_offline(left - 1, then); });
-        return;
-    }
-    agent_leave();
-    if (then) then();
-}
-
 // The same through the agent's own control (bl:link's Info): it said "offline"
 // (or 5 s went by), PlayGuard's session on it, if there is one, ends.
 void wait_offline_control(int left, std::function<void()> then)
@@ -1394,24 +1383,13 @@ void agent_stopping(std::function<void()> then)
     // whether or not PlayGuard has a session on it (another homebrew may have
     // installed it): it leaves the broker, "offline" said, and stays away until
     // it is stopped or told to come back (agent_update does, at its end).
-    // An agent from before the control commands does not know them: the
-    // PrepareShutdown below is for it, and goes when none is left (workbench's
-    // plans/boreale/suivi.md).
     if (bl_relay_available() && bl_relay_shutdown() == 0) {
         wait_offline_control(20, std::move(then));
         return;
     }
-    if (!s_agent) {
-        if (then) then();
-        return;
-    }
-    // A clean "offline" before the process ends (else the broker's last
-    // will says it).
-    if (agent_ok(agent_client::prepare_shutdown(), "shutdown")) {
-        wait_offline(20, std::move(then));
-        return;
-    }
-    agent_leave();
+    // No agent answers (none installed, or one that does not know the commands):
+    // nothing to wait for.
+    if (s_agent) agent_leave();
     if (then) then();
 }
 

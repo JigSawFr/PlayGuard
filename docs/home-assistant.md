@@ -55,7 +55,7 @@ sysmodule, [`sysmodule/agent`](https://github.com/JigSawFr/boreale-link/blob/mai
 same link while PlayGuard is closed, with the same settings:
 
 1. PlayGuard › **Console › Optional modules › Remote link agent › Install**
-   (PlayGuard carries it; or extract `playguard-agent.zip` from the release at
+   (PlayGuard carries it; or extract `boreale-link.zip` from the release at
    the SD card's root). It starts at once, and at every boot.
 2. Nothing else to set up: it reads *Remote access*. Its **Status** then reads
    *Online · through the agent*.

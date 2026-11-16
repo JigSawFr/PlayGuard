@@ -17,7 +17,7 @@ Both are built with devkitPro's libnx rules, the ARM flags and `out/<name>.nsp`
 ```sh
 make rescue          # sysmodule/rescue/out/playguard-rescue.nsp
 make dist-rescue     # playguard-rescue.zip
-make agent           # library/boreale-link/agent/out/playguard-agent.nsp
-make dist-agent      # playguard-agent.zip
+make agent           # library/boreale-link/agent/out/boreale-link.nsp
+make dist-agent      # boreale-link.zip
 make                 # the .nro, with the modules built first and bundled (cmake/bundle_sysmodules.cmake)
 ```

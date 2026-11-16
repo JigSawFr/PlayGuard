@@ -794,7 +794,7 @@ jobs:
           # to the RomFS file, and a failed check uploads both builds.
           keep() {
             mkdir -p "$1/dksh"
-            cp playguard.zip playguard-rescue.zip playguard-agent.zip build/playguard.nro build/playguard.nacp "$1/"
+            cp playguard.zip playguard-rescue.zip boreale-link.zip build/playguard.nro build/playguard.nacp "$1/"
             cp build/aurore/dksh/*.dksh "$1/dksh/"
             (cd build/resources && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > "$1/resources.sha256"
           }
@@ -818,7 +818,7 @@ jobs:
           fi
           # The raw sysmodules next to their zips, for their artifacts.
           cp sysmodule/rescue/out/playguard-rescue.nsp playguard-rescue.nsp
-          cp library/boreale-link/agent/out/playguard-agent.nsp playguard-agent.nsp
+          cp library/boreale-link/agent/out/boreale-link.nsp boreale-link.nsp
           # Only what these builds used goes back to the cache (a hit refreshes
           # an object's date), not 350 MB of builds gone by.
           ccache --evict-older-than "$(( $(date +%s) - start + 60 ))s"
@@ -850,7 +850,7 @@ jobs:
           # libnx's 21.0.0 marker (LNY2 after MOD0), which hbmenu checks; the
           # .nro files after --romfs with their RomFS in their assets (the PIN
           # gate's font, and something after its code for the forwarders' loader).
-          python3 tools/check_nro.py sysmodule/rescue/out/playguard-rescue.elf library/boreale-link/agent/out/playguard-agent.elf --romfs playguard.nro gate/out/gate.nro
+          python3 tools/check_nro.py sysmodule/rescue/out/playguard-rescue.elf library/boreale-link/agent/out/boreale-link.elf --romfs playguard.nro gate/out/gate.nro
       # compat.json (schema 1, for every installed version) and
       # compat-<schema>.json (what this version and later ones read).
       - name: compat.json
@@ -867,11 +867,11 @@ jobs:
             git submodule status
             cat toolchain.txt
           } > build-info.txt
-          sha256sum playguard.nro playguard.zip playguard-rescue.zip playguard-agent.zip compat.json compat-1.json build-info.txt > SHA256SUMS.txt
+          sha256sum playguard.nro playguard.zip playguard-rescue.zip boreale-link.zip compat.json compat-1.json build-info.txt > SHA256SUMS.txt
           cat build-info.txt
           unzip -l playguard.zip
           unzip -l playguard-rescue.zip
-          unzip -l playguard-agent.zip
+          unzip -l boreale-link.zip
       # The Homebrew App Store listing (packaging/hb-appstore/pkgbuild.json),
       # written for this build's version and checked against its zip: every
       # file installed or left out on purpose, the binary among them. Then
@@ -922,8 +922,8 @@ jobs:
         with:
           name: playguard-${{ env.LABEL }}-agent
           path: |
-            playguard-agent.zip
-            playguard-agent.nsp
+            boreale-link.zip
+            boreale-link.nsp
           if-no-files-found: error
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         id: sdcard
@@ -968,7 +968,7 @@ jobs:
         run: |
           set -- --artifact "playguard-$LABEL-nro|$NRO_URL|playguard.nro · compat.json · build-info.txt · SHA256SUMS.txt — what the console's *Install another build* downloads" \
                  --artifact "playguard-$LABEL-rescue|$RESCUE_URL|playguard-rescue.zip (unzip at the SD-card root) · playguard-rescue.nsp" \
-                 --artifact "playguard-$LABEL-agent|$AGENT_URL|playguard-agent.zip (unzip at the SD-card root) · playguard-agent.nsp"
+                 --artifact "playguard-$LABEL-agent|$AGENT_URL|boreale-link.zip (unzip at the SD-card root) · boreale-link.nsp"
           if [ -n "$SDCARD_URL" ]; then set -- "$@" --artifact "playguard-$LABEL-sdcard|$SDCARD_URL|playguard.zip (the store package: unzip at the SD-card root)"; fi
           set -- "$@" --artifact "playguard-$LABEL-hbas|$HBAS_URL|PlayGuard/ (the Homebrew App Store listing: pkgbuild.json and its images)"
           set -- "$@" --artifact "playguard-$LABEL-linker-map|$MAP_URL|playguard.map (14 days)"
@@ -1053,7 +1053,7 @@ jobs:
             dist/playguard.nro
             dist/playguard.zip
             dist/playguard-rescue.zip
-            dist/playguard-agent.zip
+            dist/boreale-link.zip
             dist/compat.json
             dist/compat-1.json
             dist/build-info.txt
@@ -1067,7 +1067,7 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           gh release upload "$TAG" --clobber dist/playguard.nro dist/playguard.zip dist/playguard-rescue.zip \
-            dist/playguard-agent.zip dist/compat.json dist/compat-1.json dist/build-info.txt dist/SHA256SUMS.txt \
+            dist/boreale-link.zip dist/compat.json dist/compat-1.json dist/build-info.txt dist/SHA256SUMS.txt \
             dist/playguard-screens.zip
       # The release page laid out (tools/release_page.sh): "PlayGuard X.Y.Z",
       # a summary, the figures, the commit list release-please wrote folded
