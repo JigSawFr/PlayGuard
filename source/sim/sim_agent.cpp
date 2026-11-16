@@ -221,11 +221,6 @@ Result reload()
     return plain(AgentCmd_ReloadConfig);
 }
 
-Result prepare_shutdown()
-{
-    return plain(AgentCmd_PrepareShutdown);
-}
-
 Result status(AgentStatus* out)
 {
     AgentCall c;

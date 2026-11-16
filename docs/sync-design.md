@@ -106,7 +106,7 @@ host, for things HA already does).
 
 ### A background agent, both processes active, one broker client
 
-**Decision.** `playguard-agent`, an optional Atmosphère boot sysmodule, is
+**Decision.** `boreale-link`, an optional Atmosphère boot sysmodule, is
 the **only MQTT client** when it runs. PlayGuard, when open, talks to it over
 a small IPC service (`pg:agent`): it pushes its own fresh snapshots after every
 change, receives the orders that arrive while it is open and applies them with
@@ -196,7 +196,7 @@ are) stays under both.
           (native discovery, or the                   │ TCP, optional TLS
            playguard HACS integration)                │
                                                       ▼
-                                        playguard-agent (boot sysmodule)
+                                        boreale-link (boot sysmodule)
                                         the only MQTT client
                                             ▲ IPC pg:agent
                                             │ (session open = PlayGuard open)

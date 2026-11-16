@@ -191,6 +191,8 @@ static void engine_start(void)
     g_tcp.fd = -1;
     const SyncHost host = { .state = h_state, .system = h_system, .order = h_order, .relay = h_relay };
     sync_engine_init(&g_engine, &g_conf, bl_tcp_io(&g_tcp), &host, bl_now_ms, "agent", "1.1.0");
+    // The agent is the console's one connection, shared by every homebrew: its id names no module.
+    CHECK(!strncmp(g_engine.client_id, "bl-", 3) && !strcmp(g_engine.client_id + strlen(g_engine.client_id) - 5, "-link"));
 }
 
 // The loop of main.c: the relay's sessions and publications, then a turn of the engine.

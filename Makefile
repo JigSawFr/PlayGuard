@@ -128,14 +128,14 @@ agent:
 
 dist-agent: agent
 	@echo making agent dist ...
-	@rm -rf out-agent/ playguard-agent.zip
+	@rm -rf out-agent/ boreale-link.zip
 	@mkdir -p out-agent/atmosphere/contents/$(AGENT_TID)/flags
-	@cp $(AGENT_DIR)/out/playguard-agent.nsp out-agent/atmosphere/contents/$(AGENT_TID)/exefs.nsp
+	@cp $(AGENT_DIR)/out/boreale-link.nsp out-agent/atmosphere/contents/$(AGENT_TID)/exefs.nsp
 	@touch out-agent/atmosphere/contents/$(AGENT_TID)/flags/boot2.flag
-	@printf '{\n  "name": "PlayGuard agent",\n  "tid": "%s",\n  "requires_reboot": false\n}\n' $(AGENT_TID) \
+	@printf '{\n  "name": "Boreale Link",\n  "tid": "%s",\n  "requires_reboot": false\n}\n' $(AGENT_TID) \
 		> out-agent/atmosphere/contents/$(AGENT_TID)/toolbox.json
 	@cp LICENSE out-agent/atmosphere/contents/$(AGENT_TID)/LICENSE.txt
-	@cd out-agent && $(ZIP_TREE) ../playguard-agent.zip
+	@cd out-agent && $(ZIP_TREE) ../boreale-link.zip
 
 desktop:
 	@cmake -B $(DESKTOP) -S . -DAURORE_PLATFORM=DESKTOP -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS)
@@ -453,7 +453,7 @@ check: test
 
 clean:
 	@echo clean ...
-	@rm -rf $(BUILD) $(DESKTOP) $(WEB) out out-rescue out-agent $(TARGET).zip playguard-rescue.zip playguard-agent.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
+	@rm -rf $(BUILD) $(DESKTOP) $(WEB) out out-rescue out-agent $(TARGET).zip playguard-rescue.zip boreale-link.zip $(TARGET).nro $(TARGET).nacp $(TARGET).elf
 	@$(MAKE) --no-print-directory -C sysmodule/rescue clean 2>/dev/null || true
 	@$(MAKE) --no-print-directory -C $(AGENT_DIR) clean 2>/dev/null || true
 	@$(MAKE) --no-print-directory -C forwarder clean 2>/dev/null || true

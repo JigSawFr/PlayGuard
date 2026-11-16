@@ -73,7 +73,7 @@ static void test_install_through_the_layer()
     CHECK(install(sd, m, b, false));
     const State s = state(sd, m);
     CHECK(s.installed && s.at_boot && s.version == "1.1.0" && offer(s, b) == Offer::None);
-    CHECK(read(dir(sd, m) + "/toolbox.json").find("PlayGuard agent") != std::string::npos);
+    CHECK(read(dir(sd, m) + "/toolbox.json").find("Boreale Link") != std::string::npos);
     CHECK(uninstall(sd, m) && !is_dir(dir(sd, m)));
 }
 

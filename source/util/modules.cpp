@@ -12,7 +12,7 @@ const std::vector<Module>& all()
 {
     static const std::vector<Module> list = {
         { { "rescue", 0x4200000000505247ULL, false, "PlayGuard rescue" }, Id::Rescue },
-        { { "agent", sysmodule::AGENT_TID, true, "PlayGuard agent" }, Id::Agent },
+        { { "agent", sysmodule::AGENT_TID, true, "Boreale Link" }, Id::Agent },
     };
     return list;
 }

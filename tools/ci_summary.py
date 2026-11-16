@@ -512,8 +512,8 @@ def cmd_build(a):
     sizes = {name: file_size(path) for name, path in (("playguard.nro", a.nro), ("playguard.zip", a.zip),
                                                       ("playguard-rescue.zip", a.rescue_zip),
                                                       ("playguard-rescue.nsp", a.rescue_nsp),
-                                                      ("playguard-agent.zip", a.agent_zip),
-                                                      ("playguard-agent.nsp", a.agent_nsp))}
+                                                      ("boreale-link.zip", a.agent_zip),
+                                                      ("boreale-link.nsp", a.agent_nsp))}
     base = read_json(a.baseline) if a.baseline else None
     toolchain = dict(line.split(None, 1) for line in (read_text(a.toolchain) or "").splitlines() if " " in line)
     libnx = toolchain.get("libnx", "?")
@@ -527,11 +527,11 @@ def cmd_build(a):
     out += [" · ".join(strip), ""]
 
     # The sizes, the .nro against main's last build.
-    heads = ["playguard.nro", "playguard.zip", "playguard-rescue.zip", "rescue .nsp", "playguard-agent.zip", "agent .nsp"]
+    heads = ["playguard.nro", "playguard.zip", "playguard-rescue.zip", "rescue .nsp", "boreale-link.zip", "agent .nsp"]
     tile = [f"**{fmt_size(sizes['playguard.nro'])}**" if nro else "—"]
     tile += [fmt_size(sizes[name]) if sizes[name] else "—"
-             for name in ("playguard.zip", "playguard-rescue.zip", "playguard-rescue.nsp", "playguard-agent.zip",
-                          "playguard-agent.nsp")]
+             for name in ("playguard.zip", "playguard-rescue.zip", "playguard-rescue.nsp", "boreale-link.zip",
+                          "boreale-link.nsp")]
     if base and base.get("size") and nro:
         heads.append(f"vs main {code(base.get('sha', '')[:7])}")
         delta = nro - base["size"]
@@ -580,7 +580,7 @@ def cmd_build(a):
         out.append("")
     listing = []
     for name, path in (("playguard.zip", a.zip), ("playguard-rescue.zip", a.rescue_zip),
-                       ("playguard-agent.zip", a.agent_zip)):
+                       ("boreale-link.zip", a.agent_zip)):
         for entry, size in zip_listing(path):
             listing.append([code(name), code(entry), fmt_size(size)])
     if listing:
@@ -777,8 +777,8 @@ def main():
     p.add_argument("--zip", default="playguard.zip")
     p.add_argument("--rescue-zip", default="playguard-rescue.zip")
     p.add_argument("--rescue-nsp", default="sysmodule/rescue/out/playguard-rescue.nsp")
-    p.add_argument("--agent-zip", default="playguard-agent.zip")
-    p.add_argument("--agent-nsp", default="library/boreale-link/agent/out/playguard-agent.nsp")
+    p.add_argument("--agent-zip", default="boreale-link.zip")
+    p.add_argument("--agent-nsp", default="library/boreale-link/agent/out/boreale-link.nsp")
     p.add_argument("--toolchain", default="toolchain.txt")
     p.add_argument("--build-info", default="build-info.txt")
     p.add_argument("--sums", default="SHA256SUMS.txt")
@@ -799,7 +799,7 @@ def main():
     p.add_argument("--repo-url", required=True)
     p.add_argument("--dir", default="dist")
     p.add_argument("--files", nargs="+", default=["playguard.nro", "playguard.zip", "playguard-rescue.zip",
-                                                  "playguard-agent.zip", "compat.json", "compat-1.json",
+                                                  "boreale-link.zip", "compat.json", "compat-1.json",
                                                   "build-info.txt", "SHA256SUMS.txt"])
     p.set_defaults(func=cmd_release)
 

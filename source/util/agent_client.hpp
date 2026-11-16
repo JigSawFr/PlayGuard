@@ -31,7 +31,6 @@ Result pop_order(AgentOrder* out);
 Result order_result(const AgentResult& r);
 Result sync_now();
 Result reload();
-Result prepare_shutdown();
 Result status(AgentStatus* out);
 Result records(AgentRecords* out);
 Result log(std::string* out);

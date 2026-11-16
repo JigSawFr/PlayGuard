@@ -790,7 +790,6 @@ and come back from the broker for the agent.
 | 12 | `GetRecords` | | `AgentRecords` | What the agent changed (extra time, console lock, relock), for PlayGuard to adopt. |
 | 13 | `ReloadConfig` | | | Read `sync.conf` and `nro_state.txt` again (also done when their date changes). |
 | 14 | `GetLog` | | buffer: text | The agent's last 200 lines, oldest first. |
-| 15 | `PrepareShutdown` | | | Publish `offline`, disconnect, stay idle: first step of an update or a stop from PlayGuard. A later `Hello` of the same protocol brings the link back (the stop did not follow). |
 | 16 | `PushGames` | buffer: JSON | | Publish `games`. |
 
 Everything but `Hello`, `GetStatus` and `GetLog` needs the session. The
@@ -835,10 +834,9 @@ connection.
   whichever homebrew installed it. **Info** answers `BlRelayInfo` (the agent's
   protocol and version, whether its broker connection is up, whether it was
   asked to leave, how many homebrews have a session open); **Shutdown** makes it
-  leave the broker (its last will says "offline") and stay away, as `pg:agent`'s
-  `PrepareShutdown`; **Resume** brings it back (a restart comes back by itself).
+  leave the broker (its last will says "offline") and stay away; **Resume** brings it back (a restart comes back by itself).
   An agent from before them answers an unknown-command error: it is too old.
-  PlayGuard's update uses them first and keeps `PrepareShutdown` for such an agent.
+  PlayGuard's update uses them.
 - **Orders**: the agent subscribes to `<base>/<module>/+/set` for each module with
   a session, one filter per module and never `+/+/set` (it would cover
   PlayGuard's own orders a second time). Retained orders come back on the next
