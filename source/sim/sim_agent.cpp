@@ -43,7 +43,7 @@ bool present()
 {
     const char* v = sim_env("PLAYGUARD_SIM_AGENT");
     if (!v || std::strcmp(v, "running")) return false;
-    const bool up = module_running(modules::get(modules::Id::Agent).tid, nullptr) && kind() != "broken";
+    const bool up = sysmodule_running(modules::get(modules::Id::Agent).tid, nullptr) && kind() != "broken";
     if (!up && s_agent) {
         // The process ended: its session and its state with it.
         aurore::Logger::info("sim agent: stopped{}", s_open ? ", session lost" : "");

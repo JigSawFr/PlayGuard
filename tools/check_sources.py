@@ -76,7 +76,6 @@ CONSOLE_ONLY = {
     "forwarder.c": "sim_forwarder.cpp",
     "gamecheck.c": "sim_gamecheck.c",
     "gate_nx.c": "the PIN gate's .nro",
-    "modules_nx.c": "sim_modules.c",
     "pctl_dump.c": "sim_pctl.c",
     "pctl_ops.c": "sim_pctl.c",
     "playstats.c": "sim_playstats.c",
