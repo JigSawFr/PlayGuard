@@ -67,7 +67,7 @@ std::string state_text(modules::Id id, bool brief, const char** color)
         c = "cadran/teal";
     }
     if (!brief && m.resident && s.installed)
-        text += " · " + (module_running(m.tid, nullptr) ? "playguard/modules/state/running"_i18n
+        text += " · " + (sysmodule_running(m.tid, nullptr) ? "playguard/modules/state/running"_i18n
                                                         : "playguard/modules/state/stopped"_i18n);
     if (color) *color = c;
     return text;
@@ -182,13 +182,13 @@ ModuleTab::ModuleTab(modules::Id which) : TabBase("xml/tab/module.xml"), id(whic
     });
     run->registerClickAction([this](aurore::View*) {
         const modules::Module& mod = modules::get(this->id);
-        const bool running = module_running(mod.tid, nullptr);
+        const bool running = sysmodule_running(mod.tid, nullptr);
         if (!allowed()) return true;
         const modules::Id mid = this->id;
         const std::function<void()> refresh_tab = this->refresher();
         const auto act = [mid, running, refresh_tab]() {
             const modules::Module& target = modules::get(mid);
-            const Result rc = running ? module_terminate(target.tid) : module_launch(target.tid);
+            const Result rc = running ? sysmodule_terminate(target.tid) : sysmodule_launch(target.tid);
             ui::notify_result(rc, running ? "playguard/modules/stopped"_i18n : "playguard/modules/started"_i18n,
                               "playguard/modules/error"_i18n);
             if (R_SUCCEEDED(rc)) record(target, running ? "stopped" : "started");
@@ -271,11 +271,11 @@ void ModuleTab::uninstall()
     ui::confirm_danger(aurore::getStr(key(m, "remove_body")), "playguard/modules/remove"_i18n, [mid, refresh_tab]() {
         const modules::Module& target = modules::get(mid);
         if (!allowed()) return;
-        const bool running = target.resident && module_running(target.tid, nullptr);
+        const bool running = target.resident && sysmodule_running(target.tid, nullptr);
         const auto drop = [mid, running, refresh_tab]() {
             const modules::Module& gone = modules::get(mid);
             if (running) {
-                module_terminate(gone.tid);
+                sysmodule_terminate(gone.tid);
                 sync_flow::reload();
             }
             if (const auto done = modules::uninstall(paths::sd_root(), gone); !done) {
@@ -298,7 +298,7 @@ void ModuleTab::refresh()
     const modules::State s = modules::state(paths::sd_root(), m);
     const modules::Bundle b = modules::bundled(bundled_modules::dir(), m);
     const modules::Offer offer = modules::offer(s, b);
-    const bool running = m.resident && s.installed && module_running(m.tid, nullptr);
+    const bool running = m.resident && s.installed && sysmodule_running(m.tid, nullptr);
 
     const char* color = nullptr;
     status->setDetailText(state_text(id, false, &color));

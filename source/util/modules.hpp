@@ -4,7 +4,7 @@
 // removing them is the kit's (util/sysmodule.hpp, host-tested there); this is
 // what PlayGuard adds: which modules it carries and their names, and the
 // recovery module's playguard-rescue.txt. Starting and stopping a module is
-// core/modules_nx.h.
+// core/sysmodule_nx.h (boreale-kit).
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 

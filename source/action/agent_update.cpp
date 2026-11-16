@@ -61,9 +61,9 @@ sysmodule_flow::Host host()
 {
     sysmodule_flow::Host h;
     h.sd_root = paths::sd_root();
-    h.running = [](uint64_t tid) { return module_running(tid, nullptr); };
-    h.launch = [](uint64_t tid) { const Result rc = module_launch(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
-    h.terminate = [](uint64_t tid) { const Result rc = module_terminate(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
+    h.running = [](uint64_t tid) { return sysmodule_running(tid, nullptr); };
+    h.launch = [](uint64_t tid) { const Result rc = sysmodule_launch(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
+    h.terminate = [](uint64_t tid) { const Result rc = sysmodule_terminate(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
     h.rc_text = [](uint32_t rc) { return ui::rc_text((Result)rc); };
     // "offline" from the agent itself, then the next step.
     h.leave = [](std::function<void()> then) { sync_flow::agent_stopping(std::move(then)); };
