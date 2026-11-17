@@ -228,15 +228,7 @@ void ModuleTab::install()
         if (target.resident) {
             // The agent: stopped cleanly, swapped, started and seen answering,
             // or the previous one put back (action/agent_update).
-            if (agent_update::running()) {
-                ui::notify("playguard/modules/agent/busy"_i18n);
-                return;
-            }
-            ui::notify(update ? "playguard/modules/agent/updating"_i18n : "playguard/modules/agent/installing"_i18n);
-            agent_update::run(bundled_modules::dir(), [refresh_tab](const agent_update::Outcome& o) {
-                agent_update::tell(o);
-                refresh_tab();
-            });
+            agent_update::run(refresh_tab);
             return;
         }
         // The recovery module only acts at boot: nothing to stop or start.

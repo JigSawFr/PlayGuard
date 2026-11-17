@@ -6,14 +6,16 @@
 #include <format>
 #include <memory>
 
+#include "action/agent_manage_flow.hpp"
+#include "action/bundled_modules.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
 #include "action/update_flow.hpp"
 #include "ui/play_ui.hpp"
-#include "bl_relay_nx.h"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
+#include "util/modules.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -55,62 +57,37 @@ sysmodule_flow::Answer answers(std::string& why)
     return sysmodule_flow::Answer::Refused;
 }
 
-// What the kit's flow asks of PlayGuard: the console's services, the link's
-// hand-over (sync_flow), the change history, and its words.
-sysmodule_flow::Host host()
+// What boreale-kit's agent flow asks of PlayGuard: the link's hand-over
+// (sync_flow), the change history, and the two ways PlayGuard has of its own:
+// the agent asked to leave through its session (and the neutral control), and
+// its Hello on pg:agent, which also tells the protocol PlayGuard speaks.
+void install_hooks()
 {
-    sysmodule_flow::Host h;
-    h.sd_root = paths::sd_root();
-    h.running = [](uint64_t tid) { return sysmodule_running(tid, nullptr); };
-    h.launch = [](uint64_t tid) { const Result rc = sysmodule_launch(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
-    h.terminate = [](uint64_t tid) { const Result rc = sysmodule_terminate(tid); return R_FAILED(rc) ? (uint32_t)rc : 0u; };
-    h.rc_text = [](uint32_t rc) { return ui::rc_text((Result)rc); };
-    // "offline" from the agent itself, then the next step.
+    static bool done = false;
+    if (done) return;
+    done = true;
+    auto& h = agent_manage_flow::hooks();
+    h.bundle_dir = []() { return bundled_modules::dir(); };
+    h.hold = [](bool on) { sync_flow::hold(on); };
+    // The agent that was asked to leave is back already (the flow resumed it);
+    // PlayGuard's own session again, or its own link when the agent is gone.
+    h.link_back = []() { sync_flow::reload(); };
+    h.record = record;
     h.leave = [](std::function<void()> then) { sync_flow::agent_stopping(std::move(then)); };
     h.answers = answers;
-    h.delay = [](long ms, std::function<void()> fn) { aurore::delay(ms, std::move(fn)); };
-    h.hold = [](bool on) { sync_flow::hold(on); };
-    // The agent that was asked to leave comes back (one that was stopped is a new process, back already), then
-    // its session again (or PlayGuard's own when it is gone).
-    h.link_back = []() {
-        bl_relay_resume();
-        sync_flow::reload();
-    };
-    h.record = record;
-    h.log = [](const std::string& line) { aurore::Logger::info("agent {}", line); };
-    h.warn = [](const std::string& why) {
-        aurore::Logger::warning("agent update: the agent is in place, {}", why);
-        aurore::sync([]() { ui::notify("playguard/modules/meta_err"_i18n, ui::Toast::Refused); });
-    };
-    h.busy_text = "playguard/modules/agent/busy"_i18n;
-    h.not_bundled_text = "playguard/modules/details/not_bundled"_i18n;
-    h.no_answer_text = "playguard/modules/agent/no_answer"_i18n;
-    return h;
+    // The PIN is the caller's (the screen and the offer ask it before).
 }
 }   // namespace
 
 bool running()
 {
-    return sysmodule_flow::running();
+    return agent_manage_flow::busy();
 }
 
-void run(const std::string& bundle_dir, std::function<void(const Outcome&)> done)
+void run(std::function<void()> done)
 {
-    sysmodule_flow::run(host(), agent(), modules::bundled(bundle_dir, agent()), std::move(done));
-}
-
-void tell(const Outcome& o)
-{
-    switch (o.end) {
-        case modules::Step::Done:
-            ui::notify(o.update ? "playguard/modules/agent/updated"_i18n : "playguard/modules/agent/installed"_i18n);
-            break;
-        case modules::Step::RolledBack:
-            ui::error(aurore::getStr(o.update ? "playguard/modules/start_failed" : "playguard/modules/agent/install_undone",
-                                   o.why));
-            break;
-        default: ui::error(aurore::getStr("playguard/modules/agent/update_failed", o.why)); break;
-    }
+    install_hooks();
+    agent_manage_flow::install(std::move(done));
 }
 
 namespace
@@ -142,13 +119,12 @@ void offer_when_free(aurore::Activity* main, const std::string& bundle_dir, int 
         config::get().agent_update_skipped = sha;
         ui::save_config();
     });
-    dialog->addButton("playguard/modules/update"_i18n, [bundle_dir]() {
+    dialog->addButton("playguard/modules/update"_i18n, []() {
         if (!pin_lock::allow_change()) {
             ui::notify(pin_lock::refusal_text());
             return;
         }
-        ui::notify("playguard/modules/agent/updating"_i18n);
-        run(bundle_dir, [](const Outcome& o) { tell(o); });
+        run(nullptr);
     });
     dialog->setCancelable(true);
     dialog->open();
