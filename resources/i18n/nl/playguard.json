@@ -1703,7 +1703,6 @@
         "stopped": "Module gestopt.",
         "error": "De module kon niet worden gewijzigd",
         "meta_err": "De module is geïnstalleerd, maar de versie kon niet op de SD-kaart worden geschreven: hij kan opnieuw worden aangeboden",
-        "start_failed": "De nieuwe versie startte niet ({}): de vorige is teruggezet.",
         "locked_out": "Buitengesloten?",
         "state": {
             "not_installed": "Niet geïnstalleerd",
@@ -1756,13 +1755,7 @@
             "installed": "Agent geïnstalleerd en gestart.",
             "updated": "Agent bijgewerkt.",
             "remove_body": "De agent stoppen en verwijderen? De verbinding op afstand werkt dan alleen terwijl PlayGuard open is.",
-            "installing": "Agent wordt geïnstalleerd...",
-            "updating": "Agent wordt bijgewerkt...",
-            "busy": "De agent wordt bijgewerkt.",
-            "no_answer": "geen antwoord binnen 10 s",
             "other_protocol": "hij spreekt protocol {}",
-            "install_undone": "De agent antwoordde niet ({}): hij is verwijderd.",
-            "update_failed": "De agent kon niet worden bijgewerkt ({}). Console › Optionele modules toont wat er nu op de SD-kaart staat.",
             "offer_body": "De agent voor de verbinding op afstand op de SD-kaart is niet die van deze PlayGuard (versie {}). Nu bijwerken? Hij stopt even, en de vorige wordt teruggezet als de nieuwe niet antwoordt.",
             "offer_refused": "Hij spreekt een ouder protocol: de verbinding op afstand werkt pas als hij is bijgewerkt."
         }

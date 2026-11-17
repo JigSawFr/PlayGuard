@@ -1703,7 +1703,6 @@
         "stopped": "Módulo parado.",
         "error": "Não foi possível alterar o módulo",
         "meta_err": "O módulo está instalado, mas não foi possível gravar a versão dele no cartão SD: ele poderá ser oferecido de novo",
-        "start_failed": "A nova versão não iniciou ({}): a anterior foi restaurada.",
         "locked_out": "Sem acesso?",
         "state": {
             "not_installed": "Não instalado",
@@ -1756,13 +1755,7 @@
             "installed": "Agente instalado e iniciado.",
             "updated": "Agente atualizado.",
             "remove_body": "Parar e remover o agente? A conexão remota passa a funcionar só enquanto o PlayGuard estiver aberto.",
-            "installing": "Instalando o agente...",
-            "updating": "Atualizando o agente...",
-            "busy": "O agente está sendo atualizado.",
-            "no_answer": "sem resposta em 10 s",
             "other_protocol": "ele usa o protocolo {}",
-            "install_undone": "O agente não respondeu ({}): ele foi removido.",
-            "update_failed": "Não foi possível atualizar o agente ({}). Console › Módulos opcionais mostra o que está no cartão SD agora.",
             "offer_body": "O agente da conexão remota no cartão SD não é o que este PlayGuard traz (versão {}). Atualizar agora? Ele para por um instante, e o anterior volta se o novo não responder.",
             "offer_refused": "Ele usa um protocolo mais antigo: a conexão remota não funciona até ele ser atualizado."
         }
