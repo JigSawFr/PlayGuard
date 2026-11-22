@@ -80,6 +80,8 @@ The real app, against a simulated console, in your browser:
 
 **Compatibility:** tested on firmware 22.0.0, 22.1.0, 22.5.0 and 23.0.1 (Atmosphère 1.11–1.12); 23.0.0 and 21.x should work, untested; older firmware, everything but the play timer. Details: [compatibility](https://guard.boreale.dev/docs/compatibility/?utm_source=github&utm_medium=readme). **No Switch 2.**
 
+**Replacement HOME menu:** [SwitchU](https://github.com/PoloNX/SwitchU) honours PlayGuard's limits from its version 1.4.2 ([details](https://guard.boreale.dev/docs/compatibility/?utm_source=github&utm_medium=readme#replacement-home-menus)).
+
 ## 📖 Documentation
 
 **[guard.boreale.dev](https://guard.boreale.dev/?utm_source=github&utm_medium=readme)**, in the console's 15 languages:

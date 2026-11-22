@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
+<!-- translated from docs/compatibility.md, sha256 a287e9835737 -->
 # 호환성
 
 지원하는 펌웨어, Atmosphère, 런처, emuMMC와 sysMMC, 그리고 PlayGuard와 대체 sysmodule의 비교를 설명합니다. 처음으로 돌아가기: [README](../../README.md).
@@ -36,6 +36,10 @@ PlayGuard는 Atmosphère가 실행 중인지만 확인하고 버전은 확인하
 
 게임 위에서 실행(title override)하는 것을 권장합니다. 앱은 애플리케이션(게임 위에서, 또는 HOME 메뉴에 있는 자체 포워더에서)으로 실행 중인지 애플릿(앨범)으로 실행 중인지 표시합니다. 게임 위에서 실행하면 본체는 PlayGuard를 사용한 시간을 그 게임의 시간으로 계산합니다. 플레이 기록에서는 실행할 때 고른 사용자의 시간으로 들어갑니다. 아이의 사용자가 아니라 보호자의 사용자로 여세요. 플레이 타이머는 본체의 것이라 모든 사용자에게 같습니다. 누가 PlayGuard를 열었든 그 시간을 계산합니다. 단, 타이머가 꺼져 있거나 PIN으로 자녀 보호 기능이 일시 중지된 경우는 제외입니다([자세히](features.md#pin을-입력하면-playguard를-사용하는-동안-자녀-보호-기능이-일시-중지됩니다)).
 
+### 대체 HOME 메뉴
+
+게임을 시작하기 전에 본체의 제한을 확인하는 것은 HOME 메뉴입니다. 그래서 대체 HOME 메뉴도 같은 일을 해야 합니다. [SwitchU](https://github.com/PoloNX/SwitchU)는 버전 1.4.2부터 이를 지원합니다. 개발자가 PlayGuard와 함께 테스트했으며, 플레이 시간 제한, 실행 및 재개 제한, 보호자의 PIN 잠금 해제, 시간이 다 되었을 때의 잠금을 지킵니다. 다른 대체 메뉴는 테스트되지 않았습니다([제보 환영](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)).
+
 ### Nintendo Switch 2
 
 지원하지 않습니다. Switch 2용 Atmosphère가 없습니다.
@@ -50,7 +54,7 @@ PlayGuard는 Atmosphère가 실행 중인지만 확인하고 버전은 확인하
 
 ### 본체가 BAN될 수 있나요?
 
-PlayGuard는 닌텐도에 절대 접속하지 않습니다. 온라인에서는 공개 시간 서버, GitHub(업데이트, 그리고 사용자가 보내는 보고서), switchbrew(최신 펌웨어와 그 릴리스 노트)에만 접속합니다. 본체가 BAN되는 원인은 커스텀 펌웨어나 emuMMC가 온라인으로 닌텐도에 접속하는 것입니다([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), 영어). 자녀 보호 기능이나 시계 변경 때문에 BAN되었다는 기록은 없습니다. 다만 보장할 수는 없습니다.
+PlayGuard는 닌텐도에 절대 접속하지 않습니다. 온라인에서는 공개 시간 서버, GitHub(업데이트, 그리고 사용자가 보내는 보고서), switchbrew(최신 펌웨어와 그 릴리스 노트), Homebrew App Store의 CDN인 `switch.cdn.fortheusers.org`(그곳에 올라온 PlayGuard 버전)에만 접속합니다. 본체가 BAN되는 원인은 커스텀 펌웨어나 emuMMC가 온라인으로 닌텐도에 접속하는 것입니다([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), 영어). 자녀 보호 기능이나 시계 변경 때문에 BAN되었다는 기록은 없습니다. 다만 보장할 수는 없습니다.
 
 ### 인터넷이 없는 본체
 
