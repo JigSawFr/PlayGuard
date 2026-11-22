@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
+<!-- translated from docs/compatibility.md, sha256 a287e9835737 -->
 # Compatibilidad
 
 Firmware, Atmosphère y lanzadores compatibles, emuMMC y sysMMC, y cómo se compara PlayGuard con un sysmodule de reemplazo. Volver al [README](../../README.md).
@@ -36,6 +36,10 @@ PlayGuard comprueba que Atmosphère esté en ejecución, no su versión: lo que 
 
 Se recomienda iniciarlo sobre un juego (title override). La aplicación indica si se ejecuta como aplicación (sobre un juego, o desde su propio forwarder en el menú HOME) o como applet (Álbum). Sobre un juego, la consola cuenta el tiempo en PlayGuard como tiempo de ese juego. En la actividad, se asigna al usuario elegido al iniciar: ábralo con el usuario de un adulto, no con el de un niño. El temporizador de juego es el de la consola, el mismo para todos los usuarios: cuenta ese tiempo sin importar quién abrió PlayGuard, salvo que el temporizador esté desactivado o que el PIN haya puesto en pausa el control parental ([detalles](features.md#el-pin-pone-en-pausa-el-control-parental-mientras-está-en-playguard)).
 
+### Menús HOME de reemplazo
+
+El menú HOME es el que revisa los límites de la consola antes de iniciar un juego, así que un menú HOME de reemplazo también tiene que hacerlo. [SwitchU](https://github.com/PoloNX/SwitchU) lo hace desde su versión 1.4.2: su autor lo probó con PlayGuard y respeta los límites de tiempo de juego, las restricciones al iniciar y al reanudar, el desbloqueo de un padre o madre con el PIN y el bloqueo cuando se acaba el tiempo. Otros menús de reemplazo no se han probado ([se agradecen los reportes](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)).
+
 ### Nintendo Switch 2
 
 No es compatible: no existe Atmosphère para ella.
@@ -50,7 +54,7 @@ Cada una tiene su propio control parental, y PlayGuard solo ve el del sistema en
 
 ### ¿Puede hacer que baneen la consola?
 
-PlayGuard nunca se comunica con Nintendo: en línea, solo se conecta a servidores de hora públicos, a GitHub (actualizaciones, y los informes que usted envíe) y a switchbrew (el firmware más reciente y sus notas de la versión). Lo que hace que baneen una consola es un firmware personalizado o una emuMMC que se conecta en línea con Nintendo ([preguntas frecuentes de switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), en inglés). No hay ningún baneo documentado relacionado con cambios en el control parental o en el reloj; eso no es una garantía.
+PlayGuard nunca se comunica con Nintendo: en línea, solo se conecta a servidores de hora públicos, a GitHub (actualizaciones, y los informes que usted envíe), a switchbrew (el firmware más reciente y sus notas de la versión) y a la CDN del Homebrew App Store, `switch.cdn.fortheusers.org` (la versión de PlayGuard que ofrece). Lo que hace que baneen una consola es un firmware personalizado o una emuMMC que se conecta en línea con Nintendo ([preguntas frecuentes de switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), en inglés). No hay ningún baneo documentado relacionado con cambios en el control parental o en el reloj; eso no es una garantía.
 
 ### Una consola sin Internet
 

@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
+<!-- translated from docs/compatibility.md, sha256 a287e9835737 -->
 # 対応状況
 
 対応するファームウェア、Atmosphère、ランチャー、emuMMC と sysMMC、そして置き換え型の sysmodule との比較について説明します。トップページは [README](../../README.md)。
@@ -36,6 +36,10 @@ PlayGuard は Atmosphère が動いていることを確認しますが、その
 
 ゲームの上から起動する（タイトルオーバーライド）のがおすすめです。アプリは、アプリケーション（ゲームの上から、または HOME メニューにある専用のフォワーダーから）として動いているか、アプレット（アルバム）として動いているかを表示します。ゲームの上から起動すると、本体は PlayGuard の時間をそのゲームの時間として数えます。プレイ記録では、起動時に選んだユーザーの時間になります。子どもではなく、保護者のユーザーで開いてください。タイマーは本体のもので、すべてのユーザーに共通です。誰が PlayGuard を開いても、その時間は数えられます。ただし、タイマーがオフの場合や、暗証番号でみまもり設定が一時停止している場合を除きます（[詳細](features.md#playguard-を使っている間は暗証番号でみまもり設定を一時停止)）。
 
+### HOME メニューの置き換え
+
+ゲームを始める前に本体の制限を確かめるのは HOME メニューです。そのため、置き換えの HOME メニューも同じことをする必要があります。[SwitchU](https://github.com/PoloNX/SwitchU) はバージョン 1.4.2 から対応しています。作者が PlayGuard で試しており、プレイ時間の制限、起動と再開の制限、保護者の PIN による一時解除、時間切れのロックを守ります。ほかの置き換えメニューは試されていません（[報告をお待ちしています](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)）。
+
 ### Nintendo Switch 2
 
 対応していません。Switch 2 用の Atmosphère はありません。
@@ -50,7 +54,7 @@ PlayGuard は Atmosphère が動いていることを確認しますが、その
 
 ### 本体が BAN される可能性は？
 
-PlayGuard は Nintendo に接続しません。オンラインでアクセスするのは、公開時刻サーバー、GitHub（アップデートと、送信したレポート）、switchbrew（最新のファームウェアとそのリリースノート）だけです。本体が BAN される原因は、カスタムファームウェアや emuMMC が Nintendo に接続することです（[switchbrew の FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)、英語）。みまもり設定や時計の変更による BAN は報告されていませんが、保証ではありません。
+PlayGuard は Nintendo に接続しません。オンラインでアクセスするのは、公開時刻サーバー、GitHub（アップデートと、送信したレポート）、switchbrew（最新のファームウェアとそのリリースノート）、Homebrew App Store の CDN `switch.cdn.fortheusers.org`（そこで配布されている PlayGuard のバージョン）だけです。本体が BAN される原因は、カスタムファームウェアや emuMMC が Nintendo に接続することです（[switchbrew の FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)、英語）。みまもり設定や時計の変更による BAN は報告されていませんが、保証ではありません。
 
 ### インターネットのない本体
 
