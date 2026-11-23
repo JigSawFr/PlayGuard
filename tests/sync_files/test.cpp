@@ -341,6 +341,13 @@ static void test_link()
     std::string text;
     CHECK(!paths::read_file(sync_files::link_file(), text));   // nothing made from sync.conf
     CHECK(paths::read_file(sync_files::conf_file(), text) && text == before);   // and left as it is
+    // The next save leaves nothing of them: not kept as unknown keys, the rest is.
+    CHECK(sync_files::save(c));
+    CHECK(paths::read_file(sync_files::conf_file(), text));
+    CHECK(text.find("\nhost=") == std::string::npos && text.find("console_id") == std::string::npos && text.find("\nport=") == std::string::npos);
+    CHECK(text.find("enabled=") == std::string::npos && text.find("policy=auto\n") != std::string::npos && text.find("old_key=1\n") != std::string::npos);
+    std::remove(sync_files::link_file().c_str());
+    CHECK(paths::atomic_write(sync_files::conf_file(), before));
 
     // link.conf there (another homebrew set it first): the one read.
     CHECK(paths::atomic_write(sync_files::link_file(), "schema=1\nenabled=1\nhost=new.lan\nport=8883\ntls=1\nother_key=1\n"));

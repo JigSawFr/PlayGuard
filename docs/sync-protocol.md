@@ -723,8 +723,8 @@ PlayGuard or the agent; nor is one with more unknown lines than fit (1 KB of
 them). Anonymous brokers need
 `allow_anonymous=1`; without a user name the link otherwise stays off.
 The broker's keys live in `link.conf` alone. A broker key left in a
-`sync.conf` from before is an unknown key: not read, kept like any other when
-PlayGuard writes the file again.
+`sync.conf` from before is not read, and PlayGuard's next save of the file
+leaves it out.
 
 A `schema=1` file (an earlier version's) is read the same way: the prefix
 it published under is taken to be the old default `playguard`, kept as
