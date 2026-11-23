@@ -21,7 +21,7 @@ Assistant is the easy path.
 - Home Assistant **2026.5 or later** (the bedtime's `time` entities: an older
   one refuses the whole device), with the **MQTT** integration set up, and a broker: the
   **Mosquitto broker** app (Settings › Apps; an add-on in older Home Assistant) or any other MQTT broker,
-  in version 5.0 or 3.1.1 (EMQX, HiveMQ, NanoMQ, VerneMQ …): *Remote access ›
+  in version 5.0 or 3.1.1 (EMQX, HiveMQ, NanoMQ, VerneMQ …): *Broker settings ›
   MQTT version* is automatic (5.0, else 3.1.1).
 - A broker user for PlayGuard. With the Mosquitto app, any Home Assistant
   user can log in: create one named `playguard` (Settings › People › Users,
@@ -32,18 +32,21 @@ Assistant is the easy path.
 
 ## Set it up on the console
 
-1. Open PlayGuard › **Console › Remote access › MQTT / Home Assistant**.
+1. Open PlayGuard › **Console › Remote access › Broker settings**: the
+   screen is shared with the other Boréale homebrews, which read the same
+   settings.
 2. **Broker address**: the IP address or name of the machine running the
-   broker (Home Assistant's, for the app). **Port**: 1883 (8883 for TLS,
-   which turns *Encrypted connection* on).
-3. **User name** and **Password**: the broker user created above. A broker
-   that accepts anonymous clients: *User name › None*.
-4. **Name in Home Assistant**: the device's name (*Living room*, *Léa's
-   Switch* …). Left empty, it is the console's nickname (System Settings ›
-   System › Console Nickname), or *Nintendo Switch* when *Publish the
-   versions and hardware* is off.
-5. Turn **Remote link** on. The console gets a random id (8 characters, never
-   the serial number), and **Status** reads *Online* within a few seconds.
+   broker (Home Assistant's, for the app). **Port**: 1883 (8883 for TLS:
+   turn *Secure connection (TLS)* on too).
+3. **User** and **Password**: the broker user created above. A broker
+   that accepts anonymous clients: *User › Connect without a user name*.
+4. **Console name**: the device's name in Home Assistant (*Living room*,
+   *Léa's Switch* …). Left empty, it is the console's nickname (System
+   Settings › System › Console Nickname), or *Nintendo Switch* when
+   *Publish the versions and hardware* is off.
+5. Turn **Connect to the broker** on. The console gets a random id (8
+   characters, never the serial number), and **Status** (back on *Remote
+   access*) reads *Online* within a few seconds.
 
 Changing any of these asks for the PIN when *Security › Protect PlayGuard with the PIN* is
 set to *Before a change*: the link can change the console.
@@ -310,7 +313,7 @@ Entity ids depend on the console's name; check them on the device's page.
   PlayGuard's own in `sd:/config/playguard/sync.conf`, in plain text. Neither
   file is ever in a diagnostic report or an online upload; the report's *Remote link* section only has the switches and the
   counters.
-- **TLS**: port 8883 and *Encrypted connection*. The console checks the
+- **TLS**: port 8883 and *Secure connection (TLS)*. The console checks the
   broker's certificate against its own certificate store; for a private
   certificate authority, put its PEM file on the SD card and set
   `ca_file=/config/playguard/sync/ca.pem` in `link.conf`. TLS has not been
@@ -329,12 +332,12 @@ Entity ids depend on the console's name; check them on the device's page.
 
 | Status | What to check |
 |---|---|
-| *Incomplete: the broker's address is missing* | Fill in *Broker address*. |
+| *Incomplete: the broker's address is missing* | Fill in *Broker address* (*Remote access › Broker settings*). |
 | *Not connected: cannot find …* | The name does not resolve: use the IP address. |
 | *Not connected: connect: Connection refused* / *no answer from the broker* | Wrong address or port, the broker is stopped, or a firewall is in the way. |
 | *Not connected: the broker refused the connection: bad user name or password* | The user name or password. |
 | *Not connected: the broker refused a subscription* | The user's access list (above). |
-| *Not connected: the broker does not speak this MQTT version* | *MQTT version* is set to one the broker does not take: set it back to *Automatic*. |
+| *Not connected: the broker does not speak this MQTT version* | *Broker settings › MQTT version* is set to one the broker does not take: set it back to *Automatic*. |
 | *Not connected: the broker does not keep retained messages* | The broker (5.0) says it does not keep them; the link needs them: turn them on in its settings. |
 
 The console retries on its own: after 5 seconds, then twice as long each time,

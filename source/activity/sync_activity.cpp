@@ -11,6 +11,7 @@
 #include "action/ha_update_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
+#include "activity/link_conf_activity.hpp"
 #include "bl_net.h"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
@@ -25,28 +26,10 @@ using namespace aurore::literals;
 namespace
 {
 const SyncPolicy POLICIES[] = { SyncPolicy_Ask, SyncPolicy_Auto, SyncPolicy_Off };
-const SyncMqttVersion VERSIONS[] = { SyncMqtt_Auto, SyncMqtt_V5, SyncMqtt_V311 };
 
 std::string policy_text(SyncPolicy p)
 {
     return aurore::getStr(std::string("playguard/sync/policies/") + sync_policy_name(p));
-}
-
-std::string version_text(SyncMqttVersion v)
-{
-    static const char* const KEYS[] = { "auto", "v5", "v311" };
-    return aurore::getStr(std::string("playguard/sync/mqtt_versions/") + KEYS[v <= SyncMqtt_V311 ? v : 0]);
-}
-
-template <size_t N>
-void set_text(char (&field)[N], const std::string& value)
-{
-    std::snprintf(field, N, "%s", value.c_str());
-}
-
-std::string or_none(const char* value)
-{
-    return value[0] ? std::string(value) : "playguard/sync/none"_i18n;
 }
 
 // When `then_ms` (the link's clock) was: "14:03" today, else the date and
@@ -78,6 +61,12 @@ std::string problem_text(const SyncConf& c)
 
 void SyncActivity::onResume()
 {
+    if (this->broker_opened) {
+        // Back from the broker's screen: its settings may have changed.
+        this->broker_opened = false;
+        this->conf = sync_files::load();
+        this->refresh();
+    }
     ui::keep_focus(this);   // after a dialog whose opener went (ui.hpp)
 }
 
@@ -88,111 +77,12 @@ void SyncActivity::onContentAvailable()
     published_note->setSingleLine(false);
     this->conf = sync_files::load();
 
-    enabled->init("playguard/sync/enabled"_i18n, conf.enabled, [this](bool on) {
-        SyncConf next = this->conf;
-        next.enabled = on;
-        if (on) {
-            uint8_t random[4] = { 0, 0, 0, 0 };
-            if (!platform_random(random, sizeof(random))) {
-                ui::error("playguard/sync/no_random"_i18n);
-                enabled->setOn(false, false);
-                return;
-            }
-            sync_files::ensure_id(next, random);
-        }
-        if (!this->commit(next)) enabled->setOn(this->conf.enabled, false);
-    });
-
-    host->registerClickAction([this](aurore::View*) {
-        ui::prompt_text("playguard/sync/host_prompt"_i18n, conf.host, SYNC_HOST_MAX - 1, [this](std::string text) {
-            SyncConf next = this->conf;
-            set_text(next.host, text);
-            this->commit(next);
-        });
-        return true;
-    });
-
-    port->registerClickAction([this](aurore::View*) {
-        ui::prompt_text("playguard/sync/port_prompt"_i18n, std::to_string(conf.port), 5, [this](std::string text) {
-            uint32_t value = 0;
-            if (!bl_parse_uint(text.c_str(), 1, 65535, &value)) {
-                ui::error("playguard/sync/port_invalid"_i18n);
-                return;
-            }
-            SyncConf next = this->conf;
-            // 8883 is MQTT over TLS by convention.
-            if (value == 8883 && next.port != 8883) next.tls = true;
-            next.port = (uint16_t)value;
-            this->commit(next);
-        });
-        return true;
-    });
-
-    tls->init("playguard/sync/tls"_i18n, conf.tls, [this](bool on) {
-        SyncConf next = this->conf;
-        next.tls = on;
-        if (!this->commit(next)) tls->setOn(this->conf.tls, false);
-    });
-
-    mqtt_version->registerClickAction([this](aurore::View*) {
-        std::vector<std::string> labels;
-        int selected = 0;
-        for (size_t i = 0; i < 3; i++) {
-            labels.push_back(version_text(VERSIONS[i]));
-            if (VERSIONS[i] == conf.mqtt_version) selected = (int)i;
-        }
-        ui::pick("playguard/sync/mqtt_version"_i18n, labels, selected, [this](int index) {
-            SyncConf next = this->conf;
-            next.mqtt_version = VERSIONS[index];
-            this->commit(next);
-        });
-        return true;
-    });
-
-    user->registerClickAction([this](aurore::View*) {
-        const std::vector<std::string> options = { "playguard/sync/user_enter"_i18n, "playguard/sync/user_anonymous"_i18n };
-        ui::pick("playguard/sync/user"_i18n, options, 0, [this](int index) {
-            if (index == 1) {
-                SyncConf next = this->conf;
-                next.username[0] = '\0';
-                next.password[0] = '\0';
-                next.allow_anonymous = true;
-                this->commit(next);
-                return;
-            }
-            ui::prompt_text("playguard/sync/user_prompt"_i18n, conf.username, SYNC_USER_MAX - 1, [this](std::string text) {
-                SyncConf next = this->conf;
-                set_text(next.username, text);
-                this->commit(next);
-            });
-        });
-        return true;
-    });
-
-    password->registerClickAction([this](aurore::View*) {
-        const std::vector<std::string> options = { "playguard/sync/password_enter"_i18n, "playguard/sync/password_none"_i18n };
-        ui::pick("playguard/sync/password"_i18n, options, 0, [this](int index) {
-            if (index == 1) {
-                SyncConf next = this->conf;
-                next.password[0] = '\0';
-                this->commit(next);
-                return;
-            }
-            ui::prompt_text("playguard/sync/password_prompt"_i18n, "", SYNC_PASS_MAX - 1, [this](std::string text) {
-                SyncConf next = this->conf;
-                set_text(next.password, text);
-                this->commit(next);
-            });
-        });
-        return true;
-    });
-
-    name->registerClickAction([this](aurore::View*) {
-        ui::prompt_text("playguard/sync/name_prompt"_i18n, conf.console_name, SYNC_NAME_MAX - 1, [this](std::string text) {
-            SyncConf next = this->conf;
-            set_text(next.console_name, text);
-            this->commit(next);
-        });
+    broker->registerClickAction([this](aurore::View*) {
+        // The screen is the kit's, shared with the other Boréale homebrews;
+        // the PIN and what follows a change are PlayGuard's, through its hooks.
+        SyncActivity::install_broker_hooks();
+        this->broker_opened = true;
+        aurore::Application::pushActivity(new LinkConfActivity());
         return true;
     });
 
@@ -353,19 +243,49 @@ bool SyncActivity::commit(SyncConf next)
     return true;
 }
 
+void SyncActivity::install_broker_hooks()
+{
+    static bool done = false;
+    if (done) return;
+    done = true;
+    LinkConfActivity::Hooks& h = LinkConfActivity::hooks();
+    // The link can change the console: the same PIN as a console change.
+    h.allowed = []() {
+        if (pin_lock::allow_change()) return true;
+        ui::notify(pin_lock::refusal_text());
+        return false;
+    };
+    // The broker's settings were saved: the console gets its id once the link
+    // is on, then the link (and the agent) read the settings again.
+    h.changed = []() {
+        uint8_t random[4] = { 0, 0, 0, 0 };
+        const bool have_random = platform_random(random, sizeof(random));
+        ui::write_later("sync.conf", [random, have_random]() {
+            SyncConf c = sync_files::load();
+            std::string error;
+            const bool needs_id = c.enabled && !sync_conf_id_valid(c.console_id);
+            const bool no_random = needs_id && !have_random;
+            bool failed = false;
+            if (needs_id && have_random) {
+                sync_files::ensure_id(c, random);
+                failed = !sync_files::save(c, &error);
+            }
+            aurore::sync([no_random, failed, error]() {
+                if (no_random) ui::error("playguard/sync/no_random"_i18n);
+                else if (failed) ui::error("playguard/sync/save_err"_i18n + " — " + error);
+                sync_files::export_nro_state();
+                sync_flow::reload();
+            });
+        }, "sync.conf");
+    };
+}
+
 void SyncActivity::refresh()
 {
     intro->setText(aurore::getStr("playguard/sync/intro", sync_files::link_file(), sync_files::conf_file()));
-    enabled->setOn(conf.enabled, false);
-    host->setDetailText(or_none(conf.host));
-    port->setDetailText(std::to_string(conf.port));
-    tls->setOn(conf.tls, false);
-    mqtt_version->setDetailText(version_text(conf.mqtt_version));
-    user->setDetailText(conf.username[0] ? std::string(conf.username)
-                                         : conf.allow_anonymous ? "playguard/sync/anonymous"_i18n
-                                                                : "playguard/sync/none"_i18n);
-    password->setDetailText(conf.password[0] ? "playguard/sync/password_set"_i18n : "playguard/sync/none"_i18n);
-    name->setDetailText(conf.console_name[0] ? std::string(conf.console_name) : "playguard/sync/name_default"_i18n);
+    const char* color = nullptr;
+    broker->setDetailText(LinkConfActivity::summary(&color));
+    broker->detail->setThemeColor("textColor", color);
     policy->setDetailText(policy_text(conf.policy));
     timer->setOn(conf.remote_timer_writes, false);
     discovery->setOn(conf.ha_discovery, false);

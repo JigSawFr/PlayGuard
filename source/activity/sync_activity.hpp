@@ -1,6 +1,7 @@
-// SyncActivity — Console › Remote access: the remote link's settings
-// (sync.conf: the MQTT broker, the console's name, what orders from Home
-// Assistant may do), its live status, "Sync now" and its log. Every change
+// SyncActivity — Console › Remote access: the remote link's settings that are
+// PlayGuard's (sync.conf: what orders from Home Assistant may do, what is
+// published; the broker's, link.conf, are boreale-kit's screen, opened from
+// here), its live status, "Sync now" and its log. Every change
 // of a setting goes through the PIN check of a console change (Security ›
 // Protect PlayGuard with the PIN): the link can change the console.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -20,6 +21,10 @@ class SyncActivity : public aurore::Activity
   public:
     CONTENT_FROM_XML_RES("activity/sync.xml");
 
+    // What the kit's broker screen asks of PlayGuard (PIN, the console's id,
+    // the link read again); set once, before the screen opens.
+    static void install_broker_hooks();
+
     void onContentAvailable() override;
     void onResume() override;
     ~SyncActivity() override;
@@ -31,6 +36,7 @@ class SyncActivity : public aurore::Activity
     ui::Alive alive = ui::make_alive();
     aurore::RepeatingTimer status_timer;
     std::string status_line;   // what the status cell says
+    bool broker_opened = false;   // the kit's broker screen was opened from here
 
     void refresh();
     void refresh_status();
@@ -48,14 +54,7 @@ class SyncActivity : public aurore::Activity
     std::vector<Published> published();
 
     AURORE_BIND(aurore::Label,       intro,     "sy_intro");
-    AURORE_BIND(aurore::BooleanCell, enabled,   "sy_enabled");
-    AURORE_BIND(aurore::DetailCell,  host,      "sy_host");
-    AURORE_BIND(aurore::DetailCell,  port,      "sy_port");
-    AURORE_BIND(aurore::BooleanCell, tls,       "sy_tls");
-    AURORE_BIND(aurore::DetailCell,  mqtt_version, "sy_mqtt_version");
-    AURORE_BIND(aurore::DetailCell,  user,      "sy_user");
-    AURORE_BIND(aurore::DetailCell,  password,  "sy_password");
-    AURORE_BIND(aurore::DetailCell,  name,      "sy_name");
+    AURORE_BIND(aurore::DetailCell,  broker,    "sy_broker");
     AURORE_BIND(aurore::DetailCell,  policy,    "sy_policy");
     AURORE_BIND(aurore::BooleanCell, timer,     "sy_timer");
     AURORE_BIND(aurore::DetailCell,  ha_install, "sy_ha_install");

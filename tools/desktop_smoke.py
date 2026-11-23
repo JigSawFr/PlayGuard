@@ -1764,6 +1764,12 @@ if SYNC:
     shot("02_console_tools")
     key("Return")
     shot("03_remote_access")   # the link online
+    # The broker's settings are boreale-kit's screen (link.conf): the same host and port
+    # the link runs on, and back to Remote access.
+    go_to("Broker settings")
+    key("Return")
+    shot("03_broker")
+    key("Escape")
     # Home Assistant › Install the integration: the two QR codes (Marketplace, add the console).
     go_to("Install the Home Assistant integration")
     key("Return")
