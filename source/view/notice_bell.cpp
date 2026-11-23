@@ -52,21 +52,21 @@ void NoticeBell::update()
 {
     // Everything listed counts, to do or for information (the parent marks
     // the latter as read); the disc is amber while something is to do.
-    const int total = notices::bell_count();
+    const int listed = notices::bell_count();
     const int to_do = notices::action_count() + notices::others_count();
     // Something new rings the bell once; a number that changed pops (not the
     // first reading: the bell is drawn as it is).
     if (this->counted && effects::motion()) {
-        if (total > this->total) this->swing_since = motion::now();
-        if (total != this->total) this->pop_since = motion::now();
+        if (listed > this->total) this->swing_since = motion::now();
+        if (listed != this->total) this->pop_since = motion::now();
     }
-    this->total   = total;
+    this->total   = listed;
     this->actions = to_do;
     this->counted = true;
-    if (total > 9) {
+    if (listed > 9) {
         std::memcpy(this->label, "9+", 3);
     } else {
-        const auto end = std::to_chars(this->label, this->label + sizeof(this->label) - 1, total < 0 ? 0 : total).ptr;
+        const auto end = std::to_chars(this->label, this->label + sizeof(this->label) - 1, listed < 0 ? 0 : listed).ptr;
         *end = '\0';
     }
 }
