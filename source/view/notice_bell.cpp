@@ -50,21 +50,23 @@ aurore::View* NoticeBell::hitTest(aurore::Point point)
 
 void NoticeBell::update()
 {
+    // Everything listed counts, to do or for information (the parent marks
+    // the latter as read); the disc is amber while something is to do.
+    const int total = notices::bell_count();
     const int to_do = notices::action_count() + notices::others_count();
-    const int said  = notices::info_count();
-    // Something new to do rings the bell once; a number that changed pops
-    // (not the first reading: the bell is drawn as it is).
+    // Something new rings the bell once; a number that changed pops (not the
+    // first reading: the bell is drawn as it is).
     if (this->counted && effects::motion()) {
-        if (to_do > this->actions) this->swing_since = motion::now();
-        if (to_do != this->actions || (to_do == 0 && (said > 0) != (this->infos > 0))) this->pop_since = motion::now();
+        if (total > this->total) this->swing_since = motion::now();
+        if (total != this->total) this->pop_since = motion::now();
     }
+    this->total   = total;
     this->actions = to_do;
-    this->infos   = said;
     this->counted = true;
-    if (to_do > 9) {
+    if (total > 9) {
         std::memcpy(this->label, "9+", 3);
     } else {
-        const auto end = std::to_chars(this->label, this->label + sizeof(this->label) - 1, to_do < 0 ? 0 : to_do).ptr;
+        const auto end = std::to_chars(this->label, this->label + sizeof(this->label) - 1, total < 0 ? 0 : total).ptr;
         *end = '\0';
     }
 }
@@ -76,7 +78,7 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
     (void)ctx;
     // The bell: a dome over a flared rim, and the clapper under it, in the
     // header's text colour (the notes' grey while nothing is there).
-    const NVGcolor ink = this->actions || this->infos ? cadran::kit::color("cadran/text") : cadran::kit::color("cadran/text3");
+    const NVGcolor ink = this->total > 0 ? cadran::kit::color("cadran/text") : cadran::kit::color("cadran/text3");
     const float cx = x + width * 0.42f, top = y + height * 0.14f;
     const float w = width * 0.62f, h = height * 0.6f;
     // Swinging: the bell turns about its crown, less and less.
@@ -106,8 +108,8 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
     nvgFill(vg);
     nvgRestore(vg);
 
-    // What it holds: the number to do on an amber disc, else a dot for
-    // information alone. A changed number pops in.
+    // What it holds: the number of entries on a disc, amber while one is
+    // to do, grey for information alone. A changed number pops in.
     const float bx = x + width * 0.76f, by = y + height * 0.24f;
     nvgSave(vg);
     if (this->pop_since) {
@@ -121,22 +123,17 @@ void NoticeBell::draw(NVGcontext* vg, float x, float y, float width, float heigh
             nvgTranslate(vg, -bx, -by);
         }
     }
-    if (this->actions > 0) {
+    if (this->total > 0) {
         const float r = height * 0.24f;
         nvgBeginPath(vg);
         nvgCircle(vg, bx, by, r);
-        nvgFillColor(vg, cadran::kit::color("cadran/amber"));
+        nvgFillColor(vg, cadran::kit::color(this->actions > 0 ? "cadran/amber" : "cadran/text3"));
         nvgFill(vg);
         nvgFontFaceId(vg, aurore::Application::getDefaultFont());
         nvgFontSize(vg, r * 1.45f);
         nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
         nvgFillColor(vg, aurore::Application::getTheme()["aurore/background"]);
         nvgText(vg, bx, by + r * 0.06f, this->label, nullptr);
-    } else if (this->infos > 0) {
-        nvgBeginPath(vg);
-        nvgCircle(vg, bx, by, height * 0.12f);
-        nvgFillColor(vg, cadran::kit::color("cadran/text3"));
-        nvgFill(vg);
     }
     nvgRestore(vg);
 }

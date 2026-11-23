@@ -60,7 +60,7 @@ L'apparence de PlayGuard s'appelle Cadran : une barre d'icônes pour les onglets
 
 ## Notifications — ce qui demande votre attention, depuis n'importe quel onglet
 
-Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet (le badge de la cloche indique *2* quand deux choses sont à faire).
+Une cloche dans l'en-tête, à gauche de la version, regroupe ce qui demande l'intervention du parent ; Ⓨ ouvre la liste depuis n'importe quel onglet. Son badge compte toutes les entrées de la liste, à faire ou pour information (*5* pour deux choses à faire et trois versions plus récentes) : orange tant qu'une est à faire, gris quand il n'y a que de l'information. Marquer une entrée comme lue, ou en ignorer une, la retire du compte..
 
 À gauche de la cloche, la langue (son code, *FR*, *EN*…) et le thème (un soleil pour clair, une lune pour sombre, un cercle à moitié plein quand il suit la console), puis la taille du texte (**AA**, son grand A en turquoise quand le texte est agrandi) : un appui ouvre la même liste que dans *Préférences*, et **−** les propose depuis n'importe quel onglet. Un nouveau thème ou une nouvelle palette prend effet tout de suite sur chaque écran, sans rien refaire ; une nouvelle langue aussi, chaque écran refait sur le même onglet avec la sélection sur la même ligne, chinois et sa police compris. La liste des thèmes finit par la palette ([plus bas](#préférences)).
 
@@ -79,7 +79,7 @@ Chacune avec un triangle orange, comptée en orange sur la cloche ; elle reste j
 
 ### Pour information
 
-Chacune avec un « i », un point sur la cloche ; elle peut être marquée comme lue :
+Chacune avec un « i », comptée sur la cloche ; elle peut être marquée comme lue :
 
 - une limite encore abaissée par *Arrêter le jeu pour aujourd'hui* un jour précédent (*Remettre*) ;
 - une nouvelle version installée (*Nouveautés* ; après une mise à jour sur place, la version précédente gardée), ou une nouvelle version de PlayGuard ;
@@ -93,7 +93,7 @@ Chacune avec un « i », un point sur la cloche ; elle peut être marquée comme
 
 ### Console
 
-Les entrées qui concernent la console plutôt que le contrôle parental viennent en dernier, sur une ligne que Ⓐ ouvre (ouverte d'emblée quand il n'y a rien d'autre). Celles à faire sont comptées sur la pastille de l'onglet Console, pas sur la cloche :
+Les entrées qui concernent la console plutôt que le contrôle parental viennent en dernier, sur une ligne que Ⓐ ouvre (ouverte d'emblée quand il n'y a rien d'autre). Elles sont comptées sur la cloche comme les autres (la pastille de l'onglet Console ne compte que celles à faire) :
 
 - des jeux installés qui ne peuvent pas démarrer (*Vérifier les jeux installés*), des patchs de jeux à vérifier ;
 - la carte SD presque pleine (moins de 500 Mo) ;

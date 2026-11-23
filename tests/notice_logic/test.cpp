@@ -50,6 +50,10 @@ static void test_groups()
     CHECK(v[0].id == "clock" && v[1].id == "week" && v[2].id == "games" && v[3].id == "sys_firmware");
     // The bell counts the parental controls' to do, console_count the console's.
     CHECK(s.action_count() == 1 && s.info_count() == 1 && s.console_count() == 1);
+    // unread_count (the bell's number) counts every entry listed, either group
+    // and either level; marking one as read or ignoring one takes it off.
+    CHECK(s.unread_count() == 4);
+    CHECK(s.dismiss("sys_firmware") && s.unread_count() == 3);
 }
 
 static void test_tabs()
