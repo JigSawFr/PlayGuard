@@ -934,6 +934,7 @@
         "state_elsewhere": "Создан другой программой",
         "pick_title": "Выберите homebrew-программу",
         "pick_none": "В папке /switch на SD-карте не найдено homebrew-программ.",
+        "pick_on_home": "Уже в меню HOME",
         "name": "Название в меню HOME",
         "author": "Издатель",
         "confirm_add": "Поместить {} в меню HOME? Значок берётся из {}.",

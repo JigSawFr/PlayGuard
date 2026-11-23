@@ -934,6 +934,7 @@
         "state_elsewhere": "由其他应用创建",
         "pick_title": "选择Homebrew",
         "pick_none": "SD卡的/switch文件夹中没有找到Homebrew。",
+        "pick_on_home": "已在 HOME 菜单",
         "name": "HOME菜单上的名称",
         "author": "发行商",
         "confirm_add": "将{}放到HOME菜单上？图标来自{}。",

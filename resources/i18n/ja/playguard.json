@@ -934,6 +934,7 @@
         "state_elsewhere": "ほかのアプリで作成",
         "pick_title": "Homebrewを選ぶ",
         "pick_none": "SDカードの/switchフォルダにHomebrewが見つかりませんでした。",
+        "pick_on_home": "HOMEに追加済み",
         "name": "HOMEメニューでの名前",
         "author": "発売元",
         "confirm_add": "{}をHOMEメニューに置きますか？ アイコンは{}のものです。",

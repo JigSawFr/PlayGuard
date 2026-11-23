@@ -451,6 +451,12 @@ static void test_merge()
     CHECK(file_title("sdmc:/switch/ftpd/ftpd.nro") == "ftpd");
     CHECK(file_title("x.NRO") == "x");
     CHECK(file_title("sdmc:/a/b.txt") == "b.txt");
+    CHECK(folder_of("/switch/Checkpoint/Checkpoint.nro") == "/switch/Checkpoint");
+    CHECK(folder_of("/switch/haze.nro") == "/switch");
+    CHECK(folder_of("/hbmenu.nro") == "/");
+    CHECK(pick_detail("Bob", "1.2", "/switch/x/x.nro", "") == "Bob \u00b7 v1.2 \u00b7 /switch/x");
+    CHECK(pick_detail("", "v3", "/switch/x.nro", "Done") == "v3 \u00b7 /switch \u00b7 Done");
+    CHECK(pick_detail("", "", "/switch/x.nro", "") == "/switch");
     CHECK(default_name("  Goldleaf ", "sdmc:/switch/Goldleaf.nro") == "Goldleaf");
     CHECK(default_name("", "sdmc:/switch/hb/hb-menu.nro") == "hb-menu");
     CHECK(default_name(std::string(100, 'n'), "x").size() == forwarders::MAX_NAME);

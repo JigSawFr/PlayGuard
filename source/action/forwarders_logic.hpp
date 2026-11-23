@@ -71,6 +71,16 @@ const Row* self_row(const std::vector<Row>& rows);
 // "sdmc:/switch/ftpd/ftpd.nro").
 std::string file_title(const std::string& path);
 
+// The folder a homebrew sits in, for a list: "/switch/Checkpoint" for
+// "/switch/Checkpoint/Checkpoint.nro"; "/switch" for one at the root of it.
+std::string folder_of(const std::string& path);
+
+// A line saying more about a homebrew in a list: its author, its version
+// and its folder, those it has, joined by " · "; `on_home` appended as
+// `on_home_text` (what says a forwarder already exists for it).
+std::string pick_detail(const std::string& author, const std::string& version, const std::string& path,
+                        const std::string& on_home_text);
+
 // The name a new forwarder gets: the .nro's own (its NACP), else its file
 // name; cut to forwarders::MAX_NAME.
 std::string default_name(const std::string& nacp_name, const std::string& path);

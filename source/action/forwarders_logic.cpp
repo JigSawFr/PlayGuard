@@ -121,6 +121,29 @@ std::string file_title(const std::string& path)
     return name;
 }
 
+std::string folder_of(const std::string& path)
+{
+    const size_t slash = path.find_last_of('/');
+    if (slash == std::string::npos || slash == 0) return "/";
+    return path.substr(0, slash);
+}
+
+std::string pick_detail(const std::string& author, const std::string& version, const std::string& path,
+                        const std::string& on_home_text)
+{
+    std::string out;
+    const auto add = [&out](const std::string& part) {
+        if (part.empty()) return;
+        if (!out.empty()) out += " \u00b7 ";
+        out += part;
+    };
+    add(author);
+    add(version.empty() || version[0] == 'v' || version[0] == 'V' ? version : "v" + version);
+    add(folder_of(path));
+    add(on_home_text);
+    return out;
+}
+
 std::string default_name(const std::string& nacp_name, const std::string& path)
 {
     const std::string name = forwarders::clean_text(nacp_name, forwarders::MAX_NAME);
