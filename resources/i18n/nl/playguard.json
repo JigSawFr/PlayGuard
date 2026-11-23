@@ -1539,6 +1539,18 @@
         "amiibo": "amiibo-instellingen",
         "maintenance": "Onderhoudsmodus"
     },
+    "log": {
+        "note": "Nieuwste eerst. Een oranje regel is een stop van de lus van de agent.",
+        "kind": "Soort",
+        "shown_count": "{}: {} regels",
+        "none_shown": "Geen regel van dit soort.",
+        "filters": {
+            "0": "Alles",
+            "1": "App",
+            "2": "Verbinding op afstand",
+            "3": "Lus"
+        }
+    },
     "sync": {
         "title": "Toegang op afstand",
         "intro": "Verbindt deze console met een MQTT-broker (de Mosquitto-app van Home Assistant, of een andere): Home Assistant toont dan de status en speeltijd ervan, en kan er opdrachten naartoe sturen. De verbinding werkt terwijl PlayGuard open is, of altijd met de optionele agent (Console › Optionele modules). De instellingen van de broker worden bewaard in {}, de rest in {}.",

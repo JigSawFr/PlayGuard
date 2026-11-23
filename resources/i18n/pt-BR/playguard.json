@@ -1539,6 +1539,18 @@
         "amiibo": "Configurações de amiibo",
         "maintenance": "Modo de manutenção"
     },
+    "log": {
+        "note": "As mais recentes primeiro. Uma linha âmbar é uma parada do loop do agente.",
+        "kind": "Tipo",
+        "shown_count": "{}: {} linhas",
+        "none_shown": "Nenhuma linha deste tipo.",
+        "filters": {
+            "0": "Tudo",
+            "1": "App",
+            "2": "Conexão remota",
+            "3": "Loop"
+        }
+    },
     "sync": {
         "title": "Acesso remoto",
         "intro": "Conecta este console a um broker MQTT (o app Mosquitto do Home Assistant, ou qualquer outro): o Home Assistant passa a mostrar o estado e o tempo de jogo dele, e pode enviar ordens a ele. A conexão funciona enquanto o PlayGuard está aberto, ou o tempo todo com o agente opcional (Console › Módulos opcionais). As configurações do broker ficam salvas em {}, o restante em {}.",

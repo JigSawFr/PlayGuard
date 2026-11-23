@@ -12,6 +12,7 @@
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
 #include "activity/link_conf_activity.hpp"
+#include "activity/log_activity.hpp"
 #include "bl_net.h"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
@@ -183,11 +184,7 @@ void SyncActivity::onContentAvailable()
     });
 
     log->registerClickAction([](aurore::View*) {
-        const auto lines = sync_flow::log_lines();
-        std::string text;
-        // The newest at the top; a dialog only holds so much.
-        for (size_t i = lines.size(); i > 0 && lines.size() - i < 20; i--) text += lines[i - 1] + "\n";
-        ui::info(text.empty() ? "playguard/sync/log_empty"_i18n : text);
+        aurore::Application::pushActivity(new LogActivity());
         return true;
     });
 

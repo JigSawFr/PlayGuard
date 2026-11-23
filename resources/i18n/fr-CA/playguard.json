@@ -1539,6 +1539,18 @@
         "amiibo": "Paramètres amiibo",
         "maintenance": "Mode maintenance"
     },
+    "log": {
+        "note": "Les plus récentes en haut. Une ligne ambre est un arrêt de la boucle de l'agent.",
+        "kind": "Type",
+        "shown_count": "{} : {} lignes",
+        "none_shown": "Aucune ligne de ce type.",
+        "filters": {
+            "0": "Tout",
+            "1": "Application",
+            "2": "Lien distant",
+            "3": "Boucle"
+        }
+    },
     "sync": {
         "title": "Accès à distance",
         "intro": "Relie cette console à un broker MQTT (l'application Mosquitto de Home Assistant, ou un autre) : Home Assistant affiche alors son état et son temps de jeu, et peut lui envoyer des ordres. Le lien fonctionne tant que PlayGuard est ouvert, ou en permanence avec l'agent facultatif (Console › Modules facultatifs). Les réglages du broker sont gardés dans {}, le reste dans {}.",

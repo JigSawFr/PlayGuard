@@ -1539,6 +1539,18 @@
         "amiibo": "amiibo settings",
         "maintenance": "Maintenance Mode"
     },
+    "log": {
+        "note": "Newest first. A line in amber is a stop of the agent's loop.",
+        "kind": "Type",
+        "shown_count": "{}: {} lines",
+        "none_shown": "No line of this kind.",
+        "filters": {
+            "0": "All",
+            "1": "App",
+            "2": "Remote link",
+            "3": "Loop"
+        }
+    },
     "sync": {
         "title": "Remote access",
         "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the optional agent (Console › Optional modules). The broker's settings are kept in {}, the rest in {}.",

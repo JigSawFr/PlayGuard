@@ -350,8 +350,10 @@ la page de l'appareil.
 
 ## Quand la connexion échoue
 
-*Accès à distance › État* dit pourquoi, et *Journal* montre les dernières
-lignes (en anglais) :
+*Accès à distance › État* dit pourquoi, et *Journal* ouvre un écran avec les dernières
+lignes (en anglais), les plus récentes en haut (chacune avec son heure ; filtre par
+application, lien ou boucle ; une ligne ambre est un arrêt de la boucle de l'agent ;
+export sur la carte SD) :
 
 | État | À vérifier |
 |---|---|
