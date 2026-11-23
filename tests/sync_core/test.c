@@ -1516,7 +1516,9 @@ static void put_file(const char *root, const char *rel, const char *text)
     snprintf(path, sizeof(path), "%s/%s", root, rel);
     snprintf(cmd, sizeof(cmd), "mkdir -p \"$(dirname '%s')\"", path);
     CHECK(system(cmd) == 0);
-    FILE *f = fopen(path, "wb");
+    // Owner-only, like every file the program itself writes.
+    int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
     if (!CHECK(f)) return;
     fputs(text, f);
     fclose(f);

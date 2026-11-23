@@ -4,6 +4,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include "check.h"
 #include <stdio.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -55,7 +56,9 @@ static void test_hekate(void)
 
 static void write_file(const char *path, const void *data, size_t len)
 {
-    FILE *f = fopen(path, "wb");
+    // Owner-only, like every file the program itself writes.
+    int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    FILE *f = fd >= 0 ? fdopen(fd, "wb") : NULL;
     REQUIRE(f != NULL);
     REQUIRE(fwrite(data, 1, len, f) == len);
     fclose(f);
