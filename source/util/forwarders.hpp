@@ -88,6 +88,9 @@ struct Made
 // save() and forget() then leave as it is; an entry without an ID or an .nro
 // is skipped. A save keeps the keys this version does not know.
 std::vector<Made> list();
+// forwarders.json was written by a newer version (list() reads none, save()
+// and forget() leave it as it is): the screens say so.
+bool written_by_newer();
 
 // The list as a JSON array (a settings backup's), and back: entries as
 // list() keeps them; anything else, none.

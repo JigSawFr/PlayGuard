@@ -8,6 +8,7 @@
 #include "action/notices.hpp"
 #include "ui/play_ui.hpp"
 #include "util/config.hpp"
+#include "util/forwarders.hpp"
 #include "util/history.hpp"
 
 using namespace aurore::literals;
@@ -72,6 +73,23 @@ void at_start()
     if (hist == history::Damage::PutAside || s_history) add("data_history", false, "playguard/data_notice/history_reset"_i18n);
     else if (hist == history::Damage::Stuck) add("data_history", true, "playguard/data_notice/history_stuck"_i18n);
     if (s_rescue) add("data_rescue", false, "playguard/data_notice/rescue_unreadable"_i18n);
+
+    // Files a newer PlayGuard wrote (a rollback, a development build): read as
+    // missing and left as they are, so the changes made meanwhile are not saved.
+    std::string newer;
+    auto name = [&newer](bool is_newer, const char* file) {
+        if (!is_newer) return;
+        if (!newer.empty()) newer += ", ";
+        newer += file;
+    };
+    name(config::shared_newer(), "config.json");
+    name(config::state_newer(), "state.json");
+    name(history::written_by_newer(), "history.json");
+    name(forwarders::written_by_newer(), "forwarders.json");
+    if (!newer.empty()) {
+        add("data_newer", false, aurore::getStr("playguard/data_notice/newer", newer));
+        aurore::Logger::warning("data: written by a newer PlayGuard, left as they are ({})", newer);
+    }
 
     if (cfg == config::Loaded::PutAside || cfg == config::Loaded::Stuck) {
         aurore::Logger::warning("config: unreadable, defaults in use ({})",

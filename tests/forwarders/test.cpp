@@ -205,7 +205,9 @@ static void test_schema()
     CHECK(forwarders::list().size() == 1 && !forwarders::list()[0].pin);
 
     const std::string newer = R"({"schema": 2, "forwarders": [{"id": "0500000000AB1000", "nro": "sdmc:/x.nro"}]})";
+    CHECK(!forwarders::written_by_newer());
     CHECK(paths::atomic_write(file, newer));
+    CHECK(forwarders::written_by_newer());
     CHECK(forwarders::list().empty());
     std::string error;
     CHECK(!forwarders::save(all[0], &error) && !error.empty());

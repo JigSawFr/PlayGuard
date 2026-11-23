@@ -122,6 +122,14 @@ Damage check(size_t* count)
     return paths::put_aside(paths::history_file()) ? Damage::PutAside : Damage::Stuck;
 }
 
+bool written_by_newer()
+{
+    nlohmann::json entries;
+    bool newer = false;
+    load_array(entries, &newer);
+    return newer;
+}
+
 bool append(const Entry& e, std::string* error, bool* put_aside)
 {
     if (put_aside) *put_aside = false;

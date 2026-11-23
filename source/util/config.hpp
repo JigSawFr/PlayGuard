@@ -175,6 +175,10 @@ enum class Loaded { Missing, Read, PutAside, Stuck };
 Config& get();
 void    load();          // never throws; missing / broken file => defaults, per field
 Loaded  loaded();
+// config.json / state.json was written by a newer version (its "schema" above
+// SCHEMA) at the last load(): read as missing, never written over.
+bool    shared_newer();
+bool    state_newer();
 // A save in two steps, so the write can be left to another thread: the
 // files' content now (false: Loaded::Stuck, nothing may be written), then
 // writing them. write() touches no config state: callable from any thread.

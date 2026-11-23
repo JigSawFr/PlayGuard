@@ -1757,7 +1757,8 @@
         "config_stuck": "De voorkeuren van PlayGuard konden niet worden gelezen of opzijgezet: de standaardwaarden worden gebruikt en er wordt voorlopig niets opgeslagen, zodat het bestand niet wordt overschreven. Controleer de SD-kaart.",
         "history_reset": "De wijzigingsgeschiedenis kon niet worden gelezen, dus er is een nieuwe begonnen. Het beschadigde bestand is bewaard als history.json.bad.",
         "history_stuck": "De wijzigingsgeschiedenis kon niet worden gelezen of opzijgezet: er worden voorlopig geen wijzigingen in vastgelegd. Controleer de SD-kaart.",
-        "rescue_unreadable": "Er is een rapport van de herstel-sysmodule gevonden, maar het kon niet worden gelezen, dus PlayGuard weet niet wat die heeft gedaan. Controleer de pincode en de speeltijdtimer."
+        "rescue_unreadable": "Er is een rapport van de herstel-sysmodule gevonden, maar het kon niet worden gelezen, dus PlayGuard weet niet wat die heeft gedaan. Controleer de pincode en de speeltijdtimer.",
+        "newer": "Sommige bestanden zijn geschreven door een nieuwere PlayGuard en blijven zoals ze zijn, dus wijzigingen worden er nu niet in opgeslagen: {}. Werk PlayGuard bij om ze te wijzigen."
     },
     "sys_notes": {
         "title": "Release-opmerkingen · {}",

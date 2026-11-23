@@ -1757,7 +1757,8 @@
         "config_stuck": "无法读取PlayGuard的偏好设置，也无法将其移到一旁：现使用默认值，且暂时不会保存任何内容，以免覆盖该文件。请检查SD卡。",
         "history_reset": "无法读取更改历史，已开始新的历史。损坏的文件已保留为history.json.bad。",
         "history_stuck": "无法读取更改历史，也无法将其移到一旁：暂时不会在其中记录任何更改。请检查SD卡。",
-        "rescue_unreadable": "找到了恢复 sysmodule 的报告，但无法读取，因此PlayGuard无法得知它做了什么。请检查PIN和游戏时间。"
+        "rescue_unreadable": "找到了恢复 sysmodule 的报告，但无法读取，因此PlayGuard无法得知它做了什么。请检查PIN和游戏时间。",
+        "newer": "部分文件由较新的 PlayGuard 写入，保持原样，因此现在所做的更改不会保存到其中：{}。请更新 PlayGuard 后再修改。"
     },
     "sys_notes": {
         "title": "版本说明 · {}",
