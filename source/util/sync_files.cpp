@@ -187,16 +187,11 @@ SyncConf load()
     std::string text;
     const bool conf = paths::read_file(conf_file(), text);
     if (conf) sync_conf_parse(&c, text.data(), text.size());
-    // The broker's settings are link.conf's, shared with every Boréale
-    // homebrew. A sync.conf from before it (schema 1 or 2) gives them to it
-    // when there is none, then loses them: written again without them, so
-    // that nothing is left of them there. (The agent does the same, whoever
-    // reads them first.)
+    // The broker's settings are link.conf's alone, shared with every Boréale
+    // homebrew: a broker key left in sync.conf is an unknown one, kept.
     bool found = false;
     const BlLinkConf l = read_link(found);
     if (found) sync_conf_from_link(&c, &l);
-    else if (c.broker_keys) found = save_link(c, nullptr);
-    if (found && c.broker_keys && !sync_conf_unwritable(&c) && save_conf(c, nullptr)) c.broker_keys = false;
     c.emummc = paths::nand_key() == "emummc";
     return c;
 }

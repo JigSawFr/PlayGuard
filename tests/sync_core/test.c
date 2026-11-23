@@ -423,8 +423,20 @@ static void test_conf(void)
                        "=novalue\n";
     sync_conf_defaults(&c);
     CHECK(sync_conf_parse(&c, text, strlen(text)));
+    // The broker's keys are link.conf's alone: left in sync.conf, they are
+    // unknown keys, kept like any other.
+    CHECK(!c.enabled && c.port == 1883 && !c.tls && c.mqtt_version == SyncMqtt_Auto);
+    CHECK(!c.host[0] && !c.password[0] && !c.username[0] && !c.console_id[0] && !c.console_name[0]);
+    CHECK(contains(c.kept, "host= broker.lan\n") && contains(c.kept, "password= p=a ss#word\n") && contains(c.kept, "console_id=a1b2c3d4\n"));
+    CHECK(sync_conf_problem(&c) != NULL);   // no host: not read from here
+    // What link.conf gives instead.
+    BlLinkConf given;
+    bl_link_conf_defaults(&given);
+    const char *link_text = "enabled=1\nhost=broker.lan\nport=8883\ntls=on\nmqtt_version=3.1.1\nusername=parent\npassword= p=a ss#word\nconsole_id=a1b2c3d4\nconsole_name=Salon\n";
+    bl_link_conf_parse(&given, link_text, strlen(link_text));
+    sync_conf_from_link(&c, &given);
     CHECK(c.enabled && c.port == 8883 && c.tls && c.mqtt_version == SyncMqtt_V311);
-    CHECK(!strcmp(c.host, " broker.lan"));
+    CHECK(!strcmp(c.host, "broker.lan"));
     CHECK(!strcmp(c.password, " p=a ss#word"));
     CHECK(!strcmp(c.console_id, "a1b2c3d4") && !strcmp(c.console_name, "Salon"));
     CHECK(c.policy == SyncPolicy_Auto && c.remote_timer_writes);
@@ -444,20 +456,18 @@ static void test_conf(void)
     CHECK(contains(c.kept, "future_key=keep me\n"));
     CHECK(sync_conf_problem(&c) == NULL);
 
-    // Its broker keys (schema 2) are to move to link.conf.
-    CHECK(c.broker_keys);
     // Round trip, unknown keys kept; the broker's keys are link.conf's, not
     // written here any more.
     char out[2048];
     const size_t n = sync_conf_write(&c, out, sizeof(out));
     CHECK(n > 0 && contains(out, "future_key=keep me\n") && contains(out, "policy=auto\n") && contains(out, "schema=3\n"));
-    CHECK(!contains(out, "mqtt_version") && !contains(out, "host=") && !contains(out, "password") && !contains(out, "console_id"));
-    CHECK(!contains(out, "topic_prefix") && !contains(out, "enabled="));
+    CHECK(contains(out, "host= broker.lan\n") && contains(out, "mqtt_version=3.1.1\n") && contains(out, "topic_prefix=bad/prefix\n"));
+    CHECK(!contains(out, "host=broker.lan") && !contains(out, "password= p=a ss#word\nschema"));   // not written from the fields
     CHECK(contains(out, "publish_activity=1\npublish_games=0\npublish_icons=0\npublish_console=1\npublish_network=0\npublish_hardware=1\n"));
     SyncConf back;
     sync_conf_defaults(&back);
     CHECK(sync_conf_parse(&back, out, n));
-    CHECK(!back.broker_keys && back.policy == c.policy && back.remote_timer_writes == c.remote_timer_writes);
+    CHECK(back.policy == c.policy && back.remote_timer_writes == c.remote_timer_writes);
     CHECK(back.publish_games == c.publish_games && !strcmp(back.kept, c.kept));
     // A copy writes its own lines, not the ones its `file.kept` still points at.
     SyncConf copy = c;
@@ -468,7 +478,6 @@ static void test_conf(void)
     bl_link_conf_defaults(&link);
     sync_conf_to_link(&c, &link);
     sync_conf_from_link(&back, &link);
-    back.broker_keys = c.broker_keys;
     back.file.schema = c.file.schema;
     back.file.kept = c.file.kept;   // each one's own buffer: the pointer is all that differs
     CHECK(!memcmp(&back, &c, sizeof(c)));
@@ -494,17 +503,17 @@ static void test_conf(void)
     CHECK(!strcmp(old.topic_prefix, "boreale") && !strcmp(old.legacy_prefix, "playguard"));
     CHECK(sync_conf_unwritable(&old) == NULL);
     const size_t on = sync_conf_write(&old, out, sizeof(out));
-    CHECK(on > 0 && contains(out, "schema=3\n") && contains(out, "legacy_prefix=playguard\n") && !contains(out, "topic_prefix"));
+    CHECK(on > 0 && contains(out, "schema=3\n") && contains(out, "legacy_prefix=playguard\n"));
     SyncConf again;
     sync_conf_defaults(&again);
     CHECK(sync_conf_parse(&again, out, on) && again.file.schema == 3 && !strcmp(again.legacy_prefix, "playguard"));
     old.legacy_prefix[0] = '\0';   // cleared: the line goes
     CHECK(sync_conf_write(&old, out, sizeof(out)) > 0 && !contains(out, "legacy_prefix"));
-    // A prefix of one's own stays; its old tree (no module level) is cleared.
+    // A prefix of one's own is link.conf's: here an unknown key, not read.
     const char v1own[] = "schema=1\nhost=broker.lan\ntopic_prefix=home_switch\n";
     sync_conf_defaults(&old);
     CHECK(sync_conf_parse(&old, v1own, strlen(v1own)));
-    CHECK(!strcmp(old.topic_prefix, "home_switch") && !strcmp(old.legacy_prefix, "home_switch"));
+    CHECK(!strcmp(old.topic_prefix, "boreale") && !strcmp(old.legacy_prefix, "playguard") && contains(old.kept, "topic_prefix=home_switch\n"));
     // No prefix in it: the old default's tree.
     const char v1bare[] = "schema=1\nhost=broker.lan\n";
     sync_conf_defaults(&old);
@@ -517,7 +526,7 @@ static void test_conf(void)
     SyncConf nc;
     sync_conf_defaults(&nc);
     CHECK(sync_conf_parse(&nc, newer, strlen(newer)));
-    CHECK(nc.file.schema == 4 && !strcmp(nc.host, "broker.lan") && nc.port == 8884 && contains(nc.kept, "later=1\n"));
+    CHECK(nc.file.schema == 4 && !nc.host[0] && nc.port == 1883 && contains(nc.kept, "port=8884\n") && contains(nc.kept, "later=1\n"));
     CHECK(sync_conf_unwritable(&nc) != NULL);
     // More unknown lines than SYNC_EXTRA_MAX keeps: not written either.
     char many[SYNC_EXTRA_MAX * 2];
@@ -527,17 +536,6 @@ static void test_conf(void)
     CHECK(sync_conf_parse(&nc, many, at));
     CHECK(nc.file.overflow && sync_conf_unwritable(&nc) != NULL);
     CHECK(sync_conf_parse(&nc, "host=x\n", 7) && !nc.file.overflow);   // read again: it starts over
-    // The MQTT version's spellings; anything else keeps the setting.
-    const struct { const char *text; SyncMqttVersion v; } versions[] = {
-        { "mqtt_version=5\n", SyncMqtt_V5 }, { "mqtt_version=5.0\n", SyncMqtt_V5 },
-        { "mqtt_version=auto\n", SyncMqtt_Auto }, { "mqtt_version=4\n", SyncMqtt_V311 },
-        { "mqtt_version=6\n", SyncMqtt_V311 },
-    };
-    SyncConf v = c;
-    for (size_t i = 0; i < sizeof(versions) / sizeof(versions[0]); i++) {
-        CHECK(sync_conf_parse(&v, versions[i].text, strlen(versions[i].text)));
-        CHECK(v.mqtt_version == versions[i].v);
-    }
     CHECK(!strcmp(sync_mqtt_version_name(SyncMqtt_V5), "5") && !strcmp(sync_mqtt_version_name(SyncMqtt_Auto), "auto"));
 
     // What is still missing.
