@@ -22,8 +22,6 @@
   "update_daily": false,
   "update_checked": "",
   "update_latest": "",
-  "sys_latest": "",
-  "sys_checked": "",
   "update_snooze_version": "",
   "update_snooze_until": "",
   "support_reminder": true,

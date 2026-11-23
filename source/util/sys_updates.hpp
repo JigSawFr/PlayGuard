@@ -46,12 +46,6 @@ std::string hekate_version(const std::string& bytes);
 // commit, "v1.6.3.0-b962f75") -> "1.6.3.0"; "" when it is not one.
 std::string syspatch_version(const std::string& logged);
 
-// config.json's sys_latest:
-// "atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1;syspatch=1.6.3.0".
-std::string to_text(const Latest& latest);
-// Unknown keys and malformed versions left out.
-Latest      from_text(const std::string& text);
-
 // The four latest releases, each "" when its page could not be read.
 // Blocking (network): run it off the main thread. On the desktop build,
 // PLAYGUARD_SIM_SYS_LATEST ("1.12.0:6.5.4:23.0.1", sys-patch's after a

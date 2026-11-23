@@ -103,39 +103,4 @@ std::string syspatch_version(const std::string& logged)
     return version_of_tag(logged.substr(0, logged.find_first_of("-+ ")));
 }
 
-std::string to_text(const Latest& latest)
-{
-    std::string out;
-    auto add = [&out](const char* key, const std::string& value) {
-        if (value.empty()) return;
-        out += (out.empty() ? "" : ";") + std::string(key) + "=" + value;
-    };
-    add("atmosphere", latest.atmosphere);
-    add("hekate", latest.hekate);
-    add("firmware", latest.firmware);
-    add("syspatch", latest.syspatch);
-    return out;
-}
-
-Latest from_text(const std::string& text)
-{
-    Latest out;
-    size_t start = 0;
-    while (start <= text.size()) {
-        size_t end = text.find(';', start);
-        if (end == std::string::npos) end = text.size();
-        const std::string part = text.substr(start, end - start);
-        const size_t eq = part.find('=');
-        if (eq != std::string::npos) {
-            const std::string key = part.substr(0, eq), value = version_of_tag(part.substr(eq + 1));
-            if (key == "atmosphere") out.atmosphere = value;
-            else if (key == "hekate") out.hekate = value;
-            else if (key == "firmware") out.firmware = value;
-            else if (key == "syspatch") out.syspatch = value;
-        }
-        start = end + 1;
-    }
-    return out;
-}
-
 }   // namespace sys_updates

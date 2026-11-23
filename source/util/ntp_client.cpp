@@ -1,6 +1,6 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor. GPLv3-or-later (see LICENSE).
 #include "ntp_client.hpp"
-#include "ntp_packet.h"
+#include "bl_ntp.h"
 
 #include <algorithm>
 #include <cerrno>
@@ -43,14 +43,14 @@ std::string socket_error(const char* operation)
     return std::string(operation) + ": " + std::strerror(error_number);
 }
 
-bool make_cookie(std::uint8_t cookie[NTP_COOKIE_SIZE], std::string& error)
+bool make_cookie(std::uint8_t cookie[BL_NTP_COOKIE_SIZE], std::string& error)
 {
-    if (!platform_random(cookie, NTP_COOKIE_SIZE)) {
+    if (!platform_random(cookie, BL_NTP_COOKIE_SIZE)) {
         error = "Could not generate NTP request cookie";
         return false;
     }
     bool nonzero = false;
-    for (unsigned i = 0; i < NTP_COOKIE_SIZE; ++i) nonzero |= cookie[i] != 0;
+    for (unsigned i = 0; i < BL_NTP_COOKIE_SIZE; ++i) nonzero |= cookie[i] != 0;
     if (!nonzero) cookie[0] = 1;
     return true;
 }
@@ -129,13 +129,13 @@ Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, boo
             continue;
         }
 
-        std::uint8_t cookie[NTP_COOKIE_SIZE];
+        std::uint8_t cookie[BL_NTP_COOKIE_SIZE];
         if (!make_cookie(cookie, reply.error)) {
             reply.kind = Error::Network;
             return reply;
         }
-        std::uint8_t request[NTP_PACKET_SIZE];
-        ntp_packet_make_request(request, cookie);
+        std::uint8_t request[BL_NTP_PACKET_SIZE];
+        bl_ntp_make_request(request, cookie);
         const ssize_t sent = ::send(socket.get(), request, sizeof(request), 0);
         if (sent != static_cast<ssize_t>(sizeof(request))) {
             reply.kind = Error::Network;
@@ -170,10 +170,10 @@ Reply fetch(const std::string& host, int timeout_ms, unsigned max_addresses, boo
             continue;
         }
         std::uint64_t seconds = 0;
-        const NtpPacketResult result = ntp_packet_parse(response, static_cast<std::size_t>(received), cookie, &seconds);
-        if (result != NTP_PACKET_OK) {
+        const BlNtpResult result = bl_ntp_parse(response, static_cast<std::size_t>(received), cookie, &seconds);
+        if (result != BlNtp_Ok) {
             reply.kind = Error::BadReply;
-            reply.error = ntp_packet_error(result);
+            reply.error = bl_ntp_error(result);
             continue;
         }
         reply.ok = true;

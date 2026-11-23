@@ -435,6 +435,15 @@ static void test_preferences()
     write_config(R"({"agent_update_skipped": ")" + std::string(65, 'b') + R"("})");
     config::load();
     CHECK(config::get().agent_update_skipped.empty());
+    // The newest versions moved to the agent's latest.conf: the retired keys
+    // are dropped by the next save, an unknown key is kept.
+    write_config(R"({"sys_latest": "hekate=6.5.4", "sys_checked": "2026-11-01", "from_newer": 1})");
+    config::load();
+    CHECK(save_config());
+    std::string saved;
+    CHECK(paths::read_file(paths::config_file(), saved));
+    CHECK(saved.find("sys_latest") == std::string::npos && saved.find("sys_checked") == std::string::npos);
+    CHECK(saved.find("from_newer") != std::string::npos);
 }
 
 static void test_tmp_recovery()

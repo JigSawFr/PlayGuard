@@ -188,8 +188,6 @@ hbl_lock_SRC   := source/core/hbl_lock.c tests/hbl_lock/test.c
 hbl_lock_FLAGS := -std=gnu11 -Isource/core -I$(PG)/core -I$(KIT)/core -I$(KIT)
 forwarder_pack_SRC   := source/core/forwarder_pack.c tests/forwarder_pack/test.c
 forwarder_pack_FLAGS := -std=c11 -Isource/core -I$(PG)/core -I$(KIT)/core -I$(KIT)
-ntp_SRC   := source/util/ntp_packet.c tests/ntp_packet/test.c
-ntp_FLAGS := -std=c11 -Isource/util -I$(KIT)/util -I$(KIT)
 playlog_SRC   := $(PG)/util/playlog.c tests/playlog/test.c
 playlog_FLAGS := -std=c11 -I$(PG)/util -I$(KIT)/util -I$(KIT)
 playstats_SRC   := $(PG)/core/playstats_logic.c $(KIT)/core/nacp.c tests/playstats/test.c
@@ -232,6 +230,9 @@ sys_updates_sim_SRC   := source/util/sys_updates.cpp source/util/sys_updates_net
 sys_updates_sim_FLAGS := $(TEST_CXXFLAGS) -Isource/core -I$(PG)/core -I$(KIT)/core -I$(KIT)
 sys_updates_sim_CSRC  := $(PG)/core/console_info_pure.c
 sys_updates_sim_CFLAGS := -std=gnu11 -Isource/core -I$(PG)/core -I$(KIT)/core -I$(KIT)
+agent_latest_SRC   := $(KIT)/util/paths.cpp source/util/agent_latest.cpp tests/agent_latest/test.cpp
+agent_latest_CSRC  := library/boreale-link/source/bl_latest.c library/boreale-link/source/bl_kv.c
+agent_latest_CFLAGS := -std=gnu11 -Ilibrary/boreale-link/source
 ntp_servers_SRC   := source/util/ntp_servers.cpp tests/ntp_servers/test.cpp
 dns_hosts_SRC   := source/util/dns_hosts.cpp tests/dns_hosts/test.cpp
 sys_notes_SRC   := $(KIT)/util/date.cpp $(C)/util/safe_text.cpp $(C)/util/markdown.cpp $(KIT)/util/update.cpp source/util/sys_updates.cpp source/util/sys_notes.cpp tests/sys_notes/test.cpp

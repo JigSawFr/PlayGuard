@@ -56,6 +56,10 @@ child screen that the time is up. A read of the
 play data ends as each tab opens, Today not freed yet (PLAYGUARD_SIM_TAB_RACE):
 the header's pill must still be the Play timer's.
 
+The "agentlatest" scenario puts a fresh latest.conf (the agent's checks) on the
+SD card and cuts the simulated network: Console must show the newer versions
+it names, and PlayGuard must not check for updates itself.
+
 The "sysnotes" scenario checks for updates at start-up against a simulated
 GitHub and switchbrew (PLAYGUARD_SIM_SYS_LATEST, PLAYGUARD_SIM_SYS_NOTES),
 hekate 6.5.3 on the SD card: Console must say how far behind each
@@ -156,7 +160,7 @@ the simulated SD card (exefs.nsp, boot2.flag, toolbox.json, version.txt), its
 start at boot turned off, then removed, each change in the history; then
 the screen's Overview tab, from which Ⓐ opens a module's tab.
 
-Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders|hbmenu|homebrew|
+Usage: tools/desktop_smoke.py <out-dir> [games|gate|errors|rescue|forged|lock|devbuild|update|library|rollback|outside|loading|alarm|sysnotes|agentlatest|cadran|cadranstates|cadranunlocked|cadranlarge|bedtime|forwarders|hbmenu|homebrew|
        sync|sync-311|agent|agent-update|agent-rollback|modules]   (needs DISPLAY, xdotool, ImageMagick)
 Environment knobs of the simulated backend (PLAYGUARD_SIM_*) are passed through;
 the console time is fixed (PLAYGUARD_SIM_NOW, TZ), the focus glow still
@@ -192,6 +196,7 @@ OUTSIDE = SCENARIO == "outside"
 LOADING = SCENARIO == "loading"
 ALARM = SCENARIO == "alarm"
 SYSNOTES = SCENARIO == "sysnotes"
+AGENTLATEST = SCENARIO == "agentlatest"
 ROLLBACK = SCENARIO == "rollback"
 GAMES = SCENARIO == "games"
 CADRAN = SCENARIO == "cadran"
@@ -727,7 +732,7 @@ if OUTSIDE or CADRANSTATES:
     history_file = os.path.join(nand_dir, "history.json")
     if os.path.exists(history_file):
         os.remove(history_file)   # the outside_* entries must be this run's
-if SYSNOTES:
+if SYSNOTES or AGENTLATEST:
     # A simulated GitHub and switchbrew (util/sys_notes.hpp), shaped like
     # theirs: Atmosphère 1.12.0 runs (1.12.1 is out), hekate 6.5.3 is on the
     # SD card (6.5.4 is out, the first to support 23.0.1), the console runs
@@ -827,6 +832,16 @@ if SYSNOTES:
     # Checking for updates at start-up (the daily check), not done yet today.
     os.makedirs(os.path.dirname(config_file), exist_ok=True)
     json.dump({"schema": 1, "update_daily": True}, open(config_file, "w"))
+if AGENTLATEST:
+    # The agent made the checks (check_versions=1) a moment ago: latest.conf
+    # names newer ones than the simulated network would (which is cut off).
+    # PlayGuard must show them and not check for itself.
+    env["PLAYGUARD_SIM_SYS_LATEST"] = "offline"
+    agent_dir = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale")
+    os.makedirs(agent_dir, exist_ok=True)
+    open(os.path.join(agent_dir, "latest.conf"), "w").write(
+        f"schema=1\nchecked={int(time.time())}\natmosphere=1.12.2\nhekate=6.5.5\nfirmware=23.0.1\nsyspatch=1.6.3.0\n"
+        "integration=0.9.0\nclock_checked=0\nclock_network=0\nclock_user=0\nclock_server=\n")
 if LOCK:
     # PIN › Protect PlayGuard with the PIN › To open PlayGuard: the lock screen comes
     # first, and the right PIN (the simulated PIN screen accepts) opens the
@@ -2777,6 +2792,14 @@ if SYSNOTES:
         if "When time is up" not in pg_notes or "Download" in pg_notes or "Install" in pg_notes or "#134" in pg_notes:
             fail("PlayGuard 1.1.0 kept wrong: " + repr(pg_kept.get("1.1.0")))
     finish(check_cache)
+if AGENTLATEST:
+    time.sleep(3)
+    key("Down", steps("dashboard", "console"))
+    key("Right")               # Network clock
+    shot("01_tools_console")   # the tiles, from latest.conf: Atmosphère 1.12.2, hekate 6.5.5, firmware 23.0.1
+    if logged("system update check"):
+        fail("PlayGuard checked for updates itself with the agent's reading less than a day old")
+    finish()
 if LOADING:
     shot("01_loading")         # the icon, the wordmark, the bar at its last step
     finish()

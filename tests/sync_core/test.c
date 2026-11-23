@@ -1243,7 +1243,7 @@ static void test_system_document(void)
     snprintf(l.ssid, sizeof(l.ssid), "Maison");
     l.uptime_s = 5 * 3600 + 17;
     const ConsoleSpace sd = { 21344, 59640 }, nand = { 18470, 26592 };
-    SyncSystem s = { 1790990000, &sys, &l, &sd, &nand, "6.5.4", "1.2.0", "1.2.0", NULL, NULL, NULL };
+    SyncSystem s = { 1790990000, &sys, &l, &sd, &nand, "6.5.4", "1.2.0", "1.2.0", NULL, NULL, NULL, NULL };
     static char buf[4096];
     size_t n = sync_system_build(&s, buf, sizeof(buf));
     CHECK(n > 0);

@@ -120,7 +120,7 @@ std::string latest(Which which)
 {
     // PlayGuard's own update check (action/update_flow) keeps what it found.
     if (which == Which::PlayGuard) return config::get().update_latest;
-    const sys_updates::Latest l = sys_updates::from_text(config::get().sys_latest);
+    const sys_updates::Latest l = sys_update_flow::latest_versions();
     return which == Which::Atmosphere ? l.atmosphere
            : which == Which::Hekate   ? l.hekate
            : which == Which::SysPatch ? l.syspatch

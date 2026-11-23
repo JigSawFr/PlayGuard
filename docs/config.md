@@ -121,10 +121,8 @@ settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreal
 | `sphaira_entry` | boolean | keeps `/config/sphaira/github/playguard.json` (PlayGuard in sphaira's *GitHub* menu) at start-up when sphaira is on the SD card; `false` removes it | `true` |
 | `update_checked` | string | `"YYYY-MM-DD"` of the last check; anything else is cleared | `""` |
 | `update_latest` | string | the latest release the last check found; while newer than the running version, start-up checks again and opens the update screen | `""` |
-| `sys_latest` | string | the latest Atmosphère, hekate, firmware and sys-patch the last check found (`"atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1;syspatch=1.6.3.0"`); the notification bell says which of the first three are newer than what the console runs; at most 96 characters | `""` |
-| `sys_checked` | string | `"YYYY-MM-DD"` of that check (once a day, with *Check for updates every day*); anything else is cleared | `""` |
 | `ha_latest` | string | the latest release of PlayGuard's Home Assistant integration the last check found (checked only once the integration said which version Home Assistant runs); the notification bell says when it is newer; at most 32 characters | `""` |
-| `ha_checked` | string | `"YYYY-MM-DD"` of that check (as `sys_checked`); anything else is cleared | `""` |
+| `ha_checked` | string | `"YYYY-MM-DD"` of that check (once a day, with *Check for updates every day*); anything else is cleared | `""` |
 | `update_snooze_version` | string | the release whose screen *Later* postponed (cleared with `update_snooze_until` when either is malformed) | `""` |
 | `update_snooze_until` | string | `"YYYY-MM-DD"`: that release is offered again from that day (30 days at most; a farther date is ignored) | `""` |
 
@@ -289,8 +287,6 @@ line; the order does not matter when it reads them:
   "sphaira_entry": true,
   "update_checked": "",
   "update_latest": "",
-  "sys_latest": "",
-  "sys_checked": "",
   "ha_latest": "",
   "ha_checked": "",
   "update_snooze_version": "",

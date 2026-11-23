@@ -100,7 +100,7 @@ The entries about the console rather than the parental controls come last, on on
 - the recovery sysmodule out of date (not the one this version ships with, or installed before it said its version; *Update* puts in the one this version carries), then the console to restart for it, until it has;
 - a build that did not finish starting and was gone back from (*Send a report*).
 
-Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), a newer release of the Home Assistant integration (once it said which version Home Assistant runs: *What's new* shows what changed since and the QR code that opens it in the Marketplace), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
+Those for information: a build gone back from, a firmware not tested with this version, a newer Atmosphère, hekate or firmware (read from the agent's checks when it makes them (off by default), else checked with *Check for updates every day*; the firmware's entry says to wait until Atmosphère supports it), a newer release of the Home Assistant integration (once it said which version Home Assistant runs: *What's new* shows what changed since and the QR code that opens it in the Marketplace), the serial number not blanked on emuMMC, the other system's own parental controls, one of PlayGuard's own files found damaged and put aside (a toast at start-up points to it).
 
 ### The other Boréale homebrews
 
