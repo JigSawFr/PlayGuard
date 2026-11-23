@@ -191,7 +191,9 @@ void ClockTab::refresh()
     const std::string na = "cadran/common/unavailable"_i18n;
     this->show_clocks(R_SUCCEEDED(s.user_rc) ? ui::time_text(s.user_time + ticked) : na,
                       R_SUCCEEDED(s.network_rc) ? ui::time_text(s.network_time + ticked) : na,
-                      R_SUCCEEDED(s.accuracy_rc), s.accuracy);
+                      R_SUCCEEDED(s.accuracy_rc), s.accuracy,
+                      this->last.ok && this->last.offset_known ? clock_flow::offset_text(this->last.offset) : std::string(),
+                      this->last.ok && this->last.offset_known && (this->last.offset < -1 || this->last.offset > 1));
     ui::set_detail(autosync, ui::bool_text(R_SUCCEEDED(s.automatic_rc), s.automatic,
                                            "playguard/common/on"_i18n, "playguard/common/off"_i18n));
     this->autosync_off = R_SUCCEEDED(s.automatic_rc) && !s.automatic;
@@ -239,7 +241,8 @@ void ClockTab::set_server(const std::string& host, const std::string& reg)
     this->refresh();
 }
 
-void ClockTab::show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate)
+void ClockTab::show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate,
+                           const std::string& drift, bool drifted)
 {
     namespace kit = cadran::kit;
     if (!this->user_time) return;
@@ -249,9 +252,12 @@ void ClockTab::show_clocks(const std::string& user_text, const std::string& netw
     this->user_date->setText(user.first.empty() ? "" : kit::long_date(user.first));
     this->network_time->setText(network.second);
 
-    const bool bad = known && !accurate;
+    // A fresh measurement shows its drift here too: the two clocks above are the
+    // console's own and agree with each other even when both are off.
+    const bool bad = known && (!accurate || drifted);
     std::string state = !known ? "cadran/common/unavailable"_i18n
                         : bad  ? "playguard/cadran/clock/inaccurate"_i18n : "playguard/cadran/clock/accurate"_i18n;
+    if (!drift.empty()) state += " · " + drift;
     if (known && !network.first.empty() && network.first != user.first) state += " · " + kit::long_date(network.first);
     this->network_state->setText(state);
     this->network_state->setThemeColor("textColor", !known ? "cadran/text3" : bad ? "cadran/amber" : "cadran/teal");
