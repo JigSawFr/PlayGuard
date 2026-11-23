@@ -471,7 +471,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 ### Modules facultatifs
 
-*Modules facultatifs ›*, une tuile sous *Outils* : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son onglet) et l'agent Boréale, qui garde le lien à distance (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
+*Modules facultatifs ›*, une tuile sous *Outils* : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son propre écran, une liste comme celui de l'agent) et l'agent Boréale, qui garde le lien à distance (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
 
 ### Les lignes de la console
 

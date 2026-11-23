@@ -1686,8 +1686,6 @@
     "modules": {
         "title": "Modules facultatifs",
         "open": "Modules facultatifs",
-        "section": "Modules facultatifs",
-        "overview": "Vue d'ensemble",
         "count": "{} installés",
         "count_one": "1 installé",
         "intro": "Deux petits programmes en arrière-plan (sysmodules) que PlayGuard peut installer sur la carte SD. Aucun n'est nécessaire, et chacun fait une seule chose. PlayGuard contient la version faite avec lui et l'installe ou la met à jour d'ici, sans ordinateur. Chaque changement demande le code PIN quand Sécurité › Protéger PlayGuard par le code PIN le demande avant un changement.",

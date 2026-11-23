@@ -1686,8 +1686,6 @@
     "modules": {
         "title": "Módulos opcionales",
         "open": "Módulos opcionales",
-        "section": "Módulos opcionales",
-        "overview": "Resumen",
         "count": "{} instalados",
         "count_one": "1 instalado",
         "intro": "Dos pequeños programas en segundo plano (sysmodules) que PlayGuard puede poner en la tarjeta SD. Ninguno es necesario, y cada uno hace una sola cosa. PlayGuard trae la versión hecha con él y la instala o actualiza desde aquí, sin computadora. Cada cambio pide el PIN cuando Seguridad › Proteger PlayGuard con el PIN lo pide antes de un cambio.",

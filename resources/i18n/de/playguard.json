@@ -1686,8 +1686,6 @@
     "modules": {
         "title": "Optionale Module",
         "open": "Optionale Module",
-        "section": "Optionale Module",
-        "overview": "Übersicht",
         "count": "{} installiert",
         "count_one": "1 installiert",
         "intro": "Zwei kleine Hintergrundprogramme (Sysmodule), die PlayGuard auf die SD-Karte legen kann. Keines ist nötig, und jedes erledigt nur eine Aufgabe. PlayGuard bringt die mit ihm erstellte Version mit und installiert oder aktualisiert sie von hier aus, ohne Computer. Jede Änderung fragt nach der Geheimzahl, wenn Sicherheit › PlayGuard mit der Geheimzahl schützen sie vor einer Änderung verlangt.",

@@ -1686,8 +1686,6 @@
     "modules": {
         "title": "Optionele modules",
         "open": "Optionele modules",
-        "section": "Optionele modules",
-        "overview": "Overzicht",
         "count": "{} geïnstalleerd",
         "count_one": "1 geïnstalleerd",
         "intro": "Twee kleine achtergrondprogramma's (sysmodules) die PlayGuard op de SD-kaart kan zetten. Geen van beide is nodig, en elk doet één ding. PlayGuard bevat de versie die ermee is gemaakt en installeert of werkt die van hieruit bij, zonder computer. Elke wijziging vraagt om de pincode als Beveiliging › PlayGuard beveiligen met de pincode daarom vraagt vóór een wijziging.",

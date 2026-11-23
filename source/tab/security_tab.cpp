@@ -111,7 +111,7 @@ SecurityTab::SecurityTab()
     });
     rescue_about->setSingleLine(false);
     rescue->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new ModulesActivity(ModulesActivity::Tab::Rescue));
+        aurore::Application::pushActivity(new ModuleActivity(modules::Id::Rescue));
         return true;
     });
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" }, { "sc_hbmenu", "home" } }, true);

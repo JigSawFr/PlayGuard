@@ -1686,8 +1686,6 @@
     "modules": {
         "title": "可选模块",
         "open": "可选模块",
-        "section": "可选模块",
-        "overview": "概览",
         "count": "已安装 {} 个",
         "count_one": "已安装 1 个",
         "intro": "PlayGuard 可以放到 SD 卡上的两个小型后台程序（sysmodule）。两者都不是必需的，各自只做一件事。PlayGuard 附带与它一起制作的版本，可在这里安装或更新，无需电脑。当“安全 › 用PIN保护PlayGuard”设为更改前要求输入 PIN 时，每项更改都需要输入 PIN。",

@@ -1686,8 +1686,6 @@
     "modules": {
         "title": "추가 모듈",
         "open": "추가 모듈",
-        "section": "추가 모듈",
-        "overview": "개요",
         "count": "{}개 설치됨",
         "count_one": "1개 설치됨",
         "intro": "PlayGuard가 SD 카드에 설치할 수 있는 작은 백그라운드 프로그램(sysmodule) 두 개입니다. 둘 다 꼭 필요하지는 않으며, 각각 한 가지 일만 합니다. PlayGuard에는 함께 만든 버전이 들어 있어 컴퓨터 없이 여기에서 설치하거나 업데이트할 수 있습니다. 보안 › PIN으로 PlayGuard 보호가 변경 전에 PIN을 묻도록 설정되어 있으면 모든 변경에 PIN이 필요합니다.",
