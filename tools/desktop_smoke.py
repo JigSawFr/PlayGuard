@@ -1768,6 +1768,9 @@ if SYNC:
     # the link runs on, and back to Remote access.
     go_to("Broker settings")
     key("Return")
+    pause(KEY_BEFORE)          # the kit's screen opened: its first row has the focus
+    if focused() != "Connect to the broker":
+        fail(f"the broker's settings did not open (the focus on {focused()!r})")
     shot("03_broker")
     key("Escape")
     # Home Assistant › Install the integration: the two QR codes (Marketplace, add the console).
