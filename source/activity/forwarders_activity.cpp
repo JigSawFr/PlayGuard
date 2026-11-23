@@ -774,14 +774,13 @@ void ForwardersActivity::pick_homebrew()
         ui::info("playguard/forwarders/pick_none"_i18n);
         return;
     }
-    // The forwarders already made, to say so in the list and keep them last.
+    // The forwarders already made, to say so in the list.
     std::set<std::string> on_home;
     for (const forwarders_logic::Row& r : forwarder_flow::rows())
         if (!r.nro.empty()) on_home.insert(r.nro);
     struct Entry
     {
         std::string path, name, detail;
-        bool made;
     };
     std::vector<Entry> entries;
     for (const std::string& p : found) {
@@ -789,11 +788,9 @@ void ForwardersActivity::pick_homebrew()
         nro::read((paths::sd_root() == "/" ? std::string() : paths::sd_root()) + p, info);
         const bool made = on_home.count(nro::sdmc_path(p)) > 0;
         entries.push_back({p, forwarders_logic::default_name(info.name, p),
-                           forwarders_logic::pick_detail(info.author, info.version, p, made ? "playguard/forwarders/pick_on_home"_i18n : std::string()),
-                           made});
+                           forwarders_logic::pick_detail(info.author, info.version, p, made ? "playguard/forwarders/pick_on_home"_i18n : std::string())});
     }
     std::stable_sort(entries.begin(), entries.end(), [](const Entry& a, const Entry& b) {
-        if (a.made != b.made) return !a.made;
         return text::lower_ascii(a.name) < text::lower_ascii(b.name);
     });
     std::vector<std::string> names, details, paths;
