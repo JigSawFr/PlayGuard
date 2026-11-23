@@ -68,7 +68,8 @@ class ClockTab : public TabBase
     void show_result(const std::string& text, bool no_answer = false);
     // Both clocks large, the network one amber while it is inaccurate
     // (`known` false: not read).
-    void show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate);
+    void show_clocks(const std::string& user_text, const std::string& network_text, bool known, bool accurate,
+                     const std::string& drift, bool drifted);
 
     AURORE_BIND(aurore::DetailCell, autosync, "ck_auto");
     AURORE_BIND(aurore::DetailCell, zone,     "ck_zone");
