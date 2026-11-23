@@ -1,5 +1,5 @@
 // The website's preview image in each language (og:image, 1280x640, the
-// size of the repository's social preview, branding/social-preview.svg), in
+// size of the repository's social preview, images/social-preview.png), in
 // Boréale's look: the night, an aurora, the mark, the site's title and the
 // console's dashboard (dark, as the site shows it) in that language, written as
 // <shots-dir>/<language>/social.png next to tools/site_screenshots.mjs'

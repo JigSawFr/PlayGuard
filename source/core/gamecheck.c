@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "nacp.h"
-#include "write_guard.h"
+#include "core/nacp.h"
+#include "core/write_guard.h"
 
 #include <time.h>
 

@@ -33,7 +33,7 @@ const THEMES = ['auto', 'light', 'dark'];
 // waited for before it starts; fetched once it runs in the others.
 const CJK = new Set(['ja', 'ko', 'zh-Hans', 'zh-Hant']);
 const CJK_FILE = '/app/resources/font/cjk.otf';
-// The data folder (source/util/paths.cpp), kept in IndexedDB under that name with `keep`.
+// The data folder (library/boreale-kit/source/util/paths.cpp), kept in IndexedDB under that name with `keep`.
 const DATA = '/playguard_data';
 // What the time buttons add to `skip`, in minutes.
 const SKIPS = [5, 15, 60];
@@ -435,6 +435,17 @@ function mountKept(m, config) {
   m.addRunDependency('keep');
   m.FS.syncfs(true, (e) => {
     if (e) log(`keep: ${e}`, true);
+    let marker = null;
+    try { marker = m.FS.readFile(`${DATA}/${SimLogic.KEPT_FILE}`, { encoding: 'utf8' }); } catch { /* first run */ }
+    // A folder a newer page kept: read as empty and never written over.
+    if (SimLogic.keptState(marker) === 'newer') {
+      forgetting = true;
+      emptyFolder(m.FS, DATA);
+      log('keep: the saved state is from a newer page; starting empty, nothing is saved', true);
+      m.removeRunDependency('keep');
+      return;
+    }
+    m.FS.writeFile(`${DATA}/${SimLogic.KEPT_FILE}`, String(SimLogic.KEPT_SCHEMA));
     let kept = {};
     try { kept = JSON.parse(m.FS.readFile(`${DATA}/config.json`, { encoding: 'utf8' })); } catch { /* first run */ }
     m.FS.writeFile(`${DATA}/config.json`, JSON.stringify({ ...kept, ...config }));
@@ -443,6 +454,14 @@ function mountKept(m, config) {
     addEventListener('visibilitychange', () => { if (document.hidden) saveData(); });
     m.removeRunDependency('keep');
   });
+}
+
+function emptyFolder(FS, dir) {
+  for (const name of FS.readdir(dir)) {
+    if (name === '.' || name === '..') continue;
+    const path = `${dir}/${name}`;
+    if (FS.isDir(FS.stat(path).mode)) { emptyFolder(FS, path); FS.rmdir(path); } else FS.unlink(path);
+  }
 }
 
 function forget() {

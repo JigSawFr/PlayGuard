@@ -1,13 +1,13 @@
 # Remote link design: the optional MQTT agent and Home Assistant
 
-**Status: phases A, B0, B and C implemented** (the C core in `source/sync/`,
+**Status: phases A, B0, B and C implemented** (the C core in `library/boreale-link/modules/playguard/sync/`,
 PlayGuard's autonomous mode and its *Remote access* screen, CI against a
 local Mosquitto; the optional modules screen; the agent sysmodule, its
 `pg:agent` service, PlayGuard's agent mode and the agent's update from
 PlayGuard with its roll-back, with a simulated agent in CI;
 user guide in [`home-assistant.md`](home-assistant.md); the Home Assistant
 integration, in its own repository,
-[JigSawFr/playguard-ha](https://github.com/JigSawFr/playguard-ha)). Not yet
+[JigSawFr/boreale-ha](https://github.com/JigSawFr/boreale-ha)). Not yet
 tried on a console: the agent itself (its IPC server, TLS, its start without a
 reboot). This document records the decisions
 behind an optional link between PlayGuard and a home-automation setup, so that
@@ -48,7 +48,7 @@ Non-goals:
 
 ## What the code base imposes
 
-- **Play history already exists on the console.** `source/core/playstats.c`
+- **Play history already exists on the console.** `library/boreale-link/modules/playguard/core/playstats.c`
   reads the system's play log (`pdm`), which covers time played while PlayGuard
   was closed. PlayGuard only folds the last 7 local days; the long-term
   archive has to live elsewhere.
@@ -106,7 +106,7 @@ host, for things HA already does).
 
 ### A background agent, both processes active, one broker client
 
-**Decision.** `playguard-agent`, an optional Atmosphère boot sysmodule, is
+**Decision.** `boreale-link`, an optional Atmosphère boot sysmodule, is
 the **only MQTT client** when it runs. PlayGuard, when open, talks to it over
 a small IPC service (`pg:agent`): it pushes its own fresh snapshots after every
 change, receives the orders that arrive while it is open and applies them with
@@ -151,12 +151,12 @@ so a parent moving from the phone app to PlayGuard finds the same words.
 
 ### One C core, two hosts, no vendored MQTT
 
-**Decision.** `source/sync/` is plain C11 with no heap allocation and
+**Decision.** `library/boreale-link/modules/playguard/sync/` is plain C11 with no heap allocation and
 caller-provided buffers: the MQTT codec and client, the state snapshot, the
 discovery payload, the order parser, the gated-write sequence, the flat config
 parser and the engine's state machine, behind two small vtables (transport,
 console). The app links it with a C++ shell on the UI side; the agent links it
-with libnx directly, alongside `source/core/pctl_ops.c` (the recovery sysmodule
+with libnx directly, alongside `library/boreale-link/modules/playguard/core/pctl_ops.c` (the recovery sysmodule
 duplicated those calls; the agent will not).
 
 **Why.** The desktop build is the only automated test bench: with the app
@@ -196,7 +196,7 @@ are) stays under both.
           (native discovery, or the                   │ TCP, optional TLS
            playguard HACS integration)                │
                                                       ▼
-                                        playguard-agent (boot sysmodule)
+                                        boreale-link (boot sysmodule)
                                         the only MQTT client
                                             ▲ IPC pg:agent
                                             │ (session open = PlayGuard open)
@@ -253,7 +253,7 @@ HA integration turns the daily totals into long-term statistics.
 
 ### The agent
 
-- Built like the recovery sysmodule (`sysmodule/agent/`, shared
+- Built like the recovery sysmodule (`library/boreale-link/agent/`, shared
   `sysmodule/common.mk`), `__nx_applet_type = None`, a static heap of
   1.5 MiB, a small `socketInitialize` (8 KiB TCP buffers that grow to 32 KiB,
   no UDP, `sb_efficiency` 4: a 256 KiB transfer memory pool, room for the
@@ -342,7 +342,7 @@ the device's diagnostics.
 
 | Phase | Content | What it gives |
 |---|---|---|
-| A | `source/sync/` with host tests; PlayGuard hosting the engine itself (no agent); native HA discovery; Mosquitto in the desktop smoke test; this protocol | State and statistics in HA whenever PlayGuard is open; the protocol proven in CI |
+| A | `library/boreale-link/modules/playguard/sync/` with host tests; PlayGuard hosting the engine itself (no agent); native HA discovery; Mosquitto in the desktop smoke test; this protocol | State and statistics in HA whenever PlayGuard is open; the protocol proven in CI |
 | B0 | The *Modules* screen, deploying the recovery module | The recovery module without a computer |
 | B | The agent, the `pg:agent` service, PlayGuard in agent mode, bundling, release assets, update from the app | Realtime; nothing stale between PlayGuard and HA |
 | C | The HACS integration (its own repository, as soon as the topics are frozen) | Game names, per game and per account, long-term statistics, automations, reports in HA |

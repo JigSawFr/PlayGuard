@@ -14,7 +14,7 @@
 #include "action/pt_flow.hpp"
 #include "action/pt_logic.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/date.hpp"
 #include "util/profiles.hpp"
 

@@ -12,9 +12,9 @@ Each fact says how sure it is:
 - **inferred**: deduced from the layout or from other facts, not tested directly;
 - **unknown**: still open. A diagnostic report that answers it is welcome.
 
-The code is the reference for the details: `source/core/pctl_ops.c` (command
-table, session handling), `source/core/pure.h` (the play-timer block),
-`source/core/time_ops.h` (clocks), `sysmodule/rescue/source/main.c` (rescue).
+The code is the reference for the details: `library/boreale-link/modules/playguard/core/pctl_ops.c` (command
+table, session handling), `library/boreale-link/modules/playguard/core/pure.h` (the play-timer block),
+`library/boreale-link/modules/playguard/core/time_ops.h` (clocks), `sysmodule/rescue/source/main.c` (rescue).
 Public reference: [switchbrew, Parental Control services](https://switchbrew.org/wiki/Parental_Control_services).
 
 ## The service and its session
@@ -147,7 +147,7 @@ matches every block PlayGuard has seen (`01 01 01 00`); byte `01` at `0`
 | `03` | `00` | reserved |
 | `04..0B` | `00 00 00 06 00 00 00 00` | the daily rule, in a day's format. Its `06` (byte `07`) stays in the "off" block, but was seen turn to `00` with the limits kept (observed, 22.0.0, between 20:10 and 20:44 on 2026-10-09; what changed it is not known) |
 
-What PlayGuard does with them (`source/core/pure.c`): in `DAILY` mode the
+What PlayGuard does with them (`library/boreale-link/modules/playguard/core/pure.c`): in `DAILY` mode the
 limits and bedtimes shown are the daily rule's, for every day (the seven
 days are ignored by the console). A write that changes such a block moves it
 to `EACH_DAY_OF_THE_WEEK` first, each day given the daily rule (all-zero days
@@ -186,7 +186,7 @@ One day (8 bytes):
   write is still checked against 1954 / 1956 / 1957 and undone when the
   console disagrees.
 
-What PlayGuard accepts as this layout (`pt_plausible`, `source/core/pure.c`):
+What PlayGuard accepts as this layout (`pt_plausible`, `library/boreale-link/modules/playguard/core/pure.c`):
 in each day and in the daily rule `04..0B`, the bedtime and limit
 switches `0` or `1`, hours below 24, minutes below 60, the limit 0 to 1440
 minutes (or `FFFF`). The four mode bytes are not checked, so any value
@@ -427,7 +427,7 @@ One day, field by field (Sunday above):
 └──────────────────────────────────── bedtime on                              verified
 ```
 
-The code (`source/core/pure.h`) reads the same block as 34 u16 instead of
+The code (`library/boreale-link/modules/playguard/core/pure.h`) reads the same block as 34 u16 instead of
 bytes. The `header=0101 0001` of the report is the first two: bytes `01 01`,
 then `01 00`. Because the header is 12 bytes, a day's u16 straddle its fields:
 a day's `[+0]` = `0x0600` is its bytes +2 and +3 (alarm minute, allowed-again

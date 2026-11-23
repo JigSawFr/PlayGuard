@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/notices.hpp"
+#include "core/fw_policy.h"
 
 #include <algorithm>
 #include <aurore.hpp>
@@ -27,7 +28,7 @@
 #include "app.hpp"
 #include "core/sim_env.h"
 #include "tab/clock_tab.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/activity_summary.hpp"
 #include "util/backup.hpp"
 #include "util/config.hpp"

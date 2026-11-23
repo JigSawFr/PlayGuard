@@ -6,7 +6,7 @@ optional agent), the MQTT broker, Home Assistant and the `playguard` HA
 integration. The design and its reasons are in
 [`sync-design.md`](sync-design.md); the user guide is
 [`home-assistant.md`](home-assistant.md). The documents below are what
-`source/sync/` writes (its host tests save examples that
+`library/boreale-link/modules/playguard/sync/` writes (its host tests save examples that
 `tools/check_sync_json.py` validates); a change that breaks a consumer bumps
 `schema`.
 
@@ -185,7 +185,28 @@ platform:
 ```
 
 `platform` (`switch`) is also in the `system` document. Each module gives
-the `schema` of its documents (`state`'s) and its version.
+the `schema` of its documents (`state`'s) and its version. `playguard` is
+listed only while its module runs: an agent carries it when PlayGuard's
+registry file (`config/boreale/apps/playguard.conf`) has `publish=1` and
+PlayGuard's `.nro` is still on the SD card; without that the agent publishes
+the console's own documents (`availability`, `system`, `notices`,
+`capabilities`) and the relayed homebrews', and nothing under `playguard/`
+(no state, activity or discovery, no subscription to its orders). What its
+module left on the broker (`state`, `activity`, `week`, `names`, `games`,
+`report` and the console's native discovery) is cleared, at each connection
+and when the module goes off; the finished days (`activity/<date>`) and the
+games' icons stay for PlayGuard to clear. The agent takes the module off only
+after three reads of the registry file in a row that say so (a card that did
+not answer once clears nothing).
+
+A homebrew that relays through the agent (`bl:link`, below) is listed while
+its session is open, with its version only (its documents carry their own
+`schema`), and taken out when the session ends; the document is published
+again when that set or a version changes:
+
+```json
+{"schema": 1, "platform": "switch", "modules": {"playguard": {"schema": 1, "version": "1.4.0"}, "playshelf": {"version": "1.2.0"}}}
+```
 
 ## `notices`
 
@@ -231,6 +252,12 @@ with the state. Every unknown value is `null`.
  "boot_ts": 1790971980}
 ```
 
+- `agent` (only in the agent's document, absent from PlayGuard's own): how it
+  is doing: `uptime_s`, `heap_used` and `heap_total` (bytes; `null` when not
+  read), `protocols` (`relay`: `bl:link`'s, `ipc`: `pg:agent`'s: the ones it
+  serves) and `module` (PlayGuard's module runs; the same as `capabilities`
+  listing it). An integration can say that the agent is too old for a homebrew.
+  A key added to schema 1.
 - `versions.hekate`: the SD card's `bootloader/update.bin`. `app`: PlayGuard's
   (from the agent: the one its last session said). `agent`: `null` without it.
 - `hardware.model`: `erista` (the first Switch), `mariko` (its 2019
@@ -340,7 +367,7 @@ forwarder on the HOME menu: PlayGuard's own, those PlayGuard made, those
 another app made, sphaira's for instance) is told as totals (`homebrew_s`,
 `homebrew_min`) and counts (`homebrews`, `forwarders`); the one in front is
 named, game or homebrew (`now_playing`, the events, `now`). What a title is
-(`source/sync/sync_titles.h`, shared by PlayGuard and the agent):
+(`library/boreale-link/modules/playguard/sync/sync_titles.h`, shared by PlayGuard and the agent):
 
 | Signal | Says | How sure |
 |---|---|---|
@@ -521,7 +548,7 @@ agent keeps an order for PlayGuard to confirm under *ask*). `rc` is
 was away misses them on purpose; the state carries `link.last_result`.
 
 What the console does on its own, found by comparing each state snapshot with
-the last one (`source/sync/sync_watch.c`), is published the same way, right
+the last one (`library/boreale-link/modules/playguard/sync/sync_watch.c`), is published the same way, right
 after the state that shows it:
 
 ```json
@@ -598,7 +625,7 @@ Assistant: `clock_accurate`, `used_screen_time`, `limit_sun` …
 `accounts`, and those of the
 `system` topic but `sd_free`, `nand_free`, `battery`, `charging` and `docked`.
 Ids and names follow HA's `nintendo_parental_controls` integration where the
-meaning matches. The table is `source/sync/sync_entities.c`.
+meaning matches. The table is `library/boreale-link/modules/playguard/sync/sync_entities.c`.
 
 The HA integration, when installed, publishes `discovery/set = OFF`, and
 creates its own entities with the same object ids.
@@ -625,7 +652,7 @@ not read (no version known). PlayGuard shows the version in
 integration's latest release with its other updates (*Check for updates
 every day*, *Check for updates*), only once the integration is known: a
 newer one is in the notification bell, with what changed since (the
-release's `CHANGELOG.md`) and the QR code that opens it in HACS.
+release's `CHANGELOG.md`) and the QR code that opens it in the Marketplace.
 
 ## Files on the SD card
 
@@ -721,10 +748,10 @@ published, for the integration to follow.
 
 ## IPC service `pg:agent` (PlayGuard ↔ agent)
 
-Hosted by the agent (`sysmodule/agent/source/agent_ipc.c`); PlayGuard's
+Hosted by the agent (`library/boreale-link/agent/source/agent_ipc.c`); PlayGuard's
 client is `source/util/agent_client_nx.cpp` (`source/action/sync_flow.cpp`
 drives it). Command ids, structures and result codes are in
-`source/sync/agent_ipc.h` (protocol 3). The IPC message holds 256 bytes, so
+`library/boreale-link/modules/playguard/sync/agent_ipc.h` (protocol 3). The IPC message holds 256 bytes, so
 documents, the log, an order and the status travel in mapped buffers.
 
 PlayGuard looks for the service when the link is on, at start-up and every
@@ -763,7 +790,6 @@ and come back from the broker for the agent.
 | 12 | `GetRecords` | | `AgentRecords` | What the agent changed (extra time, console lock, relock), for PlayGuard to adopt. |
 | 13 | `ReloadConfig` | | | Read `sync.conf` and `nro_state.txt` again (also done when their date changes). |
 | 14 | `GetLog` | | buffer: text | The agent's last 200 lines, oldest first. |
-| 15 | `PrepareShutdown` | | | Publish `offline`, disconnect, stay idle: first step of an update or a stop from PlayGuard. A later `Hello` of the same protocol brings the link back (the stop did not follow). |
 | 16 | `PushGames` | buffer: JSON | | Publish `games`. |
 
 Everything but `Hello`, `GetStatus` and `GetLog` needs the session. The
@@ -777,6 +803,50 @@ which they embed) is checked at build time against the values next to
 `AGENT_PROTOCOL`: a change to one fails the build until those values are
 updated and `AGENT_PROTOCOL` goes up.
 
+## IPC service `bl:link` (another homebrew ↔ agent)
+
+Hosted by the same thread as `pg:agent` (`library/boreale-link/agent/source/agent_ipc.c`),
+registered next to it: if the console refuses the name, the agent logs it and
+serves PlayGuard as before, and the other homebrews keep their own connection.
+The sessions, what a module may publish and the orders handed back are
+`library/boreale-link/agent/source/agent_relay.c`; the rules shared with the homebrews
+(protocol 1, which modules and topics may relay, the queue of orders) are
+boreale-link's `bl_relay`. The commands are `BlRelayCmd`: Hello (protocol,
+module, version; the reply says `accepted`), Publish, PopOrder, Status, Close,
+and three that manage the agent and need no session, Info, Shutdown and Resume
+(below).
+
+A homebrew that is open while the agent runs says Hello with its module name
+and publishes under `boreale/<id>/<module>/` through the agent, which keeps the
+console's one broker connection. One session per module, room for two; a topic
+asked for twice before the agent took it replaces the first (the newest wins),
+and the relay adds no right to the agent. The agent refuses a module that is
+one of the console's own levels or `playguard`, a topic with a wildcard or a
+`..`, and a second session of the same module; the homebrew then keeps its own
+connection.
+
+- **Publish** (send buffer): a flags byte (bit 0: retained), the topic below the
+  module's level, a NUL, then the payload (4 KiB at most).
+- **PopOrder**: the order comes in the output buffer in the same shape, its
+  length in the reply as a `u32` (0: none waiting).
+- **Control** (no Hello, a session of its own that the client closes after the
+  call): what an app that installs, replaces or stops the agent asks of it,
+  whichever homebrew installed it. **Info** answers `BlRelayInfo` (the agent's
+  protocol and version, whether its broker connection is up, whether it was
+  asked to leave, how many homebrews have a session open); **Shutdown** makes it
+  leave the broker (its last will says "offline") and stay away; **Resume** brings it back (a restart comes back by itself).
+  An agent from before them answers an unknown-command error: it is too old.
+  PlayGuard's update uses them.
+- **Orders**: the agent subscribes to `<base>/<module>/+/set` for each module with
+  a session, one filter per module and never `+/+/set` (it would cover
+  PlayGuard's own orders a second time). Retained orders come back on the next
+  subscription. A session's queue holds 8 orders; a full one refuses the new
+  order and counts it in Status.
+- Publications wait on the agent while the broker is out of reach, and go out
+  when it is back.
+
+Not yet: the homebrews' own use of it beyond PlayShelf's `state` and pause button.
+
 ## Schema and compatibility
 
 - `schema` is on every JSON document and in `sync.conf`. Adding a field does
@@ -785,6 +855,6 @@ updated and `AGENT_PROTOCOL` goes up.
   there what it accepts (see *Orders* above).
 - The HA integration pins the schema it understands and raises a repair issue
   on a newer one.
-- The entity table (`source/sync/sync_entities.h`) is exported by a host test
+- The entity table (`library/boreale-link/modules/playguard/sync/sync_entities.h`) is exported by a host test
   as `entities.json`; the integration carries a copy and its tests fail when
   the two diverge.

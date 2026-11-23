@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
+<!-- translated from docs/compatibility.md, sha256 a287e9835737 -->
 # Compatibiliteit
 
 Ondersteunde firmware, Atmosphère en launchers, emuMMC en sysMMC, en hoe PlayGuard zich verhoudt tot een vervangende sysmodule. Terug naar de [README](../../README.md).
@@ -36,6 +36,10 @@ PlayGuard controleert of Atmosphère draait, niet welke versie: wat telt, is de 
 
 Starten boven een game (title override) wordt aanbevolen. De app zegt of hij als applicatie (boven een game, of vanuit zijn eigen forwarder in het HOME-menu) of als applet (album) draait. Boven een game telt de console de tijd in PlayGuard als tijd van die game. In de activiteit gaat die naar de gebruiker die bij het starten is gekozen: open het met de gebruiker van een ouder, niet van een kind. De speeltijdtimer is die van de console, dezelfde voor elke gebruiker: hij telt die tijd mee, wie PlayGuard ook opende, tenzij de timer uit staat of de pincode ouderlijk toezicht heeft gepauzeerd ([details](features.md#de-pincode-pauzeert-ouderlijk-toezicht-zolang-je-in-playguard-bent)).
 
+### Vervangende HOME-menu's
+
+Het HOME-menu controleert de grenzen van de console voordat een spel start, dus een vervangend HOME-menu moet dat ook doen. [SwitchU](https://github.com/PoloNX/SwitchU) doet dat vanaf versie 1.4.2: de maker heeft het met PlayGuard getest, en het houdt zich aan de speeltijdgrenzen, de beperkingen bij starten en hervatten, het ontgrendelen door een ouder met de pincode en de vergrendeling als de tijd om is. Andere vervangende menu's zijn niet getest ([meldingen welkom](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)).
+
 ### Nintendo Switch 2
 
 Niet ondersteund: er bestaat geen Atmosphère voor.
@@ -50,7 +54,7 @@ Elk heeft zijn eigen ouderlijk toezicht, en PlayGuard ziet alleen dat van het sy
 
 ### Kan de console hierdoor een ban krijgen?
 
-PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers, GitHub (updates, en de rapporten die je verstuurt) en switchbrew (de nieuwste firmware en de release notes ervan). Consoles krijgen een ban door custom firmware of een emuMMC die online gaat naar Nintendo ([FAQ van switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in het Engels). Er is geen ban gedocumenteerd die samenhangt met wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.
+PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbare tijdservers, GitHub (updates, en de rapporten die je verstuurt), switchbrew (de nieuwste firmware en de release notes ervan) en het CDN van de Homebrew App Store, `switch.cdn.fortheusers.org` (de versie van PlayGuard die daar staat). Consoles krijgen een ban door custom firmware of een emuMMC die online gaat naar Nintendo ([FAQ van switchbrew](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), in het Engels). Er is geen ban gedocumenteerd die samenhangt met wijzigingen aan ouderlijk toezicht of de klok; dat is geen garantie.
 
 ### Een console zonder internet
 

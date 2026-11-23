@@ -30,7 +30,7 @@ then, for a computer:
 
 What is for GitHub only is HTML, or Markdown inside "<!-- console:hide -->" …
 "<!-- /console -->"; what the console reads instead is in a
-"<!-- console: … -->" comment (source/util/changelog.cpp). The console keeps
+"<!-- console: … -->" comment (library/boreale-kit/source/util/changelog.cpp). The console keeps
 the notes' first 16 KB only, hence the summary first.
 
 assets.json is `gh release view --json assets`; compare.json the GitHub API's
@@ -76,7 +76,7 @@ INSTALL = """## 📦 Install
 
 3. **Locked out?** [`playguard-rescue.zip`]({dl}/playguard-rescue.zip){size_rescue} is the optional recovery sysmodule, for a [forgotten PIN]({site}docs/troubleshooting/{utm}#locked-out).
 
-4. **Home Assistant?** [`playguard-agent.zip`]({dl}/playguard-agent.zip){size_agent} is the optional remote link's sysmodule, which keeps the [link to MQTT and Home Assistant]({repo}/blob/main/docs/home-assistant.md) going while PlayGuard is closed. PlayGuard also installs it from *Console › Optional modules*.
+4. **Home Assistant?** [`boreale-link.zip`]({dl}/boreale-link.zip){size_agent} is the optional remote link's sysmodule, which keeps the [link to MQTT and Home Assistant]({repo}/blob/main/docs/home-assistant.md) going while PlayGuard is closed. PlayGuard also installs it from *Console › Optional modules*.
 
 > [!NOTE]
 > Requires custom firmware (**Atmosphère**).{firmware} [Compatibility]({site}docs/compatibility/{utm})"""
@@ -297,7 +297,7 @@ def layout(notes: str, version: str, repo: str, summary: str = "", firmware: str
 
     out.append(INSTALL.format(dl=dl, site=SITE_URL, utm=UTM.format(tag=tag), repo=repo, firmware=firmware, size_zip=size("playguard.zip"),
                               size_nro=size("playguard.nro"), size_rescue=size("playguard-rescue.zip"),
-                              size_agent=size("playguard-agent.zip")))
+                              size_agent=size("boreale-link.zip")))
 
     build = []
     if run_url:

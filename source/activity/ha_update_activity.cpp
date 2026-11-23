@@ -16,8 +16,8 @@ void HaUpdateActivity::onContentAvailable()
     header->setTitle(aurore::getStr("playguard/notices/ha_integration", ha_update_flow::newer()));
     body->setSingleLine(false);
     body->setText(aurore::getStr("playguard/ha_update/body", installed));
-    qr->addView(ha_links::qr_card("playguard/ha_update/hacs"_i18n, app::HA_HACS_URL,
-                                  "playguard/ha_update/hacs_caption"_i18n));
+    qr->addView(ha_links::qr_card("playguard/ha_update/marketplace"_i18n, app::HA_MARKETPLACE_URL,
+                                  "playguard/ha_update/marketplace_caption"_i18n));
 
     const auto lines = ha_update_flow::changes();
     changes->setTitle(aurore::getStr("playguard/ha_update/changes", installed));

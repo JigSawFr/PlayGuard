@@ -19,7 +19,7 @@
 #include "activity/play_timer_perday_activity.hpp"
 #include "activity/profiles_activity.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
 #include "util/perf.hpp"

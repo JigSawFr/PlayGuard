@@ -1,9 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <!-- Boréale's look: the frame in the aurora's colours. Drawn over the icon of a forwarder protected with the PIN (transparent elsewhere). -->
-  <g transform="translate(198 196) scale(1.15) translate(-198 -200)">
-  <defs><linearGradient id="fi-shield" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00FFCC"/><stop offset="0.65" stop-color="#33BBFF"/><stop offset="1" stop-color="#8A5CFF"/></linearGradient></defs>
-  <path d="M198 158 L228 169 V193 C228 212 215 225 198 234 C181 225 168 212 168 193 V169 Z" fill="url(#fi-shield)" stroke="#0A1020" stroke-width="7" stroke-linejoin="round"/>
-  <rect x="186" y="192" width="24" height="20" rx="3.5" fill="#0A1020"/>
-  <path d="M191 192 V185 A7 7 0 0 1 205 185 V192" fill="none" stroke="#0A1020" stroke-width="5"/>
-  </g>
+  <!-- Boréale's look: drawn over the icon of a forwarder protected with the PIN (transparent elsewhere). The corner shaded, then lit by the aurora, both fading towards the middle; a fine frame in the aurora's colours rising from the corner and fading out, broken around the crest: PlayGuard's shield, lifted by its shadow, a keyhole cut in it. -->
+  <defs>
+    <linearGradient id="b-colour" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00FFCC"/><stop offset="0.65" stop-color="#33BBFF"/><stop offset="1" stop-color="#8A5CFF"/></linearGradient>
+    <linearGradient id="b-frame" x1="0" y1="0" x2="1" y2="1"><stop offset="0.3" stop-color="#00FFCC" stop-opacity="0"/><stop offset="0.7" stop-color="#33BBFF"/><stop offset="1" stop-color="#8A5CFF"/></linearGradient>
+    <linearGradient id="b-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E1A33"/><stop offset="1" stop-color="#0A1020"/></linearGradient>
+    <radialGradient id="b-shade" cx="1" cy="1" r="0.55"><stop offset="0" stop-color="#0A1020" stop-opacity="0.85"/><stop offset="0.5" stop-color="#0A1020" stop-opacity="0.45"/><stop offset="1" stop-color="#0A1020" stop-opacity="0"/></radialGradient>
+    <radialGradient id="b-aurora" cx="1" cy="1" r="0.62"><stop offset="0" stop-color="#33BBFF" stop-opacity="0.85"/><stop offset="0.35" stop-color="#8A5CFF" stop-opacity="0.45"/><stop offset="0.7" stop-color="#00FFCC" stop-opacity="0.12"/><stop offset="1" stop-color="#00FFCC" stop-opacity="0"/></radialGradient>
+    <filter id="b-shadow" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity="0.65"/></filter>
+  </defs>
+  <rect width="256" height="256" fill="url(#b-shade)" opacity="0.6"/>
+  <rect width="256" height="256" fill="url(#b-aurora)" opacity="0.75"/>
+  <path d="M188 254 H2 V2 H254 V186" fill="none" stroke="url(#b-frame)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <g filter="url(#b-shadow)"><g transform="translate(222 220) scale(0.3) translate(-128 -130)">
+    <path d="M128 42 C 154 54, 180 60, 204 60 L 204 126 C 204 172, 174 200, 128 218 C 82 200, 52 172, 52 126 L 52 60 C 76 60, 102 54, 128 42 Z" fill="url(#b-night)" stroke="url(#b-colour)" stroke-width="14" stroke-linejoin="round"/>
+    <path d="M128 52 C 152 63, 176 68, 196 68 L 196 110 C 160 118, 100 100, 60 112 L 60 68 C 80 68, 104 63, 128 52 Z" fill="#E8EEF7" fill-opacity="0.12"/>
+  </g></g>
+  <g transform="translate(222 221) scale(0.96)" fill="#E8EEF7"><circle cx="0" cy="-4" r="6"/><path d="M-2.6 -1 L 2.6 -1 L 4.6 13 Q 4.8 14.5 3.3 14.5 L -3.3 14.5 Q -4.8 14.5 -4.6 13 Z"/></g>
 </svg>

@@ -29,7 +29,7 @@ def keys_of(doc, prefix=""):
 
 # What an entity shows (sync.conf's publish_* switches; "controls" always).
 PUBLISH = ("controls", "activity", "games", "icons", "console", "network", "hardware", "serial", "report")
-MODULE = "playguard"   # source/sync/sync_discovery.h: SYNC_MODULE
+MODULE = "playguard"   # library/boreale-link/modules/playguard/sync/sync_discovery.h: SYNC_MODULE
 
 
 def main():

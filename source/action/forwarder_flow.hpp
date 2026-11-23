@@ -37,9 +37,15 @@ bool loader_present();
 // desktop build). Kept in each forwarder made (forwarders::Made::loader).
 std::string loader_id();
 
+// The badge this build draws over a protected forwarder's icon
+// (forwarder_library::BADGE), as 16 hex digits of its SHA-256; "" when it
+// cannot be read. Kept in each protected forwarder made (forwarders::Made::badge).
+std::string badge_id();
+
 // Forwarders made with another loader than this build's (or before it was
 // kept: forwarders_logic::stale_loader), or protected with another gate
-// (forwarders_logic::stale_gate), still on the HOME menu; made again
+// (forwarders_logic::stale_gate) or with another badge
+// (forwarders_logic::stale_badge), still on the HOME menu; made again
 // (confirmed first, and their patches checked) by refresh.
 std::vector<forwarders_logic::Row> to_refresh();
 void refresh(std::function<void(bool)> done);

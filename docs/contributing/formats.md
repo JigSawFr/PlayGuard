@@ -28,22 +28,23 @@ behind all meet files from another version. The rule:
 
 | Format | Written by → read by | Version | Newer | Unknown fields | Tests |
 |---|---|---|---|---|---|
-| `config.json` | `util/config.cpp` → itself; `core/gate.c` (language and theme only), the web simulator | `config::SCHEMA` 1 | defaults in memory, never written | kept on save | `tests/config/` |
+| `config.json` | `util/config.cpp` → itself; `core/gate.c` (language and theme only), the web simulator | `config::SCHEMA` 1 (the gate's copy: `GATE_CONFIG_SCHEMA`) | defaults in memory, never written; the gate reads it as absent | kept on save | `tests/config/`, `tests/gate/` |
 | `nand/<system>/state.json` | `util/config.cpp` | `config::SCHEMA` 1 | defaults in memory, never written | kept on save | `tests/config/` |
 | `nand/<system>/history.json` | `util/history.cpp` | `history::SCHEMA` 1 | read as empty, not put aside, never written (changes not recorded) | an entry's skipped | `tests/history/` |
-| `nand/<system>/watch.json` | `action/outside_change_logic.cpp` | `outside_change_logic::SCHEMA` 1 | a fresh record, never saved | skipped | `tests/outside_change_logic/` |
+| `nand/<system>/watch.json` | `action/outside_change_logic.cpp` | `outside_change_logic::SCHEMA` 1 | a fresh record, never saved | kept on save | `tests/outside_change_logic/` |
 | `nand/<system>/forwarders.json` | `util/forwarders.cpp` | `forwarders::SCHEMA` 1 (none before: 1) | read as none, never written | kept on save (the file's and each entry's) | `tests/forwarders/` |
+| web simulator's kept folder (IndexedDB, `keep=1`), file `web_schema` | `web/simulator.js` | `SimLogic.KEPT_SCHEMA` 1 (none before: 1) | read as empty, nothing saved | the files inside keep their own schema | `tests/web_page/` |
 | `github_token` | `util/github_auth.cpp` | the `v1:` prefix of `util/secret_box` | another console's box, or one this version cannot open: signed out, the file left as it is | a plain token (an older version's) sealed where it lies | `tests/secret_box/` |
 | `migrations.json` | `util/migrations.cpp` | `migrations::SCHEMA` 1 + `level` | a higher `level` brought back, nothing runs | skipped | `tests/migrations/` |
 | `nand/<system>/backups/*.json` | `util/backup.cpp` | `FORMAT` 1 (`format`), strict | refused | skipped | `tests/backup/` |
 | `compat.json`, `compat-<N>.json` (release assets) | `tools/gen_compat.py` → `util/update.cpp` | `update::COMPAT_SCHEMA` 1; `compat.json` stays 1 forever | `compat-<COMPAT_SCHEMA>.json` fetched first, `compat.json` when missing or unreadable | skipped | `tests/update/` |
-| `sync.conf` | `sync/sync_conf.c` (PlayGuard and the agent) | `SYNC_CONF_SCHEMA` 1 | read for the keys known, never written (by either) | kept (up to `SYNC_EXTRA_MAX`; beyond, the file is not written) | `tests/sync_core/`, `tests/sync_files/` |
+| `sync.conf` | `sync/sync_conf.c` (PlayGuard and the agent) | `SYNC_CONF_SCHEMA` 3 (none in the file: the current one, not 1) | read for the keys known, never written (by either) | kept by `bl_kv` (up to `SYNC_EXTRA_MAX`; beyond that, or with a line too long to read, the file is not written) | `tests/sync_core/`, `tests/sync_files/` |
 | `nand/<system>/sync/agent_events.log` | agent `main.c` → `util/sync_files.cpp` | the number of fields (10 or 11) | a line with more fields read for the known ones | an unreadable line kept in `agent_events.log.rejected` | `tests/sync_files/` |
 | `nand/<system>/sync/titles.txt` | `util/titles.cpp` → `sync/sync_titles.c` (the agent) | none (one word per title) | an unknown kind read as `homebrew`: never published by its ID | — | `tests/sync_core/`, `tests/titles/` |
 | `nand/<system>/sync/integration.json` | the agent or PlayGuard, as the integration sent it → `util/sync_files.cpp` | `sync_files::INTEGRATION_SCHEMA` 1 | kept, not read | skipped | `tests/sync_files/` |
 | `nand/<system>/sync/nro_state.txt`, `agent_state.txt` | `sync/sync_records.c` | none | a missing `read_only` writes nothing | skipped | `tests/sync_files/`, `tests/agent/` |
 | IPC `pg:agent` | `sync/agent_ipc.h` (PlayGuard ↔ agent) | `AGENT_PROTOCOL` 3; each structure's size checked at build time (`AGENT_SIZE_*`) | `AgentHello` / `AgentHelloReply` never change: the reply says the protocol, no session | — | `tests/agent/` |
-| MQTT documents (`state`, `system`, `games`, `activity`, `names`, `week`, `event`) | `source/sync/` → the Home Assistant integration | `SYNC_SCHEMA` 1 | the integration's repair issue | skipped | `tests/sync_core/`, `tools/check_sync_json.py` |
+| MQTT documents (`state`, `system`, `games`, `activity`, `names`, `week`, `event`) | `library/boreale-link/modules/playguard/sync/` → the Home Assistant integration | `SYNC_SCHEMA` 1 | the integration's repair issue | skipped | `tests/sync_core/`, `tools/check_sync_json.py` |
 | MQTT orders (`<entity>/set`) | the integration → `sync/sync_engine.c` | `state`'s `schema` (the console announces what it accepts) | an unknown entity refused (`unknown_entity`), the order cleared | — | `tests/sync_engine/` |
 | `gate_log.txt` | the gate (`core/gate_nx.c`) → `action/forwarder_rules_logic.cpp` | none | an unknown result kept as `other` (history: *Other change*) | — | `tests/gate/`, `tests/forwarder_rules_logic/` |
 | Game and play-time caches (`cache/*.bin`) | `util/game_cache.cpp`, `util/play_cache.cpp` | magic + `VERSION` + structure size | made again | — | `tests/game_cache/`, `tests/play_cache/` |

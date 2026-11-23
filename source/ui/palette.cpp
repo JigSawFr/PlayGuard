@@ -1,7 +1,7 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "ui/palette.hpp"
 
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 namespace ui
 {

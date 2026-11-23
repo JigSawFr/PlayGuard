@@ -5,7 +5,7 @@
 
 #include "action/forwarder_flow.hpp"
 #include "action/game_scan.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/forwarders.hpp"
 #include "util/paths.hpp"
 #include "util/sync_files.hpp"

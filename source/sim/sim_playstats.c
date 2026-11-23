@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../core/calendar.h"
+#include "core/calendar.h"
 #include "../core/playstats.h"
-#include "../core/sim_env.h"
+#include "core/sim_env.h"
 #include "../core/time_ops.h"
 #include "sim_games.h"
 

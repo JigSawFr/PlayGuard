@@ -9,7 +9,7 @@
 #include "action/pt_flow.hpp"
 #include "activity/profiles_activity.hpp"
 #include "ui/play_text.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
 using namespace aurore::literals;

@@ -80,6 +80,8 @@ The real app, against a simulated console, in your browser:
 
 **Compatibility:** tested on firmware 22.0.0, 22.1.0, 22.5.0 and 23.0.1 (Atmosphère 1.11–1.12); 23.0.0 and 21.x should work, untested; older firmware, everything but the play timer. Details: [compatibility](https://guard.boreale.dev/docs/compatibility/?utm_source=github&utm_medium=readme). **No Switch 2.**
 
+**Replacement HOME menu:** [SwitchU](https://github.com/PoloNX/SwitchU) honours PlayGuard's limits from its version 1.4.2 ([details](https://guard.boreale.dev/docs/compatibility/?utm_source=github&utm_medium=readme#replacement-home-menus)).
+
 ## 📖 Documentation
 
 **[guard.boreale.dev](https://guard.boreale.dev/?utm_source=github&utm_medium=readme)**, in the console's 15 languages:
@@ -95,6 +97,21 @@ The Markdown sources live in [`docs/`](docs/), with the reference pages: [`confi
 [CONTRIBUTING.md](CONTRIBUTING.md) · [Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Security](SECURITY.md)
 
 AI coding assistants help with development; every change is reviewed, unit-tested and checked on a real console before release.
+
+## 🧭 How it's made
+
+[![Human-led, AI-assisted](https://raw.githubusercontent.com/JigSawFr/boreale/main/branding/badge-ai.svg)](https://boreale.dev/how/?utm_source=github&utm_medium=readme)
+
+PlayGuard is built by [JigSawFr](https://github.com/JigSawFr), a full-stack
+engineer who has shipped production software for years, with AI coding
+assistants as part of the toolbox.
+
+- **I decide**: architecture, scope, what ships and what doesn't.
+- **AI helps write**: first drafts of code and tests, docs, and the translations.
+- **I review everything**: every change is read, tested (on a real console when it touches
+  the console) and signed before it reaches `main`.
+
+Nothing in the app or its sysmodule calls an AI service. More on [boreale.dev](https://boreale.dev/how/?utm_source=github&utm_medium=readme).
 
 ## 📜 License and credits
 

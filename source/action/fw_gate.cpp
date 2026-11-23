@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/fw_gate.hpp"
+#include "core/fw_policy.h"
 
 #include <utility>
 
@@ -8,7 +9,7 @@
 #include "action/update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
 #include "app.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/update.hpp"

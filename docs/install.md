@@ -8,7 +8,7 @@ Pick one:
 
 - **Homebrew App Store** / **sphaira's App Store** (same catalogue) — Search for *PlayGuard* and install it. New releases are picked up automatically, after a review: often a few days after GitHub. PlayGuard knows it was installed from there and recommends updating through the store.
 - **Manual** — Download `playguard.zip` from the [latest release](https://github.com/JigSawFr/PlayGuard/releases/latest) and extract it to the **root** of the SD card. The app lands in `sd:/switch/playguard/`, its files in `sd:/config/playguard/`.
-- **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira.
+- **sphaira › GitHub** — The release zip already contains the entry (`/config/sphaira/github/playguard.json`): after a first install, update from *GitHub* in sphaira. Installed another way (the Homebrew App Store leaves the entry out), PlayGuard writes it at start-up when sphaira is on the SD card, so sphaira offers each release as soon as it is on GitHub; *Preferences › Entry in sphaira's GitHub menu* (on by default) turns that off and removes it.
 
 The optional **recovery sysmodule** is installed from PlayGuard (*Console › Optional modules*, or *Security › Locked out?*), or by hand from its own download (`playguard-rescue.zip`): extract it to the root of the SD card too, then restart the console. It lands in `atmosphere/contents/4200000000505247/` and only acts when a `RESCUE` file asks it to — see [Locked out?](troubleshooting.md#locked-out).
 
@@ -39,7 +39,7 @@ All in `sd:/config/playguard/` (the app itself stays in `sd:/switch/playguard/`:
 - **`previous_build.json`**, **`boot_check.json`** — After a build is installed in place: the name of the build replaced (kept next to the `.nro` as `playguard.nro.previous`), and the check of the next start (deleted once its first screen is up)
 - **`rescue_report.txt`** — Left by the recovery sysmodule after it acted, until PlayGuard shows it at start-up (one it cannot read is removed, and PlayGuard says so)
 - **`rescue_nonce`** — A random challenge the recovery sysmodule answers in its report, so PlayGuard can tell a report it wrote from one written by hand ([sysmodule/rescue/README.md](../sysmodule/rescue/README.md)); a new one at every start
-- **`sync.conf`** — Only once *Remote access* was set up: the link's settings, the broker's password included (never in a report or an upload)
+- **`sync.conf`** — Only once *Remote access* was set up: the link's own settings (the broker's, password included, are in `sd:/config/boreale/link.conf`, shared with the other Boréale homebrews); neither is ever in a report or an upload
 - **`sync/`** — Only with *Remote access*: the saved profiles, for the optional agent (`profiles.txt`); what it reads and writes for one system is in that system's `nand/<system>/sync/` (records, game names, what it changed, its events). A sysMMC and an emuMMC share `sync.conf` but are two devices in Home Assistant
 - **`logs/`** — `reports/` the saved diagnostic reports (never contain the PIN or the serial number); `crashes/` one file per crash (what made PlayGuard stop); `uploads/` one Internet shortcut (`.url`) per report sent online; `play_timer/` the developer tools' play-timer files. How many reports, crash files and links are kept: *About › Help & diagnostics* (by number, age or size; the newest always stays)
 

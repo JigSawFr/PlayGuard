@@ -3,7 +3,7 @@
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 static constexpr float SIZE = 26;
 static constexpr const char* ICON_ID = "row_icon";

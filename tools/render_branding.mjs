@@ -1,11 +1,5 @@
-// Renders branding/*.svg to the raster files the build and the stores use:
-//   icon.jpg (256x256, NRO icon), images/store/icon.png (256x150),
-//   images/store/banner.png (848x208), images/social-preview.png (1280x640, the
-//   repository's social preview, uploaded by hand in Settings › General),
-//   resources/img/wordmark.png and wordmark-light.png (720x176, transparent: the loading screen's, dark and light),
-//   images/apple-touch-icon.png (180x180: an iPhone's home screen, the website's and the simulator's),
-//   images/icon-192.png and images/icon-512.png (Android's home screen and splash, from both manifests;
-//   maskable as they are: the logo is inside the middle 80 % Android may crop to).
+// Renders what PlayGuard draws only for itself: the app store's pictures,
+//   images/store/icon.png (256x150) and images/store/banner.png (848x208),
 // and images/splash/ (what an iPhone shows while the simulator, opened from its
 // home screen, starts: SPLASH below, each iPhone's screen in both orientations;
 // web/index.html links each with its media query).
@@ -20,17 +14,15 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+// The rest comes from Boréale's brand kit (JigSawFr/boreale, branding/playguard/,
+// copied by its tools/sync_branding.py): branding/icon.svg and mark.svg,
+// icon.jpg (the NRO icon), the loading screen's wordmarks
+// (resources/img/wordmark*.png), images/apple-touch-icon.png, icon-192.png and
+// icon-512.png (maskable: the logo inside the middle 80 % Android may crop to),
+// images/social-preview.png and the README's .github/readme/banner.png.
 const jobs = [
-  { svg: 'branding/icon.svg',       out: 'icon.jpg',                w: 256, h: 256, type: 'jpeg' },
   { svg: 'branding/store-icon.svg', out: 'images/store/icon.png',   w: 256, h: 150, type: 'png' },
   { svg: 'branding/banner.svg',     out: 'images/store/banner.png', w: 848, h: 208, type: 'png' },
-  { svg: 'branding/social-preview.svg', out: 'images/social-preview.png', w: 1280, h: 640, type: 'png' },
-  { svg: 'branding/readme-banner.svg', out: '.github/readme/banner.png', w: 1280, h: 320, type: 'png' },
-  { svg: 'branding/wordmark.svg',   out: 'resources/img/wordmark.png', w: 720, h: 176, type: 'png', transparent: true },
-  { svg: 'branding/wordmark-light.svg', out: 'resources/img/wordmark-light.png', w: 720, h: 176, type: 'png', transparent: true },
-  { svg: 'branding/icon.svg',       out: 'images/apple-touch-icon.png', w: 180, h: 180, type: 'png' },
-  { svg: 'branding/icon.svg',       out: 'images/icon-192.png',     w: 192, h: 192, type: 'png' },
-  { svg: 'branding/icon.svg',       out: 'images/icon-512.png',     w: 512, h: 512, type: 'png' },
 ];
 
 // Each iPhone's screen in CSS pixels and its pixel ratio (iOS needs the

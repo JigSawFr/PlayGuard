@@ -98,24 +98,54 @@ list(APPEND APP_PLATFORM_LIB ${CMAKE_THREAD_LIBS_INIT})
 
 # libcurl for the update check (util/http.cpp). On the Switch: devkitPro's
 # switch-curl portlib (TLS through the console's ssl service), static, so its
-# own dependencies are listed after it.
+# own dependencies are listed after it. zstd for the report as QR codes (the
+# kit's util/report_qr): the switch-zstd portlib, the system's libzstd on a
+# desktop, built from its release in a browser.
 if (PLATFORM_SWITCH)
-    list(APPEND APP_PLATFORM_LIB curl z nx)
+    list(APPEND APP_PLATFORM_LIB curl zstd z nx)
 elseif (PLAYGUARD_WEB)
     # No libcurl in a browser: source/sim/web_http.cpp answers offline.
+    include(FetchContent)
+    FetchContent_Declare(zstd
+        URL https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz
+        URL_HASH SHA256=eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3)
+    FetchContent_GetProperties(zstd)
+    if (NOT zstd_POPULATED)
+        FetchContent_Populate(zstd)
+    endif ()
+    file(GLOB PLAYGUARD_ZSTD_SRC ${zstd_SOURCE_DIR}/lib/common/*.c ${zstd_SOURCE_DIR}/lib/decompress/*.c
+                               ${zstd_SOURCE_DIR}/lib/compress/*.c)
+    add_library(playguard_zstd STATIC ${PLAYGUARD_ZSTD_SRC})
+    target_include_directories(playguard_zstd PUBLIC ${zstd_SOURCE_DIR}/lib)
+    target_compile_definitions(playguard_zstd PRIVATE ZSTD_DISABLE_ASM ZSTD_MULTITHREAD=0)
+    target_compile_options(playguard_zstd PRIVATE -w)
+    list(APPEND APP_PLATFORM_LIB playguard_zstd)
 else ()
     find_package(CURL REQUIRED)
     find_package(ZLIB REQUIRED)   # util/zip_read.cpp (the Switch links z above)
-    list(APPEND APP_PLATFORM_LIB CURL::libcurl ZLIB::ZLIB)
+    find_library(ZSTD_LIBRARY zstd REQUIRED)
+    find_path(ZSTD_INCLUDE_DIR zstd.h REQUIRED)
+    list(APPEND APP_PLATFORM_LIB CURL::libcurl ZLIB::ZLIB ${ZSTD_LIBRARY})
+    include_directories(${ZSTD_INCLUDE_DIR})
 endif ()
 
 # Sources: UI (C++) + service layer. The real service layer (source/core/*.c)
 # talks to libnx and is Switch-only; the desktop build swaps in the simulated
 # backend from source/sim/ so the UI can be run and screenshotted on a PC.
-file(GLOB_RECURSE PLAYGUARD_SRC CONFIGURE_DEPENDS source/*.cpp source/*.c)
+# The kit (JigSawFr/boreale-kit, a submodule in library/boreale-kit) is built from
+# its sources with PlayGuard's toolchain and flags.
+set(BOREALE_KIT ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-kit/source)
+# PlayGuard's module of the shared agent (library/boreale-link/modules/playguard):
+# the C service layer (core/), the remote link's documents and orders (sync/)
+# and the play log (util/), shared by the app, the agent and the recovery module.
+set(PLAYGUARD_MODULE ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-link/modules/playguard)
+file(GLOB_RECURSE PLAYGUARD_SRC CONFIGURE_DEPENDS source/*.cpp source/*.c ${BOREALE_KIT}/*.cpp ${BOREALE_KIT}/*.c)
+file(GLOB PLAYGUARD_MODULE_SRC CONFIGURE_DEPENDS ${PLAYGUARD_MODULE}/sync/*.c ${PLAYGUARD_MODULE}/util/*.c)
+list(APPEND PLAYGUARD_SRC ${PLAYGUARD_MODULE_SRC})
 if (PLATFORM_SWITCH)
     list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/sim/.*")
-    list(APPEND PLAYGUARD_SRC ${AURORE_LIBRARY}/lib/platforms/switch/switch_wrapper.c)
+    file(GLOB PLAYGUARD_MODULE_CORE_SRC CONFIGURE_DEPENDS ${PLAYGUARD_MODULE}/core/*.c)
+    list(APPEND PLAYGUARD_SRC ${PLAYGUARD_MODULE_CORE_SRC} ${AURORE_LIBRARY}/lib/platforms/switch/switch_wrapper.c)
 else ()
     list(FILTER PLAYGUARD_SRC EXCLUDE REGEX ".*/source/core/.*\\.c$")
     if (PLAYGUARD_WEB)
@@ -125,17 +155,17 @@ else ()
     endif ()
     # The console-free parts are shared with the simulator: one implementation
     # (tools/check_sources.py fails on one left out).
-    list(APPEND PLAYGUARD_SRC ${CMAKE_CURRENT_SOURCE_DIR}/source/core/pure.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/calendar.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/console_info_pure.c
+    list(APPEND PLAYGUARD_SRC ${PLAYGUARD_MODULE}/core/pure.c
+                              ${BOREALE_KIT}/core/calendar.c
+                              ${PLAYGUARD_MODULE}/core/console_info_pure.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gamecheck_rules.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/forwarder_pack.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/gate.c
                               ${CMAKE_CURRENT_SOURCE_DIR}/source/core/hbl_lock.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/rescue.c
-                              ${CMAKE_CURRENT_SOURCE_DIR}/source/core/write_guard.c
+                              ${PLAYGUARD_MODULE}/core/rescue.c
+                              ${BOREALE_KIT}/core/write_guard.c
                               # The simulated agent runs the agent's own command dispatch.
-                              ${CMAKE_CURRENT_SOURCE_DIR}/sysmodule/agent/source/agent_core.c)
+                              ${CMAKE_CURRENT_SOURCE_DIR}/library/boreale-link/agent/source/agent_core.c)
 endif ()
 
 # The remote link's transport, shared by the Boréale homebrews
@@ -155,9 +185,13 @@ endif ()
 program_target(${PROJECT_NAME} "${PLAYGUARD_SRC}")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 23)
 
-target_include_directories(${PROJECT_NAME} PRIVATE source library/boreale-link/source extern/qrcodegen extern/stb)
+if (PLATFORM_SWITCH)
+    # The console's CPU has the ARMv8 crypto extensions (util/crypto_hw): that one file asks for them, whatever the toolchain's default.
+    set_source_files_properties(${BOREALE_KIT}/util/crypto_hw.cpp PROPERTIES COMPILE_OPTIONS "-march=armv8-a+crc+crypto")
+endif ()
+target_include_directories(${PROJECT_NAME} PRIVATE source library/boreale-kit/source library/boreale-link/source library/boreale-link/modules/playguard library/boreale-link/modules/playguard/core extern/qrcodegen extern/stb)
 if (NOT PLATFORM_SWITCH)
-    target_include_directories(${PROJECT_NAME} PRIVATE source/sync sysmodule/agent/source)
+    target_include_directories(${PROJECT_NAME} PRIVATE library/boreale-link/modules/playguard/sync library/boreale-link/agent/source)
 endif ()
 # -ffunction-sections / -fdata-sections come from Aurore (PUBLIC) and
 # --gc-sections from libnx's switch.specs.
@@ -291,6 +325,8 @@ set(ASSEMBLE_RESOURCES
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${MERGED_RESOURCES}/img/gallery
     COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/img/tiles.png ${MERGED_RESOURCES}/img/demo_icon.jpg
             ${MERGED_RESOURCES}/img/aurore_96.png ${MERGED_RESOURCES}/img/aurore_256.png
+    # The kit's own strings (kit.json of every language), then ours on top.
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOREALE_KIT}/../resources ${MERGED_RESOURCES}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_RESOURCES} ${MERGED_RESOURCES}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_RESOURCES}/i18n/en-US ${MERGED_RESOURCES}/i18n/en-GB
     # About shows the latest releases from it (util/changelog.cpp).
@@ -299,7 +335,11 @@ set(ASSEMBLE_RESOURCES
     # (view/release_notes.cpp), the full list a press away.
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/.github/release-notes ${MERGED_RESOURCES}/release-notes
     COMMAND ${CMAKE_COMMAND} -E remove -f ${MERGED_RESOURCES}/release-notes/README.md ${MERGED_RESOURCES}/img/emoji/README.md
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/app_icon.jpg
+    # The HOME menu's icon (icon.jpg, with the name under the mark), for
+    # PlayGuard's own forwarder when its .nro cannot be read; inside the app,
+    # the icon without the name (images/icon-512.png): the screens say it.
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_ICON} ${MERGED_RESOURCES}/img/home_icon.jpg
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/images/icon-512.png ${MERGED_RESOURCES}/img/app_icon.png
     # The optional sysmodules, when built (make rescue / make agent).
     COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DDEST=${MERGED_RESOURCES}/sysmodules
             -DAPP_VERSION=${APP_VERSION} -DAPP_COMMIT=${APP_COMMIT}

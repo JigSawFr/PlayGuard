@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include "core/fw_policy.h"
 
 namespace fw_gate
 {

@@ -7,7 +7,7 @@
 #include "action/console_lock_logic.hpp"
 #include "action/history_flow.hpp"
 #include "action/pt_flow.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 
 using namespace aurore::literals;

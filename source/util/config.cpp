@@ -1,5 +1,9 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
+#include <functional>
+
 #include "util/config.hpp"
+
+#include "core/gate.h"
 
 #include <aurore/extern/nlohmann/json.hpp>
 #include <initializer_list>
@@ -9,6 +13,8 @@
 #include "util/json_util.hpp"
 #include "util/app_paths.hpp"
 #include "util/paths.hpp"
+
+static_assert(config::SCHEMA == GATE_CONFIG_SCHEMA, "core/gate.h reads the schema of config.json");
 
 namespace config
 {
@@ -137,6 +143,7 @@ void sanitize(Config& c)
     one_of(c.look.text_size, { "auto", "normal", "large" }, "auto");
     one_of(c.look.effects, { "auto", "full", "reduced" }, "auto");
     one_of(c.look.rail, { "auto", "open", "icons" }, "auto");
+    one_of(c.crypto, { "auto", "software", "hardware" }, "auto");
     one_of(c.update_via, { "", "inplace", "auto", "sphaira", "appstore", "manual" }, "");
     one_of(c.pin_lock, { "off", "changes", "open" }, "changes");
     one_of(c.dev_builds_order, { "newest", "number" }, "newest");
@@ -333,10 +340,12 @@ static void load_shared()
     read_bool(j, "extra_auto_restore", c.extra_auto_restore);
     read_bool(j, "dev_mode", c.dev_mode);
     read_bool(j, "pt_log", c.pt_log);
+    read_string(j, "crypto", c.crypto);
     read_bool(j, "frame_stats", c.frame_stats);
     read_bool(j, "cadran_glow", c.look.glow);
     read_string(j, "update_via", c.update_via);
     read_bool(j, "update_daily", c.update_daily);
+    read_bool(j, "sphaira_entry", c.sphaira_entry);
     read_string(j, "update_checked", c.update_checked);
     read_string(j, "update_latest", c.update_latest);
     read_string(j, "sys_latest", c.sys_latest);
@@ -468,10 +477,12 @@ bool snapshot(Snapshot& snap)
     j["extra_auto_restore"] = s_config.extra_auto_restore;
     j["dev_mode"]        = s_config.dev_mode;
     j["pt_log"]          = s_config.pt_log;
+    j["crypto"]          = s_config.crypto;
     j["frame_stats"]     = s_config.frame_stats;
     j["cadran_glow"]     = s_config.look.glow;
     j["update_via"]      = s_config.update_via;
     j["update_daily"]    = s_config.update_daily;
+    j["sphaira_entry"]   = s_config.sphaira_entry;
     j["update_checked"]  = s_config.update_checked;
     j["update_latest"]   = s_config.update_latest;
     j["sys_latest"]      = s_config.sys_latest;
@@ -548,3 +559,18 @@ bool snapshot(Snapshot& snap)
 }
 
 }   // namespace config
+
+// What the kit reads and writes of the settings (kit_settings.hpp).
+namespace kit_settings
+{
+
+Settings& get() { return config::get(); }
+
+std::function<bool()> snapshot()
+{
+    config::Snapshot snap;
+    if (!config::snapshot(snap)) return {};
+    return [snap]() { return config::write(snap); };
+}
+
+}   // namespace kit_settings

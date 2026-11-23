@@ -1,9 +1,9 @@
-// ha_update_flow — PlayGuard's Home Assistant integration (playguard-ha): the
+// ha_update_flow — PlayGuard's Home Assistant integration (boreale-ha): the
 // version Home Assistant runs, as the integration says it on the broker
 // (docs/sync-protocol.md; kept in sync_files::integration_file() by the link
 // that got it, PlayGuard's or the agent's), and its newer releases: in the
 // notification bell and on Remote access, with what changed since the
-// installed one and the QR code that opens it in HACS
+// installed one and the QR code that opens it in the Marketplace
 // (activity/ha_update_activity). Checked with PlayGuard's other updates
 // (once a day with "Check for updates every day", and by "Check for
 // updates"), and only once the integration is known: without it, nothing

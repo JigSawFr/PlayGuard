@@ -12,7 +12,7 @@
 #include <time.h>
 
 #include "../core/console_info.h"
-#include "../core/sim_env.h"
+#include "core/sim_env.h"
 
 void console_live_read(ConsoleLive *out)
 {

@@ -475,7 +475,7 @@ if SYNC:
     ha_changelog = os.path.join(OUT, "ha_changelog.md")
     open(ha_changelog, "w").write(
         "# Changelog\n\n"
-        "## [0.2.0](https://github.com/JigSawFr/playguard-ha/compare/v0.1.0...v0.2.0) (2026-10-20)\n\n\n"
+        "## [0.2.0](https://github.com/JigSawFr/boreale-ha/compare/v0.1.0...v0.2.0) (2026-10-20)\n\n\n"
         "### \U0001F680 Features\n\n"
         "* **coordinator:** tell the console which version runs ([#4](https://github.com/x/y/issues/4))\n\n"
         "### \U0001F41B Bug Fixes\n\n"
@@ -1308,7 +1308,7 @@ if GATE:
         fail("no migrations line in the log; messages: " + repr(messages()))
     # Turning a developer switch off asks first; B keeps it on (the end of
     # the scenario checks developer mode was saved on).
-    key("Up", 12)              # past Install another build, the self-test, the cleanup cells, the glow and statistics switches and the recorder: Read-only mode
+    key("Up", 14)              # past Install another build, the self-test, the cleanup cells, the glow switch, the two encryption cells, the statistics switch and the recorder: Read-only mode
     key("Return")
     shot("06a_read_only_off")  # untested firmware: the "own risk" warning
     key("Escape")
@@ -1316,7 +1316,7 @@ if GATE:
     key("Return")
     shot("06b_dev_mode_off")
     key("Escape")
-    key("Down", 7)             # Read-only, the recorder, the statistics and glow switches, the two cleanup cells: Show the diagnostic report
+    key("Down", 9)             # Read-only, the recorder, the statistics switch, the two encryption cells, the glow switch, the two cleanup cells: Show the diagnostic report
     key("Return")
     shot("06_dev_report")
     key("Escape")
@@ -1764,7 +1764,7 @@ if SYNC:
     shot("02_console_tools")
     key("Return")
     shot("03_remote_access")   # the link online
-    # Home Assistant › Install the integration: the two QR codes (HACS, add the console).
+    # Home Assistant › Install the integration: the two QR codes (Marketplace, add the console).
     go_to("Install the Home Assistant integration")
     key("Return")
     wait_for("the Home Assistant links", lambda: logged("sync: Home Assistant integration links shown"), 10)

@@ -210,11 +210,9 @@ static void test_requests_status_log(void)
     CHECK(hello(AGENT_PROTOCOL, &r) == 0);
     CHECK(call(AgentCmd_SyncNow, NULL, 0, NULL, 0, NULL, 0, NULL) == 0 && S.want_sync_now);
     CHECK(call(AgentCmd_ReloadConfig, NULL, 0, NULL, 0, NULL, 0, NULL) == 0 && S.want_reload);
-    CHECK(call(AgentCmd_PrepareShutdown, NULL, 0, NULL, 0, NULL, 0, NULL) == 0 && S.want_shutdown);
-    // The stop did not follow (an update that failed early): Hello again
-    // brings the link back; another protocol's Hello does not.
-    CHECK(hello(AGENT_PROTOCOL + 1, &r) == 0 && !r.accepted && S.want_shutdown);
-    CHECK(hello(AGENT_PROTOCOL, &r) == 0 && r.accepted && !S.want_shutdown);
+    // Another protocol's Hello is refused.
+    CHECK(hello(AGENT_PROTOCOL + 1, &r) == 0 && !r.accepted);
+    CHECK(hello(AGENT_PROTOCOL, &r) == 0 && r.accepted);
 
     S.records.valid = 1;
     S.records.records.console_lock = true;

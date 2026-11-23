@@ -5,15 +5,17 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
+#include "../core/fw_policy.h"
 #include <string.h>
 #include <time.h>
 
 #include "../core/pctl_ops.h"
 #include "../core/rescue.h"
-#include "../core/sim_env.h"
-#include "../core/sysinfo.h"
+#include "core/sim_env.h"
+#include "core/sysinfo.h"
+#include "sim/sim_sysinfo.h"
 #include "../core/time_ops.h"
-#include "../core/write_guard.h"
+#include "core/write_guard.h"
 #include "sim_games.h"
 #include "sim_state.h"
 
@@ -21,30 +23,10 @@
 #define SIM_PIN "1234"
 
 // ---------------------------------------------------------------- sysinfo
-void sysinfo_get(SysInfo *out)
-{
-    const SimConsole c = sim_state().console;
-    memset(out, 0, sizeof(*out));
-    out->hos_version = c.hos;
-    out->is_atmosphere = true;
-    out->ams_valid = true;
-    out->ams_major = 1; out->ams_minor = 12; out->ams_micro = 0;
-    out->emummc_valid = true;
-    out->emummc = sim_env_flag("PLAYGUARD_SIM_EMUMMC");
-    out->blank_valid = true;
-    out->blank = sim_env_flag("PLAYGUARD_SIM_BLANK");
-    out->applet_mode = sim_env_flag("PLAYGUARD_SIM_APPLET");
-    out->forwarder = !out->applet_mode && sim_env_flag("PLAYGUARD_SIM_FROM_FORWARDER");
-    out->serial_valid = true;
-    out->device_id_valid = true;
-    out->device_id = 0x0010000000000001ULL;
-    snprintf(out->serial, sizeof(out->serial), "%s", out->blank ? SYSINFO_BLANK_SERIAL : "XAW10000000001");
-}
-void sysinfo_version_string(u32 v, char *buf, size_t size)
-{
-    if (!v) { snprintf(buf, size, "?"); return; }
-    snprintf(buf, size, "%u.%u.%u", (unsigned)HOSVER_MAJOR(v), (unsigned)HOSVER_MINOR(v), (unsigned)HOSVER_MICRO(v));
-}
+// sysinfo_get() is the kit's (sim/sim_sysinfo.c); the simulated console's
+// firmware is this app's own, from its state.
+static u32 sim_hos(void) { return sim_state().console.hos; }
+__attribute__((constructor)) static void sim_install_hos(void) { sim_sysinfo_set_hos(sim_hos); }
 
 // ---------------------------------------------------------------- the changes
 // Each change: the read-only switch and the change check first, without the

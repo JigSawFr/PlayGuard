@@ -1,11 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/ha_update_flow.hpp"
+#include "kit_text.hpp"
 
 #include <aurore.hpp>
 
 #include "action/notices.hpp"
 #include "activity/ha_update_activity.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
 #include "util/sync_files.hpp"
@@ -52,7 +53,7 @@ void note()
         return;
     }
     notices::set(NOTICE, notices::Level::Info, aurore::getStr("playguard/notices/ha_integration", latest),
-                 aurore::getStr("playguard/notices/ha_integration_detail", s_info.version), "playguard/notices/whats_new"_i18n,
+                 aurore::getStr("playguard/notices/ha_integration_detail", s_info.version), kit_text::str("notices/whats_new"),
                  []() { open(); });
 }
 

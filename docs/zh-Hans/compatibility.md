@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
+<!-- translated from docs/compatibility.md, sha256 a287e9835737 -->
 # 兼容性
 
 支持的系统版本、Atmosphère 和启动器，emuMMC 和 sysMMC，以及 PlayGuard 与替代型 sysmodule 的比较。返回 [README](../../README.md)。
@@ -36,6 +36,10 @@ PlayGuard 检查的是 Atmosphère 是否在运行，而不是它的版本：重
 
 建议在游戏之上启动（title override）。应用会显示它是作为应用（在游戏之上，或从 HOME 菜单上它自己的转发器）还是作为小程序（相册）运行。在游戏之上启动时，主机会把 PlayGuard 的时间算作那个游戏的时间。在游玩记录中，这些时间记在启动时选择的用户名下：请用家长的用户打开它，而不是孩子的。游戏时间计时器是主机的，对所有用户都一样：无论谁打开 PlayGuard，这段时间都会计入，除非计时器已关闭，或 PIN 已暂停家长控制（[详情](features.md#输入-pin-后在你使用-playguard-期间家长控制会暂停)）。
 
+### 替代 HOME 菜单
+
+在游戏启动前检查主机限制的是 HOME 菜单，所以替代的 HOME 菜单也必须这样做。[SwitchU](https://github.com/PoloNX/SwitchU) 从 1.4.2 版起支持：其作者已和 PlayGuard 一起测试，它会遵守游戏时间限制、启动和恢复限制、家长用 PIN 码临时解锁，以及时间到时的锁定。其他替代菜单尚未测试（[欢迎反馈](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)）。
+
 ### Nintendo Switch 2
 
 不支持：它没有 Atmosphère。
@@ -50,7 +54,7 @@ PlayGuard 检查的是 Atmosphère 是否在运行，而不是它的版本：重
 
 ### 主机会被封禁吗？
 
-PlayGuard 从不连接任天堂：联网时，它只访问公共时间服务器、GitHub（更新，以及你发送的报告）和 switchbrew（最新固件及其版本说明）。导致主机被封的是带着自制固件或 emuMMC 连接任天堂（[switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)）。目前没有因修改家长控制或时钟而被封的记录；但这不是保证。
+PlayGuard 从不连接任天堂：联网时，它只访问公共时间服务器、GitHub（更新，以及你发送的报告）、switchbrew（最新固件及其版本说明）和 Homebrew App Store 的 CDN `switch.cdn.fortheusers.org`（其中提供的 PlayGuard 版本）。导致主机被封的是带着自制固件或 emuMMC 连接任天堂（[switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)）。目前没有因修改家长控制或时钟而被封的记录；但这不是保证。
 
 ### 不联网的主机
 

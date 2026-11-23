@@ -37,7 +37,8 @@
 #include "sync/sync_state.h"
 #include "sync/sync_system.h"
 #include "ui/app_hooks.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
+#include "bl_relay_nx.h"
 #include "util/agent_client.hpp"
 #include "util/config.hpp"
 #include "util/diagnostics.hpp"
@@ -685,7 +686,7 @@ std::string system_doc(const SysInfo& si, uint64_t ts, SyncDevice* device)
     sync_device_of(&si, &live, device);
     const std::string version = app::version();
     SyncSystem s{ ts, &si, &live, &sd, &nand, hekate.c_str(), version.c_str(), nullptr,
-                  serial.empty() ? nullptr : serial.c_str(), &s_conf };
+                  serial.empty() ? nullptr : serial.c_str(), &s_conf, nullptr };
     std::string out(4096, '\0');
     const size_t n = sync_system_build(&s, &out[0], out.size());
     out.resize(n);
@@ -1352,14 +1353,16 @@ void changed()
 namespace
 {
 // The agent said "offline" (or 2 s went by): PlayGuard's session on it ends.
-void wait_offline(int left, std::function<void()> then)
+// The same through the agent's own control (bl:link's Info): it said "offline"
+// (or 5 s went by), PlayGuard's session on it, if there is one, ends.
+void wait_offline_control(int left, std::function<void()> then)
 {
-    AgentStatus st;
-    if (left > 0 && s_agent && agent_ok(agent_client::status(&st), "status") && st.link.state == SyncLink_Online) {
-        aurore::delay(AGENT_POLL_MS, [left, then]() { wait_offline(left - 1, then); });
+    BlRelayInfo info;
+    if (left > 0 && bl_relay_info(&info) == 0 && info.online) {
+        aurore::delay(AGENT_POLL_MS, [left, then]() { wait_offline_control(left - 1, then); });
         return;
     }
-    agent_leave();
+    if (s_agent) agent_leave();
     if (then) then();
 }
 
@@ -1376,17 +1379,17 @@ void wait_agent(int left)
 
 void agent_stopping(std::function<void()> then)
 {
-    if (!s_agent) {
-        if (then) then();
+    // The agent's own control (bl:link, the same for every Boréale homebrew) works
+    // whether or not PlayGuard has a session on it (another homebrew may have
+    // installed it): it leaves the broker, "offline" said, and stays away until
+    // it is stopped or told to come back (agent_update does, at its end).
+    if (bl_relay_available() && bl_relay_shutdown() == 0) {
+        wait_offline_control(20, std::move(then));
         return;
     }
-    // A clean "offline" before the process ends (else the broker's last
-    // will says it).
-    if (agent_ok(agent_client::prepare_shutdown(), "shutdown")) {
-        wait_offline(20, std::move(then));
-        return;
-    }
-    agent_leave();
+    // No agent answers (none installed, or one that does not know the commands):
+    // nothing to wait for.
+    if (s_agent) agent_leave();
     if (then) then();
 }
 

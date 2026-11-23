@@ -1,4 +1,4 @@
-<!-- translated from docs/compatibility.md, sha256 74e7e81f48cb -->
+<!-- translated from docs/compatibility.md, sha256 a287e9835737 -->
 # Kompatibilität
 
 Unterstützte Firmware, Atmosphère und Launcher, emuMMC und sysMMC, und wie PlayGuard sich mit einem Ersatz-Sysmodul vergleicht. Zurück zum [README](../../README.md).
@@ -36,6 +36,10 @@ PlayGuard prüft, dass Atmosphère läuft, nicht welche Version: Was zählt, ist
 
 Empfohlen ist das Starten über ein Spiel (Title Override). Die App sagt, ob sie als Anwendung (über einem Spiel oder über ihren eigenen Forwarder im HOME-Menü) oder als Applet (Album) läuft. Über einem Spiel zählt die Konsole die Zeit in PlayGuard als die dieses Spiels. In der Aktivität geht sie an den Benutzer, der beim Start gewählt wurde: Öffne es mit dem Benutzer eines Elternteils, nicht mit dem eines Kindes. Der Timer ist der der Konsole, für jeden Benutzer derselbe: Er zählt diese Zeit, egal wer PlayGuard geöffnet hat, außer der Timer ist aus oder die Geheimzahl hat den Jugendschutz pausiert ([Details](features.md#die-geheimzahl-pausiert-den-jugendschutz-solange-du-in-playguard-bist)).
 
+### Ersatz-HOME-Menüs
+
+Das HOME-Menü prüft die Grenzen der Konsole, bevor ein Spiel startet, also muss ein Ersatz-HOME-Menü das ebenfalls tun. [SwitchU](https://github.com/PoloNX/SwitchU) tut es ab Version 1.4.2: Sein Autor hat es mit PlayGuard getestet, und es beachtet die Spielzeitgrenzen, die Einschränkungen beim Starten und Fortsetzen, die Freigabe durch ein Elternteil mit der PIN und die Sperre, wenn die Zeit abgelaufen ist. Andere Ersatzmenüs wurden nicht getestet ([Berichte willkommen](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)).
+
 ### Nintendo Switch 2
 
 Nicht unterstützt: Für sie gibt es kein Atmosphère.
@@ -50,7 +54,7 @@ Jede hat ihren eigenen Jugendschutz, und PlayGuard sieht nur den des Systems, au
 
 ### Kann die Konsole dadurch gesperrt werden?
 
-PlayGuard kontaktiert nie Nintendo: Online erreicht es nur öffentliche Zeitserver, GitHub (Updates und die Berichte, die du sendest) und switchbrew (die neueste Firmware und ihre Versionshinweise). Gesperrt werden Konsolen, deren Custom Firmware oder emuMMC sich mit Nintendo verbindet ([switchbrew-FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), auf Englisch). Eine Sperre wegen Änderungen am Jugendschutz oder an der Uhr ist nicht dokumentiert; eine Garantie ist das nicht.
+PlayGuard kontaktiert nie Nintendo: Online erreicht es nur öffentliche Zeitserver, GitHub (Updates und die Berichte, die du sendest), switchbrew (die neueste Firmware und ihre Versionshinweise) und das CDN des Homebrew App Store, `switch.cdn.fortheusers.org` (die Version von PlayGuard, die er anbietet). Gesperrt werden Konsolen, deren Custom Firmware oder emuMMC sich mit Nintendo verbindet ([switchbrew-FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html), auf Englisch). Eine Sperre wegen Änderungen am Jugendschutz oder an der Uhr ist nicht dokumentiert; eine Garantie ist das nicht.
 
 ### Eine Konsole ohne Internet
 

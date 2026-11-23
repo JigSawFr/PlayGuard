@@ -11,7 +11,7 @@
 #include "action/pt_logic.hpp"
 #include "app.hpp"
 #include "core/platform.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 
 using namespace aurore::literals;

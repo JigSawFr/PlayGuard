@@ -32,7 +32,7 @@
 #include "util/paths.hpp"
 #include "util/perf.hpp"
 #include "util/table_export.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/title_id.hpp"
 #include "view/game_tile.hpp"
 #include "view/segment_bar.hpp"

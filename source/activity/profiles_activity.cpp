@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "activity/profiles_activity.hpp"
+#include "kit_text.hpp"
 
 #include <algorithm>
 
@@ -9,7 +10,7 @@
 #include "action/profile_flow.hpp"
 #include "action/schedule_flow.hpp"
 #include "activity/play_timer_perday_activity.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 
@@ -104,7 +105,7 @@ void ProfilesActivity::actions(const profiles::Profile& p)
 {
     const std::vector<std::string> labels = {
         "playguard/play_timer/profile_action_apply"_i18n, "playguard/play_timer/profile_action_edit"_i18n,
-        "playguard/play_timer/profile_action_rename"_i18n, "playguard/common/delete"_i18n,
+        "playguard/play_timer/profile_action_rename"_i18n, kit_text::str("common/delete"),
     };
     ui::pick(p.name, labels, 0, [this, p](int index) {
         switch (index) {
@@ -181,7 +182,7 @@ void ProfilesActivity::rename(const profiles::Profile& p)
 void ProfilesActivity::remove(const profiles::Profile& p)
 {
     const std::string name = p.name, file = p.file;
-    ui::confirm_danger(aurore::getStr("playguard/play_timer/profile_delete_body", name), "playguard/common/delete"_i18n,
+    ui::confirm_danger(aurore::getStr("playguard/play_timer/profile_delete_body", name), kit_text::str("common/delete"),
                        [this, name, file]() {
                            // Before the error's dialog opens (both on the next
                            // frame): rebuilt under it, the list would delete

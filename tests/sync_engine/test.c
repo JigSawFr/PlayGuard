@@ -49,8 +49,8 @@ static struct {
     char     client_id[64], username[64], password[64];
     Message  will;
     bool     has_will;
-    char     subs[4][160];
-    uint8_t  sub_qos[4];
+    char     subs[8][160];
+    uint8_t  sub_qos[8];
     size_t   n_subs;
     char     deny[160];       // a filter its access list refuses ("" none)
     Message  retained[MAX_RETAINED];
@@ -514,6 +514,26 @@ static void h_integration(void *ctx, const char *doc, size_t len)
     host.integration_len = len;
 }
 
+static struct {
+    unsigned calls;
+    char     rel[96];
+    char     payload[64];
+    size_t   len;
+    bool     retained;
+} relayed;
+
+static void h_relay(void *ctx, const char *rel, const void *payload, size_t len, bool retained)
+{
+    (void)ctx;
+    relayed.calls++;
+    snprintf(relayed.rel, sizeof(relayed.rel), "%s", rel);
+    REQUIRE(len < sizeof(relayed.payload));
+    memcpy(relayed.payload, payload, len);
+    relayed.payload[len] = '\0';
+    relayed.len = len;
+    relayed.retained = retained;
+}
+
 // ---------------------------------------------------------------- helpers
 
 static SyncConf conf;
@@ -534,7 +554,7 @@ static void setup(bool timer_writes, SyncPolicy policy)
     BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
-                   h_device,       h_notices };
+                   h_device,       h_notices, NULL };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
 }
 
@@ -998,7 +1018,7 @@ static void test_custom_discovery_prefix(void)
     BlIo io = { NULL, io_open, io_write, io_read, io_close };
     SyncHost h = { NULL,           h_state,     h_activity,  h_order, h_report,      h_profiles,
                    h_conf_changed, h_read_only, h_now_posix, h_log,   h_integration, h_system,
-                   h_device,       h_notices };
+                   h_device,       h_notices, NULL };
     sync_engine_init(&engine, &conf, io, &h, clock_ms, "app", "1.1.0");
     turns(3);
     CHECK(sync_engine_online(&engine) && find_retained("ha/device/boreale_a1b2c3d4/config"));
@@ -1383,11 +1403,168 @@ static void test_legacy_tree(void)
     CHECK(avail && !strcmp(avail->payload, "online") && find_retained("boreale/a1b2c3d4/system"));
 }
 
+// The sessions open now, as the agent says them each turn.
+static void relay_sessions(const char *const *names, const char *version, size_t n)
+{
+    SyncRelayModule open[8];
+    for (size_t i = 0; i < n; i++) {
+        snprintf(open[i].name, sizeof(open[i].name), "%s", names[i]);
+        snprintf(open[i].version, sizeof(open[i].version), "%s", version);
+    }
+    sync_engine_relay_sync(&engine, open, n);
+}
+
+// Another homebrew's orders, relayed: a subscription per module (never one
+// that covers PlayGuard's own orders), the order handed to the host with its
+// topic below the base, PlayGuard's own orders left to the engine, and a
+// publication under that module's level only.
+static void test_relay(void)
+{
+    setup(false, SyncPolicy_Auto);
+    memset(&relayed, 0, sizeof(relayed));
+    engine.host.relay = h_relay;
+    // What cannot relay is left out: PlayGuard's own level, an empty name; nothing is subscribed or announced.
+    const char *const refused[] = { "playguard", "" };
+    relay_sessions(refused, "1.0.0", 2);
+    sync_engine_relay_sync(&engine, NULL, 0);
+    const char *const shelf[] = { "playshelf" };
+    relay_sessions(shelf, "1.2.0", 1);
+    relay_sessions(shelf, "1.2.0", 1);   // again: once
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playshelf/+/set") && broker.sub_qos[3] == 1);
+    // `capabilities` lists the open session's module, with its version only.
+    const Message *cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"modules\":{\"playguard\":{\"schema\":1,\"version\":\"1.1.0\"},\"playshelf\":{\"version\":\"1.2.0\"}}"));
+
+    // A version that changed is announced again; a session that closed is taken out (its subscription stays).
+    relay_sessions(shelf, "1.3.0", 1);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"playshelf\":{\"version\":\"1.3.0\"}"));
+    sync_engine_relay_sync(&engine, NULL, 0);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && !strstr(cap->payload, "playshelf") && strstr(cap->payload, "\"modules\":{\"playguard\":{\"schema\":1,\"version\":\"1.1.0\"}}"));
+    CHECK(broker.n_subs == 4);
+    relay_sessions(shelf, "1.3.0", 1);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"playshelf\":{\"version\":\"1.3.0\"}") && broker.n_subs == 4);
+
+    // A module that opens while connected is subscribed at once, up to four in all.
+    const char *const many[] = { "playshelf", "other", "m3", "m4", "m5" };
+    relay_sessions(many, "1.3.0", 5);
+    CHECK(broker.n_subs == 7 && !strcmp(broker.subs[4], "boreale/a1b2c3d4/other/+/set"));   // m5 has no room
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"other\":{") && strstr(cap->payload, "\"m4\":{") && !strstr(cap->payload, "m5"));
+
+    broker_publish("boreale/a1b2c3d4/playshelf/download/set", "go", 2, true);
+    turns(2);
+    // Live, to an established subscription: RETAIN 0.
+    CHECK(relayed.calls == 1 && !strcmp(relayed.rel, "playshelf/download/set") && !strcmp(relayed.payload, "go") &&
+          !relayed.retained);
+    broker_publish("boreale/a1b2c3d4/other/x/set", "1", 1, false);
+    turns(2);
+    CHECK(relayed.calls == 2 && !strcmp(relayed.rel, "other/x/set"));
+    // Not under a module we subscribed to: nothing arrives, nothing is handed over.
+    broker_publish("boreale/a1b2c3d4/stranger/x/set", "1", 1, false);
+    turns(2);
+    CHECK(relayed.calls == 2);
+
+    // Publications: below another module's level only.
+    CHECK(sync_engine_publish_relay(&engine, "playshelf/state", "{}", 2, true) == 0);
+    const Message *m = find_retained("boreale/a1b2c3d4/playshelf/state");
+    CHECK(m && m->retain && m->len == 2);
+    CHECK(sync_engine_publish_relay(&engine, "playguard/state", "{}", 2, true) < 0);
+    CHECK(sync_engine_publish_relay(&engine, "system", "{}", 2, true) < 0);
+    CHECK(sync_engine_publish_relay(&engine, "icon/0100", "{}", 2, true) < 0);
+    CHECK(sync_engine_publish_relay(&engine, NULL, "{}", 2, true) < 0);
+
+    // After a reconnection every module is subscribed again.
+    setup(false, SyncPolicy_Auto);
+    engine.host.relay = h_relay;
+    memset(&relayed, 0, sizeof(relayed));
+    relay_sessions(shelf, "1.3.0", 1);
+    broker_publish("boreale/a1b2c3d4/playshelf/download/set", "again", 5, true);   // kept for it meanwhile
+    turns(3);
+    CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playshelf/+/set"));
+    CHECK(relayed.calls == 1 && !strcmp(relayed.payload, "again") && relayed.retained);   // handed back with RETAIN 1
+    // Without a relay host (the app), nothing more is subscribed to.
+    setup(false, SyncPolicy_Auto);
+    turns(3);
+    CHECK(broker.n_subs == 3);
+}
+
+// An agent that runs without PlayGuard (its module off): the console's own
+// documents and the other homebrews', nothing of PlayGuard's; on again, all of
+// it, and the orders kept by the broker come back.
+static void test_module_off(void)
+{
+    setup(false, SyncPolicy_Auto);
+    memset(&relayed, 0, sizeof(relayed));
+    engine.host.relay = h_relay;
+    sync_engine_set_module(&engine, false);
+    snprintf(host.bell, sizeof(host.bell), "{\"schema\":1,\"todo\":0}");
+    const char *const shelf[] = { "playshelf" };
+    relay_sessions(shelf, "1.2.0", 1);
+    turns(3);
+    CHECK(sync_engine_online(&engine));
+    // Subscribed to Home Assistant's birth, the integration's version and the relayed module: not PlayGuard's orders.
+    CHECK(broker.n_subs == 3 && !strcmp(broker.subs[0], "homeassistant/status") &&
+          !strcmp(broker.subs[1], "boreale/a1b2c3d4/integration") && !strcmp(broker.subs[2], "boreale/a1b2c3d4/playshelf/+/set"));
+    CHECK(find_retained("boreale/a1b2c3d4/system") && find_retained("boreale/a1b2c3d4/notices"));
+    CHECK(!find_retained("boreale/a1b2c3d4/playguard/state") && !find_retained("boreale/a1b2c3d4/playguard/activity"));
+    CHECK(!find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
+    CHECK(host.states == 0 && host.activities == 0 && host.profiles_asked == 0);
+    // What PlayGuard's module left on the broker is cleared: its documents and the discovery.
+    static const char *const cleared[] = { "boreale/a1b2c3d4/playguard/state", "boreale/a1b2c3d4/playguard/activity",
+                                           "boreale/a1b2c3d4/playguard/week", "boreale/a1b2c3d4/playguard/names",
+                                           "boreale/a1b2c3d4/playguard/games", "boreale/a1b2c3d4/playguard/report",
+                                           "homeassistant/device/boreale_a1b2c3d4/config" };
+    for (size_t i = 0; i < sizeof(cleared) / sizeof(cleared[0]); i++) {
+        const Message *gone = last_on(cleared[i]);
+        CHECK(gone && gone->retain && gone->len == 0);
+    }
+    const Message *cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && !strstr(cap->payload, "playguard") && strstr(cap->payload, "\"modules\":{\"playshelf\":{\"version\":\"1.2.0\"}}"));
+    // A relayed order still goes through; one of PlayGuard's is not taken.
+    broker_publish("boreale/a1b2c3d4/playshelf/download/set", "go", 2, false);
+    ha_order("vr_restricted", "ON");
+    turns(2);
+    CHECK(relayed.calls == 1 && host.orders == 0);
+
+    // On again: PlayGuard announced and published, its orders subscribed to (the retained one comes back).
+    sync_engine_set_module(&engine, true);
+    sync_engine_set_module(&engine, true);   // again: nothing more
+    ha_order("vr_restricted", "ON");
+    turns(4);
+    CHECK(broker.n_subs == 4 && !strcmp(broker.subs[3], "boreale/a1b2c3d4/playguard/+/set"));
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && strstr(cap->payload, "\"playguard\":{\"schema\":1,\"version\":\"1.1.0\"}") && strstr(cap->payload, "playshelf"));
+    CHECK(find_retained("boreale/a1b2c3d4/playguard/state") && find_retained("boreale/a1b2c3d4/playguard/activity"));
+    CHECK(find_retained("homeassistant/device/boreale_a1b2c3d4/config"));
+    CHECK(host.orders == 1);
+
+    // Off again: PlayGuard is out of `capabilities` and takes no more orders.
+    sync_engine_set_module(&engine, false);
+    turns(2);
+    cap = find_retained("boreale/a1b2c3d4/capabilities");
+    CHECK(cap && !strstr(cap->payload, "\"playguard\"") && strstr(cap->payload, "playshelf"));
+    ha_order("vr_restricted", "OFF");
+    turns(2);
+    CHECK(host.orders == 1);
+}
+
 int main(void)
 {
     static Message log[MAX_LOG];
     broker.log = log;
     test_connect_and_publish();
+    test_relay();
+    test_module_off();
     test_notices();
     test_shared_bell();
     test_orders_applied_and_refused();

@@ -13,7 +13,7 @@
 #include "action/bundled_modules.hpp"
 #include "app.hpp"
 #include "core/platform.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/modules.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/paths.hpp"

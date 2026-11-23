@@ -8,7 +8,7 @@
 #include "action/history_flow.hpp"
 #include "action/pairing_state.hpp"
 #include "action/session_pause.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/pctl_ops_c.hpp"
 
 using namespace aurore::literals;

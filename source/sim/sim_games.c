@@ -11,7 +11,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "../core/sim_env.h"
+#include "core/sim_env.h"
 #include "../core/time_ops.h"
 #include "sim_homebrew_icons.h"
 #include "sim_icons.h"

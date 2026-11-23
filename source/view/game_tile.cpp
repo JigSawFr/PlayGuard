@@ -8,7 +8,7 @@
 #include <aurore/cadran/ui/motion.hpp>
 
 #include "action/game_icons.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 namespace
 {

@@ -18,7 +18,7 @@
 #include "action/pin_lock.hpp"
 #include "core/gate.h"
 #include "core/pctl_ops.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/forwarders.hpp"
 #include "util/gate_tally.hpp"
 #include "util/paths.hpp"

@@ -23,7 +23,7 @@ std::string file_path()
 // Every key array_of() writes in an entry: the others (a newer version's)
 // are kept as the file had them.
 constexpr const char* ENTRY_KEYS[] = { "id", "nro", "argv", "name", "author", "pin", "gate", "gone", "verified",
-                                       "free", "free2", "closed", "limit", "carried", "icon", "loader", "icon_x",
+                                       "free", "free2", "closed", "limit", "carried", "icon", "loader", "badge", "icon_x",
                                        "ask_user", "screenshots", "video" };
 
 // The file as an object; false when it is missing or damaged (read as none).
@@ -59,6 +59,7 @@ nlohmann::json array_of(const std::vector<Made>& all)
         if (m.pin && m.carried) e["carried"] = true;
         if (!m.icon.empty()) e["icon"] = m.icon;
         if (!m.loader.empty()) e["loader"] = m.loader;
+        if (m.pin && !m.badge.empty()) e["badge"] = m.badge;
         if (!m.icon.empty() && m.icon_x != ICON_X_MIDDLE) e["icon_x"] = m.icon_x;
         if (m.ask_user) e["ask_user"] = true;
         if (!m.screenshots) e["screenshots"] = false;
@@ -179,6 +180,7 @@ std::vector<Made> from_array(const nlohmann::json& list)
         m.carried = m.pin && json_util::flag_at(e, "carried");
         m.icon = json_util::string_at(e, "icon");
         m.loader = json_util::string_at(e, "loader");
+        m.badge = m.pin ? json_util::string_at(e, "badge") : "";
         const int64_t x = json_util::integer_or(e, "icon_x", ICON_X_MIDDLE);
         m.icon_x = !m.icon.empty() && x >= 0 && x <= 100 ? (int)x : ICON_X_MIDDLE;
         // Missing (made before they were kept): the defaults.

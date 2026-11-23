@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "time_ops.h"
-#include "write_guard.h"
+#include "core/write_guard.h"
 
 enum { MOCK_ERROR = 0x701, ROOT_KIND = 99, MAX_HANDLES = 64 };
 typedef struct { bool active; unsigned root_call; u32 kind; } Handle;

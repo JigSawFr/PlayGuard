@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "action/forwarders_logic.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 namespace hbmenu_lock::detail
 {

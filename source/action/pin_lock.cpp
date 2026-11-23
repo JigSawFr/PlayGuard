@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/pin_lock.hpp"
+#include "kit_text.hpp"
 
 #include <aurore.hpp>
 #include <chrono>
@@ -8,7 +9,7 @@
 
 #include "action/pin_lock_logic.hpp"
 #include "action/session_pause.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 
@@ -152,8 +153,8 @@ bool before_show_pin()
 std::string refusal_text()
 {
     if (R_SUCCEEDED(s_last_rc) || NXM_IS_APP_RESULT(s_last_rc)) return ui::rc_text(NXM_RC_NOT_CONFIRMED);
-    return aurore::getStr("playguard/error/code_hint", std::format("0x{:08X}", (unsigned)s_last_rc),
-                        "playguard/error/not_confirmed"_i18n);
+    return kit_text::str("error/code_hint", std::format("0x{:08X}", (unsigned)s_last_rc),
+                        kit_text::str("error/not_confirmed"));
 }
 
 std::string mode_text()

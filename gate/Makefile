@@ -16,7 +16,8 @@ TARGET      := gate
 BUILD       := build
 OUTDIR      := out
 SOURCES     := source ../source/core ../extern/stb
-INCLUDES    := ../source/core ../extern/stb ../library/aurore/library/include
+# gate_nx.c reads pctl_ops_internal.h, which is in PlayGuard's module of the shared agent (boreale-link).
+INCLUDES    := ../source/core ../library/boreale-link/modules/playguard/core ../library/boreale-kit/source ../extern/stb ../library/aurore/library/include
 # Its screen's brand font, from PlayGuard's resources, in its romfs.
 ROMFS       := build/romfs
 # A NACP too: elf2nro writes the assets (the romfs with them) only when it

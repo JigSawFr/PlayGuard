@@ -5,6 +5,10 @@
   playguard.json) defines exactly the keys of en-US, with as many "{}";
 - Aurore's ui::LANGUAGES (library/aurore, the language picker's list that
   config::LANGUAGES names) lists exactly those languages;
+- every forwarder icon of the library (source/util/forwarder_library.cpp's IDS,
+  and the badge) has its source SVG (branding/forwarder-icons/) and its PNG
+  (resources/img/forwarder/), and the SVGs use only the colours of Boréale's
+  kit (branding/tokens.json in JigSawFr/boreale; the icon's deep night too);
 - every "playguard/..." key referenced from C++ or XML exists in en-US (but
   the theme keys source/ui/palette.hpp declares: colours);
 - a key built at runtime ("playguard/days_short/{}",
@@ -79,6 +83,13 @@ import unicodedata
 import xml.parsers.expat
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
+
+
+def code_glob(pattern):
+    """The app's sources and the kit's (library/boreale-kit, a submodule)."""
+    return [p for base in ("source", "library/boreale-kit/source")
+            for p in glob.glob(f"{ROOT}/{base}/**/{pattern}", recursive=True)]
+
 # Aurore's Cadran's preferences: the languages, themes, text sizes, effects.
 PREFS_HPP = "library/aurore/library/include/aurore/cadran/ui/prefs.hpp"
 errors = []
@@ -214,7 +225,7 @@ def check_key(key, where):
         errors.append(f"{where}: unknown i18n key {key}")
 
 
-for path in glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True) + glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
+for path in code_glob("*.[ch]pp") + code_glob("*.[ch]"):
     text = open(path, encoding="utf-8").read()
     for m in re.finditer(r'"(playguard/[A-Za-z0-9_/{}.-]*)"', text):
         check_key(m.group(1), path)
@@ -307,7 +318,6 @@ DYNAMIC_KEYS = {
     # sidebars are Aurore's Cadran's, in its own cadran.json).
     "clock/region_names/": re.findall(r'^\s*\{\s*"(\w+)",\s*\{', read(f"{ROOT}/source/util/ntp_servers.cpp"), re.M) +
     ["custom"],   # clock_tab.cpp: the servers the parent typed
-    "error/": strings_of(re.sub(r"//[^\n]*", "", function_of("source/action/error_hint_logic.cpp", "hint_key"))),
     "games/group_note/": returned_by("source/action/game_check_text.cpp", "category_key"),
     "games/groups/": returned_by("source/action/game_check_text.cpp", "category_key"),
     "games/issues/": issue_suffixes(),
@@ -321,7 +331,6 @@ DYNAMIC_KEYS = {
     re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
     "prefs/effects_values/": array_of(PREFS_HPP, "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
-    "tools/update_via_values/": array_of("source/action/update_flow.cpp", "METHODS"),
     "forwarders/icon_lib/": array_of("source/util/forwarder_library.cpp", "IDS"),   # icon_sheet.cpp: the library's icons
     # notices::reason_of: what a row's badge is for, the ids its tab marks
     # (TabBase::mark(row, { "id", ... })).
@@ -331,14 +340,15 @@ DYNAMIC_KEYS = {
     # The remote link (sync_activity.cpp, sync_orders.cpp) and the optional
     # modules (modules_activity.cpp, agent_update.cpp).
     "sync/mqtt_versions/": array_of("source/activity/sync_activity.cpp", "KEYS"),
-    "sync/policies/": returned_by("source/sync/sync_conf.c", "sync_policy_name"),
+    "sync/policies/": returned_by("library/boreale-link/modules/playguard/sync/sync_conf.c", "sync_policy_name"),
     # "unknown": an enumerator out of range, never in an outcome.
-    "sync/reasons/": [r for r in returned_by("source/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
+    "sync/reasons/": [r for r in returned_by("library/boreale-link/modules/playguard/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
     "modules/": [f"{name}/{what}"
-                 for name in re.findall(r'\{\s*Id::\w+,\s*"(\w+)"', read(f"{ROOT}/source/util/modules.cpp"))
+                 for name in re.findall(r'\{\s*\{\s*"(\w+)",', read(f"{ROOT}/source/util/modules.cpp"))
                  for call in re.findall(r"\bkey\(\w+,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
                  for what in strings_of(call)],
-    "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp")
+    "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp",
+                                      "library/boreale-kit/source/action/sysmodule_flow.cpp")
                       for call in re.findall(r"\brecord\(([^;{]*?)\);", read(f"{ROOT}/{path}"))
                       for v in strings_of(call)],
 }
@@ -359,13 +369,34 @@ def dynamic(k):
     return any(k.startswith(p) and k[len(p):] in vs for p, vs in DYNAMIC_KEYS.items())
 
 
+# playguard/kit/<key>: PlayGuard's own wording of a text of the kit's catalog
+# (library/boreale-kit/resources/i18n/en-US/kit.json, kit_text.hpp reads it in
+# place of the kit's): it must name a key the kit has, with the same arguments.
+KIT_EN = {}
+try:
+    def _flat(d, pre=""):
+        for k, v in d.items():
+            if isinstance(v, dict):
+                yield from _flat(v, pre + k + "/")
+            else:
+                yield pre + k, v
+    KIT_EN = dict(_flat(json.load(open(f"{ROOT}/library/boreale-kit/resources/i18n/en-US/kit.json", encoding="utf-8"))))
+except (OSError, ValueError):
+    errors.append("library/boreale-kit/resources/i18n/en-US/kit.json is missing (git submodule update --init)")
+ARGS = re.compile(r"\{([2-9]\d*)(?::[^{}]*)?\}")
 for k in sorted(en_keys):
-    if k not in used_exact and not dynamic(k):
+    if k.startswith("kit/"):
+        kit_key = k[len("kit/"):]
+        if kit_key not in KIT_EN:
+            errors.append(f"playguard/{k} words a text the kit does not have ({kit_key})")
+        elif sorted(set(ARGS.findall(base[k]))) != sorted(set(ARGS.findall(KIT_EN[kit_key]))):
+            errors.append(f"playguard/{k} has other arguments than the kit's text")
+    elif k not in used_exact and not dynamic(k):
         errors.append(f"unused i18n key playguard/{k} (remove it from every language)")
 
 # The kinds and sources of the history the code writes, against those the
 # History screen names.
-code_text = {p: read(p) for p in glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)}
+code_text = {p: read(p) for p in code_glob("*.[ch]pp")}
 kinds = DYNAMIC_KEYS["history/kinds/"]
 sources = DYNAMIC_KEYS["history/sources/"] | {"", "profile"}   # "profile": named apart
 for path, text in sorted(code_text.items()):
@@ -390,7 +421,7 @@ for path, text in sorted(code_text.items()):
 # the last "X::f(" a definition at the start of a line opens, whichever is
 # nearer; in the header or in its .cpp.
 xml_dir = f"{ROOT}/resources/xml"
-code_files = glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)
+code_files = code_glob("*.[ch]pp")
 class_xml = {}      # class name -> the XML paths it inflates, relative to resources/xml
 class_binds = {}    # class name -> (file, [ids])
 loaded_xml = set()
@@ -405,7 +436,7 @@ def owner_at(text, pos):
 
 
 pairs = sorted({p[:-len(".hpp")] if p.endswith(".hpp") else p[:-len(".cpp")]
-                for p in glob.glob(f"{ROOT}/source/**/*.[ch]pp", recursive=True)})
+                for p in code_glob("*.[ch]pp")})
 for stem in pairs:
     for path in (stem + ".hpp", stem + ".cpp"):
         text = read(path)
@@ -506,7 +537,7 @@ for path in sorted(glob.glob(f"{ROOT}/resources/img/**/*", recursive=True)):
 
 
 def is_emoji(cp):
-    """The pictographs source/util/changelog.cpp draws as images."""
+    """The pictographs library/boreale-kit/source/util/changelog.cpp draws as images."""
     return cp >= 0x1F000 or 0x2600 <= cp <= 0x27BF or 0x2B00 <= cp <= 0x2BFF or \
         0x231A <= cp <= 0x231B or 0x23E9 <= cp <= 0x23FA
 
@@ -561,8 +592,9 @@ for path, text in code_text.items():
     sim_read |= set(re.findall(r'(?:sim_env(?:_flag|_int)?|getenv|sim_net::value)\(\s*"(PLAYGUARD_SIM_\w+)"', text))
     # The shared code (app_id.h) names them APP_ENV "_SIM_<name>".
     sim_read |= {"PLAYGUARD_SIM_" + v for v in re.findall(r'(?:sim_env(?:_flag|_int)?|sim_net::value)\(\s*APP_ENV\s*"_SIM_(\w+)"', text)}
-for path in glob.glob(f"{ROOT}/source/**/*.[ch]", recursive=True):
+for path in code_glob("*.[ch]"):
     sim_read |= set(re.findall(r'(?:sim_env(?:_flag|_int)?|getenv)\(\s*"(PLAYGUARD_SIM_\w+)"', read(path)))
+    sim_read |= {"PLAYGUARD_SIM_" + v for v in re.findall(r'(?:sim_env(?:_flag|_int)?|getenv)\(\s*APP_ENV\s*"_SIM_(\w+)"', read(path))}
 # Aurore's Cadran reads its flags through ui::env_flag("NAME"), which
 # activity/screen_hooks.cpp answers with PLAYGUARD_SIM_NAME.
 for path in glob.glob(f"{ROOT}/library/aurore/library/lib/cadran/**/*.cpp", recursive=True):
@@ -648,6 +680,18 @@ for folder, dirs, files in os.walk(ROOT):
             errors.append(f"{rel}: a game package or a part of one, which the repository never carries")
         if KEY_FILES.search(name):
             errors.append(f"{rel}: a console's key file, which the repository never carries")
+
+# Forwarder icons: a source and a PNG each, in the kit's colours only.
+KIT_COLOURS = {"#0B1424", "#0E1A33", "#E8EEF7", "#A9B6CC", "#00FFCC", "#33BBFF", "#8A5CFF",
+               "#0A1020"}   # the last is the deep night of the kit's icons, not a token
+for icon in array_of("source/util/forwarder_library.cpp", "IDS") + ["badge"]:
+    for folder, ext in (("branding/forwarder-icons", "svg"), ("resources/img/forwarder", "png")):
+        if not os.path.exists(f"{ROOT}/{folder}/{icon}.{ext}"):
+            errors.append(f"forwarder icon {icon}: {folder}/{icon}.{ext} is missing (tools/forwarder_icons.py)")
+for svg in sorted(glob.glob(f"{ROOT}/branding/forwarder-icons/*.svg")):
+    for colour in sorted(set(c.upper() for c in re.findall(r"#[0-9a-fA-F]{6}\b", read(svg)))):
+        if colour not in KIT_COLOURS:
+            errors.append(f"{os.path.relpath(svg, ROOT)}: {colour} is not a colour of the kit")
 
 for w in warnings:
     print("WARNING:", w)

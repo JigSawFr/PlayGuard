@@ -5,7 +5,7 @@
 #include <ctime>
 
 #include "action/pin_lock.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/date.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"

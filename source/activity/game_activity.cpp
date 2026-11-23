@@ -7,7 +7,7 @@
 #include "action/play_data.hpp"
 #include "action/rating_flow.hpp"
 #include "action/rating_logic.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/activity_summary.hpp"
 
 using namespace aurore::literals;

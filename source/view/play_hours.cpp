@@ -7,7 +7,7 @@
 #include <aurore/cadran/ui/cadran_frame.hpp>
 #include <aurore/cadran/ui/cadran_kit.hpp>
 
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 namespace
 {

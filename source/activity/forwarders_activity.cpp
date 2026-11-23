@@ -15,8 +15,9 @@
 #include "activity/forwarders_pickers.hpp"
 #include "activity/icon_sheet.hpp"
 #include "app.hpp"
+#include "kit_text.hpp"
 #include "ui/play_text.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/forwarders.hpp"
 #include "util/nro.hpp"
 #include "util/paths.hpp"
@@ -603,7 +604,7 @@ void ForwardersActivity::actions(const Row& row)
                             },
                             "trash", "", files, Tone::DANGER });
     } else {
-        choices.push_back({ "playguard/common/delete"_i18n, [this, r]() { this->remove_with_undo(r); }, "trash", "", files,
+        choices.push_back({ kit_text::str("common/delete"), [this, r]() { this->remove_with_undo(r); }, "trash", "", files,
                             Tone::DANGER });
     }
     ui::pick_actions(r.name, choices, state_text(r), this->icon_of(r.id));

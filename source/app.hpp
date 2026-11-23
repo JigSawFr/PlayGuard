@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <string>
 
+#include "kit_app.hpp"   // version(), commit(), repo_url(), read_only(), dev_mode(): the kit asks for them
+
 namespace app
 {
 
@@ -16,55 +18,39 @@ void shutdown();
 
 uint32_t    pctl_init_result();   // 0 if the probe succeeded
 
-std::string version();            // "1.0.0"
-// The commit this build comes from ("1a2b3c4"), empty when unknown (built
-// outside a git checkout). Tells which development build is installed.
-std::string commit();
-// True for a published release (built from its vX.Y.Z tag), false for any
-// other build (main, a pull request, a local one): a development build.
-bool        is_release();
-// The pull request this build was made for by CI (306), 0 for any other build.
-int         pr();
-// Where the running .nro is, from the SD card root ("/switch/playguard/playguard.nro"),
-// as hbloader gave it in argv[0]; empty when unknown (nxlink, desktop).
-std::string self_path();
+// is_release(), pr() and self_path() (kit_app.hpp) are defined here.
 void        set_self_path(const char* argv0);
 // The screen another Boréale homebrew opened PlayGuard at (a click in its
 // bell: --open=<route>, boreale-link's bl_open_route): one of
 // config::START_TABS, "" none or one PlayGuard does not know.
 std::string open_route();
 void        set_open_route(int argc, char** argv);
-const char* repo_url();
 // The website (https://guard.boreale.dev/, tools/build_site.py) and a page of its
 // documentation in the console's language ("troubleshooting", "locked-out"):
 // a release's as published (docs/), main's for a development build (docs/dev/).
 // Tagged for the site's audience (utm_source=playguard, utm_medium=qr).
 const char* site_url();
 std::string doc_url(const std::string& page, const std::string& anchor = "");
-// Funding links (.github/FUNDING.yml), shown in About.
-constexpr const char* SPONSORS_URL = "https://github.com/sponsors/JigSawFr";
-constexpr const char* KOFI_URL     = "https://ko-fi.com/jigsawfr";
-// The Home Assistant integration (JigSawFr/playguard-ha), through My Home
+// The Home Assistant integration (JigSawFr/boreale-ha), through My Home
 // Assistant's redirects (it asks once for the user's own instance, then opens
-// the page there): the repository in HACS, and adding the integration.
-constexpr const char* HA_HACS_URL =
-    "https://my.home-assistant.io/redirect/hacs_repository/?owner=JigSawFr&repository=playguard-ha&category=integration";
-constexpr const char* HA_ADD_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=playguard";
+// the page there): the repository in the Marketplace (Home Assistant 2026.11
+// and later: marketplace_repository), and adding the integration.
+constexpr const char* HA_MARKETPLACE_URL =
+    "https://my.home-assistant.io/redirect/marketplace_repository/?owner=JigSawFr&repository=boreale-ha&category=integration";
+constexpr const char* HA_ADD_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=boreale";
 // Its releases, with what changed in each.
-constexpr const char* HA_RELEASES_URL = "https://github.com/JigSawFr/playguard-ha/releases";
+constexpr const char* HA_RELEASES_URL = "https://github.com/JigSawFr/boreale-ha/releases";
 
 // Read-only mode: the service layer refuses every change (core/write_guard.h)
 // and the tabs hide their write controls. On at launch when the firmware is
 // newer than the checked one, until the firmware screen says otherwise.
 // After a change, call ui::on_mode_changed() to update what is on screen.
-bool        read_only();
 void        set_read_only(bool on);
 
 // Developer mode: the developer tools at the end of About › Help & diagnostics, and the
 // full diagnostic of Play timer › Advanced.
 // Saved in the preferences, or on for this session only (firmware screen,
 // "read-only + developer mode").
-bool        dev_mode();
 // Saved off the UI thread, with ui::save_config's toasts.
 void        set_dev_mode(bool on, bool persist, const std::string& saved_text = "", const std::string& failed_text = "");
 

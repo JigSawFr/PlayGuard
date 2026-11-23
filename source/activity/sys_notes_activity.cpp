@@ -12,7 +12,7 @@
 #include <aurore/cadran/view/markdown_view.hpp>
 
 #include "action/sys_notes_flow.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "view/build_cell.hpp"
 #include "view/release_notes.hpp"
 

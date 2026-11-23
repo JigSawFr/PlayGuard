@@ -86,6 +86,14 @@ test('the variables and config.json PlayGuard starts with', () => {
   assert.equal(L.envName('dev_builds'), 'PLAYGUARD_SIM_DEV_BUILDS');
 });
 
+test('the kept folder: no marker, this page, a newer page', () => {
+  assert.equal(L.keptState(null), 'absent');
+  assert.equal(L.keptState(String(L.KEPT_SCHEMA)), 'ok');
+  assert.equal(L.keptState(' 1\n'), 'ok');
+  assert.equal(L.keptState(String(L.KEPT_SCHEMA + 1)), 'newer');
+  assert.equal(L.keptState('garbage'), 'ok');   // unreadable: not taken for a newer one
+});
+
 test('the time moved on, as the page shows it', () => {
   assert.equal(L.skipText(0), '');
   assert.equal(L.skipText('junk'), '');

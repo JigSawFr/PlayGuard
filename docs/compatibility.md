@@ -35,6 +35,10 @@ PlayGuard checks that Atmosphère runs, not which version: what counts is the fi
 
 Launching over a game (title override) is recommended. The app says whether it runs as an application (over a game, or from its own forwarder on the HOME menu) or as an applet (album). Over a game, the console counts PlayGuard's time as that game's. In the activity, it goes to the user picked at launch: open it with a parent's user, not a child's. The play timer is the console's, the same for every user: it counts that time whoever opened PlayGuard, unless the timer is off or the PIN has paused parental controls ([details](features.md#the-pin-pauses-parental-controls-while-you-are-in-playguard)).
 
+### Replacement HOME menus
+
+The HOME menu is what checks the console's limits before a game starts, so a replacement HOME menu has to do it too. [SwitchU](https://github.com/PoloNX/SwitchU) does from version 1.4.2: its author tested it with PlayGuard, and it respects the play-time limits, the launch and resume restrictions, the parent's unlock with the PIN and the lock when time is up. Other replacement menus have not been tested ([reports welcome](https://github.com/JigSawFr/PlayGuard/discussions/categories/console-reports)).
+
 ### Nintendo Switch 2
 
 Not supported: there is no Atmosphère for it.
@@ -49,7 +53,7 @@ Each has its own parental controls, and PlayGuard only sees those of the system 
 
 ### Can it get the console banned?
 
-PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub (updates, and the reports you send) and switchbrew (the latest firmware and its release notes). What gets consoles banned is custom firmware or an emuMMC going online to Nintendo ([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)). No ban tied to parental-control or clock changes is documented; that is not a guarantee.
+PlayGuard never contacts Nintendo: online, it only reaches public time servers, GitHub (updates, and the reports you send), switchbrew (the latest firmware and its release notes) and the Homebrew App Store's CDN, `switch.cdn.fortheusers.org` (the version of PlayGuard it lists). What gets consoles banned is custom firmware or an emuMMC going online to Nintendo ([switchbrew FAQ](https://switchbrewdocs.readthedocs.io/en/latest/faq.html)). No ban tied to parental-control or clock changes is documented; that is not a guarantee.
 
 ### A console without Internet
 

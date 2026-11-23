@@ -194,6 +194,11 @@ bool stale_gate(bool pin, const std::string& made, const std::string& current, b
     return pin && pinned && !current.empty() && made != current;
 }
 
+bool stale_badge(bool pin, const std::string& made, const std::string& current)
+{
+    return pin && !current.empty() && made != current;
+}
+
 std::string patch_gaps(const patches::Report& r)
 {
     std::string out;

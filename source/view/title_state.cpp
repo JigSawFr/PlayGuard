@@ -1,12 +1,13 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "view/title_state.hpp"
+#include "kit_text.hpp"
 
 #include <aurore.hpp>
 
 #include "action/console_actions.hpp"
 #include "action/fw_gate.hpp"
 #include "ui/app_hooks.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 
@@ -38,7 +39,7 @@ static void open_read_only()
     // Else the developer switch turned it on: Help & diagnostics, on that switch.
     if (!hooks.make_help_tab) return;
     aurore::View* help = hooks.make_help_tab();
-    ui::open_screen(help, "playguard/prefs/help"_i18n);
+    ui::open_screen(help, kit_text::str("prefs/help"));
     aurore::sync([help]() {
         aurore::View* cell = help->getView("hp_dev_read_only");
         if (cell && cell->getVisibility() == aurore::Visibility::VISIBLE) aurore::Application::giveFocus(cell);

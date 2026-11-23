@@ -10,13 +10,17 @@ Errors:
   CONSOLE_ONLY ones below) missing from the desktop build's list
   (CMakeLists.txt, which leaves source/core/*.c out and adds those back by
   hand: the simulator shares them) unless NOT_ON_DESKTOP says why, or from
-  the host tests' sources (Makefile); a name below that is no file any more.
+  the host tests' sources (Makefile); a name below that is no file any more;
+- library/aurore pointing at a commit that is no `vX.Y.Z` tag of Aurore (an
+  app follows a release, never a commit of main). Skipped, with a note, when
+  the tags cannot be listed (no network).
 
 Usage: tools/check_sources.py [repo-root]
 """
 import glob
 import os
 import re
+import subprocess
 import sys
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
@@ -31,17 +35,13 @@ UPWARD = re.compile(r'^\s*#\s*include\s+"((?:activity|tab)/[^"]+)"', re.M)
 # in); nothing else of source/action includes a screen.
 ACTION_SCREENS = {
     "source/action/clock_check.cpp": {"tab/clock_tab.hpp"},                     # opens the network clock's screen
-    "source/action/dev_build_flow.cpp": {"activity/dev_build_activity.hpp",     # the development builds' screens
-                                         "activity/dev_builds_activity.hpp"},
     "source/action/fw_gate.cpp": {"activity/firmware_gate_activity.hpp"},       # the firmware screen
     "source/action/game_notice.cpp": {"activity/game_check_activity.hpp"},      # the installed games check
     "source/action/ha_update_flow.cpp": {"activity/ha_update_activity.hpp"},    # the integration's What's new
     "source/action/notices.cpp": {"activity/onboarding_activity.hpp",           # what the bell's entries open:
                                   "tab/clock_tab.hpp"},                         # First steps, the network clock
     "source/action/profile_flow.cpp": {"activity/profiles_activity.hpp"},       # the profiles' screen
-    "source/action/support_flow.cpp": {"activity/whats_new_activity.hpp"},      # What's new
     "source/action/sys_notes_flow.cpp": {"activity/sys_notes_activity.hpp"},    # the release notes' screen
-    "source/action/update_flow.cpp": {"activity/update_activity.hpp"},          # the update screen
 }
 
 
@@ -68,31 +68,23 @@ for rel, allowed in sorted(ACTION_SCREENS.items()):
         errors.append(f'tools/check_sources.py: ACTION_SCREENS lists "{inc}" for {rel}, which does not include it')
 
 # ------------------------------------------------------------ source/core
-# The console's own: the simulator stands in for them on the desktop
+# The console's own that are PlayGuard's, here or in its module (the kit's are checked by its own CI): the simulator stands in for them on the desktop
 # (source/sim/), or the desktop has no use for them.
 CONSOLE_ONLY = {
     "album.c": "sim_album.cpp",
     "console_info.c": "sim_console.c",
-    "crash_handler.c": "the console's exception handler",
-    "device_key.c": "sim_device_key.cpp",
     "forwarder.c": "sim_forwarder.cpp",
     "gamecheck.c": "sim_gamecheck.c",
     "gate_nx.c": "the PIN gate's .nro",
-    "modules_nx.c": "sim_modules.c",
-    "nacp_read.c": "sim_games.c",
     "pctl_dump.c": "sim_pctl.c",
     "pctl_ops.c": "sim_pctl.c",
-    "platform.c": "sim_platform.cpp",
     "playstats.c": "sim_playstats.c",
-    "startup_hook.c": "libnx's userAppInit",
-    "sysinfo.c": "sim_pctl.c",
     "time_ops.c": "sim_time.c",
 }
 # Console-free, host-tested, but not in the desktop build.
 NOT_ON_DESKTOP = {
     "gate_screen.c": "the PIN gate's screen (stb, built for the console only)",
     "gate_text.c": "the PIN gate's texts",
-    "nacp.c": "a game's control data: the made-up games have their names",
     "playstats_logic.c": "the raw play log: sim_playstats.c makes the figures themselves",
 }
 
@@ -105,9 +97,12 @@ def read(path):
         return ""
 
 
-cmake = set(re.findall(r"\$\{CMAKE_CURRENT_SOURCE_DIR\}/source/core/(\w+\.c)\b", read("CMakeLists.txt")))
-make = set(re.findall(r"\bsource/core/(\w+\.c)\b", read("Makefile")))
-core = {os.path.basename(p) for p in glob.glob(f"{ROOT}/source/core/*.c")}
+# PlayGuard's service layer is in two folders: the app's (source/core) and its module of the shared agent
+# (library/boreale-link/modules/playguard/core, $(PG) in the Makefile, ${PLAYGUARD_MODULE} in CMakeLists.txt).
+MODULE_CORE = "library/boreale-link/modules/playguard/core"
+cmake = set(re.findall(r"\$\{(?:CMAKE_CURRENT_SOURCE_DIR\}/source|PLAYGUARD_MODULE\})/core/(\w+\.c)\b", read("CMakeLists.txt")))
+make = set(re.findall(r"(?:\bsource|\$\(PG\))/core/(\w+\.c)\b", read("Makefile")))
+core = {os.path.basename(p) for p in glob.glob(f"{ROOT}/source/core/*.c") + glob.glob(f"{ROOT}/{MODULE_CORE}/*.c")}
 if not cmake or not make or not core:
     errors.append("no source/core/*.c found in CMakeLists.txt, the Makefile or source/core")
 for name in sorted(set(CONSOLE_ONLY) | set(NOT_ON_DESKTOP)):
@@ -123,6 +118,36 @@ for name in sorted(core - set(CONSOLE_ONLY)):
 for name in sorted(cmake & set(CONSOLE_ONLY)):
     errors.append(f"CMakeLists.txt adds source/core/{name} to the desktop build, which "
                   f"tools/check_sources.py says is the console's ({CONSOLE_ONLY[name]})")
+
+# ------------------------------------------------------------ aurore's tag
+def git(*args):
+    return subprocess.run(["git", "-C", ROOT, *args], capture_output=True, text=True, timeout=60)
+
+
+def check_aurore_tag():
+    pin = git("ls-tree", "HEAD", "library/aurore")
+    fields = pin.stdout.split()
+    if pin.returncode != 0 or len(fields) < 3 or fields[0] != "160000":
+        return  # not a git checkout, or no such submodule
+    sha = fields[2]
+    url = git("config", "-f", ".gitmodules", "--get", "submodule.library/aurore.url").stdout.strip()
+    if not url:
+        errors.append(".gitmodules has no submodule.library/aurore.url")
+        return
+    try:
+        tags = subprocess.run(["git", "ls-remote", "--tags", url], capture_output=True, text=True, timeout=60)
+    except subprocess.TimeoutExpired:
+        tags = None
+    if tags is None or tags.returncode != 0:
+        print("sources check: Aurore's tags could not be listed, library/aurore's pin not checked")
+        return
+    release = re.compile(r"^refs/tags/v\d+\.\d+\.\d+(\^\{\})?$")
+    if not any(line.split()[0] == sha for line in tags.stdout.splitlines() if release.match(line.split()[1])):
+        errors.append(f"library/aurore points at {sha[:12]}, which is no vX.Y.Z tag of Aurore: "
+                      "an app follows a release of Aurore, never a commit of main")
+
+
+check_aurore_tag()
 
 for e in errors:
     print("ERROR:", e)

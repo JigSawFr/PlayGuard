@@ -13,7 +13,7 @@
 #include "gate.h"
 #include "gate_screen.h"
 #include "gate_text.h"
-#include "nx_types.h"
+#include "core/nx_types.h"
 #include "pctl_ops_internal.h"
 
 #define GATE_DIR "sdmc:/config/playguard/"

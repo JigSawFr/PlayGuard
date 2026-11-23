@@ -12,7 +12,7 @@
 #include "action/pin_lock.hpp"
 #include "action/sync_flow.hpp"
 #include "bl_net.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/sync_files.hpp"
@@ -355,7 +355,7 @@ bool SyncActivity::commit(SyncConf next)
 
 void SyncActivity::refresh()
 {
-    intro->setText(aurore::getStr("playguard/sync/intro", sync_files::conf_file()));
+    intro->setText(aurore::getStr("playguard/sync/intro", sync_files::link_file(), sync_files::conf_file()));
     enabled->setOn(conf.enabled, false);
     host->setDetailText(or_none(conf.host));
     port->setDetailText(std::to_string(conf.port));
@@ -398,7 +398,7 @@ void SyncActivity::refresh_ha_install()
     const std::string installed = ha_update_flow::installed();
     if (installed.empty()) {
         ha_install->setText("playguard/sync/ha_install"_i18n);
-        ha_install->setDetailText("HACS");
+        ha_install->setDetailText("Marketplace");
         ha_install->detail->setThemeColor("textColor", "cadran/text2");
         return;
     }
@@ -414,7 +414,10 @@ void SyncActivity::refresh_status()
     const sync_flow::Status st = sync_flow::status();
     std::string text;
     const char* color = "cadran/text2";
-    if (!conf.enabled) {
+    if (sync_files::written_by_newer()) {
+        text = "playguard/sync/state_newer"_i18n;
+        color = "cadran/amber";
+    } else if (!conf.enabled) {
         text = "playguard/sync/state_off"_i18n;
     } else if (!st.ready) {
         text = aurore::getStr("playguard/sync/state_incomplete", problem_text(conf));

@@ -1,11 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/pt_block_flow.hpp"
+#include "kit_text.hpp"
 
 #include <algorithm>
 #include <format>
 #include <aurore.hpp>
 
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/diagnostics.hpp"
 #include "util/pctl_ops_c.hpp"
 #include "util/pt_block.hpp"
@@ -39,8 +40,8 @@ void save_report(const pt_block::Reference& ref, const pt_block::Block& now)
 {
     std::string err;
     const std::string path = diagnostic::save(pt_block::report(ref, now, ui::now_stamp()), &err);
-    if (path.empty()) ui::error("playguard/toast/diag_err"_i18n, err);
-    else ui::notify(aurore::getStr("playguard/toast/diag_saved", path));
+    if (path.empty()) ui::error(kit_text::str("toast/diag_err"), err);
+    else ui::notify(kit_text::str("toast/diag_saved", path));
 }
 }   // namespace
 

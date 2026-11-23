@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/paths.hpp"
 
 namespace game_scan

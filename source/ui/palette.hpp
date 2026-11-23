@@ -53,8 +53,8 @@ struct ImageSlot
 
 constexpr ImageSlot IMAGE_SLOTS[] = {
     // The loading screen's picture in the middle (view/loading_mark): the
-    // app's icon, drawn 168 units square.
-    { "playguard/loading/art", "@res/img/app_icon.jpg", 512 },
+    // app's icon without its name (the wordmark says it), drawn 168 units square.
+    { "playguard/loading/art", "@res/img/app_icon.png", 512 },
     // The name under it (activity/loading_activity), 360 x 88 units: the
     // wordmark, in light ink (wordmark-light.png, the light theme's, is
     // PlayGuard's own choice when the theme gives none).

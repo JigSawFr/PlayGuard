@@ -2,6 +2,7 @@
 // what it says.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/dashboard_tab.hpp"
+#include "core/fw_policy.h"
 
 #include <utility>
 
@@ -12,7 +13,7 @@
 #include "action/nintendo_dns.hpp"
 #include "action/pairing_state.hpp"
 #include "action/session_pause.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 

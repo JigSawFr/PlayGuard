@@ -13,7 +13,7 @@
 
 #include "action/notices.hpp"
 #include "ui/app_hooks.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 static constexpr float SIZE = 40;
 static constexpr const char* BELL_ID = "notice_bell";

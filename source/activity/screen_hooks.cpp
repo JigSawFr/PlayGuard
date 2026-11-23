@@ -11,6 +11,12 @@
 #include <aurore/cadran/ui/hooks.hpp>
 #include <aurore/cadran/ui/prefs.hpp>
 
+#include "action/fw_gate.hpp"
+#include "action/ha_update_flow.hpp"
+#include "action/hbmenu_lock.hpp"
+#include "action/others_update.hpp"
+#include "action/pin_lock.hpp"
+#include "action/sys_update_flow.hpp"
 #include "action/frame_stats_flow.hpp"
 #include "action/notices.hpp"
 #include "action/pt_log_flow.hpp"
@@ -27,10 +33,14 @@
 #include "core/sysinfo.h"
 #include "tab/tab_base.hpp"
 #include "ui/app_hooks.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/paths.hpp"
+#include "util/pt_upload.hpp"
 #include "util/sync_files.hpp"
+#ifndef __SWITCH__
+#include "sim/sim_homebrew.hpp"
+#endif
 #include "view/title_state.hpp"
 
 using namespace aurore::literals;
@@ -270,6 +280,46 @@ void install_screen_hooks()
             if (dynamic_cast<LockActivity*>(act)) return true;
         return false;
     };
+    a.error_key = [](const std::string& key) -> std::string {
+        // Read-only for a firmware not checked yet: the firmware screen turns
+        // it off, not the developer switch.
+        return key == "read_only" && fw_gate::needed() ? "read_only_fw" : "";
+    };
+    a.may_replace_self = [](bool hand_over) {
+        if (hand_over) return pin_lock::before_handing_over(hbmenu_lock::locked());
+        // Replacing PlayGuard can undo everything it guards: the PIN is asked
+        // whenever one is set, whatever Protect PlayGuard with the PIN says
+        // (unless it was entered since PlayGuard opened).
+        if (pin_lock::confirm()) return true;
+        ui::refuse(pin_lock::refusal_text());
+        return false;
+    };
+    a.update_checked = [](const update::Result& r) { others_update::check(r); };
+    a.also_check = []() {
+        sys_update_flow::check_now();   // Atmosphère, hekate, firmware: in the notification bell
+        ha_update_flow::check_now();    // the Home Assistant integration, once known: there too
+    };
+    a.also_at_start = []() {
+        sys_update_flow::at_start();
+        ha_update_flow::at_start();
+    };
+    a.report_files = []() -> std::function<ui::app_hooks::Hooks::ReportFiles()> {
+        // The recorder's file only while it records: the developer is after it.
+        const bool pt_log = config::get().pt_log;
+        return [pt_log]() { return pt_upload::debug_files(pt_log); };
+    };
+    a.notice_set = [](const std::string& id, const std::string& title, const std::string& text, const std::string& button,
+                      std::function<void()> action, bool action_needed) {
+        notices::set(id, action_needed ? notices::Level::Action : notices::Level::Info, title, text, button, std::move(action));
+    };
+    a.notice_clear = [](const std::string& id) { notices::clear(id); };
+#ifndef __SWITCH__
+    // The simulated SD card's files first (PLAYGUARD_SIM_FORWARDERS puts the
+    // patches forwarders need there).
+    a.before_patch_report = []() {
+        if (sim_env_flag("PLAYGUARD_SIM_FORWARDERS")) sim_homebrew::seed(paths::sd_root());
+    };
+#endif
     a.mode_changed = []() {
         pt_log_flow::apply();
         frame_stats_flow::apply();

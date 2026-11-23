@@ -1,6 +1,7 @@
 // ha_links — PlayGuard's Home Assistant integration in the parent's own Home
 // Assistant, from a phone, through My Home Assistant's redirects (it asks
-// once for the instance's address): playguard-ha in HACS (app::HA_HACS_URL),
+// once for the instance's address): the integration in the Marketplace
+// (app::HA_MARKETPLACE_URL),
 // and adding a console (app::HA_ADD_URL). Remote access › Home Assistant and
 // the integration's update screen show them as QR codes.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).

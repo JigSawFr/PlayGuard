@@ -1,11 +1,12 @@
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #include "action/game_verify_flow.hpp"
+#include "kit_text.hpp"
 
 #include <format>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 
 using namespace aurore::literals;
 
@@ -18,7 +19,7 @@ std::string size_text(u64 bytes)
     const u64 mb = bytes >> 20;
     if (mb < 1024) return aurore::getStr("playguard/games/size_mb", (int)mb);
     std::string gb = std::format("{:.1f}", (double)bytes / (double)(1ULL << 30));
-    const std::string mark = "playguard/games/decimal_mark"_i18n;
+    const std::string mark = kit_text::str("games/decimal_mark");
     const size_t dot = gb.find('.');
     if (dot != std::string::npos) gb.replace(dot, 1, mark);
     return aurore::getStr("playguard/games/size_gb", gb);

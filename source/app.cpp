@@ -10,7 +10,7 @@
 #include "bl_notices.h"
 #include "core/platform.h"
 #include "core/sim_env.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 

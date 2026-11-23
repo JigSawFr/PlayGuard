@@ -61,6 +61,7 @@ struct Record
     std::string reset_at;           // "HH:MM" the play time started over
     bool        accounts_known = false;   // the accounts were listed once
     std::vector<KnownAccount> accounts;   // oldest first
+    std::string extra;      // keys this version does not know, as a JSON object; written back as read
     bool        newer = false;  // the file came from a newer version: read as empty, never saved
 };
 

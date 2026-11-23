@@ -9,37 +9,20 @@
 
 #include <aurore/cadran/ui/prefs.hpp>
 
+#include "kit_settings.hpp"
+
 namespace config
 {
 
-struct Config
+struct Config : kit_settings::Settings
 {
-    // The look Aurore's Cadran draws (ui::use_prefs): the language, the
-    // theme, the text size ("auto": larger while docked), the effects ("auto":
-    // lighter off the dock), the main screen's sidebar ("auto": on its icons
-    // while a tab has the focus) and the screens' background glow
-    // (Developer › glow).
-    ui::Prefs look;
+    // The look, the update settings, the logs kept and the support reminder: kit_settings::Settings.
     std::string ntp_server;            // empty: pick from the console region
     std::vector<std::string> custom_servers;
     bool advanced = false;             // show debug-class play-timer actions
     bool auto_relock = true;           // lock again right after a change that needed an unlock
     bool dev_mode = false;             // developer tools (7 presses on About > Version)
     bool pt_log = false;               // Developer › record the play timer (action/pt_log_flow)
-    bool frame_stats = false;          // Developer › frame statistics (action/frame_stats_flow)
-    // How an update is installed: "" (not chosen yet: asked on the first
-    // update), "inplace" (PlayGuard downloads it and replaces itself),
-    // "auto", "sphaira", "appstore", "manual".
-    std::string update_via;
-    bool update_daily = false;         // check for updates at start-up, once a day
-    std::string update_checked;        // "YYYY-MM-DD" of the last check, any kind
-    // The latest release the last check found ("1.2.0"): a newer one than the
-    // running version is offered at each start-up (action/update_flow) until
-    // installed or postponed. update_snooze_version / _until: "Later" on that
-    // screen, for that version until that day ("YYYY-MM-DD", 30 days at most).
-    std::string update_latest;
-    std::string update_snooze_version;
-    std::string update_snooze_until;
     // What the console runs on (action/sys_update_flow): the latest Atmosphère,
     // hekate and firmware the last check found (util/sys_updates.hpp's text),
     // and the day of that check ("YYYY-MM-DD").
@@ -61,15 +44,8 @@ struct Config
     std::string activity_account_last;   // "" every account, or a uid as above
     int  export_format   = 0;          // last export format (table_export::Format)
     int  backup_keep     = 0;          // backups kept after a new one (0: all of them)
-    // The saved reports and the crash files kept, each folder on its own
-    // (util/log_files.hpp; 0: no limit): the newest logs_keep, those of the
-    // last logs_keep_days days, the newest that fit in logs_keep_mb MB.
-    int  logs_keep       = 20;
-    int  logs_keep_days  = 0;
-    int  logs_keep_mb    = 0;
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
     bool intro = true;                 // the loading screen stays 2 s at start-up (activity/loading_activity.hpp)
-    std::string dev_builds_order = "newest";   // Install another build's pull requests: "newest" or "number"
     // PIN › Protect PlayGuard with the PIN: "off", "changes" (before the first
     // change) or "open" (to open PlayGuard). See pin_lock.hpp.
     // "changes" by default, and when the value is missing or unknown: a
@@ -86,14 +62,6 @@ struct Config
     // its "Show at start-up" switch was turned off.
     bool onboarding_at_start = true;
 
-    // "Support PlayGuard" once a month at start-up (Preferences; off stays
-    // off, updates included), and "What's new" once after each update. See
-    // util/support.hpp. support_reminded: "YYYY-MM-DD" of the last reminder
-    // (or of when the month started); seen_version: the version whose
-    // "What's new" was handled.
-    bool        support_reminder = true;
-    std::string support_reminded;
-    std::string seen_version;
     // The agent sysmodule PlayGuard carries (its SHA-256) that the parent
     // answered "Later" to at start-up: not offered again at start (Console ›
     // Optional modules still offers it).

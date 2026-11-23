@@ -1,5 +1,6 @@
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
 #include "tab/console_tab.hpp"
+#include "core/fw_policy.h"
 
 #include <aurore/cadran/ui/cadran_frame.hpp>
 #include <aurore/cadran/ui/cadran_kit.hpp>
@@ -17,7 +18,7 @@
 #include "activity/sync_activity.hpp"
 #include "core/sysinfo.h"
 #include "tab/clock_tab.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/modules.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"

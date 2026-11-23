@@ -77,11 +77,10 @@ PlayGuard's website, on GitHub Pages: <https://guard.boreale.dev/>.
   page the previous and next ones; the changelog folds the older releases.
 - **For a parent in a hurry**: *Locked out?* under the home page's
   buttons; a check on the compatibility page (a firmware typed, what
-  PlayGuard does on it, from `source/core/sysinfo.h`'s limits as
+  PlayGuard does on it, from `library/boreale-link/modules/playguard/core/fw_policy.h`'s limits as
   `tools/gen_compat.py` reads them); a copy button on each block of code; a
   page that prints as its text alone (its folded parts open); an icon for an
-  iPhone's home screen (`images/apple-touch-icon.png`,
-  `tools/render_branding.mjs`).
+  iPhone's home screen (`images/apple-touch-icon.png`, from Boréale's brand kit).
 - **The home page's install**: two tabs (`site.js`, both under their names
   without it), the app store or by hand; the release's date links to its notes.
   The buttons to the simulator say what it downloads (`SITE_SIMULATOR`, the

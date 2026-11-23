@@ -9,7 +9,7 @@
 #include "action/session_pause_logic.hpp"
 #include "app.hpp"
 #include "core/sysinfo.h"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/pctl_ops_c.hpp"
 

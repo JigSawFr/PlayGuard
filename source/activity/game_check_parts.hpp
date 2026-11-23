@@ -13,7 +13,7 @@
 
 #include "action/game_check_text.hpp"
 #include "action/game_verify_flow.hpp"
-#include "ui/ui.hpp"
+#include "ui/play_ui.hpp"
 #include "view/game_tile.hpp"
 
 namespace game_check_parts
