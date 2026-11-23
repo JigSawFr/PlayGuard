@@ -70,7 +70,11 @@ struct Choice
 // (updated in place when it has one of that size already).
 void show_pixels(aurore::Image* image, const std::vector<uint8_t>& rgba, int px)
 {
-    if (!image || rgba.size() != (size_t)px * px * 4) return;
+    if (!image) return;
+    if (rgba.size() != (size_t)px * px * 4) {
+        aurore::Logger::error("Icon picker: {} bytes for a {}-px square", rgba.size(), px);
+        return;
+    }
     image->setScalingType(aurore::ImageScalingType::FIT);
     image->setImageFromRGBA(rgba.data(), px, px);
 }
@@ -572,6 +576,19 @@ class Sheet : public aurore::Box
             }
             Pixels mark;
             mark.rgba = forwarder_icon::rgba_of(asset_bytes(forwarder_library::BADGE), mark.w, mark.h);
+            // The icons first, whatever caps:a and ns answer (or wait for) below:
+            // a cell is never blank because the games are slow to name.
+            aurore::sync([this, weak, own, icons, mark]() {
+                if (weak.expired()) return;
+                this->shield = mark;
+                this->choices[0].small = own;
+                this->draw_cell(0);
+                for (size_t i = 0; i < icons->size() && i + 1 < this->choices.size(); i++) {
+                    this->choices[i + 1].small = (*icons)[i];
+                    this->draw_cell(i + 1);
+                }
+                this->select(this->focus);
+            });
             // The games, from caps:a; their names from ns, once each.
             std::vector<AlbumShot> found(512);
             found.resize(album_shots_of_games(found.data(), found.size()));
@@ -595,15 +612,8 @@ class Sheet : public aurore::Box
                 }
                 games->push_back({ names[it->second], false });
             }
-            aurore::sync([this, weak, own, icons, mark, games]() {
+            aurore::sync([this, weak, games]() {
                 if (weak.expired()) return;
-                this->shield = mark;
-                this->choices[0].small = own;
-                this->draw_cell(0);
-                for (size_t i = 0; i < icons->size() && i + 1 < this->choices.size(); i++) {
-                    this->choices[i + 1].small = (*icons)[i];
-                    this->draw_cell(i + 1);
-                }
                 for (size_t i = 0; i < games->size() && i < this->choices.size(); i++) {
                     this->choices[i].game = (*games)[i].first;
                     this->choices[i].no_game = (*games)[i].second;
