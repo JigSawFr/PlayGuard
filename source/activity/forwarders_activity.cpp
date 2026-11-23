@@ -2,6 +2,7 @@
 #include "activity/forwarders_activity.hpp"
 
 #include <algorithm>
+#include <utility>
 #include <set>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
@@ -781,6 +782,7 @@ void ForwardersActivity::pick_homebrew()
     struct Entry
     {
         std::string path, name, detail;
+        std::vector<uint8_t> icon;   // the .nro's own icon (JPEG), empty when it has none
     };
     std::vector<Entry> entries;
     for (const std::string& p : found) {
@@ -788,20 +790,25 @@ void ForwardersActivity::pick_homebrew()
         nro::read((paths::sd_root() == "/" ? std::string() : paths::sd_root()) + p, info);
         const bool made = on_home.count(nro::sdmc_path(p)) > 0;
         entries.push_back({p, forwarders_logic::default_name(info.name, p),
-                           forwarders_logic::pick_detail(info.author, info.version, p, made ? "playguard/forwarders/pick_on_home"_i18n : std::string())});
+                           forwarders_logic::pick_detail(info.author, info.version, p, made ? "playguard/forwarders/pick_on_home"_i18n : std::string()),
+                           std::move(info.icon)});
     }
     std::stable_sort(entries.begin(), entries.end(), [](const Entry& a, const Entry& b) {
         return text::lower_ascii(a.name) < text::lower_ascii(b.name);
     });
     std::vector<std::string> names, details, paths;
-    for (const Entry& e : entries) {
+    ui::PickOptions options;
+    options.search = "playguard/forwarders/pick_search"_i18n;
+    options.clear = "playguard/forwarders/pick_search_clear"_i18n;
+    for (Entry& e : entries) {
         names.push_back(e.name);
         details.push_back(e.detail);
         paths.push_back(e.path);
+        options.pictures.push_back(std::move(e.icon));
     }
     std::weak_ptr<bool> weak = this->alive;
     ui::pick("playguard/forwarders/pick_title"_i18n, names, 0, [this, weak, paths](int index) {
         if (weak.expired() || index < 0 || (size_t)index >= paths.size()) return;
         forwarder_flow::create(paths[(size_t)index], this->then_rebuild());
-    }, false, details);
+    }, false, details, {}, {}, options);
 }
