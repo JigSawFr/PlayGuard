@@ -117,10 +117,10 @@ intro), but "lock", which turns the intro off in config.json.
 
 The "sync" scenario starts a local Mosquitto (needs mosquitto and
 mosquitto-clients) and sets the remote link up in an earlier version's
-sync.conf (schema 1): PlayGuard must come online on Boréale's tree, publish
+sync.conf (schema 1) and the broker's settings in config/boreale/link.conf:
+PlayGuard must come online on Boréale's tree, publish
 the capabilities, clear what the earlier version left retained under
-playguard/<id> and its discovery, move the broker's settings to
-config/boreale/link.conf and save sync.conf as schema 3 without them, publish the
+playguard/<id> and its discovery, save sync.conf as schema 3, publish the
 Home Assistant discovery, the state, today's
 activity and the names, carry out a limit order (event, retained order
 cleared, new state, change history), refuse one out of range, publish the
@@ -395,11 +395,18 @@ if UPDATE:
 sync_conf = os.path.join(run_dir, "playguard_data", "sync.conf")
 if os.path.exists(sync_conf):
     os.remove(sync_conf)   # the link is off but in the "sync" scenario
-# The broker's settings every Boréale homebrew shares: made from sync.conf
-# by each scenario's PlayGuard, from nothing.
+# The broker's settings every Boréale homebrew shares: the scenarios that
+# need the link write them here (sync.conf holds PlayGuard's own keys only).
 link_conf = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "link.conf")
 if os.path.exists(link_conf):
     os.remove(link_conf)
+
+
+def write_link_conf(text):
+    os.makedirs(os.path.dirname(link_conf), exist_ok=True)
+    open(link_conf, "w").write("schema=1\n" + text)
+
+
 # PlayGuard in the Boréale homebrews' registry, written at each start.
 app_conf = os.path.join(run_dir, "playguard_data", "sd", "config", "boreale", "apps", "playguard.conf")
 if os.path.exists(app_conf):
@@ -503,10 +510,12 @@ if SYNC:
     os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
     # An earlier version's file (schema 1, the old default prefix): the
     # link moves to Boréale's tree and clears the old one.
-    open(sync_conf, "w").write(
-        "schema=1\nenabled=1\nhost=127.0.0.1\n"
+    write_link_conf(
+        "enabled=1\nhost=127.0.0.1\n"
         f"port={mqtt_port}\nallow_anonymous=1\nconsole_id={SYNC_ID}\nconsole_name=Smoke\n"
-        f"mqtt_version={'3.1.1' if MQTT311 else 'auto'}\n"
+        f"mqtt_version={'3.1.1' if MQTT311 else 'auto'}\n")
+    open(sync_conf, "w").write(
+        "schema=1\n"
         f"publish_serial={1 if MQTT311 else 0}\n"
         f"publish_network={0 if MQTT311 else 1}\n"
         "policy=auto\nremote_timer_writes=1\npoll_s=10\n")
@@ -524,9 +533,8 @@ if AGENT:
     env.setdefault("PLAYGUARD_SIM_MODULES", "agent:running")
     env.setdefault("PLAYGUARD_SIM_AGENT_ORDER", "limit_uniform=90")
     os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
-    open(sync_conf, "w").write(
-        "enabled=1\nhost=127.0.0.1\nport=1\nallow_anonymous=1\n"
-        f"console_id={SYNC_ID}\nconsole_name=Smoke\npolicy=auto\nremote_timer_writes=1\npoll_s=10\n")
+    write_link_conf(f"enabled=1\nhost=127.0.0.1\nport=1\nallow_anonymous=1\nconsole_id={SYNC_ID}\nconsole_name=Smoke\n")
+    open(sync_conf, "w").write("policy=auto\nremote_timer_writes=1\npoll_s=10\n")
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)
@@ -555,9 +563,8 @@ if AGENT_UPDATE:
         f"version=9.9.9\ncommit=smoke00\nsha256={hashlib.sha256(NEW_NSP).hexdigest()}\n")
     env.setdefault("PLAYGUARD_SIM_BUNDLED", bundle)
     os.makedirs(os.path.dirname(sync_conf), exist_ok=True)
-    open(sync_conf, "w").write(
-        "enabled=1\nhost=127.0.0.1\nport=1\nallow_anonymous=1\n"
-        f"console_id={SYNC_ID}\nconsole_name=Smoke\npolicy=auto\npoll_s=10\n")
+    write_link_conf(f"enabled=1\nhost=127.0.0.1\nport=1\nallow_anonymous=1\nconsole_id={SYNC_ID}\nconsole_name=Smoke\n")
+    open(sync_conf, "w").write("policy=auto\npoll_s=10\n")
     history = os.path.join(nand_dir, "history.json")
     if os.path.exists(history):
         os.remove(history)
@@ -1653,9 +1660,9 @@ if SYNC:
     # The tree an earlier version left (seeded before PlayGuard started), cleared.
     for topic in OLD_TREE:
         wait_for(f"{topic} cleared", lambda topic=topic: mqtt_get(topic, 1) is None, 20)
-    # Then written again as schema 3, without legacy_prefix and without the
-    # broker's keys, which moved to link.conf: nothing of the old left.
-    wait_for("sync.conf written as schema 3, without legacy_prefix nor the broker's keys",
+    # Then written again as schema 3, without legacy_prefix: nothing of the
+    # old left in sync.conf.
+    wait_for("sync.conf written as schema 3, without legacy_prefix",
              lambda: "schema=3\n" in open(sync_conf).read() and "legacy_prefix" not in open(sync_conf).read()
              and "\nhost=" not in open(sync_conf).read(), 10)
     if f"\nport={mqtt_port}\n" not in open(link_conf).read():
