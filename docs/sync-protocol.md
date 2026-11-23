@@ -675,7 +675,7 @@ release's `CHANGELOG.md`) and the QR code that opens it in the Marketplace.
 
 | File | Written by | Content |
 |---|---|---|
-| `config/boreale/link.conf` | PlayGuard (*Remote access*), or another Boréale homebrew's screen; hand-editable | The broker's settings every Boréale homebrew of the console shares (boreale-link's `bl_link_conf`): `schema=1`, `enabled`, `host`, `port`, `tls`, `ca_file`, `mqtt_version`, `username`, `password`, `allow_anonymous`, `console_id`, `console_name`, `topic_prefix`, `discovery_prefix`, as in `sync.conf` (below). Made from `sync.conf` the first time PlayGuard or the agent reads its settings, which is then written again without them (schema 3); the one read for those keys afterwards. Unknown keys kept, a newer `schema` never written over. |
+| `config/boreale/link.conf` | PlayGuard (*Remote access*), or another Boréale homebrew's screen; hand-editable | The broker's settings every Boréale homebrew of the console shares (boreale-link's `bl_link_conf`): `schema=1`, `enabled`, `host`, `port`, `tls`, `ca_file`, `mqtt_version`, `username`, `password`, `allow_anonymous`, `console_id`, `console_name`, `topic_prefix`, `discovery_prefix`, as in `sync.conf` (below). The one read for those keys; a broker key left in `sync.conf` is not read. Unknown keys kept, a newer `schema` never written over. |
 | `config/boreale/apps/playguard.conf` | PlayGuard, at each start when something changed | PlayGuard in the registry of the Boréale homebrews installed (boreale-link's `bl_app`), for the others to know it is there: `schema=1`, `name`, `version`, `nro` (from the SD card's root, kept when PlayGuard was started from elsewhere), `icon` (empty: the `.nro`'s own), `repo` (`JigSawFr/PlayGuard`). Unknown keys kept, a newer `schema` never written over. |
 | `config/boreale/notices/playguard.json` | PlayGuard, when its bell changes | PlayGuard's bell as the other Boréale homebrews read it (boreale-link's `bl_notices`): `schema=1`, `module`, `nro`, and each entry shown (`id`, `level` `todo` or `info`, `title` and `detail` in the console's language with `lang`, `updated`, `expires`, `route`: the tab where it is dealt with, one of Preferences › *Start on*'s). A click on one in another homebrew starts PlayGuard with `--open=<tab>`, which opens that tab (an unknown one: the usual start tab). Written only when an entry changed; unknown members kept, a newer `schema` never written over. |
 | `config/playguard/sync.conf` | PlayGuard (*Remote access*); hand-editable | The link's settings, `key=value`, one per line (below). Shared by every system on the SD card. PlayGuard's own keys only: the broker's are in `link.conf`. |
@@ -722,14 +722,13 @@ version's) is read for the keys this one knows and never written again, by
 PlayGuard or the agent; nor is one with more unknown lines than fit (1 KB of
 them). Anonymous brokers need
 `allow_anonymous=1`; without a user name the link otherwise stays off.
-A `sync.conf` of schema 1 or 2 still holds the broker's keys: the first
-read moves them to `link.conf` (when it has none yet; else `link.conf`'s
-win) and writes `sync.conf` again without them, so nothing of them is left
-there.
+The broker's keys live in `link.conf` alone. A broker key left in a
+`sync.conf` from before is not read, and PlayGuard's next save of the file
+leaves it out.
 
-A `schema=1` file (an earlier version's) is read the same way: its
-`topic_prefix`, when it is the old default `playguard`, becomes `boreale`,
-and the prefix it had is kept as `legacy_prefix`. At its next connection,
+A `schema=1` file (an earlier version's) is read the same way: the prefix
+it published under is taken to be the old default `playguard`, kept as
+`legacy_prefix` (the broker's own `topic_prefix` is `link.conf`'s). At its next connection,
 the console clears (empty retained publish) what it left on the old tree:
 `<legacy_prefix>/<id>/{state, activity, week, names, games, report}`, each
 `<entity>/set`, the finished days around today (`activity/<date>`),

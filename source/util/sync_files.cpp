@@ -164,6 +164,30 @@ bool save_conf(const SyncConf& c, std::string* error)
     paths::ensure_dir(paths::data_dir());
     return paths::atomic_write(conf_file(), text, error);
 }
+
+// The broker's keys a sync.conf from before link.conf (schema 1 or 2) still
+// holds: dropped from the lines kept, so the next save leaves nothing of them.
+// Goes with the release that follows 1.4.0 (workbench's plans/playguard/suivi.md).
+void drop_broker_keys(SyncConf& c)
+{
+    static const char* const keys[] = {"enabled", "host", "port", "tls", "ca_file", "mqtt_version", "username", "password",
+                                       "allow_anonymous", "console_id", "console_name", "topic_prefix", "discovery_prefix"};
+    std::string kept(c.file.kept, c.file.len), out;
+    size_t at = 0;
+    while (at < kept.size()) {
+        size_t end = kept.find('\n', at);
+        end = end == std::string::npos ? kept.size() : end + 1;
+        const size_t eq = kept.find('=', at);
+        const std::string key = eq != std::string::npos && eq < end ? kept.substr(at, eq - at) : std::string();
+        bool broker = false;
+        for (const char* k : keys) broker = broker || key == k;
+        if (!broker) out.append(kept, at, end - at);
+        at = end;
+    }
+    std::memcpy(c.file.kept, out.data(), out.size());
+    c.file.kept[out.size()] = '\0';
+    c.file.len = out.size();
+}
 }   // namespace
 
 bool written_by_newer()
@@ -186,17 +210,12 @@ SyncConf load()
     sync_conf_defaults(&c);
     std::string text;
     const bool conf = paths::read_file(conf_file(), text);
-    if (conf) sync_conf_parse(&c, text.data(), text.size());
-    // The broker's settings are link.conf's, shared with every Boréale
-    // homebrew. A sync.conf from before it (schema 1 or 2) gives them to it
-    // when there is none, then loses them: written again without them, so
-    // that nothing is left of them there. (The agent does the same, whoever
-    // reads them first.)
+    if (conf && sync_conf_parse(&c, text.data(), text.size())) drop_broker_keys(c);
+    // The broker's settings are link.conf's alone, shared with every Boréale
+    // homebrew: a broker key left in sync.conf is an unknown one, kept.
     bool found = false;
     const BlLinkConf l = read_link(found);
     if (found) sync_conf_from_link(&c, &l);
-    else if (c.broker_keys) found = save_link(c, nullptr);
-    if (found && c.broker_keys && !sync_conf_unwritable(&c) && save_conf(c, nullptr)) c.broker_keys = false;
     c.emummc = paths::nand_key() == "emummc";
     return c;
 }
