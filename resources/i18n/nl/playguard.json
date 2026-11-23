@@ -935,6 +935,8 @@
         "pick_title": "Kies een homebrew",
         "pick_none": "Geen homebrew gevonden in de map /switch van de SD-kaart.",
         "pick_on_home": "Al in het HOME-menu",
+        "pick_search": "Zoek een homebrew",
+        "pick_search_clear": "Alle homebrews tonen",
         "name": "Naam in het HOME-menu",
         "author": "Uitgever",
         "confirm_add": "{} in het HOME-menu zetten? Het pictogram komt uit {}.",

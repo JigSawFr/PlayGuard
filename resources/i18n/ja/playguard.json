@@ -935,6 +935,8 @@
         "pick_title": "Homebrewを選ぶ",
         "pick_none": "SDカードの/switchフォルダにHomebrewが見つかりませんでした。",
         "pick_on_home": "HOMEに追加済み",
+        "pick_search": "Homebrewを検索",
+        "pick_search_clear": "すべてのHomebrewを表示",
         "name": "HOMEメニューでの名前",
         "author": "発売元",
         "confirm_add": "{}をHOMEメニューに置きますか？ アイコンは{}のものです。",

@@ -935,6 +935,8 @@
         "pick_title": "Scegli un homebrew",
         "pick_none": "Nessun homebrew trovato nella cartella /switch della scheda SD.",
         "pick_on_home": "Già nel menu HOME",
+        "pick_search": "Cerca un homebrew",
+        "pick_search_clear": "Mostra tutti gli homebrew",
         "name": "Nome nel menu HOME",
         "author": "Editore",
         "confirm_add": "Mettere {} nel menu HOME? La sua icona viene da {}.",

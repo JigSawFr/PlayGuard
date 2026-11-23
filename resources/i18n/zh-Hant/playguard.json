@@ -935,6 +935,8 @@
         "pick_title": "選擇Homebrew",
         "pick_none": "SD卡的/switch資料夾中找不到Homebrew。",
         "pick_on_home": "已在 HOME 選單",
+        "pick_search": "搜尋 Homebrew",
+        "pick_search_clear": "顯示全部 Homebrew",
         "name": "HOME選單上的名稱",
         "author": "發行商",
         "confirm_add": "要將{}放到HOME選單上嗎？圖示來自{}。",
