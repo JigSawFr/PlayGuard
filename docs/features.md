@@ -59,7 +59,7 @@ PlayGuard's look is called Cadran: an icon rail for the tabs, a navy or cool-whi
 
 ## Notifications — what needs you, from any tab
 
-A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab (the bell's badge says *2* when two things are to do).
+A bell in the header, left of the version, gathers what needs the parent; Ⓨ opens the list from any tab. Its badge counts every entry in the list, to do or for information (*5* for two things to do and three newer releases): amber while one is to do, grey when there is information alone. Marking an entry as read, or ignoring one, takes it off the count.
 
 Left of the bell, the language (its code, *FR*, *EN*…) and the theme (a sun for light, a moon for dark, a half-filled circle when it follows the console), then the text size (**AA**, its large A in teal while the text is larger): a tap opens the same list as *Preferences*, and **−** offers them from any tab. A new theme or palette takes effect at once on every screen, nothing made again; a new language too, every screen made again on the same tab with the focus on the same line, Chinese and its own font included. The theme list ends with the palette ([below](#preferences)).
 
@@ -78,7 +78,7 @@ Each with an amber warning sign, counted on the bell in amber; it stays until it
 
 ### For information
 
-Each with an "i", a dot on the bell; it can be marked as read:
+Each with an "i", counted on the bell; it can be marked as read:
 
 - a limit still lowered by *No more play today* on an earlier day (*Put back*);
 - a new version installed (*What's new*; after an update in place, the previous build kept), or a newer version of PlayGuard;
@@ -92,7 +92,7 @@ Each with an "i", a dot on the bell; it can be marked as read:
 
 ### Console
 
-The entries about the console rather than the parental controls come last, on one line that Ⓐ opens (open at once when nothing else is there). Those to do are counted on the Console tab's badge, not on the bell:
+The entries about the console rather than the parental controls come last, on one line that Ⓐ opens (open at once when nothing else is there). They are counted on the bell like the others (the Console tab's badge counts only those to do):
 
 - installed games that cannot start (*Check the installed games*), game patches that need a look;
 - the SD card almost full (under 500 MB);

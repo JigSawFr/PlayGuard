@@ -1,7 +1,7 @@
 // notices — the notification bell of the main screen: what needs the parent,
 // gathered from the parts of PlayGuard that see it (notice_logic has the
 // rules). Y on the main screen opens the list (activity/notices_activity);
-// the bell in the header counts what is to do. Each entry can carry an
+// the bell in the header counts everything listed. Each entry can carry an
 // action: the fix itself, or the screen where it is made. UI thread only.
 //
 // The sources: Today's readings and a sweep of the main screen every
@@ -68,6 +68,10 @@ int action_count();    // the parental controls' entries to do: the bell's numbe
 int others_count();
 int info_count();      // the parental controls' entries for information
 int console_count();   // the console's entries to do
+// The bell's number: every entry listed (parental controls and console, to do
+// or for information: an information entry goes once marked as read, an
+// ignored one is not listed), with the other homebrews' to do or failed.
+int bell_count();
 int tab_count(const std::string& tab);   // the entries to do of a tab (notice_logic::tab_of): its sidebar badge
 int count_of(const std::vector<std::string>& ids);   // the entries to do among `ids`: a row's badge in its tab
 // What the first entry to do among `ids` is about, in a few words, said by

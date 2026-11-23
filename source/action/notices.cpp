@@ -342,6 +342,11 @@ int console_count()
     return s_store.console_count();
 }
 
+int bell_count()
+{
+    return s_store.unread_count() + s_others;
+}
+
 int tab_count(const std::string& tab)
 {
     return s_store.tab_count(tab);
