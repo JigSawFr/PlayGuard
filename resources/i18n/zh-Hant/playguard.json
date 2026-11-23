@@ -1537,6 +1537,18 @@
         "amiibo": "amiibo設定",
         "maintenance": "維護模式"
     },
+    "log": {
+        "note": "最新的在前。琥珀色的行表示代理迴圈停止。",
+        "kind": "類型",
+        "shown_count": "{}：{} 行",
+        "none_shown": "沒有此類行。",
+        "filters": {
+            "0": "全部",
+            "1": "應用程式",
+            "2": "遠端連線",
+            "3": "迴圈"
+        }
+    },
     "sync": {
         "title": "遠端存取",
         "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（主機 › 選用模組）。Broker 的設定儲存在 {} 中，其餘儲存在 {} 中。",

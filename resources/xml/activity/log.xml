@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- The remote link's journal, newest first: what is shown (everything, the
+     app, the link, the agent's loop), an export, then the lines. The list is
+     built by source/activity/log_activity.cpp. -->
+
+<aurore:AppletFrame
+    iconInterpolation="linear">
+
+    <ScrollView
+        title="@i18n/playguard/sync/log"
+        icon="@res/img/app_icon.png"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <aurore:Box
+            id="lg_root"
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
+
+            <aurore:Label id="lg_note" text="@i18n/playguard/log/note" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="lg_filter" title="@i18n/playguard/history/show"/>
+            <aurore:DetailCell id="lg_export" title="@i18n/playguard/history/export"/>
+            <aurore:Box id="lg_list" width="auto" height="auto" axis="column" alignItems="stretch" marginTop="16"/>
+            <aurore:Label id="lg_empty" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+
+        </aurore:Box>
+
+    </ScrollView>
+
+</aurore:AppletFrame>

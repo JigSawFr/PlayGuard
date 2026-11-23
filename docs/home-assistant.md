@@ -328,7 +328,7 @@ Entity ids depend on the console's name; check them on the device's page.
 
 ## When it does not connect
 
-*Remote access › Status* says why, and *Log* shows the last lines:
+*Remote access › Status* says why, and *Log* opens a screen with the last lines, newest first (each with its time; filter by app, link or loop; a line in amber is a stop of the agent's loop; export to the SD card):
 
 | Status | What to check |
 |---|---|

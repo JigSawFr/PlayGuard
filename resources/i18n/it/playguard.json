@@ -1537,6 +1537,18 @@
         "amiibo": "Impostazioni amiibo",
         "maintenance": "Modalità manutenzione"
     },
+    "log": {
+        "note": "Le più recenti in alto. Una riga ambra è un arresto del ciclo dell'agente.",
+        "kind": "Tipo",
+        "shown_count": "{}: {} righe",
+        "none_shown": "Nessuna riga di questo tipo.",
+        "filters": {
+            "0": "Tutto",
+            "1": "App",
+            "2": "Collegamento remoto",
+            "3": "Ciclo"
+        }
+    },
     "sync": {
         "title": "Accesso remoto",
         "intro": "Collega questa console a un broker MQTT (l'app Mosquitto di Home Assistant, o un altro): Home Assistant mostra allora il suo stato e il suo tempo di gioco, e può inviarle comandi. Il collegamento funziona mentre PlayGuard è aperto, o sempre con l'agente facoltativo (Console › Moduli facoltativi). Le impostazioni del broker sono conservate in {}, il resto in {}.",

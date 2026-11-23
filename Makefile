@@ -214,6 +214,7 @@ pin_lock_logic_SRC   := source/action/pin_lock_logic.cpp tests/pin_lock_logic/te
 session_pause_logic_SRC   := source/action/session_pause_logic.cpp tests/session_pause_logic/test.cpp
 console_lock_logic_SRC   := source/action/console_lock_logic.cpp tests/console_lock_logic/test.cpp
 history_logic_SRC   := $(KIT)/util/date.cpp source/action/history_logic.cpp tests/history_logic/test.cpp
+log_logic_SRC   := source/action/log_logic.cpp tests/log_logic/test.cpp
 self_test_logic_SRC   := source/action/self_test_logic.cpp tests/self_test_logic/test.cpp
 gate_tally_SRC   := $(KIT)/util/date.cpp source/util/gate_tally.cpp tests/gate_tally/test.cpp
 timer_health_logic_SRC   := source/action/timer_health_logic.cpp tests/timer_health_logic/test.cpp

@@ -1792,6 +1792,16 @@ if SYNC:
         fail("the update screen has no changes")
     shot("06_ha_update")
     key("Escape")
+    # Journal: its own screen (not a dialog), the lines of the link's log. Its
+    # times are the clock's, so the screen is not one of the references.
+    go_to("Log", "Up")
+    key("Return")
+    wait_for("the journal screen", lambda: logged("journal: "), 10)
+    if logged("journal: 0 of 0 lines"):
+        fail("the journal has no line")
+    time.sleep(0.5)
+    shot("08_journal")
+    key("Escape")
     # The integration removed: the document cleared, so is the file.
     mqtt_pub(f"{BASE}/integration", "")
     wait_for("the integration's document removed", lambda: not os.path.exists(integration_json), 10)
