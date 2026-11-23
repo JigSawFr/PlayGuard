@@ -1715,9 +1715,9 @@
             "short_title": "恢复模块"
         },
         "agent": {
-            "title": "远程连接代理程序",
+            "title": "Boréale agent",
             "other_protocol": "它使用协议 {}",
-            "offer_body": "SD 卡上的远程连接代理程序不是这个 PlayGuard 附带的那个（版本 {}）。要现在更新吗？它会短暂停止；如果新版本没有响应，会恢复之前的版本。",
+            "offer_body": "SD 卡上的Boréale agent不是这个 PlayGuard 附带的那个（版本 {}）。要现在更新吗？它会短暂停止；如果新版本没有响应，会恢复之前的版本。",
             "offer_refused": "它使用较旧的协议：更新之前，远程连接无法使用。"
         }
     },

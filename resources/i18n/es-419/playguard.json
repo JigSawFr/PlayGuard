@@ -1715,9 +1715,9 @@
             "short_title": "Módulo de recuperación"
         },
         "agent": {
-            "title": "Agente del enlace remoto",
+            "title": "Boréale agent",
             "other_protocol": "usa el protocolo {}",
-            "offer_body": "El agente del enlace remoto de la tarjeta SD no es el que trae este PlayGuard (versión {}). ¿Actualizarlo ahora? Se detiene un momento, y se restaura el anterior si el nuevo no responde.",
+            "offer_body": "El Boréale agent de la tarjeta SD no es el que trae este PlayGuard (versión {}). ¿Actualizarlo ahora? Se detiene un momento, y se restaura el anterior si el nuevo no responde.",
             "offer_refused": "Usa un protocolo más antiguo: el enlace remoto no funciona hasta que se actualice."
         }
     },

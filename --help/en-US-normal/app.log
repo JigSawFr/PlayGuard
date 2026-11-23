@@ -1,0 +1,16 @@
+dbus-daemon[14302]: [session uid=0 pid=14302] org.freedesktop.DBus.Error.AccessDenied: Failed to set fd limit to 65536: Operation not permitted
+23:24:50.616[0;34m[INFO][0m start-up: migrations: no ./playguard_data/migrations.json (a first start, or a build from before it): steps 1 to 2 to run
+23:24:50.616[0;34m[INFO][0m start-up: migration 1 (data folder): 0 entries moved in 0 ms
+23:24:50.616[0;34m[INFO][0m start-up: migration 2 (logs subfolders): 0 entries moved in 0 ms
+23:24:50.621[0;34m[INFO][0m start-up: migrations: level 2 and PlayGuard 1.0.0 written to ./playguard_data/migrations.json
+23:24:50.622[0;34m[INFO][0m start-up: migrations: level 2 recorded, last started by PlayGuard 1.0.0
+23:24:50.622[0;34m[INFO][0m start-up: migration 3 (per-system folder): 0 entries moved in 0 ms
+23:24:50.622[0;34m[INFO][0m start-up: migration 4 (own icon cache): 0 entries moved in 0 ms
+23:24:50.623[0;34m[INFO][0m start-up: migrations: level 4 and PlayGuard 1.0.0 written to ./playguard_data/migrations.json
+23:24:50.623[0;34m[INFO][0m start-up: PlayGuard 1.0.0 (1a2b3c4), firmware 23.0.1, Atmosphère 1.12.0, sysMMC, over a game
+23:24:50.628[0;34m[INFO][0m Using platform SDL
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+23:24:50.637[0;31m[ERROR][0m sdl: failed to initialize
+23:24:50.639[0;34m[INFO][0m joystick num: 0
+23:24:50.639[0;34m[INFO][0m No custom font (searched at: /home/user/playguard/build-desktop/resources/font/font.ttf), using the internal one: /home/user/playguard/build-desktop/resources/font/aurore_text.ttf

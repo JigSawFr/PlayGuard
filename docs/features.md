@@ -466,11 +466,11 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### Remote access
 
-*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker's settings (its address, user and MQTT version, the console's name: the screen the other Boréale homebrews share), what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games and every game's icon; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from the Marketplace and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
+*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, set up from the app and off by default ([the Home Assistant guide](home-assistant.md)). The broker's settings (its address, user and MQTT version, the console's name: the screen the other Boréale homebrews share), what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games and every game's icon; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from the Marketplace and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
 
 ### Optional modules
 
-*Optional modules ›*, a tile under *Tools*: install, update, start at boot or remove the recovery module (its own screen, a list like the agent's) and the Boréale agent, which keeps the remote link up (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
+*Optional modules ›*, a tile under *Tools*: install, update, start at boot or remove the recovery module (its own screen, a list like the agent's) and the Boréale agent, shared by every Boréale homebrew: it keeps the connection to the broker up while PlayGuard is closed, receives orders and checks for updates (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
 
 ### The console's lines
 

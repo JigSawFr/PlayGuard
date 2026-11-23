@@ -1715,9 +1715,9 @@
             "short_title": "Módulo de recuperação"
         },
         "agent": {
-            "title": "Agente da ligação remota",
+            "title": "Boréale agent",
             "other_protocol": "usa o protocolo {}",
-            "offer_body": "O agente da ligação remota no cartão SD não é o que este PlayGuard traz (versão {}). Atualizá-lo agora? Para durante um instante, e o anterior é reposto se o novo não responder.",
+            "offer_body": "O Boréale agent no cartão SD não é o que este PlayGuard traz (versão {}). Atualizá-lo agora? Para durante um instante, e o anterior é reposto se o novo não responder.",
             "offer_refused": "Usa um protocolo mais antigo: a ligação remota não funciona enquanto não for atualizado."
         }
     },

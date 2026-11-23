@@ -1715,9 +1715,9 @@
             "short_title": "復原模組"
         },
         "agent": {
-            "title": "遠端連線代理程式",
+            "title": "Boréale agent",
             "other_protocol": "它使用通訊協定 {}",
-            "offer_body": "SD 卡上的遠端連線代理程式不是這個 PlayGuard 附帶的版本（版本 {}）。要現在更新嗎？它會短暫停止；如果新版本沒有回應，會改回先前的版本。",
+            "offer_body": "SD 卡上的Boréale agent不是這個 PlayGuard 附帶的版本（版本 {}）。要現在更新嗎？它會短暫停止；如果新版本沒有回應，會改回先前的版本。",
             "offer_refused": "它使用較舊的通訊協定：更新之前，遠端連線無法運作。"
         }
     },

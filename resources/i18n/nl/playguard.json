@@ -1715,7 +1715,7 @@
             "short_title": "Herstelmodule"
         },
         "agent": {
-            "title": "Agent voor verbinding op afstand",
+            "title": "Boréale agent",
             "other_protocol": "hij spreekt protocol {}",
             "offer_body": "De agent voor de verbinding op afstand op de SD-kaart is niet die van deze PlayGuard (versie {}). Nu bijwerken? Hij stopt even, en de vorige wordt teruggezet als de nieuwe niet antwoordt.",
             "offer_refused": "Hij spreekt een ouder protocol: de verbinding op afstand werkt pas als hij is bijgewerkt."

@@ -1,5 +1,5 @@
 // modules — PlayGuard's optional sysmodules on the SD card: the recovery
-// module (sysmodule/rescue/, acts once at boot) and the remote-link agent
+// module (sysmodule/rescue/, acts once at boot) and the Boréale agent
 // (sysmodule/agent/, stays running). Installing, updating with a rollback and
 // removing them is the kit's (util/sysmodule.hpp, host-tested there); this is
 // what PlayGuard adds: which modules it carries and their names, and the

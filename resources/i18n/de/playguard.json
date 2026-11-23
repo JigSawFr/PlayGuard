@@ -1715,9 +1715,9 @@
             "short_title": "Wiederherstellungsmodul"
         },
         "agent": {
-            "title": "Agent der Fernverbindung",
+            "title": "Boréale agent",
             "other_protocol": "er spricht Protokoll {}",
-            "offer_body": "Der Agent der Fernverbindung auf der SD-Karte ist nicht der, den dieses PlayGuard mitbringt (Version {}). Jetzt aktualisieren? Er hält kurz an, und der vorherige wird wiederhergestellt, wenn der neue nicht antwortet.",
+            "offer_body": "Der Boréale agent auf der SD-Karte ist nicht der, den dieses PlayGuard mitbringt (Version {}). Jetzt aktualisieren? Er hält kurz an, und der vorherige wird wiederhergestellt, wenn der neue nicht antwortet.",
             "offer_refused": "Er spricht ein älteres Protokoll: Die Fernverbindung funktioniert erst, wenn er aktualisiert ist."
         }
     },

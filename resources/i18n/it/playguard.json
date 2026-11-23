@@ -1715,9 +1715,9 @@
             "short_title": "Modulo di ripristino"
         },
         "agent": {
-            "title": "Agente del collegamento remoto",
+            "title": "Boréale agent",
             "other_protocol": "usa il protocollo {}",
-            "offer_body": "L'agente del collegamento remoto sulla scheda SD non è quello contenuto in questo PlayGuard (versione {}). Aggiornarlo ora? Si ferma un istante, e il precedente viene rimesso se il nuovo non risponde.",
+            "offer_body": "L'Boréale agent sulla scheda SD non è quello contenuto in questo PlayGuard (versione {}). Aggiornarlo ora? Si ferma un istante, e il precedente viene rimesso se il nuovo non risponde.",
             "offer_refused": "Usa un protocollo più vecchio: il collegamento remoto non funziona finché non viene aggiornato."
         }
     },

@@ -1539,7 +1539,7 @@
     },
     "sync": {
         "title": "Accès à distance",
-        "intro": "Relie cette console à un broker MQTT (l'application Mosquitto de Home Assistant, ou un autre) : Home Assistant affiche alors son état et son temps de jeu, et peut lui envoyer des ordres. Le lien fonctionne tant que PlayGuard est ouvert, ou en permanence avec l'agent facultatif (Console › Modules facultatifs). Les réglages du broker sont gardés dans {}, le reste dans {}.",
+        "intro": "Relie cette console à un broker MQTT (l'application Mosquitto de Home Assistant, ou un autre) : Home Assistant affiche alors son état et son temps de jeu, et peut lui envoyer des ordres. Le lien fonctionne tant que PlayGuard est ouvert, ou en permanence avec l'agent Boréale (Console › Modules facultatifs), qui la garde pour tous les homebrews Boréale. Les réglages du broker sont gardés dans {}, le reste dans {}.",
         "section_status": "Lien",
         "status": "État",
         "sync_now": "Synchroniser maintenant",
@@ -1664,7 +1664,7 @@
         "open": "Modules facultatifs",
         "count": "{} installés",
         "count_one": "1 installé",
-        "intro": "Deux petits programmes en arrière-plan (sysmodules) que PlayGuard peut installer sur la carte SD. Aucun n'est nécessaire, et chacun fait une seule chose. PlayGuard contient la version faite avec lui et l'installe ou la met à jour d'ici, sans ordinateur. Chaque changement demande le code PIN quand Sécurité › Protéger PlayGuard par le code PIN le demande avant un changement.",
+        "intro": "Deux petits programmes en arrière-plan (sysmodules) que PlayGuard peut installer sur la carte SD. Aucun n'est nécessaire. Le module de secours n'agit qu'une fois, au démarrage, quand un fichier RESCUE le demande. L'agent Boréale est commun à tous les homebrews Boréale : il garde la connexion à votre broker quand PlayGuard est fermé, reçoit les ordres et vérifie les mises à jour. PlayGuard contient les versions faites avec lui et les installe ou les met à jour d'ici, sans ordinateur. Chaque changement demande le code PIN quand Sécurité › Protéger PlayGuard par le code PIN le demande avant un changement.",
         "status": "État",
         "install": "Installer",
         "update": "Mettre à jour",
@@ -1715,9 +1715,9 @@
             "short_title": "Module de secours"
         },
         "agent": {
-            "title": "Agent du lien à distance",
+            "title": "Agent Boréale",
             "other_protocol": "il parle le protocole {}",
-            "offer_body": "L'agent du lien à distance présent sur la carte SD n'est pas celui que contient ce PlayGuard (version {}). Le mettre à jour maintenant ? Il s'arrête un instant, et le précédent est remis si le nouveau ne répond pas.",
+            "offer_body": "L'agent Boréale présent sur la carte SD n'est pas celui que contient ce PlayGuard (version {}). Le mettre à jour maintenant ? Il s'arrête un instant, et le précédent est remis si le nouveau ne répond pas.",
             "offer_refused": "Il parle un protocole plus ancien : le lien à distance ne fonctionne pas tant qu'il n'est pas mis à jour."
         }
     },

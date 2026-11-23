@@ -1539,7 +1539,7 @@
     },
     "sync": {
         "title": "Remote access",
-        "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the optional agent (Console › Optional modules). The broker's settings are kept in {}, the rest in {}.",
+        "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the Boréale agent (Console › Optional modules), which keeps it up for every Boréale homebrew. The broker's settings are kept in {}, the rest in {}.",
         "section_status": "Link",
         "status": "Status",
         "sync_now": "Sync now",
@@ -1664,7 +1664,7 @@
         "open": "Optional modules",
         "count": "{} installed",
         "count_one": "1 installed",
-        "intro": "Two small background programs (sysmodules) PlayGuard can put on the SD card. Neither is needed, and each does one thing. PlayGuard carries the version made with it and installs or updates it from here, without a computer. Every change asks for the PIN when Security › Protect PlayGuard with the PIN asks for it before a change.",
+        "intro": "Two small background programs (sysmodules) PlayGuard can put on the SD card. Neither is needed. The recovery module acts once at boot, when a RESCUE file asks it. The Boréale agent is shared by every Boréale homebrew: it keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates. PlayGuard carries the versions made with it and installs or updates them from here, without a computer. Every change asks for the PIN when Security › Protect PlayGuard with the PIN asks for it before a change.",
         "status": "State",
         "install": "Install",
         "update": "Update",
@@ -1715,9 +1715,9 @@
             "short_title": "Recovery module"
         },
         "agent": {
-            "title": "Remote link agent",
+            "title": "Boréale agent",
             "other_protocol": "it speaks protocol {}",
-            "offer_body": "The remote link agent on the SD card is not the one this PlayGuard carries (version {}). Update it now? It stops for a moment, and the previous one is put back if the new one does not answer.",
+            "offer_body": "The Boréale agent on the SD card is not the one this PlayGuard carries (version {}). Update it now? It stops for a moment, and the previous one is put back if the new one does not answer.",
             "offer_refused": "It speaks an older protocol: the remote link does not work until it is updated."
         }
     },
