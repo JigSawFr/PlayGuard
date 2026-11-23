@@ -4,11 +4,13 @@
 #include <aurore.hpp>
 #include <format>
 #include <mutex>
+#include <ctime>
 #include <string>
 
 #include "action/notices.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "ui/play_ui.hpp"
+#include "util/agent_latest.hpp"
 #include "util/config.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"
@@ -25,6 +27,13 @@ namespace
 {
 bool s_checking = false;
 
+// What PlayGuard's own check found this session, when the agent's reading
+// (latest.conf) was absent or old: kept in memory only, the agent is the one
+// who keeps it on the SD card.
+sys_updates::Latest s_own;
+int64_t             s_own_at = 0;
+
+
 // One entry: `latest` newer than `running`, else none.
 void entry(const char* id, const std::string& latest, const std::string& running, const std::string& title,
            const std::string& detail)
@@ -36,7 +45,7 @@ void entry(const char* id, const std::string& latest, const std::string& running
 // The entries from what the last check found, against what runs now.
 void note()
 {
-    const sys_updates::Latest latest = sys_updates::from_text(config::get().sys_latest);
+    const sys_updates::Latest latest = latest_versions();
     SysInfo si;
     sysinfo_get(&si);
     const std::string ams = si.ams_valid ? std::format("{}.{}.{}", si.ams_major, si.ams_minor, si.ams_micro) : "";
@@ -72,24 +81,27 @@ void check()
             s_checking = false;
             if (!error.empty()) aurore::Logger::info("system update check: {}", error);
             // What could not be read keeps what the last check found.
-            auto& cfg = config::get();
-            sys_updates::Latest kept = sys_updates::from_text(cfg.sys_latest);
-            if (!found.atmosphere.empty()) kept.atmosphere = found.atmosphere;
-            if (!found.hekate.empty()) kept.hekate = found.hekate;
-            if (!found.firmware.empty()) kept.firmware = found.firmware;
-            if (!found.syspatch.empty()) kept.syspatch = found.syspatch;
-            const bool any = !found.atmosphere.empty() || !found.hekate.empty() || !found.firmware.empty() ||
-                             !found.syspatch.empty();
-            if (any) {
-                cfg.sys_latest  = sys_updates::to_text(kept);
-                cfg.sys_checked = ui::today_date();
-                ui::save_config();
-            }
+            if (!found.atmosphere.empty()) s_own.atmosphere = found.atmosphere;
+            if (!found.hekate.empty()) s_own.hekate = found.hekate;
+            if (!found.firmware.empty()) s_own.firmware = found.firmware;
+            if (!found.syspatch.empty()) s_own.syspatch = found.syspatch;
+            if (!found.atmosphere.empty() || !found.hekate.empty() || !found.firmware.empty() || !found.syspatch.empty())
+                s_own_at = (int64_t)std::time(nullptr);
             note();
         });
     });
 }
 }   // namespace
+
+// The agent's reading while it is fresh, unless a check made here since is
+// newer; else what that check found; else nothing known.
+sys_updates::Latest latest_versions()
+{
+    const agent_latest::Reading r = agent_latest::read();
+    const int64_t now = (int64_t)std::time(nullptr);
+    if (agent_latest::versions_fresh(r, now) && r.checked >= s_own_at) return r.versions;
+    return s_own;
+}
 
 // bootloader/update.bin is what hekate loads when it is newer than the
 // payload that started it: the version on the SD card. The version sits in
@@ -118,7 +130,7 @@ std::string installed_syspatch()
 
 std::string with_latest(const char* which, const std::string& running, bool* newer)
 {
-    const sys_updates::Latest l = sys_updates::from_text(config::get().sys_latest);
+    const sys_updates::Latest l = latest_versions();
     const std::string w = which;
     const std::string& latest = w == "atmosphere" ? l.atmosphere
                                 : w == "hekate"   ? l.hekate
@@ -133,8 +145,11 @@ void at_start()
     // The release notes kept, read in the background for the entries below.
     sys_notes_flow::load();
     note();
-    const auto& cfg = config::get();
-    if (cfg.update_daily && cfg.sys_checked != ui::today_date()) check();
+    // The agent's reading (latest.conf) is the check, while it is fresh; here
+    // only when it is not (the agent off, not installed, or not running) and
+    // not already made since PlayGuard opened.
+    const int64_t now = (int64_t)std::time(nullptr);
+    if (config::get().update_daily && !agent_latest::versions_fresh(agent_latest::read(), now) && s_own_at == 0) check();
 }
 
 void refresh_entries()

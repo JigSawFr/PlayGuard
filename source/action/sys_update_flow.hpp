@@ -1,8 +1,9 @@
 // sys_update_flow — newer Atmosphère, hekate and firmware releases in the
-// notification bell (util/sys_updates.hpp): checked with PlayGuard's own
-// updates (once a day with "Check for updates every day", and by "Check for
-// updates"), remembered in config.json, compared at each start with what
-// the console runs. For information only: PlayGuard updates none of them,
+// notification bell (util/sys_updates.hpp): read from the agent's
+// latest.conf (util/agent_latest.hpp) while it is fresh, else checked by
+// PlayGuard itself (at start with "Check for updates every day", and by
+// "Check for updates"; kept in memory), compared with what the console
+// runs. For information only: PlayGuard updates none of them,
 // and a firmware is worth installing only once Atmosphère (and hekate)
 // support it, which the firmware's entry says.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -10,11 +11,14 @@
 
 #include <string>
 
+#include "util/sys_updates.hpp"
+
 namespace sys_update_flow
 {
 
 // Start-up: the entries from the last check, then a new check in the
-// background when Check for updates every day is on and none ran today.
+// background when Check for updates every day is on and the agent's reading
+// is absent or over a day old.
 void at_start();
 
 // Check for updates: a new check now, in the background.
@@ -23,6 +27,10 @@ void check_now();
 // The bell's entries again, from what the last check found (Preferences ›
 // Notifications turned them back on).
 void refresh_entries();
+
+// The newest versions known now: the agent's reading while fresh, else
+// PlayGuard's own check this session ("" for each not known).
+sys_updates::Latest latest_versions();
 
 // hekate as installed on the SD card (bootloader/update.bin); "" when absent.
 // Read once per run (its first KB): hekate is not updated while PlayGuard runs.

@@ -130,31 +130,6 @@ static void test_hekate_version()
     CHECK(hekate_version("ICTC65").empty());
 }
 
-static void test_text()
-{
-    Latest l;
-    l.atmosphere = "1.12.0";
-    l.hekate     = "6.5.4";
-    l.firmware   = "23.0.1";
-    l.syspatch   = "1.6.3.0";
-    const std::string t = to_text(l);
-    CHECK(t == "atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1;syspatch=1.6.3.0");
-    const Latest back = from_text(t);
-    CHECK(back.atmosphere == "1.12.0" && back.hekate == "6.5.4" && back.firmware == "23.0.1" &&
-          back.syspatch == "1.6.3.0");
-    // Missing ones are left out, unknown keys and bad versions ignored.
-    Latest some;
-    some.hekate = "6.5.4";
-    CHECK(to_text(some) == "hekate=6.5.4");
-    const Latest odd = from_text("firmware=junk;hekate=v6.5.4;other=1.0.0;atmosphere");
-    CHECK(odd.firmware.empty() && odd.hekate == "6.5.4" && odd.atmosphere.empty());
-    CHECK(to_text(Latest{}).empty());
-    const Latest none = from_text("");
-    CHECK(none.atmosphere.empty() && none.hekate.empty() && none.firmware.empty() && none.syspatch.empty());
-    // A sys_latest kept before sys-patch was checked: it is just unknown.
-    CHECK(from_text("atmosphere=1.12.0;hekate=6.5.4;firmware=23.0.1").syspatch.empty());
-}
-
 static void test_syspatch_version()
 {
     CHECK(syspatch_version("v1.6.3.0") == "1.6.3.0");
@@ -172,7 +147,6 @@ int main()
     test_tag_of_url();
     test_firmware_of_versions();
     test_hekate_version();
-    test_text();
     test_syspatch_version();
     return CHECK_DONE("sys_updates tests passed");
 }

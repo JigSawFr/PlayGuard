@@ -249,9 +249,26 @@ with the state. Every unknown value is `null`.
  "storage": {"sd": {"free_mb": 21344, "total_mb": 59640}, "nand": {"free_mb": 18470, "total_mb": 26592}},
  "power": {"battery_pct": 87, "charging": true, "charger": "official", "docked": false, "temperature_c": 41},
  "network": {"type": "wifi", "ip": "192.168.1.20", "wifi_bars": 3, "ssid": "Maison"},
+ "latest": {"checked": 1792000000, "firmware": "23.0.1", "atmosphere": "1.12.0", "hekate": "6.5.4",
+            "syspatch": "1.6.3.0", "integration": "0.9.0"},
+ "clock": {"checked": 1792003600, "network_drift_s": -2, "user_drift_s": 0, "server": "pool.ntp.org"},
  "boot_ts": 1790971980}
 ```
 
+- `latest` and `clock` (only in the agent's document, and only once its
+  checks ran: they are off by default, `check_versions` and `check_clock` in
+  `sd:/config/boreale/agent.conf`; absent otherwise; a key added to schema 1):
+  what the agent found out of the network, every 12 h and every 2 h.
+  `latest` follows `publish_hardware`: `checked` (POSIX) and the newest
+  `firmware` (Nintendo's, from switchbrew), `atmosphere`, `hekate`, `syspatch`
+  and `integration` (this integration's own newest release), each `null`
+  when it could not be read. `clock` follows `publish_console`: `checked`,
+  and how far the console's network and user clocks are from `server`, in
+  seconds, to the second (positive: the console is ahead); `null` before the
+  first comparison. The same values are kept for the homebrews in
+  `sd:/config/boreale/latest.conf`, which PlayGuard reads (a reading under a
+  day old for the versions, 4 hours for the clock; older, or no file, and it
+  checks for itself).
 - `agent` (only in the agent's document, absent from PlayGuard's own): how it
   is doing: `uptime_s`, `heap_used` and `heap_total` (bytes; `null` when not
   read), `protocols` (`relay`: `bl:link`'s, `ipc`: `pg:agent`'s: the ones it

@@ -23,11 +23,6 @@ struct Config : kit_settings::Settings
     bool auto_relock = true;           // lock again right after a change that needed an unlock
     bool dev_mode = false;             // developer tools (7 presses on About > Version)
     bool pt_log = false;               // Developer › record the play timer (action/pt_log_flow)
-    // What the console runs on (action/sys_update_flow): the latest Atmosphère,
-    // hekate and firmware the last check found (util/sys_updates.hpp's text),
-    // and the day of that check ("YYYY-MM-DD").
-    std::string sys_latest;
-    std::string sys_checked;
     // PlayGuard's Home Assistant integration (action/ha_update_flow): its
     // latest release the last check found, and the day of that check.
     std::string ha_latest;
