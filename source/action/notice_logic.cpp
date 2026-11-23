@@ -201,6 +201,14 @@ int Store::console_count() const
     return this->count(Group::Console, Level::Action);
 }
 
+int Store::unread_count() const
+{
+    int n = 0;
+    for (const auto& s : this->slots)
+        if (!s.dismissed && !s.acked) n++;
+    return n;
+}
+
 int Store::tab_count(const std::string& tab) const
 {
     int n = 0;

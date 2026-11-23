@@ -1927,8 +1927,7 @@ if MODULES:
     key("Right")
     go_to("Recovery module", most=40)   # Locked out?, the tab's last line
     shot("01_security_end")
-    key("Return")                # opens on the recovery module's tab, the sidebar focused
-    key("Right")                 # State
+    key("Return")                # opens the recovery module's screen, State focused
     shot("02_modules")           # not installed; Install has the focus next
     key("Down")                  # Install
     key("Return")
@@ -1957,19 +1956,24 @@ if MODULES:
     shot("06_removed")
     if os.path.exists(RESCUE_DIR):
         fail("the module's folder is still there after Remove")
-    key("Escape")                # back to the sidebar
-    key("Up")                    # Overview
-    key("Right")                 # its first module
-    shot("07_overview")          # the intro, each module's state
+    key("Escape")                # back on Security's tab
+    key("Left")                  # the sidebar
+    key("Down", steps("security", "console"))
+    key("Right")
+    go_to("Remote access", most=40)      # the second row of tiles
+    key("Right")                 # Optional modules
+    key("Return")                # the overview: the intro, then a cell per module
+    time.sleep(0.5)
+    shot("07_overview")          # each module's state
     key("Down")                  # the agent
     key("Return")                # Ⓐ opens boreale-kit's screen for it
     time.sleep(0.5)
     shot("08_agent")             # its state, Install (the app carries no copy here: the screen says so)
     key("Escape")                # back on the overview, the agent's cell
     key("Up")                    # the recovery module
-    key("Return")                # Ⓐ opens that module's tab
+    key("Return")                # Ⓐ opens that module's screen
     time.sleep(0.5)
-    shot("09_rescue_tab")
+    shot("09_rescue_screen")
 
     def recorded():
         try:

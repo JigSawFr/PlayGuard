@@ -1662,8 +1662,6 @@
     "modules": {
         "title": "Moduli facoltativi",
         "open": "Moduli facoltativi",
-        "section": "Moduli facoltativi",
-        "overview": "Panoramica",
         "count": "{} installati",
         "count_one": "1 installato",
         "intro": "Due piccoli programmi in background (sysmodule) che PlayGuard può mettere sulla scheda SD. Nessuno dei due è necessario, e ognuno fa una sola cosa. PlayGuard contiene la versione creata insieme a lui e la installa o la aggiorna da qui, senza computer. Ogni modifica chiede il PIN quando Sicurezza › Proteggi PlayGuard con il PIN lo chiede prima di una modifica.",

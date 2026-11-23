@@ -89,6 +89,7 @@ class Store
     int action_count() const;   // the parental controls' Action entries: the bell's number
     int info_count() const;     // the parental controls' Info entries shown
     int console_count() const;  // the console's Action entries
+    int unread_count() const;   // every entry shown, either group, to do or for information: neither put away nor ignored
     int tab_count(const std::string& tab) const;   // the Action entries of tab_of() `tab`: its number in the sidebar
     int count_of(const std::vector<std::string>& ids) const;   // the Action entries among `ids`: a row's badge
     // The first Action entry among `ids` counted (in the bell's order): what
