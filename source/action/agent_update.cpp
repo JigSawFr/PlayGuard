@@ -61,6 +61,8 @@ sysmodule_flow::Answer answers(std::string& why)
 // (sync_flow), the change history, and the two ways PlayGuard has of its own:
 // the agent asked to leave through its session (and the neutral control), and
 // its Hello on pg:agent, which also tells the protocol PlayGuard speaks.
+}   // namespace
+
 void install_hooks()
 {
     static bool done = false;
@@ -75,9 +77,13 @@ void install_hooks()
     h.record = record;
     h.leave = [](std::function<void()> then) { sync_flow::agent_stopping(std::move(then)); };
     h.answers = answers;
-    // The PIN is the caller's (the screen and the offer ask it before).
+    // The PIN, as for a console change: the agent can change the console.
+    h.allowed = []() {
+        if (pin_lock::allow_change()) return true;
+        ui::notify(pin_lock::refusal_text());
+        return false;
+    };
 }
-}   // namespace
 
 bool running()
 {
@@ -120,10 +126,6 @@ void offer_when_free(aurore::Activity* main, const std::string& bundle_dir, int 
         ui::save_config();
     });
     dialog->addButton("playguard/modules/update"_i18n, []() {
-        if (!pin_lock::allow_change()) {
-            ui::notify(pin_lock::refusal_text());
-            return;
-        }
         run(nullptr);
     });
     dialog->setCancelable(true);

@@ -18,10 +18,14 @@ class Activity;
 namespace agent_update
 {
 
-// Installs or updates the agent from the copy PlayGuard carries (Console ›
-// Optional modules'), says how it went, records it in the change history, then
-// hands the link over again; `done` is called when it has ended. The PIN is
-// the caller's.
+// What boreale-kit's agent screen and flow ask of PlayGuard (the PIN, the
+// link's hand-over, the history, its own way to see the agent answer): set
+// once, before the screen opens or the flow runs.
+void install_hooks();
+
+// Installs or updates the agent from the copy PlayGuard carries, says how it
+// went, records it in the change history, then hands the link over again;
+// `done` is called when it has ended. The flow asks the PIN.
 void run(std::function<void()> done);
 bool running();
 

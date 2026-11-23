@@ -1695,12 +1695,8 @@
         "install": "Installer",
         "update": "Mettre à jour",
         "at_boot": "Démarrer au démarrage de la console",
-        "start": "Démarrer maintenant",
-        "stop": "Arrêter maintenant",
         "remove": "Supprimer",
         "removed": "Module supprimé.",
-        "started": "Module démarré.",
-        "stopped": "Module arrêté.",
         "error": "Le module n'a pas pu être modifié",
         "meta_err": "Le module est installé, mais sa version n'a pas pu être écrite sur la carte SD : il pourra être proposé à nouveau",
         "locked_out": "Bloqué ?",
@@ -1709,8 +1705,6 @@
             "not_bundled": "Absent de cette version",
             "installed": "Installé, à jour",
             "update": "Installé, une mise à jour est disponible",
-            "running": "en marche",
-            "stopped": "arrêté",
             "none": "Aucun installé"
         },
         "short": {
@@ -1748,13 +1742,6 @@
         },
         "agent": {
             "title": "Agent du lien à distance",
-            "tab": "Agent du lien",
-            "about": "Garde le lien avec Home Assistant (Console › Accès à distance) actif quand PlayGuard est fermé : les ordres sont exécutés et l'état reste à jour.",
-            "install_body": "Installer et démarrer l'agent (version {}) ? Il se lance à chaque démarrage et utilise les réglages de l'Accès à distance.",
-            "update_body": "Mettre à jour l'agent en version {} ? Il s'arrête un instant puis redémarre.",
-            "installed": "Agent installé et démarré.",
-            "updated": "Agent mis à jour.",
-            "remove_body": "Arrêter et supprimer l'agent ? Le lien à distance ne fonctionnera alors que quand PlayGuard est ouvert.",
             "other_protocol": "il parle le protocole {}",
             "offer_body": "L'agent du lien à distance présent sur la carte SD n'est pas celui que contient ce PlayGuard (version {}). Le mettre à jour maintenant ? Il s'arrête un instant, et le précédent est remis si le nouveau ne répond pas.",
             "offer_refused": "Il parle un protocole plus ancien : le lien à distance ne fonctionne pas tant qu'il n'est pas mis à jour."

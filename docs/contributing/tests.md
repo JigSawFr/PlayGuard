@@ -32,7 +32,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md). The host tests themsel
   - `agent` — the link handed to a simulated agent sysmodule: what the agent changed while PlayGuard was closed in the history, an order it hands PlayGuard carried out and answered.
   - `agent-update` — an older agent on the card: the offer at start-up, accepted, the new agent in place and answering.
   - `agent-rollback` — the same with a new agent that never answers: the previous one back after 10 s.
-  - `modules` — *Console › Optional modules*: the recovery module installed from *Security › Locked out?*, its start at boot turned off, then removed; the screen's overview.
+  - `modules` — *Console › Optional modules*: the recovery module installed from *Security › Locked out?*, its start at boot turned off, then removed; the screen's overview, then the agent's screen (boreale-kit's) opened from it.
 
   What no simulator can show (the console's HOME menu and PIN screen, Atmosphère reading the lock, the recovery sysmodule at boot): [docs/hardware-test.md](../../docs/hardware-test.md), to go through on a console after a change there.
 - `tools/cut_text_check.py <out-dir> [language …]` — starts the desktop build on the tabs in each of the 15 languages, at the normal text size and the larger one, shows every tab, then from *Today* the picker of *Stop for today*, the confirmation of the unlock it needs and that unlock's failure dialog (`PLAYGUARD_SIM_FAIL=unlock`), then the child screen, and fails on any text cut short (drawn with "…"; Aurore patch `0008`, `PLAYGUARD_SIM_CUT_TEXT`) that `tests/cut_text/allowed.txt` does not list. About 30 s a language and size; CI's `languages-1` to `languages-5` shards run it, three languages each (needs `DISPLAY` and `xdotool`).

@@ -1695,12 +1695,8 @@
         "install": "Installeren",
         "update": "Bijwerken",
         "at_boot": "Starten bij het opstarten",
-        "start": "Nu starten",
-        "stop": "Nu stoppen",
         "remove": "Verwijderen",
         "removed": "Module verwijderd.",
-        "started": "Module gestart.",
-        "stopped": "Module gestopt.",
         "error": "De module kon niet worden gewijzigd",
         "meta_err": "De module is geïnstalleerd, maar de versie kon niet op de SD-kaart worden geschreven: hij kan opnieuw worden aangeboden",
         "locked_out": "Buitengesloten?",
@@ -1709,8 +1705,6 @@
             "not_bundled": "Niet in deze build",
             "installed": "Geïnstalleerd, up-to-date",
             "update": "Geïnstalleerd, er is een update beschikbaar",
-            "running": "actief",
-            "stopped": "gestopt",
             "none": "Geen geïnstalleerd"
         },
         "short": {
@@ -1748,13 +1742,6 @@
         },
         "agent": {
             "title": "Agent voor verbinding op afstand",
-            "tab": "Verbindingsagent",
-            "about": "Houdt de verbinding met Home Assistant (Console › Toegang op afstand) actief terwijl PlayGuard gesloten is: opdrachten worden uitgevoerd en de status blijft actueel.",
-            "install_body": "De agent (versie {}) installeren en starten? Hij start bij elke keer opstarten en gebruikt de instellingen van Toegang op afstand.",
-            "update_body": "De agent bijwerken naar versie {}? Hij stopt even en start daarna opnieuw.",
-            "installed": "Agent geïnstalleerd en gestart.",
-            "updated": "Agent bijgewerkt.",
-            "remove_body": "De agent stoppen en verwijderen? De verbinding op afstand werkt dan alleen terwijl PlayGuard open is.",
             "other_protocol": "hij spreekt protocol {}",
             "offer_body": "De agent voor de verbinding op afstand op de SD-kaart is niet die van deze PlayGuard (versie {}). Nu bijwerken? Hij stopt even, en de vorige wordt teruggezet als de nieuwe niet antwoordt.",
             "offer_refused": "Hij spreekt een ouder protocol: de verbinding op afstand werkt pas als hij is bijgewerkt."

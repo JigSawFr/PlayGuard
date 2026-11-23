@@ -10,11 +10,11 @@
 #include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/agent_update.hpp"
+#include "activity/agent_activity.hpp"
 #include "action/bundled_modules.hpp"
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/rescue.hpp"
-#include "action/sync_flow.hpp"
 #include "app.hpp"
 #include "tab/tab_base.hpp"
 #include "ui/play_ui.hpp"
@@ -66,14 +66,11 @@ std::string state_text(modules::Id id, bool brief, const char** color)
         text = brief ? "playguard/modules/short/installed"_i18n : "playguard/modules/state/installed"_i18n;
         c = "cadran/teal";
     }
-    if (!brief && m.resident && s.installed)
-        text += " · " + (sysmodule_running(m.tid, nullptr) ? "playguard/modules/state/running"_i18n
-                                                        : "playguard/modules/state/stopped"_i18n);
     if (color) *color = c;
     return text;
 }
 
-// One module's tab: what it does, then its cells. Tabs are deleted when
+// The recovery module's tab: what it does, then its cells. Tabs are deleted when
 // another one is opened: what ends later refreshes through refresher()
 // (TabBase's `alive`), never through `this`.
 class ModuleTab : public TabBase
@@ -96,11 +93,11 @@ class ModuleTab : public TabBase
     AURORE_BIND(aurore::DetailCell,  status, "md_status");
     AURORE_BIND(aurore::DetailCell,  action, "md_action");
     AURORE_BIND(aurore::BooleanCell, boot,   "md_boot");
-    AURORE_BIND(aurore::DetailCell,  run,    "md_run");
     AURORE_BIND(aurore::DetailCell,  remove, "md_remove");
 };
 
-// The overview: what the modules are, and each one's state (Ⓐ opens its tab).
+// The overview: what the modules are, and each one's state (Ⓐ opens the
+// recovery module's tab, or the agent's own screen, boreale-kit's).
 class ModulesOverview : public TabBase
 {
   public:
@@ -118,7 +115,6 @@ class ModulesOverview : public TabBase
 
 // Sidebar positions (the separator counts).
 constexpr int TAB_RESCUE   = 2;
-constexpr int TAB_AGENT    = 3;
 
 ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml"), list(this)
 {
@@ -128,7 +124,10 @@ ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml"), li
         return true;
     });
     agent->registerClickAction([this](aurore::View*) {
-        ui::go_to_tab(this, TAB_AGENT);
+        // The screen is the kit's, shared with the other apps; the PIN and the
+        // history are PlayGuard's, through the flow's hooks.
+        agent_update::install_hooks();
+        aurore::Application::pushActivity(new AgentActivity());
         return true;
     });
     this->list.apply({ { "md_rescue", "unlock" }, { "md_agent", "server" } });
@@ -139,7 +138,7 @@ void ModulesOverview::refresh()
     const char* color = nullptr;
     rescue->setDetailText(ModulesActivity::summary(modules::Id::Rescue, &color));
     rescue->detail->setThemeColor("textColor", color);
-    agent->setDetailText(ModulesActivity::summary(modules::Id::Agent, &color));
+    agent->setDetailText(AgentActivity::summary(&color));
     agent->detail->setThemeColor("textColor", color);
     this->list.sync();
 }
@@ -180,33 +179,12 @@ ModuleTab::ModuleTab(modules::Id which) : TabBase("xml/tab/module.xml"), id(whic
         }
         this->refresh();
     });
-    run->registerClickAction([this](aurore::View*) {
-        const modules::Module& mod = modules::get(this->id);
-        const bool running = sysmodule_running(mod.tid, nullptr);
-        if (!allowed()) return true;
-        const modules::Id mid = this->id;
-        const std::function<void()> refresh_tab = this->refresher();
-        const auto act = [mid, running, refresh_tab]() {
-            const modules::Module& target = modules::get(mid);
-            const Result rc = running ? sysmodule_terminate(target.tid) : sysmodule_launch(target.tid);
-            ui::notify_result(rc, running ? "playguard/modules/stopped"_i18n : "playguard/modules/started"_i18n,
-                              "playguard/modules/error"_i18n);
-            if (R_SUCCEEDED(rc)) record(target, running ? "stopped" : "started");
-            // The link follows: the agent's, or PlayGuard's own.
-            if (running || R_FAILED(rc)) sync_flow::reload();
-            else sync_flow::agent_started();
-            refresh_tab();
-        };
-        if (running) sync_flow::agent_stopping(act);
-        else act();
-        return true;
-    });
     remove->registerClickAction([this](aurore::View*) {
         this->uninstall();
         return true;
     });
     this->list.apply({ { "md_status", "info" }, { "md_action", "download" }, { "md_boot", "bolt" },
-                       { "md_run", "refresh" }, { "md_remove", "trash" } });
+                       { "md_remove", "trash" } });
 }
 
 void ModuleTab::install()
@@ -225,12 +203,6 @@ void ModuleTab::install()
     ui::confirm(body, update ? "playguard/modules/update"_i18n : "playguard/modules/install"_i18n, [mid, b, update, refresh_tab]() {
         const modules::Module& target = modules::get(mid);
         if (!allowed()) return;
-        if (target.resident) {
-            // The agent: stopped cleanly, swapped, started and seen answering,
-            // or the previous one put back (action/agent_update).
-            agent_update::run(refresh_tab);
-            return;
-        }
         // The recovery module only acts at boot: nothing to stop or start.
         const std::string sd = paths::sd_root();
         const auto done = modules::install(sd, target, b, false);
@@ -263,24 +235,14 @@ void ModuleTab::uninstall()
     ui::confirm_danger(aurore::getStr(key(m, "remove_body")), "playguard/modules/remove"_i18n, [mid, refresh_tab]() {
         const modules::Module& target = modules::get(mid);
         if (!allowed()) return;
-        const bool running = target.resident && sysmodule_running(target.tid, nullptr);
-        const auto drop = [mid, running, refresh_tab]() {
-            const modules::Module& gone = modules::get(mid);
-            if (running) {
-                sysmodule_terminate(gone.tid);
-                sync_flow::reload();
-            }
-            if (const auto done = modules::uninstall(paths::sd_root(), gone); !done) {
-                ui::error("playguard/modules/error"_i18n + " — " + done.error());
-            } else {
-                record(gone, "removed");
-                if (gone.id == modules::Id::Rescue) rescue::note_version();
-                ui::notify("playguard/modules/removed"_i18n);
-            }
-            refresh_tab();
-        };
-        if (running) sync_flow::agent_stopping(drop);
-        else drop();
+        if (const auto done = modules::uninstall(paths::sd_root(), target); !done) {
+            ui::error("playguard/modules/error"_i18n + " — " + done.error());
+        } else {
+            record(target, "removed");
+            if (target.id == modules::Id::Rescue) rescue::note_version();
+            ui::notify("playguard/modules/removed"_i18n);
+        }
+        refresh_tab();
     });
 }
 
@@ -290,7 +252,6 @@ void ModuleTab::refresh()
     const modules::State s = modules::state(paths::sd_root(), m);
     const modules::Bundle b = modules::bundled(bundled_modules::dir(), m);
     const modules::Offer offer = modules::offer(s, b);
-    const bool running = m.resident && s.installed && sysmodule_running(m.tid, nullptr);
 
     const char* color = nullptr;
     status->setDetailText(state_text(id, false, &color));
@@ -301,9 +262,6 @@ void ModuleTab::refresh()
     ui::set_visible(action, offer != modules::Offer::None);
     boot->setOn(s.at_boot, false);
     ui::set_visible(boot, s.installed);
-    // The recovery module only acts at boot: no Start / Stop.
-    run->setText(running ? "playguard/modules/stop"_i18n : "playguard/modules/start"_i18n);
-    ui::set_visible(run, m.resident && s.installed);
     ui::set_visible(remove, s.installed);
     this->list.sync();
 }
@@ -313,7 +271,7 @@ void ModuleTab::refresh()
 // one. Its names shrink to fit, as there.
 void dress_rail(aurore::View* tab_frame)
 {
-    static const char* const ICONS[] = { "list", "", "unlock", "server" };
+    static const char* const ICONS[] = { "list", "", "unlock" };
     auto* sidebar = dynamic_cast<aurore::Sidebar*>(tab_frame->getView("aurore/tab_frame/sidebar"));
     aurore::SidebarItem* first = sidebar ? sidebar->getItem(0) : nullptr;
     aurore::Box* list = first ? first->getParent() : nullptr;
@@ -366,17 +324,15 @@ void ModulesActivity::onContentAvailable()
     tabs->addTab("playguard/modules/overview"_i18n, []() { return new ModulesOverview(); });
     tabs->addSeparator();
     tabs->addTab("playguard/modules/rescue/tab"_i18n, []() { return new ModuleTab(modules::Id::Rescue); });
-    tabs->addTab("playguard/modules/agent/tab"_i18n, []() { return new ModuleTab(modules::Id::Agent); });
     // Dressed here, not by the screens' skin (Cadran's), which would take
     // the sidebar for the list: the header, and the rail.
     cadran::style_header(dynamic_cast<aurore::AppletFrame*>(this->getContentView()), nullptr, "", false, false);
     dress_rail(tabs.getView());
 
     if (start != Tab::Overview) {
-        const int position = start == Tab::Rescue ? TAB_RESCUE : TAB_AGENT;
-        aurore::sync([this, position]() {
+        aurore::sync([this]() {
             auto stack = aurore::Application::getActivitiesStack();
-            if (!stack.empty() && stack.back() == this) tabs->focusTab(position);
+            if (!stack.empty() && stack.back() == this) tabs->focusTab(TAB_RESCUE);
         });
     }
 }

@@ -1695,12 +1695,8 @@
         "install": "Instalar",
         "update": "Actualizar",
         "at_boot": "Iniciar al arrancar",
-        "start": "Iniciar ahora",
-        "stop": "Detener ahora",
         "remove": "Eliminar",
         "removed": "Módulo eliminado.",
-        "started": "Módulo iniciado.",
-        "stopped": "Módulo detenido.",
         "error": "No se ha podido cambiar el módulo",
         "meta_err": "El módulo está instalado, pero no se ha podido escribir su versión en la tarjeta SD: puede que se vuelva a ofrecer",
         "locked_out": "¿Sin acceso?",
@@ -1709,8 +1705,6 @@
             "not_bundled": "No incluido en esta compilación",
             "installed": "Instalado, actualizado",
             "update": "Instalado, hay una actualización disponible",
-            "running": "en ejecución",
-            "stopped": "detenido",
             "none": "Ninguno instalado"
         },
         "short": {
@@ -1748,13 +1742,6 @@
         },
         "agent": {
             "title": "Agente del enlace remoto",
-            "tab": "Agente del enlace",
-            "about": "Mantiene activo el enlace con Home Assistant (Consola › Acceso remoto) mientras PlayGuard está cerrado: las órdenes se ejecutan y el estado se mantiene al día.",
-            "install_body": "¿Instalar e iniciar el agente (versión {})? Se inicia en cada arranque y usa los ajustes de Acceso remoto.",
-            "update_body": "¿Actualizar el agente a la versión {}? Se detiene un momento y vuelve a iniciarse.",
-            "installed": "Agente instalado e iniciado.",
-            "updated": "Agente actualizado.",
-            "remove_body": "¿Detener y quitar el agente? El enlace remoto solo funcionará entonces mientras PlayGuard esté abierto.",
             "other_protocol": "usa el protocolo {}",
             "offer_body": "El agente del enlace remoto de la tarjeta SD no es el que trae este PlayGuard (versión {}). ¿Actualizarlo ahora? Se detiene un momento, y se vuelve a poner el anterior si el nuevo no responde.",
             "offer_refused": "Usa un protocolo más antiguo: el enlace remoto no funciona hasta que se actualice."

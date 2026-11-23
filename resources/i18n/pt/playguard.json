@@ -1695,12 +1695,8 @@
         "install": "Instalar",
         "update": "Atualizar",
         "at_boot": "Iniciar com a consola",
-        "start": "Iniciar agora",
-        "stop": "Parar agora",
         "remove": "Remover",
         "removed": "Módulo removido.",
-        "started": "Módulo iniciado.",
-        "stopped": "Módulo parado.",
         "error": "Não foi possível alterar o módulo",
         "meta_err": "O módulo está instalado, mas não foi possível escrever a sua versão no cartão SD: poderá ser proposto de novo",
         "locked_out": "Sem acesso?",
@@ -1709,8 +1705,6 @@
             "not_bundled": "Não incluído nesta compilação",
             "installed": "Instalado, atualizado",
             "update": "Instalado, há uma atualização disponível",
-            "running": "em execução",
-            "stopped": "parado",
             "none": "Nenhum instalado"
         },
         "short": {
@@ -1748,13 +1742,6 @@
         },
         "agent": {
             "title": "Agente da ligação remota",
-            "tab": "Agente da ligação",
-            "about": "Mantém ativa a ligação ao Home Assistant (Consola › Acesso remoto) enquanto o PlayGuard está fechado: as ordens são executadas e o estado mantém-se atualizado.",
-            "install_body": "Instalar e iniciar o agente (versão {})? É iniciado com a consola e usa as definições do Acesso remoto.",
-            "update_body": "Atualizar o agente para a versão {}? Para durante um instante e volta a iniciar.",
-            "installed": "Agente instalado e iniciado.",
-            "updated": "Agente atualizado.",
-            "remove_body": "Parar e remover o agente? A ligação remota passa a funcionar só enquanto o PlayGuard estiver aberto.",
             "other_protocol": "usa o protocolo {}",
             "offer_body": "O agente da ligação remota no cartão SD não é o que este PlayGuard traz (versão {}). Atualizá-lo agora? Para durante um instante, e o anterior é reposto se o novo não responder.",
             "offer_refused": "Usa um protocolo mais antigo: a ligação remota não funciona enquanto não for atualizado."
