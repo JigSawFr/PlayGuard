@@ -216,7 +216,7 @@ over (unless that day's limit was changed since). All four keys go together.
 ### Scheduled profile
 
 *Play timer › Profiles › Scheduled profile*: a profile for a period, set by
-an earlier version (a new one is Home Assistant's: *Console › Remote access*). When the period begins, PlayGuard asks to put it in force (once a day, when it is
+an earlier version (a new one is Home Assistant's: *Console › Optional modules › Remote access*). When the period begins, PlayGuard asks to put it in force (once a day, when it is
 opened); once it is over, to put back the limits it replaced. A period that
 went by with the profile never in force is forgotten. The six keys go
 together.

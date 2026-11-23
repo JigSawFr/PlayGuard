@@ -5,7 +5,9 @@
 // PlayGuard is closed). A list as the other screens are (sync.xml): what
 // they are, then a cell per module with its state; Ⓐ opens the module's own
 // screen, a list as well: the recovery module's (ModuleActivity), or the
-// agent's, which is boreale-kit's AgentActivity. Every change asks for the
+// agent's, which is boreale-kit's AgentActivity. Under them the remote link
+// (Remote access: its status, broker, log and settings, SyncActivity), which
+// the agent keeps up while PlayGuard is closed. Every change asks for the
 // PIN as a console change does: the recovery module can unlock the console.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
@@ -31,6 +33,10 @@ class ModulesActivity : public aurore::Activity
     // its colour when `color` is given.
     static std::string summary(modules::Id id, const char** color = nullptr);   // the recovery module's
 
+    // The remote link's state: "Online" or "Offline", and "Off" when `with_off`
+    // (empty when it is off and not asked: the Console tile says nothing then).
+    static std::string remote_state(bool with_off);
+
   private:
     void refresh();
 
@@ -39,6 +45,7 @@ class ModulesActivity : public aurore::Activity
     AURORE_BIND(aurore::Label,      intro,  "md_intro");
     AURORE_BIND(aurore::DetailCell, rescue, "md_rescue");
     AURORE_BIND(aurore::DetailCell, agent,  "md_agent");
+    AURORE_BIND(aurore::DetailCell, remote, "md_remote");
 };
 
 // One module's screen: what it does, its state, Install / Update, At boot,

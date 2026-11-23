@@ -233,7 +233,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 - **Profils** enregistrés sur la carte SD : appliquer (un profil déjà en vigueur le dit simplement), modifier, renommer ou supprimer un profil ; enregistrer les limites actuelles ou en créer un nouveau.
 - N'importe quel nom, dans n'importe quelle écriture (*École*, *周末*, *Выходные* …) — un nom sans lettres latines reçoit son propre nom de fichier, et deux noms qui donneraient le même fichier sont repérés.
-- **Profil programmé** (*Profils › Profil programmé*) : *Avec Home Assistant*. PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul : Home Assistant le fait, depuis un agenda ou les vacances scolaires, une fois la console reliée par *Console › Accès à distance* (une automatisation qui règle son sélecteur *Profil* ; [le guide Home Assistant](../home-assistant.fr.md)). Un profil programmé avec une version précédente est toujours proposé quand sa période commence, et la ligne le modifie, le retire ou y met fin.
+- **Profil programmé** (*Profils › Profil programmé*) : *Avec Home Assistant*. PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul : Home Assistant le fait, depuis un agenda ou les vacances scolaires, une fois la console reliée par *Console › Modules facultatifs › Accès à distance* (une automatisation qui règle son sélecteur *Profil* ; [le guide Home Assistant](../home-assistant.fr.md)). Un profil programmé avec une version précédente est toujours proposé quand sa période commence, et la ligne le modifie, le retire ou y met fin.
 
 ### Bloquer tous les jeux
 
@@ -375,7 +375,7 @@ Le dernier de l'onglet : le sysmodule de récupération facultatif, pour un code
 
 *[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
-**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les outils en tuiles, sous *Outils* (*Horloge réseau*, *Jeux installés* et *Forwarders* ; les deux premiers montrent dans leur coin ce qui demande un coup d'œil ; puis *Accès à distance* et *Modules facultatifs*), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
+**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les outils en tuiles, sous *Outils* (*Horloge réseau*, *Jeux installés* et *Forwarders* ; les deux premiers montrent dans leur coin ce qui demande un coup d'œil ; puis *Modules facultatifs*, qui contient le lien à distance), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
 
 ### Horloge réseau
 
@@ -467,11 +467,11 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 ### Accès à distance
 
-*Accès à distance ›*, une tuile sous *Outils* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Les réglages du broker (son adresse, l'utilisateur, la version de MQTT, le nom de la console : l'écran que partagent les autres homebrews Boréale), que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux et l'icône de chacun ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis la Marketplace et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal.
+*Modules facultatifs › Accès à distance ›*, la dernière cellule de l'écran des modules facultatifs : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Les réglages du broker (son adresse, l'utilisateur, la version de MQTT, le nom de la console : l'écran que partagent les autres homebrews Boréale), que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux et l'icône de chacun ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis la Marketplace et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal.
 
 ### Modules facultatifs
 
-*Modules facultatifs ›*, une tuile sous *Outils* : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son propre écran, une liste comme celui de l'agent) et l'agent Boréale, qui garde le lien à distance (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
+*Modules facultatifs ›*, une tuile sous *Outils* (sa ligne dit aussi *En ligne* ou *Hors ligne* quand le lien à distance est activé) : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son propre écran, une liste comme celui de l'agent) et l'agent Boréale, qui garde le lien à distance (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
 
 ### Les lignes de la console
 

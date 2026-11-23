@@ -2061,7 +2061,7 @@
         "remove": "La retirer",
         "removed": "Profil programmé retiré.",
         "soon": "Avec Home Assistant",
-        "soon_note": "PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul. Home Assistant le peut : Console › Accès à distance y relie la console, et une automatisation choisit le profil (son sélecteur Profil) depuis un agenda ou les vacances scolaires."
+        "soon_note": "PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul. Home Assistant le peut : Console › Modules facultatifs › Accès à distance y relie la console, et une automatisation choisit le profil (son sélecteur Profil) depuis un agenda ou les vacances scolaires."
     },
     "sigpatch": {
         "set_aside": "Mettre les sigpatches de côté",

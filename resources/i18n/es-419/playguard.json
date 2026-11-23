@@ -2061,7 +2061,7 @@
         "remove": "Quitarlo",
         "removed": "Perfil programado quitado.",
         "soon": "Con Home Assistant",
-        "soon_note": "PlayGuard solo funciona mientras está abierto, así que no puede cambiar de perfil el día indicado por sí solo. Home Assistant sí puede: Consola › Acceso remoto enlaza la consola con él, y una automatización elige el perfil (su selector Perfil) a partir de un calendario o de las vacaciones escolares."
+        "soon_note": "PlayGuard solo funciona mientras está abierto, así que no puede cambiar de perfil el día indicado por sí solo. Home Assistant sí puede: Consola › Módulos opcionales › Acceso remoto enlaza la consola con él, y una automatización elige el perfil (su selector Perfil) a partir de un calendario o de las vacaciones escolares."
     },
     "sigpatch": {
         "set_aside": "Apartar los archivos sigpatch",

@@ -124,7 +124,7 @@ discovery again when Home Assistant says it restarted, publish the system
 document (the simulated console; the serial number only in sync-311, which
 sets publish_serial and leaves the network unpublished) and the games
 document, describe the device as Nintendo's OLED model, show the link online
-in Console › Remote access with the Home Assistant integration's QR
+in Console › Optional modules › Remote access with the Home Assistant integration's QR
 codes, keep the integration's version once it says it (integration.json),
 find its newer release (PLAYGUARD_SIM_HA_LATEST, its changelog) and show
 what changed, stop publishing the games once turned off (their document
@@ -141,7 +141,7 @@ The "agent" scenario runs with a simulated agent sysmodule
 was closed into the history with the agent's time, push the state, today's
 activity and the names, carry out the order the agent hands it
 (PLAYGUARD_SIM_AGENT_ORDER) and answer it, show "through the agent" in
-Console › Remote access, and close its session at exit.
+Console › Optional modules › Remote access, and close its session at exit.
 
 The "agent-update" and "agent-rollback" scenarios start with an old agent
 on the simulated SD card (it speaks another protocol) and a new one carried
@@ -1760,8 +1760,10 @@ if SYNC:
     shot("01_overview")        # Today after the remote change (1 h 30 every day)
     key("Down", steps("dashboard", "console"))
     key("Right")               # Network clock, the first tool
-    go_to("Remote access")     # the tools' second row
+    go_to("Optional modules")  # the tools' second row
     shot("02_console_tools")
+    key("Return")
+    go_to("Remote access")     # the last cell of the modules' screen
     key("Return")
     shot("03_remote_access")   # the link online
     # The broker's settings are boreale-kit's screen (link.conf): the same host and port
@@ -1879,10 +1881,14 @@ if AGENT:
     shot("01_overview")        # Today after the order (1 h 30 every day)
     key("Down", steps("dashboard", "console"))
     key("Right")               # Network clock, the first tool
-    go_to("Remote access")     # the tools' second row
+    go_to("Optional modules")  # the tools' second row
+    shot("01b_console_tools")
+    key("Return")
+    go_to("Remote access")     # the last cell of the modules' screen
     key("Return")
     shot("02_remote_access")   # online, through the agent
     # Quit the way a user does (B twice on the sidebar): the session must end.
+    key("Escape")              # the modules' screen
     key("Escape")
     key("Left")
     key("Escape", 2)
@@ -1945,8 +1951,7 @@ if MODULES:
     key("Left")                  # the sidebar
     key("Down", steps("security", "console"))
     key("Right")
-    go_to("Remote access", most=40)      # the second row of tiles
-    key("Right")                 # Optional modules
+    go_to("Optional modules", most=40)   # the second row of tiles
     key("Return")                # the overview: the intro, then a cell per module
     time.sleep(0.5)
     shot("07_overview")          # each module's state

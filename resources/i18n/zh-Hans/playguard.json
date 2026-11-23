@@ -2061,7 +2061,7 @@
         "remove": "移除",
         "removed": "已移除计划的配置。",
         "soon": "通过 Home Assistant",
-        "soon_note": "PlayGuard 只在打开时运行，因此无法在指定的日子自行切换配置。Home Assistant 可以：“主机 › 远程访问”把主机连接到它，再由自动化根据日历或学校假期选择配置（它的“配置”选择器）。"
+        "soon_note": "PlayGuard 只在打开时运行，因此无法在指定的日子自行切换配置。Home Assistant 可以：“主机 › 可选模块 › 远程访问”把主机连接到它，再由自动化根据日历或学校假期选择配置（它的“配置”选择器）。"
     },
     "sigpatch": {
         "set_aside": "将签名补丁文件移到一旁",

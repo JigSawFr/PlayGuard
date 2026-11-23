@@ -232,7 +232,7 @@ In larger text, Today still fits on one screen: the line above the headline says
 
 - **Profiles** saved on the SD card: apply (a profile already in force just says so), edit, rename or delete one; save the current limits or make a new one.
 - Any name, in any script (*École*, *周末*, *Выходные* …) — a name without Latin letters gets a file name of its own, and two names that would map to the same file are caught.
-- **Scheduled profile** (*Profiles › Scheduled profile*): *With Home Assistant*. PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself: Home Assistant does, from a calendar or the school holidays, once *Console › Remote access* links the console to it (an automation that sets its *Profile* select; [the Home Assistant guide](home-assistant.md)). A profile scheduled with an earlier version is still offered when its period begins, and the line still changes, removes or ends it.
+- **Scheduled profile** (*Profiles › Scheduled profile*): *With Home Assistant*. PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself: Home Assistant does, from a calendar or the school holidays, once *Console › Optional modules › Remote access* links the console to it (an automation that sets its *Profile* select; [the Home Assistant guide](home-assistant.md)). A profile scheduled with an earlier version is still offered when its period begins, and the line still changes, removes or ends it.
 
 ### Block all games
 
@@ -374,7 +374,7 @@ Last in the tab: the optional recovery module, for a forgotten PIN with a 0-minu
 
 *[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
-**At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles, under *Tools* (*Network clock*, *Installed games* and *Forwarders*; the first two show what needs a look in their corner; then *Remote access* and *Optional modules*), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
+**At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then the tools as tiles, under *Tools* (*Network clock*, *Installed games* and *Forwarders*; the first two show what needs a look in their corner; then *Optional modules*, which holds the remote link), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
 ### Network clock
 
@@ -466,11 +466,11 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### Remote access
 
-*Remote access ›*, a tile under *Tools*: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker's settings (its address, user and MQTT version, the console's name: the screen the other Boréale homebrews share), what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games and every game's icon; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from the Marketplace and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
+*Optional modules › Remote access ›*, the last cell of the optional modules' screen: an optional link to an MQTT broker and Home Assistant on your local network, off by default ([the Home Assistant guide](home-assistant.md)). The broker's settings (its address, user and MQTT version, the console's name: the screen the other Boréale homebrews share), what to do with orders (ask on the console, carry them out, refuse them), whether they may change the play timer (off by default), Home Assistant's discovery, the console's own information (model, versions, storage, battery, network, games and every game's icon; the serial number only with *Publish the serial number*), QR codes that install the PlayGuard integration from the Marketplace and add the console (once installed, its version, and its newer release), the live status, *Sync now* and the log.
 
 ### Optional modules
 
-*Optional modules ›*, a tile under *Tools*: install, update, start at boot or remove the recovery module (its own screen, a list like the agent's) and the Boréale agent, which keeps the remote link up (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
+*Optional modules ›*, a tile under *Tools* (its line also says *Online* or *Offline* when the remote link is on): install, update, start at boot or remove the recovery module (its own screen, a list like the agent's) and the Boréale agent, which keeps the remote link up (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
 
 ### The console's lines
 

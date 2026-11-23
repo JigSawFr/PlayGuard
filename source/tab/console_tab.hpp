@@ -34,7 +34,6 @@ class ConsoleTab : public TabBase
     AURORE_BIND(aurore::DetailCell,  clock,        "cn_clock");
     AURORE_BIND(aurore::DetailCell,  games,        "cn_games");
     AURORE_BIND(aurore::DetailCell,  forwarders,   "cn_forwarders");
-    AURORE_BIND(aurore::DetailCell,  remote,       "cn_remote");
     AURORE_BIND(aurore::DetailCell,  modules_cell, "cn_modules");
     AURORE_BIND(aurore::DetailCell,  fw,           "cn_fw");
     AURORE_BIND(aurore::DetailCell,  ams,          "cn_ams");

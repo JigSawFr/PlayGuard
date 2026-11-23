@@ -29,6 +29,7 @@
             <aurore:Label id="md_intro" text="@i18n/playguard/modules/intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
             <aurore:DetailCell id="md_rescue" title="@i18n/playguard/modules/rescue/tab"/>
             <aurore:DetailCell id="md_agent" title="@i18n/playguard/modules/agent/title"/>
+            <aurore:DetailCell id="md_remote" marginTop="24" title="@i18n/playguard/sync/title"/>
 
         </aurore:Box>
 

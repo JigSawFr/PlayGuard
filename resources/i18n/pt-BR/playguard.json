@@ -2061,7 +2061,7 @@
         "remove": "Removê-lo",
         "removed": "Perfil agendado removido.",
         "soon": "Com o Home Assistant",
-        "soon_note": "O PlayGuard só funciona enquanto está aberto, então não consegue trocar de perfil sozinho no dia certo. O Home Assistant consegue: Console › Acesso remoto conecta o console a ele, e uma automação escolhe o perfil (o seletor Perfil dele) a partir de um calendário ou das férias escolares."
+        "soon_note": "O PlayGuard só funciona enquanto está aberto, então não consegue trocar de perfil sozinho no dia certo. O Home Assistant consegue: Console › Módulos opcionais › Acesso remoto conecta o console a ele, e uma automação escolhe o perfil (o seletor Perfil dele) a partir de um calendário ou das férias escolares."
     },
     "sigpatch": {
         "set_aside": "Deixar os arquivos de sigpatch de lado",

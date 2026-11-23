@@ -12,6 +12,8 @@
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/rescue.hpp"
+#include "action/sync_flow.hpp"
+#include "activity/sync_activity.hpp"
 #include "app.hpp"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
@@ -207,6 +209,14 @@ std::string ModulesActivity::summary(modules::Id id, const char** color)
     return state_text(id, true, color);
 }
 
+std::string ModulesActivity::remote_state(bool with_off)
+{
+    const sync_flow::Status link = sync_flow::status();
+    if (!link.enabled) return with_off ? "playguard/sync/state_off"_i18n : "";
+    return link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
+                                                              : "playguard/sync/state_offline"_i18n;
+}
+
 void ModulesActivity::refresh()
 {
     const char* color = nullptr;
@@ -214,6 +224,7 @@ void ModulesActivity::refresh()
     rescue->detail->setThemeColor("textColor", color);
     agent->setDetailText(AgentActivity::summary(&color));
     agent->detail->setThemeColor("textColor", color);
+    remote->setDetailText(remote_state(true));
     if (this->list) this->list->sync();
 }
 
@@ -237,7 +248,11 @@ void ModulesActivity::onContentAvailable()
         aurore::Application::pushActivity(new AgentActivity());
         return true;
     });
+    remote->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new SyncActivity());
+        return true;
+    });
     this->list = std::make_unique<cadran::List>(this->getContentView(), true);
-    this->list->apply({ { "md_rescue", "unlock" }, { "md_agent", "server" } });
+    this->list->apply({ { "md_rescue", "unlock" }, { "md_agent", "server" }, { "md_remote", "server" } });
     this->refresh();
 }

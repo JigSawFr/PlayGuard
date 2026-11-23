@@ -2061,7 +2061,7 @@
         "remove": "Verwijderen",
         "removed": "Gepland profiel verwijderd.",
         "soon": "Met Home Assistant",
-        "soon_note": "PlayGuard draait alleen terwijl het open is, dus kan het niet zelf op de juiste dag van profiel wisselen. Home Assistant kan dat wel: Console › Toegang op afstand verbindt de console ermee, en een automatisering kiest het profiel (zijn keuzelijst Profiel) vanuit een agenda of de schoolvakanties."
+        "soon_note": "PlayGuard draait alleen terwijl het open is, dus kan het niet zelf op de juiste dag van profiel wisselen. Home Assistant kan dat wel: Console › Optionele modules › Toegang op afstand verbindt de console ermee, en een automatisering kiest het profiel (zijn keuzelijst Profiel) vanuit een agenda of de schoolvakanties."
     },
     "sigpatch": {
         "set_aside": "De sigpatch-bestanden opzijzetten",

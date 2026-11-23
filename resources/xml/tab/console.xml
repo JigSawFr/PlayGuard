@@ -39,10 +39,9 @@
             <aurore:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
             <aurore:DetailCell id="cn_games" title="@i18n/playguard/tiles/games"/>
             <aurore:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
-            <!-- A second row: the remote link (MQTT, Home Assistant:
-                 activity/sync_activity.hpp) and the optional sysmodules
+            <!-- A second row: the optional modules, the remote link (MQTT, Home
+                 Assistant: activity/sync_activity.hpp) and the sysmodules
                  (activity/modules_activity.hpp). -->
-            <aurore:DetailCell id="cn_remote" title="@i18n/playguard/sync/title"/>
             <aurore:DetailCell id="cn_modules" title="@i18n/playguard/modules/open"/>
             <aurore:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>

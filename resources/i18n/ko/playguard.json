@@ -2061,7 +2061,7 @@
         "remove": "삭제",
         "removed": "예약된 프로필을 삭제했습니다.",
         "soon": "Home Assistant로 가능",
-        "soon_note": "PlayGuard는 열려 있는 동안에만 실행되므로 정해진 날에 스스로 프로필을 바꿀 수 없습니다. Home Assistant는 할 수 있습니다. 본체 › 원격 접속으로 본체를 Home Assistant에 연결하면, 자동화가 캘린더나 방학 일정에 따라 프로필(본체의 \"프로필\" 선택 항목)을 고릅니다."
+        "soon_note": "PlayGuard는 열려 있는 동안에만 실행되므로 정해진 날에 스스로 프로필을 바꿀 수 없습니다. Home Assistant는 할 수 있습니다. 본체 › 추가 모듈 › 원격 접속으로 본체를 Home Assistant에 연결하면, 자동화가 캘린더나 방학 일정에 따라 프로필(본체의 \"프로필\" 선택 항목)을 고릅니다."
     },
     "sigpatch": {
         "set_aside": "sigpatch 파일 치워 두기",

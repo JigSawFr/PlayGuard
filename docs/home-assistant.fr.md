@@ -31,11 +31,11 @@ Mosquitto de Home Assistant est le plus simple.
   réseau local uniquement »), ou ajoutez un identifiant dans la configuration
   de l'application.
 - La console sur le même réseau que le broker, avec une version de PlayGuard
-  qui a *Console › Accès à distance*.
+  qui a *Console › Modules facultatifs › Accès à distance*.
 
 ## Le configurer sur la console
 
-1. Ouvrez PlayGuard › **Console › Accès à distance › Réglages du broker** :
+1. Ouvrez PlayGuard › **Console › Modules facultatifs › Accès à distance › Réglages du broker** :
    l'écran est partagé avec les autres homebrews Boréale, qui lisent les
    mêmes réglages.
 2. **Adresse du broker** : l'adresse IP ou le nom de la machine du broker

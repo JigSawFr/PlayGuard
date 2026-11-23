@@ -2061,7 +2061,7 @@
         "remove": "移除",
         "removed": "已移除排定的設定檔。",
         "soon": "透過 Home Assistant",
-        "soon_note": "PlayGuard 只在開啟時執行，因此無法在指定的日子自行切換設定檔。Home Assistant 可以：「主機 › 遠端存取」會將主機連線到它，再由自動化依據行事曆或學校假期選擇設定檔（它的「設定檔」選擇器）。"
+        "soon_note": "PlayGuard 只在開啟時執行，因此無法在指定的日子自行切換設定檔。Home Assistant 可以：「主機 › 選用模組 › 遠端存取」會將主機連線到它，再由自動化依據行事曆或學校假期選擇設定檔（它的「設定檔」選擇器）。"
     },
     "sigpatch": {
         "set_aside": "將Sigpatch檔案移到一旁",

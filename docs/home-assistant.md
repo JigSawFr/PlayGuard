@@ -28,11 +28,11 @@ Assistant is the easy path.
   "can only log in from the local network"), or add a login in the app's
   configuration.
 - The console on the same network as the broker, with a PlayGuard that has
-  *Console › Remote access*.
+  *Console › Optional modules › Remote access*.
 
 ## Set it up on the console
 
-1. Open PlayGuard › **Console › Remote access › Broker settings**: the
+1. Open PlayGuard › **Console › Optional modules › Remote access › Broker settings**: the
    screen is shared with the other Boréale homebrews, which read the same
    settings.
 2. **Broker address**: the IP address or name of the machine running the

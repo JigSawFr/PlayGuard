@@ -2061,7 +2061,7 @@
         "remove": "Remove it",
         "removed": "Scheduled profile removed.",
         "soon": "With Home Assistant",
-        "soon_note": "PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself. Home Assistant can: Console › Remote access links the console to it, and an automation picks the profile (its Profile select) from a calendar or the school holidays."
+        "soon_note": "PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself. Home Assistant can: Console › Optional modules › Remote access links the console to it, and an automation picks the profile (its Profile select) from a calendar or the school holidays."
     },
     "sigpatch": {
         "set_aside": "Set the sigpatch files aside",

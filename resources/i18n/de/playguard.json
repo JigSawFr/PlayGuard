@@ -2061,7 +2061,7 @@
         "remove": "Entfernen",
         "removed": "Geplantes Profil entfernt.",
         "soon": "Mit Home Assistant",
-        "soon_note": "PlayGuard läuft nur, während es geöffnet ist, und kann daher nicht von selbst am richtigen Tag das Profil wechseln. Home Assistant kann es: Konsole › Fernzugriff verbindet die Konsole damit, und eine Automatisierung wählt das Profil (seine Auswahl „Profil“) nach einem Kalender oder den Schulferien."
+        "soon_note": "PlayGuard läuft nur, während es geöffnet ist, und kann daher nicht von selbst am richtigen Tag das Profil wechseln. Home Assistant kann es: Konsole › Optionale Module › Fernzugriff verbindet die Konsole damit, und eine Automatisierung wählt das Profil (seine Auswahl „Profil“) nach einem Kalender oder den Schulferien."
     },
     "sigpatch": {
         "set_aside": "Die Sigpatch-Dateien beiseitelegen",
