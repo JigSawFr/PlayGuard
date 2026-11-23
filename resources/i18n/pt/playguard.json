@@ -1726,10 +1726,12 @@
             "installed": "Módulo de recuperação instalado. Atua no próximo arranque se houver um ficheiro RESCUE.",
             "updated": "Módulo de recuperação atualizado.",
             "remove_body": "Remover o módulo de recuperação? Sem ele, um PIN esquecido com um limite de 0 minutos precisa de um computador para ser resolvido.",
-            "short_title": "Módulo de recuperação"
+            "short_title": "Módulo de recuperação",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
             "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates. The connection itself is set up in Console › Remote access.",
             "other_protocol": "usa o protocolo {}",
             "offer_body": "O Boréale agent no cartão SD não é o que este PlayGuard traz (versão {}). Atualizá-lo agora? Para durante um instante, e o anterior é reposto se o novo não responder.",
             "offer_refused": "Usa um protocolo mais antigo: a ligação remota não funciona enquanto não for atualizado."

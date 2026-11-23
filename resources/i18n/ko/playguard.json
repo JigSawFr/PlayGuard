@@ -1726,10 +1726,12 @@
             "installed": "복구 모듈을 설치했습니다. RESCUE 파일이 있으면 다음 부팅 때 작동합니다.",
             "updated": "복구 모듈을 업데이트했습니다.",
             "remove_body": "복구 모듈을 제거할까요? 모듈이 없으면 0분 제한에서 PIN을 잊어버렸을 때 컴퓨터가 있어야 해결할 수 있습니다.",
-            "short_title": "복구 모듈"
+            "short_title": "복구 모듈",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
             "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates. The connection itself is set up in Console › Remote access.",
             "other_protocol": "프로토콜 {} 사용",
             "offer_body": "SD 카드의 Boréale agent가 이 PlayGuard에 들어 있는 것(버전 {})과 다릅니다. 지금 업데이트할까요? 잠시 멈추며, 새 에이전트가 응답하지 않으면 이전 것으로 되돌립니다.",
             "offer_refused": "이전 프로토콜을 사용하므로 업데이트할 때까지 원격 연결이 작동하지 않습니다."

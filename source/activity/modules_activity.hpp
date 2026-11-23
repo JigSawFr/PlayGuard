@@ -37,6 +37,8 @@ class ModulesActivity : public aurore::Activity
     std::unique_ptr<cadran::List> list;
 
     AURORE_BIND(aurore::Label,      intro,  "md_intro");
+    AURORE_BIND(aurore::Label,      rescue_note, "md_rescue_note");
+    AURORE_BIND(aurore::Label,      agent_note,  "md_agent_note");
     AURORE_BIND(aurore::DetailCell, rescue, "md_rescue");
     AURORE_BIND(aurore::DetailCell, agent,  "md_agent");
 };

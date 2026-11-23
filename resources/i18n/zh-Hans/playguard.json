@@ -1726,10 +1726,12 @@
             "installed": "恢复模块已安装。下次开机时，如果有 RESCUE 文件，它就会起作用。",
             "updated": "恢复模块已更新。",
             "remove_body": "要移除恢复模块吗？没有它，在限制为 0 分钟时忘记 PIN，就需要用电脑来解决。",
-            "short_title": "恢复模块"
+            "short_title": "恢复模块",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
             "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates. The connection itself is set up in Console › Remote access.",
             "other_protocol": "它使用协议 {}",
             "offer_body": "SD 卡上的Boréale agent不是这个 PlayGuard 附带的那个（版本 {}）。要现在更新吗？它会短暂停止；如果新版本没有响应，会恢复之前的版本。",
             "offer_refused": "它使用较旧的协议：更新之前，远程连接无法使用。"

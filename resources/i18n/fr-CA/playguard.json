@@ -1678,7 +1678,7 @@
         "open": "Modules facultatifs",
         "count": "{} installés",
         "count_one": "1 installé",
-        "intro": "Deux petits programmes en arrière-plan (sysmodules) que PlayGuard peut installer sur la carte SD. Aucun n'est nécessaire. Le module de secours n'agit qu'une fois, au démarrage, quand un fichier RESCUE le demande. L'agent Boréale est commun à tous les homebrews Boréale : il garde la connexion à votre broker quand PlayGuard est fermé, reçoit les ordres et vérifie les mises à jour. PlayGuard contient les versions faites avec lui et les installe ou les met à jour d'ici, sans ordinateur. Chaque changement demande le code PIN quand Sécurité › Protéger PlayGuard par le code PIN le demande avant un changement.",
+        "intro": "Deux petits programmes en arrière-plan (sysmodules) que PlayGuard peut installer sur la carte SD. Aucun n'est nécessaire. PlayGuard contient les versions faites avec lui et les installe ou les met à jour d'ici, sans ordinateur. Chaque changement demande le code PIN quand Sécurité › Protéger PlayGuard par le code PIN le demande avant un changement.",
         "status": "État",
         "install": "Installer",
         "update": "Mettre à jour",
@@ -1726,10 +1726,12 @@
             "installed": "Module de secours installé. Il agit au prochain démarrage si un fichier RESCUE est là.",
             "updated": "Module de secours mis à jour.",
             "remove_body": "Supprimer le module de secours ? Sans lui, un code PIN oublié avec une limite de 0 minute demande un ordinateur.",
-            "short_title": "Module de secours"
+            "short_title": "Module de secours",
+            "blurb": "Module de secours : déverrouille la console au démarrage quand un code PIN oublié et une limite de 0 minute bloquent tout."
         },
         "agent": {
             "title": "Agent Boréale",
+            "blurb": "Agent Boréale : commun à tous les homebrews Boréale. Il garde la connexion à votre broker quand PlayGuard est fermé, reçoit les ordres et vérifie les mises à jour. La connexion elle-même se règle dans Console › Accès à distance.",
             "other_protocol": "il parle le protocole {}",
             "offer_body": "L'agent Boréale présent sur la carte SD n'est pas celui que contient ce PlayGuard (version {}). Le mettre à jour maintenant ? Il s'arrête un instant, et le précédent est remis si le nouveau ne répond pas.",
             "offer_refused": "Il parle un protocole plus ancien : le lien à distance ne fonctionne pas tant qu'il n'est pas mis à jour."

@@ -209,11 +209,18 @@ std::string ModulesActivity::summary(modules::Id id, const char** color)
 
 void ModulesActivity::refresh()
 {
+    // Each module as a tile: its state, with a check when it is as it should
+    // be and a warning when it needs an update or a look.
+    const auto tile = [this](aurore::DetailCell* cell, const char* id, const std::string& text, const char* color) {
+        cell->setDetailText(text);
+        const std::string c = color ? color : "";
+        this->list->state(id, c == "cadran/teal" ? "cadran/teal_fill" : c == "cadran/amber" ? "cadran/amber_fill" : nullptr);
+    };
     const char* color = nullptr;
-    rescue->setDetailText(summary(modules::Id::Rescue, &color));
-    rescue->detail->setThemeColor("textColor", color);
-    agent->setDetailText(AgentActivity::summary(&color));
-    agent->detail->setThemeColor("textColor", color);
+    const std::string rescue_text = summary(modules::Id::Rescue, &color);
+    if (this->list) tile(rescue, "md_rescue", rescue_text, color);
+    const std::string agent_text = AgentActivity::summary(&color);
+    if (this->list) tile(agent, "md_agent", agent_text, color);
     if (this->list) this->list->sync();
 }
 
@@ -226,6 +233,8 @@ void ModulesActivity::onResume()
 void ModulesActivity::onContentAvailable()
 {
     intro->setSingleLine(false);
+    rescue_note->setSingleLine(false);
+    agent_note->setSingleLine(false);
     rescue->registerClickAction([](aurore::View*) {
         aurore::Application::pushActivity(new ModuleActivity(modules::Id::Rescue));
         return true;
@@ -238,6 +247,8 @@ void ModulesActivity::onContentAvailable()
         return true;
     });
     this->list = std::make_unique<cadran::List>(this->getContentView(), true);
-    this->list->apply({ { "md_rescue", "unlock" }, { "md_agent", "server" } });
+    // The two modules side by side as tiles, what each one does under them.
+    this->list->tiles({ { "md_rescue", "unlock" }, { "md_agent", "server" } }, true);
+    this->list->apply({});
     this->refresh();
 }
