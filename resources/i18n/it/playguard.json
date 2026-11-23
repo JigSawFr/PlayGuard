@@ -935,6 +935,8 @@
         "pick_title": "Scegli un homebrew",
         "pick_none": "Nessun homebrew trovato nella cartella /switch della scheda SD.",
         "pick_on_home": "Già nel menu HOME",
+        "pick_search": "Cerca un homebrew",
+        "pick_search_clear": "Mostra tutti gli homebrew",
         "name": "Nome nel menu HOME",
         "author": "Editore",
         "confirm_add": "Mettere {} nel menu HOME? La sua icona viene da {}.",
@@ -1536,6 +1538,18 @@
         "user_page": "Pagina utente",
         "amiibo": "Impostazioni amiibo",
         "maintenance": "Modalità manutenzione"
+    },
+    "log": {
+        "note": "Le più recenti in alto. Una riga ambra è un arresto del ciclo dell'agente.",
+        "kind": "Tipo",
+        "shown_count": "{}: {} righe",
+        "none_shown": "Nessuna riga di questo tipo.",
+        "filters": {
+            "0": "Tutto",
+            "1": "App",
+            "2": "Collegamento remoto",
+            "3": "Ciclo"
+        }
     },
     "sync": {
         "title": "Accesso remoto",

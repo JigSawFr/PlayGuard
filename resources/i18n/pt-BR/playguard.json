@@ -935,6 +935,8 @@
         "pick_title": "Escolha um homebrew",
         "pick_none": "Nenhum homebrew encontrado na pasta /switch do cartão SD.",
         "pick_on_home": "Já no menu HOME",
+        "pick_search": "Procurar um homebrew",
+        "pick_search_clear": "Mostrar todos os homebrews",
         "name": "Nome no menu HOME",
         "author": "Editora",
         "confirm_add": "Colocar {} no menu HOME? O ícone vem de {}.",
@@ -1536,6 +1538,18 @@
         "user_page": "Página do usuário",
         "amiibo": "Configurações de amiibo",
         "maintenance": "Modo de manutenção"
+    },
+    "log": {
+        "note": "As mais recentes primeiro. Uma linha âmbar é uma parada do loop do agente.",
+        "kind": "Tipo",
+        "shown_count": "{}: {} linhas",
+        "none_shown": "Nenhuma linha deste tipo.",
+        "filters": {
+            "0": "Tudo",
+            "1": "App",
+            "2": "Conexão remota",
+            "3": "Loop"
+        }
     },
     "sync": {
         "title": "Acesso remoto",

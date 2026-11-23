@@ -935,6 +935,8 @@
         "pick_title": "Choose a homebrew",
         "pick_none": "No homebrew found in the SD card's /switch folder.",
         "pick_on_home": "Already on HOME",
+        "pick_search": "Search a homebrew",
+        "pick_search_clear": "Show every homebrew",
         "name": "Name on the HOME menu",
         "author": "Publisher",
         "confirm_add": "Put {} on the HOME menu? Its icon comes from {}.",
@@ -1536,6 +1538,18 @@
         "user_page": "User page",
         "amiibo": "amiibo settings",
         "maintenance": "Maintenance Mode"
+    },
+    "log": {
+        "note": "Newest first. A line in amber is a stop of the agent's loop.",
+        "kind": "Type",
+        "shown_count": "{}: {} lines",
+        "none_shown": "No line of this kind.",
+        "filters": {
+            "0": "All",
+            "1": "App",
+            "2": "Remote link",
+            "3": "Loop"
+        }
     },
     "sync": {
         "title": "Remote access",

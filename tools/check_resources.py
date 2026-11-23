@@ -314,6 +314,7 @@ DYNAMIC_KEYS = {
     "days_short/": numbers(7),
     "restrictions/levels/": numbers(5),  # format_text.cpp, level_name: up to 4
     "history/filters/": numbers(enum_count("source/action/history_logic.hpp", "Filter")),
+    "log/filters/": numbers(enum_count("source/action/log_logic.hpp", "Filter")),   # log_activity.cpp
     # The code's lists (the days, months, languages, themes, text sizes and
     # sidebars are Aurore's Cadran's, in its own cadran.json).
     "clock/region_names/": re.findall(r'^\s*\{\s*"(\w+)",\s*\{', read(f"{ROOT}/source/util/ntp_servers.cpp"), re.M) +

@@ -935,6 +935,8 @@
         "pick_title": "Homebrewを選ぶ",
         "pick_none": "SDカードの/switchフォルダにHomebrewが見つかりませんでした。",
         "pick_on_home": "HOMEに追加済み",
+        "pick_search": "Homebrewを検索",
+        "pick_search_clear": "すべてのHomebrewを表示",
         "name": "HOMEメニューでの名前",
         "author": "発売元",
         "confirm_add": "{}をHOMEメニューに置きますか？ アイコンは{}のものです。",
@@ -1536,6 +1538,18 @@
         "user_page": "ユーザーページ",
         "amiibo": "amiibo設定",
         "maintenance": "メンテナンスモード"
+    },
+    "log": {
+        "note": "新しい順。琥珀色の行はエージェントのループの停止です。",
+        "kind": "種類",
+        "shown_count": "{}：{} 行",
+        "none_shown": "この種類の行はありません。",
+        "filters": {
+            "0": "すべて",
+            "1": "アプリ",
+            "2": "リモート接続",
+            "3": "ループ"
+        }
     },
     "sync": {
         "title": "リモートアクセス",

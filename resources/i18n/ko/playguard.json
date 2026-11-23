@@ -935,6 +935,8 @@
         "pick_title": "Homebrew 선택",
         "pick_none": "SD 카드의 /switch 폴더에서 Homebrew를 찾지 못했습니다.",
         "pick_on_home": "HOME에 이미 있음",
+        "pick_search": "Homebrew 검색",
+        "pick_search_clear": "모든 Homebrew 표시",
         "name": "HOME 메뉴 이름",
         "author": "배급사",
         "confirm_add": "{}을(를) HOME 메뉴에 놓을까요? 아이콘은 {}에서 가져옵니다.",
@@ -1536,6 +1538,18 @@
         "user_page": "사용자 페이지",
         "amiibo": "amiibo 설정",
         "maintenance": "유지보수 모드"
+    },
+    "log": {
+        "note": "최신순입니다. 황색 줄은 에이전트 루프의 정지입니다.",
+        "kind": "종류",
+        "shown_count": "{}: {}줄",
+        "none_shown": "이 종류의 줄이 없습니다.",
+        "filters": {
+            "0": "전체",
+            "1": "앱",
+            "2": "원격 연결",
+            "3": "루프"
+        }
     },
     "sync": {
         "title": "원격 접속",

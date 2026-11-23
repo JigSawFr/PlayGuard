@@ -935,6 +935,8 @@
         "pick_title": "Elija un homebrew",
         "pick_none": "No se ha encontrado ningún homebrew en la carpeta /switch de la tarjeta SD.",
         "pick_on_home": "Ya en HOME",
+        "pick_search": "Buscar un homebrew",
+        "pick_search_clear": "Mostrar todos los homebrew",
         "name": "Nombre en el menú HOME",
         "author": "Editor",
         "confirm_add": "¿Colocar {} en el menú HOME? Su icono viene de {}.",
@@ -1536,6 +1538,18 @@
         "user_page": "Página de usuario",
         "amiibo": "Configuración de amiibo",
         "maintenance": "Modo de mantenimiento"
+    },
+    "log": {
+        "note": "Las más recientes primero. Una línea ámbar es una parada del bucle del agente.",
+        "kind": "Tipo",
+        "shown_count": "{}: {} líneas",
+        "none_shown": "Ninguna línea de este tipo.",
+        "filters": {
+            "0": "Todo",
+            "1": "App",
+            "2": "Enlace remoto",
+            "3": "Bucle"
+        }
     },
     "sync": {
         "title": "Acceso remoto",

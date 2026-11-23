@@ -982,7 +982,7 @@ static void test_alarm_only(void)
     reset();
     model.pt_ignored = true;
     CHECK(pctl_play_timer_set_alarm_only(true) == NXM_RC_NOT_APPLIED && model.writes == 2 && model.refs == 0);
-    CHECK(memcmp(model.last_write, model.pt_block, 0x44) == 0);
+    CHECK(sizeof(model.last_write) == sizeof(model.pt_block) && memcmp(model.last_write, model.pt_block, sizeof(model.pt_block)) == 0);
     /* The block unreadable after the write: it stands. */
     reset();
     model.fail_nth_command = 145601;

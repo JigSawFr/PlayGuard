@@ -935,6 +935,8 @@
         "pick_title": "選擇Homebrew",
         "pick_none": "SD卡的/switch資料夾中找不到Homebrew。",
         "pick_on_home": "已在 HOME 選單",
+        "pick_search": "搜尋 Homebrew",
+        "pick_search_clear": "顯示全部 Homebrew",
         "name": "HOME選單上的名稱",
         "author": "發行商",
         "confirm_add": "要將{}放到HOME選單上嗎？圖示來自{}。",
@@ -1536,6 +1538,18 @@
         "user_page": "使用者頁面",
         "amiibo": "amiibo設定",
         "maintenance": "維護模式"
+    },
+    "log": {
+        "note": "最新的在前。琥珀色的行表示代理迴圈停止。",
+        "kind": "類型",
+        "shown_count": "{}：{} 行",
+        "none_shown": "沒有此類行。",
+        "filters": {
+            "0": "全部",
+            "1": "應用程式",
+            "2": "遠端連線",
+            "3": "迴圈"
+        }
     },
     "sync": {
         "title": "遠端存取",

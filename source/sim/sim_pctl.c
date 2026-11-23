@@ -446,7 +446,11 @@ void pctl_dump(char *buf, size_t n)
     int used = snprintf(buf, n, "=== pctl state (simulated desktop backend) ===\n"
                         "safety_level=%u pin=%s enabled=%d temp_unlocked=%d\n145601 block:",
                         (unsigned)c.safety_level, c.pin_length ? "set" : "none", (int)c.restriction_enabled, (int)c.temp_unlocked);
-    for (int i = 0; i < PT_U16_COUNT && used > 0 && (size_t)used < n; i++)
-        used += snprintf(buf + used, n - (size_t)used, " %04X", c.block[i]);
-    if (used > 0 && (size_t)used < n) snprintf(buf + used, n - (size_t)used, "\n");
+    size_t len = used > 0 ? (size_t)used : 0;
+    for (int i = 0; i < PT_U16_COUNT && len + 1 < n; i++) {
+        int w = snprintf(buf + len, n - len, " %04X", c.block[i]);
+        if (w < 0 || (size_t)w >= n - len) { len = n - 1; break; }   // cut: stop at the end
+        len += (size_t)w;
+    }
+    if (len + 1 < n) snprintf(buf + len, n - len, "\n");
 }

@@ -935,6 +935,8 @@
         "pick_title": "Homebrew-App wählen",
         "pick_none": "Im Ordner /switch der SD-Karte wurde keine Homebrew-App gefunden.",
         "pick_on_home": "Schon im HOME-Menü",
+        "pick_search": "Homebrew suchen",
+        "pick_search_clear": "Alle Homebrew-Apps zeigen",
         "name": "Name im HOME-Menü",
         "author": "Herausgeber",
         "confirm_add": "{} ins HOME-Menü legen? Das Symbol stammt aus {}.",
@@ -1536,6 +1538,18 @@
         "user_page": "Nutzerseite",
         "amiibo": "amiibo-Einstellungen",
         "maintenance": "Wartungsmodus"
+    },
+    "log": {
+        "note": "Neueste zuerst. Eine bernsteinfarbene Zeile ist ein Halt der Schleife des Agenten.",
+        "kind": "Art",
+        "shown_count": "{}: {} Zeilen",
+        "none_shown": "Keine Zeile dieser Art.",
+        "filters": {
+            "0": "Alle",
+            "1": "App",
+            "2": "Fernzugriff",
+            "3": "Schleife"
+        }
     },
     "sync": {
         "title": "Fernzugriff",
