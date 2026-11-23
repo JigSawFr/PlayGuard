@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Console › Remote access: the remote link's settings (sync.conf), its
-     status, "Sync now" and its log. Filled by
+<!-- Console › Remote access: what is PlayGuard's of the remote link (sync.conf),
+     its status, "Sync now" and its log; the broker's settings are boreale-kit's
+     screen, opened from the "Broker" cell. Filled by
      source/activity/sync_activity.cpp. -->
 
 <aurore:AppletFrame
@@ -34,16 +35,9 @@
             <aurore:DetailCell id="sy_log" title="@i18n/playguard/sync/log"/>
 
             <aurore:Header title="@i18n/playguard/sync/section_broker" marginTop="24" marginBottom="8"/>
-            <aurore:BooleanCell id="sy_enabled"/>
-            <aurore:DetailCell id="sy_host" title="@i18n/playguard/sync/host"/>
-            <aurore:DetailCell id="sy_port" title="@i18n/playguard/sync/port"/>
-            <aurore:BooleanCell id="sy_tls"/>
-            <aurore:DetailCell id="sy_mqtt_version" title="@i18n/playguard/sync/mqtt_version"/>
-            <aurore:DetailCell id="sy_user" title="@i18n/playguard/sync/user"/>
-            <aurore:DetailCell id="sy_password" title="@i18n/playguard/sync/password"/>
+            <aurore:DetailCell id="sy_broker" title="@i18n/playguard/sync/broker"/>
 
             <aurore:Header title="@i18n/playguard/sync/section_console" marginTop="24" marginBottom="8"/>
-            <aurore:DetailCell id="sy_name" title="@i18n/playguard/sync/name"/>
             <aurore:DetailCell id="sy_id" title="@i18n/playguard/sync/id"/>
             <aurore:DetailCell id="sy_policy" title="@i18n/playguard/sync/policy"/>
             <aurore:BooleanCell id="sy_timer"/>

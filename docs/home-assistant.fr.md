@@ -24,7 +24,7 @@ Mosquitto de Home Assistant est le plus simple.
   plus ancien refuse tout l'appareil), avec l'intégration **MQTT** configurée, et un broker : le
   application **Mosquitto broker** (Paramètres › Applications ; un module complémentaire dans un Home Assistant plus ancien) ou tout
   autre broker MQTT, en version 5.0 ou 3.1.1 (EMQX, HiveMQ, NanoMQ, VerneMQ…) :
-  *Accès à distance › Version MQTT* est automatique (5.0, sinon 3.1.1).
+  *Réglages du broker › Version de MQTT* est automatique (5.0, sinon 3.1.1).
 - Un utilisateur du broker pour PlayGuard. Avec l'application Mosquitto, tout
   utilisateur de Home Assistant peut se connecter : créez-en un nommé
   `playguard` (Paramètres › Personnes › Utilisateurs, « connexion depuis le
@@ -35,21 +35,22 @@ Mosquitto de Home Assistant est le plus simple.
 
 ## Le configurer sur la console
 
-1. Ouvrez PlayGuard › **Console › Accès à distance › MQTT / Home
-   Assistant**.
+1. Ouvrez PlayGuard › **Console › Accès à distance › Réglages du broker** :
+   l'écran est partagé avec les autres homebrews Boréale, qui lisent les
+   mêmes réglages.
 2. **Adresse du broker** : l'adresse IP ou le nom de la machine du broker
-   (celle de Home Assistant, pour l'application). **Port** : 1883 (8883 pour TLS,
-   qui active *Connexion chiffrée*).
-3. **Nom d'utilisateur** et **Mot de passe** : l'utilisateur du broker créé
-   plus haut. Un broker qui accepte les clients anonymes : *Nom d'utilisateur
-   › Aucun*.
-4. **Nom dans Home Assistant** : le nom de l'appareil (*Salon*, *Switch de
-   Léa*…). Laissé vide, c'est le surnom de la console (Paramètres de la
-   console › Console › Surnom), ou *Nintendo Switch* quand *Publier les
+   (celle de Home Assistant, pour l'application). **Port** : 1883 (8883 pour
+   TLS : activez aussi *Connexion sécurisée (TLS)*).
+3. **Utilisateur** et **Mot de passe** : l'utilisateur du broker créé plus
+   haut. Un broker qui accepte les clients anonymes : *Utilisateur › Se
+   connecter sans nom d'utilisateur*.
+4. **Nom de la console** : le nom de l'appareil dans Home Assistant (*Salon*,
+   *Switch de Léa*…). Laissé vide, c'est le surnom de la console (Paramètres
+   de la console › Console › Surnom), ou *Nintendo Switch* quand *Publier les
    versions et le matériel* est désactivé.
-5. Activez **Lien à distance**. La console reçoit un identifiant aléatoire
-   (8 caractères, jamais le numéro de série), et **État** affiche *En ligne*
-   en quelques secondes.
+5. Activez **Se connecter au broker**. La console reçoit un identifiant
+   aléatoire (8 caractères, jamais le numéro de série), et **État** (de retour
+   sur *Accès à distance*) affiche *En ligne* en quelques secondes.
 
 Changer l'un de ces réglages demande le code PIN quand *Sécurité › Protéger PlayGuard par le
 code PIN* vaut *Avant un changement* : le lien peut modifier la console.
@@ -333,7 +334,7 @@ la page de l'appareil.
   clair. Aucun de ces fichiers n'est jamais dans un rapport de diagnostic ni
   dans un envoi en ligne ; la section *Remote link* du
   rapport ne contient que les interrupteurs et les compteurs.
-- **TLS** : port 8883 et *Connexion chiffrée*. La console vérifie le
+- **TLS** : port 8883 et *Connexion sécurisée (TLS)*. La console vérifie le
   certificat du broker avec son propre magasin de certificats ; pour une
   autorité de certification privée, copiez son fichier PEM sur la carte SD et
   ajoutez `ca_file=/config/playguard/sync/ca.pem` dans `link.conf`. TLS n'a
@@ -354,12 +355,12 @@ lignes (en anglais) :
 
 | État | À vérifier |
 |---|---|
-| *Incomplet : l'adresse du broker manque* | Renseignez *Adresse du broker*. |
+| *Incomplet : l'adresse du broker manque* | Renseignez *Adresse du broker* (*Réglages du broker*). |
 | *Non connecté : cannot find …* | Le nom n'est pas résolu : utilisez l'adresse IP. |
 | *Non connecté : connect: Connection refused* / *no answer from the broker* | Mauvaise adresse ou mauvais port, broker arrêté, ou pare-feu. |
 | *Non connecté : the broker refused the connection: bad user name or password* | Le nom d'utilisateur ou le mot de passe. |
 | *Non connecté : the broker refused a subscription* | La liste d'accès de l'utilisateur (plus haut). |
-| *Non connecté : the broker does not speak this MQTT version* | *Version MQTT* est réglée sur une version que le broker refuse : remettez *Automatique*. |
+| *Non connecté : the broker does not speak this MQTT version* | *Version de MQTT* est réglée sur une version que le broker refuse : remettez *Automatique*. |
 | *Non connecté : the broker does not keep retained messages* | Le broker (5.0) dit ne pas garder les messages retenus ; le lien en a besoin : activez-les dans ses réglages. |
 
 La console réessaie d'elle-même : après 5 secondes, puis deux fois plus

@@ -339,7 +339,6 @@ DYNAMIC_KEYS = {
                        for i in re.findall(r'"(\w+)"', ids)],
     # The remote link (sync_activity.cpp, sync_orders.cpp) and the optional
     # modules (modules_activity.cpp, agent_update.cpp).
-    "sync/mqtt_versions/": array_of("source/activity/sync_activity.cpp", "KEYS"),
     "sync/policies/": returned_by("library/boreale-link/modules/playguard/sync/sync_conf.c", "sync_policy_name"),
     # "unknown": an enumerator out of range, never in an outcome.
     "sync/reasons/": [r for r in returned_by("library/boreale-link/modules/playguard/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
