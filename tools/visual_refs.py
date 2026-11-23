@@ -20,7 +20,8 @@ release's, and which a checkout without a cache fetches.
                                 one: the latest release's zip (--release
                                 TAG for another, --zip FILE for a local
                                 one), or a run's refs artifacts with
-                                --run ID (gh)
+                                --run ID (gh); a scenario the release
+                                predates comes from main's last run (gh)
   zip <refs-dir> <out.zip>      the references as a release attaches them
   diff <before-dir> <after-dir> what changed between two sets (two
                                 releases' zips unpacked): --json the
@@ -114,21 +115,48 @@ def unzip_refs(zip_path, into, only=None):
     return done
 
 
+def fetch_run(run, wanted, into):
+    """The refs artifacts of workflow run `run` (gh) for the scenarios of
+    `wanted` into `into`; returns the scenarios got, none when gh cannot
+    have them (not installed or signed in, artifacts expired)."""
+    got = set()
+    with tempfile.TemporaryDirectory() as tmp:
+        try:
+            subprocess.run(["gh", "run", "download", run, "-R", REPO, "-p", "*-refs-*", "-D", tmp],
+                           check=True, capture_output=True, text=True)
+        except (OSError, subprocess.CalledProcessError) as e:
+            print(f"run {run}: no refs artifacts ({(getattr(e, 'stderr', '') or str(e)).strip().splitlines()[-1:] or 'gh'})")
+            return got
+        for folder in os.listdir(tmp):
+            for sc in os.listdir(os.path.join(tmp, folder)):
+                if sc in wanted and os.path.isdir(os.path.join(tmp, folder, sc)):
+                    shutil.copytree(os.path.join(tmp, folder, sc), os.path.join(into, sc), dirs_exist_ok=True)
+                    got.add(sc)
+    return got
+
+
+def latest_main_run():
+    """The id of the last successful push run of build.yml on main (gh), or
+    None."""
+    try:
+        p = subprocess.run(["gh", "run", "list", "-R", REPO, "-w", "build.yml", "-b", "main", "-e", "push",
+                            "-s", "success", "-L", "1", "--json", "databaseId", "-q", ".[0].databaseId"],
+                           capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    out = p.stdout.strip()
+    return out if p.returncode == 0 and out.isdigit() else None
+
+
 def cmd_fetch(a):
     wanted = [s for s in scenarios(a.scenarios) if a.force or not os.path.isdir(os.path.join(a.refs, s))]
     if not wanted:
         print("every scenario has its references already")
         return 0
     os.makedirs(a.refs, exist_ok=True)
+    notes = {}
     if a.run:
-        with tempfile.TemporaryDirectory() as tmp:
-            subprocess.run(["gh", "run", "download", a.run, "-R", REPO, "-p", "*-refs-*", "-D", tmp], check=True)
-            got = set()
-            for folder in os.listdir(tmp):
-                for sc in os.listdir(os.path.join(tmp, folder)):
-                    if sc in wanted and os.path.isdir(os.path.join(tmp, folder, sc)):
-                        shutil.copytree(os.path.join(tmp, folder, sc), os.path.join(a.refs, sc), dirs_exist_ok=True)
-                        got.add(sc)
+        got = fetch_run(a.run, set(wanted), a.refs)
         source = f"run {a.run}"
     else:
         if a.zip:
@@ -145,8 +173,20 @@ def cmd_fetch(a):
         got = unzip_refs(zip_path, a.refs, set(wanted))
         if not a.zip:
             os.remove(zip_path)
+        # A release only has the scenarios that existed when it was built (a
+        # scenario added since is in no zip until the next release): those
+        # come from main's last run, which keeps every scenario's screens.
+        missing = [sc for sc in wanted if sc not in got]
+        if missing and not a.zip and not a.release:
+            run = latest_main_run()
+            if run:
+                print(f"{', '.join(missing)}: not in {source}, which predates them: main's run {run} instead")
+                after = fetch_run(run, set(missing), a.refs)
+                got |= after
+                for sc in after:
+                    notes[sc] = f"run {run}"
     for sc in wanted:
-        print(f"{sc}: {'fetched' if sc in got else 'not in'} {source}")
+        print(f"{sc}: {'fetched from ' + notes.get(sc, source) if sc in got else 'not in ' + source}")
     return 0
 
 

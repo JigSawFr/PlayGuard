@@ -50,6 +50,7 @@ Locally, the same check against main's screens:
 ```sh
 make desktop
 python3 tools/visual_refs.py fetch                  # the latest release's playguard-screens.zip into .visual-refs/
+                                                    # (a scenario added since that release comes from main's last run, with gh signed in)
 python3 tools/visual_refs.py fetch --run <run id>   # or a run's refs artifacts, with gh signed in
 xvfb-run -s "-screen 0 1280x720x24" python3 tools/desktop_smoke.py smoke
 python3 tools/visual_check.py smoke .visual-refs/smoke --screens tests/visual/smoke/SCREENS --scenario smoke
