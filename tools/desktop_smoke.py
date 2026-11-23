@@ -1937,9 +1937,15 @@ if MODULES:
     key("Up")                    # Overview
     key("Right")                 # its first module
     shot("07_overview")          # the intro, each module's state
+    key("Down")                  # the agent
+    key("Return")                # Ⓐ opens boreale-kit's screen for it
+    time.sleep(0.5)
+    shot("08_agent")             # its state, Install (the app carries no copy here: the screen says so)
+    key("Escape")                # back on the overview, the agent's cell
+    key("Up")                    # the recovery module
     key("Return")                # Ⓐ opens that module's tab
     time.sleep(0.5)
-    shot("08_rescue_tab")
+    shot("09_rescue_tab")
 
     def recorded():
         try:

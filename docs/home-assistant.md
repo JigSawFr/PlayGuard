@@ -54,7 +54,7 @@ The **agent** is a small optional background module (an Atmosphère
 sysmodule, [`sysmodule/agent`](https://github.com/JigSawFr/boreale-link/blob/main/agent/README.md)) that holds the
 same link while PlayGuard is closed, with the same settings:
 
-1. PlayGuard › **Console › Optional modules › Remote link agent › Install**
+1. PlayGuard › **Console › Optional modules › Boréale agent › Install**
    (PlayGuard carries it; or extract `boreale-link.zip` from the release at
    the SD card's root). It starts at once, and at every boot.
 2. Nothing else to set up: it reads *Remote access*. Its **Status** then reads

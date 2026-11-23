@@ -3,8 +3,9 @@
 // (util/modules.hpp): the recovery module (acts once at boot when a RESCUE
 // file asks it to) and the remote-link agent (keeps the link up while
 // PlayGuard is closed). A sidebar, as on the main screen: an overview (what
-// they are, each one's state; Ⓐ opens its tab), then a tab per module with
-// its state, Install / Update, At boot, Start / Stop now (the agent), Remove.
+// they are, each one's state; Ⓐ opens the recovery module's tab, or the
+// agent's own screen, which is boreale-kit's AgentActivity), then the
+// recovery module's tab with its state, Install / Update, At boot, Remove.
 // Every change asks for the PIN as a console change does: the recovery
 // module can unlock the console.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
@@ -18,7 +19,7 @@ class ModulesActivity : public aurore::Activity
 {
   public:
     // The tab opened first: the overview, or a module's.
-    enum class Tab { Overview, Rescue, Agent };
+    enum class Tab { Overview, Rescue };
 
     explicit ModulesActivity(Tab first = Tab::Overview);
 
@@ -30,7 +31,7 @@ class ModulesActivity : public aurore::Activity
     // "Installed", "Update available" … short enough to share one line with
     // the title of a cell that opens this screen (and the overview's), and
     // its colour when `color` is given.
-    static std::string summary(modules::Id id, const char** color = nullptr);
+    static std::string summary(modules::Id id, const char** color = nullptr);   // the recovery module's
 
   private:
     Tab start;

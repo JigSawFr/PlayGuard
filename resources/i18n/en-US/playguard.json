@@ -1695,12 +1695,8 @@
         "install": "Install",
         "update": "Update",
         "at_boot": "Start at boot",
-        "start": "Start now",
-        "stop": "Stop now",
         "remove": "Remove",
         "removed": "Module removed.",
-        "started": "Module started.",
-        "stopped": "Module stopped.",
         "error": "The module could not be changed",
         "meta_err": "The module is installed, but its version could not be written on the SD card: it may be offered again",
         "locked_out": "Locked out?",
@@ -1709,8 +1705,6 @@
             "not_bundled": "Not in this build",
             "installed": "Installed, up to date",
             "update": "Installed, an update is available",
-            "running": "running",
-            "stopped": "stopped",
             "none": "None installed"
         },
         "short": {
@@ -1748,13 +1742,6 @@
         },
         "agent": {
             "title": "Remote link agent",
-            "tab": "Link agent",
-            "about": "Keeps the link to Home Assistant (Console › Remote access) running while PlayGuard is closed: orders are carried out and the state stays up to date.",
-            "install_body": "Install and start the agent (version {})? It starts at each boot and uses the settings of Remote access.",
-            "update_body": "Update the agent to version {}? It stops for a moment and starts again.",
-            "installed": "Agent installed and started.",
-            "updated": "Agent updated.",
-            "remove_body": "Stop and remove the agent? The remote link then runs only while PlayGuard is open.",
             "other_protocol": "it speaks protocol {}",
             "offer_body": "The remote link agent on the SD card is not the one this PlayGuard carries (version {}). Update it now? It stops for a moment, and the previous one is put back if the new one does not answer.",
             "offer_refused": "It speaks an older protocol: the remote link does not work until it is updated."

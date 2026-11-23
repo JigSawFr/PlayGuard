@@ -344,11 +344,13 @@ DYNAMIC_KEYS = {
     # "unknown": an enumerator out of range, never in an outcome.
     "sync/reasons/": [r for r in returned_by("library/boreale-link/modules/playguard/sync/sync_apply.c", "sync_reason_name") if r != "unknown"],
     "modules/": [f"{name}/{what}"
-                 for name in re.findall(r'\{\s*\{\s*"(\w+)",', read(f"{ROOT}/source/util/modules.cpp"))
+                 # The agent's screen is boreale-kit's: only the recovery module's tab builds keys.
+                 for name in re.findall(r'\{\s*\{\s*"(\w+)",', read(f"{ROOT}/source/util/modules.cpp")) if name != "agent"
                  for call in re.findall(r"\bkey\(\w+,\s*([^;)]*)\)", read(f"{ROOT}/source/activity/modules_activity.cpp"))
                  for what in strings_of(call)],
     "modules/done/": [v for path in ("source/activity/modules_activity.cpp", "source/action/agent_update.cpp",
-                                      "library/boreale-kit/source/action/sysmodule_flow.cpp")
+                                      "library/boreale-kit/source/action/sysmodule_flow.cpp",
+                                      "library/boreale-kit/source/action/agent_manage_flow.cpp")
                       for call in re.findall(r"\brecord\(([^;{]*?)\);", read(f"{ROOT}/{path}"))
                       for v in strings_of(call)],
 }

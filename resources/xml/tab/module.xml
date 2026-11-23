@@ -28,7 +28,6 @@
             <aurore:DetailCell id="md_status" title="@i18n/playguard/modules/status"/>
             <aurore:DetailCell id="md_action" title="@i18n/playguard/modules/install"/>
             <aurore:BooleanCell id="md_boot"/>
-            <aurore:DetailCell id="md_run" title="@i18n/playguard/modules/start"/>
             <aurore:DetailCell id="md_remove" title="@i18n/playguard/modules/remove"/>
 
         </aurore:Box>

@@ -1695,12 +1695,8 @@
         "install": "Installieren",
         "update": "Aktualisieren",
         "at_boot": "Beim Systemstart starten",
-        "start": "Jetzt starten",
-        "stop": "Jetzt beenden",
         "remove": "Entfernen",
         "removed": "Modul entfernt.",
-        "started": "Modul gestartet.",
-        "stopped": "Modul beendet.",
         "error": "Das Modul konnte nicht geändert werden",
         "meta_err": "Das Modul ist installiert, aber seine Version konnte nicht auf die SD-Karte geschrieben werden: Es wird eventuell erneut angeboten",
         "locked_out": "Ausgesperrt?",
@@ -1709,8 +1705,6 @@
             "not_bundled": "Nicht in diesem Build",
             "installed": "Installiert, aktuell",
             "update": "Installiert, ein Update ist verfügbar",
-            "running": "läuft",
-            "stopped": "beendet",
             "none": "Keines installiert"
         },
         "short": {
@@ -1748,13 +1742,6 @@
         },
         "agent": {
             "title": "Agent der Fernverbindung",
-            "tab": "Verbindungsagent",
-            "about": "Hält die Verbindung zu Home Assistant (Konsole › Fernzugriff) aufrecht, während PlayGuard geschlossen ist: Befehle werden ausgeführt, und der Status bleibt aktuell.",
-            "install_body": "Den Agenten (Version {}) installieren und starten? Er startet bei jedem Systemstart und verwendet die Einstellungen unter Fernzugriff.",
-            "update_body": "Den Agenten auf Version {} aktualisieren? Er hält kurz an und startet dann neu.",
-            "installed": "Agent installiert und gestartet.",
-            "updated": "Agent aktualisiert.",
-            "remove_body": "Den Agenten anhalten und entfernen? Die Fernverbindung läuft dann nur, während PlayGuard geöffnet ist.",
             "other_protocol": "er spricht Protokoll {}",
             "offer_body": "Der Agent der Fernverbindung auf der SD-Karte ist nicht der, den dieses PlayGuard mitbringt (Version {}). Jetzt aktualisieren? Er hält kurz an, und der vorherige wird wiederhergestellt, wenn der neue nicht antwortet.",
             "offer_refused": "Er spricht ein älteres Protokoll: Die Fernverbindung funktioniert erst, wenn er aktualisiert ist."

@@ -1695,12 +1695,8 @@
         "install": "Instalar",
         "update": "Atualizar",
         "at_boot": "Iniciar com o console",
-        "start": "Iniciar agora",
-        "stop": "Parar agora",
         "remove": "Remover",
         "removed": "Módulo removido.",
-        "started": "Módulo iniciado.",
-        "stopped": "Módulo parado.",
         "error": "Não foi possível alterar o módulo",
         "meta_err": "O módulo está instalado, mas não foi possível gravar a versão dele no cartão SD: ele poderá ser oferecido de novo",
         "locked_out": "Sem acesso?",
@@ -1709,8 +1705,6 @@
             "not_bundled": "Não incluído nesta compilação",
             "installed": "Instalado, atualizado",
             "update": "Instalado, há uma atualização disponível",
-            "running": "em execução",
-            "stopped": "parado",
             "none": "Nenhum instalado"
         },
         "short": {
@@ -1748,13 +1742,6 @@
         },
         "agent": {
             "title": "Agente da conexão remota",
-            "tab": "Agente da conexão",
-            "about": "Mantém ativa a conexão com o Home Assistant (Console › Acesso remoto) enquanto o PlayGuard está fechado: as ordens são executadas e o estado continua atualizado.",
-            "install_body": "Instalar e iniciar o agente (versão {})? Ele é iniciado com o console e usa as configurações do Acesso remoto.",
-            "update_body": "Atualizar o agente para a versão {}? Ele para por um instante e inicia de novo.",
-            "installed": "Agente instalado e iniciado.",
-            "updated": "Agente atualizado.",
-            "remove_body": "Parar e remover o agente? A conexão remota passa a funcionar só enquanto o PlayGuard estiver aberto.",
             "other_protocol": "ele usa o protocolo {}",
             "offer_body": "O agente da conexão remota no cartão SD não é o que este PlayGuard traz (versão {}). Atualizar agora? Ele para por um instante, e o anterior volta se o novo não responder.",
             "offer_refused": "Ele usa um protocolo mais antigo: a conexão remota não funciona até ele ser atualizado."
