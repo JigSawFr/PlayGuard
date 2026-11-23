@@ -934,6 +934,7 @@
         "state_elsewhere": "Criado por outra aplicação",
         "pick_title": "Escolha um homebrew",
         "pick_none": "Não foi encontrado nenhum homebrew na pasta /switch do cartão SD.",
+        "pick_on_home": "Já no menu HOME",
         "name": "Nome no menu HOME",
         "author": "Editora",
         "confirm_add": "Colocar {} no menu HOME? O seu ícone vem de {}.",

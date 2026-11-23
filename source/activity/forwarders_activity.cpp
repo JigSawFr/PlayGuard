@@ -2,10 +2,12 @@
 #include "activity/forwarders_activity.hpp"
 
 #include <algorithm>
+#include <set>
 
 #include <aurore/cadran/ui/cadran_kit.hpp>
 #include <aurore/cadran/ui/cadran_list.hpp>
 #include <aurore/cadran/ui/cadran_text.hpp>
+#include <aurore/cadran/util/text.hpp>
 #include <aurore/cadran/view/cadran_icon.hpp>
 
 #include "action/forwarder_flow.hpp"
@@ -772,16 +774,34 @@ void ForwardersActivity::pick_homebrew()
         ui::info("playguard/forwarders/pick_none"_i18n);
         return;
     }
-    std::vector<std::string> names, paths_shown;
+    // The forwarders already made, to say so in the list.
+    std::set<std::string> on_home;
+    for (const forwarders_logic::Row& r : forwarder_flow::rows())
+        if (!r.nro.empty()) on_home.insert(r.nro);
+    struct Entry
+    {
+        std::string path, name, detail;
+    };
+    std::vector<Entry> entries;
     for (const std::string& p : found) {
         nro::Info info;
         nro::read((paths::sd_root() == "/" ? std::string() : paths::sd_root()) + p, info);
-        names.push_back(forwarders_logic::default_name(info.name, p));
-        paths_shown.push_back(p);
+        const bool made = on_home.count(nro::sdmc_path(p)) > 0;
+        entries.push_back({p, forwarders_logic::default_name(info.name, p),
+                           forwarders_logic::pick_detail(info.author, info.version, p, made ? "playguard/forwarders/pick_on_home"_i18n : std::string())});
+    }
+    std::stable_sort(entries.begin(), entries.end(), [](const Entry& a, const Entry& b) {
+        return text::lower_ascii(a.name) < text::lower_ascii(b.name);
+    });
+    std::vector<std::string> names, details, paths;
+    for (const Entry& e : entries) {
+        names.push_back(e.name);
+        details.push_back(e.detail);
+        paths.push_back(e.path);
     }
     std::weak_ptr<bool> weak = this->alive;
-    ui::pick("playguard/forwarders/pick_title"_i18n, names, 0, [this, weak, found](int index) {
-        if (weak.expired() || index < 0 || (size_t)index >= found.size()) return;
-        forwarder_flow::create(found[(size_t)index], this->then_rebuild());
-    }, false, paths_shown);
+    ui::pick("playguard/forwarders/pick_title"_i18n, names, 0, [this, weak, paths](int index) {
+        if (weak.expired() || index < 0 || (size_t)index >= paths.size()) return;
+        forwarder_flow::create(paths[(size_t)index], this->then_rebuild());
+    }, false, details);
 }
