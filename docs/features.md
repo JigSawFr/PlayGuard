@@ -470,7 +470,7 @@ On a console without Internet, *Use the console clock* is offered in the result'
 
 ### Optional modules
 
-*Optional modules ›*, a tile under *Tools*: install, update, start at boot or remove the recovery module (its own tab) and the Boréale agent, which keeps the remote link up (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
+*Optional modules ›*, a tile under *Tools*: install, update, start at boot or remove the recovery module (its own screen, a list like the agent's) and the Boréale agent, which keeps the remote link up (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
 
 ### The console's lines
 

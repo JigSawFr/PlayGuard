@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Console › Optional modules: a sidebar, as on the main screen: an overview
-     (what these modules are, and each one's state), then a tab per module
-     (the recovery module, the remote-link agent), so each is a press away.
-     The tabs are added by source/activity/modules_activity.cpp. -->
+<!-- Console › Optional modules: what these modules are, then a cell per module
+     with its state (Ⓐ opens its screen). Filled by
+     source/activity/modules_activity.cpp. -->
 
 <aurore:AppletFrame
-    iconInterpolation="linear"
-    footerHidden="false">
+    iconInterpolation="linear">
 
-    <aurore:TabFrame
-        id="md_tabs"
+    <ScrollView
         title="@i18n/playguard/modules/title"
-        icon="@res/img/app_icon.png"/>
+        icon="@res/img/app_icon.png"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <aurore:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
+
+            <aurore:Label id="md_intro" text="@i18n/playguard/modules/intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="md_rescue" title="@i18n/playguard/modules/rescue/tab"/>
+            <aurore:DetailCell id="md_agent" title="@i18n/playguard/modules/agent/title"/>
+
+        </aurore:Box>
+
+    </ScrollView>
 
 </aurore:AppletFrame>

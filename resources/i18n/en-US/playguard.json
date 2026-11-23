@@ -1662,8 +1662,6 @@
     "modules": {
         "title": "Optional modules",
         "open": "Optional modules",
-        "section": "Optional modules",
-        "overview": "Overview",
         "count": "{} installed",
         "count_one": "1 installed",
         "intro": "Two small background programs (sysmodules) PlayGuard can put on the SD card. Neither is needed, and each does one thing. PlayGuard carries the version made with it and installs or updates it from here, without a computer. Every change asks for the PIN when Security › Protect PlayGuard with the PIN asks for it before a change.",

@@ -2,11 +2,8 @@
 #include "activity/modules_activity.hpp"
 
 #include <format>
-#include <iterator>
 #include <memory>
 
-#include <aurore/cadran/ui/cadran_frame.hpp>
-#include <aurore/cadran/ui/cadran_kit.hpp>
 #include <aurore/cadran/ui/cadran_list.hpp>
 
 #include "action/agent_update.hpp"
@@ -16,7 +13,6 @@
 #include "action/pin_lock.hpp"
 #include "action/rescue.hpp"
 #include "app.hpp"
-#include "tab/tab_base.hpp"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
 #include "util/pctl_ops_c.hpp"
@@ -70,85 +66,23 @@ std::string state_text(modules::Id id, bool brief, const char** color)
     return text;
 }
 
-// The recovery module's tab: what it does, then its cells. Tabs are deleted when
-// another one is opened: what ends later refreshes through refresher()
-// (TabBase's `alive`), never through `this`.
-class ModuleTab : public TabBase
+}   // namespace
+
+ModuleActivity::ModuleActivity(modules::Id which) : id(which)
 {
-  public:
-    explicit ModuleTab(modules::Id which);
-
-  protected:
-    void refresh() override;
-
-  private:
-    modules::Id id;
-    cadran::List list;
-
-    void install();
-    void uninstall();
-
-    AURORE_BIND(aurore::Header,      header, "md_header");
-    AURORE_BIND(aurore::Label,       about,  "md_about");
-    AURORE_BIND(aurore::DetailCell,  status, "md_status");
-    AURORE_BIND(aurore::DetailCell,  action, "md_action");
-    AURORE_BIND(aurore::BooleanCell, boot,   "md_boot");
-    AURORE_BIND(aurore::DetailCell,  remove, "md_remove");
-};
-
-// The overview: what the modules are, and each one's state (Ⓐ opens the
-// recovery module's tab, or the agent's own screen, boreale-kit's).
-class ModulesOverview : public TabBase
-{
-  public:
-    ModulesOverview();
-
-  protected:
-    void refresh() override;
-
-  private:
-    cadran::List list;
-    AURORE_BIND(aurore::Label,      intro,  "md_intro");
-    AURORE_BIND(aurore::DetailCell, rescue, "md_rescue");
-    AURORE_BIND(aurore::DetailCell, agent,  "md_agent");
-};
-
-// Sidebar positions (the separator counts).
-constexpr int TAB_RESCUE   = 2;
-
-ModulesOverview::ModulesOverview() : TabBase("xml/tab/modules_overview.xml"), list(this)
-{
-    intro->setSingleLine(false);
-    rescue->registerClickAction([this](aurore::View*) {
-        ui::go_to_tab(this, TAB_RESCUE);
-        return true;
-    });
-    agent->registerClickAction([this](aurore::View*) {
-        // The screen is the kit's, shared with the other apps; the PIN and the
-        // history are PlayGuard's, through the flow's hooks.
-        agent_update::install_hooks();
-        aurore::Application::pushActivity(new AgentActivity());
-        return true;
-    });
-    this->list.apply({ { "md_rescue", "unlock" }, { "md_agent", "server" } });
 }
 
-void ModulesOverview::refresh()
+void ModuleActivity::onResume()
 {
-    const char* color = nullptr;
-    rescue->setDetailText(ModulesActivity::summary(modules::Id::Rescue, &color));
-    rescue->detail->setThemeColor("textColor", color);
-    agent->setDetailText(AgentActivity::summary(&color));
-    agent->detail->setThemeColor("textColor", color);
-    this->list.sync();
+    this->refresh();
+    ui::keep_focus(this);   // after a dialog whose opener went (ui.hpp)
 }
 
-ModuleTab::ModuleTab(modules::Id which) : TabBase("xml/tab/module.xml"), id(which), list(this)
+void ModuleActivity::onContentAvailable()
 {
-    const modules::Module& m = modules::get(which);
-    header->setTitle(aurore::getStr(key(m, "title")));
+    const modules::Id which = this->id;
     about->setSingleLine(false);
-    about->setText(aurore::getStr(key(m, "about")));
+    about->setText(aurore::getStr(key(modules::get(which), "about")));
 
     status->registerClickAction([which](aurore::View*) {
         const modules::Module& mod = modules::get(which);
@@ -183,11 +117,13 @@ ModuleTab::ModuleTab(modules::Id which) : TabBase("xml/tab/module.xml"), id(whic
         this->uninstall();
         return true;
     });
-    this->list.apply({ { "md_status", "info" }, { "md_action", "download" }, { "md_boot", "bolt" },
-                       { "md_remove", "trash" } });
+    this->list = std::make_unique<cadran::List>(this->getContentView(), true);
+    this->list->apply({ { "md_status", "info" }, { "md_action", "download" }, { "md_boot", "bolt" },
+                        { "md_remove", "trash" } });
+    this->refresh();
 }
 
-void ModuleTab::install()
+void ModuleActivity::install()
 {
     const modules::Module& m = modules::get(id);
     const modules::Bundle b = modules::bundled(bundled_modules::dir(), m);
@@ -199,7 +135,7 @@ void ModuleTab::install()
     const bool update = s.installed;
     const std::string body = aurore::getStr(key(m, update ? "update_body" : "install_body"), b.version);
     const modules::Id mid = this->id;
-    const std::function<void()> refresh_tab = this->refresher();
+    const std::function<void()> refresh_tab = ui::guarded(this->alive, [this]() { this->refresh(); });
     ui::confirm(body, update ? "playguard/modules/update"_i18n : "playguard/modules/install"_i18n, [mid, b, update, refresh_tab]() {
         const modules::Module& target = modules::get(mid);
         if (!allowed()) return;
@@ -226,12 +162,12 @@ void ModuleTab::install()
     });
 }
 
-void ModuleTab::uninstall()
+void ModuleActivity::uninstall()
 {
     const modules::Module& m = modules::get(id);
     if (!modules::state(paths::sd_root(), m).installed) return;
     const modules::Id mid = this->id;
-    const std::function<void()> refresh_tab = this->refresher();
+    const std::function<void()> refresh_tab = ui::guarded(this->alive, [this]() { this->refresh(); });
     ui::confirm_danger(aurore::getStr(key(m, "remove_body")), "playguard/modules/remove"_i18n, [mid, refresh_tab]() {
         const modules::Module& target = modules::get(mid);
         if (!allowed()) return;
@@ -246,7 +182,7 @@ void ModuleTab::uninstall()
     });
 }
 
-void ModuleTab::refresh()
+void ModuleActivity::refresh()
 {
     const modules::Module& m = modules::get(id);
     const modules::State s = modules::state(paths::sd_root(), m);
@@ -263,50 +199,7 @@ void ModuleTab::refresh()
     boot->setOn(s.at_boot, false);
     ui::set_visible(boot, s.installed);
     ui::set_visible(remove, s.installed);
-    this->list.sync();
-}
-
-// The rail, always open, its icons before the names: Cadran's own
-// (cadran::style_rail) is the main screen's, the one that folds, and there is
-// one. Its names shrink to fit, as there.
-void dress_rail(aurore::View* tab_frame)
-{
-    static const char* const ICONS[] = { "list", "", "unlock" };
-    auto* sidebar = dynamic_cast<aurore::Sidebar*>(tab_frame->getView("aurore/tab_frame/sidebar"));
-    aurore::SidebarItem* first = sidebar ? sidebar->getItem(0) : nullptr;
-    aurore::Box* list = first ? first->getParent() : nullptr;
-    if (!list) return;
-    list->setPadding(6, 8, 10, 16);
-    size_t position = 0;
-    for (aurore::View* v : list->getChildren()) {
-        const char* name = position < std::size(ICONS) ? ICONS[position] : "";
-        position++;
-        auto* item = dynamic_cast<aurore::SidebarItem*>(v);
-        if (!item) continue;   // a separator
-        item->setHeight(52);
-        item->setPaddingLeft(12);
-        item->setPaddingRight(12);
-        item->setAlignItems(aurore::AlignItems::CENTER);
-        // The active tab says so in teal; no accent bar beside it.
-        if (auto* accent = item->getView("aurore/sidebar/item_accent")) {
-            accent->setWidth(0);
-            accent->setMargins(0, 0, 0, 0);
-            accent->setVisibility(aurore::Visibility::GONE);
-        }
-        if (auto* label = dynamic_cast<aurore::Label*>(item->getView("aurore/sidebar/item_label"))) {
-            label->setFontSize(17);
-            label->setFontScaleMax(1.25f);
-            label->setShrinkToFit(true);
-            label->setSingleLine(true);
-            label->setMargins(0, 0, 0, *name ? 10 : 4);
-        }
-        if (*name) item->addView(cadran::kit::icon(name, 22), 0);
-    }
-}
-}   // namespace
-
-ModulesActivity::ModulesActivity(Tab first) : start(first)
-{
+    if (this->list) this->list->sync();
 }
 
 std::string ModulesActivity::summary(modules::Id id, const char** color)
@@ -314,25 +207,37 @@ std::string ModulesActivity::summary(modules::Id id, const char** color)
     return state_text(id, true, color);
 }
 
+void ModulesActivity::refresh()
+{
+    const char* color = nullptr;
+    rescue->setDetailText(summary(modules::Id::Rescue, &color));
+    rescue->detail->setThemeColor("textColor", color);
+    agent->setDetailText(AgentActivity::summary(&color));
+    agent->detail->setThemeColor("textColor", color);
+    if (this->list) this->list->sync();
+}
+
 void ModulesActivity::onResume()
 {
+    this->refresh();   // back from a module's screen: its new state
     ui::keep_focus(this);   // after a dialog whose opener went (ui.hpp)
 }
 
 void ModulesActivity::onContentAvailable()
 {
-    tabs->addTab("playguard/modules/overview"_i18n, []() { return new ModulesOverview(); });
-    tabs->addSeparator();
-    tabs->addTab("playguard/modules/rescue/tab"_i18n, []() { return new ModuleTab(modules::Id::Rescue); });
-    // Dressed here, not by the screens' skin (Cadran's), which would take
-    // the sidebar for the list: the header, and the rail.
-    cadran::style_header(dynamic_cast<aurore::AppletFrame*>(this->getContentView()), nullptr, "", false, false);
-    dress_rail(tabs.getView());
-
-    if (start != Tab::Overview) {
-        aurore::sync([this]() {
-            auto stack = aurore::Application::getActivitiesStack();
-            if (!stack.empty() && stack.back() == this) tabs->focusTab(TAB_RESCUE);
-        });
-    }
+    intro->setSingleLine(false);
+    rescue->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new ModuleActivity(modules::Id::Rescue));
+        return true;
+    });
+    agent->registerClickAction([](aurore::View*) {
+        // The screen is the kit's, shared with the other apps; the PIN and the
+        // history are PlayGuard's, through the flow's hooks.
+        agent_update::install_hooks();
+        aurore::Application::pushActivity(new AgentActivity());
+        return true;
+    });
+    this->list = std::make_unique<cadran::List>(this->getContentView(), true);
+    this->list->apply({ { "md_rescue", "unlock" }, { "md_agent", "server" } });
+    this->refresh();
 }
