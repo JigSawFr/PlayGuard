@@ -1757,7 +1757,8 @@
         "config_stuck": "No se pudieron leer las preferencias de PlayGuard ni apartarlas: se usan los valores predeterminados y por ahora no se guardará nada, para no sobrescribir el archivo. Revise la tarjeta SD.",
         "history_reset": "No se pudo leer el historial de cambios, así que se empezó uno nuevo. El archivo dañado se guardó como history.json.bad.",
         "history_stuck": "No se pudo leer el historial de cambios ni apartarlo: por ahora no se registrará en él ningún cambio. Revise la tarjeta SD.",
-        "rescue_unreadable": "Se encontró un informe del sysmodule de recuperación, pero no se pudo leer, así que PlayGuard no puede saber qué hizo. Revise el PIN y el tiempo de juego."
+        "rescue_unreadable": "Se encontró un informe del sysmodule de recuperación, pero no se pudo leer, así que PlayGuard no puede saber qué hizo. Revise el PIN y el tiempo de juego.",
+        "newer": "Algunos archivos los escribió un PlayGuard más reciente y se dejan como están, así que los cambios de ahora no se guardan en ellos: {}. Actualiza PlayGuard para cambiarlos."
     },
     "sys_notes": {
         "title": "Notas de la versión · {}",

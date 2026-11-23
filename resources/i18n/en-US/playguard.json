@@ -1757,7 +1757,8 @@
         "config_stuck": "PlayGuard's settings could not be read, nor put aside: the defaults are used, and nothing will be saved for now so the file is not overwritten. Check the SD card.",
         "history_reset": "The change history could not be read, so a new one was started; the damaged file was kept as history.json.bad.",
         "history_stuck": "The change history could not be read, nor put aside: no change will be recorded in it for now. Check the SD card.",
-        "rescue_unreadable": "A report from the recovery sysmodule was found but could not be read, so PlayGuard cannot tell what it did. Check the PIN and the play timer."
+        "rescue_unreadable": "A report from the recovery sysmodule was found but could not be read, so PlayGuard cannot tell what it did. Check the PIN and the play timer.",
+        "newer": "Some files were written by a newer PlayGuard and are left as they are, so changes made now are not saved in them: {}. Update PlayGuard to change them."
     },
     "sys_notes": {
         "title": "Release notes · {}",

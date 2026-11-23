@@ -30,6 +30,8 @@ static bool s_shared_newer = false, s_state_newer = false;
 
 Config& get() { return s_config; }
 Loaded loaded() { return s_loaded; }
+bool shared_newer() { return s_shared_newer; }
+bool state_newer() { return s_state_newer; }
 
 namespace
 {

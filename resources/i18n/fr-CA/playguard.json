@@ -1757,7 +1757,8 @@
         "config_stuck": "Les réglages de PlayGuard n'ont pas pu être lus, ni mis de côté : les valeurs par défaut sont utilisées et rien ne sera enregistré pour l'instant, pour ne pas écraser le fichier. Vérifiez la carte SD.",
         "history_reset": "L'historique des modifications n'a pas pu être lu, un nouveau a donc été commencé. Le fichier endommagé a été gardé en history.json.bad.",
         "history_stuck": "L'historique des modifications n'a pas pu être lu, ni mis de côté : aucune modification n'y sera enregistrée pour l'instant. Vérifiez la carte SD.",
-        "rescue_unreadable": "Un rapport du sysmodule de récupération a été trouvé mais n'a pas pu être lu : PlayGuard ne peut pas savoir ce qu'il a fait. Vérifiez le NIP et le temps de jeu."
+        "rescue_unreadable": "Un rapport du sysmodule de récupération a été trouvé mais n'a pas pu être lu : PlayGuard ne peut pas savoir ce qu'il a fait. Vérifiez le NIP et le temps de jeu.",
+        "newer": "Des fichiers ont été écrits par un PlayGuard plus récent et sont laissés tels quels : les changements faits maintenant n'y sont pas enregistrés ({}). Mettez PlayGuard à jour pour les modifier."
     },
     "sys_notes": {
         "title": "Notes de version · {}",

@@ -1757,7 +1757,8 @@
         "config_stuck": "無法讀取PlayGuard的偏好設定，也無法將其移到一旁：目前使用預設值，且暫時不會儲存任何內容，以免覆寫該檔案。請檢查SD卡。",
         "history_reset": "無法讀取變更紀錄，已開始新的紀錄。損壞的檔案已保留為history.json.bad。",
         "history_stuck": "無法讀取變更紀錄，也無法將其移到一旁：暫時不會在其中記錄任何變更。請檢查SD卡。",
-        "rescue_unreadable": "找到了復原用 sysmodule 的報告，但無法讀取，因此PlayGuard無法得知它做了什麼。請檢查PIN碼和遊玩時間限制。"
+        "rescue_unreadable": "找到了復原用 sysmodule 的報告，但無法讀取，因此PlayGuard無法得知它做了什麼。請檢查PIN碼和遊玩時間限制。",
+        "newer": "部分檔案由較新的 PlayGuard 寫入，保持原樣，因此現在所做的變更不會儲存到其中：{}。請更新 PlayGuard 後再修改。"
     },
     "sys_notes": {
         "title": "版本說明 · {}",

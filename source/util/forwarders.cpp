@@ -121,6 +121,14 @@ std::vector<Made> list()
     return from_array(*it);
 }
 
+bool written_by_newer()
+{
+    nlohmann::json doc;
+    bool newer = false;
+    read_doc(&doc, &newer);
+    return newer;
+}
+
 std::string list_text(const std::vector<Made>& all)
 {
     return array_of(all).dump(-1, ' ', false, nlohmann::json::error_handler_t::replace);

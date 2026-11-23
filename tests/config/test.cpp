@@ -584,6 +584,7 @@ static void test_schema()
     CHECK(paths::atomic_write(paths::state_file(), newer_state));
     config::load();
     CHECK(config::loaded() == config::Loaded::Read);
+    CHECK(config::shared_newer() && config::state_newer());
     CHECK(config::get().look.theme == "dark" && !config::get().dev_mode && !config::get().console_lock);
     config::get().pt_log = true;
     config::get().relock_pending = true;
@@ -596,6 +597,7 @@ static void test_schema()
     CHECK(paths::atomic_write(paths::state_file(), newer_state));
     config::load();
     CHECK(config::get().look.theme == "light" && !config::get().console_lock);
+    CHECK(!config::shared_newer() && config::state_newer());
     config::get().pt_log = true;
     CHECK(save_config());
     CHECK(paths::read_file(paths::config_file(), text) && text.find("\"pt_log\": true") != std::string::npos);

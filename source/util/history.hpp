@@ -73,6 +73,9 @@ struct Entry
 // reading, so the parent's count needs no second one.
 enum class Damage { None, PutAside, Stuck };
 Damage check(size_t* count = nullptr);
+// history.json was written by a newer version (read as empty, never written
+// over): the screens say so.
+bool written_by_newer();
 
 // Adds `e` (newest) and keeps the newest MAX_ENTRIES. False when the SD card
 // refused the write (*error says why). *put_aside: a damaged file found then

@@ -255,10 +255,16 @@ static void test_schema()
     CHECK(paths::atomic_write(paths::history_file(), newer));
     size_t counted = 99;
     CHECK(history::check(&counted) == history::Damage::None && counted == 0);
+    CHECK(history::written_by_newer());
     CHECK(history::load().empty());
     bool put_aside = true;
     CHECK(history::append(limits(60, 90), nullptr, &put_aside) && !put_aside);
     CHECK(paths::read_file(paths::history_file(), kept) && kept == newer);
+    // Missing, current and a file without "schema": not newer.
+    std::remove(paths::history_file().c_str());
+    CHECK(!history::written_by_newer());
+    CHECK(paths::atomic_write(paths::history_file(), R"({"entries": []})"));
+    CHECK(!history::written_by_newer());
     std::remove(paths::history_file().c_str());
 }
 

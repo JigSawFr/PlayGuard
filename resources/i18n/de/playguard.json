@@ -1757,7 +1757,8 @@
         "config_stuck": "Die Optionen von PlayGuard konnten weder gelesen noch beiseitegelegt werden: Es gelten die Standardwerte, und vorerst wird nichts gespeichert, damit die Datei nicht überschrieben wird. Prüfen Sie die SD-Karte.",
         "history_reset": "Der Änderungsverlauf konnte nicht gelesen werden, daher wurde ein neuer begonnen. Die beschädigte Datei wurde als history.json.bad aufbewahrt.",
         "history_stuck": "Der Änderungsverlauf konnte weder gelesen noch beiseitegelegt werden: Vorerst werden darin keine Änderungen aufgezeichnet. Prüfen Sie die SD-Karte.",
-        "rescue_unreadable": "Ein Bericht des Wiederherstellungs-Sysmoduls wurde gefunden, konnte aber nicht gelesen werden, daher weiß PlayGuard nicht, was es getan hat. Prüfen Sie die Geheimzahl und die Spielzeit."
+        "rescue_unreadable": "Ein Bericht des Wiederherstellungs-Sysmoduls wurde gefunden, konnte aber nicht gelesen werden, daher weiß PlayGuard nicht, was es getan hat. Prüfen Sie die Geheimzahl und die Spielzeit.",
+        "newer": "Einige Dateien stammen von einem neueren PlayGuard und bleiben unverändert, Änderungen werden darin jetzt nicht gespeichert: {}. Aktualisiere PlayGuard, um sie zu ändern."
     },
     "sys_notes": {
         "title": "Versionshinweise · {}",
