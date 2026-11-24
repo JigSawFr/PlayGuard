@@ -36,23 +36,32 @@ BorealeHubTab::BorealeHubTab()
         ui::open_screen(new BorealeTab(), "playguard/about/boreale"_i18n);
         return true;
     });
-    this->list.apply({ { "bh_remote", "server" }, { "bh_rescue", "unlock" }, { "bh_agent", "bolt" }, { "bh_boreale", "list" } });
+    // As Console's: the link and the homebrews as one tile each (an action:
+    // its words under the title), the two modules side by side as status
+    // tiles with their state's check or warning.
+    this->list.tiles({ { "bh_remote", "server" } }, false);
+    this->list.tiles({ { "bh_rescue", "unlock" }, { "bh_agent", "bolt" } }, true);
+    this->list.tiles({ { "bh_boreale", "list" } }, false);
+    this->list.apply({});
 }
 
 void BorealeHubTab::refresh()
 {
-    remote->setDetailText(ui::opens(ModulesActivity::remote_state()));
-    // Each module's state, with its colour: teal when as it should be, amber
+    remote->setDetailText(ModulesActivity::remote_state());
+    // Each module's state, with a check when as it should be and a warning
     // when it needs an update.
+    const auto tile = [this](aurore::DetailCell* cell, const char* id, const std::string& text, const char* color) {
+        cell->setDetailText(text);
+        const std::string c = color ? color : "";
+        this->list.state(id, c == "cadran/teal" ? "cadran/teal_fill" : c == "cadran/amber" ? "cadran/amber_fill" : nullptr);
+    };
     const char* color = nullptr;
     const std::string rescue_text = ModulesActivity::summary(modules::Id::Rescue, &color);
-    rescue->setDetailText(ui::opens(rescue_text));
-    rescue->detail->setThemeColor("textColor", color ? color : "cadran/text2");
+    tile(rescue, "bh_rescue", rescue_text, color);
     color = nullptr;
     const std::string agent_text = ModulesActivity::agent_summary(&color);
-    agent->setDetailText(ui::opens(agent_text));
-    agent->detail->setThemeColor("textColor", color ? color : "cadran/text2");
-    boreale->setDetailText(ui::opens(BorealeTab::names()));
+    tile(agent, "bh_agent", agent_text, color);
+    boreale->setDetailText(BorealeTab::names());
     this->list.sync();
     cadran::set_pill("");
 }
