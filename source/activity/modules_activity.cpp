@@ -213,8 +213,10 @@ std::string ModulesActivity::remote_state()
 {
     const sync_flow::Status link = sync_flow::status();
     if (!link.enabled) return "playguard/sync/state_off"_i18n;
-    return link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
-                                                              : "playguard/sync/state_offline"_i18n;
+    const std::string text = link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
+                                                                                  : "playguard/sync/state_offline"_i18n;
+    // Held by the agent: said, so that the two sections of this screen read as one.
+    return link.agent ? aurore::getStr("playguard/sync/state_agent", text) : text;
 }
 
 void ModulesActivity::refresh()
@@ -229,7 +231,13 @@ void ModulesActivity::refresh()
     const char* color = nullptr;
     const std::string rescue_text = summary(modules::Id::Rescue, &color);
     if (this->list) tile(rescue, "md_rescue", rescue_text, color);
-    const std::string agent_text = AgentActivity::summary(&color);
+    std::string agent_text = AgentActivity::summary(&color);
+    // The kit's line is long for a tile ("Not installed (not carried by this
+    // build)"): the short one this screen already has for the other module.
+    const modules::Module& agent_module = modules::get(modules::Id::Agent);
+    if (!modules::state(paths::sd_root(), agent_module).installed &&
+        !modules::bundled(bundled_modules::dir(), agent_module).present)
+        agent_text = "playguard/modules/state/not_bundled"_i18n;
     if (this->list) tile(agent, "md_agent", agent_text, color);
     remote->setDetailText(remote_state());
     if (this->list) this->list->sync();
