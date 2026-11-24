@@ -365,6 +365,7 @@ static void load_shared()
     read_int(j, "logs_keep_mb", c.logs_keep_mb);
     read_bool(j, "clock_check_at_start", c.clock_check_at_start);
     read_bool(j, "intro", c.intro);
+    read_bool(j, "redraw_on_demand", c.redraw_on_demand);
     read_string(j, "dev_builds_order", c.dev_builds_order);
     read_string(j, "pin_lock", c.pin_lock);
     read_bool(j, "pin_ask_again", c.pin_ask_again);
@@ -507,6 +508,7 @@ bool snapshot(Snapshot& snap)
     j["logs_keep_mb"]    = s_config.logs_keep_mb;
     j["clock_check_at_start"] = s_config.clock_check_at_start;
     j["intro"]           = s_config.intro;
+    j["redraw_on_demand"] = s_config.redraw_on_demand;
     j["dev_builds_order"] = s_config.dev_builds_order;
     j["pin_lock"]        = s_config.pin_lock;
     j["pin_ask_again"]   = s_config.pin_ask_again;

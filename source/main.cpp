@@ -208,6 +208,10 @@ void show_first(aurore::Activity* first)
     aurore::Application::pushActivity(first, aurore::TransitionAnimation::NONE);
     pt_log_flow::apply();   // Help & diagnostics › Developer › Record the play timer, when on (after fw_gate::prepare)
     frame_stats_flow::apply();  // Help & diagnostics › Developer › Frame statistics, when on
+    // Drawn when something changed, and once a second for what changes without
+    // saying so (config.json: redraw_on_demand). Not while the frame statistics
+    // run: they measure every frame.
+    aurore::Application::setRedrawOnDemand(config::get().redraw_on_demand && !frame_stats_flow::running());
     crypto_flow::apply();       // Help & diagnostics › Developer › Encryption: which AES and SHA-256 the sealed secrets run on
     log_prune_flow::run();  // the reports and crashes past the limits of About › Help & diagnostics
     startup_mark(StartupStep_FirstScreen);

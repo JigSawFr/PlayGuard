@@ -11,6 +11,8 @@
 # and nanovg's own counters (draw calls, triangles). The summary covers the last
 # 4 s, the steady state. Everything lands in build-desktop/perf/<name>/.
 #
+# PERF_REDRAW=false draws every frame (redraw_on_demand off, the app's
+# default is on: the lines then count the frames drawn, not the frames run),
 # PERF_THEME=light runs the light variant, PERF_KEYS the keys to press first
 # (see below). Extra VAR=value pairs go to the app: PLAYGUARD_SIM_CADRAN_NOGLOW=1
 # and PLAYGUARD_SIM_CADRAN_NORING=1 to leave out the look's two custom draws
@@ -30,7 +32,7 @@ DIR="$ROOT/build-desktop/perf/$NAME"
 [ -x "$APP" ] || { echo "no desktop build: make desktop first"; exit 1; }
 rm -rf "$DIR"; mkdir -p "$DIR/run/playguard_data"
 # French, dark (PERF_THEME=light for the other variant).
-echo "{\"language\":\"fr\",\"theme\":\"${PERF_THEME:-dark}\"}" > "$DIR/run/playguard_data/config.json"
+echo "{\"language\":\"fr\",\"theme\":\"${PERF_THEME:-dark}\",\"redraw_on_demand\":${PERF_REDRAW:-true}}" > "$DIR/run/playguard_data/config.json"
 # The keys pressed before the screenshot, 0.6 s apart (xdotool names; Return
 # is A, Escape B): PERF_KEYS="Right Down Right Return" reaches a deeper screen.
 KEYS="${PERF_KEYS:-Right}"
