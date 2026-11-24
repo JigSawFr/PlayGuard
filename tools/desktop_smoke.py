@@ -1982,12 +1982,12 @@ if MODULES:
     key("Return")                # the overview: the intro, then a cell per module
     time.sleep(0.5)
     shot("07_overview")          # each module's state
-    key("Down")                  # the agent
+    key("Right")                 # the agent, the tile beside it
     key("Return")                # Ⓐ opens boreale-kit's screen for it
     time.sleep(0.5)
     shot("08_agent")             # its state, Install (the app carries no copy here: the screen says so)
     key("Escape")                # back on the overview, the agent's cell
-    key("Up")                    # the recovery module
+    key("Left")                  # the recovery module
     key("Return")                # Ⓐ opens that module's screen
     time.sleep(0.5)
     shot("09_rescue_screen")

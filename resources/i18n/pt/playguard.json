@@ -1678,6 +1678,8 @@
         "open": "Módulos opcionais",
         "count": "{} instalados",
         "count_one": "1 instalado",
+        "section_modules": "Sysmodules",
+        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
         "intro": "Dois pequenos programas em segundo plano (sysmodules) que o PlayGuard pode colocar no cartão SD. Nenhum é necessário, e cada um faz uma só coisa. O PlayGuard traz a versão feita com ele e instala-a ou atualiza-a a partir daqui, sem computador. Cada alteração pede o PIN quando Segurança › Proteger o PlayGuard com o PIN o pede antes de uma alteração.",
         "status": "Estado",
         "install": "Instalar",
@@ -1726,12 +1728,14 @@
             "installed": "Módulo de recuperação instalado. Atua no próximo arranque se houver um ficheiro RESCUE.",
             "updated": "Módulo de recuperação atualizado.",
             "remove_body": "Remover o módulo de recuperação? Sem ele, um PIN esquecido com um limite de 0 minutos precisa de um computador para ser resolvido.",
-            "short_title": "Módulo de recuperação"
+            "short_title": "Módulo de recuperação",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
-            "title": "Agente da ligação remota",
+            "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "usa o protocolo {}",
-            "offer_body": "O agente da ligação remota no cartão SD não é o que este PlayGuard traz (versão {}). Atualizá-lo agora? Para durante um instante, e o anterior é reposto se o novo não responder.",
+            "offer_body": "O Boréale agent no cartão SD não é o que este PlayGuard traz (versão {}). Atualizá-lo agora? Para durante um instante, e o anterior é reposto se o novo não responder.",
             "offer_refused": "Usa um protocolo mais antigo: a ligação remota não funciona enquanto não for atualizado."
         }
     },

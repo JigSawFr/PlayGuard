@@ -12,6 +12,8 @@
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/rescue.hpp"
+#include "action/sync_flow.hpp"
+#include "activity/sync_activity.hpp"
 #include "app.hpp"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
@@ -207,13 +209,37 @@ std::string ModulesActivity::summary(modules::Id id, const char** color)
     return state_text(id, true, color);
 }
 
+std::string ModulesActivity::remote_state()
+{
+    const sync_flow::Status link = sync_flow::status();
+    if (!link.enabled) return "playguard/sync/state_off"_i18n;
+    const std::string text = link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
+                                                                                  : "playguard/sync/state_offline"_i18n;
+    // Held by the agent: said, so that the two sections of this screen read as one.
+    return link.agent ? aurore::getStr("playguard/sync/state_agent", text) : text;
+}
+
 void ModulesActivity::refresh()
 {
+    // Each module as a tile: its state, with a check when it is as it should
+    // be and a warning when it needs an update or a look.
+    const auto tile = [this](aurore::DetailCell* cell, const char* id, const std::string& text, const char* color) {
+        cell->setDetailText(text);
+        const std::string c = color ? color : "";
+        this->list->state(id, c == "cadran/teal" ? "cadran/teal_fill" : c == "cadran/amber" ? "cadran/amber_fill" : nullptr);
+    };
     const char* color = nullptr;
-    rescue->setDetailText(summary(modules::Id::Rescue, &color));
-    rescue->detail->setThemeColor("textColor", color);
-    agent->setDetailText(AgentActivity::summary(&color));
-    agent->detail->setThemeColor("textColor", color);
+    const std::string rescue_text = summary(modules::Id::Rescue, &color);
+    if (this->list) tile(rescue, "md_rescue", rescue_text, color);
+    std::string agent_text = AgentActivity::summary(&color);
+    // The kit's line is long for a tile ("Not installed (not carried by this
+    // build)"): the short one this screen already has for the other module.
+    const modules::Module& agent_module = modules::get(modules::Id::Agent);
+    if (!modules::state(paths::sd_root(), agent_module).installed &&
+        !modules::bundled(bundled_modules::dir(), agent_module).present)
+        agent_text = "playguard/modules/state/not_bundled"_i18n;
+    if (this->list) tile(agent, "md_agent", agent_text, color);
+    remote->setDetailText(remote_state());
     if (this->list) this->list->sync();
 }
 
@@ -226,6 +252,13 @@ void ModulesActivity::onResume()
 void ModulesActivity::onContentAvailable()
 {
     intro->setSingleLine(false);
+    rescue_note->setSingleLine(false);
+    agent_note->setSingleLine(false);
+    remote_note->setSingleLine(false);
+    remote->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new SyncActivity());
+        return true;
+    });
     rescue->registerClickAction([](aurore::View*) {
         aurore::Application::pushActivity(new ModuleActivity(modules::Id::Rescue));
         return true;
@@ -238,6 +271,9 @@ void ModulesActivity::onContentAvailable()
         return true;
     });
     this->list = std::make_unique<cadran::List>(this->getContentView(), true);
-    this->list->apply({ { "md_rescue", "unlock" }, { "md_agent", "server" } });
+    // The two modules side by side as tiles, what each one does under them.
+    this->list->tiles({ { "md_rescue", "unlock" }, { "md_agent", "server" } }, true);
+    this->list->tiles({ { "md_remote", "server" } }, false);
+    this->list->apply({});
     this->refresh();
 }

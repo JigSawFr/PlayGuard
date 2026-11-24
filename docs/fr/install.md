@@ -19,7 +19,7 @@ Ouvrez ensuite PlayGuard **par-dessus un jeu**, avec le compte d'un parent ([pou
 
 - **Dans PlayGuard :** *Préférences › Mettre à jour avec* choisit comment — dans PlayGuard même (il télécharge la version, la vérifie, se remplace et redémarre), sphaira, le Homebrew App Store ou à la main. Avec *Rechercher les mises à jour chaque jour* activé, PlayGuard s'ouvre sur la nouvelle version quand il y en a une.
 - **Le sysmodule de récupération** suit la version de PlayGuard : après chaque mise à jour, extrayez à nouveau le `playguard-rescue.zip` de cette version (ou *Mettre à jour* sur l'entrée *Le sysmodule de récupération n'est pas à jour* de la cloche, ou dans *Console › Modules facultatifs*), puis redémarrez la console.
-- **L'agent du lien à distance**, s'il est installé, est proposé au démarrage suivant quand PlayGuard en contient un plus récent ([Home Assistant](../home-assistant.fr.md#garder-le-lien-quand-playguard-est-fermé)).
+- **L'agent Boréale**, s'il est installé, est proposé au démarrage suivant quand PlayGuard en contient un plus récent ([Home Assistant](../home-assistant.fr.md#garder-le-lien-quand-playguard-est-fermé)).
 - Les réglages, l'historique, les profils et les sauvegardes restent : ils sont dans `sd:/config/playguard/`, pas à côté de l'application.
 
 ## Le supprimer
