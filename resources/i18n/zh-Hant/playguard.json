@@ -1262,8 +1262,7 @@
         "section_support": "支持 PlayGuard",
         "section_help": "說明",
         "support_note": "PlayGuard 免費、開源且無廣告。如果它對您的家庭有幫助，可以支持它的開發：用手機掃描 QR 碼（選取可放大）。",
-        "whats_new_close": "繼續",
-        "boreale": "Boréale 自製軟體"
+        "whats_new_close": "繼續"
     },
     "prefs": {
         "section_app": "應用程式",
@@ -2088,7 +2087,6 @@
         "done": "Sigpatch檔案已移到一旁。請重新啟動主機，然後再試一次轉發器。"
     },
     "boreale": {
-        "intro": "此主機上安裝的 Boréale 家族自製軟體：每個軟體啟動時會把自己加到這裡。在其中一個上按 A 即可開啟。",
         "this_app": "本應用程式",
         "open_manual": "請從自製軟體選單開啟 {}。"
     },

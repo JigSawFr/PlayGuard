@@ -1262,8 +1262,7 @@
         "section_support": "支持 PlayGuard",
         "section_help": "帮助",
         "support_note": "PlayGuard 免费、开源且无广告。如果它对您的家庭有帮助，可以支持它的开发：用手机扫描二维码（选中可放大）。",
-        "whats_new_close": "继续",
-        "boreale": "Boréale 自制软件"
+        "whats_new_close": "继续"
     },
     "prefs": {
         "section_app": "应用",
@@ -2088,7 +2087,6 @@
         "done": "签名补丁文件已移到一旁。请重新启动主机，然后再试一次转发器。"
     },
     "boreale": {
-        "intro": "此主机上安装的 Boréale 家族自制软件：每个软件启动时会把自己添加到这里。在其中一个上按 A 即可打开。",
         "this_app": "本应用",
         "open_manual": "请从自制软件菜单打开 {}。"
     },

@@ -4,7 +4,7 @@
      remote link (MQTT, Home Assistant: activity/sync_activity.hpp), the
      optional sysmodules, among them the Boréale agent that keeps the link
      going with PlayGuard closed (activity/modules_activity.hpp), and the
-     homebrews installed on the console (tab/boreale_tab). -->
+     homebrews installed on the console, listed (action/boreale_apps_logic). -->
 
 <aurore:Box
     width="auto"
@@ -31,7 +31,7 @@
             <aurore:DetailCell id="bh_rescue" title="@i18n/playguard/modules/rescue/tab"/>
             <aurore:DetailCell id="bh_agent" title="@i18n/playguard/modules/agent/title"/>
             <aurore:Header title="@i18n/playguard/hub/section_homebrews" marginTop="24" marginBottom="8"/>
-            <aurore:DetailCell id="bh_boreale" title="@i18n/playguard/about/boreale"/>
+            <aurore:Box id="bh_list" width="auto" height="auto" axis="column" alignItems="stretch"/>
 
         </aurore:Box>
 

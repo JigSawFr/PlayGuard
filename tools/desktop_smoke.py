@@ -2496,15 +2496,13 @@ if CADRAN:
         shot(f"{i:02d}_{tab}_end")
         key("Left")            # back to the sidebar
 
-    # Boréale tab › Boréale homebrews: PlayGuard, then the made-up Lantern.
+    # Boréale tab › the Boréale homebrews, listed: PlayGuard, then the made-up Lantern.
     key("Up", steps("boreale", "about"))   # the sidebar, from About up to Boréale
     key("Right")               # its first line, Remote access
-    key("Down", 2)             # past the two optional modules (side by side)
-    key("Return")
+    key("Down", 2)             # past the two optional modules (side by side): Lantern
     time.sleep(0.6)
     shot("10_homebrews")
-    key("Escape")
-    key("Left")
+    key("Left")                # the sidebar
     key("Down", steps("boreale", "about"))  # back on About, as the lines below expect
 
     # The child screen, then back to the parent's with the PIN (the simulated

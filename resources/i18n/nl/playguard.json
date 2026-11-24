@@ -1262,8 +1262,7 @@
         "section_support": "PlayGuard steunen",
         "section_help": "Help",
         "support_note": "PlayGuard is gratis, open source en zonder advertenties. Helpt het je gezin, dan kun je de ontwikkeling steunen: scan een code met je telefoon (selecteer hem om te vergroten).",
-        "whats_new_close": "Doorgaan",
-        "boreale": "Boréale-homebrews"
+        "whats_new_close": "Doorgaan"
     },
     "prefs": {
         "section_app": "App",
@@ -2088,7 +2087,6 @@
         "done": "De sigpatch-bestanden zijn opzijgezet. Start de console opnieuw op en probeer de forwarder daarna nog eens."
     },
     "boreale": {
-        "intro": "De homebrews van de Boréale-familie op deze console: elk voegt zich hier toe bij het starten. A op een ervan opent het.",
         "this_app": "Deze app",
         "open_manual": "Open {} via het homebrewmenu."
     },

@@ -1262,8 +1262,7 @@
         "section_support": "PlayGuard 후원하기",
         "section_help": "도움말",
         "support_note": "PlayGuard는 무료 오픈 소스이며 광고가 없습니다. 가족에게 도움이 되었다면 개발을 후원할 수 있습니다: 휴대폰으로 코드를 스캔하세요(선택하면 크게 표시됩니다).",
-        "whats_new_close": "계속",
-        "boreale": "Boréale 홈브류"
+        "whats_new_close": "계속"
     },
     "prefs": {
         "section_app": "앱",
@@ -2088,7 +2087,6 @@
         "done": "sigpatch 파일을 치워 두었습니다. 본체를 다시 시작한 뒤 포워더를 다시 실행해 보세요."
     },
     "boreale": {
-        "intro": "이 콘솔에 설치된 Boréale 패밀리의 홈브류입니다. 각각 시작할 때 여기에 추가됩니다. A를 누르면 열립니다.",
         "this_app": "이 앱",
         "open_manual": "홈브류 메뉴에서 {}을(를) 여세요."
     },

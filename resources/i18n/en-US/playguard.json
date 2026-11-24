@@ -1262,8 +1262,7 @@
         "section_support": "Support PlayGuard",
         "section_help": "Help",
         "support_note": "PlayGuard is free, open source and has no ads. If it helps your family, you can support its development: scan a code with your phone (select it to enlarge it).",
-        "whats_new_close": "Continue",
-        "boreale": "Boréale homebrews"
+        "whats_new_close": "Continue"
     },
     "prefs": {
         "section_app": "App",
@@ -2088,7 +2087,6 @@
         "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
     },
     "boreale": {
-        "intro": "The homebrews of the Boréale family installed on this console: each one adds itself here when it starts. A on one opens it.",
         "this_app": "This app",
         "open_manual": "Open {} from the homebrew menu."
     },

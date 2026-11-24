@@ -1262,8 +1262,7 @@
         "section_support": "PlayGuard unterstützen",
         "section_help": "Hilfe",
         "support_note": "PlayGuard ist kostenlos, quelloffen und werbefrei. Wenn es Ihrer Familie hilft, können Sie die Entwicklung unterstützen: Scannen Sie einen Code mit Ihrem Smartphone (auswählen zum Vergrößern).",
-        "whats_new_close": "Weiter",
-        "boreale": "Boréale-Homebrews"
+        "whats_new_close": "Weiter"
     },
     "prefs": {
         "section_app": "App",
@@ -2088,7 +2087,6 @@
         "done": "Die Sigpatch-Dateien sind beiseitegelegt. Starten Sie die Konsole neu und versuchen Sie den Forwarder dann erneut."
     },
     "boreale": {
-        "intro": "Die Homebrews der Boréale-Familie auf dieser Konsole: Jedes trägt sich beim Start hier ein. Mit A auf einem öffnen Sie es.",
         "this_app": "Diese App",
         "open_manual": "Öffnen Sie {} über das Homebrew-Menü."
     },

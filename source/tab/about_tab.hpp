@@ -1,7 +1,7 @@
 // AboutTab — the installed PlayGuard and help with it: version (Ⓐ opens its
 // release notes, SysNotesActivity; seven presses of a hidden Ⓨ on it turn the
 // developer tools on, at the end of Help & diagnostics), launch mode and data
-// folder; its updates (check now, every day, how, sphaira's menu); Help (the first steps again, a line to Help & diagnostics (HelpTab, on a screen of its own)); one to the Boréale homebrews installed (BorealeTab); the credits; how to
+// folder; its updates (check now, every day, how, sphaira's menu); Help (the first steps again, a line to Help & diagnostics (HelpTab, on a screen of its own)); one to the Boréale homebrews installed; the credits; how to
 // support it (the funding links as QR codes, to scan with a phone); "Made in
 // France".
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).

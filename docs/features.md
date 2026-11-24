@@ -488,7 +488,7 @@ The *Optional modules* section of the *Boréale* tab, a line for each module (it
 
 ### The Boréale homebrews
 
-*Boréale homebrews* lists the homebrews of the Boréale family installed on the console, as each one adds itself when it starts (`config/boreale/apps/`), PlayGuard first, each with its version. Ⓐ on another one starts it once PlayGuard closes; when PlayGuard was not started from the homebrew menu, a message says to open it from there. A homebrew deleted from the SD card leaves the list.
+The *Homebrews* section of the *Boréale* tab lists the homebrews of the Boréale family installed on the console, as each one adds itself when it starts (`config/boreale/apps/`), PlayGuard first, each with its version. Ⓐ on another one starts it once PlayGuard closes; when PlayGuard was not started from the homebrew menu, a message says to open it from there. A homebrew deleted from the SD card leaves the list.
 
 ## Preferences
 

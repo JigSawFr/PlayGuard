@@ -489,7 +489,7 @@ La section *Modules facultatifs* de l'onglet *Boréale*, une ligne par module (s
 
 ### Les homebrews Boréale
 
-*Homebrews Boréale* liste les homebrews de la famille Boréale installés sur la console, tels que chacun s'ajoute à son démarrage (`config/boreale/apps/`), PlayGuard en premier, chacun avec sa version. Ⓐ sur un autre le lance une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message dit de l'ouvrir de là. Un homebrew supprimé de la carte SD quitte la liste.
+La section *Homebrews* de l'onglet *Boréale* liste les homebrews de la famille Boréale installés sur la console, tels que chacun s'ajoute à son démarrage (`config/boreale/apps/`), PlayGuard en premier, chacun avec sa version. Ⓐ sur un autre le lance une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message dit de l'ouvrir de là. Un homebrew supprimé de la carte SD quitte la liste.
 
 ## Préférences
 
