@@ -32,7 +32,6 @@
             <aurore:DetailCell id="cn_hekate" title="hekate"/>
             <aurore:DetailCell id="cn_syspatch" title="sys-patch"/>
             <!-- A tile: the installed games check (activity/game_check_activity.hpp). -->
-            <aurore:Header title="@i18n/playguard/tools/section_tools" marginBottom="8"/>
             <aurore:DetailCell id="cn_games" title="@i18n/playguard/tiles/games"/>
             <aurore:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>

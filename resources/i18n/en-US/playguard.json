@@ -543,7 +543,6 @@
     "security": {
         "section_status": "Status",
         "pin": "PIN",
-        "restrictions": "Restrictions enabled",
         "section_actions": "Actions",
         "set_pin": "Set or change the PIN",
         "show_pin": "Show the PIN…",
@@ -649,7 +648,6 @@
     },
     "tools": {
         "section_diag": "Diagnostics",
-        "section_tools": "Tools",
         "section_reports": "Reports",
         "section_system": "System",
         "export": "Export a diagnostic report",
@@ -703,7 +701,6 @@
         "extra_amounts": "Extra time amounts",
         "extra_auto": "Put the limit back by itself after \"No more play today\"",
         "clock_check": "Check the network clock at start-up",
-        "section_about": "About",
         "version": "Version",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
@@ -1398,9 +1395,6 @@
     "history": {
         "title": "Change history",
         "tab_intro": "Every change to the settings, and their backups. What was played is in Activity.",
-        "open": "Changes made with PlayGuard",
-        "count": "{} recorded",
-        "count_one": "1 recorded",
         "tile_changes": "Changes",
         "none": "Nothing recorded yet. Every change PlayGuard makes on the console (limits, restriction level, PIN, unlocks…) is listed here.",
         "note": "The newest {} changes, kept on the SD card in {}. A on a change shows it and, when possible, puts the previous value back.",

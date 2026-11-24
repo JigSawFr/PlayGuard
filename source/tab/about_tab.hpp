@@ -28,7 +28,6 @@ class AboutTab : public TabBase
 
     void count_version_press();
 
-    AURORE_BIND(aurore::DetailCell,  version,          "ab_version");
     AURORE_BIND(aurore::DetailCell,  update_cell,      "ab_update");
     AURORE_BIND(aurore::BooleanCell, update_daily,     "ab_update_daily");
     AURORE_BIND(aurore::DetailCell,  update_via,       "ab_update_via");

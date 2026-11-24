@@ -31,7 +31,7 @@ HistoryTab::HistoryTab()
     // The bell's "no backup for 30 days" is fixed here.
     this->mark(backup_save.getView(), { "backup" });
     backup_note->setSingleLine(false);
-    history->registerClickAction([](aurore::View*) {
+    changes->registerClickAction([](aurore::View*) {
         aurore::Application::pushActivity(new HistoryActivity());
         return true;
     });
@@ -63,7 +63,7 @@ HistoryTab::HistoryTab()
     });
 
     this->list.tiles({ { "hs_changes", "history" }, { "hs_last_backup", "save" } }, true);
-    this->list.apply({ { "hs_history", "history" }, { "hs_backup_save", "save" }, { "hs_backup_restore", "restore" },
+    this->list.apply({ { "hs_backup_save", "save" }, { "hs_backup_restore", "restore" },
                        { "hs_backup_keep", "folder" } });
 }
 
@@ -71,8 +71,6 @@ void HistoryTab::refresh()
 {
     const size_t n = history_flow::count();
     ui::set_detail(changes, std::to_string(n));
-    history->setDetailText(ui::opens(n == 1 ? "playguard/history/count_one"_i18n
-                                         : n ? aurore::getStr("playguard/history/count", (int)n) : ""));
 
     // The newest backup's day, with a warning once one is due (none yet, or
     // none for 30 days: the bell's "backup" entry), a check otherwise.

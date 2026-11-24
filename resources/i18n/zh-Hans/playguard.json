@@ -543,7 +543,6 @@
     "security": {
         "section_status": "状态",
         "pin": "PIN",
-        "restrictions": "限制已启用",
         "section_actions": "操作",
         "set_pin": "设置或更改PIN",
         "show_pin": "显示PIN…",
@@ -649,7 +648,6 @@
     },
     "tools": {
         "section_diag": "诊断",
-        "section_tools": "工具",
         "section_reports": "报告",
         "section_system": "系统",
         "export": "导出诊断报告",
@@ -703,7 +701,6 @@
         "extra_amounts": "加时选项",
         "extra_auto": "“今天停止游玩”后，第二天自动恢复平时的限制",
         "clock_check": "启动时检查网络时钟",
-        "section_about": "关于",
         "version": "版本",
         "firmware": "系统版本",
         "atmosphere": "Atmosphère",
@@ -1398,9 +1395,6 @@
     "history": {
         "title": "更改历史",
         "tab_intro": "设置的每次更改及其备份。游玩情况请看“游玩记录”。",
-        "open": "通过PlayGuard进行的更改",
-        "count": "已记录{}条",
-        "count_one": "已记录1条",
         "tile_changes": "更改",
         "none": "尚无记录。PlayGuard对主机进行的每项更改（限制、限制等级、PIN、解除…）都会列在这里。",
         "note": "最近{}条更改，保存在SD卡的{}中。在更改上按A可查看详情，并在可能时恢复之前的值。",

@@ -543,7 +543,6 @@
     "security": {
         "section_status": "状態",
         "pin": "暗証番号",
-        "restrictions": "制限が有効",
         "section_actions": "操作",
         "set_pin": "暗証番号を設定・変更",
         "show_pin": "暗証番号を表示…",
@@ -649,7 +648,6 @@
     },
     "tools": {
         "section_diag": "診断",
-        "section_tools": "ツール",
         "section_reports": "レポート",
         "section_system": "システム",
         "export": "診断レポートをエクスポート",
@@ -703,7 +701,6 @@
         "extra_amounts": "延長時間の選択肢",
         "extra_auto": "「今日のプレイを終了」の翌日に自動でいつもの上限に戻す",
         "clock_check": "起動時にネットワーク時計を確認",
-        "section_about": "情報",
         "version": "バージョン",
         "firmware": "ファームウェア",
         "atmosphere": "Atmosphère",
@@ -1398,9 +1395,6 @@
     "history": {
         "title": "変更履歴",
         "tab_intro": "設定の変更とそのバックアップです。遊んだ記録は「プレイ記録」にあります。",
-        "open": "PlayGuardで行った変更",
-        "count": "{}件記録",
-        "count_one": "1件記録",
         "tile_changes": "変更",
         "none": "まだ記録はありません。PlayGuardが本体に対して行った変更（上限、制限レベル、暗証番号、一時解除など）がここに一覧表示されます。",
         "note": "最新{}件の変更を、SDカードの{}に保存しています。変更でAを押すと内容を表示し、可能な場合は前の値に戻せます。",

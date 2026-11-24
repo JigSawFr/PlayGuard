@@ -3036,7 +3036,7 @@ if not GAMES:
                 return True
             time.sleep(0.25)
         return False
-    go_to("Changes made with PlayGuard", "Up")
+    go_to("Changes", "Up")
     key("Return")
     shot("27_history")
     if not history_listed("2 of 2 changes"):

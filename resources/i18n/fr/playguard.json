@@ -543,7 +543,6 @@
     "security": {
         "section_status": "État",
         "pin": "Code PIN",
-        "restrictions": "Restrictions activées",
         "section_actions": "Actions",
         "set_pin": "Définir ou changer le code PIN",
         "show_pin": "Afficher le code PIN…",
@@ -649,7 +648,6 @@
     },
     "tools": {
         "section_diag": "Diagnostic",
-        "section_tools": "Outils",
         "section_reports": "Rapports",
         "section_system": "Système",
         "export": "Exporter un rapport de diagnostic",
@@ -703,7 +701,6 @@
         "extra_amounts": "Montants du temps en plus",
         "extra_auto": "Remettre la limite d'office après un arrêt du jeu",
         "clock_check": "Vérifier l'horloge réseau au lancement",
-        "section_about": "À propos",
         "version": "Version",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
@@ -1398,9 +1395,6 @@
     "history": {
         "title": "Historique des modifications",
         "tab_intro": "Chaque modification des réglages, et leurs sauvegardes. Ce qui a été joué est dans Activité.",
-        "open": "Historique des modifications",
-        "count": "{} enregistrées",
-        "count_one": "1 enregistrée",
         "tile_changes": "Modifications",
         "none": "Rien d'enregistré pour l'instant. Chaque modification faite par PlayGuard sur la console (limites, niveau de restriction, code PIN, déverrouillages…) apparaît ici.",
         "note": "Les {} dernières modifications, gardées sur la carte SD dans {}. A sur une modification l'affiche et, si possible, remet la valeur précédente.",

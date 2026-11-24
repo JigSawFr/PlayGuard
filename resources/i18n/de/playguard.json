@@ -543,7 +543,6 @@
     "security": {
         "section_status": "Status",
         "pin": "Geheimzahl",
-        "restrictions": "Einschränkungen aktiv",
         "section_actions": "Aktionen",
         "set_pin": "Geheimzahl festlegen oder ändern",
         "show_pin": "Geheimzahl anzeigen…",
@@ -649,7 +648,6 @@
     },
     "tools": {
         "section_diag": "Diagnose",
-        "section_tools": "Werkzeuge",
         "section_reports": "Berichte",
         "section_system": "System",
         "export": "Diagnosebericht exportieren",
@@ -703,7 +701,6 @@
         "extra_amounts": "Zusatzzeit-Auswahl",
         "extra_auto": "Limit nach Spielstopp automatisch zurücksetzen",
         "clock_check": "Netzwerkuhr beim Start prüfen",
-        "section_about": "Info",
         "version": "Version",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
@@ -1398,9 +1395,6 @@
     "history": {
         "title": "Änderungsverlauf",
         "tab_intro": "Jede Änderung der Einstellungen und ihre Sicherungen. Was gespielt wurde, steht unter Aktivität.",
-        "open": "Änderungen durch PlayGuard",
-        "count": "{} erfasst",
-        "count_one": "1 erfasst",
         "tile_changes": "Änderungen",
         "none": "Noch nichts erfasst. Jede Änderung, die PlayGuard an der Konsole vornimmt (Limits, Einschränkungskategorie, Geheimzahl, Aufhebungen…), wird hier aufgeführt.",
         "note": "Die {} neuesten Änderungen, auf der SD-Karte in {} gespeichert. Mit A wird eine Änderung angezeigt und, wenn möglich, der vorherige Wert wiederhergestellt.",

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- About: the installed PlayGuard and help with it. Its card first (the
-     mark, the name, the version), then the version (Ⓐ opens every version's
-     release notes, on a screen of their own; seven presses of a hidden Ⓨ
-     turn the developer tools on, at the end of Help & diagnostics, below)
+     mark, the name, the version; Ⓐ on it opens every version's release
+     notes, on a screen of their own; seven presses of a hidden Ⓨ turn the
+     developer tools on, at the end of Help & diagnostics, below), then
      the updates (check now, every day, how, sphaira's menu); Help (the first
      steps again, then a line to Help & diagnostics (tab/help.xml, on a screen of its own, with the
      launch mode and the data folder); a line to the Boréale homebrews installed
@@ -30,9 +30,7 @@
             paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <aurore:Header title="@i18n/playguard/tools/section_about" marginBottom="8"/>
-            <aurore:DetailCell id="ab_version" title="@i18n/playguard/tools/version"/>
-            <aurore:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
+            <aurore:Header title="@i18n/playguard/tools/section_update" marginBottom="8"/>
             <aurore:DetailCell id="ab_update" title="@i18n/playguard/tools/update"/>
             <aurore:BooleanCell id="ab_update_daily"/>
             <aurore:DetailCell id="ab_update_via" title="@i18n/kit/tools/update_via"/>

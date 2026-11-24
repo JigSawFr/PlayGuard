@@ -110,7 +110,7 @@ Below PlayGuard's own entries, each other Boréale homebrew installed on the con
 
 - Each section lists its entries in a fixed order, whichever check finished first.
 - **In the sidebar**, an amber badge by a tab's name counts its entries to do, where they are fixed: the Security tab (no PIN, a weak PIN, PlayGuard without its PIN, temporarily unlocked), the Play timer (the alarm off, the console not counting), Today (changes made outside PlayGuard, extra time to put back), the Console (its entries above, and the network clock). Ignored entries and those for information are not counted.
-- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Installed games*, *Storage*, *Game patches*; *Set or change the PIN*, *Protect PlayGuard with the PIN*; the Play timer's *Advanced* for the alarm), and the tab opens on the first of them. A row with no value of its own says what the badge is for, in amber, before it (*Easy to guess*, *Not accurate*).
+- In the tab, the same badge is on the row where each is fixed (*Network clock*, *Installed games*, *Storage*, *Game patches*; *PIN ›* (the tile, in Security: it opens *Set or change the PIN*, *Protect PlayGuard with the PIN*); the Play timer's *Advanced* for the alarm), and the tab opens on the first of them. A row with no value of its own says what the badge is for, in amber, before it (*Easy to guess*, *Not accurate*).
 - **Ⓐ** on an entry does the fix (*Turn it on*, *Set it*, *Update*…) or opens the tab where it is made. An entry goes by itself once what it says is fixed.
 - **Ⓧ** marks an entry for information as read; **Ⓨ** marks them all. An entry marked as read stays read at the next start, until its text changes.
 - **Ignoring:** a few entries to do can be ignored with Ⓧ, after a confirmation and the PIN: a PIN anyone would try first, PlayGuard opening without the PIN, the "time's up" alarm off, the SD card almost full (never no PIN, unlocked controls, the clock, the play timer not counting or PlayGuard's own files). An ignored entry is no longer counted, and is listed last under *Ignored*, where Ⓐ counts it again. It comes back by itself 30 days later (unless *Count ignored warnings again after 30 days* is off), once what it says is fixed and then happens again, or, for the PIN, for a new PIN of another length.
@@ -326,9 +326,9 @@ Time per game **today**, in the **last 7 days** and **in all**, from the console
 
 *[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
-- **At the top**, four tiles: the PIN, the restrictions, the temporary unlock and the homebrew menu, each with a teal check when it is as it should be (a PIN set, restrictions on, locked) or an amber warning when it needs you; the homebrew menu says *Open* or *Locked* (a check once locked: open is fine without forwarders).
-- **Set / change the PIN** (system PIN screen).
-- **Show the PIN**: after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered.
+- **At the top**, three tiles: the PIN (*PIN ›*), the companion app (*Nintendo Switch Parental Controls app ›*) and the homebrew menu, each with a teal check when it is as it should be (a PIN set, locked) or an amber warning when it needs you (no PIN; a companion app that would overwrite the limits); the homebrew menu says *Open* or *Locked* (a check once locked: open is fine without forwarders).
+- **PIN ›**, a screen of its own, holds everything about the PIN: set or change it (system PIN screen), show it, protect PlayGuard with it, ask it again, pause parental controls while you are in PlayGuard.
+- **Show the PIN** (*Security › PIN*): after a warning and the PIN itself, asked every time; recorded in the history, then a new PIN is offered.
 - **Unlock temporarily**, and whether PlayGuard turns them back on by itself right after a change that needed the unlock (on by default).
 
 ### Protect PlayGuard with the PIN
@@ -356,7 +356,7 @@ The PIN in PlayGuard itself:
 
 ### Companion app
 
-- Whether the Nintendo Switch Parental Controls app is linked, its last sync, and **unlink** (otherwise its next sync overwrites the limits set here: while it is linked, every change PlayGuard asks to confirm says so).
+- On its own screen (*Security › Nintendo Switch Parental Controls app*): whether the Nintendo Switch Parental Controls app is linked, its last sync, and **unlink** (otherwise its next sync overwrites the limits set here: while it is linked, every change PlayGuard asks to confirm says so).
 - When Atmosphère's DNS redirection (`atmosphere/hosts`) sends Nintendo's parental-control server elsewhere, the app cannot synchronize: PlayGuard then says *sync blocked (DNS)* here and mentions the app nowhere else (no note in the dialogs, no bell entry, no first-steps step, no pill on *Today*, no help to decode, and unlinking asks without saying what the app would overwrite).
 - While it is linked and can sync, *Before unlinking: help decode…* opens the block comparison (see [CONTRIBUTING.md](../CONTRIBUTING.md#no-code-needed)).
 
@@ -437,7 +437,7 @@ Last in the tab: the optional recovery module, for a forgotten PIN with a 0-minu
 
 *[Try it in the simulator ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
-**At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then *Installed games* as a tile, under *Tools* (it shows what needs a look in its corner), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
+**At the top**, what the console runs as tiles, under *System* (the firmware, Atmosphère, hekate when it is on the SD card and sys-patch when it is installed; Ⓐ opens its release notes), then *Installed games* as a tile under them (it shows what needs a look in its corner), then the console's lines, compatibility first (a teal check alone when PlayGuard was checked on this firmware, else a warning and what is wrong).
 
 ### Installed games
 
@@ -511,7 +511,7 @@ The *Homebrews* section of the *Boréale* tab lists the homebrews of the Boréal
 ### Version and updates
 
 - At the top, its card: the mark, the name, the version.
-- The installed PlayGuard: version (in amber when a newer one is out; Ⓐ opens its **release notes**).
+- The installed PlayGuard, on the card at the top of *About*: version (in amber when a newer one is out; Ⓐ on the card opens its **release notes**).
 - **Check for updates** now; *Check for updates every day* at start-up, under *Updates* too.
 - *Update with*: in PlayGuard, which downloads the release, checks it, replaces itself and restarts, or sphaira, Homebrew App Store or by hand (asked on the first update when none is chosen). Handing over to a store asks for the PIN as a change does (*Protect PlayGuard with the PIN › Before a change*), and always while the homebrew menu is locked: a store starts any homebrew. Installed from the Homebrew App Store or sphaira's App Store, the store is the way recommended there, so it keeps track of the version; when its catalogue does not have the new release yet (it publishes one after a review, often a few days later), PlayGuard says so and offers to update in place instead. *Entry in sphaira's GitHub menu* (in *Preferences*, on by default) keeps PlayGuard in sphaira's *GitHub* menu, which has each release as soon as it is out: with it, *Update with › sphaira* points there, without asking the store.
 - While a newer release is known, PlayGuard opens on **PlayGuard X.Y.Z is available** (its date and notes): *Update*, or *Later* for 1 day, 1 week or 30 days at most.

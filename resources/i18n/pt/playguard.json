@@ -543,7 +543,6 @@
     "security": {
         "section_status": "Estado",
         "pin": "PIN",
-        "restrictions": "Restrições ativas",
         "section_actions": "Ações",
         "set_pin": "Definir ou alterar o PIN",
         "show_pin": "Mostrar o PIN…",
@@ -649,7 +648,6 @@
     },
     "tools": {
         "section_diag": "Diagnóstico",
-        "section_tools": "Ferramentas",
         "section_reports": "Relatórios",
         "section_system": "Sistema",
         "export": "Exportar relatório de diagnóstico",
@@ -703,7 +701,6 @@
         "extra_amounts": "Quantidades de tempo extra",
         "extra_auto": "Repor o limite após \"Terminar o jogo por hoje\"",
         "clock_check": "Verificar o relógio de rede ao iniciar",
-        "section_about": "Sobre",
         "version": "Versão",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
@@ -1398,9 +1395,6 @@
     "history": {
         "title": "Histórico de alterações",
         "tab_intro": "Cada alteração das definições e as suas cópias de segurança. O que foi jogado está em Atividade.",
-        "open": "Alterações do PlayGuard",
-        "count": "{} no histórico",
-        "count_one": "1 no histórico",
         "tile_changes": "Alterações",
         "none": "O histórico está vazio. Todas as alterações que o PlayGuard faz na consola (limites, nível de restrição, PIN, desbloqueios…) aparecem aqui.",
         "note": "As {} alterações mais recentes, guardadas no cartão SD em {}. A numa alteração mostra-a e, quando possível, repõe o valor anterior.",

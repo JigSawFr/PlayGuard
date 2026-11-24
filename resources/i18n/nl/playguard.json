@@ -543,7 +543,6 @@
     "security": {
         "section_status": "Status",
         "pin": "Pincode",
-        "restrictions": "Beperkingen ingeschakeld",
         "section_actions": "Acties",
         "set_pin": "Pincode instellen of wijzigen",
         "show_pin": "Pincode tonen…",
@@ -649,7 +648,6 @@
     },
     "tools": {
         "section_diag": "Diagnose",
-        "section_tools": "Hulpmiddelen",
         "section_reports": "Rapporten",
         "section_system": "Systeem",
         "export": "Een diagnoserapport exporteren",
@@ -703,7 +701,6 @@
         "extra_amounts": "Hoeveelheden extra tijd",
         "extra_auto": "Limiet vanzelf terug na \"Vandaag niet meer spelen\"",
         "clock_check": "Netwerkklok controleren bij het opstarten",
-        "section_about": "Info",
         "version": "Versie",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
@@ -1398,9 +1395,6 @@
     "history": {
         "title": "Wijzigingsgeschiedenis",
         "tab_intro": "Elke wijziging van de instellingen, en hun back-ups. Wat er gespeeld is, staat bij Activiteit.",
-        "open": "Wijzigingen via PlayGuard",
-        "count": "{} vastgelegd",
-        "count_one": "1 vastgelegd",
         "tile_changes": "Wijzigingen",
         "none": "Nog niets vastgelegd. Elke wijziging die PlayGuard op de console maakt (limieten, beperkingsniveau, pincode, ontgrendelingen…) wordt hier vermeld.",
         "note": "De {} nieuwste wijzigingen, bewaard op de SD-kaart in {}. Druk op A bij een wijziging om die te bekijken en, indien mogelijk, de vorige waarde terug te zetten.",

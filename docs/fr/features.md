@@ -111,7 +111,7 @@ Sous les entrées de PlayGuard, chaque autre homebrew Boréale installé sur la 
 
 - Chaque section liste ses entrées dans un ordre fixe, quelle que soit la vérification qui a fini la première.
 - **Dans la barre latérale**, une pastille ambre à côté du nom d'un onglet compte ses entrées à faire, là où elles se règlent : l'onglet Sécurité (pas de code PIN, un code PIN trop simple, PlayGuard sans son code PIN, déverrouillé temporairement), Temps de jeu (l'alarme désactivée, la console qui ne compte pas), *Aujourd'hui* (des changements faits hors de PlayGuard, du temps en plus à retirer), la Console (ses entrées ci-dessus, et l'horloge réseau). Les entrées ignorées et celles pour information ne sont pas comptées.
-- Dans l'onglet, la même pastille est sur la ligne où chacune se règle (*Horloge réseau*, *Jeux installés*, *Stockage*, *Patchs de jeux* ; *Définir ou changer le code PIN*, *Protéger PlayGuard par le code PIN* ; *Avancé* du Temps de jeu pour l'alarme), et l'onglet s'ouvre sur la première d'entre elles. Une ligne sans valeur propre dit à quoi sert la pastille, en orange, juste avant (*Facile à deviner*, *Imprécise*).
+- Dans l'onglet, la même pastille est sur la ligne où chacune se règle (*Horloge réseau*, *Jeux installés*, *Stockage*, *Patchs de jeux* ; *PIN ›* (la tuile, dans Sécurité : elle ouvre *Définir ou changer le code PIN*, *Protéger PlayGuard par le code PIN*) ; *Avancé* du Temps de jeu pour l'alarme), et l'onglet s'ouvre sur la première d'entre elles. Une ligne sans valeur propre dit à quoi sert la pastille, en orange, juste avant (*Facile à deviner*, *Imprécise*).
 - **Ⓐ** sur une entrée fait la correction (*L'activer*, *La régler*, *Mettre à jour*…) ou ouvre l'onglet où elle se fait. Une entrée disparaît d'elle-même une fois réglé ce qu'elle signale.
 - **Ⓧ** marque une entrée pour information comme lue ; **Ⓨ** les marque toutes. Une entrée marquée comme lue le reste au lancement suivant, jusqu'à ce que son texte change.
 - **Ignorer :** quelques entrées à faire peuvent être ignorées avec Ⓧ, après une confirmation et le code PIN : un code PIN que tout le monde essaierait en premier, PlayGuard qui s'ouvre sans le code PIN, l'alarme « temps écoulé » désactivée, la carte SD presque pleine (jamais l'absence de PIN, le contrôle parental déverrouillé, l'horloge, le minuteur qui ne compte pas ni les fichiers de PlayGuard). Une entrée ignorée n'est plus comptée et s'affiche en dernier sous *Ignorés*, où Ⓐ la fait compter de nouveau. Elle revient d'elle-même 30 jours plus tard (sauf si *Rappeler les avertissements ignorés après 30 jours* est désactivé), dès que le problème a été corrigé puis se reproduit, ou, pour le code PIN, avec un nouveau code d'une autre longueur.
@@ -327,9 +327,9 @@ Temps passé sur chaque jeu **aujourd'hui**, sur les **7 derniers jours** et **d
 
 *[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=security&utm_source=github&utm_medium=docs)*
 
-- **En haut**, quatre tuiles : le code PIN, les restrictions, le déverrouillage temporaire et le menu homebrew, chacune avec une coche turquoise quand tout est comme il faut (code PIN défini, restrictions actives, verrouillé) ou un triangle orange quand il faut intervenir ; le menu homebrew dit *Ouvert* ou *Verrouillé* (une coche une fois verrouillé : ouvert convient sans forwarders).
-- **Définir ou changer le code PIN** (écran système).
-- **Afficher le code PIN** : après un avertissement et le code PIN lui-même, demandé à chaque fois ; noté dans l'historique, puis un nouveau code PIN est proposé.
+- **En haut**, trois tuiles : le code PIN (*PIN ›*), l'application mobile (*Application Contrôle parental Nintendo Switch ›*) et le menu homebrew, chacune avec une coche turquoise quand tout est comme il faut (code PIN défini, verrouillé) ou un triangle orange quand il faut intervenir (pas de code PIN ; une application mobile qui écraserait les limites) ; le menu homebrew dit *Ouvert* ou *Verrouillé* (une coche une fois verrouillé : ouvert convient sans forwarders).
+- **PIN ›**, un écran à part, réunit tout ce qui touche au code PIN : le définir ou le changer (écran système), l'afficher, protéger PlayGuard par le code PIN, le redemander, mettre le contrôle parental en pause dans PlayGuard.
+- **Afficher le code PIN** (*Sécurité › PIN*) : après un avertissement et le code PIN lui-même, demandé à chaque fois ; noté dans l'historique, puis un nouveau code PIN est proposé.
 - **Déverrouiller temporairement**, et si PlayGuard le réactive de lui-même juste après une modification qui a demandé le déverrouillage (activé par défaut).
 
 ### Protéger PlayGuard par le code PIN
@@ -357,7 +357,7 @@ Le code PIN dans PlayGuard lui-même :
 
 ### Application mobile
 
-- Association de l'application Contrôle parental Nintendo Switch, dernière synchronisation, et **dissociation** (sinon sa prochaine synchronisation écrase les limites réglées ici : tant qu'elle est associée, chaque modification que PlayGuard fait confirmer le rappelle).
+- Sur son écran (*Sécurité › Application Contrôle parental Nintendo Switch*) : association de l'application Contrôle parental Nintendo Switch, dernière synchronisation, et **dissociation** (sinon sa prochaine synchronisation écrase les limites réglées ici : tant qu'elle est associée, chaque modification que PlayGuard fait confirmer le rappelle).
 - Quand la redirection DNS d'Atmosphère (`atmosphere/hosts`) détourne le serveur du contrôle parental de Nintendo, l'application ne peut pas se synchroniser : PlayGuard indique alors *synchro bloquée (DNS)* ici et ne la mentionne nulle part ailleurs (pas de note dans les dialogues, pas d'entrée dans la cloche, pas d'étape dans les premiers pas, pas de pastille sur *Aujourd'hui*, pas d'aide au décodage, et la dissociation se confirme sans dire ce que l'application écraserait).
 - Tant qu'elle est associée et peut se synchroniser, *Avant de dissocier : aidez à décoder…* ouvre la comparaison du bloc (voir [CONTRIBUTING.md](../../CONTRIBUTING.md#no-code-needed), en anglais).
 
@@ -438,7 +438,7 @@ Le dernier de l'onglet : le sysmodule de récupération facultatif, pour un code
 
 *[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
 
-**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis *Jeux installés* en tuile, sous *Outils* (elle montre dans son coin ce qui demande un coup d'œil), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
+**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis *Jeux installés* en tuile juste dessous (elle montre dans son coin ce qui demande un coup d'œil), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
 
 ### Jeux installés
 
@@ -512,7 +512,7 @@ La section *Homebrews* de l'onglet *Boréale* liste les homebrews de la famille 
 ### Version et mises à jour
 
 - En haut, sa carte : la marque, le nom, la version.
-- PlayGuard installé : version (en ambre quand une plus récente est sortie ; Ⓐ ouvre ses **notes de version**).
+- PlayGuard installé, sur la carte en haut de *À propos* : version (en ambre quand une plus récente est sortie ; Ⓐ sur la carte ouvre ses **notes de version**).
 - **Recherche d'une mise à jour** maintenant ; *Rechercher les mises à jour chaque jour* au lancement, sous *Mises à jour* aussi.
 - *Mettre à jour avec* : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi). Passer la main à un store demande le code PIN comme une modification (*Protéger PlayGuard par le code PIN › Avant une modification*), et toujours quand le menu homebrew est verrouillé : un store lance n'importe quel homebrew. Installé depuis le Homebrew App Store ou l'App Store de sphaira, c'est le store qui est recommandé, pour qu'il suive la version ; quand son catalogue n'a pas encore la nouvelle version (il la publie après une vérification, souvent quelques jours plus tard), PlayGuard le dit et propose de se mettre à jour lui-même. *Entrée dans le menu GitHub de sphaira* (dans *Préférences*, activé par défaut) garde PlayGuard dans le menu *GitHub* de sphaira, qui a chaque version dès sa sortie : avec elle, *Mettre à jour avec › sphaira* y renvoie, sans passer par le store.
 - Tant qu'une version plus récente est connue, PlayGuard s'ouvre sur **PlayGuard X.Y.Z est disponible** (sa date et ses notes) : *Mettre à jour*, ou *Plus tard* pour 1 jour, 1 semaine ou 30 jours au plus.

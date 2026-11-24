@@ -21,7 +21,6 @@ class HistoryTab : public TabBase
     cadran::List list;
     AURORE_BIND(aurore::DetailCell, changes,        "hs_changes");
     AURORE_BIND(aurore::DetailCell, last_backup,    "hs_last_backup");
-    AURORE_BIND(aurore::DetailCell, history,        "hs_history");
     AURORE_BIND(aurore::DetailCell, backup_save,    "hs_backup_save");
     AURORE_BIND(aurore::DetailCell, backup_restore, "hs_backup_restore");
     AURORE_BIND(aurore::DetailCell, backup_keep,    "hs_backup_keep");
