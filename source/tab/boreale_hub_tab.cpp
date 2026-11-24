@@ -3,7 +3,6 @@
 
 #include <aurore/cadran/ui/cadran_frame.hpp>
 
-#include "action/sync_flow.hpp"
 #include "activity/modules_activity.hpp"
 #include "activity/sync_activity.hpp"
 #include "kit_text.hpp"
@@ -37,10 +36,7 @@ void BorealeHubTab::refresh()
     // The remote link's state, and how many optional sysmodules are on the SD
     // card (whether each exefs.nsp is there: a stat, not its hash, which the
     // screen itself reads).
-    const sync_flow::Status link = sync_flow::status();
-    remote->setDetailText(ui::opens(!link.enabled ? "playguard/sync/state_off"_i18n
-                          : link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
-                                                                              : "playguard/sync/state_offline"_i18n));
+    remote->setDetailText(ui::opens(ModulesActivity::remote_state()));
     int installed = 0;
     for (const auto& m : modules::all())
         installed += paths::file_exists(modules::dir(paths::sd_root(), m) + "/exefs.nsp") ? 1 : 0;

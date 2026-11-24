@@ -13,7 +13,6 @@
 #include "action/pin_lock.hpp"
 #include "action/rescue.hpp"
 #include "action/sync_flow.hpp"
-#include "activity/sync_activity.hpp"
 #include "app.hpp"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
@@ -239,7 +238,6 @@ void ModulesActivity::refresh()
         !modules::bundled(bundled_modules::dir(), agent_module).present)
         agent_text = "playguard/modules/state/not_bundled"_i18n;
     if (this->list) tile(agent, "md_agent", agent_text, color);
-    remote->setDetailText(remote_state());
     if (this->list) this->list->sync();
 }
 
@@ -254,11 +252,6 @@ void ModulesActivity::onContentAvailable()
     intro->setSingleLine(false);
     rescue_note->setSingleLine(false);
     agent_note->setSingleLine(false);
-    remote_note->setSingleLine(false);
-    remote->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new SyncActivity());
-        return true;
-    });
     rescue->registerClickAction([](aurore::View*) {
         aurore::Application::pushActivity(new ModuleActivity(modules::Id::Rescue));
         return true;
@@ -273,7 +266,6 @@ void ModulesActivity::onContentAvailable()
     this->list = std::make_unique<cadran::List>(this->getContentView(), true);
     // The two modules side by side as tiles, what each one does under them.
     this->list->tiles({ { "md_rescue", "unlock" }, { "md_agent", "server" } }, true);
-    this->list->tiles({ { "md_remote", "server" } }, false);
     this->list->apply({});
     this->refresh();
 }

@@ -43,8 +43,6 @@ class ModulesActivity : public aurore::Activity
     AURORE_BIND(aurore::Label,      intro,  "md_intro");
     AURORE_BIND(aurore::Label,      rescue_note, "md_rescue_note");
     AURORE_BIND(aurore::Label,      agent_note,  "md_agent_note");
-    AURORE_BIND(aurore::Label,      remote_note, "md_remote_note");
-    AURORE_BIND(aurore::DetailCell, remote, "md_remote");
     AURORE_BIND(aurore::DetailCell, rescue, "md_rescue");
     AURORE_BIND(aurore::DetailCell, agent,  "md_agent");
 };

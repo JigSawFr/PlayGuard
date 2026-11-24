@@ -174,7 +174,7 @@ const std::pair<const char*, int> TABS[] = {
     { "tab/dashboard", ui::tab::dashboard },       { "tab/play_timer", ui::tab::play_timer },
     { "tab/activity", ui::tab::activity },         { "tab/restrictions", ui::tab::restrictions },
     { "tab/security", ui::tab::security },         { "tab/history", ui::tab::history },
-    { "tab/console", ui::tab::console },           { "tab/boreale", ui::tab::boreale },
+    { "tab/console", ui::tab::console },           { "tab/boreale_hub", ui::tab::boreale },
     { "tab/preferences", ui::tab::preferences },
     { "tab/about", ui::tab::about },
 };

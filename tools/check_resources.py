@@ -329,7 +329,8 @@ DYNAMIC_KEYS = {
     "pin_lock/notes/": array_of("source/action/pin_lock_logic.cpp", "MODES"),
     "pin_lock/again_on/": [m for m in array_of("source/action/pin_lock_logic.cpp", "MODES") if m != "off"],   # pin_lock.cpp, note_text
     "tabs/": array_of("source/util/config.hpp", "START_TABS") +
-    re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")),
+    re.findall(r'open_label\("(\w+)"\)', read(f"{ROOT}/source/action/notices.cpp")) +
+    re.findall(r'"tab/(\w+)"', read(f"{ROOT}/source/activity/screen_hooks.cpp")),   # a tab's screen name, for the way back
     "prefs/effects_values/": array_of(PREFS_HPP, "EFFECTS"),
     "restrictions/org_where/": array_of("source/tab/restrictions_tab.cpp", "ORG_WHERE"),
     "forwarders/icon_lib/": array_of("source/util/forwarder_library.cpp", "IDS"),   # icon_sheet.cpp: the library's icons
