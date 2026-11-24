@@ -1682,12 +1682,6 @@
         }
     },
     "modules": {
-        "title": "Modules facultatifs",
-        "open": "Modules facultatifs",
-        "count": "{} installés",
-        "count_one": "1 installé",
-        "section_modules": "Sysmodules",
-        "intro": "Deux petits programmes en arrière-plan (sysmodules) que PlayGuard peut installer sur la carte SD. Aucun n'est nécessaire. PlayGuard contient les versions faites avec lui et les installe ou les met à jour d'ici, sans ordinateur. Chaque changement demande le code PIN quand Sécurité › Protéger PlayGuard par le code PIN le demande avant un changement.",
         "status": "État",
         "install": "Installer",
         "update": "Mettre à jour",
@@ -1701,8 +1695,7 @@
             "not_installed": "Non installé",
             "not_bundled": "Absent de cette version",
             "installed": "Installé, à jour",
-            "update": "Installé, une mise à jour est disponible",
-            "none": "Aucun installé"
+            "update": "Installé, une mise à jour est disponible"
         },
         "short": {
             "installed": "Installé",
@@ -1735,12 +1728,10 @@
             "installed": "Module de secours installé. Il agit au prochain démarrage si un fichier RESCUE est là.",
             "updated": "Module de secours mis à jour.",
             "remove_body": "Supprimer le module de secours ? Sans lui, un code PIN oublié avec une limite de 0 minute demande un ordinateur.",
-            "short_title": "Module de secours",
-            "blurb": "Module de secours : déverrouille la console au démarrage quand un code PIN oublié et une limite de 0 minute bloquent tout."
+            "short_title": "Module de secours"
         },
         "agent": {
             "title": "Agent Boréale",
-            "blurb": "Agent Boréale : commun à tous les homebrews Boréale. Il garde la connexion à votre broker quand PlayGuard est fermé, reçoit les ordres et vérifie les mises à jour.",
             "other_protocol": "il parle le protocole {}",
             "offer_body": "L'agent Boréale présent sur la carte SD n'est pas celui que contient ce PlayGuard (version {}). Le mettre à jour maintenant ? Il s'arrête un instant, et le précédent est remis si le nouveau ne répond pas.",
             "offer_refused": "Il parle un protocole plus ancien : le lien à distance ne fonctionne pas tant qu'il n'est pas mis à jour."

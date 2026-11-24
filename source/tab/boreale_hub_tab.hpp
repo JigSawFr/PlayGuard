@@ -21,6 +21,7 @@ class BorealeHubTab : public TabBase
   private:
     cadran::List list;
     AURORE_BIND(aurore::DetailCell, remote,      "bh_remote");
-    AURORE_BIND(aurore::DetailCell, modules_cell, "bh_modules");
+    AURORE_BIND(aurore::DetailCell, rescue,      "bh_rescue");
+    AURORE_BIND(aurore::DetailCell, agent,       "bh_agent");
     AURORE_BIND(aurore::DetailCell, boreale,     "bh_boreale");
 };

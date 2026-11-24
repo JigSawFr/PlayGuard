@@ -484,7 +484,7 @@ What PlayGuard shares with the other Boréale homebrews, in a tab of its own: *R
 
 ### Optional modules
 
-*Optional modules ›*, the second line of the *Boréale* tab: install, update, start at boot or remove the recovery module (its own screen, a list like the agent's) and the Boréale agent, shared by every Boréale homebrew: it keeps the connection to the broker up while PlayGuard is closed, receives orders and checks for updates (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
+The *Optional modules* section of the *Boréale* tab, a line for each module (its state on the right; Ⓐ opens its own screen): install, update, start at boot or remove the recovery module (its own screen, a list like the agent's) and the Boréale agent, shared by every Boréale homebrew: it keeps the connection to the broker up while PlayGuard is closed, receives orders and checks for updates (its own screen, the one the other Boréale apps show too: also start and stop it), from the copies PlayGuard carries (no computer needed). Every change asks for the PIN when *Protect PlayGuard with the PIN* does.
 
 ### The Boréale homebrews
 

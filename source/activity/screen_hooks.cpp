@@ -208,7 +208,7 @@ void install_screen_hooks()
     // main.xml's order: Today | timer, activity, restrictions, security, history | console, boreale | preferences, about.
     h.rail_icons = []() {
         return std::vector<std::string>{ "today", "", "timer", "activity", "shield", "lock",
-                                         "history", "", "chip", "mark", "", "settings", "info" };
+                                         "history", "", "chip", "sparkle", "", "settings", "info" };
     };
     // The lines of PlayGuard's own screens that Cadran dresses, and their icons.
     h.screen_icons = []() {

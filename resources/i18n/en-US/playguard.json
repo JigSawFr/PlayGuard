@@ -1682,12 +1682,6 @@
         }
     },
     "modules": {
-        "title": "Optional modules",
-        "open": "Optional modules",
-        "count": "{} installed",
-        "count_one": "1 installed",
-        "section_modules": "Sysmodules",
-        "intro": "Two small background programs (sysmodules) PlayGuard can put on the SD card. Neither is needed. PlayGuard carries the versions made with it and installs or updates them from here, without a computer. Every change asks for the PIN when Security › Protect PlayGuard with the PIN asks for it before a change.",
         "status": "State",
         "install": "Install",
         "update": "Update",
@@ -1701,8 +1695,7 @@
             "not_installed": "Not installed",
             "not_bundled": "Not in this build",
             "installed": "Installed, up to date",
-            "update": "Installed, an update is available",
-            "none": "None installed"
+            "update": "Installed, an update is available"
         },
         "short": {
             "installed": "Installed",
@@ -1735,12 +1728,10 @@
             "installed": "Recovery module installed. It acts at the next boot when a RESCUE file is there.",
             "updated": "Recovery module updated.",
             "remove_body": "Remove the recovery module? Without it, a forgotten PIN with a 0-minute limit needs a computer to fix.",
-            "short_title": "Recovery module",
-            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
+            "short_title": "Recovery module"
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "it speaks protocol {}",
             "offer_body": "The Boréale agent on the SD card is not the one this PlayGuard carries (version {}). Update it now? It stops for a moment, and the previous one is put back if the new one does not answer.",
             "offer_refused": "It speaks an older protocol: the remote link does not work until it is updated."

@@ -27,7 +27,8 @@
 
             <aurore:Header title="@i18n/playguard/hub/section_link" marginBottom="8"/>
             <aurore:DetailCell id="bh_remote" title="@i18n/playguard/sync/title"/>
-            <aurore:DetailCell id="bh_modules" title="@i18n/playguard/modules/open"/>
+            <aurore:DetailCell id="bh_rescue" title="@i18n/playguard/modules/rescue/tab"/>
+            <aurore:DetailCell id="bh_agent" title="@i18n/playguard/modules/agent/title"/>
             <aurore:Header title="@i18n/playguard/hub/section_homebrews" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="bh_boreale" title="@i18n/playguard/about/boreale"/>
 

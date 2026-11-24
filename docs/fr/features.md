@@ -485,7 +485,7 @@ Ce que PlayGuard partage avec les autres homebrews Boréale, dans un onglet à p
 
 ### Modules facultatifs
 
-*Modules facultatifs ›*, la deuxième ligne de l'onglet *Boréale* : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son propre écran, une liste comme celui de l'agent) et l'agent Boréale, commun à tous les homebrews Boréale : il garde la connexion au broker quand PlayGuard est fermé, reçoit les ordres et vérifie les mises à jour (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
+La section *Modules facultatifs* de l'onglet *Boréale*, une ligne par module (son état à droite ; Ⓐ ouvre son écran) : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son propre écran, une liste comme celui de l'agent) et l'agent Boréale, commun à tous les homebrews Boréale : il garde la connexion au broker quand PlayGuard est fermé, reçoit les ordres et vérifie les mises à jour (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
 
 ### Les homebrews Boréale
 

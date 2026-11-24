@@ -1976,16 +1976,15 @@ if MODULES:
     key("Left")                  # the sidebar
     key("Down", steps("security", "boreale"))
     key("Right")                 # Remote access
-    key("Down")                  # Optional modules
-    key("Return")                # the overview: the intro, then a cell per module
+    key("Down")                  # the recovery module, first of the Optional modules
     time.sleep(0.5)
-    shot("07_overview")          # each module's state
-    key("Right")                 # the agent, the tile beside it
+    shot("07_overview")          # each module's state, on the Boréale tab
+    key("Down")                  # the agent
     key("Return")                # Ⓐ opens boreale-kit's screen for it
     time.sleep(0.5)
     shot("08_agent")             # its state, Install (the app carries no copy here: the screen says so)
-    key("Escape")                # back on the overview, the agent's cell
-    key("Left")                  # the recovery module
+    key("Escape")                # back on the Boréale tab, the agent's line
+    key("Up")                    # the recovery module
     key("Return")                # Ⓐ opens that module's screen
     time.sleep(0.5)
     shot("09_rescue_screen")
@@ -2500,7 +2499,7 @@ if CADRAN:
     # Boréale tab › Boréale homebrews: PlayGuard, then the made-up Lantern.
     key("Up", steps("boreale", "about"))   # the sidebar, from About up to Boréale
     key("Right")               # its first line, Remote access
-    key("Down", 2)             # past Optional modules
+    key("Down", 3)             # past the two optional modules
     key("Return")
     time.sleep(0.6)
     shot("10_homebrews")

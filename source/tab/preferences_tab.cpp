@@ -75,7 +75,7 @@ PreferencesTab::PreferencesTab()
         for (const char* t : config::START_TABS) labels.push_back(tab_name(t));
         // Each tab's icon, as the sidebar draws it (ui/cadran_frame.cpp).
         const std::vector<std::string> icons = { "today", "timer",   "activity", "shield", "lock",
-                                                 "history", "chip", "mark", "settings", "info" };
+                                                 "history", "chip", "sparkle", "settings", "info" };
         static_assert(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]) == 10, "an icon for each tab");
         ui::pick_grid("playguard/tools/start_tab"_i18n, labels, icons, index_of(config::START_TABS, config::get().start_tab), [this](int i) {
             config::get().start_tab = config::START_TABS[i];
