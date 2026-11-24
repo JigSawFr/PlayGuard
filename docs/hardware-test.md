@@ -1,6 +1,6 @@
 # Testing on a console: forwarders and the homebrew menu
 
-What the desktop and web simulators cannot show: the console's own HOME menu, its PIN screen, Atmosphère reading `override_config.ini`, the recovery sysmodule at boot. Go through it on a console after a change to *Console › Forwarders* (the files under `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), and note in the pull request what was checked, on which firmware and Atmosphère.
+What the desktop and web simulators cannot show: the console's own HOME menu, its PIN screen, Atmosphère reading `override_config.ini`, the recovery sysmodule at boot. Go through it on a console after a change to *Security › Forwarders* (the files under `source/action/forwarder*`, `hbmenu_lock*`, `source/core/gate*`, `hbl_lock*`, `gate/`, `sysmodule/`), and note in the pull request what was checked, on which firmware and Atmosphère.
 
 Before starting: a PIN on the console, sys-patch (or sigpatch files), sphaira in `/switch/sphaira/`, a computer with an SD card reader at hand, and preferably the recovery sysmodule installed (`playguard-rescue.zip`). Use a console you can put back as it was.
 

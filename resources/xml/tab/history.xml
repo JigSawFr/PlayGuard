@@ -24,10 +24,8 @@
             paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
             <aurore:Label id="hs_intro" text="@i18n/playguard/history/tab_intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
-            <aurore:DetailCell id="hs_changes" focusable="false" title="@i18n/playguard/history/tile_changes"/>
+            <aurore:DetailCell id="hs_changes" title="@i18n/playguard/history/tile_changes"/>
             <aurore:DetailCell id="hs_last_backup" focusable="false" title="@i18n/playguard/backup/tile_last"/>
-            <aurore:Header title="@i18n/playguard/history/title" marginTop="24" marginBottom="8"/>
-            <aurore:DetailCell id="hs_history" title="@i18n/playguard/history/open"/>
             <aurore:Header title="@i18n/playguard/tools/section_backup" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="hs_backup_save" title="@i18n/playguard/tools/backup_save"/>
             <aurore:DetailCell id="hs_backup_restore" title="@i18n/playguard/tools/backup_restore"/>

@@ -174,7 +174,8 @@ const std::pair<const char*, int> TABS[] = {
     { "tab/dashboard", ui::tab::dashboard },       { "tab/play_timer", ui::tab::play_timer },
     { "tab/activity", ui::tab::activity },         { "tab/restrictions", ui::tab::restrictions },
     { "tab/security", ui::tab::security },         { "tab/history", ui::tab::history },
-    { "tab/console", ui::tab::console },           { "tab/preferences", ui::tab::preferences },
+    { "tab/console", ui::tab::console },           { "tab/boreale_hub", ui::tab::boreale },
+    { "tab/preferences", ui::tab::preferences },
     { "tab/about", ui::tab::about },
 };
 }   // namespace
@@ -204,10 +205,10 @@ void install_screen_hooks()
         return -1;
     };
     h.settings_tab = []() { return ui::tab::preferences; };
-    // main.xml's order: Today | timer, activity, restrictions, security, history | console | preferences, about.
+    // main.xml's order: Today | timer, activity, restrictions, security, history | console, boreale | preferences, about.
     h.rail_icons = []() {
         return std::vector<std::string>{ "today", "", "timer", "activity", "shield", "lock",
-                                         "history", "", "chip", "", "settings", "info" };
+                                         "history", "", "chip", "sparkle", "", "settings", "info" };
     };
     // The lines of PlayGuard's own screens that Cadran dresses, and their icons.
     h.screen_icons = []() {

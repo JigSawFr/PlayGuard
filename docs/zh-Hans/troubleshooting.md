@@ -19,13 +19,13 @@ PlayGuard 只能看到它所运行的系统的家长控制：**emuMMC 和 sysMMC
 
 ### 游戏时间阻止了一切（限制为 0 分钟），而且忘记了 PIN
 
-这时 PlayGuard 本身无法启动。请**事先**安装可选的恢复 sysmodule（*主机 › 可选模块*，或手动安装 `playguard-rescue.zip`）；被锁在外面时，在 SD 卡上放一个空的 `config/playguard/RESCUE` 文件并启动主机——它会解除主机的锁定，让 PlayGuard 能够打开。见 [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)（英文）。
+这时 PlayGuard 本身无法启动。请**事先**安装可选的恢复 sysmodule（*Boréale › 可选模块*，或手动安装 `playguard-rescue.zip`）；被锁在外面时，在 SD 卡上放一个空的 `config/playguard/RESCUE` 文件并启动主机——它会解除主机的锁定，让 PlayGuard 能够打开。见 [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)（英文）。
 
 这个模块必须与 PlayGuard 的版本一致：每次更新 PlayGuard 后，重新解压该版本的 `playguard-rescue.zip`（或者在通知铃铛的 *恢复 sysmodule 不是最新版本* 上选择 *更新*），然后重启主机。较旧的模块留下的报告 PlayGuard 无法核验：这时恢复画面不提供任何操作，会说明模块较旧，再次使用 `RESCUE` 也是同样的结果，直到它被更新。
 
 ### Homebrew 菜单被锁定
 
-*主机 › 转发器 › 锁定自制软件菜单* 让相册和按住 R 启动的游戏都无法打开 Homebrew 菜单。如果 PlayGuard 的转发器和受保护的菜单都不在了（在主机的“设置”中被删除，或者在另一个系统上：锁定位于 SD 卡上，sysMMC 和 emuMMC 都会读取它）：
+*安全 › 转发器 › 锁定自制软件菜单* 让相册和按住 R 启动的游戏都无法打开 Homebrew 菜单。如果 PlayGuard 的转发器和受保护的菜单都不在了（在主机的“设置”中被删除，或者在另一个系统上：锁定位于 SD 卡上，sysMMC 和 emuMMC 都会读取它）：
 
 - **从电脑上：** 删除 SD 卡上的 `atmosphere/config/override_config.ini`（或者放回 `config/playguard/override_config.ini.backup`，即原来的文件），然后重启主机。
 - **安装了恢复 sysmodule 时**（可选）：在 SD 卡上放一个空的 `config/playguard/RESCUE` 文件并重启；该 sysmodule 会在启动时解除锁定，PlayGuard 下次启动时会说明这一点。锁定之后更新了 Atmosphère，也会以同样的方式解除锁定。
@@ -40,7 +40,7 @@ PlayGuard 帮不上忙：它需要 Atmosphère。任天堂客服的主密钥（m
 
 剩余时间约 90 秒没有变化时，*今天* 会显示 *主机目前没有计算游戏时间*。可能的原因：
 
-- **网络时钟从未设置。** *主机 › 网络时钟 › 测量时间差*，然后设置它（[网络时钟](features.md#网络时钟)）。
+- **网络时钟从未设置。** *游戏时间 › 网络时钟 › 测量时间差*，然后设置它（[网络时钟](features.md#网络时钟)）。
 - **时钟被调回。** 时钟往回调后，计时会停止，直到时钟走过原来的时间；无需任何操作。
 - **刚刚写入了限制。** 启动一个游戏玩一分钟，然后再查看。
 - **家长控制已暂时解除。** 这时游戏时间可能不会计入：*今天 › 重新启用*（或点击标题栏的胶囊标签）。
@@ -76,15 +76,15 @@ PlayGuard 帮不上忙：它需要 Atmosphère。任天堂客服的主密钥（m
 
 ### 受保护的转发器显示错误 2347-0100
 
-它的门禁（`config/playguard/gate-….nro`）已不再是制作转发器时的那个文件：它在 SD 卡上被更改或替换了，所以转发器不会启动它。从 PlayGuard 自己的转发器打开 PlayGuard：它在启动时会重新写入门禁；*主机 › 转发器 › 全部重新安装* 会用它重新制作所有转发器。
+它的门禁（`config/playguard/gate-….nro`）已不再是制作转发器时的那个文件：它在 SD 卡上被更改或替换了，所以转发器不会启动它。从 PlayGuard 自己的转发器打开 PlayGuard：它在启动时会重新写入门禁；*安全 › 转发器 › 全部重新安装* 会用它重新制作所有转发器。
 
 ### 受保护的转发器一打开就关闭（“发生错误”）
 
-在出现任何 PlayGuard 画面之前，没有错误代码（Atmosphère 在 `atmosphere/crash_reports/` 中的报告指出 `forwarder` 模块，结果为 `2000-0000`）：它是由某个 PlayGuard 制作的，而那个 PlayGuard 的门禁在构建时缺少资源，被转发器的加载程序拒绝了。更新 PlayGuard，然后重新制作它：铃铛和 *主机 › 转发器* 会为每个用较旧加载程序制作的转发器提供这一操作。
+在出现任何 PlayGuard 画面之前，没有错误代码（Atmosphère 在 `atmosphere/crash_reports/` 中的报告指出 `forwarder` 模块，结果为 `2000-0000`）：它是由某个 PlayGuard 制作的，而那个 PlayGuard 的门禁在构建时缺少资源，被转发器的加载程序拒绝了。更新 PlayGuard，然后重新制作它：铃铛和 *安全 › 转发器* 会为每个用较旧加载程序制作的转发器提供这一操作。
 
 ### 受保护的转发器输入 PIN 后停在门禁画面上
 
-PIN 已被接受，带有 Homebrew 图标的画面却一直停着，之后什么也没有发生：它的门禁用单个缓冲区绘制了那个画面，然后一直等待绘制下一个画面。更新 PlayGuard，然后重新制作它：铃铛和 *主机 › 转发器* 会为每个用较旧门禁制作的转发器提供这一操作。
+PIN 已被接受，带有 Homebrew 图标的画面却一直停着，之后什么也没有发生：它的门禁用单个缓冲区绘制了那个画面，然后一直等待绘制下一个画面。更新 PlayGuard，然后重新制作它：铃铛和 *安全 › 转发器* 会为每个用较旧门禁制作的转发器提供这一操作。
 
 ### 转发器显示“无法启动软件”
 
@@ -93,7 +93,7 @@ PIN 已被接受，带有 Homebrew 图标的画面却一直停着，之后什么
 - **sys-patch 旁边还有 sigpatch 文件。** sys-patch 运行时，`atmosphere/kip_patches/fs_patches`、`loader_patches` 或 `atmosphere/exefs_patches/es_patches` 中还有 `.ips` 文件：两个工具在修补同样的检查，这是 GBAtemp 上 sys-patch 和 sigpatch 讨论帖中最常提到的原因。*主机 › 游戏补丁* 会对此发出提示，在那里按 Ⓐ 可以把它们移到一旁（移到 `config/playguard/sigpatches-aside/`，从不删除；hekate 的 `bootloader/patches.ini` 保持不动）。然后重启主机。
 - **sys-patch 没有应用某个特征码。** 转发器需要它的 fs 和 loader 补丁，也就是它针对这个系统版本的所有特征码（`noncasigchk_17.0.0+`、`nocntchk_19.0.0+`、`noacidsigchk_10.0.0+`），而不只是每个模块一个。*关于 › 帮助与诊断 › 导出诊断报告* 会在它的 `game patches` 一行列出 sys-patch 的版本和每个没有应用的特征码；`sd:/config/sys-patch/log.ini` 中也有同样的内容。检查 `config/sys-patch/config.ini` 是否修补这个系统（emuMMC 上为 `patch_emummc=1`），并且没有关闭其中任何一项；sys-patch 的维护者本人表示，23.0.x 不需要比 1.6.2.3 更新的 sys-patch。
 - **补丁更改后没有重启。** sys-patch 在开机时打补丁。
-- **由较早版本的 PlayGuard 制作的转发器。** 铃铛和 *主机 › 转发器* 会提议重新制作那些用较旧加载程序构建的转发器。
+- **由较早版本的 PlayGuard 制作的转发器。** 铃铛和 *安全 › 转发器* 会提议重新制作那些用较旧加载程序构建的转发器。
 
 ### 铃铛或某个标签页显示琥珀色标记
 

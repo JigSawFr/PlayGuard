@@ -62,7 +62,7 @@ settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreal
 | `pin_ask_again` | boolean | the PIN, once entered, holds 5 minutes instead of until PlayGuard closes: *Before a change* asks again after them, *To open PlayGuard* locks again after 5 minutes or more out of focus | `false` | Security (*Ask for the PIN again after 5 minutes*) |
 | `pin_pauses` | boolean | once the PIN is entered, parental controls are paused (unlocked temporarily) while PlayGuard is open and in focus, so the time spent in it does not take from the child's; they come back on as it is left. Off, entering the PIN changes nothing on the console | `false` | Security (*Pause parental controls while I'm in PlayGuard*) |
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
-| `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Console › Network clock |
+| `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Play timer › Network clock |
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
 | `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `3` last 30 days, `2` all time | `1` | Activity, Activity › All games |
 | `games_grid` | boolean | *Activity › All games* shows the games as a grid of covers; off, as a list | `true` | Activity › All games (Ⓨ) |
@@ -112,7 +112,7 @@ settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreal
 
 ## Updates
 
-`update_via`, `update_daily` and `sphaira_entry` are set in *Preferences › Updates*; *About › Check for updates* checks at once.
+`update_via`, `update_daily` and `sphaira_entry` are set in *About › Updates*; *About › Check for updates* checks at once.
 
 | Key | Type | Values | Default |
 |---|---|---|---|
@@ -133,7 +133,7 @@ settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreal
 | `support_reminder` | boolean | *Support PlayGuard* once a month at start-up (*Preferences › Notifications*) | `true` |
 | `support_reminded` | string | `"YYYY-MM-DD"` of the last reminder; anything else is cleared | `""` |
 | `seen_version` | string | the version whose *What's new* was shown; at most 32 characters | `""` |
-| `agent_update_skipped` | string | the SHA-256 of the Boréale agent PlayGuard carries that the offer to update the installed one was answered *Later* to: not offered again at start-up for that build (*Console › Optional modules* still offers it); at most 64 characters | `""` |
+| `agent_update_skipped` | string | the SHA-256 of the Boréale agent PlayGuard carries that the offer to update the installed one was answered *Later* to: not offered again at start-up for that build (*Boréale › Optional modules* still offers it); at most 64 characters | `""` |
 | `notices_system` | boolean | the notification bell shows newer Atmosphère, hekate and firmware releases (*Preferences › Notifications*) | `true` |
 | `notices_summary` | boolean | the bell shows the week's play time and a limit passed on several days | `true` |
 | `notices_reminders` | boolean | the bell reminds of a settings backup to make, the other system's parental controls and *Block all games* on for a week | `true` |
@@ -214,7 +214,7 @@ over (unless that day's limit was changed since). All four keys go together.
 ### Scheduled profile
 
 *Play timer › Profiles › Scheduled profile*: a profile for a period, set by
-an earlier version (a new one is Home Assistant's: *Console › Remote access*). When the period begins, PlayGuard asks to put it in force (once a day, when it is
+an earlier version (a new one is Home Assistant's: *Boréale › Remote access*). When the period begins, PlayGuard asks to put it in force (once a day, when it is
 opened); once it is over, to put back the limits it replaced. A period that
 went by with the profile never in force is forgotten. The six keys go
 together.

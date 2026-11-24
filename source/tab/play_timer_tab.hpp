@@ -54,6 +54,7 @@ class PlayTimerTab : public TabBase
     AURORE_BIND(aurore::Label,       limit_note,      "pt_limit_note");
     AURORE_BIND(aurore::Header,      lock_header,     "pt_lock_header");
     AURORE_BIND(aurore::DetailCell,  console_lock_cell, "pt_console_lock");
+    AURORE_BIND(aurore::DetailCell,  clock_cell,      "pt_clock");
     AURORE_BIND(aurore::Label,       console_lock_note, "pt_console_lock_note");
     AURORE_BIND(aurore::Header,      bedtime_header,  "pt_bedtime_header");
     AURORE_BIND(aurore::DetailCell,  bedtime_reset,   "pt_bedtime_reset");

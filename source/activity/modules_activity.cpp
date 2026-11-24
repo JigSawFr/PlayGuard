@@ -13,7 +13,6 @@
 #include "action/pin_lock.hpp"
 #include "action/rescue.hpp"
 #include "action/sync_flow.hpp"
-#include "activity/sync_activity.hpp"
 #include "app.hpp"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
@@ -219,61 +218,14 @@ std::string ModulesActivity::remote_state()
     return link.agent ? aurore::getStr("playguard/sync/state_agent", text) : text;
 }
 
-void ModulesActivity::refresh()
+std::string ModulesActivity::agent_summary(const char** color)
 {
-    // Each module as a tile: its state, with a check when it is as it should
-    // be and a warning when it needs an update or a look.
-    const auto tile = [this](aurore::DetailCell* cell, const char* id, const std::string& text, const char* color) {
-        cell->setDetailText(text);
-        const std::string c = color ? color : "";
-        this->list->state(id, c == "cadran/teal" ? "cadran/teal_fill" : c == "cadran/amber" ? "cadran/amber_fill" : nullptr);
-    };
-    const char* color = nullptr;
-    const std::string rescue_text = summary(modules::Id::Rescue, &color);
-    if (this->list) tile(rescue, "md_rescue", rescue_text, color);
-    std::string agent_text = AgentActivity::summary(&color);
-    // The kit's line is long for a tile ("Not installed (not carried by this
-    // build)"): the short one this screen already has for the other module.
+    std::string text = AgentActivity::summary(color);
+    // The kit's line is long for a cell ("Not installed (not carried by this
+    // build)"): the short one the recovery module has.
     const modules::Module& agent_module = modules::get(modules::Id::Agent);
     if (!modules::state(paths::sd_root(), agent_module).installed &&
         !modules::bundled(bundled_modules::dir(), agent_module).present)
-        agent_text = "playguard/modules/state/not_bundled"_i18n;
-    if (this->list) tile(agent, "md_agent", agent_text, color);
-    remote->setDetailText(remote_state());
-    if (this->list) this->list->sync();
-}
-
-void ModulesActivity::onResume()
-{
-    this->refresh();   // back from a module's screen: its new state
-    ui::keep_focus(this);   // after a dialog whose opener went (ui.hpp)
-}
-
-void ModulesActivity::onContentAvailable()
-{
-    intro->setSingleLine(false);
-    rescue_note->setSingleLine(false);
-    agent_note->setSingleLine(false);
-    remote_note->setSingleLine(false);
-    remote->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new SyncActivity());
-        return true;
-    });
-    rescue->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new ModuleActivity(modules::Id::Rescue));
-        return true;
-    });
-    agent->registerClickAction([](aurore::View*) {
-        // The screen is the kit's, shared with the other apps; the PIN and the
-        // history are PlayGuard's, through the flow's hooks.
-        agent_update::install_hooks();
-        aurore::Application::pushActivity(new AgentActivity());
-        return true;
-    });
-    this->list = std::make_unique<cadran::List>(this->getContentView(), true);
-    // The two modules side by side as tiles, what each one does under them.
-    this->list->tiles({ { "md_rescue", "unlock" }, { "md_agent", "server" } }, true);
-    this->list->tiles({ { "md_remote", "server" } }, false);
-    this->list->apply({});
-    this->refresh();
+        text = "playguard/modules/state/not_bundled"_i18n;
+    return text;
 }

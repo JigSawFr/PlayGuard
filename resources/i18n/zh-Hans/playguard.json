@@ -15,6 +15,8 @@
         "clock": "网络时钟",
         "security": "安全",
         "history": "历史记录",
+        "boreale_hub": "Boréale",
+        "boreale": "Boréale",
         "console": "主机",
         "preferences": "偏好设置",
         "about": "关于"
@@ -208,6 +210,7 @@
         "profile_action_edit": "编辑限制…",
         "profile_action_rename": "重命名…",
         "profile_edit_title": "配置：{}",
+        "section_reliability": "Reliability",
         "section_bedtime": "就寝时间",
         "bedtime_reset": "可再次游玩的时间",
         "bedtime_note": "适用于每一天，或按星期设置。到就寝时间时，主机会显示提醒，也可能中断软件（见“时间到时”），直到可以再次游玩。PlayGuard 会检查主机是否报告新的时间，否则会恢复之前的设置。",
@@ -282,7 +285,7 @@
         "write_err": "无法应用游戏时间限制",
         "removed": "已取消游戏时间限制。",
         "remove_err": "无法取消游戏时间限制",
-        "not_counting": "主机目前没有计算游戏时间。可能的原因：时钟被调回（之后会重新计时）、网络时钟从未设置（“主机 › 网络时钟”），或刚刚写入了限制（启动一个游戏玩一分钟后再查看）。",
+        "not_counting": "主机目前没有计算游戏时间。可能的原因：时钟被调回（之后会重新计时）、网络时钟从未设置（“游戏时间 › 网络时钟”），或刚刚写入了限制（启动一个游戏玩一分钟后再查看）。",
         "limit_note": "达到限制时，主机会显示“时间到”，然后按照“时间到时”的设置中断游戏或仅提醒。",
         "unsaved": "未保存的进度可能会丢失：请先让孩子存档。",
         "profile_already": "配置“{}”已经应用。",
@@ -505,7 +508,7 @@
             "timeout": "无响应",
             "bad_reply": "响应无效"
         },
-        "start_off": "网络时钟误差为{}（以{}为准）。游戏时间依赖网络时钟：请查看“主机 › 网络时钟”。",
+        "start_off": "网络时钟误差为{}（以{}为准）。游戏时间依赖网络时钟：请查看“游戏时间 › 网络时钟”。",
         "guided_body": "网络时钟不准确，而游戏时间依赖网络时钟。\n\n要现在通过{}测量时间吗？（主机需连接网络。）设置时钟前会再次询问。",
         "guided_measure": "立即测量",
         "guided_fine": "网络时钟准确：无需操作。",
@@ -540,7 +543,6 @@
     "security": {
         "section_status": "状态",
         "pin": "PIN",
-        "restrictions": "限制已启用",
         "section_actions": "操作",
         "set_pin": "设置或更改PIN",
         "show_pin": "显示PIN…",
@@ -646,7 +648,6 @@
     },
     "tools": {
         "section_diag": "诊断",
-        "section_tools": "工具",
         "section_reports": "报告",
         "section_system": "系统",
         "export": "导出诊断报告",
@@ -700,7 +701,6 @@
         "extra_amounts": "加时选项",
         "extra_auto": "“今天停止游玩”后，第二天自动恢复平时的限制",
         "clock_check": "启动时检查网络时钟",
-        "section_about": "关于",
         "version": "版本",
         "firmware": "系统版本",
         "atmosphere": "Atmosphère",
@@ -1135,6 +1135,11 @@
         "refresh_title": "用旧加载器制作的转发器",
         "refresh_detail": "{}：由旧版PlayGuard制作。重新制作后，它们将用此版本的加载器启动各自的Homebrew。"
     },
+    "hub": {
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "可选模块"
+    },
     "hbmenu": {
         "section": "自制软件菜单",
         "cell": "锁定自制软件菜单",
@@ -1252,9 +1257,9 @@
         "credit_ui": "界面",
         "credit_family": "所属",
         "section_support": "支持 PlayGuard",
+        "section_help": "帮助",
         "support_note": "PlayGuard 免费、开源且无广告。如果它对您的家庭有帮助，可以支持它的开发：用手机扫描二维码（选中可放大）。",
-        "whats_new_close": "继续",
-        "boreale": "Boréale 自制软件"
+        "whats_new_close": "继续"
     },
     "prefs": {
         "section_app": "应用",
@@ -1300,7 +1305,7 @@
         "forwarders_body": "此备份中还有{}个已不在HOME菜单上的转发器：{}。要恢复吗？",
         "forwarders_put_back": "恢复",
         "forwarders_lock_title": "自制软件菜单曾被锁定",
-        "forwarders_lock": "制作此备份时它处于锁定状态。请在主机 › 转发器中重新锁定：先进行检查。"
+        "forwarders_lock": "制作此备份时它处于锁定状态。请在安全 › 转发器中重新锁定：先进行检查。"
     },
     "update": {
         "title": "有可用更新"
@@ -1390,9 +1395,6 @@
     "history": {
         "title": "更改历史",
         "tab_intro": "设置的每次更改及其备份。游玩情况请看“游玩记录”。",
-        "open": "通过PlayGuard进行的更改",
-        "count": "已记录{}条",
-        "count_one": "已记录1条",
         "tile_changes": "更改",
         "none": "尚无记录。PlayGuard对主机进行的每项更改（限制、限制等级、PIN、解除…）都会列在这里。",
         "note": "最近{}条更改，保存在SD卡的{}中。在更改上按A可查看详情，并在可能时恢复之前的值。",
@@ -1553,7 +1555,7 @@
     },
     "sync": {
         "title": "远程访问",
-        "intro": "把这台主机连接到 MQTT broker（Home Assistant 的 Mosquitto 应用，或其他任何 broker）：Home Assistant 随后会显示它的状态和游戏时间，并可以向它发送指令。连接在 PlayGuard 打开期间运行，安装可选的代理程序后则始终运行（主机 › 可选模块）。Broker 的设置保存在 {} 中，其余保存在 {} 中。",
+        "intro": "把这台主机连接到 MQTT broker（Home Assistant 的 Mosquitto 应用，或其他任何 broker）：Home Assistant 随后会显示它的状态和游戏时间，并可以向它发送指令。连接在 PlayGuard 打开期间运行，安装可选的代理程序后则始终运行（Boréale › 可选模块）。Broker 的设置保存在 {} 中，其余保存在 {} 中。",
         "section_status": "连接",
         "status": "状态",
         "sync_now": "立即同步",
@@ -1618,7 +1620,7 @@
         "status_agent": "代理程序 {} 负责维持连接：PlayGuard 把读取到的内容交给它，并执行它转交的指令。",
         "status_agent_read_only": "代理程序单独运行时不会更改任何内容：PlayGuard 上次处于只读模式，或者自 PlayGuard 上次运行以来系统版本已更改。",
         "state_agent": "{} · 经由代理程序",
-        "state_agent_refused": "代理程序 {} 需要更新（主机 › 可选模块）",
+        "state_agent_refused": "代理程序 {} 需要更新（Boréale › 可选模块）",
         "ask_body": "通过远程连接收到一条指令：{}。\n\n要在这台主机上执行吗？",
         "ask_confirm": "执行",
         "done": "远程指令已执行：{}。",
@@ -1674,13 +1676,6 @@
         }
     },
     "modules": {
-        "title": "可选模块",
-        "open": "可选模块",
-        "count": "已安装 {} 个",
-        "count_one": "已安装 1 个",
-        "section_modules": "Sysmodules",
-        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
-        "intro": "PlayGuard 可以放到 SD 卡上的两个小型后台程序（sysmodule）。两者都不是必需的，各自只做一件事。PlayGuard 附带与它一起制作的版本，可在这里安装或更新，无需电脑。当“安全 › 用PIN保护PlayGuard”设为更改前要求输入 PIN 时，每项更改都需要输入 PIN。",
         "status": "状态",
         "install": "安装",
         "update": "更新",
@@ -1694,8 +1689,7 @@
             "not_installed": "未安装",
             "not_bundled": "此构建中没有",
             "installed": "已安装，已是最新",
-            "update": "已安装，有可用更新",
-            "none": "未安装任何模块"
+            "update": "已安装，有可用更新"
         },
         "short": {
             "installed": "已安装",
@@ -1728,12 +1722,10 @@
             "installed": "恢复模块已安装。下次开机时，如果有 RESCUE 文件，它就会起作用。",
             "updated": "恢复模块已更新。",
             "remove_body": "要移除恢复模块吗？没有它，在限制为 0 分钟时忘记 PIN，就需要用电脑来解决。",
-            "short_title": "恢复模块",
-            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
+            "short_title": "恢复模块"
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "它使用协议 {}",
             "offer_body": "SD 卡上的Boréale agent不是这个 PlayGuard 附带的那个（版本 {}）。要现在更新吗？它会短暂停止；如果新版本没有响应，会恢复之前的版本。",
             "offer_refused": "它使用较旧的协议：更新之前，远程连接无法使用。"
@@ -2079,7 +2071,7 @@
         "remove": "移除",
         "removed": "已移除计划的配置。",
         "soon": "通过 Home Assistant",
-        "soon_note": "PlayGuard 只在打开时运行，因此无法在指定的日子自行切换配置。Home Assistant 可以：“主机 › 远程访问”把主机连接到它，再由自动化根据日历或学校假期选择配置（它的“配置”选择器）。"
+        "soon_note": "PlayGuard 只在打开时运行，因此无法在指定的日子自行切换配置。Home Assistant 可以：“Boréale › 远程访问”把主机连接到它，再由自动化根据日历或学校假期选择配置（它的“配置”选择器）。"
     },
     "sigpatch": {
         "set_aside": "将签名补丁文件移到一旁",
@@ -2089,7 +2081,6 @@
         "done": "签名补丁文件已移到一旁。请重新启动主机，然后再试一次转发器。"
     },
     "boreale": {
-        "intro": "此主机上安装的 Boréale 家族自制软件：每个软件启动时会把自己添加到这里。在其中一个上按 A 即可打开。",
         "this_app": "本应用",
         "open_manual": "请从自制软件菜单打开 {}。"
     },

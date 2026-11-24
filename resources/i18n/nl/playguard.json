@@ -15,6 +15,8 @@
         "clock": "Netwerkklok",
         "security": "Beveiliging",
         "history": "Geschiedenis",
+        "boreale_hub": "Boréale",
+        "boreale": "Boréale",
         "console": "Console",
         "preferences": "Voorkeuren",
         "about": "Info"
@@ -208,6 +210,7 @@
         "profile_action_edit": "Limieten bewerken…",
         "profile_action_rename": "Hernoemen…",
         "profile_edit_title": "Profiel: {}",
+        "section_reliability": "Betrouwbaarheid",
         "section_bedtime": "Bedtijd",
         "bedtime_reset": "Weer spelen vanaf",
         "bedtime_note": "Voor elke dag, of per dag van de week. Op bedtijd toont de console het alarm, en onderbreekt hij misschien ook de software (zie \"Als de tijd om is\"), totdat er weer gespeeld mag worden. PlayGuard controleert of de console de nieuwe tijd meldt, en zet anders de vorige instellingen terug.",
@@ -282,7 +285,7 @@
         "write_err": "Kan de speeltijdlimiet niet toepassen",
         "removed": "Speeltijdlimiet verwijderd.",
         "remove_err": "Kan de speeltijdlimiet niet verwijderen",
-        "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (Console › Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
+        "not_counting": "De console telt op dit moment geen speeltijd. Waarschijnlijke oorzaken: de klok is teruggezet (later telt hij weer), de netwerkklok is nooit ingesteld (Speeltijdtimer › Netwerkklok), of er is net een limiet geschreven (start een game voor een minuut en kijk dan opnieuw).",
         "limit_note": "Bij de limiet toont de console \"Tijd is om\" en onderbreekt hij daarna de game of waarschuwt hij alleen, volgens \"Als de tijd om is\".",
         "unsaved": "Niet-opgeslagen voortgang kan verloren gaan: laat het kind eerst opslaan.",
         "profile_already": "Het profiel ‘{}’ is al toegepast.",
@@ -505,7 +508,7 @@
             "timeout": "geen antwoord",
             "bad_reply": "ongeldig antwoord"
         },
-        "start_off": "De netwerkklok wijkt {} af (gecontroleerd met {}). De speeltijdtimer is ervan afhankelijk: zie Console › Netwerkklok.",
+        "start_off": "De netwerkklok wijkt {} af (gecontroleerd met {}). De speeltijdtimer is ervan afhankelijk: zie Speeltijdtimer › Netwerkklok.",
         "guided_body": "De netwerkklok is onnauwkeurig, en de speeltijdtimer is ervan afhankelijk.\n\nNu de tijd meten met {}? (De console moet online zijn.) Daarna krijg je eerst nog de vraag of de klok mag worden ingesteld.",
         "guided_measure": "Nu meten",
         "guided_fine": "De netwerkklok is nauwkeurig: niets te doen.",
@@ -540,7 +543,6 @@
     "security": {
         "section_status": "Status",
         "pin": "Pincode",
-        "restrictions": "Beperkingen ingeschakeld",
         "section_actions": "Acties",
         "set_pin": "Pincode instellen of wijzigen",
         "show_pin": "Pincode tonen…",
@@ -646,7 +648,6 @@
     },
     "tools": {
         "section_diag": "Diagnose",
-        "section_tools": "Hulpmiddelen",
         "section_reports": "Rapporten",
         "section_system": "Systeem",
         "export": "Een diagnoserapport exporteren",
@@ -700,7 +701,6 @@
         "extra_amounts": "Hoeveelheden extra tijd",
         "extra_auto": "Limiet vanzelf terug na \"Vandaag niet meer spelen\"",
         "clock_check": "Netwerkklok controleren bij het opstarten",
-        "section_about": "Info",
         "version": "Versie",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
@@ -1135,6 +1135,11 @@
         "refresh_title": "Forwarders gemaakt met een oudere loader",
         "refresh_detail": "{}: gemaakt door een oudere PlayGuard. Opnieuw gemaakt starten ze hun homebrew met de loader van deze build."
     },
+    "hub": {
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Optionele modules"
+    },
     "hbmenu": {
         "section": "Homebrewmenu",
         "cell": "Homebrewmenu vergrendelen",
@@ -1252,9 +1257,9 @@
         "credit_ui": "Interface",
         "credit_family": "Onderdeel van",
         "section_support": "PlayGuard steunen",
+        "section_help": "Help",
         "support_note": "PlayGuard is gratis, open source en zonder advertenties. Helpt het je gezin, dan kun je de ontwikkeling steunen: scan een code met je telefoon (selecteer hem om te vergroten).",
-        "whats_new_close": "Doorgaan",
-        "boreale": "Boréale-homebrews"
+        "whats_new_close": "Doorgaan"
     },
     "prefs": {
         "section_app": "App",
@@ -1300,7 +1305,7 @@
         "forwarders_body": "Deze back-up heeft ook {} forwarders die niet meer in het HOME-menu staan: {}. Terugzetten?",
         "forwarders_put_back": "Terugzetten",
         "forwarders_lock_title": "Het homebrewmenu was vergrendeld",
-        "forwarders_lock": "Het was vergrendeld toen deze back-up werd gemaakt. Vergrendel het opnieuw via Console › Forwarders: eerst komen de controles."
+        "forwarders_lock": "Het was vergrendeld toen deze back-up werd gemaakt. Vergrendel het opnieuw via Beveiliging › Forwarders: eerst komen de controles."
     },
     "update": {
         "title": "Update beschikbaar"
@@ -1390,9 +1395,6 @@
     "history": {
         "title": "Wijzigingsgeschiedenis",
         "tab_intro": "Elke wijziging van de instellingen, en hun back-ups. Wat er gespeeld is, staat bij Activiteit.",
-        "open": "Wijzigingen via PlayGuard",
-        "count": "{} vastgelegd",
-        "count_one": "1 vastgelegd",
         "tile_changes": "Wijzigingen",
         "none": "Nog niets vastgelegd. Elke wijziging die PlayGuard op de console maakt (limieten, beperkingsniveau, pincode, ontgrendelingen…) wordt hier vermeld.",
         "note": "De {} nieuwste wijzigingen, bewaard op de SD-kaart in {}. Druk op A bij een wijziging om die te bekijken en, indien mogelijk, de vorige waarde terug te zetten.",
@@ -1553,7 +1555,7 @@
     },
     "sync": {
         "title": "Toegang op afstand",
-        "intro": "Verbindt deze console met een MQTT-broker (de Mosquitto-app van Home Assistant, of een andere): Home Assistant toont dan de status en speeltijd ervan, en kan er opdrachten naartoe sturen. De verbinding werkt terwijl PlayGuard open is, of altijd met de optionele agent (Console › Optionele modules). De instellingen van de broker worden bewaard in {}, de rest in {}.",
+        "intro": "Verbindt deze console met een MQTT-broker (de Mosquitto-app van Home Assistant, of een andere): Home Assistant toont dan de status en speeltijd ervan, en kan er opdrachten naartoe sturen. De verbinding werkt terwijl PlayGuard open is, of altijd met de optionele agent (Boréale › Optionele modules). De instellingen van de broker worden bewaard in {}, de rest in {}.",
         "section_status": "Verbinding",
         "status": "Status",
         "sync_now": "Nu synchroniseren",
@@ -1618,7 +1620,7 @@
         "status_agent": "De agent {} houdt de verbinding: PlayGuard geeft hem door wat het leest en voert de opdrachten uit die hij doorgeeft.",
         "status_agent_read_only": "Op zichzelf wijzigt de agent niets: PlayGuard stond in alleen-lezenmodus, of de firmware is veranderd sinds PlayGuard voor het laatst draaide.",
         "state_agent": "{} · via de agent",
-        "state_agent_refused": "De agent {} moet worden bijgewerkt (Console › Optionele modules)",
+        "state_agent_refused": "De agent {} moet worden bijgewerkt (Boréale › Optionele modules)",
         "ask_body": "Er kwam een opdracht binnen via de verbinding op afstand: {}.\n\nUitvoeren op deze console?",
         "ask_confirm": "Uitvoeren",
         "done": "Opdracht op afstand uitgevoerd: {}.",
@@ -1674,13 +1676,6 @@
         }
     },
     "modules": {
-        "title": "Optionele modules",
-        "open": "Optionele modules",
-        "count": "{} geïnstalleerd",
-        "count_one": "1 geïnstalleerd",
-        "section_modules": "Sysmodules",
-        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
-        "intro": "Twee kleine achtergrondprogramma's (sysmodules) die PlayGuard op de SD-kaart kan zetten. Geen van beide is nodig, en elk doet één ding. PlayGuard bevat de versie die ermee is gemaakt en installeert of werkt die van hieruit bij, zonder computer. Elke wijziging vraagt om de pincode als Beveiliging › PlayGuard beveiligen met de pincode daarom vraagt vóór een wijziging.",
         "status": "Toestand",
         "install": "Installeren",
         "update": "Bijwerken",
@@ -1694,8 +1689,7 @@
             "not_installed": "Niet geïnstalleerd",
             "not_bundled": "Niet in deze build",
             "installed": "Geïnstalleerd, up-to-date",
-            "update": "Geïnstalleerd, er is een update beschikbaar",
-            "none": "Geen geïnstalleerd"
+            "update": "Geïnstalleerd, er is een update beschikbaar"
         },
         "short": {
             "installed": "Geïnstalleerd",
@@ -1728,12 +1722,10 @@
             "installed": "Herstelmodule geïnstalleerd. Hij doet iets bij de volgende keer opstarten als er een RESCUE-bestand staat.",
             "updated": "Herstelmodule bijgewerkt.",
             "remove_body": "De herstelmodule verwijderen? Zonder deze module is bij een vergeten pincode met een limiet van 0 minuten een computer nodig.",
-            "short_title": "Herstelmodule",
-            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
+            "short_title": "Herstelmodule"
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "hij spreekt protocol {}",
             "offer_body": "De agent voor de verbinding op afstand op de SD-kaart is niet die van deze PlayGuard (versie {}). Nu bijwerken? Hij stopt even, en de vorige wordt teruggezet als de nieuwe niet antwoordt.",
             "offer_refused": "Hij spreekt een ouder protocol: de verbinding op afstand werkt pas als hij is bijgewerkt."
@@ -2079,7 +2071,7 @@
         "remove": "Verwijderen",
         "removed": "Gepland profiel verwijderd.",
         "soon": "Met Home Assistant",
-        "soon_note": "PlayGuard draait alleen terwijl het open is, dus kan het niet zelf op de juiste dag van profiel wisselen. Home Assistant kan dat wel: Console › Toegang op afstand verbindt de console ermee, en een automatisering kiest het profiel (zijn keuzelijst Profiel) vanuit een agenda of de schoolvakanties."
+        "soon_note": "PlayGuard draait alleen terwijl het open is, dus kan het niet zelf op de juiste dag van profiel wisselen. Home Assistant kan dat wel: Boréale › Toegang op afstand verbindt de console ermee, en een automatisering kiest het profiel (zijn keuzelijst Profiel) vanuit een agenda of de schoolvakanties."
     },
     "sigpatch": {
         "set_aside": "De sigpatch-bestanden opzijzetten",
@@ -2089,7 +2081,6 @@
         "done": "De sigpatch-bestanden zijn opzijgezet. Start de console opnieuw op en probeer de forwarder daarna nog eens."
     },
     "boreale": {
-        "intro": "De homebrews van de Boréale-familie op deze console: elk voegt zich hier toe bij het starten. A op een ervan opent het.",
         "this_app": "Deze app",
         "open_manual": "Open {} via het homebrewmenu."
     },

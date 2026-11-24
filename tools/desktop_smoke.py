@@ -1236,7 +1236,7 @@ if not LOADING and not LOCK:
     if not m or int(m.group(1)) < 2000:
         fail("the first screen came before the end of the intro: " + (ready[0].strip() if ready else "no line"))
 
-tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "history", "console", "preferences", "about"]
+tabs = ["dashboard", "play_timer", "activity", "restrictions", "security", "history", "console", "boreale", "preferences", "about"]
 
 
 def steps(a, b):
@@ -1293,7 +1293,7 @@ if GATE:
     key("Left")
     key("Right")
     key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-    key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
+    key("Up", 2)               # past Credits: Help & diagnostics
     key("Return")
     key_to_end("Down", hold=0.15) # the Developer section, down to its last cell
     shot("05_dev_tools")
@@ -1429,7 +1429,7 @@ if DEVBUILD:
     key("Left")
     key("Right")
     key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-    key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
+    key("Up", 2)               # past Credits: Help & diagnostics
     key("Return")
     key_to_end("Down", hold=0.15) # the Developer section, down to its last cell (Run the migrations again)
     key("Up")                  # Install another build
@@ -1564,7 +1564,8 @@ if UPDATE:
 if ERRORS:
     shot("01_limit_reached")   # Today: today's limit reached
     key("Down")                # Play timer: the state line says the limit is reached
-    key("Right")               # the profile chip
+    key("Right")               # the line marked to do (Network clock)
+    key("Up", 12)              # to the top: the profile chip
     key("Right")               # Same limit every day
     key("Return")
     shot("02_picker")          # the days differ: "Custom…" is selected
@@ -1576,9 +1577,9 @@ if ERRORS:
     shot("04_unlock_failed")   # a dialog, not a toast
     key("Return")              # OK
     key("Left", 2)             # the profile chip, then the sidebar
-    key("Down", steps("play_timer", "console"))
-    key("Right")               # Network clock, its own screen
-    key("Return")
+    key("Right")               # back into Play timer, on the profile chip
+    go_to("Network clock", most=40)   # Play timer › Reliability
+    key("Return")              # its own screen
     shot("05_clock_autosync_off")
     # No time server answers: measuring offers the console clock instead,
     # behind the same confirmation as a measured time.
@@ -1780,10 +1781,9 @@ if SYNC:
     wait_for("the discovery again", lambda: len(discoveries()) > before)
 
     shot("01_overview")        # Today after the remote change (1 h 30 every day)
-    key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock, the first tool
-    go_to("Remote access")     # the tools' second row
-    shot("02_console_tools")
+    key("Down", steps("dashboard", "boreale"))
+    key("Right")               # Remote access, the Boréale tab's first line
+    shot("02_boreale_tab")
     key("Return")
     shot("03_remote_access")   # the link online
     # The broker's settings are boreale-kit's screen (link.conf): the same host and port
@@ -1909,9 +1909,8 @@ if AGENT:
         fail("the agent's events were not taken: " + agent_events)
 
     shot("01_overview")        # Today after the order (1 h 30 every day)
-    key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock, the first tool
-    go_to("Remote access")     # the tools' second row
+    key("Down", steps("dashboard", "boreale"))
+    key("Right")               # Remote access, the Boréale tab's first line
     key("Return")
     shot("02_remote_access")   # online, through the agent
     # Quit the way a user does (B twice on the sidebar): the session must end.
@@ -1975,18 +1974,16 @@ if MODULES:
         fail("the module's folder is still there after Remove")
     key("Escape")                # back on Security's tab
     key("Left")                  # the sidebar
-    key("Down", steps("security", "console"))
-    key("Right")
-    go_to("Remote access", most=40)      # the second row of tiles
-    key("Right")                 # Optional modules
-    key("Return")                # the overview: the intro, then a cell per module
+    key("Down", steps("security", "boreale"))
+    key("Right")                 # Remote access
+    key("Down")                  # the recovery module, first of the Optional modules
     time.sleep(0.5)
-    shot("07_overview")          # each module's state
+    shot("07_overview")          # each module's state, on the Boréale tab
     key("Right")                 # the agent, the tile beside it
     key("Return")                # Ⓐ opens boreale-kit's screen for it
     time.sleep(0.5)
     shot("08_agent")             # its state, Install (the app carries no copy here: the screen says so)
-    key("Escape")                # back on the overview, the agent's cell
+    key("Escape")                # back on the Boréale tab, the agent's tile
     key("Left")                  # the recovery module
     key("Return")                # Ⓐ opens that module's screen
     time.sleep(0.5)
@@ -2030,10 +2027,10 @@ if FORWARDERS:
         except (OSError, ValueError):
             return []
     self_id = "050537e2542e2000"   # forwarder_id() of sdmc:/switch/playguard/playguard.nro
-    key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock, the first tool
-    key("Right", 2)            # past Check the installed games: Forwarders
-    shot("00_console")
+    key("Down", steps("dashboard", "security"))
+    key("Right")
+    go_to("Forwarders", most=40)   # Security › Forwarders, after the homebrew menu's lock
+    shot("00_security")
     key("Return")
     shot("01_forwarders")      # Save Keeper (another app's), PlayGuard to add, no signature patches
     key("Return")              # Save Keeper: Details or Delete
@@ -2135,9 +2132,9 @@ if HBMENU:
         fail("the gate's log was not taken: " + repr(refused))
     if len(recorded("hbmenu_lock_removed")) != 1 or os.path.exists(hbmenu_state):
         fail("the lock taken away outside PlayGuard was not told")
-    key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock, the first tool
-    key("Right", 2)            # past Check the installed games: Forwarders
+    key("Down", steps("dashboard", "security"))
+    key("Right")
+    go_to("Forwarders", most=40)   # Security › Forwarders, after the homebrew menu's lock
     key("Return")
     key("Down", 4)             # PlayGuard's line, Another homebrew, Install them all again, Lock the homebrew menu
     key("Return")
@@ -2265,9 +2262,9 @@ if HOMEBREW:
             return open(os.path.join(data_dir, name)).read()
         except OSError:
             return ""
-    key("Down", steps("dashboard", "console"))
-    key("Right")               # Network clock, the first tool
-    key("Right", 2)            # past Check the installed games: Forwarders
+    key("Down", steps("dashboard", "security"))
+    key("Right")
+    go_to("Forwarders", most=40)   # Security › Forwarders, after the homebrew menu's lock
     key("Return")
     shot("01_in_use")          # the card, the groups, the badges, sphaira paused
     key("Down")                # sphaira
@@ -2499,15 +2496,14 @@ if CADRAN:
         shot(f"{i:02d}_{tab}_end")
         key("Left")            # back to the sidebar
 
-    # About › Boréale homebrews: PlayGuard, then the made-up Lantern.
-    key("Right")               # About, where the loop above left it: its end
-    key("Up", 12)              # its first line, Version
-    key("Down", 3)             # past Check for updates and Help
-    key("Return")
+    # Boréale tab › the Boréale homebrews, listed: PlayGuard, then the made-up Lantern.
+    key("Up", steps("boreale", "about"))   # the sidebar, from About up to Boréale
+    key("Right")               # its first line, Remote access
+    key("Down", 2)             # past the two optional modules (side by side): Lantern
     time.sleep(0.6)
-    shot("10_boreale")
-    key("Escape")
-    key("Left")
+    shot("10_homebrews")
+    key("Left")                # the sidebar
+    key("Down", steps("boreale", "about"))  # back on About, as the lines below expect
 
     # The child screen, then back to the parent's with the PIN (the simulated
     # PIN screen accepts at once), which pauses parental controls while
@@ -2531,7 +2527,8 @@ if CADRAN:
     # the timer needs no unlock (the "smoke" scenario has that dialog).
     key("Left", 3)             # the sidebar (Escape there would ask to quit)
     key("Down", steps("dashboard", "play_timer"))
-    key("Right")               # the profile chip
+    key("Right")               # the line marked to do (Network clock)
+    key("Up", 12)              # to the top: the profile chip
     key("Down")                # the week, on Monday
     key("Return")              # A: edit the day
     key("Up", 2)               # +30 min
@@ -2582,8 +2579,9 @@ if CADRAN:
 
     # Console › Network clock: both clocks large.
     key("Left", 3)
-    key("Up", steps("console", "preferences"))
-    key("Right")               # Network clock, the first line
+    key("Up", steps("play_timer", "preferences"))
+    key("Right")
+    go_to("Network clock", most=40)   # Play timer › Reliability
     key("Return")
     time.sleep(1)              # the screen's own entrance over
     shot("18_clock")
@@ -2591,7 +2589,7 @@ if CADRAN:
 
     # Activity: a game's own screen from its card.
     key("Left")
-    key("Up", steps("activity", "console"))
+    key("Down", steps("play_timer", "activity"))
     key("Right")               # Every account, the first chip
     key("Down")                # the first game's card
     key("Return")
@@ -2700,7 +2698,7 @@ if CADRANLARGE:
     key("Right")
     shot("07_about")
     key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-    key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
+    key("Up", 2)               # past Credits: Help & diagnostics
     key("Return")
     time.sleep(0.6)
     shot("08_help")            # its title after where it opened from
@@ -2748,7 +2746,7 @@ if SYSNOTES:
     key("Down", steps("dashboard", "console"))
     key("Right")               # Network clock
     shot("01_tools_console")   # the tiles: 2 versions behind, and 23.0.1 needs hekate 6.5.4 first
-    key("Up")                  # Firmware, the first of the system's tiles, above the tools
+    go_to("Firmware", direction="Up")   # the first of the system's tiles, above the tools
     key("Return")
     wait_logged("release notes: firmware fetched", "firmware notes")
     shot("02_firmware_next")   # the closest newer one, 23.0.0: security fixes, parental controls changed
@@ -2916,7 +2914,8 @@ if not GAMES:
     # Monday–Friday picker first), a day's picker there and an exact
     # duration with the stepper, discarded. (Extra time is Today's.)
     key("Up", steps("play_timer", tabs[-1]))   # from the last tab back to Play timer
-    key("Right")               # the profile chip
+    key("Right")               # the first line marked to do (Network clock), else the profile chip
+    key("Up", 12)              # to the top: the profile chip
     key("Down", 3)             # the week, the bedtime chip: Weekdays and weekend
     key("Return")
     shot("21_split")           # the editor, Monday–Friday picker open
@@ -3037,7 +3036,7 @@ if not GAMES:
                 return True
             time.sleep(0.25)
         return False
-    go_to("Changes made with PlayGuard", "Up")
+    go_to("Changes", "Up")
     key("Return")
     shot("27_history")
     if not history_listed("2 of 2 changes"):
@@ -3075,7 +3074,7 @@ saved = saved_reports()
 key("Down", steps("dashboard", "about"))
 key("Right")
 key_to_end("Down", hold=0.15) # its last line: the funding QR codes
-key("Up", 3)               # past Credits and Boréale homebrews: Help & diagnostics
+key("Up", 2)               # past Credits: Help & diagnostics
 key("Return")
 key("Right")               # past First steps: Send a report online, the tile beside it
 key("Return")

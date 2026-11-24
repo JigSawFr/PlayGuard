@@ -58,7 +58,7 @@ PlayGuard nunca se comunica con Nintendo: en línea, solo se conecta a servidore
 
 ### Una consola sin Internet
 
-Para eso está PlayGuard, y el temporizador de juego igual necesita un reloj de red ajustado. Sin un servidor de hora al que consultar, *Consola › Reloj de red › Medir la diferencia horaria* ofrece ajustarlo al reloj de la consola: verifique primero el reloj de la consola, con *Sincronizar el reloj por Internet* desactivado, y active esa opción solo después (consulte [reloj de red](features.md#ningún-servidor-responde)).
+Para eso está PlayGuard, y el temporizador de juego igual necesita un reloj de red ajustado. Sin un servidor de hora al que consultar, *Tiempo de juego › Reloj de red › Medir la diferencia horaria* ofrece ajustarlo al reloj de la consola: verifique primero el reloj de la consola, con *Sincronizar el reloj por Internet* desactivado, y active esa opción solo después (consulte [reloj de red](features.md#ningún-servidor-responde)).
 
 ### Notificaciones en el celular
 

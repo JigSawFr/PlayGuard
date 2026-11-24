@@ -28,7 +28,7 @@ Abra o PlayGuard **sobre um jogo** (mantenha R premido ao iniciar um jogo, com o
 
 ## 3. Siga os *Primeiros passos*
 
-No primeiro arranque, aparece o guia *Primeiros passos* (mais tarde: *Preferências › Primeiros passos*). *Hoje* mostra os mesmos passos num cartão até estarem feitos (*1 de 3*):
+No primeiro arranque, aparece o guia *Primeiros passos* (mais tarde: *Sobre › Primeiros passos*). *Hoje* mostra os mesmos passos num cartão até estarem feitos (*1 de 3*):
 
 1. **O PIN.** O PIN da própria consola, pedido pelo menu HOME para iniciar um jogo depois do limite ou para alterar as definições. Evite 0000, 1234 ou 2580: o PlayGuard assinala um PIN que qualquer pessoa experimentaria primeiro.
 2. **Um limite diário.** O mesmo todos os dias, ou um para os dias úteis e outro para o fim de semana. Mais tarde, altere qualquer dia em separado em *Tempo de jogo*.
@@ -40,7 +40,7 @@ Ainda associada à aplicação *Controlo Parental* da Nintendo (ou uma consola e
 
 ## 5. Acerte o relógio de rede
 
-*Consola › Relógio de rede › Medir a diferença horária* consulta três servidores de hora públicos; depois, *Acertar o relógio de rede*. Acertar o relógio repõe a zero o tempo de jogo de hoje, por isso faça-o antes de a criança jogar.
+*Tempo de jogo › Relógio de rede › Medir a diferença horária* consulta três servidores de hora públicos; depois, *Acertar o relógio de rede*. Acertar o relógio repõe a zero o tempo de jogo de hoje, por isso faça-o antes de a criança jogar.
 
 Uma consola sem Internet: quando nenhum servidor responde, o PlayGuard propõe acertar o relógio de rede pelo relógio da consola. Confira primeiro o relógio da consola com um telemóvel ou um relógio, com *Definições da consola › Consola › Data e hora › Sincronizar relógio através da Internet* desativado ([detalhes](features.md#relógio-de-rede)).
 

@@ -1,12 +1,11 @@
-// ModulesActivity — Console › Optional modules: PlayGuard's two sysmodules,
-// which it carries in its romfs and installs on the SD card
-// (util/modules.hpp): the recovery module (acts once at boot when a RESCUE
-// file asks it to) and the Boréale agent (keeps the link up while
-// PlayGuard is closed). A list as the other screens are (sync.xml): what
-// they are, then a cell per module with its state; Ⓐ opens the module's own
-// screen, a list as well: the recovery module's (ModuleActivity), or the
-// agent's, which is boreale-kit's AgentActivity. Every change asks for the
-// PIN as a console change does: the recovery module can unlock the console.
+// The optional modules: PlayGuard's two sysmodules, which it carries in its
+// romfs and installs on the SD card (util/modules.hpp): the recovery module
+// (acts once at boot when a RESCUE file asks it to) and the Boréale agent
+// (keeps the link up while PlayGuard is closed). Their lines are in the
+// Boréale tab (tab/boreale_hub_tab.cpp); Ⓐ opens the module's own screen:
+// the recovery module's (ModuleActivity, below), or the agent's, which is
+// boreale-kit's AgentActivity. Every change asks for the PIN as a console
+// change does: the recovery module can unlock the console.
 // Copyright (C) 2026 JigSawFr.  GPLv3-or-later (see LICENSE).
 #pragma once
 
@@ -18,39 +17,24 @@
 
 #include "util/modules.hpp"
 
-class ModulesActivity : public aurore::Activity
+class ModulesActivity
 {
   public:
-    CONTENT_FROM_XML_RES("activity/modules.xml");
-
-    void onContentAvailable() override;
-    void onResume() override;
-
     // "Installed", "Update available" … short enough to share one line with
-    // the title of a cell that opens this screen (and the overview's), and
-    // its colour when `color` is given.
+    // a cell title, and its colour when `color` is given.
     static std::string summary(modules::Id id, const char** color = nullptr);   // the recovery module's
+
+    // The same for the Boréale agent (the kit's line, shortened when this
+    // build does not carry it).
+    static std::string agent_summary(const char** color = nullptr);
 
     // The remote link's state ("Online", "Offline", "Off"), for the cell that
     // opens Remote access.
     static std::string remote_state();
-
-  private:
-    void refresh();
-
-    std::unique_ptr<cadran::List> list;
-
-    AURORE_BIND(aurore::Label,      intro,  "md_intro");
-    AURORE_BIND(aurore::Label,      rescue_note, "md_rescue_note");
-    AURORE_BIND(aurore::Label,      agent_note,  "md_agent_note");
-    AURORE_BIND(aurore::Label,      remote_note, "md_remote_note");
-    AURORE_BIND(aurore::DetailCell, remote, "md_remote");
-    AURORE_BIND(aurore::DetailCell, rescue, "md_rescue");
-    AURORE_BIND(aurore::DetailCell, agent,  "md_agent");
 };
 
 // One module's screen: what it does, its state, Install / Update, At boot,
-// Remove. Opened from the overview, and from Security › Locked out?.
+// Remove. Opened from the Boréale tab, and from Security › Locked out?.
 class ModuleActivity : public aurore::Activity
 {
   public:

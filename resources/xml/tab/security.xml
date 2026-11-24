@@ -26,26 +26,14 @@
 
             <aurore:Label id="tab_ro_note" text="@i18n/playguard/common/read_only_note" fontSize="20" marginBottom="16" textColor="@theme/cadran/amber"/>
             <aurore:Header title="@i18n/playguard/security/section_status" marginBottom="8"/>
-            <aurore:DetailCell id="sc_pin" focusable="false" title="@i18n/playguard/security/pin"/>
-            <aurore:DetailCell id="sc_restrictions" focusable="false" title="@i18n/playguard/security/restrictions"/>
-            <aurore:DetailCell id="sc_temp" focusable="false" title="@i18n/playguard/cadran/today/pc_title"/>
+            <aurore:DetailCell id="sc_pin" title="@i18n/playguard/security/pin"/>
+            <aurore:DetailCell id="sc_companion" title="@i18n/playguard/pairing/section"/>
             <aurore:DetailCell id="sc_hbmenu" focusable="false" title="@i18n/playguard/hbmenu/section"/>
             <aurore:Header id="sc_actions_header" title="@i18n/playguard/security/section_actions" marginTop="24" marginBottom="8"/>
-            <aurore:DetailCell id="sc_set_pin" title="@i18n/playguard/security/set_pin"/>
-            <aurore:DetailCell id="sc_pin_lock" title="@i18n/playguard/pin_lock/title"/>
-            <aurore:BooleanCell id="sc_pin_ask_again"/>
-            <aurore:BooleanCell id="sc_pin_pauses"/>
             <aurore:DetailCell id="sc_hbmenu_lock" title="@i18n/playguard/hbmenu/cell"/>
-            <aurore:DetailCell id="sc_show_pin" title="@i18n/playguard/security/show_pin"/>
+            <aurore:DetailCell id="sc_forwarders" title="@i18n/playguard/forwarders/open"/>
             <aurore:DetailCell id="sc_unlock" title="@i18n/playguard/security/unlock"/>
             <aurore:BooleanCell id="sc_auto_relock"/>
-            <aurore:Label id="sc_pin_lock_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
-            <aurore:Header title="@i18n/playguard/pairing/section" marginTop="24" marginBottom="8"/>
-            <aurore:DetailCell id="pr_active" focusable="false" title="@i18n/playguard/pairing/active"/>
-            <aurore:DetailCell id="pr_updated" focusable="false" title="@i18n/playguard/pairing/updated"/>
-            <aurore:DetailCell id="pr_decode" title="@i18n/playguard/pairing/decode"/>
-            <aurore:DetailCell id="pr_unlink" title="@i18n/playguard/pairing/unlink"/>
-            <aurore:Label id="pr_note" text="@i18n/playguard/pairing/note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
             <aurore:Header id="sc_danger_header" title="@i18n/playguard/security/section_danger" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="sc_delete" title="@i18n/playguard/security/delete"/>
             <aurore:Header title="@i18n/playguard/modules/locked_out" marginTop="24" marginBottom="8"/>

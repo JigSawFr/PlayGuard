@@ -58,7 +58,7 @@ O PlayGuard nunca contata a Nintendo: online, ele só acessa servidores de horá
 
 ### Um console sem internet
 
-É para isso que o PlayGuard existe, e o temporizador ainda precisa de um relógio de rede ajustado. Sem servidor de horário para consultar, *Console › Relógio de rede › Medir a diferença de horário* oferece ajustá-lo pelo relógio do console: confira primeiro o relógio do console, com *Sincronizar relógio pela Internet* desativado, e só ative essa configuração depois (veja [relógio de rede](features.md#nenhum-servidor-responde)).
+É para isso que o PlayGuard existe, e o temporizador ainda precisa de um relógio de rede ajustado. Sem servidor de horário para consultar, *Tempo de jogo › Relógio de rede › Medir a diferença de horário* oferece ajustá-lo pelo relógio do console: confira primeiro o relógio do console, com *Sincronizar relógio pela Internet* desativado, e só ative essa configuração depois (veja [relógio de rede](features.md#nenhum-servidor-responde)).
 
 ### Notificações no celular
 

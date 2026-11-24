@@ -54,6 +54,7 @@
 #include "core/sim_env.h"
 #include "tab/about_tab.hpp"
 #include "tab/activity_tab.hpp"
+#include "tab/boreale_hub_tab.hpp"
 #include "tab/console_tab.hpp"
 #include "tab/dashboard_tab.hpp"
 #include "tab/history_tab.hpp"
@@ -342,6 +343,7 @@ void register_views()
     aurore::Application::registerXMLView("SecurityTab",     SecurityTab::create);
     aurore::Application::registerXMLView("HistoryTab",      HistoryTab::create);
     aurore::Application::registerXMLView("ConsoleTab",      ConsoleTab::create);
+    aurore::Application::registerXMLView("BorealeHubTab",   BorealeHubTab::create);
     aurore::Application::registerXMLView("PreferencesTab",  PreferencesTab::create);
     aurore::Application::registerXMLView("AboutTab",        AboutTab::create);
 

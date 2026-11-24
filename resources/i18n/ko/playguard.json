@@ -15,6 +15,8 @@
         "clock": "네트워크 시계",
         "security": "보안",
         "history": "변경 기록",
+        "boreale_hub": "Boréale",
+        "boreale": "Boréale",
         "console": "본체",
         "preferences": "환경 설정",
         "about": "정보"
@@ -208,6 +210,7 @@
         "profile_action_edit": "제한 편집…",
         "profile_action_rename": "이름 변경…",
         "profile_edit_title": "프로필: {}",
+        "section_reliability": "Reliability",
         "section_bedtime": "취침 시간",
         "bedtime_reset": "다시 플레이 가능 시각",
         "bedtime_note": "매일 또는 요일별로 적용됩니다. 취침 시간이 되면 본체가 알람을 표시하고, 소프트웨어를 일시 정지할 수도 있으며('시간이 다 되면' 참고), 다시 플레이할 수 있을 때까지 유지됩니다. PlayGuard는 본체가 새 시각을 알려 주는지 확인하고, 그렇지 않으면 이전 설정으로 되돌립니다.",
@@ -282,7 +285,7 @@
         "write_err": "플레이 시간 제한을 적용할 수 없습니다",
         "removed": "플레이 시간 제한을 해제했습니다.",
         "remove_err": "플레이 시간 제한을 해제할 수 없습니다",
-        "not_counting": "지금 본체가 플레이 시간을 계산하지 않고 있습니다. 가능한 원인: 시계를 뒤로 돌렸거나(나중에 다시 계산됩니다), 네트워크 시계를 한 번도 설정하지 않았거나('본체 › 네트워크 시계'), 방금 제한을 기록했습니다(게임을 1분 정도 실행한 뒤 다시 확인하세요).",
+        "not_counting": "지금 본체가 플레이 시간을 계산하지 않고 있습니다. 가능한 원인: 시계를 뒤로 돌렸거나(나중에 다시 계산됩니다), 네트워크 시계를 한 번도 설정하지 않았거나('플레이 타이머 › 네트워크 시계'), 방금 제한을 기록했습니다(게임을 1분 정도 실행한 뒤 다시 확인하세요).",
         "limit_note": "제한에 도달하면 본체에 \"시간 종료\"가 표시되고, '시간이 다 되면' 설정에 따라 게임을 일시 정지하거나 알리기만 합니다.",
         "unsaved": "저장하지 않은 진행 상황이 사라질 수 있습니다. 먼저 자녀가 저장하게 하세요.",
         "profile_already": "\"{}\" 프로필이 이미 적용되어 있습니다.",
@@ -505,7 +508,7 @@
             "timeout": "응답 없음",
             "bad_reply": "잘못된 응답"
         },
-        "start_off": "네트워크 시계가 {} 어긋나 있습니다({} 기준). 플레이 타이머는 이 시계를 기준으로 합니다: 본체 › 네트워크 시계를 확인하세요.",
+        "start_off": "네트워크 시계가 {} 어긋나 있습니다({} 기준). 플레이 타이머는 이 시계를 기준으로 합니다: 플레이 타이머 › 네트워크 시계를 확인하세요.",
         "guided_body": "네트워크 시계가 정확하지 않으며, 플레이 타이머는 이 시계를 기준으로 합니다.\n\n지금 {} 기준으로 시간을 측정하시겠습니까? (본체가 인터넷에 연결되어 있어야 합니다.) 시계를 맞추기 전에 다시 확인합니다.",
         "guided_measure": "지금 측정",
         "guided_fine": "네트워크 시계가 정확합니다: 할 일이 없습니다.",
@@ -540,7 +543,6 @@
     "security": {
         "section_status": "상태",
         "pin": "PIN",
-        "restrictions": "제한 사용 중",
         "section_actions": "작업",
         "set_pin": "PIN 설정 또는 변경",
         "show_pin": "PIN 표시…",
@@ -646,7 +648,6 @@
     },
     "tools": {
         "section_diag": "진단",
-        "section_tools": "도구",
         "section_reports": "보고서",
         "section_system": "시스템",
         "export": "진단 보고서 내보내기",
@@ -700,7 +701,6 @@
         "extra_amounts": "추가 시간 단위",
         "extra_auto": "'오늘 플레이 종료' 다음 날 평소 제한으로 자동 복원",
         "clock_check": "시작할 때 네트워크 시계 확인",
-        "section_about": "정보",
         "version": "버전",
         "firmware": "펌웨어",
         "atmosphere": "Atmosphère",
@@ -1135,6 +1135,11 @@
         "refresh_title": "이전 로더로 만든 포워더",
         "refresh_detail": "{}: 이전 PlayGuard로 만들어졌습니다. 다시 만들면 이 빌드의 로더로 Homebrew를 실행합니다."
     },
+    "hub": {
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "추가 모듈"
+    },
     "hbmenu": {
         "section": "Homebrew 메뉴",
         "cell": "Homebrew 메뉴 잠그기",
@@ -1252,9 +1257,9 @@
         "credit_ui": "인터페이스",
         "credit_family": "소속",
         "section_support": "PlayGuard 후원하기",
+        "section_help": "도움말",
         "support_note": "PlayGuard는 무료 오픈 소스이며 광고가 없습니다. 가족에게 도움이 되었다면 개발을 후원할 수 있습니다: 휴대폰으로 코드를 스캔하세요(선택하면 크게 표시됩니다).",
-        "whats_new_close": "계속",
-        "boreale": "Boréale 홈브류"
+        "whats_new_close": "계속"
     },
     "prefs": {
         "section_app": "앱",
@@ -1300,7 +1305,7 @@
         "forwarders_body": "이 백업에는 HOME 메뉴에 더 이상 없는 포워더 {}개도 있습니다: {}. 되돌릴까요?",
         "forwarders_put_back": "되돌리기",
         "forwarders_lock_title": "Homebrew 메뉴가 잠겨 있었습니다",
-        "forwarders_lock": "이 백업을 만들 때 잠겨 있었습니다. 본체 › 포워더에서 다시 잠그세요: 먼저 확인이 진행됩니다."
+        "forwarders_lock": "이 백업을 만들 때 잠겨 있었습니다. 보안 › 포워더에서 다시 잠그세요: 먼저 확인이 진행됩니다."
     },
     "update": {
         "title": "업데이트 가능"
@@ -1390,9 +1395,6 @@
     "history": {
         "title": "변경 기록",
         "tab_intro": "설정의 모든 변경과 그 백업입니다. 플레이한 기록은 '플레이 기록'에 있습니다.",
-        "open": "PlayGuard로 변경한 내용",
-        "count": "{}건 기록됨",
-        "count_one": "1건 기록됨",
         "tile_changes": "변경",
         "none": "아직 기록이 없습니다. PlayGuard가 본체에서 변경한 모든 내용(제한, 제한 레벨, PIN, 일시 해제…)이 여기에 표시됩니다.",
         "note": "최근 변경 {}건이 SD 카드의 {}에 보관됩니다. 변경 내용에서 A를 누르면 자세히 보고, 가능하면 이전 값으로 되돌릴 수 있습니다.",
@@ -1553,7 +1555,7 @@
     },
     "sync": {
         "title": "원격 접속",
-        "intro": "이 본체를 MQTT 브로커(Home Assistant의 Mosquitto 앱 또는 다른 브로커)에 연결합니다. 그러면 Home Assistant에서 본체의 상태와 플레이 시간을 보고 명령을 보낼 수 있습니다. 연결은 PlayGuard가 열려 있는 동안 작동하며, 선택 사항인 에이전트(본체 › 추가 모듈)가 있으면 항상 작동합니다. 브로커 설정은 {}에, 나머지는 {}에 저장됩니다.",
+        "intro": "이 본체를 MQTT 브로커(Home Assistant의 Mosquitto 앱 또는 다른 브로커)에 연결합니다. 그러면 Home Assistant에서 본체의 상태와 플레이 시간을 보고 명령을 보낼 수 있습니다. 연결은 PlayGuard가 열려 있는 동안 작동하며, 선택 사항인 에이전트(Boréale › 추가 모듈)가 있으면 항상 작동합니다. 브로커 설정은 {}에, 나머지는 {}에 저장됩니다.",
         "section_status": "연결",
         "status": "상태",
         "sync_now": "지금 동기화",
@@ -1618,7 +1620,7 @@
         "status_agent": "연결은 에이전트 {}이(가) 유지합니다. PlayGuard는 읽은 내용을 에이전트에 넘기고, 에이전트가 넘긴 명령을 실행합니다.",
         "status_agent_read_only": "에이전트 혼자서는 아무것도 바꾸지 않습니다. PlayGuard가 읽기 전용 모드였거나, PlayGuard를 마지막으로 실행한 뒤 펌웨어가 바뀌었습니다.",
         "state_agent": "{} · 에이전트 경유",
-        "state_agent_refused": "에이전트 {} 업데이트 필요 (본체 › 추가 모듈)",
+        "state_agent_refused": "에이전트 {} 업데이트 필요 (Boréale › 추가 모듈)",
         "ask_body": "원격 연결로 명령이 왔습니다: {}.\n\n이 본체에서 실행할까요?",
         "ask_confirm": "실행",
         "done": "원격 명령을 실행했습니다: {}.",
@@ -1674,13 +1676,6 @@
         }
     },
     "modules": {
-        "title": "추가 모듈",
-        "open": "추가 모듈",
-        "count": "{}개 설치됨",
-        "count_one": "1개 설치됨",
-        "section_modules": "Sysmodules",
-        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
-        "intro": "PlayGuard가 SD 카드에 설치할 수 있는 작은 백그라운드 프로그램(sysmodule) 두 개입니다. 둘 다 꼭 필요하지는 않으며, 각각 한 가지 일만 합니다. PlayGuard에는 함께 만든 버전이 들어 있어 컴퓨터 없이 여기에서 설치하거나 업데이트할 수 있습니다. 보안 › PIN으로 PlayGuard 보호가 변경 전에 PIN을 묻도록 설정되어 있으면 모든 변경에 PIN이 필요합니다.",
         "status": "상태",
         "install": "설치",
         "update": "업데이트",
@@ -1694,8 +1689,7 @@
             "not_installed": "설치 안 됨",
             "not_bundled": "이 빌드에 없음",
             "installed": "설치됨, 최신 상태",
-            "update": "설치됨, 업데이트 있음",
-            "none": "설치된 모듈 없음"
+            "update": "설치됨, 업데이트 있음"
         },
         "short": {
             "installed": "설치됨",
@@ -1728,12 +1722,10 @@
             "installed": "복구 모듈을 설치했습니다. RESCUE 파일이 있으면 다음 부팅 때 작동합니다.",
             "updated": "복구 모듈을 업데이트했습니다.",
             "remove_body": "복구 모듈을 제거할까요? 모듈이 없으면 0분 제한에서 PIN을 잊어버렸을 때 컴퓨터가 있어야 해결할 수 있습니다.",
-            "short_title": "복구 모듈",
-            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
+            "short_title": "복구 모듈"
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "프로토콜 {} 사용",
             "offer_body": "SD 카드의 Boréale agent가 이 PlayGuard에 들어 있는 것(버전 {})과 다릅니다. 지금 업데이트할까요? 잠시 멈추며, 새 에이전트가 응답하지 않으면 이전 것으로 되돌립니다.",
             "offer_refused": "이전 프로토콜을 사용하므로 업데이트할 때까지 원격 연결이 작동하지 않습니다."
@@ -2079,7 +2071,7 @@
         "remove": "삭제",
         "removed": "예약된 프로필을 삭제했습니다.",
         "soon": "Home Assistant로 가능",
-        "soon_note": "PlayGuard는 열려 있는 동안에만 실행되므로 정해진 날에 스스로 프로필을 바꿀 수 없습니다. Home Assistant는 할 수 있습니다. 본체 › 원격 접속으로 본체를 Home Assistant에 연결하면, 자동화가 캘린더나 방학 일정에 따라 프로필(본체의 \"프로필\" 선택 항목)을 고릅니다."
+        "soon_note": "PlayGuard는 열려 있는 동안에만 실행되므로 정해진 날에 스스로 프로필을 바꿀 수 없습니다. Home Assistant는 할 수 있습니다. Boréale › 원격 접속으로 본체를 Home Assistant에 연결하면, 자동화가 캘린더나 방학 일정에 따라 프로필(본체의 \"프로필\" 선택 항목)을 고릅니다."
     },
     "sigpatch": {
         "set_aside": "sigpatch 파일 치워 두기",
@@ -2089,7 +2081,6 @@
         "done": "sigpatch 파일을 치워 두었습니다. 본체를 다시 시작한 뒤 포워더를 다시 실행해 보세요."
     },
     "boreale": {
-        "intro": "이 콘솔에 설치된 Boréale 패밀리의 홈브류입니다. 각각 시작할 때 여기에 추가됩니다. A를 누르면 열립니다.",
         "this_app": "이 앱",
         "open_manual": "홈브류 메뉴에서 {}을(를) 여세요."
     },

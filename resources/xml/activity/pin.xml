@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Security › PIN: set it, show it, protect PlayGuard with it, ask it again,
+     let it pause the parental controls.
+     Filled by source/activity/pin_activity.cpp. -->
+
+<aurore:AppletFrame
+    iconInterpolation="linear">
+
+    <ScrollView
+        title="@i18n/playguard/security/pin"
+        icon="@res/img/app_icon.png"
+        width="auto"
+        height="auto"
+        axis="column"
+        alignItems="stretch"
+        grow="1.0">
+
+        <aurore:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingTop="@style/aurore/sidebar/padding_top"
+            paddingRight="@style/aurore/sidebar/padding_right"
+            paddingBottom="@style/aurore/sidebar/padding_bottom"
+            paddingLeft="@style/aurore/sidebar/padding_left">
+
+            <aurore:DetailCell id="pn_set" title="@i18n/playguard/security/set_pin"/>
+            <aurore:DetailCell id="pn_show" title="@i18n/playguard/security/show_pin"/>
+            <aurore:DetailCell id="pn_lock" title="@i18n/playguard/pin_lock/title"/>
+            <aurore:BooleanCell id="pn_ask_again"/>
+            <aurore:BooleanCell id="pn_pauses"/>
+            <aurore:Label id="pn_lock_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+        </aurore:Box>
+
+    </ScrollView>
+
+</aurore:AppletFrame>

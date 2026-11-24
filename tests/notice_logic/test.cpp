@@ -58,14 +58,17 @@ static void test_groups()
 
 static void test_tabs()
 {
-    // Each entry where it is fixed: the console's and the network clock on
-    // the Console tab, the PIN's on the PIN tab, the alarm on the Play timer.
+    // Each entry where it is fixed: the console's on the Console tab, the
+    // network clock and the alarm on the Play timer, the PIN's, the
+    // forwarders' and the homebrew menu's on Security, the Home Assistant
+    // integration's on Boréale.
     // Unlocked on none: the header's pill and the bell say it already.
-    for (const char* id : { "games", "sd_space", "data_history", "rescue_old", "clock", "clock_off" })
-        CHECK(tab_of(id) == "console");
-    for (const char* id : { "pin_missing", "pin_weak", "pin_lock_off" }) CHECK(tab_of(id) == "security");
+    for (const char* id : { "games", "sd_space", "data_history", "rescue_old" }) CHECK(tab_of(id) == "console");
+    for (const char* id : { "pin_missing", "pin_weak", "pin_lock_off", "hbmenu_route", "forwarder_gone", "gate_remake", "gate_paused" })
+        CHECK(tab_of(id) == "security");
+    CHECK(tab_of("ha_integration") == "boreale");
     CHECK(tab_of("unlocked") == "");
-    for (const char* id : { "alarm_off", "not_counting", "console_lock_long" }) CHECK(tab_of(id) == "play_timer");
+    for (const char* id : { "alarm_off", "not_counting", "console_lock_long", "clock", "clock_off" }) CHECK(tab_of(id) == "play_timer");
     CHECK(tab_of("outside") == "dashboard" && tab_of("extra_restore") == "dashboard");
     CHECK(tab_of("backup") == "history");
     CHECK(tab_of("new") == "");
@@ -80,8 +83,8 @@ static void test_tabs()
     s.set("clock", Level::Action, "Clock off", "");
     s.set("sys_firmware", Level::Info, "23.0.1", "");
     CHECK(s.tab_count("security") == 2);
-    CHECK(s.tab_count("console") == 2);
-    CHECK(s.tab_count("play_timer") == 0);
+    CHECK(s.tab_count("console") == 1);
+    CHECK(s.tab_count("play_timer") == 1);
     CHECK(s.ack("pin_weak"));
     CHECK(s.tab_count("security") == 1);
     s.clear("pin_missing");

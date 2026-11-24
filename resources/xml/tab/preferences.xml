@@ -4,11 +4,11 @@
      theme, text size and start tab as tiles first, the palette, the
      effects, the sidebar, the intro),
      the messages it shows (the kinds of notifications, the monthly "Support
-     PlayGuard" reminder), how it updates and the first steps again. A
+     PlayGuard" reminder). A
      setting that shapes one feature sits with it (extra time in Play timer,
      relocking in Security, the clock check in Console › Network clock); the
-     change history and backups have their tab, Help & diagnostics is in
-     About. -->
+     change history and backups have their tab, how it updates, the first steps
+     and Help & diagnostics are in About. -->
 
 <aurore:Box
     width="auto"
@@ -46,12 +46,6 @@
             <aurore:BooleanCell id="pf_notices_ack_remind"/>
             <aurore:BooleanCell id="pf_notices_others"/>
             <aurore:BooleanCell id="pf_support_reminder"/>
-            <aurore:Header title="@i18n/playguard/tools/section_update" marginTop="24" marginBottom="8"/>
-            <aurore:BooleanCell id="pf_update_daily"/>
-            <aurore:DetailCell id="pf_update_via" title="@i18n/kit/tools/update_via"/>
-            <aurore:BooleanCell id="pf_sphaira_entry"/>
-            <aurore:Header title="@i18n/playguard/tools/section_start" marginTop="24" marginBottom="8"/>
-            <aurore:DetailCell id="pf_first_steps" title="@i18n/playguard/onboarding/open"/>
 
         </aurore:Box>
 

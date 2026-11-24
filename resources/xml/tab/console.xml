@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Console: what it runs (firmware, Atmosphère, hekate, sys-patch: tiles, A on each
-     opens its release notes), then under Tools, as tiles too, the network
-     clock (its own screen, the former tab), the installed games check and
-     the forwarders (homebrew on the HOME menu), the remote link and the
-     optional sysmodules, then compatibility,
-     storage, the serial number and the game patches. -->
+     opens its release notes), then the installed games check, then compatibility,
+     storage, the serial number and the game patches. The network clock is in
+     Play timer, the forwarders in Security, the remote link and the optional
+     modules in Boréale. -->
 
 <aurore:Box
     width="auto"
@@ -32,18 +31,8 @@
             <aurore:DetailCell id="cn_ams" title="@i18n/playguard/tools/atmosphere"/>
             <aurore:DetailCell id="cn_hekate" title="hekate"/>
             <aurore:DetailCell id="cn_syspatch" title="sys-patch"/>
-            <!-- Tiles: the screens of their own (the network clock, the
-                 installed games, homebrew on the HOME menu:
-                 activity/forwarders_activity.hpp). -->
-            <aurore:Header title="@i18n/playguard/tools/section_tools" marginBottom="8"/>
-            <aurore:DetailCell id="cn_clock" title="@i18n/playguard/tabs/clock"/>
+            <!-- A tile: the installed games check (activity/game_check_activity.hpp). -->
             <aurore:DetailCell id="cn_games" title="@i18n/playguard/tiles/games"/>
-            <aurore:DetailCell id="cn_forwarders" title="@i18n/playguard/forwarders/open"/>
-            <!-- A second row: the remote link (MQTT, Home Assistant:
-                 activity/sync_activity.hpp) and the optional sysmodules
-                 (activity/modules_activity.hpp). -->
-            <aurore:DetailCell id="cn_remote" title="@i18n/playguard/sync/title"/>
-            <aurore:DetailCell id="cn_modules" title="@i18n/playguard/modules/open"/>
             <aurore:Header title="@i18n/playguard/tools/section_console" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="cn_compat" title="@i18n/playguard/tools/compat"/>
             <aurore:DetailCell id="cn_storage" focusable="false" title="@i18n/playguard/tools/storage"/>

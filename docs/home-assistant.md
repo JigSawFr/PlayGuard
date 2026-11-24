@@ -28,11 +28,11 @@ Assistant is the easy path.
   "can only log in from the local network"), or add a login in the app's
   configuration.
 - The console on the same network as the broker, with a PlayGuard that has
-  *Console › Remote access*.
+  *Boréale › Remote access*.
 
 ## Set it up on the console
 
-1. Open PlayGuard › **Console › Remote access › Broker settings**: the
+1. Open PlayGuard › **Boréale › Remote access › Broker settings**: the
    screen is shared with the other Boréale homebrews, which read the same
    settings.
 2. **Broker address**: the IP address or name of the machine running the
@@ -57,7 +57,7 @@ The **agent** is a small optional background module (an Atmosphère
 sysmodule, [`sysmodule/agent`](https://github.com/JigSawFr/boreale-link/blob/main/agent/README.md)) that holds the
 same link while PlayGuard is closed, with the same settings:
 
-1. PlayGuard › **Console › Optional modules › Boréale agent › Install**
+1. PlayGuard › **Boréale › Optional modules › Boréale agent › Install**
    (PlayGuard carries it; or extract `boreale-link.zip` from the release at
    the SD card's root). It starts at once, and at every boot.
 2. Nothing else to set up: it reads *Remote access*. Its **Status** then reads

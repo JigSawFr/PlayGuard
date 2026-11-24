@@ -15,6 +15,8 @@
         "clock": "ネットワーク時計",
         "security": "セキュリティ",
         "history": "履歴",
+        "boreale_hub": "Boréale",
+        "boreale": "Boréale",
         "console": "本体",
         "preferences": "オプション",
         "about": "情報"
@@ -208,6 +210,7 @@
         "profile_action_edit": "上限を編集…",
         "profile_action_rename": "名前を変更…",
         "profile_edit_title": "プリセット：{}",
+        "section_reliability": "Reliability",
         "section_bedtime": "おやすみアラーム",
         "bedtime_reset": "再び遊べる時刻",
         "bedtime_note": "毎日、または曜日ごとに適用されます。おやすみ時刻になると、本体はアラームを表示し、ソフトを中断することもあります（「時間になったとき」を参照）。再び遊べる時刻まで続きます。PlayGuardは本体が新しい時刻を返すことを確認し、返さない場合は元の設定に戻します。",
@@ -282,7 +285,7 @@
         "write_err": "プレイ時間の上限を適用できませんでした",
         "removed": "プレイ時間の制限を解除しました。",
         "remove_err": "プレイ時間の制限を解除できませんでした",
-        "not_counting": "本体は今、プレイ時間をカウントしていません。考えられる原因：時計が戻された（あとでまたカウントされます）、ネットワーク時計が一度も設定されていない（「本体 › ネットワーク時計」）、上限を書き込んだ直後（ゲームを1分ほど起動してから確認してください）。",
+        "not_counting": "本体は今、プレイ時間をカウントしていません。考えられる原因：時計が戻された（あとでまたカウントされます）、ネットワーク時計が一度も設定されていない（「プレイ時間 › ネットワーク時計」）、上限を書き込んだ直後（ゲームを1分ほど起動してから確認してください）。",
         "limit_note": "上限に達すると、本体は「時間です」と表示し、「時間になったとき」の設定に従ってゲームを中断するか、知らせるだけにします。",
         "unsaved": "セーブしていない進行状況は失われることがあります。先にお子さまにセーブさせてください。",
         "profile_already": "プリセット「{}」はすでに適用されています。",
@@ -505,7 +508,7 @@
             "timeout": "応答なし",
             "bad_reply": "無効な応答"
         },
-        "start_off": "ネットワーク時計が{}ずれています（{}で確認）。プレイ時間の制限はこの時計を基準にしています。「本体 › ネットワーク時計」を確認してください。",
+        "start_off": "ネットワーク時計が{}ずれています（{}で確認）。プレイ時間の制限はこの時計を基準にしています。「プレイ時間 › ネットワーク時計」を確認してください。",
         "guided_body": "ネットワーク時計が不正確です。プレイ時間の制限はこの時計を基準にしています。\n\n今すぐ{}で時刻を測定しますか？（本体がインターネットに接続している必要があります。）時計を合わせる前にもう一度確認します。",
         "guided_measure": "今すぐ測定",
         "guided_fine": "ネットワーク時計は正確です。何もする必要はありません。",
@@ -540,7 +543,6 @@
     "security": {
         "section_status": "状態",
         "pin": "暗証番号",
-        "restrictions": "制限が有効",
         "section_actions": "操作",
         "set_pin": "暗証番号を設定・変更",
         "show_pin": "暗証番号を表示…",
@@ -646,7 +648,6 @@
     },
     "tools": {
         "section_diag": "診断",
-        "section_tools": "ツール",
         "section_reports": "レポート",
         "section_system": "システム",
         "export": "診断レポートをエクスポート",
@@ -700,7 +701,6 @@
         "extra_amounts": "延長時間の選択肢",
         "extra_auto": "「今日のプレイを終了」の翌日に自動でいつもの上限に戻す",
         "clock_check": "起動時にネットワーク時計を確認",
-        "section_about": "情報",
         "version": "バージョン",
         "firmware": "ファームウェア",
         "atmosphere": "Atmosphère",
@@ -1135,6 +1135,11 @@
         "refresh_title": "古いローダーで作成されたフォワーダー",
         "refresh_detail": "{}：以前のPlayGuardで作成されました。作り直すと、このビルドのローダーでHomebrewを起動します。"
     },
+    "hub": {
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "追加モジュール"
+    },
     "hbmenu": {
         "section": "Homebrewメニュー",
         "cell": "Homebrewメニューをロック",
@@ -1252,9 +1257,9 @@
         "credit_ui": "インターフェース",
         "credit_family": "所属",
         "section_support": "PlayGuardを応援する",
+        "section_help": "ヘルプ",
         "support_note": "PlayGuardは無料・オープンソースで、広告はありません。ご家族の役に立っていれば、開発を応援できます：スマートフォンでコードを読み取ってください（選ぶと拡大します）。",
-        "whats_new_close": "続ける",
-        "boreale": "Boréale のHomebrew"
+        "whats_new_close": "続ける"
     },
     "prefs": {
         "section_app": "アプリ",
@@ -1300,7 +1305,7 @@
         "forwarders_body": "このバックアップには、HOMEメニューにないフォワーダーが{}個あります：{}。元に戻しますか？",
         "forwarders_put_back": "元に戻す",
         "forwarders_lock_title": "Homebrewメニューはロックされていました",
-        "forwarders_lock": "このバックアップの作成時はロックされていました。本体 › フォワーダーから再度ロックしてください：先に確認が行われます。"
+        "forwarders_lock": "このバックアップの作成時はロックされていました。セキュリティ › フォワーダーから再度ロックしてください：先に確認が行われます。"
     },
     "update": {
         "title": "アップデートがあります"
@@ -1390,9 +1395,6 @@
     "history": {
         "title": "変更履歴",
         "tab_intro": "設定の変更とそのバックアップです。遊んだ記録は「プレイ記録」にあります。",
-        "open": "PlayGuardで行った変更",
-        "count": "{}件記録",
-        "count_one": "1件記録",
         "tile_changes": "変更",
         "none": "まだ記録はありません。PlayGuardが本体に対して行った変更（上限、制限レベル、暗証番号、一時解除など）がここに一覧表示されます。",
         "note": "最新{}件の変更を、SDカードの{}に保存しています。変更でAを押すと内容を表示し、可能な場合は前の値に戻せます。",
@@ -1553,7 +1555,7 @@
     },
     "sync": {
         "title": "リモートアクセス",
-        "intro": "この本体を MQTT ブローカー（Home Assistant の Mosquitto アプリ、またはほかのもの）に接続します。Home Assistant で本体の状態とプレイ時間を表示し、本体に指示を送れるようになります。接続は PlayGuard を開いている間、または追加のエージェント（本体 › 追加モジュール）があれば常に動作します。ブローカーの設定は {} に、その他は {} に保存されます。",
+        "intro": "この本体を MQTT ブローカー（Home Assistant の Mosquitto アプリ、またはほかのもの）に接続します。Home Assistant で本体の状態とプレイ時間を表示し、本体に指示を送れるようになります。接続は PlayGuard を開いている間、または追加のエージェント（Boréale › 追加モジュール）があれば常に動作します。ブローカーの設定は {} に、その他は {} に保存されます。",
         "section_status": "接続",
         "status": "状態",
         "sync_now": "今すぐ同期",
@@ -1618,7 +1620,7 @@
         "status_agent": "接続はエージェント {} が保っています。PlayGuard は読み取った内容をエージェントに渡し、エージェントから渡された指示を実行します。",
         "status_agent_read_only": "エージェントだけでは何も変更しません。PlayGuard が閲覧のみモードだったか、PlayGuard を前回起動してからファームウェアが変わりました。",
         "state_agent": "{} · エージェント経由",
-        "state_agent_refused": "エージェント {} の更新が必要です（本体 › 追加モジュール）",
+        "state_agent_refused": "エージェント {} の更新が必要です（Boréale › 追加モジュール）",
         "ask_body": "リモート接続から指示が届きました：{}。\n\nこの本体で実行しますか？",
         "ask_confirm": "実行する",
         "done": "リモートの指示を実行しました：{}。",
@@ -1674,13 +1676,6 @@
         }
     },
     "modules": {
-        "title": "追加モジュール",
-        "open": "追加モジュール",
-        "count": "{} 個インストール済み",
-        "count_one": "1 個インストール済み",
-        "section_modules": "Sysmodules",
-        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
-        "intro": "PlayGuard が SD カードに入れられる、2 つの小さなバックグラウンドプログラム（sysmodule）です。どちらも必須ではなく、それぞれ 1 つのことだけを行います。PlayGuard は一緒に作られたバージョンを同梱しており、パソコンなしでここからインストールや更新ができます。「セキュリティ › PlayGuardを暗証番号で保護」が変更前に暗証番号を求める設定なら、どの変更にも暗証番号が必要です。",
         "status": "状態",
         "install": "インストール",
         "update": "アップデート",
@@ -1694,8 +1689,7 @@
             "not_installed": "未インストール",
             "not_bundled": "このビルドには含まれていません",
             "installed": "インストール済み・最新",
-            "update": "インストール済み・更新あり",
-            "none": "インストールなし"
+            "update": "インストール済み・更新あり"
         },
         "short": {
             "installed": "インストール済み",
@@ -1728,12 +1722,10 @@
             "installed": "リカバリーモジュールをインストールしました。RESCUE ファイルがあれば、次の起動時に作動します。",
             "updated": "リカバリーモジュールを更新しました。",
             "remove_body": "リカバリーモジュールを削除しますか？削除すると、上限 0 分で暗証番号を忘れたとき、直すのにパソコンが必要になります。",
-            "short_title": "リカバリーモジュール",
-            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
+            "short_title": "リカバリーモジュール"
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "プロトコル {} を使用",
             "offer_body": "SD カードのBoréale agentは、この PlayGuard に含まれているもの（バージョン {}）ではありません。今すぐ更新しますか？少しの間停止し、新しいものが応答しない場合は前のものに戻します。",
             "offer_refused": "古いプロトコルを使っているため、更新するまでリモート接続は動作しません。"
@@ -2079,7 +2071,7 @@
         "remove": "取り消す",
         "removed": "予約したプリセットを取り消しました。",
         "soon": "Home Assistant で対応",
-        "soon_note": "PlayGuard は開いている間しか動かないため、決まった日に自分でプリセットを切り替えることはできません。Home Assistant ならできます。「本体 › リモートアクセス」で本体を Home Assistant に接続し、オートメーションがカレンダーや学校の休みをもとにプリセット（本体の「プリセット」セレクト）を選びます。"
+        "soon_note": "PlayGuard は開いている間しか動かないため、決まった日に自分でプリセットを切り替えることはできません。Home Assistant ならできます。「Boréale › リモートアクセス」で本体を Home Assistant に接続し、オートメーションがカレンダーや学校の休みをもとにプリセット（本体の「プリセット」セレクト）を選びます。"
     },
     "sigpatch": {
         "set_aside": "sigpatchファイルを退避する",
@@ -2089,7 +2081,6 @@
         "done": "sigpatchファイルを退避しました。本体を再起動してから、もう一度フォワーダーを試してください。"
     },
     "boreale": {
-        "intro": "このコンソールにインストールされている Boréale ファミリーのHomebrew です。それぞれ起動時にここに追加されます。A で開きます。",
         "this_app": "このアプリ",
         "open_manual": "Homebrew メニューから {} を開いてください。"
     },

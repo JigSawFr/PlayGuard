@@ -15,6 +15,8 @@
         "clock": "Network clock",
         "security": "Security",
         "history": "History",
+        "boreale_hub": "Boréale",
+        "boreale": "Boréale",
         "console": "Console",
         "preferences": "Preferences",
         "about": "About"
@@ -208,6 +210,7 @@
         "profile_action_edit": "Edit the limits…",
         "profile_action_rename": "Rename…",
         "profile_edit_title": "Profile: {}",
+        "section_reliability": "Reliability",
         "section_bedtime": "Bedtime",
         "bedtime_reset": "Play allowed again at",
         "bedtime_note": "Every day, or by day of the week. At bedtime the console shows the alarm, and may also suspend the software (see \"When the time is up\"), until play is allowed again. PlayGuard checks that the console reports the new time, and puts the previous settings back if it does not.",
@@ -282,7 +285,7 @@
         "write_err": "Could not apply the play-time limit",
         "removed": "Play-time limit removed.",
         "remove_err": "Could not remove the play-time limit",
-        "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Console › Network clock), or a limit was just written (start a game for a minute, then check).",
+        "not_counting": "The console is not counting play time right now. Likely causes: the clock was set back (it counts again later), the network clock was never set (Play timer › Network clock), or a limit was just written (start a game for a minute, then check).",
         "limit_note": "At the limit the console shows \"Time's up\", then suspends the game or only warns, as set in \"When the time is up\".",
         "unsaved": "Unsaved progress may be lost: let the child save first.",
         "profile_already": "The profile \"{}\" is already in place.",
@@ -505,7 +508,7 @@
             "timeout": "no answer",
             "bad_reply": "invalid answer"
         },
-        "start_off": "The network clock is {} off (checked against {}). The play timer counts on it: see Console › Network clock.",
+        "start_off": "The network clock is {} off (checked against {}). The play timer counts on it: see Play timer › Network clock.",
         "guided_body": "The network clock is inaccurate, and the play timer counts on it.\n\nMeasure the time against {} now? (The console must be online.) You will then be asked before the clock is set.",
         "guided_measure": "Measure now",
         "guided_fine": "The network clock is accurate: nothing to do.",
@@ -540,7 +543,6 @@
     "security": {
         "section_status": "Status",
         "pin": "PIN",
-        "restrictions": "Restrictions enabled",
         "section_actions": "Actions",
         "set_pin": "Set or change the PIN",
         "show_pin": "Show the PIN…",
@@ -646,7 +648,6 @@
     },
     "tools": {
         "section_diag": "Diagnostics",
-        "section_tools": "Tools",
         "section_reports": "Reports",
         "section_system": "System",
         "export": "Export a diagnostic report",
@@ -700,7 +701,6 @@
         "extra_amounts": "Extra time amounts",
         "extra_auto": "Put the limit back by itself after \"No more play today\"",
         "clock_check": "Check the network clock at start-up",
-        "section_about": "About",
         "version": "Version",
         "firmware": "Firmware",
         "atmosphere": "Atmosphère",
@@ -1135,6 +1135,11 @@
         "refresh_title": "Forwarders made with an older loader",
         "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
     },
+    "hub": {
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Optional modules"
+    },
     "hbmenu": {
         "section": "Homebrew menu",
         "cell": "Lock the homebrew menu",
@@ -1252,9 +1257,9 @@
         "credit_ui": "Interface",
         "credit_family": "Part of",
         "section_support": "Support PlayGuard",
+        "section_help": "Help",
         "support_note": "PlayGuard is free, open source and has no ads. If it helps your family, you can support its development: scan a code with your phone (select it to enlarge it).",
-        "whats_new_close": "Continue",
-        "boreale": "Boréale homebrews"
+        "whats_new_close": "Continue"
     },
     "prefs": {
         "section_app": "App",
@@ -1300,7 +1305,7 @@
         "forwarders_body": "This backup also has {} forwarders that are no longer on the HOME menu: {}. Put them back?",
         "forwarders_put_back": "Put them back",
         "forwarders_lock_title": "The homebrew menu was locked",
-        "forwarders_lock": "It was locked when this backup was made. Lock it again from Console › Forwarders: its checks come first."
+        "forwarders_lock": "It was locked when this backup was made. Lock it again from Security › Forwarders: its checks come first."
     },
     "update": {
         "title": "Update available"
@@ -1390,9 +1395,6 @@
     "history": {
         "title": "Change history",
         "tab_intro": "Every change to the settings, and their backups. What was played is in Activity.",
-        "open": "Changes made with PlayGuard",
-        "count": "{} recorded",
-        "count_one": "1 recorded",
         "tile_changes": "Changes",
         "none": "Nothing recorded yet. Every change PlayGuard makes on the console (limits, restriction level, PIN, unlocks…) is listed here.",
         "note": "The newest {} changes, kept on the SD card in {}. A on a change shows it and, when possible, puts the previous value back.",
@@ -1553,7 +1555,7 @@
     },
     "sync": {
         "title": "Remote access",
-        "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the Boréale agent (Console › Optional modules), which keeps it up for every Boréale homebrew. The broker's settings are kept in {}, the rest in {}.",
+        "intro": "Links this console to an MQTT broker (Home Assistant's Mosquitto app, or any other): Home Assistant then shows its state and play time, and can send it orders. The link runs while PlayGuard is open, or all the time with the Boréale agent (Boréale › Optional modules), which keeps it up for every Boréale homebrew. The broker's settings are kept in {}, the rest in {}.",
         "section_status": "Link",
         "status": "Status",
         "sync_now": "Sync now",
@@ -1618,7 +1620,7 @@
         "status_agent": "The agent {} holds the link: PlayGuard passes it what it reads and carries out the orders it hands over.",
         "status_agent_read_only": "On its own, the agent changes nothing: PlayGuard was in read-only mode, or the firmware changed since PlayGuard last ran.",
         "state_agent": "{} · through the agent",
-        "state_agent_refused": "The agent {} needs an update (Console › Optional modules)",
+        "state_agent_refused": "The agent {} needs an update (Boréale › Optional modules)",
         "ask_body": "An order came through the remote link: {}.\n\nCarry it out on this console?",
         "ask_confirm": "Carry it out",
         "done": "Remote order done: {}.",
@@ -1674,13 +1676,6 @@
         }
     },
     "modules": {
-        "title": "Optional modules",
-        "open": "Optional modules",
-        "count": "{} installed",
-        "count_one": "1 installed",
-        "section_modules": "Sysmodules",
-        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
-        "intro": "Two small background programs (sysmodules) PlayGuard can put on the SD card. Neither is needed. PlayGuard carries the versions made with it and installs or updates them from here, without a computer. Every change asks for the PIN when Security › Protect PlayGuard with the PIN asks for it before a change.",
         "status": "State",
         "install": "Install",
         "update": "Update",
@@ -1694,8 +1689,7 @@
             "not_installed": "Not installed",
             "not_bundled": "Not in this build",
             "installed": "Installed, up to date",
-            "update": "Installed, an update is available",
-            "none": "None installed"
+            "update": "Installed, an update is available"
         },
         "short": {
             "installed": "Installed",
@@ -1728,12 +1722,10 @@
             "installed": "Recovery module installed. It acts at the next boot when a RESCUE file is there.",
             "updated": "Recovery module updated.",
             "remove_body": "Remove the recovery module? Without it, a forgotten PIN with a 0-minute limit needs a computer to fix.",
-            "short_title": "Recovery module",
-            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
+            "short_title": "Recovery module"
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "it speaks protocol {}",
             "offer_body": "The Boréale agent on the SD card is not the one this PlayGuard carries (version {}). Update it now? It stops for a moment, and the previous one is put back if the new one does not answer.",
             "offer_refused": "It speaks an older protocol: the remote link does not work until it is updated."
@@ -2079,7 +2071,7 @@
         "remove": "Remove it",
         "removed": "Scheduled profile removed.",
         "soon": "With Home Assistant",
-        "soon_note": "PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself. Home Assistant can: Console › Remote access links the console to it, and an automation picks the profile (its Profile select) from a calendar or the school holidays."
+        "soon_note": "PlayGuard runs only while it is open, so it cannot switch a profile on the right day by itself. Home Assistant can: Boréale › Remote access links the console to it, and an automation picks the profile (its Profile select) from a calendar or the school holidays."
     },
     "sigpatch": {
         "set_aside": "Set the sigpatch files aside",
@@ -2089,7 +2081,6 @@
         "done": "The sigpatch files are set aside. Restart the console, then try the forwarder again."
     },
     "boreale": {
-        "intro": "The homebrews of the Boréale family installed on this console: each one adds itself here when it starts. A on one opens it.",
         "this_app": "This app",
         "open_manual": "Open {} from the homebrew menu."
     },

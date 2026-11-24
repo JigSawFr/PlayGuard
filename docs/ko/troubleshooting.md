@@ -19,13 +19,13 @@ PIN은 알지만 이전 소유자의 스마트폰 앱이 아직 연동되어 있
 
 ### 플레이 타이머가 모든 것을 막고(0분 제한) PIN도 잊어버렸을 때
 
-이때는 PlayGuard 자체가 시작되지 않습니다. 선택 사항인 복구 sysmodule을 **미리** 설치해 두세요(*본체 › 추가 모듈* 또는 `playguard-rescue.zip`으로 직접). 잠겼을 때 SD 카드에 빈 `config/playguard/RESCUE` 파일을 넣고 부팅하면 본체의 잠금이 풀려 PlayGuard를 열 수 있습니다. [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)(영어)를 참고하세요.
+이때는 PlayGuard 자체가 시작되지 않습니다. 선택 사항인 복구 sysmodule을 **미리** 설치해 두세요(*Boréale › 추가 모듈* 또는 `playguard-rescue.zip`으로 직접). 잠겼을 때 SD 카드에 빈 `config/playguard/RESCUE` 파일을 넣고 부팅하면 본체의 잠금이 풀려 PlayGuard를 열 수 있습니다. [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)(영어)를 참고하세요.
 
 이 모듈은 PlayGuard 버전에 맞춰야 합니다. PlayGuard를 업데이트할 때마다 그 버전의 `playguard-rescue.zip`을 다시 압축 해제하고(또는 알림 벨의 *복구 sysmodule이 최신이 아닙니다*에서 *업데이트*), 본체를 다시 시작하세요. 오래된 모듈이 남긴 보고서는 PlayGuard가 확인할 수 없습니다. 이때 복구 화면은 아무것도 제안하지 않고 모듈이 오래되었다고 알려 주며, 모듈을 업데이트할 때까지는 `RESCUE`를 다시 해도 결과가 같습니다.
 
 ### Homebrew 메뉴 잠김
 
-*본체 › 포워더 › Homebrew 메뉴 잠그기*를 하면 앨범이나 R을 누른 채 시작한 게임에서 Homebrew 메뉴가 열리지 않습니다. PlayGuard의 포워더와 보호된 메뉴가 둘 다 없어졌다면(본체 설정에서 삭제했거나, 다른 시스템에 있는 경우. 잠금은 SD 카드에 있어 sysMMC와 emuMMC 모두 읽습니다):
+*보안 › 포워더 › Homebrew 메뉴 잠그기*를 하면 앨범이나 R을 누른 채 시작한 게임에서 Homebrew 메뉴가 열리지 않습니다. PlayGuard의 포워더와 보호된 메뉴가 둘 다 없어졌다면(본체 설정에서 삭제했거나, 다른 시스템에 있는 경우. 잠금은 SD 카드에 있어 sysMMC와 emuMMC 모두 읽습니다):
 
 - **컴퓨터에서:** SD 카드의 `atmosphere/config/override_config.ini`를 삭제하고(또는 원래 파일인 `config/playguard/override_config.ini.backup`을 되돌려 놓고) 본체를 다시 시작하세요.
 - **복구 sysmodule을 설치해 두었다면**(선택 사항): SD 카드에 빈 `config/playguard/RESCUE` 파일을 넣고 다시 시작하세요. sysmodule이 부팅할 때 잠금을 풀고, PlayGuard가 다음에 시작할 때 그렇다고 알려 줍니다. 잠근 뒤 Atmosphère를 업데이트해도 같은 방식으로 잠금이 풀립니다.
@@ -40,7 +40,7 @@ PlayGuard로는 도울 수 없습니다. Atmosphère가 필요합니다. 공식�
 
 약 90초 동안 움직이지 않으면 *오늘*에 *지금 본체가 플레이 시간을 계산하지 않고 있습니다*라고 표시됩니다. 가능한 원인은 다음과 같습니다.
 
-- **네트워크 시계를 한 번도 맞추지 않았습니다.** *본체 › 네트워크 시계 › 시간 차이 측정*을 한 뒤 시계를 맞추세요([네트워크 시계](features.md#네트워크-시계)).
+- **네트워크 시계를 한 번도 맞추지 않았습니다.** *플레이 타이머 › 네트워크 시계 › 시간 차이 측정*을 한 뒤 시계를 맞추세요([네트워크 시계](features.md#네트워크-시계)).
 - **시계를 뒤로 돌렸습니다.** 뒤로 돌린 뒤에는 시계가 이전 시각을 지날 때까지 계산이 멈춥니다. 따로 할 일은 없습니다.
 - **방금 제한을 기록했습니다.** 게임을 1분 정도 실행한 뒤 다시 확인하세요.
 - **자녀 보호 기능이 일시 해제되어 있습니다.** 이때는 플레이 시간이 계산되지 않을 수 있습니다. *오늘 › 다시 켜기*를 누르세요(머리글의 라벨을 눌러도 됩니다).
@@ -76,15 +76,15 @@ PlayGuard로는 도울 수 없습니다. Atmosphère가 필요합니다. 공식�
 
 ### 보호된 포워더에 오류 2347-0100이 표시됨
 
-게이트(`config/playguard/gate-….nro`)가 더 이상 포워더를 만들 때의 파일이 아닙니다. SD 카드에서 바뀌었거나 교체되었으므로 포워더가 게이트를 시작하지 않습니다. PlayGuard 자체의 포워더로 PlayGuard를 여세요. 시작할 때 게이트를 다시 씁니다. *본체 › 포워더 › 모두 다시 설치*를 하면 모든 포워더를 그 게이트로 다시 만듭니다.
+게이트(`config/playguard/gate-….nro`)가 더 이상 포워더를 만들 때의 파일이 아닙니다. SD 카드에서 바뀌었거나 교체되었으므로 포워더가 게이트를 시작하지 않습니다. PlayGuard 자체의 포워더로 PlayGuard를 여세요. 시작할 때 게이트를 다시 씁니다. *보안 › 포워더 › 모두 다시 설치*를 하면 모든 포워더를 그 게이트로 다시 만듭니다.
 
 ### 보호된 포워더가 바로 닫힘("오류가 발생했습니다")
 
-PlayGuard 화면이 나오기 전에 오류 코드 없이 닫힙니다(`atmosphere/crash_reports/`의 Atmosphère 보고서에 `forwarder` 모듈, 결과 `2000-0000`이 적혀 있습니다). 게이트가 에셋 없이 빌드된 PlayGuard로 만든 포워더이며, 포워더의 로더가 이를 거부했습니다. PlayGuard를 업데이트한 뒤 다시 만드세요. 이전 로더로 만든 모든 포워더에 대해 벨과 *본체 › 포워더*에서 다시 만들기를 제안합니다.
+PlayGuard 화면이 나오기 전에 오류 코드 없이 닫힙니다(`atmosphere/crash_reports/`의 Atmosphère 보고서에 `forwarder` 모듈, 결과 `2000-0000`이 적혀 있습니다). 게이트가 에셋 없이 빌드된 PlayGuard로 만든 포워더이며, 포워더의 로더가 이를 거부했습니다. PlayGuard를 업데이트한 뒤 다시 만드세요. 이전 로더로 만든 모든 포워더에 대해 벨과 *보안 › 포워더*에서 다시 만들기를 제안합니다.
 
 ### 보호된 포워더가 PIN 입력 뒤에도 게이트 화면에 머묾
 
-PIN이 받아들여졌는데도 Homebrew 아이콘이 있는 화면이 그대로이고 더 이상 아무 일도 일어나지 않습니다. 게이트가 그 화면을 단일 버퍼로 그린 뒤, 다음 화면을 그리기를 끝없이 기다린 것입니다. PlayGuard를 업데이트한 뒤 다시 만드세요. 이전 게이트로 만든 모든 포워더에 대해 벨과 *본체 › 포워더*에서 다시 만들기를 제안합니다.
+PIN이 받아들여졌는데도 Homebrew 아이콘이 있는 화면이 그대로이고 더 이상 아무 일도 일어나지 않습니다. 게이트가 그 화면을 단일 버퍼로 그린 뒤, 다음 화면을 그리기를 끝없이 기다린 것입니다. PlayGuard를 업데이트한 뒤 다시 만드세요. 이전 게이트로 만든 모든 포워더에 대해 벨과 *보안 › 포워더*에서 다시 만들기를 제안합니다.
 
 ### 포워더에 "소프트웨어를 시작할 수 없습니다"가 표시됨
 
@@ -93,7 +93,7 @@ PIN이 받아들여졌는데도 Homebrew 아이콘이 있는 화면이 그대로
 - **sys-patch 옆의 sigpatch 파일.** sys-patch가 작동하는 동안 `atmosphere/kip_patches/fs_patches`, `loader_patches` 또는 `atmosphere/exefs_patches/es_patches`에 `.ips` 파일이 있는 경우입니다. 두 도구가 같은 검사를 패치하는 것으로, GBAtemp의 sys-patch와 sigpatch 스레드에서 가장 많이 꼽히는 원인입니다. *본체 › 게임 패치*가 이를 경고하며, 거기서 Ⓐ를 누르면 따로 옮겨 둡니다(`config/playguard/sigpatches-aside/`로 옮기기만 하고 삭제하지 않음. hekate의 `bootloader/patches.ini`는 그대로). 본체를 다시 시작하세요.
 - **sys-patch가 적용하지 않은 패턴.** 포워더에는 모듈마다 하나가 아니라, sys-patch가 이 펌웨어용으로 가진 fs와 loader의 모든 패턴(`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`)이 필요합니다. *정보 › 도움말 및 진단 › 진단 보고서 내보내기*의 `game patches` 줄에 sys-patch 버전과 빠진 각 패턴이 나옵니다. `sd:/config/sys-patch/log.ini`에도 같은 내용이 있습니다. `config/sys-patch/config.ini`가 이 시스템을 패치하도록(emuMMC에서는 `patch_emummc=1`) 되어 있고 어느 것도 끄지 않았는지 확인하세요. sys-patch 관리자 본인에 따르면 23.0.x에는 1.6.2.3보다 새로운 sys-patch가 필요하지 않습니다.
 - **패치가 바뀐 뒤 다시 시작하지 않음.** sys-patch는 부팅할 때 패치합니다.
-- **이전 PlayGuard로 만든 포워더.** 벨과 *본체 › 포워더*에서 이전 로더로 만든 포워더를 다시 만들도록 제안합니다.
+- **이전 PlayGuard로 만든 포워더.** 벨과 *보안 › 포워더*에서 이전 로더로 만든 포워더를 다시 만들도록 제안합니다.
 
 ### 벨이나 탭에 호박색 배지가 표시됨
 

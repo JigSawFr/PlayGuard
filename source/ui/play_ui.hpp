@@ -68,13 +68,14 @@ constexpr int activity     = 3;   // play time per game
 constexpr int restrictions = 4;
 constexpr int security     = 5;   // PIN, unlock, protecting PlayGuard, companion app, delete
 constexpr int history      = 6;   // the change history and settings backups
-constexpr int console      = 8;   // the network clock, installed games, forwarders, firmware, storage, serial, patches
-constexpr int preferences  = 10;  // the app's settings and its updates
-constexpr int about        = 11;  // version, help, credits
+constexpr int console      = 8;   // installed games, firmware, storage, serial, patches
+constexpr int boreale      = 9;   // remote access, optional modules, the Boréale homebrews
+constexpr int preferences  = 11;  // the app's settings
+constexpr int about        = 12;  // version, updates, help, credits
 // The n-th tab (0 = Today) as a sidebar position (separators count).
 constexpr int of(int n)
 {
-    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, history, console, preferences, about };
+    constexpr int positions[] = { dashboard, play_timer, activity, restrictions, security, history, console, boreale, preferences, about };
     return n >= 0 && n < (int)std::size(positions) ? positions[n] : dashboard;
 }
 }   // namespace tab

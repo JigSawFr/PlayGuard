@@ -9,17 +9,11 @@
 #include "action/fw_gate.hpp"
 #include "action/sys_notes_flow.hpp"
 #include "action/sigpatch_flow.hpp"
-#include "action/sync_flow.hpp"
 #include "action/sys_update_flow.hpp"
 #include "activity/firmware_gate_activity.hpp"
-#include "activity/forwarders_activity.hpp"
 #include "activity/game_check_activity.hpp"
-#include "activity/modules_activity.hpp"
-#include "activity/sync_activity.hpp"
 #include "core/sysinfo.h"
-#include "tab/clock_tab.hpp"
 #include "ui/play_ui.hpp"
-#include "util/modules.hpp"
 #include "util/patches.hpp"
 #include "util/paths.hpp"
 #include "view/row_icon.hpp"
@@ -29,24 +23,8 @@ using namespace aurore::literals;
 ConsoleTab::ConsoleTab()
     : TabBase("xml/tab/console.xml"), list(this)
 {
-    clock->registerClickAction([](aurore::View*) {
-        ClockTab::open_screen();
-        return true;
-    });
     games->registerClickAction([](aurore::View*) {
         aurore::Application::pushActivity(new GameCheckActivity());
-        return true;
-    });
-    forwarders->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new ForwardersActivity());
-        return true;
-    });
-    remote->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new SyncActivity());
-        return true;
-    });
-    modules_cell->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new ModulesActivity());
         return true;
     });
 
@@ -76,7 +54,6 @@ ConsoleTab::ConsoleTab()
     }
 
     // What the notification bell says is to do here, on its row.
-    this->mark(clock.getView(), { "clock" });
     this->mark(games.getView(), { "games" });
     this->mark(storage.getView(), { "sd_space" });
     this->mark(game_patches.getView(), { "patches" });
@@ -131,9 +108,9 @@ ConsoleTab::ConsoleTab()
     }
     // The screens of their own as tiles under them, each one's count of
     // things to do (mark()) in its corner rather than under its title.
-    if (aurore::Box* tools = this->list.tiles({ { "cn_clock", "globe" }, { "cn_games", "gamepad" }, { "cn_forwarders", "home" } }, false)) {
+    if (aurore::Box* tools = this->list.tiles({ { "cn_games", "gamepad" } }, false)) {
         tools->setMarginBottom(20);
-        for (const char* tile : { "cn_clock", "cn_games" }) {
+        for (const char* tile : { "cn_games" }) {
             auto* cell = (aurore::DetailCell*)this->getView(tile);
             TabBadge* badge = TabBadge::on_row(cell);
             aurore::Box* head = this->list.head(tile);
@@ -145,28 +122,12 @@ ConsoleTab::ConsoleTab()
             head->addView(badge);
         }
     }
-    // The remote link and the optional sysmodules: a second row of them.
-    if (aurore::Box* more = this->list.tiles({ { "cn_remote", "server" }, { "cn_modules", "tools" } }, false))
-        more->setMarginBottom(20);
     this->list.apply({ { "cn_compat", "check" }, { "cn_storage", "folder" }, { "cn_blank", "code" },
                        { "cn_serial", "tag" }, { "cn_patches", "shield" } });
 }
 
 void ConsoleTab::refresh()
 {
-    // The remote link's state, and how many optional sysmodules are on the SD
-    // card (whether each exefs.nsp is there: a stat, not its hash, which the
-    // screen itself reads).
-    const sync_flow::Status link = sync_flow::status();
-    remote->setDetailText(!link.enabled ? "playguard/sync/state_off"_i18n
-                          : link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
-                                                                              : "playguard/sync/state_offline"_i18n);
-    int installed = 0;
-    for (const auto& m : modules::all())
-        installed += paths::file_exists(modules::dir(paths::sd_root(), m) + "/exefs.nsp") ? 1 : 0;
-    modules_cell->setDetailText(installed == 1 ? "playguard/modules/count_one"_i18n
-                                : installed ? aurore::getStr("playguard/modules/count", installed)
-                                            : "playguard/modules/state/none"_i18n);
     SysInfo si;
     sysinfo_get(&si);
     // Each tile: the installed version after a check once a check knows it is

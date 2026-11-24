@@ -254,7 +254,7 @@ def tabs(new_page):
     page = new_page()
     if open_page(page, FIXED, "tabs"):
         shot(page, "overview")
-        for name in ["play_timer", "activity", "restrictions", "security", "history", "console", "preferences", "about"]:
+        for name in ["play_timer", "activity", "restrictions", "security", "history", "console", "boreale", "preferences", "about"]:
             steps(page, "down")
             shot(page, name if name in ("play_timer", "activity", "console") else f"tabs_{name}")
         if page.evaluate("document.body.dataset.playguard") != "ready":
@@ -273,13 +273,13 @@ def limit_reached(new_page):
         print("ok   limit_reached")
 
 
-# Console › Forwarders in use (PLAYGUARD_SIM_FORWARDERS): the card, the
+# Security › Forwarders in use (PLAYGUARD_SIM_FORWARDERS): the card, the
 # groups and badges, then the steps to the lock.
 @scenario
 def forwarders(new_page):
     page = new_page()
-    if open_page(page, FIXED + "&forwarders=1&tab=console", "forwarders"):
-        steps(page, "right.down*2.a")   # Network clock, then Forwarders, under Homebrew
+    if open_page(page, FIXED + "&forwarders=1&tab=security", "forwarders"):
+        steps(page, "right.down*5.a")   # Set PIN, then down to Forwarders, after the homebrew menu's lock
         shot(page, "forwarders")
         print("ok   forwarders")
 
@@ -309,7 +309,7 @@ def alarm(new_page):
 def unlock_error(new_page):
     page = new_page()
     if open_page(page, FIXED + "&fail=unlock&restricted=1&autosync_off=1&ntp=offline&network_offset=1411", "errors"):
-        steps(page, "down.right.right.a")  # Play timer › the profile chip › Same limit every day
+        steps(page, "down.right.up*12.right.right.a")  # Play timer (opens on the clock, to do) › up to the profile chip › Same limit every day
         shot(page, "errors_picker")
         steps(page, "up.a")                # No play (0 min): the change needs the unlock
         shot(page, "errors_gate")

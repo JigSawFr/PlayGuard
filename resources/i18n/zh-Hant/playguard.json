@@ -15,6 +15,8 @@
         "clock": "網路時鐘",
         "security": "安全",
         "history": "紀錄",
+        "boreale_hub": "Boréale",
+        "boreale": "Boréale",
         "console": "主機",
         "preferences": "偏好設定",
         "about": "關於"
@@ -208,6 +210,7 @@
         "profile_action_edit": "編輯上限…",
         "profile_action_rename": "重新命名…",
         "profile_edit_title": "設定檔：{}",
+        "section_reliability": "Reliability",
         "section_bedtime": "就寢時間",
         "bedtime_reset": "可再次遊玩的時間",
         "bedtime_note": "適用於每一天，或依星期設定。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（見「時間到時」），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
@@ -282,7 +285,7 @@
         "write_err": "無法套用遊玩時間上限",
         "removed": "已移除遊玩時間限制。",
         "remove_err": "無法移除遊玩時間限制",
-        "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「主機 › 網路時鐘」），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
+        "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「遊玩時間限制 › 網路時鐘」），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
         "limit_note": "達到上限時，主機會顯示「時間到」，然後依照「時間到時」的設定中斷遊戲或僅提醒。",
         "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。",
         "profile_already": "設定檔「{}」已經套用。",
@@ -505,7 +508,7 @@
             "timeout": "無回應",
             "bad_reply": "回應無效"
         },
-        "start_off": "網路時鐘偏差{}（與{}比對）。遊玩時間限制依據此時鐘：請查看「主機 › 網路時鐘」。",
+        "start_off": "網路時鐘偏差{}（與{}比對）。遊玩時間限制依據此時鐘：請查看「遊玩時間限制 › 網路時鐘」。",
         "guided_body": "網路時鐘不準確，而遊玩時間限制依據此時鐘。\n\n要立即以{}測量時間嗎？（主機必須連線至網路。）設定時鐘前會再次詢問您。",
         "guided_measure": "立即測量",
         "guided_fine": "網路時鐘準確：不需要任何操作。",
@@ -540,7 +543,6 @@
     "security": {
         "section_status": "狀態",
         "pin": "PIN碼",
-        "restrictions": "限制已啟用",
         "section_actions": "操作",
         "set_pin": "設定或變更PIN碼",
         "show_pin": "顯示PIN碼…",
@@ -646,7 +648,6 @@
     },
     "tools": {
         "section_diag": "診斷",
-        "section_tools": "工具",
         "section_reports": "報告",
         "section_system": "系統",
         "export": "匯出診斷報告",
@@ -700,7 +701,6 @@
         "extra_amounts": "延長時間的選項",
         "extra_auto": "「停止今天的遊玩」後，隔天自動改回平常的上限",
         "clock_check": "啟動時確認網路時鐘",
-        "section_about": "關於",
         "version": "版本",
         "firmware": "韌體",
         "atmosphere": "Atmosphère",
@@ -1135,6 +1135,11 @@
         "refresh_title": "用舊載入器製作的轉發器",
         "refresh_detail": "{}：由舊版PlayGuard製作。重新製作後，它們會用此版本的載入器啟動各自的Homebrew。"
     },
+    "hub": {
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "選用模組"
+    },
     "hbmenu": {
         "section": "自製軟體選單",
         "cell": "鎖定自製軟體選單",
@@ -1252,9 +1257,9 @@
         "credit_ui": "介面",
         "credit_family": "所屬",
         "section_support": "支持 PlayGuard",
+        "section_help": "說明",
         "support_note": "PlayGuard 免費、開源且無廣告。如果它對您的家庭有幫助，可以支持它的開發：用手機掃描 QR 碼（選取可放大）。",
-        "whats_new_close": "繼續",
-        "boreale": "Boréale 自製軟體"
+        "whats_new_close": "繼續"
     },
     "prefs": {
         "section_app": "應用程式",
@@ -1300,7 +1305,7 @@
         "forwarders_body": "此備份中還有{}個已不在HOME選單上的轉發器：{}。要復原嗎？",
         "forwarders_put_back": "復原",
         "forwarders_lock_title": "自製軟體選單曾被鎖定",
-        "forwarders_lock": "製作此備份時它處於鎖定狀態。請在主機 › 轉發器中重新鎖定：先進行檢查。"
+        "forwarders_lock": "製作此備份時它處於鎖定狀態。請在安全 › 轉發器中重新鎖定：先進行檢查。"
     },
     "update": {
         "title": "有可用更新"
@@ -1390,9 +1395,6 @@
     "history": {
         "title": "變更紀錄",
         "tab_intro": "設定的每次變更及其備份。遊玩情況請看「活動紀錄」。",
-        "open": "使用PlayGuard進行的變更",
-        "count": "已記錄{}筆",
-        "count_one": "已記錄1筆",
         "tile_changes": "變更",
         "none": "尚無紀錄。PlayGuard對主機所做的每項變更（上限、限制等級、PIN碼、解除…）都會列在此處。",
         "note": "最新的{}筆變更，儲存於SD卡的{}。在變更上按A即可查看，並在可能時改回先前的數值。",
@@ -1553,7 +1555,7 @@
     },
     "sync": {
         "title": "遠端存取",
-        "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（主機 › 選用模組）。Broker 的設定儲存在 {} 中，其餘儲存在 {} 中。",
+        "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（Boréale › 選用模組）。Broker 的設定儲存在 {} 中，其餘儲存在 {} 中。",
         "section_status": "連線",
         "status": "狀態",
         "sync_now": "立即同步",
@@ -1618,7 +1620,7 @@
         "status_agent": "代理程式 {} 負責維持連線：PlayGuard 把讀取到的內容交給它，並執行它轉交的指令。",
         "status_agent_read_only": "代理程式單獨執行時不會變更任何設定：PlayGuard 上次處於唯讀模式，或自 PlayGuard 上次執行以來韌體已變更。",
         "state_agent": "{} · 透過代理程式",
-        "state_agent_refused": "代理程式 {} 需要更新（主機 › 選用模組）",
+        "state_agent_refused": "代理程式 {} 需要更新（Boréale › 選用模組）",
         "ask_body": "透過遠端連線收到一則指令：{}。\n\n要在這台主機上執行嗎？",
         "ask_confirm": "執行",
         "done": "遠端指令已執行：{}。",
@@ -1674,13 +1676,6 @@
         }
     },
     "modules": {
-        "title": "選用模組",
-        "open": "選用模組",
-        "count": "已安裝 {} 個",
-        "count_one": "已安裝 1 個",
-        "section_modules": "Sysmodules",
-        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
-        "intro": "PlayGuard 可以放到 SD 卡上的兩個小型背景程式（sysmodule）。兩者都不是必要的，各自只做一件事。PlayGuard 附帶與它一起製作的版本，可在此安裝或更新，不需要電腦。當「安全 › 用PIN碼保護PlayGuard」設為變更前詢問PIN碼時，每項變更都會要求輸入PIN碼。",
         "status": "狀態",
         "install": "安裝",
         "update": "更新",
@@ -1694,8 +1689,7 @@
             "not_installed": "未安裝",
             "not_bundled": "此建置未附帶",
             "installed": "已安裝，已是最新",
-            "update": "已安裝，有可用的更新",
-            "none": "未安裝任何模組"
+            "update": "已安裝，有可用的更新"
         },
         "short": {
             "installed": "已安裝",
@@ -1728,12 +1722,10 @@
             "installed": "復原模組已安裝。下次開機時，若有 RESCUE 檔案，它就會動作。",
             "updated": "復原模組已更新。",
             "remove_body": "要移除復原模組嗎？沒有它，在上限為 0 分鐘時忘記 PIN碼，就需要用電腦來解決。",
-            "short_title": "復原模組",
-            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
+            "short_title": "復原模組"
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "它使用通訊協定 {}",
             "offer_body": "SD 卡上的Boréale agent不是這個 PlayGuard 附帶的版本（版本 {}）。要現在更新嗎？它會短暫停止；如果新版本沒有回應，會改回先前的版本。",
             "offer_refused": "它使用較舊的通訊協定：更新之前，遠端連線無法運作。"
@@ -2079,7 +2071,7 @@
         "remove": "移除",
         "removed": "已移除排定的設定檔。",
         "soon": "透過 Home Assistant",
-        "soon_note": "PlayGuard 只在開啟時執行，因此無法在指定的日子自行切換設定檔。Home Assistant 可以：「主機 › 遠端存取」會將主機連線到它，再由自動化依據行事曆或學校假期選擇設定檔（它的「設定檔」選擇器）。"
+        "soon_note": "PlayGuard 只在開啟時執行，因此無法在指定的日子自行切換設定檔。Home Assistant 可以：「Boréale › 遠端存取」會將主機連線到它，再由自動化依據行事曆或學校假期選擇設定檔（它的「設定檔」選擇器）。"
     },
     "sigpatch": {
         "set_aside": "將Sigpatch檔案移到一旁",
@@ -2089,7 +2081,6 @@
         "done": "Sigpatch檔案已移到一旁。請重新啟動主機，然後再試一次轉發器。"
     },
     "boreale": {
-        "intro": "此主機上安裝的 Boréale 家族自製軟體：每個軟體啟動時會把自己加到這裡。在其中一個上按 A 即可開啟。",
         "this_app": "本應用程式",
         "open_manual": "請從自製軟體選單開啟 {}。"
     },

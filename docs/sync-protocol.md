@@ -325,7 +325,7 @@ forwarders left out), `total_min` every title played, every account, the
 homebrews included: the games' `total_min` and `homebrew_min` (the homebrews'
 time since first played) add up to it. `homebrews` is the number of `.nro`
 files in the SD card's `/switch` folder and its sub-folders one level down
-(what *Console › Forwarders* offers), `forwarders` the forwarders installed
+(what *Security › Forwarders* offers), `forwarders` the forwarders installed
 (PlayGuard's own included); `null` when not known (the installed titles never
 checked). Home Assistant's native discovery has the totals; the
 integration lists every game on *Games installed* (an attribute) and keeps
@@ -390,7 +390,7 @@ named, game or homebrew (`now_playing`, the events, `now`). What a title is
 |---|---|---|
 | The title ID below `0100000000010000` | The console's own program | Certain: Nintendo numbers its applications from `0100000000010000` (switchbrew's title list) |
 | The title ID's top byte other than `01` | A homebrew | Certain the other way round: no Nintendo application has one. sphaira and PlayGuard give their forwarders `05` (`core/forwarder_pack.h`); a homebrew under a `01…` ID is not caught by this |
-| *Console › Forwarders*' record (`forwarders.json`) | A homebrew, PlayGuard's own told apart | Certain for those PlayGuard made, whatever their ID |
+| *Security › Forwarders*' record (`forwarders.json`) | A homebrew, PlayGuard's own told apart | Certain for those PlayGuard made, whatever their ID |
 | PlayGuard's record, `nand/<system>/titles.txt` | What was seen before | As sure as when it was written: a forwarder keeps its kind and name after it is deleted |
 
 What a control.nacp says was looked at and not used: a forwarder's is its
@@ -693,7 +693,7 @@ release's `CHANGELOG.md`) and the QR code that opens it in the Marketplace.
 | `config/playguard/nand/<system>/sync/agent_events.log` | the agent | One line per order the agent carried out itself, tab-separated: time (POSIX), entity, payload, applied (0/1), reason, change kind (`SyncChange`), number of values, source (`remote`, `remote_extra`…), values before (comma-separated), values after, the console lock afterwards (-1 unchanged, 0, 1). PlayGuard imports them into `history.json`, with the agent's time, when it opens a session, and removes the file. A line with more fields than PlayGuard knows is read for the ones it knows; one it cannot read is kept in `agent_events.log.rejected` (for a later version), and the file is not removed until it is. |
 | `config/playguard/nand/<system>/sync/agent_watchdog.log` | the agent | One line each time its loop has not turned for a minute, and when it turns again: the local date and time, how long, and where it stopped (and whether its socket was shut down to free it). Started again past 16 KiB. PlayGuard's report shows the last 6 lines. |
 | `config/playguard/logs/reports/report_<date>_<time>.txt` | the agent | A report asked for by `export_report` while PlayGuard is closed (clocks and parental controls, as PlayGuard's report has them). Named as PlayGuard's reports, so *About › Help & diagnostics* lists, sends and prunes it with them. |
-| `atmosphere/contents/<tid>/{exefs.nsp, flags/boot2.flag, toolbox.json, version.txt}` | *Console › Optional modules*, or the user | The installed module (`4200000000505247` recovery, `4200000000504741` agent). |
+| `atmosphere/contents/<tid>/{exefs.nsp, flags/boot2.flag, toolbox.json, version.txt}` | *Boréale › Optional modules*, or the user | The installed module (`4200000000505247` recovery, `4200000000504741` agent). |
 
 `<system>` is `sysmmc`, `emummc` or `unknown`, as for the rest of PlayGuard's
 per-system files (`util/nand.hpp`; the agent names it the same way,
@@ -773,7 +773,7 @@ documents, the log, an order and the status travel in mapped buffers.
 PlayGuard looks for the service when the link is on, at start-up and every
 5 s after (Atmosphère's `sm` answers whether a service is registered without
 waiting for it), so the agent can be started or stopped while PlayGuard runs
-(*Console › Optional modules* does it, and hands the link over at once). With
+(*Boréale › Optional modules* does it, and hands the link over at once). With
 the agent there, PlayGuard opens no broker session of its own; when the
 agent goes away, PlayGuard's own session takes over. Once its session opens,
 PlayGuard adopts the agent's records (`GetRecords`) when `agent_state.txt` is

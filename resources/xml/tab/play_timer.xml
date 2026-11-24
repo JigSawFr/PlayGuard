@@ -78,6 +78,8 @@
             <aurore:Header id="pt_lock_header" title="@i18n/playguard/console_lock/section" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="pt_console_lock" title="@i18n/playguard/console_lock/title"/>
             <aurore:Label id="pt_console_lock_note" text="" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>
+            <aurore:Header id="pt_clock_header" title="@i18n/playguard/play_timer/section_reliability" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="pt_clock" title="@i18n/playguard/tabs/clock"/>
             <aurore:Header id="pt_bedtime_header" title="@i18n/playguard/play_timer/section_bedtime" marginTop="24" marginBottom="8"/>
             <aurore:DetailCell id="pt_bedtime_reset" title="@i18n/playguard/play_timer/bedtime_reset"/>
             <aurore:Label id="pt_bedtime_note" text="@i18n/playguard/play_timer/bedtime_note" fontSize="20" marginTop="10" marginBottom="6" textColor="@theme/cadran/text3"/>

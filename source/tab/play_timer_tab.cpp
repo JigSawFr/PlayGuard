@@ -19,6 +19,7 @@
 #include "activity/play_timer_perday_activity.hpp"
 #include "activity/profiles_activity.hpp"
 #include "app.hpp"
+#include "tab/clock_tab.hpp"
 #include "ui/play_ui.hpp"
 #include "util/config.hpp"
 #include "util/date.hpp"
@@ -87,7 +88,7 @@ PlayTimerTab::PlayTimerTab()
     // The keys and the bars' key on two lines when the text is larger.
     kit::wrap(this->getView("cpt_keys_idle"));
     kit::wrap(this->getView("pt_chips"));
-    this->list.apply({ { "pt_split", "calendar" }, { "pt_today", "today" }, { "pt_console_lock", "gamepad" },
+    this->list.apply({ { "pt_split", "calendar" }, { "pt_today", "today" }, { "pt_console_lock", "gamepad" }, { "pt_clock", "globe" },
                        { "pt_bedtime_reset", "moon" }, { "pt_extra_amounts", "plus" },
                        { "pt_extra_auto", "refresh" }, { "pt_advanced", "settings" }, { "pt_remove", "trash" } });
     // Removing the limit: last, apart, in coral (as Security's "Delete all").
@@ -173,6 +174,14 @@ PlayTimerTab::PlayTimerTab()
     ui::set_detail(today, ui::opens("playguard/tabs/dashboard"_i18n));
     today->registerClickAction([](aurore::View* view) {
         ui::go_to_tab(view, ui::tab::dashboard);
+        return true;
+    });
+    // The network clock decides whether the limit counts right: its screen
+    // (ClockTab), with the count of what the bell says is to do about it.
+    this->mark(clock_cell.getView(), { "clock" });
+    clock_cell->setDetailText(ui::opens());
+    clock_cell->registerClickAction([](aurore::View*) {
+        ClockTab::open_screen();
         return true;
     });
     // Every day's limit at 0 (action/console_lock), the previous ones back

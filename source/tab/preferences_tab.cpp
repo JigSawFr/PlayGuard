@@ -7,8 +7,6 @@
 
 #include "action/notices.hpp"
 #include "action/sys_update_flow.hpp"
-#include "action/update_flow.hpp"
-#include "activity/onboarding_activity.hpp"
 #include "ui/play_ui.hpp"
 #include "util/config.hpp"
 
@@ -77,8 +75,8 @@ PreferencesTab::PreferencesTab()
         for (const char* t : config::START_TABS) labels.push_back(tab_name(t));
         // Each tab's icon, as the sidebar draws it (ui/cadran_frame.cpp).
         const std::vector<std::string> icons = { "today", "timer",   "activity", "shield", "lock",
-                                                 "history", "chip", "settings", "info" };
-        static_assert(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]) == 9, "an icon for each tab");
+                                                 "history", "chip", "sparkle", "settings", "info" };
+        static_assert(sizeof(config::START_TABS) / sizeof(config::START_TABS[0]) == 10, "an icon for each tab");
         ui::pick_grid("playguard/tools/start_tab"_i18n, labels, icons, index_of(config::START_TABS, config::get().start_tab), [this](int i) {
             config::get().start_tab = config::START_TABS[i];
             ui::save_config();
@@ -131,35 +129,11 @@ PreferencesTab::PreferencesTab()
         ui::save_config();
     });
 
-    // How PlayGuard updates (checking now is in About, by the version).
-    update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
-        config::get().update_daily = on;
-        ui::save_config();
-    });
-    update_via->registerClickAction([this](aurore::View*) {
-        update_flow::choose_method(this->refresher());
-        return true;
-    });
-    // PlayGuard's own entry in sphaira's GitHub menu (written when sphaira is
-    // there, removed when off).
-    sphaira_entry->init("playguard/tools/sphaira_entry"_i18n, config::get().sphaira_entry, [](bool on) {
-        config::get().sphaira_entry = on;
-        ui::save_config();
-        update_flow::sync_sphaira_entry();
-    });
-    // The guide again (also at the top of About › Help & diagnostics).
-    first_steps->setDetailText(ui::opens());
-    first_steps->registerClickAction([](aurore::View*) {
-        aurore::Application::pushActivity(new OnboardingActivity());
-        return true;
-    });
-
     this->list.tiles({ { "pf_language", "language" }, { "pf_theme", "contrast" }, { "pf_text_size", "eye" },
                        { "pf_start_tab", "home" } }, false);
     this->list.apply({ { "pf_palette", "contrast" }, { "pf_effects", "sparkle" }, { "pf_rail", "rail-auto" }, { "pf_look_shared", "palette" }, { "pf_intro", "bolt" }, { "pf_notices_system", "chip" }, { "pf_notices_summary", "calendar" },
                        { "pf_notices_reminders", "bell" }, { "pf_notices_ack_remind", "alert" }, { "pf_notices_others", "list" },
-                       { "pf_support_reminder", "heart" }, { "pf_update_daily", "calendar" }, { "pf_update_via", "server" }, { "pf_sphaira_entry", "download" },
-                       { "pf_first_steps", "sparkle" } });
+                       { "pf_support_reminder", "heart" } });
 }
 
 void PreferencesTab::refresh()
@@ -180,9 +154,6 @@ void PreferencesTab::refresh()
     notices_others->setOn(cfg.notices_others, false);
     look_shared->setOn(cfg.look_shared, false);
     support_reminder->setOn(cfg.support_reminder, false);
-    update_daily->setOn(cfg.update_daily, false);
-    update_via->setDetailText(update_flow::method_text());
-    sphaira_entry->setOn(cfg.sphaira_entry, false);
     this->list.sync();
     cadran::set_pill("");
 }

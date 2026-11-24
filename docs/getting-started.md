@@ -27,7 +27,7 @@ Open PlayGuard **over a game** (hold R while starting a game, with hbmenu, sphai
 
 ## 3. Follow *First steps*
 
-On the first start, the *First steps* guide comes up (later: *Preferences › First steps*). *Today* shows the same steps as a card until they are done (*1 of 3*):
+On the first start, the *First steps* guide comes up (later: *About › First steps*). *Today* shows the same steps as a card until they are done (*1 of 3*):
 
 1. **The PIN.** The console's own PIN, asked by the HOME menu to start a game past the limit or to change the settings. Avoid 0000, 1234 or 2580: PlayGuard flags a PIN anyone would try first.
 2. **A daily limit.** The same every day, or one for weekdays and one for the weekend. Change any single day later on *Play timer*.
@@ -39,7 +39,7 @@ Still linked to Nintendo's *Parental Controls* phone app, the companion app (or 
 
 ## 5. Set the network clock
 
-*Console › Network clock › Measure the time difference* asks three public time servers, then *Set the network clock*. Setting the clock starts today's play time over, so do it before the child plays.
+*Play timer › Network clock › Measure the time difference* asks three public time servers, then *Set the network clock*. Setting the clock starts today's play time over, so do it before the child plays.
 
 A console without Internet: when no server answers, PlayGuard offers to set the network clock to the console clock instead. Check the console clock against a phone or a watch first, with *System Settings › System › Date and Time › Synchronize Clock via Internet* off ([details](features.md#network-clock)).
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- About: the installed PlayGuard and help with it. Its card first (the
-     mark, the name, the version), then the version (Ⓐ opens every version's
-     release notes, on a screen of their own; seven presses of a hidden Ⓨ
-     turn the developer tools on, at the end of Help & diagnostics, below)
-     and checking for updates now (every day and how: Preferences); a line
-     to Help & diagnostics (tab/help.xml, on a screen of its own, with the
-     launch mode and the data folder) and to the Boréale homebrews installed
-     on the console (tab/boreale_tab, on a screen of its own); the credits and the licence, in one
+     mark, the name, the version; Ⓐ on it opens every version's release
+     notes, on a screen of their own; seven presses of a hidden Ⓨ turn the
+     developer tools on, at the end of Help & diagnostics, below), then
+     the updates (check now, every day, how, sphaira's menu); Help (the first
+     steps again, then a line to Help & diagnostics (tab/help.xml, on a screen of its own, with the
+     launch mode and the data folder); a line to the Boréale homebrews installed
+     on the console (listed in the Boréale tab); the credits and the licence, in one
      dialog; how to support it (QR codes of the funding links, Ⓐ shows one
      larger), and "Made in France". -->
 
@@ -30,11 +30,14 @@
             paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
             paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
 
-            <aurore:Header title="@i18n/playguard/tools/section_about" marginBottom="8"/>
-            <aurore:DetailCell id="ab_version" title="@i18n/playguard/tools/version"/>
+            <aurore:Header title="@i18n/playguard/tools/section_update" marginBottom="8"/>
             <aurore:DetailCell id="ab_update" title="@i18n/playguard/tools/update"/>
-            <aurore:DetailCell id="ab_help" title="@i18n/kit/prefs/help" marginTop="24"/>
-            <aurore:DetailCell id="ab_boreale" title="@i18n/playguard/about/boreale"/>
+            <aurore:BooleanCell id="ab_update_daily"/>
+            <aurore:DetailCell id="ab_update_via" title="@i18n/kit/tools/update_via"/>
+            <aurore:BooleanCell id="ab_sphaira_entry"/>
+            <aurore:Header title="@i18n/playguard/about/section_help" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="ab_first_steps" title="@i18n/playguard/onboarding/open"/>
+            <aurore:DetailCell id="ab_help" title="@i18n/kit/prefs/help"/>
             <aurore:DetailCell id="ab_credits" title="@i18n/playguard/about/credits_open" marginTop="24"/>
             <aurore:Header title="@i18n/playguard/about/section_support" marginTop="24" marginBottom="8"/>
             <aurore:Label id="ab_support_note" text="@i18n/playguard/about/support_note" fontSize="20" marginBottom="6" textColor="@theme/cadran/text3"/>
