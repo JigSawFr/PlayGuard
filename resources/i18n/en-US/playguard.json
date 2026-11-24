@@ -1678,6 +1678,8 @@
         "open": "Optional modules",
         "count": "{} installed",
         "count_one": "1 installed",
+        "section_modules": "Sysmodules",
+        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
         "intro": "Two small background programs (sysmodules) PlayGuard can put on the SD card. Neither is needed. PlayGuard carries the versions made with it and installs or updates them from here, without a computer. Every change asks for the PIN when Security › Protect PlayGuard with the PIN asks for it before a change.",
         "status": "State",
         "install": "Install",
@@ -1731,7 +1733,7 @@
         },
         "agent": {
             "title": "Boréale agent",
-            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates. The connection itself is set up in Console › Remote access.",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "it speaks protocol {}",
             "offer_body": "The Boréale agent on the SD card is not the one this PlayGuard carries (version {}). Update it now? It stops for a moment, and the previous one is put back if the new one does not answer.",
             "offer_refused": "It speaks an older protocol: the remote link does not work until it is updated."

@@ -12,6 +12,8 @@
 #include "action/history_flow.hpp"
 #include "action/pin_lock.hpp"
 #include "action/rescue.hpp"
+#include "action/sync_flow.hpp"
+#include "activity/sync_activity.hpp"
 #include "app.hpp"
 #include "ui/play_ui.hpp"
 #include "util/paths.hpp"
@@ -207,6 +209,14 @@ std::string ModulesActivity::summary(modules::Id id, const char** color)
     return state_text(id, true, color);
 }
 
+std::string ModulesActivity::remote_state()
+{
+    const sync_flow::Status link = sync_flow::status();
+    if (!link.enabled) return "playguard/sync/state_off"_i18n;
+    return link.running && link.link.state == SyncLink_Online ? "playguard/sync/state_online"_i18n
+                                                              : "playguard/sync/state_offline"_i18n;
+}
+
 void ModulesActivity::refresh()
 {
     // Each module as a tile: its state, with a check when it is as it should
@@ -221,6 +231,7 @@ void ModulesActivity::refresh()
     if (this->list) tile(rescue, "md_rescue", rescue_text, color);
     const std::string agent_text = AgentActivity::summary(&color);
     if (this->list) tile(agent, "md_agent", agent_text, color);
+    remote->setDetailText(remote_state());
     if (this->list) this->list->sync();
 }
 
@@ -235,6 +246,11 @@ void ModulesActivity::onContentAvailable()
     intro->setSingleLine(false);
     rescue_note->setSingleLine(false);
     agent_note->setSingleLine(false);
+    remote_note->setSingleLine(false);
+    remote->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new SyncActivity());
+        return true;
+    });
     rescue->registerClickAction([](aurore::View*) {
         aurore::Application::pushActivity(new ModuleActivity(modules::Id::Rescue));
         return true;
@@ -249,6 +265,7 @@ void ModulesActivity::onContentAvailable()
     this->list = std::make_unique<cadran::List>(this->getContentView(), true);
     // The two modules side by side as tiles, what each one does under them.
     this->list->tiles({ { "md_rescue", "unlock" }, { "md_agent", "server" } }, true);
+    this->list->tiles({ { "md_remote", "server" } }, false);
     this->list->apply({});
     this->refresh();
 }

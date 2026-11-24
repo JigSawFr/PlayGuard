@@ -27,10 +27,15 @@
             paddingLeft="@style/aurore/sidebar/padding_left">
 
             <aurore:Label id="md_intro" text="@i18n/playguard/modules/intro" fontSize="20" marginBottom="16" textColor="@theme/cadran/text3"/>
+            <aurore:Header title="@i18n/playguard/modules/section_modules" marginTop="16" marginBottom="8"/>
             <aurore:DetailCell id="md_rescue" title="@i18n/playguard/modules/rescue/tab"/>
             <aurore:DetailCell id="md_agent" title="@i18n/playguard/modules/agent/title"/>
             <aurore:Label id="md_rescue_note" text="@i18n/playguard/modules/rescue/blurb" fontSize="20" marginTop="12" textColor="@theme/cadran/text3"/>
             <aurore:Label id="md_agent_note" text="@i18n/playguard/modules/agent/blurb" fontSize="20" marginTop="14" textColor="@theme/cadran/text3"/>
+
+            <aurore:Header title="@i18n/playguard/sync/title" marginTop="24" marginBottom="8"/>
+            <aurore:Label id="md_remote_note" text="@i18n/playguard/modules/remote_note" fontSize="20" marginBottom="10" textColor="@theme/cadran/text3"/>
+            <aurore:DetailCell id="md_remote" title="@i18n/playguard/sync/title"/>
 
         </aurore:Box>
 
