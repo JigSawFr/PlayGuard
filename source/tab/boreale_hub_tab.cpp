@@ -50,10 +50,10 @@ void BorealeHubTab::refresh()
     remote->setDetailText(ModulesActivity::remote_state());
     // Each module's state, with a check when as it should be and a warning
     // when it needs an update.
-    const auto tile = [this](aurore::DetailCell* cell, const char* id, const std::string& text, const char* color) {
+    const auto tile = [this](aurore::DetailCell* cell, const char* tile_id, const std::string& text, const char* color) {
         cell->setDetailText(text);
         const std::string c = color ? color : "";
-        this->list.state(id, c == "cadran/teal" ? "cadran/teal_fill" : c == "cadran/amber" ? "cadran/amber_fill" : nullptr);
+        this->list.state(tile_id, c == "cadran/teal" ? "cadran/teal_fill" : c == "cadran/amber" ? "cadran/amber_fill" : nullptr);
     };
     const char* color = nullptr;
     const std::string rescue_text = ModulesActivity::summary(modules::Id::Rescue, &color);
