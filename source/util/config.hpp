@@ -41,6 +41,7 @@ struct Config : kit_settings::Settings
     int  backup_keep     = 0;          // backups kept after a new one (0: all of them)
     bool clock_check_at_start = false; // measure the network clock at start-up, say when it is off
     bool intro = true;                 // the loading screen stays 2 s at start-up (activity/loading_activity.hpp)
+    bool redraw_on_demand = true;      // the screen is drawn when something changed (and once a second), not every frame (main.cpp)
     // PIN › Protect PlayGuard with the PIN: "off", "changes" (before the first
     // change) or "open" (to open PlayGuard). See pin_lock.hpp.
     // "changes" by default, and when the value is missing or unknown: a

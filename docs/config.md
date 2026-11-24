@@ -63,6 +63,7 @@ settings are not here but in `sync.conf` and, for the broker, `sd:/config/boreal
 | `pin_pauses` | boolean | once the PIN is entered, parental controls are paused (unlocked temporarily) while PlayGuard is open and in focus, so the time spent in it does not take from the child's; they come back on as it is left. Off, entering the PIN changes nothing on the console | `false` | Security (*Pause parental controls while I'm in PlayGuard*) |
 | `onboarding_at_start` | boolean | *First steps* opens by itself at start-up while no PIN is set | `true` | First steps (*Show at start-up*) |
 | `clock_check_at_start` | boolean | measures the network clock at start-up and says when it is off | `false` | Console › Network clock |
+| `redraw_on_demand` | boolean | the screen is drawn when something changed (and at least once a second) instead of every frame: the same picture for a fraction of the work, so less heat and battery while PlayGuard is open. Off, every frame is drawn as before. Left as drawn every frame while *Frame statistics* is on, which measures frames | `true` | — (`config.json` only) |
 | `intro` | boolean | the loading screen stays 2 seconds at start-up (Ⓐ or Ⓑ skips it); off, the first screen comes as soon as it is ready | `true` | Preferences (*Show the intro for 2 seconds*) |
 | `activity_period` | integer | Activity's period: `0` today, `1` last 7 days, `3` last 30 days, `2` all time | `1` | Activity, Activity › All games |
 | `games_grid` | boolean | *Activity › All games* shows the games as a grid of covers; off, as a list | `true` | Activity › All games (Ⓨ) |
@@ -269,6 +270,7 @@ line; the order does not matter when it reads them:
   "onboarding_at_start": true,
   "clock_check_at_start": false,
   "intro": true,
+  "redraw_on_demand": true,
   "activity_period": 1,
   "games_grid": true,
   "activity_account": "last",

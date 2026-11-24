@@ -230,6 +230,7 @@ static void test_round_trip()
     c.extra_value = 150;
     c.extra_auto_restore = true;
     c.intro = false;
+    c.redraw_on_demand = false;
     CHECK(save_config());
 
     std::string text;
@@ -240,7 +241,7 @@ static void test_round_trip()
     CHECK(c.ntp_server == "fr.pool.ntp.org");
     CHECK(c.custom_servers.size() == 1 && c.dev_mode && c.pt_log && c.relock_pending);
     CHECK(c.extra_weekday == 0 && c.extra_base == 120 && c.extra_value == 150 && c.extra_auto_restore);
-    CHECK(!c.intro);
+    CHECK(!c.intro && !c.redraw_on_demand);
 
     // Console lock: the flag and the seven saved limits round-trip.
     c = config::Config{};
@@ -287,7 +288,7 @@ static void test_preferences()
     CHECK(d.activity_account == "last" && d.activity_account_last.empty());
     CHECK(d.logs_keep == 20 && d.logs_keep_days == 0 && d.logs_keep_mb == 0);
     CHECK(!d.update_daily && d.update_checked.empty() && !d.clock_check_at_start && d.pin_lock == "changes" && !d.pin_ask_again && !d.pin_pauses);
-    CHECK(d.onboarding_at_start && d.intro && d.dev_builds_order == "newest");
+    CHECK(d.onboarding_at_start && d.intro && d.redraw_on_demand && d.dev_builds_order == "newest");
     CHECK(d.look.effects == "auto");
     CHECK(d.support_reminder && d.support_reminded.empty() && d.seen_version.empty());
     CHECK(d.sphaira_entry);
