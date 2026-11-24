@@ -1685,6 +1685,8 @@
         "open": "Optionele modules",
         "count": "{} geïnstalleerd",
         "count_one": "1 geïnstalleerd",
+        "section_modules": "Sysmodules",
+        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
         "intro": "Twee kleine achtergrondprogramma's (sysmodules) die PlayGuard op de SD-kaart kan zetten. Geen van beide is nodig, en elk doet één ding. PlayGuard bevat de versie die ermee is gemaakt en installeert of werkt die van hieruit bij, zonder computer. Elke wijziging vraagt om de pincode als Beveiliging › PlayGuard beveiligen met de pincode daarom vraagt vóór een wijziging.",
         "status": "Toestand",
         "install": "Installeren",
@@ -1733,10 +1735,12 @@
             "installed": "Herstelmodule geïnstalleerd. Hij doet iets bij de volgende keer opstarten als er een RESCUE-bestand staat.",
             "updated": "Herstelmodule bijgewerkt.",
             "remove_body": "De herstelmodule verwijderen? Zonder deze module is bij een vergeten pincode met een limiet van 0 minuten een computer nodig.",
-            "short_title": "Herstelmodule"
+            "short_title": "Herstelmodule",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
-            "title": "Agent voor verbinding op afstand",
+            "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "hij spreekt protocol {}",
             "offer_body": "De agent voor de verbinding op afstand op de SD-kaart is niet die van deze PlayGuard (versie {}). Nu bijwerken? Hij stopt even, en de vorige wordt teruggezet als de nieuwe niet antwoordt.",
             "offer_refused": "Hij spreekt een ouder protocol: de verbinding op afstand werkt pas als hij is bijgewerkt."

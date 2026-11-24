@@ -1685,6 +1685,8 @@
         "open": "追加モジュール",
         "count": "{} 個インストール済み",
         "count_one": "1 個インストール済み",
+        "section_modules": "Sysmodules",
+        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
         "intro": "PlayGuard が SD カードに入れられる、2 つの小さなバックグラウンドプログラム（sysmodule）です。どちらも必須ではなく、それぞれ 1 つのことだけを行います。PlayGuard は一緒に作られたバージョンを同梱しており、パソコンなしでここからインストールや更新ができます。「セキュリティ › PlayGuardを暗証番号で保護」が変更前に暗証番号を求める設定なら、どの変更にも暗証番号が必要です。",
         "status": "状態",
         "install": "インストール",
@@ -1733,12 +1735,14 @@
             "installed": "リカバリーモジュールをインストールしました。RESCUE ファイルがあれば、次の起動時に作動します。",
             "updated": "リカバリーモジュールを更新しました。",
             "remove_body": "リカバリーモジュールを削除しますか？削除すると、上限 0 分で暗証番号を忘れたとき、直すのにパソコンが必要になります。",
-            "short_title": "リカバリーモジュール"
+            "short_title": "リカバリーモジュール",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
-            "title": "リモート接続エージェント",
+            "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "プロトコル {} を使用",
-            "offer_body": "SD カードのリモート接続エージェントは、この PlayGuard に含まれているもの（バージョン {}）ではありません。今すぐ更新しますか？少しの間停止し、新しいものが応答しない場合は前のものに戻します。",
+            "offer_body": "SD カードのBoréale agentは、この PlayGuard に含まれているもの（バージョン {}）ではありません。今すぐ更新しますか？少しの間停止し、新しいものが応答しない場合は前のものに戻します。",
             "offer_refused": "古いプロトコルを使っているため、更新するまでリモート接続は動作しません。"
         }
     },

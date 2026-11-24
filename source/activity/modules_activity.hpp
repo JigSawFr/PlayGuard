@@ -1,7 +1,7 @@
 // ModulesActivity — Console › Optional modules: PlayGuard's two sysmodules,
 // which it carries in its romfs and installs on the SD card
 // (util/modules.hpp): the recovery module (acts once at boot when a RESCUE
-// file asks it to) and the remote-link agent (keeps the link up while
+// file asks it to) and the Boréale agent (keeps the link up while
 // PlayGuard is closed). A list as the other screens are (sync.xml): what
 // they are, then a cell per module with its state; Ⓐ opens the module's own
 // screen, a list as well: the recovery module's (ModuleActivity), or the
@@ -31,12 +31,20 @@ class ModulesActivity : public aurore::Activity
     // its colour when `color` is given.
     static std::string summary(modules::Id id, const char** color = nullptr);   // the recovery module's
 
+    // The remote link's state ("Online", "Offline", "Off"), for the cell that
+    // opens Remote access.
+    static std::string remote_state();
+
   private:
     void refresh();
 
     std::unique_ptr<cadran::List> list;
 
     AURORE_BIND(aurore::Label,      intro,  "md_intro");
+    AURORE_BIND(aurore::Label,      rescue_note, "md_rescue_note");
+    AURORE_BIND(aurore::Label,      agent_note,  "md_agent_note");
+    AURORE_BIND(aurore::Label,      remote_note, "md_remote_note");
+    AURORE_BIND(aurore::DetailCell, remote, "md_remote");
     AURORE_BIND(aurore::DetailCell, rescue, "md_rescue");
     AURORE_BIND(aurore::DetailCell, agent,  "md_agent");
 };

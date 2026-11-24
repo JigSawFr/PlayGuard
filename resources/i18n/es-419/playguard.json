@@ -1685,6 +1685,8 @@
         "open": "Módulos opcionales",
         "count": "{} instalados",
         "count_one": "1 instalado",
+        "section_modules": "Sysmodules",
+        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
         "intro": "Dos pequeños programas en segundo plano (sysmodules) que PlayGuard puede poner en la tarjeta SD. Ninguno es necesario, y cada uno hace una sola cosa. PlayGuard trae la versión hecha con él y la instala o actualiza desde aquí, sin computadora. Cada cambio pide el PIN cuando Seguridad › Proteger PlayGuard con el PIN lo pide antes de un cambio.",
         "status": "Estado",
         "install": "Instalar",
@@ -1733,12 +1735,14 @@
             "installed": "Módulo de recuperación instalado. Actúa en el siguiente arranque si hay un archivo RESCUE.",
             "updated": "Módulo de recuperación actualizado.",
             "remove_body": "¿Quitar el módulo de recuperación? Sin él, un PIN olvidado con un límite de 0 minutos necesita una computadora para solucionarse.",
-            "short_title": "Módulo de recuperación"
+            "short_title": "Módulo de recuperación",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
-            "title": "Agente del enlace remoto",
+            "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "usa el protocolo {}",
-            "offer_body": "El agente del enlace remoto de la tarjeta SD no es el que trae este PlayGuard (versión {}). ¿Actualizarlo ahora? Se detiene un momento, y se restaura el anterior si el nuevo no responde.",
+            "offer_body": "El Boréale agent de la tarjeta SD no es el que trae este PlayGuard (versión {}). ¿Actualizarlo ahora? Se detiene un momento, y se restaura el anterior si el nuevo no responde.",
             "offer_refused": "Usa un protocolo más antiguo: el enlace remoto no funciona hasta que se actualice."
         }
     },

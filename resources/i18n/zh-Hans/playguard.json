@@ -1685,6 +1685,8 @@
         "open": "可选模块",
         "count": "已安装 {} 个",
         "count_one": "已安装 1 个",
+        "section_modules": "Sysmodules",
+        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
         "intro": "PlayGuard 可以放到 SD 卡上的两个小型后台程序（sysmodule）。两者都不是必需的，各自只做一件事。PlayGuard 附带与它一起制作的版本，可在这里安装或更新，无需电脑。当“安全 › 用PIN保护PlayGuard”设为更改前要求输入 PIN 时，每项更改都需要输入 PIN。",
         "status": "状态",
         "install": "安装",
@@ -1733,12 +1735,14 @@
             "installed": "恢复模块已安装。下次开机时，如果有 RESCUE 文件，它就会起作用。",
             "updated": "恢复模块已更新。",
             "remove_body": "要移除恢复模块吗？没有它，在限制为 0 分钟时忘记 PIN，就需要用电脑来解决。",
-            "short_title": "恢复模块"
+            "short_title": "恢复模块",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
-            "title": "远程连接代理程序",
+            "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "它使用协议 {}",
-            "offer_body": "SD 卡上的远程连接代理程序不是这个 PlayGuard 附带的那个（版本 {}）。要现在更新吗？它会短暂停止；如果新版本没有响应，会恢复之前的版本。",
+            "offer_body": "SD 卡上的Boréale agent不是这个 PlayGuard 附带的那个（版本 {}）。要现在更新吗？它会短暂停止；如果新版本没有响应，会恢复之前的版本。",
             "offer_refused": "它使用较旧的协议：更新之前，远程连接无法使用。"
         }
     },

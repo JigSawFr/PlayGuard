@@ -1685,6 +1685,8 @@
         "open": "Moduli facoltativi",
         "count": "{} installati",
         "count_one": "1 installato",
+        "section_modules": "Sysmodules",
+        "remote_note": "The link to your broker (MQTT, Home Assistant) is set up here, in PlayGuard. It runs while PlayGuard is open, and all the time with the Boréale agent.",
         "intro": "Due piccoli programmi in background (sysmodule) che PlayGuard può mettere sulla scheda SD. Nessuno dei due è necessario, e ognuno fa una sola cosa. PlayGuard contiene la versione creata insieme a lui e la installa o la aggiorna da qui, senza computer. Ogni modifica chiede il PIN quando Sicurezza › Proteggi PlayGuard con il PIN lo chiede prima di una modifica.",
         "status": "Stato",
         "install": "Installa",
@@ -1733,12 +1735,14 @@
             "installed": "Modulo di ripristino installato. Agisce al prossimo avvio se c'è un file RESCUE.",
             "updated": "Modulo di ripristino aggiornato.",
             "remove_body": "Rimuovere il modulo di ripristino? Senza di esso, per risolvere un PIN dimenticato con un limite di 0 minuti serve un computer.",
-            "short_title": "Modulo di ripristino"
+            "short_title": "Modulo di ripristino",
+            "blurb": "Recovery module: unlocks the console at boot when a forgotten PIN and a 0-minute limit lock everything."
         },
         "agent": {
-            "title": "Agente del collegamento remoto",
+            "title": "Boréale agent",
+            "blurb": "Boréale agent: shared by every Boréale homebrew. It keeps the connection to your broker up while PlayGuard is closed, receives orders and checks for updates.",
             "other_protocol": "usa il protocollo {}",
-            "offer_body": "L'agente del collegamento remoto sulla scheda SD non è quello contenuto in questo PlayGuard (versione {}). Aggiornarlo ora? Si ferma un istante, e il precedente viene rimesso se il nuovo non risponde.",
+            "offer_body": "L'Boréale agent sulla scheda SD non è quello contenuto in questo PlayGuard (versione {}). Aggiornarlo ora? Si ferma un istante, e il precedente viene rimesso se il nuovo non risponde.",
             "offer_refused": "Usa un protocollo più vecchio: il collegamento remoto non funziona finché non viene aggiornato."
         }
     },
