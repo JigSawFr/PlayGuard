@@ -1139,8 +1139,9 @@
         "refresh_detail": "{}: creati da un PlayGuard precedente. Una volta rifatti, avviano il loro homebrew con il loader di questa build."
     },
     "hub": {
-        "section_link": "Link and modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Moduli facoltativi"
     },
     "hbmenu": {
         "section": "Menu homebrew",

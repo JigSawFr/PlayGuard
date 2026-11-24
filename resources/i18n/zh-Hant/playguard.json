@@ -1139,8 +1139,9 @@
         "refresh_detail": "{}：由舊版PlayGuard製作。重新製作後，它們會用此版本的載入器啟動各自的Homebrew。"
     },
     "hub": {
-        "section_link": "Link and modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "選用模組"
     },
     "hbmenu": {
         "section": "自製軟體選單",

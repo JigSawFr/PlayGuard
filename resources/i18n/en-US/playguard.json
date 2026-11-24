@@ -1139,8 +1139,9 @@
         "refresh_detail": "{}: made by an older PlayGuard. Made again, they start their homebrew with this build's loader."
     },
     "hub": {
-        "section_link": "Link and modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Optional modules"
     },
     "hbmenu": {
         "section": "Homebrew menu",

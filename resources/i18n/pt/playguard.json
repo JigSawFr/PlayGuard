@@ -1139,8 +1139,9 @@
         "refresh_detail": "{}: feitos por um PlayGuard anterior. Depois de refeitos, abrem o seu homebrew com o carregador desta compilação."
     },
     "hub": {
-        "section_link": "Link and modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Módulos opcionais"
     },
     "hbmenu": {
         "section": "Menu homebrew",

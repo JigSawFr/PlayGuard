@@ -1139,8 +1139,9 @@
         "refresh_detail": "{}：以前のPlayGuardで作成されました。作り直すと、このビルドのローダーでHomebrewを起動します。"
     },
     "hub": {
-        "section_link": "Link and modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "追加モジュール"
     },
     "hbmenu": {
         "section": "Homebrewメニュー",

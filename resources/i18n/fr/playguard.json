@@ -1139,8 +1139,9 @@
         "refresh_detail": "{} : faits par un PlayGuard plus ancien. Refaits, ils lancent leur homebrew avec le chargeur de cette version."
     },
     "hub": {
-        "section_link": "Lien et modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Lien",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Modules facultatifs"
     },
     "hbmenu": {
         "section": "Menu homebrew",

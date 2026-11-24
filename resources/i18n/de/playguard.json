@@ -1139,8 +1139,9 @@
         "refresh_detail": "{}: von einem älteren PlayGuard erstellt. Neu erstellt starten sie ihre Homebrew-App mit dem Loader dieses Builds."
     },
     "hub": {
-        "section_link": "Link and modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Optionale Module"
     },
     "hbmenu": {
         "section": "Homebrew-Menü",

@@ -1139,8 +1139,9 @@
         "refresh_detail": "{}: созданы старой версией PlayGuard. После пересоздания они запускают свою homebrew-программу загрузчиком этой сборки."
     },
     "hub": {
-        "section_link": "Link and modules",
-        "section_homebrews": "Homebrews"
+        "section_link": "Link",
+        "section_homebrews": "Homebrews",
+        "section_modules": "Дополнительные модули"
     },
     "hbmenu": {
         "section": "Меню homebrew",
