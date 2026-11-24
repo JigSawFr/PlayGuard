@@ -30,8 +30,14 @@ SecurityTab::SecurityTab()
     this->mark(pin_lock_cell.getView(), { "pin_lock_off" });
     pr_note->setSingleLine(false);
     pin_lock_note->setSingleLine(false);
-    // The homebrew menu's lock is made on Console › Forwarders, after its
-    // checks: a line to it here, by the PIN that guards it.
+    // The homebrew menu's lock is made on Forwarders, after its checks: a
+    // line to it here, by the PIN that guards it, and one to Forwarders
+    // itself (homebrew on the HOME menu, protected by the PIN).
+    forwarders->setDetailText(ui::opens());
+    forwarders->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new ForwardersActivity());
+        return true;
+    });
     hbmenu_lock->registerClickAction([](aurore::View*) {
         aurore::Application::pushActivity(new ForwardersActivity());
         return true;
@@ -117,7 +123,7 @@ SecurityTab::SecurityTab()
     this->list.tiles({ { "sc_pin", "key" }, { "sc_restrictions", "shield" }, { "sc_temp", "unlock" }, { "sc_hbmenu", "home" } }, true);
     this->list.apply({ { "sc_set_pin", "key" }, { "sc_pin_lock", "lock" }, { "sc_pin_ask_again", "timer" },
                        { "sc_pin_pauses", "pause" },
-                       { "sc_hbmenu_lock", "home" }, { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" },
+                       { "sc_hbmenu_lock", "home" }, { "sc_forwarders", "home" }, { "sc_show_pin", "eye" }, { "sc_unlock", "unlock" },
                        { "sc_auto_relock", "refresh" }, { "pr_active", "phone" },
                        { "pr_updated", "refresh" }, { "pr_decode", "code" }, { "pr_unlink", "stop" }, { "sc_delete", "trash" },
                        { "sc_rescue", "tools" } });

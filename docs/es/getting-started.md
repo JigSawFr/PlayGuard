@@ -28,7 +28,7 @@ Abre PlayGuard **sobre un juego** (mantén pulsado R al iniciar un juego, con hb
 
 ## 3. Sigue *Primeros pasos*
 
-En el primer inicio aparece la guía *Primeros pasos* (más adelante: *Preferencias › Primeros pasos*). *Hoy* muestra los mismos pasos en una tarjeta hasta que se completan (*1 de 3*):
+En el primer inicio aparece la guía *Primeros pasos* (más adelante: *Acerca de › Primeros pasos*). *Hoy* muestra los mismos pasos en una tarjeta hasta que se completan (*1 de 3*):
 
 1. **El PIN.** El PIN de la propia consola, que el menú HOME pide para iniciar un juego pasado el límite o para cambiar los ajustes. Evita 0000, 1234 o 2580: PlayGuard señala un PIN que cualquiera probaría primero.
 2. **Un límite diario.** El mismo todos los días, o uno para entre semana y otro para el fin de semana. Cambia cualquier día suelto más adelante en *Tiempo de juego*.
@@ -40,7 +40,7 @@ En el primer inicio aparece la guía *Primeros pasos* (más adelante: *Preferenc
 
 ## 5. Ajusta el reloj de red
 
-*Consola › Reloj de red › Medir el desfase del reloj* consulta tres servidores de hora públicos, y luego *Ajustar el reloj de red*. Ajustar el reloj pone a cero el tiempo de juego de hoy, así que hazlo antes de que juegue el niño.
+*Tiempo de juego › Reloj de red › Medir el desfase del reloj* consulta tres servidores de hora públicos, y luego *Ajustar el reloj de red*. Ajustar el reloj pone a cero el tiempo de juego de hoy, así que hazlo antes de que juegue el niño.
 
 Una consola sin Internet: cuando ningún servidor responde, PlayGuard ofrece ajustar el reloj de red al reloj de la consola. Comprueba antes el reloj de la consola con un móvil o un reloj, con *Configuración de la consola › Consola › Fecha y hora › Sincronizar el reloj por Internet* desactivado ([detalles](features.md#reloj-de-red)).
 

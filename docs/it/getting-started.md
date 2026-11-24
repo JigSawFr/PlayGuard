@@ -28,7 +28,7 @@ Apri PlayGuard **sopra un gioco** (tieni premuto R mentre avvii un gioco, con hb
 
 ## 3. Segui *Primi passi*
 
-Al primo avvio compare la guida *Primi passi* (in seguito: *Preferenze › Primi passi*). *Oggi* mostra gli stessi passaggi come riquadro finché non sono fatti (*1 di 3*):
+Al primo avvio compare la guida *Primi passi* (in seguito: *Informazioni › Primi passi*). *Oggi* mostra gli stessi passaggi come riquadro finché non sono fatti (*1 di 3*):
 
 1. **Il PIN.** Il PIN della console stessa, chiesto dal menu HOME per avviare un gioco oltre il limite o per cambiare le impostazioni. Evita 0000, 1234 o 2580: PlayGuard segnala un PIN che chiunque proverebbe per primo.
 2. **Un limite giornaliero.** Lo stesso ogni giorno, oppure uno per i giorni feriali e uno per il weekend. Cambia un singolo giorno più tardi in *Tempo di gioco*.
@@ -40,7 +40,7 @@ Ancora collegata all'app *Filtro famiglia* di Nintendo (o una console usata coll
 
 ## 5. Imposta l'orologio di rete
 
-*Console › Orologio di rete › Misura la differenza oraria* interroga tre server dell'ora pubblici, poi *Imposta l'orologio di rete*. Impostare l'orologio azzera il tempo di gioco di oggi, quindi fallo prima che il bambino giochi.
+*Tempo di gioco › Orologio di rete › Misura la differenza oraria* interroga tre server dell'ora pubblici, poi *Imposta l'orologio di rete*. Impostare l'orologio azzera il tempo di gioco di oggi, quindi fallo prima che il bambino giochi.
 
 Una console senza Internet: quando nessun server risponde, PlayGuard propone invece di impostare l'orologio di rete sull'orologio della console. Controlla prima l'orologio della console con un telefono o un orologio, con *Impostazioni di sistema › Sistema › Data e ora › Sincronizza l'orologio tramite Internet* disattivato ([dettagli](features.md#orologio-di-rete)).
 

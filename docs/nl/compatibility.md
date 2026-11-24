@@ -58,7 +58,7 @@ PlayGuard neemt nooit contact op met Nintendo: online bereikt het alleen openbar
 
 ### Een console zonder internet
 
-Daar is PlayGuard voor, en de speeltijdtimer heeft toch een netwerkklok nodig die is ingesteld. Zonder tijdserver om te raadplegen biedt *Console › Netwerkklok › Tijdsverschil meten* aan om hem in plaats daarvan op de consoleklok in te stellen: controleer eerst de consoleklok, met *Klok synchroniseren via internet* uit, en zet die instelling pas daarna aan (zie [netwerkklok](features.md#geen-enkele-server-antwoordt)).
+Daar is PlayGuard voor, en de speeltijdtimer heeft toch een netwerkklok nodig die is ingesteld. Zonder tijdserver om te raadplegen biedt *Speeltijdtimer › Netwerkklok › Tijdsverschil meten* aan om hem in plaats daarvan op de consoleklok in te stellen: controleer eerst de consoleklok, met *Klok synchroniseren via internet* uit, en zet die instelling pas daarna aan (zie [netwerkklok](features.md#geen-enkele-server-antwoordt)).
 
 ### Meldingen op de telefoon
 

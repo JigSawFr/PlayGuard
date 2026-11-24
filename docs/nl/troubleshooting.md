@@ -19,13 +19,13 @@ Je kent de pincode, maar de app op de telefoon van de vorige eigenaar is nog gek
 
 ### De speeltijdtimer blokkeert alles (limiet van 0 minuten) en de pincode is vergeten
 
-PlayGuard zelf kan dan niet starten. Installeer de optionele herstel-sysmodule **van tevoren** (*Console › Optionele modules*, of `playguard-rescue.zip` met de hand); als je buitengesloten bent, zet je een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start je op — de module ontgrendelt de console zodat PlayGuard kan openen. Zie [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (in het Engels).
+PlayGuard zelf kan dan niet starten. Installeer de optionele herstel-sysmodule **van tevoren** (*Boréale › Optionele modules*, of `playguard-rescue.zip` met de hand); als je buitengesloten bent, zet je een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start je op — de module ontgrendelt de console zodat PlayGuard kan openen. Zie [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (in het Engels).
 
 De module moet de versie van PlayGuard volgen: pak bij elke update van PlayGuard de `playguard-rescue.zip` van die release opnieuw uit (of *Bijwerken* bij *De herstel-sysmodule is verouderd* onder de meldingenbel), en start de console daarna opnieuw op. Een oudere module laat een rapport achter dat PlayGuard niet kan controleren: het herstelscherm biedt dan niets aan, zegt dat de module ouder is, en `RESCUE` opnieuw doen geeft hetzelfde tot de module is bijgewerkt.
 
 ### Homebrewmenu vergrendeld
 
-*Console › Forwarders › Homebrewmenu vergrendelen* zorgt ervoor dat het album en een game die met R is gestart het homebrew-menu niet meer openen. Als de forwarder van PlayGuard en het beveiligde menu allebei weg zijn (verwijderd in de systeeminstellingen, of op het andere systeem: de vergrendeling staat op de SD-kaart en wordt door sysMMC en emuMMC allebei gelezen):
+*Security › Forwarders › Homebrewmenu vergrendelen* zorgt ervoor dat het album en een game die met R is gestart het homebrew-menu niet meer openen. Als de forwarder van PlayGuard en het beveiligde menu allebei weg zijn (verwijderd in de systeeminstellingen, of op het andere systeem: de vergrendeling staat op de SD-kaart en wordt door sysMMC en emuMMC allebei gelezen):
 
 - **Vanaf een computer:** verwijder `atmosphere/config/override_config.ini` op de SD-kaart (of zet `config/playguard/override_config.ini.backup` terug, het bestand zoals het was), en start de console daarna opnieuw op.
 - **Met de herstel-sysmodule geïnstalleerd** (optioneel): zet een leeg bestand `config/playguard/RESCUE` op de SD-kaart en start opnieuw op; de sysmodule heft de vergrendeling op bij het opstarten, en PlayGuard meldt dat bij zijn volgende start. Een update van Atmosphère sinds de vergrendeling heft haar op dezelfde manier op.
@@ -40,7 +40,7 @@ PlayGuard kan niet helpen: het heeft Atmosphère nodig. De master-key-procedure 
 
 *Vandaag* meldt *De console telt op dit moment geen speeltijd* als die ongeveer 90 s niet is veranderd. De waarschijnlijke oorzaken:
 
-- **De netwerkklok is nooit ingesteld.** *Console › Netwerkklok › Tijdsverschil meten*, en stel hem daarna in ([netwerkklok](features.md#netwerkklok)).
+- **De netwerkklok is nooit ingesteld.** *Speeltijdtimer › Netwerkklok › Tijdsverschil meten*, en stel hem daarna in ([netwerkklok](features.md#netwerkklok)).
 - **De klok is teruggezet.** Na een sprong terug stopt de telling tot de klok het oude tijdstip voorbij is; je hoeft niets te doen.
 - **Er is net een limiet geschreven.** Start een game voor een minuut en kijk dan opnieuw.
 - **Ouderlijk toezicht is tijdelijk ontgrendeld.** Speeltijd wordt dan mogelijk niet geteld: *Vandaag › Weer inschakelen* (of een tik op de pil in de kopregel).
@@ -76,15 +76,15 @@ De console draait een firmware die nieuwer is dan de nieuwste geteste: PlayGuard
 
 ### Een beveiligde forwarder toont fout 2347-0100
 
-Zijn poort (`config/playguard/gate-….nro`) is niet meer het bestand waarmee de forwarder is gemaakt: hij is op de SD-kaart gewijzigd of vervangen, dus de forwarder start hem niet. Open PlayGuard via zijn eigen forwarder: die schrijft de poort bij het starten terug; *Console › Forwarders › Alles opnieuw installeren* maakt elke forwarder er opnieuw mee.
+Zijn poort (`config/playguard/gate-….nro`) is niet meer het bestand waarmee de forwarder is gemaakt: hij is op de SD-kaart gewijzigd of vervangen, dus de forwarder start hem niet. Open PlayGuard via zijn eigen forwarder: die schrijft de poort bij het starten terug; *Security › Forwarders › Alles opnieuw installeren* maakt elke forwarder er opnieuw mee.
 
 ### Een beveiligde forwarder sluit meteen ("Er is een fout opgetreden")
 
-Vóór enig scherm van PlayGuard, zonder foutcode (het rapport van Atmosphère in `atmosphere/crash_reports/` noemt de module `forwarder`, resultaat `2000-0000`): hij is gemaakt door een PlayGuard waarvan de poort zonder zijn assets was gebouwd, wat de loader van de forwarder weigerde. Werk PlayGuard bij en maak hem dan opnieuw: de bel en *Console › Forwarders* bieden dat aan voor elke forwarder die met een oudere loader is gemaakt.
+Vóór enig scherm van PlayGuard, zonder foutcode (het rapport van Atmosphère in `atmosphere/crash_reports/` noemt de module `forwarder`, resultaat `2000-0000`): hij is gemaakt door een PlayGuard waarvan de poort zonder zijn assets was gebouwd, wat de loader van de forwarder weigerde. Werk PlayGuard bij en maak hem dan opnieuw: de bel en *Security › Forwarders* bieden dat aan voor elke forwarder die met een oudere loader is gemaakt.
 
 ### Een beveiligde forwarder blijft na de pincode op het scherm van zijn poort staan
 
-De pincode is geaccepteerd, het scherm met het icoon van de homebrew blijft staan en er gebeurt niets meer: zijn poort tekende dat scherm met één enkele buffer, en wachtte eindeloos om het volgende te tekenen. Werk PlayGuard bij en maak hem dan opnieuw: de bel en *Console › Forwarders* bieden dat aan voor elke forwarder die met een oudere poort is gemaakt.
+De pincode is geaccepteerd, het scherm met het icoon van de homebrew blijft staan en er gebeurt niets meer: zijn poort tekende dat scherm met één enkele buffer, en wachtte eindeloos om het volgende te tekenen. Werk PlayGuard bij en maak hem dan opnieuw: de bel en *Security › Forwarders* bieden dat aan voor elke forwarder die met een oudere poort is gemaakt.
 
 ### Een forwarder toont "De software kan niet worden gestart"
 
@@ -93,7 +93,7 @@ De console weigerde hem te starten: er is nog een handtekeningcontrole actief. I
 - **sigpatch-bestanden naast sys-patch.** `.ips`-bestanden in `atmosphere/kip_patches/fs_patches`, `loader_patches` of `atmosphere/exefs_patches/es_patches` terwijl sys-patch draait: twee hulpmiddelen die dezelfde controles patchen, de oorzaak die de topics over sys-patch en sigpatches op GBAtemp het vaakst noemen. *Console › Gamepatches* waarschuwt ervoor, en Ⓐ daar zet ze opzij (verplaatst naar `config/playguard/sigpatches-aside/`, nooit verwijderd; `bootloader/patches.ini` van hekate blijft). Start de console opnieuw op.
 - **Een patroon dat sys-patch niet heeft toegepast.** Forwarders hebben zijn patches voor fs en loader nodig, elk patroon dat het voor deze firmware heeft (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), niet maar één per module. *Info › Hulp en diagnose › Een diagnoserapport exporteren* vermeldt op zijn regel `game patches` de versie van sys-patch en elk overgeslagen patroon; `sd:/config/sys-patch/log.ini` bevat hetzelfde. Controleer dat `config/sys-patch/config.ini` dit systeem patcht (`patch_emummc=1` op emuMMC) en er geen enkele uitschakelt; de maintainer van sys-patch zelf zegt dat 23.0.x geen nieuwere sys-patch nodig heeft dan 1.6.2.3.
 - **Geen herstart sinds de patches zijn gewijzigd.** sys-patch patcht bij het opstarten.
-- **Een forwarder die door een oudere PlayGuard is gemaakt.** De bel en *Console › Forwarders* bieden aan om die met een oudere loader opnieuw te maken.
+- **Een forwarder die door een oudere PlayGuard is gemaakt.** De bel en *Security › Forwarders* bieden aan om die met een oudere loader opnieuw te maken.
 
 ### De bel of een tabblad toont een oranje badge
 

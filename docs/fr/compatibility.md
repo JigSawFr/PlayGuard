@@ -58,7 +58,7 @@ PlayGuard ne contacte jamais Nintendo : en ligne, il ne joint que des serveurs d
 
 ### Une console sans Internet
 
-C'est la cible de PlayGuard, et le minuteur a quand même besoin d'une horloge réseau réglée. Sans serveur de temps à interroger, *Console › Horloge réseau › Mesurer l'écart* propose de la régler sur l'horloge de la console à la place : vérifiez d'abord l'horloge de la console, avec *Synchroniser l'horloge via Internet* désactivé, et n'activez ce réglage qu'ensuite (voir [horloge réseau](features.md#aucun-serveur-ne-répond)).
+C'est la cible de PlayGuard, et le minuteur a quand même besoin d'une horloge réseau réglée. Sans serveur de temps à interroger, *Temps de jeu › Horloge réseau › Mesurer l'écart* propose de la régler sur l'horloge de la console à la place : vérifiez d'abord l'horloge de la console, avec *Synchroniser l'horloge via Internet* désactivé, et n'activez ce réglage qu'ensuite (voir [horloge réseau](features.md#aucun-serveur-ne-répond)).
 
 ### Notifications sur le téléphone
 

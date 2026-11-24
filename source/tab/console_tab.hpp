@@ -1,6 +1,4 @@
-// ConsoleTab — the console PlayGuard runs on: the network clock (its own
-// screen, ClockTab), the installed games check, the forwarders (homebrew on
-// the HOME menu, ForwardersActivity), the firmware, Atmosphère, hekate and
+// ConsoleTab — the console PlayGuard runs on: the installed games check, the firmware, Atmosphère, hekate and
 // sys-patch (A on each opens its release notes), compatibility, storage, the
 // serial number and the game patches.
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -31,11 +29,7 @@ class ConsoleTab : public TabBase
     RowIcon*    patches_icon = nullptr;
     RowIcon*    fw_warn      = nullptr;    // a newer firmware not supported yet (its notes say why)
 
-    AURORE_BIND(aurore::DetailCell,  clock,        "cn_clock");
     AURORE_BIND(aurore::DetailCell,  games,        "cn_games");
-    AURORE_BIND(aurore::DetailCell,  forwarders,   "cn_forwarders");
-    AURORE_BIND(aurore::DetailCell,  remote,       "cn_remote");
-    AURORE_BIND(aurore::DetailCell,  modules_cell, "cn_modules");
     AURORE_BIND(aurore::DetailCell,  fw,           "cn_fw");
     AURORE_BIND(aurore::DetailCell,  ams,          "cn_ams");
     AURORE_BIND(aurore::DetailCell,  hekate,       "cn_hekate");

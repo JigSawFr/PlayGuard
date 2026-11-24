@@ -22,7 +22,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_AUTOSYNC_OFF=1` | *Synchronise Clock via Internet* off |
 | `PLAYGUARD_SIM_NETWORK_OFFSET=1411` | A network clock that many seconds ahead of the console clock until it is set (the console clock follows it while *Synchronise* is on) |
 | `PLAYGUARD_SIM_NTP=offline` | No time server answers (a console without Internet). In a browser, which sends no UDP, they answer otherwise with the simulated world's time (the console's before any clock change) |
-| `PLAYGUARD_SIM_FAIL=timer,clock,unverified,bedtime,remove,launch,verify,forwarder` | Failures: the play-timer write, setting the clock, an unlock the system does not confirm, a bedtime the console does not take, removing a game or a content, resetting a launch version, the integrity check, installing or removing a forwarder (*Console › Forwarders*) |
+| `PLAYGUARD_SIM_FAIL=timer,clock,unverified,bedtime,remove,launch,verify,forwarder` | Failures: the play-timer write, setting the clock, an unlock the system does not confirm, a bedtime the console does not take, removing a game or a content, resetting a launch version, the integrity check, installing or removing a forwarder (*Security › Forwarders*) |
 | `PLAYGUARD_SIM_CHECK_MS=150` | How long checking one installed game takes (*Console › Installed games*) |
 | `PLAYGUARD_SIM_GAMES_OK=1` | Every installed game fine (*Console › Installed games*; by default one of each problem) |
 | `PLAYGUARD_SIM_SD_FREE_MB=300` | The SD card's free space, in MB (unset: unknown, as the desktop's own disk says nothing of a console; under 500 MB, *The SD card is almost full* on the Console tab) |
@@ -59,7 +59,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_BOOT_CHOICE=a` | The answer of the start-up screen that offers the previous build after a start that did not finish (`a`: A, else B) |
 | `PLAYGUARD_SIM_GITHUB_LOGIN=ok` | The GitHub device flow of *GitHub account*: `ok` approves at once, `denied` refuses, `offline` fails |
 | `PLAYGUARD_SIM_HBLOADER=1` | A homebrew loader that can hand an update over to a store |
-| `PLAYGUARD_SIM_FORWARDERS=1` | Console › Forwarders in use: PlayGuard's own, sphaira protected and seen working, Star Atlas without the PIN, the signature patches, four screenshots in the album dated from the console's day (two in Star Kart Racers the same minute today, one yesterday, one on the HOME menu nine days ago) |
+| `PLAYGUARD_SIM_FORWARDERS=1` | Security › Forwarders in use: PlayGuard's own, sphaira protected and seen working, Star Atlas without the PIN, the signature patches, four screenshots in the album dated from the console's day (two in Star Kart Racers the same minute today, one yesterday, one on the HOME menu nine days ago) |
 | `PLAYGUARD_SIM_NOW=<POSIX seconds>` | A frozen console time (with `TZ=` for its time zone) |
 | `PLAYGUARD_SIM_STILL_FOCUS=1` | Not the console: the focus highlight without its moving glow, the loading screen's ring still, every movement of the look drawn at its end (`effects::motion()`: no entrance, no pulse, no slide), and the footer's hints never greyed while a screen or a dialog opens or closes (Aurore patch `0014`), for screenshots that compare |
 | `PLAYGUARD_SIM_VERSION=1.0.0:1a2b3c4` | Not the console: the version and commit the header's badge shows (`1.0.0:` for a release), not the build's own, for screenshots that compare |
@@ -73,7 +73,7 @@ Part of the [contributor's guide](../../CONTRIBUTING.md).
 | `PLAYGUARD_SIM_AGENT_ORDER=limit_uniform=90` | An order the simulated agent hands PlayGuard once, after `Hello` |
 | `PLAYGUARD_SIM_BUNDLED=<folder>` | The optional modules PlayGuard carries (`<name>/exefs.nsp` and `version.txt`, as `cmake/bundle_sysmodules.cmake` writes them in the romfs) |
 
-Game patches are read from `./playguard_data/sd/`, the simulated SD card root; *Console › Forwarders* writes a few made-up homebrew there (`switch/*.nro`, `source/sim/sim_forwarder.cpp`) to make forwarders for.
+Game patches are read from `./playguard_data/sd/`, the simulated SD card root; *Security › Forwarders* writes a few made-up homebrew there (`switch/*.nro`, `source/sim/sim_forwarder.cpp`) to make forwarders for.
 
 The simulated console's games are made up (`source/sim/sim_games.c`: their names, ratings, play and problems). Their icons and the album's screenshots of them are drawn by `tools/sim_art.py` from `tools/sim_art_games.json`, a scene for each game (`tools/sim_art_scenes.py`, PlayShelf's web demo's scenes: SVG drawn the way key art is, rendered in Chromium), its name over its icon and a head-up display of its kind of game over its screenshots, nothing of a real game. The pictures are compiled in from `source/sim/sim_icons.h` and `sim_shots.h`, which are in the repository, so no build needs Chromium: after changing the table or a scene, run `tools/sim_art.py` (Playwright for Python and Pillow; `CHROMIUM=<path>` for a Chromium of one's own) and commit the headers. The made-up homebrew keep their own icons (`sim_homebrew_icons.h`), as do forwarders installed without one.
 

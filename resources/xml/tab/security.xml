@@ -36,6 +36,7 @@
             <aurore:BooleanCell id="sc_pin_ask_again"/>
             <aurore:BooleanCell id="sc_pin_pauses"/>
             <aurore:DetailCell id="sc_hbmenu_lock" title="@i18n/playguard/hbmenu/cell"/>
+            <aurore:DetailCell id="sc_forwarders" title="@i18n/playguard/forwarders/open"/>
             <aurore:DetailCell id="sc_show_pin" title="@i18n/playguard/security/show_pin"/>
             <aurore:DetailCell id="sc_unlock" title="@i18n/playguard/security/unlock"/>
             <aurore:BooleanCell id="sc_auto_relock"/>

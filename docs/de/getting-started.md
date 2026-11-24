@@ -28,7 +28,7 @@ Suche im Homebrew App Store oder im App Store von sphaira nach *PlayGuard* und i
 
 ## 3. *Erste Schritte* folgen
 
-Beim ersten Start erscheint die Anleitung *Erste Schritte* (später: *Optionen › Erste Schritte*). *Heute* zeigt dieselben Schritte als Karte, bis sie erledigt sind (*1 von 3*):
+Beim ersten Start erscheint die Anleitung *Erste Schritte* (später: *Info › Erste Schritte*). *Heute* zeigt dieselben Schritte als Karte, bis sie erledigt sind (*1 von 3*):
 
 1. **Die Geheimzahl.** Die eigene Geheimzahl der Konsole, die das HOME-Menü abfragt, um ein Spiel über das Limit hinaus zu starten oder die Einstellungen zu ändern. Vermeide 0000, 1234 oder 2580: PlayGuard meldet eine Geheimzahl, die jeder zuerst ausprobieren würde.
 2. **Ein Tageslimit.** Jeden Tag gleich, oder eines für die Wochentage und eines für das Wochenende. Ändere jeden einzelnen Tag später in *Spielzeit*.
@@ -40,7 +40,7 @@ Noch mit der App „Nintendo Switch-Altersbeschränkungen“ verknüpft (oder ei
 
 ## 5. Die Netzwerkuhr stellen
 
-*Konsole › Netzwerkuhr › Zeitabweichung messen* fragt drei öffentliche Zeitserver, dann *Netzwerkuhr stellen*. Das Stellen der Uhr lässt die heutige Spielzeit neu beginnen, also mach es, bevor das Kind spielt.
+*Spielzeit › Netzwerkuhr › Zeitabweichung messen* fragt drei öffentliche Zeitserver, dann *Netzwerkuhr stellen*. Das Stellen der Uhr lässt die heutige Spielzeit neu beginnen, also mach es, bevor das Kind spielt.
 
 Eine Konsole ohne Internet: Wenn kein Server antwortet, bietet PlayGuard an, die Netzwerkuhr stattdessen auf die Konsolenuhr zu stellen. Vergleiche die Konsolenuhr vorher mit einem Handy oder einer Uhr, mit *Systemeinstellungen › Konsole › Datum und Uhrzeit › Uhr mithilfe des Internets synchronisieren* aus ([Details](features.md#netzwerkuhr)).
 

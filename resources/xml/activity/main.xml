@@ -44,6 +44,10 @@
             <ConsoleTab/>
         </aurore:Tab>
 
+        <aurore:Tab label="@i18n/playguard/tabs/boreale">
+            <BorealeHubTab/>
+        </aurore:Tab>
+
         <aurore:Separator/>
 
         <aurore:Tab label="@i18n/playguard/tabs/preferences">

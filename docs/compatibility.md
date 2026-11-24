@@ -57,7 +57,7 @@ PlayGuard never contacts Nintendo: online, it only reaches public time servers, 
 
 ### A console without Internet
 
-That is what PlayGuard is for, and the play timer still needs a network clock that has been set. With no time server to ask, *Console › Network clock › Measure* offers to set it to the console clock instead: check the console clock first, with *Synchronize Clock via Internet* off, and turn that setting on only afterwards (see [network clock](features.md#no-server-answers)).
+That is what PlayGuard is for, and the play timer still needs a network clock that has been set. With no time server to ask, *Play timer › Network clock › Measure* offers to set it to the console clock instead: check the console clock first, with *Synchronize Clock via Internet* off, and turn that setting on only afterwards (see [network clock](features.md#no-server-answers)).
 
 ### Phone notifications
 

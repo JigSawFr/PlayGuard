@@ -7,9 +7,9 @@
 
 #include "action/sys_notes_flow.hpp"
 #include "action/update_flow.hpp"
+#include "activity/onboarding_activity.hpp"
 #include "app.hpp"
 #include "kit_text.hpp"
-#include "tab/boreale_tab.hpp"
 #include "tab/help_tab.hpp"
 #include "ui/play_ui.hpp"
 #include "util/config.hpp"
@@ -47,14 +47,33 @@ AboutTab::AboutTab()
         return true;
     });
 
-    help->setDetailText(ui::opens());
-    help->registerClickAction([](aurore::View*) {
-        ui::open_screen(new HelpTab(), kit_text::str("prefs/help"));
+    // How PlayGuard updates (checking now is the line above).
+    update_daily->init("playguard/tools/update_daily"_i18n, config::get().update_daily, [](bool on) {
+        config::get().update_daily = on;
+        ui::save_config();
+    });
+    update_via->registerClickAction([this](aurore::View*) {
+        update_flow::choose_method(this->refresher());
+        return true;
+    });
+    // PlayGuard's own entry in sphaira's GitHub menu (written when sphaira is
+    // there, removed when off).
+    sphaira_entry->init("playguard/tools/sphaira_entry"_i18n, config::get().sphaira_entry, [](bool on) {
+        config::get().sphaira_entry = on;
+        ui::save_config();
+        update_flow::sync_sphaira_entry();
+    });
+    // The guide again (Help & diagnostics also has it).
+    first_steps->setDetailText(ui::opens());
+    first_steps->registerClickAction([](aurore::View*) {
+        aurore::Application::pushActivity(new OnboardingActivity());
         return true;
     });
 
-    boreale->registerClickAction([](aurore::View*) {
-        ui::open_screen(new BorealeTab(), "playguard/about/boreale"_i18n);
+
+    help->setDetailText(ui::opens());
+    help->registerClickAction([](aurore::View*) {
+        ui::open_screen(new HelpTab(), kit_text::str("prefs/help"));
         return true;
     });
 
@@ -112,8 +131,9 @@ AboutTab::AboutTab()
         hero->addView(text);
         column->addView(hero, 0);
     }
-    this->list.apply({ { "ab_version", "info" }, { "ab_update", "download" }, { "ab_help", "tools" },
-                       { "ab_boreale", "list" }, { "ab_credits", "user" } });
+    this->list.apply({ { "ab_version", "info" }, { "ab_update", "download" }, { "ab_update_daily", "calendar" }, { "ab_update_via", "server" },
+                       { "ab_sphaira_entry", "download" }, { "ab_first_steps", "sparkle" }, { "ab_help", "tools" },
+                       { "ab_credits", "user" } });
 }
 
 void AboutTab::count_version_press()
@@ -151,7 +171,9 @@ void AboutTab::refresh()
     bool newer = false;
     version->setDetailText(ui::opens(sys_notes_flow::status_text(sys_notes::Which::PlayGuard, &newer) + commit + flags));
     version->detail->setThemeColor("textColor", newer ? "cadran/amber" : "cadran/text2");
-    boreale->setDetailText(ui::opens(BorealeTab::names()));
+    update_daily->setOn(cfg.update_daily, false);
+    update_via->setDetailText(update_flow::method_text());
+    sphaira_entry->setOn(cfg.sphaira_entry, false);
     this->list.sync();
     if (this->version_line) {
         const std::string version_text = app::commit().empty() ? app::version() : app::version() + " · " + app::commit();

@@ -28,7 +28,7 @@ Open PlayGuard **boven een game** (houd R ingedrukt terwijl je een game start, m
 
 ## 3. Volg *Eerste stappen*
 
-Bij de eerste start verschijnt de gids *Eerste stappen* (later: *Voorkeuren › Eerste stappen*). *Vandaag* toont dezelfde stappen als kaart tot ze gedaan zijn (*1 van 3*):
+Bij de eerste start verschijnt de gids *Eerste stappen* (later: *Info › Eerste stappen*). *Vandaag* toont dezelfde stappen als kaart tot ze gedaan zijn (*1 van 3*):
 
 1. **De pincode.** De eigen pincode van de console, die het HOME-menu vraagt om na de limiet een game te starten of om de instellingen te wijzigen. Vermijd 0000, 1234 of 2580: PlayGuard markeert een pincode die iedereen als eerste zou proberen.
 2. **Een daglimiet.** Elke dag dezelfde, of één voor doordeweeks en één voor het weekend. Wijzig later elke afzonderlijke dag in *Speeltijdtimer*.
@@ -40,7 +40,7 @@ Nog gekoppeld aan de app *Ouderlijk toezicht* van Nintendo (of een tweedehands c
 
 ## 5. Stel de netwerkklok in
 
-*Console › Netwerkklok › Tijdsverschil meten* raadpleegt drie openbare tijdservers, daarna *Netwerkklok instellen*. De klok instellen zet de speeltijd van vandaag terug op nul, dus doe het voordat het kind speelt.
+*Speeltijdtimer › Netwerkklok › Tijdsverschil meten* raadpleegt drie openbare tijdservers, daarna *Netwerkklok instellen*. De klok instellen zet de speeltijd van vandaag terug op nul, dus doe het voordat het kind speelt.
 
 Een console zonder internet: als geen enkele server antwoordt, biedt PlayGuard aan om de netwerkklok in plaats daarvan op de consoleklok in te stellen. Controleer eerst de consoleklok met een telefoon of een horloge, met *Systeeminstellingen › Systeem › Datum en tijd › Klok synchroniseren via internet* uit ([details](features.md#netwerkklok)).
 

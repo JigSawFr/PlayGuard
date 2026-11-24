@@ -58,7 +58,7 @@ PlayGuard non contatta mai Nintendo: online raggiunge solo server dell'ora pubbl
 
 ### Una console senza Internet
 
-È proprio lo scopo di PlayGuard, e il timer ha comunque bisogno di un orologio di rete che sia stato impostato. Senza un server dell'ora da interrogare, *Console › Orologio di rete › Misura la differenza oraria* propone invece di impostarlo sull'orologio della console: controlla prima l'orologio della console, con *Sincronizza l'orologio tramite Internet* disattivato, e attiva quell'impostazione solo dopo (vedi [orologio di rete](features.md#nessun-server-risponde)).
+È proprio lo scopo di PlayGuard, e il timer ha comunque bisogno di un orologio di rete che sia stato impostato. Senza un server dell'ora da interrogare, *Tempo di gioco › Orologio di rete › Misura la differenza oraria* propone invece di impostarlo sull'orologio della console: controlla prima l'orologio della console, con *Sincronizza l'orologio tramite Internet* disattivato, e attiva quell'impostazione solo dopo (vedi [orologio di rete](features.md#nessun-server-risponde)).
 
 ### Notifiche sul telefono
 

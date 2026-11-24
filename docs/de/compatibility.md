@@ -58,7 +58,7 @@ PlayGuard kontaktiert nie Nintendo: Online erreicht es nur öffentliche Zeitserv
 
 ### Eine Konsole ohne Internet
 
-Genau dafür ist PlayGuard da, und der Timer braucht trotzdem eine Netzwerkuhr, die gestellt wurde. Ohne Zeitserver, den es fragen kann, bietet *Konsole › Netzwerkuhr › Zeitabweichung messen* an, sie stattdessen auf die Konsolenuhr zu stellen: Prüfe zuerst die Konsolenuhr, mit *Uhr mithilfe des Internets synchronisieren* aus, und schalte diese Einstellung erst danach ein (siehe [Netzwerkuhr](features.md#kein-server-antwortet)).
+Genau dafür ist PlayGuard da, und der Timer braucht trotzdem eine Netzwerkuhr, die gestellt wurde. Ohne Zeitserver, den es fragen kann, bietet *Spielzeit › Netzwerkuhr › Zeitabweichung messen* an, sie stattdessen auf die Konsolenuhr zu stellen: Prüfe zuerst die Konsolenuhr, mit *Uhr mithilfe des Internets synchronisieren* aus, und schalte diese Einstellung erst danach ein (siehe [Netzwerkuhr](features.md#kein-server-antwortet)).
 
 ### Benachrichtigungen auf dem Handy
 

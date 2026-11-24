@@ -19,13 +19,13 @@ Conoces el PIN, pero la aplicación móvil del anterior propietario sigue vincul
 
 ### El temporizador lo bloquea todo (límite de 0 minutos) y has olvidado el PIN
 
-En ese caso, PlayGuard ni siquiera puede iniciarse. Instala **de antemano** el sysmodule de recuperación opcional (*Consola › Módulos opcionales*, o `playguard-rescue.zip` a mano); si te quedas bloqueado, coloca un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y arranca: desbloquea la consola para que PlayGuard pueda abrirse. Consulta [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (en inglés).
+En ese caso, PlayGuard ni siquiera puede iniciarse. Instala **de antemano** el sysmodule de recuperación opcional (*Boréale › Módulos opcionales*, o `playguard-rescue.zip` a mano); si te quedas bloqueado, coloca un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y arranca: desbloquea la consola para que PlayGuard pueda abrirse. Consulta [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (en inglés).
 
 El módulo debe seguir la versión de PlayGuard: con cada actualización de PlayGuard, vuelve a extraer el `playguard-rescue.zip` de esa versión (o *Actualizar* en *El sysmodule de recuperación no está actualizado*, en la campana de notificaciones) y reinicia la consola. Un módulo más antiguo deja un informe que PlayGuard no puede verificar: la pantalla de recuperación no ofrece entonces nada, indica que el módulo es más antiguo, y volver a usar `RESCUE` da el mismo resultado hasta que se actualice.
 
 ### Menú homebrew bloqueado
 
-*Consola › Forwarders › Bloquear el menú homebrew* impide que el álbum y un juego iniciado con R abran el menú homebrew. Si el forwarder de PlayGuard y el menú protegido han desaparecido los dos (eliminados en la configuración de la consola, o en el otro sistema: el bloqueo está en la tarjeta SD y lo leen tanto la sysMMC como la emuMMC):
+*Seguridad › Forwarders › Bloquear el menú homebrew* impide que el álbum y un juego iniciado con R abran el menú homebrew. Si el forwarder de PlayGuard y el menú protegido han desaparecido los dos (eliminados en la configuración de la consola, o en el otro sistema: el bloqueo está en la tarjeta SD y lo leen tanto la sysMMC como la emuMMC):
 
 - **Desde un ordenador:** elimina `atmosphere/config/override_config.ini` de la tarjeta SD (o vuelve a poner `config/playguard/override_config.ini.backup`, el archivo tal como estaba) y reinicia la consola.
 - **Con el sysmodule de recuperación instalado** (opcional): coloca un archivo vacío `config/playguard/RESCUE` en la tarjeta SD y reinicia; el sysmodule quita el bloqueo al arrancar, y PlayGuard lo indica la siguiente vez que se inicia. Una actualización de Atmosphère desde que se bloqueó lo quita de la misma forma.
@@ -40,7 +40,7 @@ PlayGuard no puede ayudar: necesita Atmosphère. La vía oficial es el procedimi
 
 *Hoy* indica *La consola no está contando el tiempo de juego ahora mismo* cuando no se ha movido durante unos 90 s. Las causas probables:
 
-- **El reloj de red nunca se ajustó.** *Consola › Reloj de red › Medir el desfase del reloj*, y luego ajústalo ([reloj de red](features.md#reloj-de-red)).
+- **El reloj de red nunca se ajustó.** *Tiempo de juego › Reloj de red › Medir el desfase del reloj*, y luego ajústalo ([reloj de red](features.md#reloj-de-red)).
 - **El reloj se atrasó.** Tras un salto hacia atrás, la cuenta se detiene hasta que el reloj pasa la hora anterior; no hay nada que hacer.
 - **Se acaba de escribir un límite.** Inicia un juego un minuto y vuelve a comprobarlo.
 - **El control parental está desbloqueado temporalmente.** Es posible que entonces no se cuente el tiempo de juego: *Hoy › Reactivar* (o un toque en la píldora de la cabecera).
@@ -76,15 +76,15 @@ La consola usa un firmware más reciente que el más reciente probado: PlayGuard
 
 ### Un forwarder protegido muestra el error 2347-0100
 
-Su puerta (`config/playguard/gate-….nro`) ya no es el archivo con el que se hizo el forwarder: se ha modificado o reemplazado en la tarjeta SD, así que el forwarder no la inicia. Abre PlayGuard desde su propio forwarder: vuelve a escribir la puerta al iniciarse; *Consola › Forwarders › Reinstalar todos* rehace todos los forwarders con ella.
+Su puerta (`config/playguard/gate-….nro`) ya no es el archivo con el que se hizo el forwarder: se ha modificado o reemplazado en la tarjeta SD, así que el forwarder no la inicia. Abre PlayGuard desde su propio forwarder: vuelve a escribir la puerta al iniciarse; *Seguridad › Forwarders › Reinstalar todos* rehace todos los forwarders con ella.
 
 ### Un forwarder protegido se cierra al instante («se ha producido un error»)
 
-Antes de cualquier pantalla de PlayGuard, sin código de error (el informe de Atmosphère en `atmosphere/crash_reports/` nombra el módulo `forwarder`, resultado `2000-0000`): lo hizo un PlayGuard cuya puerta se compiló sin sus recursos, que el cargador del forwarder rechazó. Actualiza PlayGuard y luego vuelve a hacerlo: la campana y *Consola › Forwarders* lo ofrecen para cada forwarder hecho con un cargador anterior.
+Antes de cualquier pantalla de PlayGuard, sin código de error (el informe de Atmosphère en `atmosphere/crash_reports/` nombra el módulo `forwarder`, resultado `2000-0000`): lo hizo un PlayGuard cuya puerta se compiló sin sus recursos, que el cargador del forwarder rechazó. Actualiza PlayGuard y luego vuelve a hacerlo: la campana y *Seguridad › Forwarders* lo ofrecen para cada forwarder hecho con un cargador anterior.
 
 ### Un forwarder protegido se queda en la pantalla de su puerta tras el PIN
 
-El PIN se acepta, la pantalla con el icono del homebrew se queda y no pasa nada más: su puerta dibujó esa pantalla con un solo búfer y esperó indefinidamente para dibujar la siguiente. Actualiza PlayGuard y luego vuelve a hacerlo: la campana y *Consola › Forwarders* lo ofrecen para cada forwarder hecho con una puerta anterior.
+El PIN se acepta, la pantalla con el icono del homebrew se queda y no pasa nada más: su puerta dibujó esa pantalla con un solo búfer y esperó indefinidamente para dibujar la siguiente. Actualiza PlayGuard y luego vuelve a hacerlo: la campana y *Seguridad › Forwarders* lo ofrecen para cada forwarder hecho con una puerta anterior.
 
 ### Un forwarder muestra «No se pudo iniciar el programa»
 
@@ -93,7 +93,7 @@ La consola se negó a iniciarlo: sigue habiendo una comprobación de firma. Por 
 - **Archivos de sigpatches junto a sys-patch.** Archivos `.ips` en `atmosphere/kip_patches/fs_patches`, `loader_patches` o `atmosphere/exefs_patches/es_patches` mientras sys-patch está activo: dos herramientas que parchean las mismas comprobaciones, la causa que más citan los hilos de sys-patch y de sigpatches en GBAtemp. *Consola › Parches de juegos* lo advierte, y Ⓐ ahí los aparta (los mueve a `config/playguard/sigpatches-aside/`, nunca los borra; el `bootloader/patches.ini` de hekate se queda). Reinicia la consola.
 - **Un patrón que sys-patch no aplicó.** Los forwarders necesitan sus parches de fs y de loader, todos los patrones que tiene para este firmware (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), no solo uno por módulo. *Acerca de › Ayuda y diagnóstico › Exportar un informe de diagnóstico* indica, en su línea `game patches`, la versión de sys-patch y cada patrón omitido; `sd:/config/sys-patch/log.ini` contiene lo mismo. Comprueba que `config/sys-patch/config.ini` parchea este sistema (`patch_emummc=1` en la emuMMC) y no desactiva ninguno; el propio responsable de sys-patch dice que 23.0.x no necesita un sys-patch más reciente que el 1.6.2.3.
 - **Ningún reinicio desde que cambiaron los parches.** sys-patch parchea al arrancar.
-- **Un forwarder hecho por un PlayGuard anterior.** La campana y *Consola › Forwarders* ofrecen volver a hacer los que se crearon con un cargador anterior.
+- **Un forwarder hecho por un PlayGuard anterior.** La campana y *Seguridad › Forwarders* ofrecen volver a hacer los que se crearon con un cargador anterior.
 
 ### La campana o una pestaña muestra una insignia ámbar
 

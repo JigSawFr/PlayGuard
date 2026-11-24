@@ -19,13 +19,13 @@ PlayGuard 只能看到它所執行的那個系統的家長監護：**emuMMC 和 
 
 ### 遊玩時間限制封鎖了一切（0 分鐘上限），又忘了PIN碼
 
-這時 PlayGuard 本身無法啟動。請**事先**安裝選用的復原 sysmodule（*主機 › 選用模組*，或手動安裝 `playguard-rescue.zip`）；被鎖住時，在 SD 卡上放一個空的 `config/playguard/RESCUE` 檔案再開機——它會解除主機的鎖定，讓 PlayGuard 可以開啟。請見 [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)（英文）。
+這時 PlayGuard 本身無法啟動。請**事先**安裝選用的復原 sysmodule（*Boréale › 選用模組*，或手動安裝 `playguard-rescue.zip`）；被鎖住時，在 SD 卡上放一個空的 `config/playguard/RESCUE` 檔案再開機——它會解除主機的鎖定，讓 PlayGuard 可以開啟。請見 [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md)（英文）。
 
 這個模組必須跟上 PlayGuard 的版本：每次更新 PlayGuard，都要重新解壓縮該版本的 `playguard-rescue.zip`（或在通知鈴鐺的*復原 sysmodule 不是最新版本*上選*更新*），然後重新啟動主機。舊版模組留下的報告 PlayGuard 無法驗證：這時復原畫面不會提供任何操作，只會說明模組版本較舊；在更新模組之前，再次使用 `RESCUE` 也會得到相同的結果。
 
 ### Homebrew 選單已鎖定
 
-*主機 › 轉發器 › 鎖定自製軟體選單*會讓相簿和按住 R 啟動的遊戲不再開啟 Homebrew 選單。如果 PlayGuard 的轉發器和受保護的選單都不見了（在主機的「設定」中被刪除，或是在另一個系統上：鎖定寫在 SD 卡上，sysMMC 和 emuMMC 都會讀取）：
+*安全 › 轉發器 › 鎖定自製軟體選單*會讓相簿和按住 R 啟動的遊戲不再開啟 Homebrew 選單。如果 PlayGuard 的轉發器和受保護的選單都不見了（在主機的「設定」中被刪除，或是在另一個系統上：鎖定寫在 SD 卡上，sysMMC 和 emuMMC 都會讀取）：
 
 - **用電腦：** 刪除 SD 卡上的 `atmosphere/config/override_config.ini`（或放回 `config/playguard/override_config.ini.backup`，也就是原本的檔案），然後重新啟動主機。
 - **已安裝復原 sysmodule 時**（選用）：在 SD 卡上放一個空的 `config/playguard/RESCUE` 檔案後重新啟動；sysmodule 會在開機時解除鎖定，PlayGuard 下次啟動時會說明。鎖定之後更新了 Atmosphère，也會以同樣的方式解除鎖定。
@@ -40,7 +40,7 @@ PlayGuard 幫不上忙：它需要 Atmosphère。官方的做法是向任天堂�
 
 剩餘時間大約 90 秒都沒有變化時，*今天*會顯示*主機目前沒有計算遊玩時間*。可能的原因：
 
-- **網路時鐘從未設定過。** *主機 › 網路時鐘 › 測量時間差*，然後設定它（[網路時鐘](features.md#網路時鐘)）。
+- **網路時鐘從未設定過。** *遊玩時間限制 › 網路時鐘 › 測量時間差*，然後設定它（[網路時鐘](features.md#網路時鐘)）。
 - **時鐘被調回了。** 時鐘往回調之後，計時會停止，直到時鐘超過原本的時間；不需要做任何事。
 - **剛寫入上限。** 啟動遊戲玩一分鐘後再查看。
 - **家長監護已暫時解除。** 這時遊玩時間可能不會被計算：*今天 › 重新啟用*（或點一下標題列的膠囊標籤）。
@@ -76,15 +76,15 @@ PlayGuard 幫不上忙：它需要 Atmosphère。官方的做法是向任天堂�
 
 ### 受保護的轉發器顯示錯誤 2347-0100
 
-它的關卡（`config/playguard/gate-….nro`）已不再是製作轉發器時的那個檔案：它在 SD 卡上被變更或取代了，所以轉發器不會啟動它。請從 PlayGuard 自己的轉發器開啟 PlayGuard：它在啟動時會把關卡寫回去；*主機 › 轉發器 › 全部重新安裝*會用它重新製作所有轉發器。
+它的關卡（`config/playguard/gate-….nro`）已不再是製作轉發器時的那個檔案：它在 SD 卡上被變更或取代了，所以轉發器不會啟動它。請從 PlayGuard 自己的轉發器開啟 PlayGuard：它在啟動時會把關卡寫回去；*安全 › 轉發器 › 全部重新安裝*會用它重新製作所有轉發器。
 
 ### 受保護的轉發器一開啟就關閉（「發生錯誤」）
 
-在出現任何 PlayGuard 畫面之前，沒有錯誤代碼（Atmosphère 在 `atmosphere/crash_reports/` 中的報告會指出 `forwarder` 模組，結果為 `2000-0000`）：它是由某個 PlayGuard 製作的，而那個 PlayGuard 的關卡在建置時缺少資源，被轉發器的載入程式拒絕了。請更新 PlayGuard，然後重新製作它：鈴鐺和*主機 › 轉發器*會為每個用較舊載入程式製作的轉發器提供這個操作。
+在出現任何 PlayGuard 畫面之前，沒有錯誤代碼（Atmosphère 在 `atmosphere/crash_reports/` 中的報告會指出 `forwarder` 模組，結果為 `2000-0000`）：它是由某個 PlayGuard 製作的，而那個 PlayGuard 的關卡在建置時缺少資源，被轉發器的載入程式拒絕了。請更新 PlayGuard，然後重新製作它：鈴鐺和*安全 › 轉發器*會為每個用較舊載入程式製作的轉發器提供這個操作。
 
 ### 受保護的轉發器輸入PIN碼後停在關卡畫面上
 
-PIN碼已被接受，附有 Homebrew 圖示的畫面卻一直停著，之後什麼也沒有發生：它的關卡用單一緩衝區繪製了那個畫面，然後一直等待繪製下一個畫面。請更新 PlayGuard，然後重新製作它：鈴鐺和*主機 › 轉發器*會為每個用較舊關卡製作的轉發器提供這個操作。
+PIN碼已被接受，附有 Homebrew 圖示的畫面卻一直停著，之後什麼也沒有發生：它的關卡用單一緩衝區繪製了那個畫面，然後一直等待繪製下一個畫面。請更新 PlayGuard，然後重新製作它：鈴鐺和*安全 › 轉發器*會為每個用較舊關卡製作的轉發器提供這個操作。
 
 ### 轉發器顯示「無法啟動軟體」
 
@@ -93,7 +93,7 @@ PIN碼已被接受，附有 Homebrew 圖示的畫面卻一直停著，之後什�
 - **sys-patch 旁邊還有 sigpatch 檔案。** sys-patch 執行時，`atmosphere/kip_patches/fs_patches`、`loader_patches` 或 `atmosphere/exefs_patches/es_patches` 中還有 `.ips` 檔案：兩個工具在修補相同的檢查，這是 GBAtemp 上 sys-patch 和 sigpatch 討論串中最常提到的原因。*主機 › 遊戲修補*會對此發出提醒，在那裡按 Ⓐ 可以把它們移到一旁（移到 `config/playguard/sigpatches-aside/`，絕不刪除；hekate 的 `bootloader/patches.ini` 保持不動）。接著重新啟動主機。
 - **sys-patch 沒有套用某個特徵碼。** 轉發器需要它的 fs 和 loader 修補，也就是它針對這個韌體的所有特徵碼（`noncasigchk_17.0.0+`、`nocntchk_19.0.0+`、`noacidsigchk_10.0.0+`），而不只是每個模組一個。*關於 › 說明與診斷 › 匯出診斷報告*會在它的 `game patches` 一行列出 sys-patch 的版本和每個沒有套用的特徵碼；`sd:/config/sys-patch/log.ini` 中也有相同的內容。請確認 `config/sys-patch/config.ini` 會修補這個系統（emuMMC 上為 `patch_emummc=1`），而且沒有關閉其中任何一項；sys-patch 的維護者本人表示，23.0.x 不需要比 1.6.2.3 更新的 sys-patch。
 - **修補變更後沒有重新啟動。** sys-patch 會在開機時修補。
-- **由較早版本的 PlayGuard 製作的轉發器。** 鈴鐺和*主機 › 轉發器*會建議重新製作那些用較舊載入程式建置的轉發器。
+- **由較早版本的 PlayGuard 製作的轉發器。** 鈴鐺和*安全 › 轉發器*會建議重新製作那些用較舊載入程式建置的轉發器。
 
 ### 鈴鐺或某個分頁顯示琥珀色標記
 

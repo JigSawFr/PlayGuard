@@ -56,9 +56,16 @@ int rank_of(const std::string& id)
 
 std::string tab_of(const std::string& id)
 {
-    // The network clock is a screen of the Console tab, and Today
-    // says the changes seen outside and the limits to put back.
-    if (group_of(id) == Group::Console || id == "clock" || id == "clock_off") return "console";
+    // The network clock is a screen reached from Play timer, the forwarders'
+    // and the homebrew menu's entries are Security's, the Home Assistant
+    // integration's is Boréale's; Today says the changes seen outside and
+    // the limits to put back.
+    if (id == "clock" || id == "clock_off") return "play_timer";
+    if (id == "ha_integration") return "boreale";
+    if (id == "hbmenu_route" || id == "hbmenu_lifted" || id == "hbmenu_removed" || id == "forwarder_gone" || id == "gate_remake" ||
+        text::starts_with(id, "gate_"))
+        return "security";
+    if (group_of(id) == Group::Console) return "console";
     if (id == "pin_missing" || id == "pin_weak" || id == "pin_lock_off" || id == "pairing") return "security";
     if (id == "alarm_off" || id == "not_counting" || id == "over_limit" || id == "console_lock_long") return "play_timer";
     if (id == "outside" || id == "extra_restore") return "dashboard";

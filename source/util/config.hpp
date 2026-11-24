@@ -148,7 +148,7 @@ inline constexpr const auto& TEXT_SIZES = ui::TEXT_SIZES;
 inline constexpr const auto& EFFECTS = ui::EFFECTS;
 // What start_tab may be, in the sidebar's order.
 constexpr const char* START_TABS[] = { "dashboard", "play_timer", "activity", "restrictions",
-                                       "security", "history", "console", "preferences", "about" };
+                                       "security", "history", "console", "boreale", "preferences", "about" };
 // What extra_amounts may be (the Play timer tab's picker offers these sets).
 constexpr int EXTRA_SETS[][3] = { { 15, 30, 60 }, { 10, 20, 30 }, { 30, 60, 90 }, { 5, 10, 15 } };
 constexpr int BACKUP_KEEP[]   = { 0, 5, 10, 20 };

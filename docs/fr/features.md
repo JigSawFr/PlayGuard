@@ -14,7 +14,7 @@ Les captures montrent le thème sombre, celui par défaut (en anglais).
 | ![Temps de jeu](../../images/screenshots/play_timer.png) | ![Un jour en modification](../../images/screenshots/per_day.png) |
 | **Activité** | **Un jeu** |
 | ![Activité](../../images/screenshots/activity.png) | ![Un jeu](../../images/screenshots/activity_game.png) |
-| **Restrictions** | **Console › Horloge réseau** |
+| **Restrictions** | **Temps de jeu › Horloge réseau** |
 | ![Restrictions](../../images/screenshots/restrictions.png) | ![Horloge réseau](../../images/screenshots/clock.png) |
 | **Sécurité** | **Préférences** |
 | ![Sécurité](../../images/screenshots/security.png) | ![Préférences](../../images/screenshots/preferences.png) |
@@ -161,7 +161,7 @@ Tant que le code PIN et les limites de la semaine ne sont pas définis, une cart
 Le temps de PlayGuard lui-même compte quand il tourne comme une application : avec une limite aujourd'hui, le temps restant doit donc baisser tant qu'il est ouvert. S'il n'a pas bougé pendant environ 90 s à l'écran (minuteur actif, limite aujourd'hui, ni déverrouillage ni pause pendant votre visite, pas d'ouverture depuis l'album), une ligne orange sous le temps joué indique *La console ne décompte pas le temps de jeu en ce moment*, avec les causes probables :
 
 - l'horloge a été reculée (le décompte reprendra plus tard) ;
-- l'horloge réseau n'a jamais été réglée (*Console › Horloge réseau*) ;
+- l'horloge réseau n'a jamais été réglée (*Temps de jeu › Horloge réseau*) ;
 - une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).
 
 Elle disparaît dès que le temps restant bouge de nouveau. *Temps de jeu* l'indique aussi.
@@ -233,7 +233,7 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 - **Profils** enregistrés sur la carte SD : appliquer (un profil déjà en vigueur le dit simplement), modifier, renommer ou supprimer un profil ; enregistrer les limites actuelles ou en créer un nouveau.
 - N'importe quel nom, dans n'importe quelle écriture (*École*, *周末*, *Выходные* …) — un nom sans lettres latines reçoit son propre nom de fichier, et deux noms qui donneraient le même fichier sont repérés.
-- **Profil programmé** (*Profils › Profil programmé*) : *Avec Home Assistant*. PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul : Home Assistant le fait, depuis un agenda ou les vacances scolaires, une fois la console reliée par *Console › Accès à distance* (une automatisation qui règle son sélecteur *Profil* ; [le guide Home Assistant](../home-assistant.fr.md)). Un profil programmé avec une version précédente est toujours proposé quand sa période commence, et la ligne le modifie, le retire ou y met fin.
+- **Profil programmé** (*Profils › Profil programmé*) : *Avec Home Assistant*. PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul : Home Assistant le fait, depuis un agenda ou les vacances scolaires, une fois la console reliée par *Boréale › Accès à distance* (une automatisation qui règle son sélecteur *Profil* ; [le guide Home Assistant](../home-assistant.fr.md)). Un profil programmé avec une version précédente est toujours proposé quand sa période commence, et la ligne le modifie, le retire ou y met fin.
 
 ### Bloquer tous les jeux
 
@@ -253,6 +253,24 @@ En texte plus grand, *Aujourd'hui* tient toujours sur un écran : la ligne au-de
 
 - **Temps en plus :** les montants proposés (+15/+30/+1 h, +10/+20/+30 min…) et la remise d'office de la limite habituelle après *Arrêter le jeu pour aujourd'hui* (le temps en plus revient toujours sans rien demander). L'une comme l'autre se fait la prochaine fois que PlayGuard est ouvert, à partir du lendemain : tant qu'il n'est pas ouvert, la console garde la limite de ce jour-là.
 - **Avancé ›**, un écran à part : l'interrupteur des actions de débogage et, tant qu'il est activé, l'alarme « temps écoulé » et la pause / reprise du décompte. Le même interrupteur permet à une sauvegarde ou à l'historique de remettre l'alarme.
+
+### Horloge réseau
+
+*Horloge réseau ›*, un écran à part — l'horloge dont dépend le minuteur. Une console qui n'atteint jamais les serveurs de Nintendo garde cette horloge imprécise, ce qui fausse le minuteur.
+
+- **Horloges console et réseau**, fuseau horaire, précision. Quand la redirection DNS d'Atmosphère (`atmosphere/hosts`) envoie ailleurs le serveur d'heure de Nintendo (`aauth-lp1.ndas.srv.nintendo.net`), la console ne peut plus régler son horloge réseau elle-même : cet écran, l'entrée de la cloche et la carte d'*Aujourd'hui* le disent et renvoient à la mesure ci-dessous.
+- **Choix d'un serveur NTP public** (≈ 50 intégrés, par région, ou le vôtre).
+- **Mesure** sur 3 serveurs (médiane ; alerte orange en cas de désaccord) : une fenêtre affiche le résultat — l'avance ou le retard de l'horloge réseau, en grand, l'heure des serveurs face à celle de l'horloge réseau, la réponse de chaque serveur — et règle l'horloge réseau depuis là. Une mesure reste utilisable 2 minutes, avec un décompte sous *Régler l'horloge réseau*. La confirmation le dit : changer l'horloge remet à zéro le temps de jeu du jour, toute la limite redevient donc disponible.
+- **Vérification de l'horloge réseau au lancement** : une notification si elle a plus d'une minute d'écart ; elle ne règle jamais l'horloge.
+
+#### Aucun serveur ne répond
+
+Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé dans la fenêtre du résultat, *Régler l'horloge réseau sur l'horloge de la console* sous la mesure (et sur la carte de l'horloge réseau d'*Aujourd'hui*, quand sa mesure échoue), derrière la même confirmation.
+
+- PlayGuard n'a rien d'autre pour comparer l'horloge de la console : la confirmation affiche son heure et demande de la vérifier d'abord avec un téléphone ou une montre, et une horloge de console antérieure à 2026 (jamais réglée) est refusée.
+- Avec *Synchroniser l'horloge via Internet* désactivé, l'horloge de la console ne bouge pas, et activer le réglage ensuite ne la fait plus sauter ; s'il est activé, l'horloge de la console suit déjà l'horloge réseau, et la confirmation indique de le désactiver et de régler l'heure à la main si elle est fausse.
+- Seule l'horloge est écrite, pas le contrôle parental : aucun déverrouillage n'est nécessaire (le code PIN de *Protéger PlayGuard par le code PIN* s'applique toujours) ; comme tout changement d'horloge, cela remet à zéro le temps de jeu du jour.
+- Pas encore essayé sur une console.
 
 ## Activité — qui a joué à quoi, et combien de temps
 
@@ -334,7 +352,7 @@ Le code PIN dans PlayGuard lui-même :
 - Il se réactive de lui-même dès que PlayGuard est quitté (menu HOME, veille) ou fermé, depuis le menu HOME aussi (la fermeture l'attend), et tant que l'écran enfant ou l'écran verrouillé est affiché. De retour dans PlayGuard, le code PIN valant toujours, il se remet en pause.
 - Pas depuis l'album (le temps n'y compte pas, et un jeu peut rester ouvert derrière), pas en lecture seule, et jamais par-dessus un déverrouillage fait avec *Déverrouiller temporairement*, qui reste tel quel.
 - Noté comme tout déverrouillage : si PlayGuard s'arrête sans reverrouiller, son prochain lancement reverrouille, et un redémarrage de la console le fait de lui-même. Cela repose sur le fait que le temps ne compte pas pendant un déverrouillage, déduit mais pas encore mesuré ([plus bas](#ce-qui-compte-comme-temps-de-jeu)).
-- **Verrouiller le menu homebrew ›** ouvre *Console › Forwarders*, où il se verrouille après ses vérifications (voir [Forwarders](#forwarders)).
+- **Verrouiller le menu homebrew ›** ouvre *Security › Forwarders*, où il se verrouille après ses vérifications (voir [Forwarders](#forwarders)).
 - **Quitter** alors que le contrôle parental est encore déverrouillé propose de le reverrouiller (*Réactiver et quitter* ferme aussi le jeu par-dessus lequel PlayGuard a été ouvert, retour au menu HOME plutôt qu'à hbmenu) ; fermé depuis le menu HOME à la place, PlayGuard le reverrouille à son prochain lancement, et un redémarrage de la console le reverrouille de lui-même. La pause de PlayGuard lui-même ne demande rien : elle se termine à la fermeture.
 
 ### Application mobile
@@ -349,80 +367,11 @@ Deux confirmations, irréversible ; une sauvegarde des réglages est d'abord enr
 
 ### Bloqué ?
 
-Le dernier de l'onglet : le sysmodule de récupération facultatif, pour un code PIN oublié avec une limite de 0 minute. Ⓐ l'ouvre dans *Console › Modules facultatifs*, qui l'installe.
-
-## Historique — ce que PlayGuard a changé, et les sauvegardes
-
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
-
-**En haut**, combien de modifications sont enregistrées et le jour de la dernière sauvegarde, en tuiles : une coche turquoise, ou un triangle orange quand il n'y en a aucune, ou aucune depuis 30 jours.
-
-### Historique des modifications
-
-- Les 500 dernières modifications faites par PlayGuard (limites, niveau de restriction, code PIN, déverrouillages, dissociation, horloge, restaurations, mise en pause ou reprise du décompte…) et ce qu'il a vu changer en dehors de lui, regroupées par jour (*Aujourd'hui*, *Hier*, puis le jour et la date), avec l'heure et depuis où ; une limite changée pour un seul jour nomme ce jour.
-- Une modification **refusée** par la console apparaît aussi, en orange, avec l'erreur de la console et ce qui était demandé (jamais remise : rien n'a changé).
-- *Afficher* ne garde qu'un type (temps de jeu, restrictions, sécurité et appli, vu en dehors de PlayGuard, refusé par la console) ; *Exporter ce qui est affiché* l'écrit dans `exports/` en CSV, JSON, XLSX ou PDF.
-- Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis.
-- Chaque modification garde la version de PlayGuard qui l'a faite (une version de développement : dite telle, avec son commit et, pour la version d'une pull request, son numéro) ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
-
-### Sauvegardes
-
-- **Sauvegarder / restaurer les réglages** sur la carte SD : niveau de restriction, réglages personnalisés, mode VR, organisme de classification, limites quotidiennes, alarme « temps écoulé » (avec les actions avancées activées), et pour mémoire le bloc brut du minuteur — jamais le code PIN.
-- La restauration ne liste que ce qui changerait (rien à changer : elle le dit simplement, sans déverrouillage ni écriture), et signale quand la sauvegarde avait une alarme du coucher (elle n'est pas réécrite).
-- Nombre de sauvegardes conservées au choix.
-
-## Console — l'horloge réseau, les jeux installés, ce que fait tourner la console
-
-*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
-
-**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis les outils en tuiles, sous *Outils* (*Horloge réseau*, *Jeux installés* et *Forwarders* ; les deux premiers montrent dans leur coin ce qui demande un coup d'œil ; puis *Accès à distance* et *Modules facultatifs*), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
-
-### Horloge réseau
-
-*Horloge réseau ›*, un écran à part — l'horloge dont dépend le minuteur. Une console qui n'atteint jamais les serveurs de Nintendo garde cette horloge imprécise, ce qui fausse le minuteur.
-
-- **Horloges console et réseau**, fuseau horaire, précision. Quand la redirection DNS d'Atmosphère (`atmosphere/hosts`) envoie ailleurs le serveur d'heure de Nintendo (`aauth-lp1.ndas.srv.nintendo.net`), la console ne peut plus régler son horloge réseau elle-même : cet écran, l'entrée de la cloche et la carte d'*Aujourd'hui* le disent et renvoient à la mesure ci-dessous.
-- **Choix d'un serveur NTP public** (≈ 50 intégrés, par région, ou le vôtre).
-- **Mesure** sur 3 serveurs (médiane ; alerte orange en cas de désaccord) : une fenêtre affiche le résultat — l'avance ou le retard de l'horloge réseau, en grand, l'heure des serveurs face à celle de l'horloge réseau, la réponse de chaque serveur — et règle l'horloge réseau depuis là. Une mesure reste utilisable 2 minutes, avec un décompte sous *Régler l'horloge réseau*. La confirmation le dit : changer l'horloge remet à zéro le temps de jeu du jour, toute la limite redevient donc disponible.
-- **Vérification de l'horloge réseau au lancement** : une notification si elle a plus d'une minute d'écart ; elle ne règle jamais l'horloge.
-
-#### Aucun serveur ne répond
-
-Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé dans la fenêtre du résultat, *Régler l'horloge réseau sur l'horloge de la console* sous la mesure (et sur la carte de l'horloge réseau d'*Aujourd'hui*, quand sa mesure échoue), derrière la même confirmation.
-
-- PlayGuard n'a rien d'autre pour comparer l'horloge de la console : la confirmation affiche son heure et demande de la vérifier d'abord avec un téléphone ou une montre, et une horloge de console antérieure à 2026 (jamais réglée) est refusée.
-- Avec *Synchroniser l'horloge via Internet* désactivé, l'horloge de la console ne bouge pas, et activer le réglage ensuite ne la fait plus sauter ; s'il est activé, l'horloge de la console suit déjà l'horloge réseau, et la confirmation indique de le désactiver et de régler l'heure à la main si elle est fausse.
-- Seule l'horloge est écrite, pas le contrôle parental : aucun déverrouillage n'est nécessaire (le code PIN de *Protéger PlayGuard par le code PIN* s'applique toujours) ; comme tout changement d'horloge, cela remet à zéro le temps de jeu du jour.
-- Pas encore essayé sur une console.
-
-### Jeux installés
-
-*Jeux installés* (une tuile sous *Console › Outils*) trouve les jeux que le menu HOME ne peut pas lancer ou afficher — une icône qui charge sans fin, un « ! », un cadre en pointillés — avec ce qui ne va pas et quoi faire, sous l'icône du jeu, et le nombre de jeux installés qui ont un problème.
-
-**Ce qu'il trouve :** nom et icône illisibles, jeu absent derrière sa mise à jour, plus rien d'installé, fichiers manquants, données corrompues repérées par la console, firmware plus récent requis par le jeu ou seulement par sa mise à jour, clés trop récentes pour le firmware, licence (ticket) manquante, console qui réclame une mise à jour retirée, carte SD illisible, lancement refusé par la console.
-
-**La liste a une section par solution**, chacune avec son nombre et quoi faire, les jeux au même problème regroupés (deux jeux au même nom se distinguent par leur version ou leur Title ID) :
-
-| Section | Ce qu'elle contient |
-|---|---|
-| **Réparables ici** | Ce que PlayGuard répare |
-| **À vérifier** | Des données dont la console doute : la vérification dit s'il faut réinstaller le jeu |
-| **À réinstaller** | Fichiers manquants ou inutilisables, ou données trouvées corrompues : supprimer, puis réinstaller |
-| **Firmware ou carte SD** | Le jeu va bien, la console non |
-
-- **Vérifier les données :** le résultat de la vérification des données reste attaché au jeu tant que la même version est installée : corrompues, il passe dans *À réinstaller* en *Corrompu (vérifié)*, avec la date et le code de la console ; intactes, il quitte la liste. *Vérifier ces jeux* vérifie toute la section *À vérifier*, un jeu après l'autre dans un seul dialogue, leurs jaquettes au-dessus (*jeu 2 sur 5*), puis dit combien sont corrompus, intacts ou n'ont pas pu être vérifiés, avec la suppression des jeux corrompus à portée de main.
-- **Plusieurs jeux à la fois :** Ⓨ sélectionne des jeux (une coche devant) ; dès le premier, une ligne au-dessus des sections dit combien, et A dessus sélectionne aussi une section entière, puis une seule action pour tous : vérifier leurs données, ou les supprimer (leur liste enregistrée d'abord, une seule question, un seul code PIN).
-- **En supprimer plusieurs :** les jaquettes s'envolent à mesure que chaque jeu part (un « ! » corail sur celui qui reste), la barre un segment par jeu (jusqu'à 20) ; à la fin, combien ont été supprimés et ce que cela a libéré, et le dialogue se ferme tout seul. S'il en reste : leurs jaquettes cerclées de corail, et *Réessayer* pour eux.
-- **Sous *À réinstaller*,** leur liste peut être enregistrée (JSON et texte, dans le dossier des exports : nom, Title ID, version, problème), et tous peuvent être supprimés d'un coup après une seule question et un seul code PIN : la liste est d'abord enregistrée, puis les jeux sont supprimés pour qu'un installeur ne les compte plus comme installés.
-- **Les actions :** quand une action est la solution, c'est le premier bouton du dialogue ; les autres suivent : accepter à nouveau la version installée (quand la console réclame une mise à jour retirée), supprimer seulement la mise à jour ou un contenu additionnel, vérifier si les données sont corrompues (la vérification de la console, avec sa progression et un bouton Annuler), ou supprimer le jeu.
-- Les versions sont affichées comme le jeu les affiche (*version 1.4.0*, *mise à jour n°4*) ; après une réparation, un message dit si le jeu fonctionne de nouveau. Les sauvegardes restent toujours ; chaque modification figure dans l'historique.
-- **Quand il vérifie :** la dernière vérification s'affiche tout de suite ; seuls les jeux dont l'entrée a changé sont ensuite revérifiés (tous une fois par jour, après une mise à jour du firmware, ou avec Ⓧ *Vérifier à nouveau*), chacun affiché dès qu'il est vérifié. Ⓧ *Vérifier à nouveau* ouvre un dialogue : les jaquettes des jeux qui défilent, une barre et le compte ; *Annuler* s'arrête après le jeu en cours, ce qui a été vérifié reste. Sans jeu encore listé, les jaquettes défilent dans la carte pendant la vérification.
-- Plusieurs jeux cassés à la fois orientent vers la carte SD ou vers un jeu installé depuis l'autre mémoire (sysMMC / emuMMC).
-- Ⓡ présente les jeux en **liste** ou en **jaquettes** (icône, nom et problème ; le choix est gardé), comme *Tous les jeux*.
+Le dernier de l'onglet : le sysmodule de récupération facultatif, pour un code PIN oublié avec une limite de 0 minute. Ⓐ l'ouvre dans *Boréale › Modules facultatifs*, qui l'installe.
 
 ### Forwarders
 
-*Forwarders ›*, un écran à part, une tuile sous *Outils* (aussi *Sécurité › Verrouiller le menu homebrew*) — un homebrew sur le menu HOME, avec son icône et son nom, lancé de là comme un jeu (un forwarder de NRO, comme sphaira les crée).
+*Forwarders ›*, un écran à part, une ligne de *Sécurité* (aussi *Sécurité › Verrouiller le menu homebrew*) — un homebrew sur le menu HOME, avec son icône et son nom, lancé de là comme un jeu (un forwarder de NRO, comme sphaira les crée).
 
 - **Une carte en haut** dit où en est le menu homebrew : verrouillé ou ouvert, ses chemins de retour (le forwarder de PlayGuard, les menus protégés, ceux jamais lancés depuis le menu HOME), ce qui l'ouvre encore sans le code PIN, et si le sysmodule de récupération est installé. Ⓐ dessus liste quoi faire, chaque action à portée d'un appui (l'étape suivante vers le verrou, protéger ou supprimer un forwarder qui l'ouvre sans code PIN, la vérification, la fiche de secours).
 - **La liste par groupes :** celui de PlayGuard, les autres qu'il a créés (protégés ou non, dans une même carte : l'icône dit lequel), ceux d'une autre application, ceux qui ne sont plus sur le menu HOME. Un forwarder protégé a un cadenas sur son icône (une coche pour un menu vu en marche à travers son portail), un forwarder créé ici sans code PIN un cadenas ouvert orange.
@@ -431,7 +380,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 - **Un autre homebrew** (confirmé avec ce que le menu HOME affichera : son icône, son nom et son éditeur) : n'importe quel `.nro` du dossier `/switch` de la carte SD (et d'un dossier en dessous), listé de A à Z avec son éditeur, sa version et son dossier, ceux déjà sur le menu HOME marqués, son nom demandé d'abord (celui du `.nro`, à garder ou à changer). Son icône est celle du `.nro`, convertie dans le JPEG de 256 × 256 qu'affiche le menu HOME quand elle a une autre taille ou est un PNG (une manette à sa place quand le `.nro` n'en a pas), comme le fait sphaira. Un chemin qui contient un espace est passé au homebrew entre guillemets.
 - **Les forwarders du menu HOME**, chacun avec son icône : ceux que PlayGuard a créés (Ⓐ : détails, renommer, changer l'éditeur, réinstaller, supprimer) et ceux d'une autre application (détails, supprimer). Ⓐ ouvre une fiche par sections (*Ce forwarder*, *Au lancement*, *Protection*, *Installer et supprimer*) sous son icône et son état, chaque ligne avec son icône et ce qui est réglé (ses horaires ; un interrupteur pour *Demander le code PIN*, *Fermé une fois le temps de jeu du jour écoulé* et chaque option de lancement), *Supprimer* en rouge ; B ou un toucher en dehors la ferme. *Détails* liste ses règles de la même façon, puis son éditeur, sa version, son `.nro` et son ID de programme ; Ⓐ sur une règle (ou l'éditeur) la change, comme dans la fiche. Sous les forwarders protégés, une ligne dit ce que veut dire chaque icône qui y apparaît. Celui dont le `.nro` a disparu le dit ; celui supprimé dans les paramètres de la console reste listé jusqu'à ce qu'il soit réinstallé ou oublié. Réinstaller garde son ID de programme : l'entrée du menu HOME est remplacée, pas doublée ; un forwarder créé par un autre outil pour le même `.nro` est remplacé aussi.
 - **Protégé par le code PIN** (Ⓐ › *Protéger par le code PIN*, pour un forwarder créé par PlayGuard autre que le sien) : lancé depuis le menu HOME, le forwarder ouvre d'abord une petite porte (`config/playguard/gate.nro`, quelques centaines de kilo-octets que PlayGuard écrit depuis ses propres fichiers), qui affiche aussitôt l'écran du code PIN de la console, puis le homebrew une fois le bon code PIN entré ; B y ramène au menu HOME. Autour de l'écran du code PIN, celui de la porte : l'icône et le nom du homebrew, *Protégé par PlayGuard*, et l'issue (lancement, horaires libres, code PIN non saisi), à la manière de l'écran de chargement de PlayGuard, dans sa langue et son thème (*Préférences*) (`make gate-preview` le dessine sur un ordinateur). Il garde son ID de programme et son icône, et l'historique des modifications le note. Sa ligne montre ses règles en icônes, une par règle activée : une clé pour le code PIN, un cadenas ouvert pour des horaires sans code PIN, un carré (stop) pour des horaires où il ne s'ouvre jamais, un minuteur pour fermé une fois le temps de jeu du jour écoulé ; *Détails* (Ⓐ) les donne en toutes lettres. Il faut un code PIN sur la console. *Ne plus demander le code PIN* le demande d'abord, quel que soit le réglage *Protéger PlayGuard par le code PIN*, tout comme le supprimer ou le refaire sans code PIN (*Ajouter un forwarder* pour le même `.nro`). Seule l'icône du menu HOME est protégée : le `.nro` se lance toujours depuis le menu homebrew, sauf s'il est verrouillé (plus bas). Un forwarder protégé par un PlayGuard antérieur lance PlayGuard lui-même comme porte, ce qui fonctionne toujours ; *Tout réinstaller* le fait passer à la petite porte.
-  - **Horaires sans code PIN** (Ⓐ sur un forwarder protégé) : tous les jours, du lundi au vendredi ou le week-end, d'une heure à une autre (y compris après minuit), ou *Du lundi au vendredi, et le week-end à part* (une plage pour chacun) ; *Détails* indique quand. Les régler demande le code PIN. Elles suivent l'horloge de la console, que les Paramètres de la console peuvent changer : dès qu'elle s'écarte de plus de 5 minutes de l'horloge réseau, la porte demande quand même le code PIN (*Pas d'horaires libres : l'horloge de la console diffère de l'horloge réseau*), et de même quand l'horloge réseau ne peut pas être lue pour la vérifier (*Pas d'horaires libres : l'horloge réseau ne peut pas être lue pour vérifier celle de la console*) ; *Console › Horloge réseau* remet les deux à l'heure, sur une console sans Internet aussi.
+  - **Horaires sans code PIN** (Ⓐ sur un forwarder protégé) : tous les jours, du lundi au vendredi ou le week-end, d'une heure à une autre (y compris après minuit), ou *Du lundi au vendredi, et le week-end à part* (une plage pour chacun) ; *Détails* indique quand. Les régler demande le code PIN. Elles suivent l'horloge de la console, que les Paramètres de la console peuvent changer : dès qu'elle s'écarte de plus de 5 minutes de l'horloge réseau, la porte demande quand même le code PIN (*Pas d'horaires libres : l'horloge de la console diffère de l'horloge réseau*), et de même quand l'horloge réseau ne peut pas être lue pour la vérifier (*Pas d'horaires libres : l'horloge réseau ne peut pas être lue pour vérifier celle de la console*) ; *Temps de jeu › Horloge réseau* remet les deux à l'heure, sur une console sans Internet aussi.
   - **Heures où il ne s'ouvre jamais** (Ⓐ sur un forwarder protégé), réglées de la même façon : la porte dit alors *Pas à cette heure-ci* et les heures, et revient au menu HOME, même avec le code PIN (le coucher pour les homebrews). Elles passent avant les heures sans code PIN. Quand l'horloge de la console s'écarte de plus de 5 minutes de l'horloge réseau, il reste fermé dès que l'une des deux est dans ces heures, et la pause après les refus se compte à l'horloge réseau et à l'horloge continue de la console (qu'aucun réglage ne déplace) : changer l'heure ne les contourne pas.
   - **Fermé une fois le temps de jeu du jour écoulé** (Ⓐ sur un forwarder protégé) : quand la minuterie de la console n'a plus de temps aujourd'hui, la porte dit *Le temps de jeu du jour est écoulé* et revient au menu HOME, code PIN ou non. Désactivé tant qu'on ne le règle pas.
   - **Les règles sont dans le forwarder, pas sur la carte SD :** les horaires, la limite du jour et la pause après les refus vont dans les données du forwarder lui-même (sur la mémoire de la console) : un ordinateur ne peut pas ajouter d'horaires libres en modifiant un fichier ; en changer une refait le forwarder, en quelques secondes. Le forwarder garde aussi le SHA-256 de la porte (`config/playguard/gate-<empreinte>.nro`) : une porte modifiée sur la carte SD n'est pas lancée (erreur 2347-0100, [dépannage](troubleshooting.md#un-forwarder-protégé-affiche-lerreur-2347-0100)). Un forwarder protégé par un PlayGuard plus ancien lit ses règles sur la carte : ses horaires sans code PIN ne sont alors pas respectés, et la cloche propose *Refaire*.
@@ -461,17 +410,60 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
   - Avec le sysmodule de récupération installé (facultatif, [sysmodule/README.md](../../sysmodule/README.md)), une requête `RESCUE` le lève aussi au démarrage, tout comme une mise à jour d'Atmosphère depuis le verrouillage (les patchs de signature peuvent avoir du retard, et aucun forwarder ne démarre sans eux) : PlayGuard le signale à l'ouverture suivante et propose de reverrouiller.
 - **Un forwarder supprimé en dehors de PlayGuard** (dans les Paramètres) : noté une fois dans l'historique, et dans la cloche tant que ça dure, avec *Réinstaller* ou *Oublier* sur sa ligne.
 - **Dans les sauvegardes des réglages** (*Historique › Sauvegardes*) : ce que PlayGuard a créé et si le menu homebrew était verrouillé. Restaurer une sauvegarde propose, après le reste, de remettre les forwarders qui ne sont plus sur le menu HOME (protégés comme avant, avec leurs heures et leur icône) ; le verrou est seulement signalé, à refaire depuis cet écran.
-- **Patchs de signature :** la console ne lance un forwarder qu'avec des patchs de signature de fs et du loader (sys-patch, ou des fichiers sigpatch), chaque motif que sys-patch prévoit pour ce firmware étant appliqué. Quand ils manquent, ou que sys-patch en a laissé un de côté (un sys-patch plus ancien que le firmware), l'écran le dit au-dessus de la liste en nommant ce qui n'est pas patché, et ajouter un forwarder, créer celui de PlayGuard ou tout réinstaller préviennent d'abord que le forwarder ne démarrerait pas encore : l'ajouter quand même (il démarrera une fois les patchs en place), ou annuler. Le verrouillage du menu homebrew les attend aussi (*Console › Patchs de jeux* donne le détail). Des fichiers sigpatches laissés à côté de sys-patch sont signalés, et *Console › Patchs de jeux* les met de côté (déplacés, jamais supprimés). Chaque forwarder garde le chargeur avec lequel il a été construit, et un forwarder protégé le badge qu'il porte : ceux faits par un PlayGuard plus ancien avec un autre chargeur ou un autre badge sont proposés à refaire (la cloche, *Console › Forwarders*). Le `.nro` reste où il est ; supprimer un forwarder n'y touche jamais.
+- **Patchs de signature :** la console ne lance un forwarder qu'avec des patchs de signature de fs et du loader (sys-patch, ou des fichiers sigpatch), chaque motif que sys-patch prévoit pour ce firmware étant appliqué. Quand ils manquent, ou que sys-patch en a laissé un de côté (un sys-patch plus ancien que le firmware), l'écran le dit au-dessus de la liste en nommant ce qui n'est pas patché, et ajouter un forwarder, créer celui de PlayGuard ou tout réinstaller préviennent d'abord que le forwarder ne démarrerait pas encore : l'ajouter quand même (il démarrera une fois les patchs en place), ou annuler. Le verrouillage du menu homebrew les attend aussi (*Console › Patchs de jeux* donne le détail). Des fichiers sigpatches laissés à côté de sys-patch sont signalés, et *Console › Patchs de jeux* les met de côté (déplacés, jamais supprimés). Chaque forwarder garde le chargeur avec lequel il a été construit, et un forwarder protégé le badge qu'il porte : ceux faits par un PlayGuard plus ancien avec un autre chargeur ou un autre badge sont proposés à refaire (la cloche, *Security › Forwarders*). Le `.nro` reste où il est ; supprimer un forwarder n'y touche jamais.
 - **Temps de jeu :** lancé depuis son icône, un homebrew tourne comme un jeu : le temps de jeu le compte et le suspend comme n'importe quel jeu une fois le temps écoulé, et Activité le liste. PlayGuard reste accessible depuis le menu des homebrews.
 - Chaque modification demande le code PIN quand *Protéger PlayGuard par le code PIN* le prévoit, est refusée en lecture seule et figure dans l'historique. Ce que PlayGuard a créé est gardé par système (sysMMC / emuMMC), dans `forwarders.json`.
 
-### Accès à distance
+## Historique — ce que PlayGuard a changé, et les sauvegardes
 
-*Accès à distance ›*, une tuile sous *Outils* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Les réglages du broker (son adresse, l'utilisateur, la version de MQTT, le nom de la console : l'écran que partagent les autres homebrews Boréale), que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux et l'icône de chacun ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis la Marketplace et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal (un écran à part : filtre, export).
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=history&utm_source=github&utm_medium=docs)*
 
-### Modules facultatifs
+**En haut**, combien de modifications sont enregistrées et le jour de la dernière sauvegarde, en tuiles : une coche turquoise, ou un triangle orange quand il n'y en a aucune, ou aucune depuis 30 jours.
 
-*Modules facultatifs ›*, une tuile sous *Outils* : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son propre écran, une liste comme celui de l'agent) et l'agent Boréale, qui garde le lien à distance (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
+### Historique des modifications
+
+- Les 500 dernières modifications faites par PlayGuard (limites, niveau de restriction, code PIN, déverrouillages, dissociation, horloge, restaurations, mise en pause ou reprise du décompte…) et ce qu'il a vu changer en dehors de lui, regroupées par jour (*Aujourd'hui*, *Hier*, puis le jour et la date), avec l'heure et depuis où ; une limite changée pour un seul jour nomme ce jour.
+- Une modification **refusée** par la console apparaît aussi, en orange, avec l'erreur de la console et ce qui était demandé (jamais remise : rien n'a changé).
+- *Afficher* ne garde qu'un type (temps de jeu, restrictions, sécurité et appli, vu en dehors de PlayGuard, refusé par la console) ; *Exporter ce qui est affiché* l'écrit dans `exports/` en CSV, JSON, XLSX ou PDF.
+- Ⓐ sur une modification l'affiche et, pour une valeur, **remet la précédente** — avec le même déverrouillage et le même code PIN que toute modification, en signalant si elle a changé depuis.
+- Chaque modification garde la version de PlayGuard qui l'a faite (une version de développement : dite telle, avec son commit et, pour la version d'une pull request, son numéro) ; une modification enregistrée par une version plus récente de PlayGuard apparaît comme *Autre modification*.
+
+### Sauvegardes
+
+- **Sauvegarder / restaurer les réglages** sur la carte SD : niveau de restriction, réglages personnalisés, mode VR, organisme de classification, limites quotidiennes, alarme « temps écoulé » (avec les actions avancées activées), et pour mémoire le bloc brut du minuteur — jamais le code PIN.
+- La restauration ne liste que ce qui changerait (rien à changer : elle le dit simplement, sans déverrouillage ni écriture), et signale quand la sauvegarde avait une alarme du coucher (elle n'est pas réécrite).
+- Nombre de sauvegardes conservées au choix.
+
+## Console — les jeux installés, ce que fait tourner la console
+
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=console&utm_source=github&utm_medium=docs)*
+
+**En haut**, ce que fait tourner la console en tuiles, sous *Système* (le firmware, Atmosphère, hekate quand il est sur la carte SD et sys-patch quand il est installé ; Ⓐ ouvre ses notes de version), puis *Jeux installés* en tuile, sous *Outils* (elle montre dans son coin ce qui demande un coup d'œil), puis les lignes de la console, la compatibilité en premier (une coche turquoise seule quand PlayGuard a été vérifié sur ce firmware, sinon un triangle et ce qui ne va pas).
+
+### Jeux installés
+
+*Jeux installés* (une tuile de *Console*) trouve les jeux que le menu HOME ne peut pas lancer ou afficher — une icône qui charge sans fin, un « ! », un cadre en pointillés — avec ce qui ne va pas et quoi faire, sous l'icône du jeu, et le nombre de jeux installés qui ont un problème.
+
+**Ce qu'il trouve :** nom et icône illisibles, jeu absent derrière sa mise à jour, plus rien d'installé, fichiers manquants, données corrompues repérées par la console, firmware plus récent requis par le jeu ou seulement par sa mise à jour, clés trop récentes pour le firmware, licence (ticket) manquante, console qui réclame une mise à jour retirée, carte SD illisible, lancement refusé par la console.
+
+**La liste a une section par solution**, chacune avec son nombre et quoi faire, les jeux au même problème regroupés (deux jeux au même nom se distinguent par leur version ou leur Title ID) :
+
+| Section | Ce qu'elle contient |
+|---|---|
+| **Réparables ici** | Ce que PlayGuard répare |
+| **À vérifier** | Des données dont la console doute : la vérification dit s'il faut réinstaller le jeu |
+| **À réinstaller** | Fichiers manquants ou inutilisables, ou données trouvées corrompues : supprimer, puis réinstaller |
+| **Firmware ou carte SD** | Le jeu va bien, la console non |
+
+- **Vérifier les données :** le résultat de la vérification des données reste attaché au jeu tant que la même version est installée : corrompues, il passe dans *À réinstaller* en *Corrompu (vérifié)*, avec la date et le code de la console ; intactes, il quitte la liste. *Vérifier ces jeux* vérifie toute la section *À vérifier*, un jeu après l'autre dans un seul dialogue, leurs jaquettes au-dessus (*jeu 2 sur 5*), puis dit combien sont corrompus, intacts ou n'ont pas pu être vérifiés, avec la suppression des jeux corrompus à portée de main.
+- **Plusieurs jeux à la fois :** Ⓨ sélectionne des jeux (une coche devant) ; dès le premier, une ligne au-dessus des sections dit combien, et A dessus sélectionne aussi une section entière, puis une seule action pour tous : vérifier leurs données, ou les supprimer (leur liste enregistrée d'abord, une seule question, un seul code PIN).
+- **En supprimer plusieurs :** les jaquettes s'envolent à mesure que chaque jeu part (un « ! » corail sur celui qui reste), la barre un segment par jeu (jusqu'à 20) ; à la fin, combien ont été supprimés et ce que cela a libéré, et le dialogue se ferme tout seul. S'il en reste : leurs jaquettes cerclées de corail, et *Réessayer* pour eux.
+- **Sous *À réinstaller*,** leur liste peut être enregistrée (JSON et texte, dans le dossier des exports : nom, Title ID, version, problème), et tous peuvent être supprimés d'un coup après une seule question et un seul code PIN : la liste est d'abord enregistrée, puis les jeux sont supprimés pour qu'un installeur ne les compte plus comme installés.
+- **Les actions :** quand une action est la solution, c'est le premier bouton du dialogue ; les autres suivent : accepter à nouveau la version installée (quand la console réclame une mise à jour retirée), supprimer seulement la mise à jour ou un contenu additionnel, vérifier si les données sont corrompues (la vérification de la console, avec sa progression et un bouton Annuler), ou supprimer le jeu.
+- Les versions sont affichées comme le jeu les affiche (*version 1.4.0*, *mise à jour n°4*) ; après une réparation, un message dit si le jeu fonctionne de nouveau. Les sauvegardes restent toujours ; chaque modification figure dans l'historique.
+- **Quand il vérifie :** la dernière vérification s'affiche tout de suite ; seuls les jeux dont l'entrée a changé sont ensuite revérifiés (tous une fois par jour, après une mise à jour du firmware, ou avec Ⓧ *Vérifier à nouveau*), chacun affiché dès qu'il est vérifié. Ⓧ *Vérifier à nouveau* ouvre un dialogue : les jaquettes des jeux qui défilent, une barre et le compte ; *Annuler* s'arrête après le jeu en cours, ce qui a été vérifié reste. Sans jeu encore listé, les jaquettes défilent dans la carte pendant la vérification.
+- Plusieurs jeux cassés à la fois orientent vers la carte SD ou vers un jeu installé depuis l'autre mémoire (sysMMC / emuMMC).
+- Ⓡ présente les jeux en **liste** ou en **jaquettes** (icône, nom et problème ; le choix est gardé), comme *Tous les jeux*.
 
 ### Les lignes de la console
 
@@ -480,6 +472,24 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 - **Compatibilité**, puis **stockage** (emuMMC ou sysMMC, avec une icône d'information quand l'autre système a son propre contrôle parental : Ⓐ explique).
 - Le **masquage du numéro de série** par Atmosphère (*Oui (XAW00000000000)*, le numéro que le système voit alors ; en emuMMC, s'il n'est pas masqué, une icône d'avertissement, que Ⓐ explique), puis le **vrai numéro de série** de la console, le milieu caché : s'il est masqué, lu dans la sauvegarde du PRODINFO qu'Atmosphère garde dans `atmosphere/automatic_backups/` (celle de cette console, d'après son identifiant, quand la carte SD en contient plusieurs). Ⓐ sur son icône d'info l'affiche en entier et dit d'où il vient.
 - **Patchs de jeux** (sys-patch ou fichiers sigpatches, avec une recommandation de sys-patch quand seuls des fichiers sont utilisés : une icône d'information, ou d'avertissement quand quelque chose est à vérifier, que Ⓐ explique).
+
+## Boréale — le lien distant, les modules facultatifs, les autres homebrews
+
+*[L'essayer dans le simulateur ›](https://guard.boreale.dev/simulator/?tab=boreale&utm_source=github&utm_medium=docs)*
+
+Ce que PlayGuard partage avec les autres homebrews Boréale, dans un onglet à part : *Accès à distance*, *Modules facultatifs* et *Homebrews Boréale*.
+
+### Accès à distance
+
+*Accès à distance ›*, la première ligne de l'onglet *Boréale* : un lien facultatif avec un broker MQTT et Home Assistant sur votre réseau local, désactivé par défaut ([le guide Home Assistant](../home-assistant.fr.md)). Les réglages du broker (son adresse, l'utilisateur, la version de MQTT, le nom de la console : l'écran que partagent les autres homebrews Boréale), que faire des ordres (demander sur la console, les exécuter, les refuser), s'ils peuvent changer le temps de jeu (désactivé par défaut), la découverte Home Assistant, les informations de la console elle-même (modèle, versions, stockage, batterie, réseau, jeux et l'icône de chacun ; le numéro de série seulement avec *Publier le numéro de série*), des QR codes qui installent l'intégration PlayGuard depuis la Marketplace et ajoutent la console (une fois installée, sa version et sa nouvelle version), l'état en direct, *Synchroniser maintenant* et le journal (un écran à part : filtre, export).
+
+### Modules facultatifs
+
+*Modules facultatifs ›*, la deuxième ligne de l'onglet *Boréale* : installer, mettre à jour, lancer au démarrage ou supprimer le sysmodule de récupération (son propre écran, une liste comme celui de l'agent) et l'agent Boréale, qui garde le lien à distance (son propre écran, le même que dans les autres applications Boréale : on peut aussi le démarrer et l'arrêter), depuis les copies que contient PlayGuard (sans ordinateur). Chaque changement demande le code PIN quand *Protéger PlayGuard par le code PIN* le fait.
+
+### Les homebrews Boréale
+
+*Homebrews Boréale* liste les homebrews de la famille Boréale installés sur la console, tels que chacun s'ajoute à son démarrage (`config/boreale/apps/`), PlayGuard en premier, chacun avec sa version. Ⓐ sur un autre le lance une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message dit de l'ouvrir de là. Un homebrew supprimé de la carte SD quitte la liste.
 
 ## Préférences
 
@@ -493,9 +503,7 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 - Les messages qu'il affiche :
   - Les types de notifications (voir [plus haut](#comportement-des-entrées)).
   - Un **rappel mensuel pour soutenir PlayGuard** (activé par défaut, jamais le premier mois ni juste après une mise à jour ; *Ne plus afficher* sur le rappel ou cet interrupteur le désactive pour de bon, mises à jour comprises).
-- Sa mise à jour : *Rechercher les mises à jour chaque jour* au lancement, et *Mettre à jour avec* (voir [À propos](#version-et-mises-à-jour)).
-- **Premiers pas** à nouveau (aussi dans *À propos › Aide et diagnostic*).
-- Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Sécurité*, la vérification de l'horloge dans *Console › Horloge réseau*. L'historique des modifications et les sauvegardes ont leur onglet, [Historique](#historique--ce-que-playguard-a-changé-et-les-sauvegardes) ; la recherche d'une mise à jour et *Aide et diagnostic* sont dans *À propos*.
+- Un réglage qui ne concerne qu'une fonction est à côté d'elle : le temps en plus dans *Temps de jeu*, la réactivation dans *Sécurité*, la vérification de l'horloge dans *Temps de jeu › Horloge réseau*. L'historique des modifications et les sauvegardes ont leur onglet, [Historique](#historique--ce-que-playguard-a-changé-et-les-sauvegardes) ; sa mise à jour, *Premiers pas* et *Aide et diagnostic* sont dans *À propos* ; le lien distant, les modules facultatifs et les autres homebrews Boréale dans *Boréale*.
 
 ## À propos
 
@@ -505,24 +513,20 @@ Sur une console sans Internet, *Utiliser l'horloge de la console* est proposé d
 
 - En haut, sa carte : la marque, le nom, la version.
 - PlayGuard installé : version (en ambre quand une plus récente est sortie ; Ⓐ ouvre ses **notes de version**).
-- **Recherche d'une mise à jour** maintenant ; *Rechercher les mises à jour chaque jour* au lancement est dans *Préférences*.
-- *Mettre à jour avec* (dans *Préférences*) : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi). Passer la main à un store demande le code PIN comme une modification (*Protéger PlayGuard par le code PIN › Avant une modification*), et toujours quand le menu homebrew est verrouillé : un store lance n'importe quel homebrew. Installé depuis le Homebrew App Store ou l'App Store de sphaira, c'est le store qui est recommandé, pour qu'il suive la version ; quand son catalogue n'a pas encore la nouvelle version (il la publie après une vérification, souvent quelques jours plus tard), PlayGuard le dit et propose de se mettre à jour lui-même. *Entrée dans le menu GitHub de sphaira* (dans *Préférences*, activé par défaut) garde PlayGuard dans le menu *GitHub* de sphaira, qui a chaque version dès sa sortie : avec elle, *Mettre à jour avec › sphaira* y renvoie, sans passer par le store.
+- **Recherche d'une mise à jour** maintenant ; *Rechercher les mises à jour chaque jour* au lancement, sous *Mises à jour* aussi.
+- *Mettre à jour avec* : dans PlayGuard, qui télécharge la version, la vérifie, se remplace et redémarre, ou sphaira, le Homebrew App Store ou à la main (demandé à la première mise à jour si rien n'est choisi). Passer la main à un store demande le code PIN comme une modification (*Protéger PlayGuard par le code PIN › Avant une modification*), et toujours quand le menu homebrew est verrouillé : un store lance n'importe quel homebrew. Installé depuis le Homebrew App Store ou l'App Store de sphaira, c'est le store qui est recommandé, pour qu'il suive la version ; quand son catalogue n'a pas encore la nouvelle version (il la publie après une vérification, souvent quelques jours plus tard), PlayGuard le dit et propose de se mettre à jour lui-même. *Entrée dans le menu GitHub de sphaira* (dans *Préférences*, activé par défaut) garde PlayGuard dans le menu *GitHub* de sphaira, qui a chaque version dès sa sortie : avec elle, *Mettre à jour avec › sphaira* y renvoie, sans passer par le store.
 - Tant qu'une version plus récente est connue, PlayGuard s'ouvre sur **PlayGuard X.Y.Z est disponible** (sa date et ses notes) : *Mettre à jour*, ou *Plus tard* pour 1 jour, 1 semaine ou 30 jours au plus.
 - Les notes de version sont celles de PlayGuard, sur le même écran que celles d'Atmosphère et de hekate dans *Console* : depuis ses versions GitHub, un onglet par version (l'installée, les plus récentes, les plus anciennes), chacune avec ses points forts en cartes et tous ses changements, gardées sur la carte SD pour une lecture hors ligne (celles de la version installée sont aussi dans l'application, quand rien n'a encore été récupéré).
 - Après une mise à jour, PlayGuard s'ouvre une fois sur **Nouveautés de la X.Y.Z** (les mêmes points forts, puis les QR codes).
 
 ### Aide et diagnostic
 
-*Aide et diagnostic ›*, un écran à part, sous *Rechercher une mise à jour* :
+Sous *Aide* : *Premiers pas*, puis *Aide et diagnostic ›*, un écran à part :
 
 - **En haut**, sous *Pour commencer*, deux tuiles : *Premiers pas* et *Envoyer un rapport…* ; puis *Diagnostic*.
 - **Premiers pas** rouvre le guide (avec une étape *Dissocier l'application mobile* tant qu'elle est associée, une étape *Réactiver l'alarme « temps écoulé »* tant qu'elle est désactivée, une étape *Protéger PlayGuard* une fois le code PIN défini — le choix *Protéger PlayGuard par le code PIN* —, et un interrupteur pour qu'il ne s'ouvre plus au lancement). Sous *Fermer*, *Soutenir PlayGuard* affiche les QR codes de soutien.
 - Comment PlayGuard a été lancé (une application par-dessus un jeu ou par son icône HOME, ou une applet) et son dossier des données.
 - **Exporter un rapport de diagnostic**, ou **l'envoyer en ligne** (*Envoyer un rapport…* ; voir [Signaler un bug](troubleshooting.md#signaler-un-bug)) ; combien de rapports enregistrés, de fichiers de plantage, de journaux de session et de liens des rapports envoyés en ligne sont gardés, par nombre, âge ou taille.
-
-### Les homebrews Boréale
-
-*Homebrews Boréale* liste les homebrews de la famille Boréale installés sur la console, tels que chacun s'ajoute à son démarrage (`config/boreale/apps/`), PlayGuard en premier, chacun avec sa version. Ⓐ sur un autre le lance une fois PlayGuard fermé ; quand PlayGuard n'a pas été lancé depuis le menu des homebrews, un message dit de l'ouvrir de là. Un homebrew supprimé de la carte SD quitte la liste.
 
 ### Crédits
 

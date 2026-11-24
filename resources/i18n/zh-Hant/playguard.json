@@ -15,6 +15,7 @@
         "clock": "網路時鐘",
         "security": "安全",
         "history": "紀錄",
+        "boreale": "Boréale",
         "console": "主機",
         "preferences": "偏好設定",
         "about": "關於"
@@ -208,6 +209,7 @@
         "profile_action_edit": "編輯上限…",
         "profile_action_rename": "重新命名…",
         "profile_edit_title": "設定檔：{}",
+        "section_reliability": "Reliability",
         "section_bedtime": "就寢時間",
         "bedtime_reset": "可再次遊玩的時間",
         "bedtime_note": "適用於每一天，或依星期設定。到就寢時間時，主機會顯示鬧鐘，也可能中斷軟體（見「時間到時」），直到可以再次遊玩。PlayGuard 會檢查主機是否回報新的時間，否則會還原先前的設定。",
@@ -282,7 +284,7 @@
         "write_err": "無法套用遊玩時間上限",
         "removed": "已移除遊玩時間限制。",
         "remove_err": "無法移除遊玩時間限制",
-        "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「主機 › 網路時鐘」），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
+        "not_counting": "主機目前沒有計算遊玩時間。可能的原因：時鐘被調回（之後會重新計時）、網路時鐘從未設定（「遊玩時間限制 › 網路時鐘」），或剛寫入上限（啟動遊戲玩一分鐘後再查看）。",
         "limit_note": "達到上限時，主機會顯示「時間到」，然後依照「時間到時」的設定中斷遊戲或僅提醒。",
         "unsaved": "未儲存的進度可能會遺失：請先讓孩子存檔。",
         "profile_already": "設定檔「{}」已經套用。",
@@ -505,7 +507,7 @@
             "timeout": "無回應",
             "bad_reply": "回應無效"
         },
-        "start_off": "網路時鐘偏差{}（與{}比對）。遊玩時間限制依據此時鐘：請查看「主機 › 網路時鐘」。",
+        "start_off": "網路時鐘偏差{}（與{}比對）。遊玩時間限制依據此時鐘：請查看「遊玩時間限制 › 網路時鐘」。",
         "guided_body": "網路時鐘不準確，而遊玩時間限制依據此時鐘。\n\n要立即以{}測量時間嗎？（主機必須連線至網路。）設定時鐘前會再次詢問您。",
         "guided_measure": "立即測量",
         "guided_fine": "網路時鐘準確：不需要任何操作。",
@@ -1135,6 +1137,10 @@
         "refresh_title": "用舊載入器製作的轉發器",
         "refresh_detail": "{}：由舊版PlayGuard製作。重新製作後，它們會用此版本的載入器啟動各自的Homebrew。"
     },
+    "hub": {
+        "section_link": "Link and modules",
+        "section_homebrews": "Homebrews"
+    },
     "hbmenu": {
         "section": "自製軟體選單",
         "cell": "鎖定自製軟體選單",
@@ -1252,6 +1258,7 @@
         "credit_ui": "介面",
         "credit_family": "所屬",
         "section_support": "支持 PlayGuard",
+        "section_help": "說明",
         "support_note": "PlayGuard 免費、開源且無廣告。如果它對您的家庭有幫助，可以支持它的開發：用手機掃描 QR 碼（選取可放大）。",
         "whats_new_close": "繼續",
         "boreale": "Boréale 自製軟體"
@@ -1300,7 +1307,7 @@
         "forwarders_body": "此備份中還有{}個已不在HOME選單上的轉發器：{}。要復原嗎？",
         "forwarders_put_back": "復原",
         "forwarders_lock_title": "自製軟體選單曾被鎖定",
-        "forwarders_lock": "製作此備份時它處於鎖定狀態。請在主機 › 轉發器中重新鎖定：先進行檢查。"
+        "forwarders_lock": "製作此備份時它處於鎖定狀態。請在安全 › 轉發器中重新鎖定：先進行檢查。"
     },
     "update": {
         "title": "有可用更新"
@@ -1553,7 +1560,7 @@
     },
     "sync": {
         "title": "遠端存取",
-        "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（主機 › 選用模組）。Broker 的設定儲存在 {} 中，其餘儲存在 {} 中。",
+        "intro": "將這台主機連線到 MQTT broker（Home Assistant 的 Mosquitto 應用程式，或其他任何 broker）：Home Assistant 隨後會顯示它的狀態和遊玩時間，並可以向它傳送指令。連線在 PlayGuard 開啟期間運作，安裝選用的代理程式後則會一直運作（Boréale › 選用模組）。Broker 的設定儲存在 {} 中，其餘儲存在 {} 中。",
         "section_status": "連線",
         "status": "狀態",
         "sync_now": "立即同步",
@@ -1618,7 +1625,7 @@
         "status_agent": "代理程式 {} 負責維持連線：PlayGuard 把讀取到的內容交給它，並執行它轉交的指令。",
         "status_agent_read_only": "代理程式單獨執行時不會變更任何設定：PlayGuard 上次處於唯讀模式，或自 PlayGuard 上次執行以來韌體已變更。",
         "state_agent": "{} · 透過代理程式",
-        "state_agent_refused": "代理程式 {} 需要更新（主機 › 選用模組）",
+        "state_agent_refused": "代理程式 {} 需要更新（Boréale › 選用模組）",
         "ask_body": "透過遠端連線收到一則指令：{}。\n\n要在這台主機上執行嗎？",
         "ask_confirm": "執行",
         "done": "遠端指令已執行：{}。",
@@ -2075,7 +2082,7 @@
         "remove": "移除",
         "removed": "已移除排定的設定檔。",
         "soon": "透過 Home Assistant",
-        "soon_note": "PlayGuard 只在開啟時執行，因此無法在指定的日子自行切換設定檔。Home Assistant 可以：「主機 › 遠端存取」會將主機連線到它，再由自動化依據行事曆或學校假期選擇設定檔（它的「設定檔」選擇器）。"
+        "soon_note": "PlayGuard 只在開啟時執行，因此無法在指定的日子自行切換設定檔。Home Assistant 可以：「Boréale › 遠端存取」會將主機連線到它，再由自動化依據行事曆或學校假期選擇設定檔（它的「設定檔」選擇器）。"
     },
     "sigpatch": {
         "set_aside": "將Sigpatch檔案移到一旁",

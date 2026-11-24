@@ -19,13 +19,13 @@ Du kennst die Geheimzahl, aber die Smart-Geräte-App des Vorbesitzers ist noch v
 
 ### Der Timer sperrt alles (Limit von 0 Minuten) und die Geheimzahl ist vergessen
 
-PlayGuard selbst kann dann nicht starten. Installiere das optionale Wiederherstellungs-Sysmodul **vorher** (*Konsole › Optionale Module* oder `playguard-rescue.zip` von Hand); bist du ausgesperrt, lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte die Konsole — es hebt die Sperre der Konsole auf, damit PlayGuard öffnen kann. Siehe [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (auf Englisch).
+PlayGuard selbst kann dann nicht starten. Installiere das optionale Wiederherstellungs-Sysmodul **vorher** (*Boréale › Optionale Module* oder `playguard-rescue.zip` von Hand); bist du ausgesperrt, lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte die Konsole — es hebt die Sperre der Konsole auf, damit PlayGuard öffnen kann. Siehe [`sysmodule/rescue/README.md`](../../sysmodule/rescue/README.md) (auf Englisch).
 
 Das Sysmodul muss der Version von PlayGuard folgen: Entpacke bei jedem Update von PlayGuard die `playguard-rescue.zip` dieser Version erneut (oder *Aktualisieren* auf *Das Wiederherstellungs-Sysmodul ist veraltet* in der Benachrichtigungsglocke) und starte die Konsole dann neu. Ein älteres Sysmodul hinterlässt einen Bericht, den PlayGuard nicht prüfen kann: Der Wiederherstellungsbildschirm bietet dann nichts an, sagt, dass das Sysmodul älter ist, und ein erneutes `RESCUE` ergibt dasselbe, bis es aktualisiert ist.
 
 ### Homebrew-Menü gesperrt
 
-*Konsole › Forwarder › Homebrew-Menü sperren* verhindert, dass das Album und ein mit R gestartetes Spiel das Homebrew-Menü öffnen. Wenn der Forwarder von PlayGuard und das geschützte Menü beide weg sind (in den Systemeinstellungen gelöscht, oder auf dem anderen System: Die Sperre liegt auf der SD-Karte und wird von sysMMC und emuMMC gelesen):
+*Sicherheit › Forwarder › Homebrew-Menü sperren* verhindert, dass das Album und ein mit R gestartetes Spiel das Homebrew-Menü öffnen. Wenn der Forwarder von PlayGuard und das geschützte Menü beide weg sind (in den Systemeinstellungen gelöscht, oder auf dem anderen System: Die Sperre liegt auf der SD-Karte und wird von sysMMC und emuMMC gelesen):
 
 - **Von einem Computer aus:** Lösche `atmosphere/config/override_config.ini` auf der SD-Karte (oder lege `config/playguard/override_config.ini.backup` zurück, die Datei, wie sie war) und starte die Konsole dann neu.
 - **Mit installiertem Wiederherstellungs-Sysmodul** (optional): Lege eine leere Datei `config/playguard/RESCUE` auf die SD-Karte und starte neu; das Sysmodul hebt die Sperre beim Start auf, und PlayGuard sagt es bei seinem nächsten Start. Ein Update von Atmosphère seit dem Sperren hebt sie auf dieselbe Weise auf.
@@ -40,7 +40,7 @@ PlayGuard kann nicht helfen: Es braucht Atmosphère. Der offizielle Weg ist das 
 
 *Heute* sagt *Die Konsole zählt die Spielzeit gerade nicht*, wenn sie sich etwa 90 s lang nicht bewegt hat. Die wahrscheinlichen Ursachen:
 
-- **Die Netzwerkuhr wurde nie gestellt.** *Konsole › Netzwerkuhr › Zeitabweichung messen*, dann stelle sie ([Netzwerkuhr](features.md#netzwerkuhr)).
+- **Die Netzwerkuhr wurde nie gestellt.** *Spielzeit › Netzwerkuhr › Zeitabweichung messen*, dann stelle sie ([Netzwerkuhr](features.md#netzwerkuhr)).
 - **Die Uhr wurde zurückgestellt.** Nach einem Sprung zurück hält die Zählung an, bis die Uhr die alte Uhrzeit überschreitet; nichts zu tun.
 - **Ein Limit wurde gerade geschrieben.** Starte ein Spiel für eine Minute, dann prüfe erneut.
 - **Der Jugendschutz ist vorübergehend aufgehoben.** Die Spielzeit wird dann möglicherweise nicht gezählt: *Heute › Wieder aktivieren* (oder ein Tippen auf die Kapsel in der Kopfzeile).
@@ -76,15 +76,15 @@ Auf der Konsole läuft eine Firmware, die neuer ist als die neueste getestete: P
 
 ### Ein geschützter Forwarder zeigt Fehler 2347-0100
 
-Sein Tor (`config/playguard/gate-….nro`) ist nicht mehr die Datei, mit der der Forwarder erstellt wurde: Es wurde auf der SD-Karte verändert oder ersetzt, also startet der Forwarder es nicht. Öffne PlayGuard über seinen eigenen Forwarder: Es schreibt das Tor beim Start zurück; *Konsole › Forwarder › Alle neu installieren* erstellt damit jeden Forwarder neu.
+Sein Tor (`config/playguard/gate-….nro`) ist nicht mehr die Datei, mit der der Forwarder erstellt wurde: Es wurde auf der SD-Karte verändert oder ersetzt, also startet der Forwarder es nicht. Öffne PlayGuard über seinen eigenen Forwarder: Es schreibt das Tor beim Start zurück; *Sicherheit › Forwarder › Alle neu installieren* erstellt damit jeden Forwarder neu.
 
 ### Ein geschützter Forwarder schließt sich sofort („Ein Fehler ist aufgetreten“)
 
-Vor jedem Bildschirm von PlayGuard, ohne Fehlercode (der Bericht von Atmosphère in `atmosphere/crash_reports/` nennt das Modul `forwarder`, Ergebnis `2000-0000`): Er wurde von einem PlayGuard erstellt, dessen Tor ohne seine Ressourcen gebaut war, was der Loader des Forwarders abgelehnt hat. Aktualisiere PlayGuard und erstelle ihn dann neu: Die Glocke und *Konsole › Forwarder* bieten das für jeden Forwarder an, der mit einem älteren Loader erstellt wurde.
+Vor jedem Bildschirm von PlayGuard, ohne Fehlercode (der Bericht von Atmosphère in `atmosphere/crash_reports/` nennt das Modul `forwarder`, Ergebnis `2000-0000`): Er wurde von einem PlayGuard erstellt, dessen Tor ohne seine Ressourcen gebaut war, was der Loader des Forwarders abgelehnt hat. Aktualisiere PlayGuard und erstelle ihn dann neu: Die Glocke und *Sicherheit › Forwarder* bieten das für jeden Forwarder an, der mit einem älteren Loader erstellt wurde.
 
 ### Ein geschützter Forwarder bleibt nach der Geheimzahl auf dem Bildschirm seines Tors
 
-Die Geheimzahl wurde angenommen, der Bildschirm mit dem Symbol des Homebrews bleibt, und sonst passiert nichts: Sein Tor hat diesen Bildschirm mit einem einzigen Puffer gezeichnet und ewig darauf gewartet, den nächsten zu zeichnen. Aktualisiere PlayGuard und erstelle ihn dann neu: Die Glocke und *Konsole › Forwarder* bieten das für jeden Forwarder an, der mit einem älteren Tor erstellt wurde.
+Die Geheimzahl wurde angenommen, der Bildschirm mit dem Symbol des Homebrews bleibt, und sonst passiert nichts: Sein Tor hat diesen Bildschirm mit einem einzigen Puffer gezeichnet und ewig darauf gewartet, den nächsten zu zeichnen. Aktualisiere PlayGuard und erstelle ihn dann neu: Die Glocke und *Sicherheit › Forwarder* bieten das für jeden Forwarder an, der mit einem älteren Tor erstellt wurde.
 
 ### Ein Forwarder zeigt „Die Software konnte nicht gestartet werden“
 
@@ -93,7 +93,7 @@ Die Konsole hat sich geweigert, ihn zu starten: Eine Signaturprüfung ist noch a
 - **sigpatch-Dateien neben sys-patch.** `.ips`-Dateien in `atmosphere/kip_patches/fs_patches`, `loader_patches` oder `atmosphere/exefs_patches/es_patches`, während sys-patch läuft: zwei Werkzeuge, die dieselben Prüfungen patchen, die Ursache, die die Threads zu sys-patch und sigpatches auf GBAtemp am häufigsten nennen. *Konsole › Spiel-Patches* warnt davor, und Ⓐ dort legt sie beiseite (verschoben nach `config/playguard/sigpatches-aside/`, nie gelöscht; die `bootloader/patches.ini` von hekate bleibt). Starte die Konsole neu.
 - **Ein Muster, das sys-patch nicht angewendet hat.** Forwarder brauchen seine Patches für fs und loader, jedes Muster, das es für diese Firmware hat (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), nicht nur eines pro Modul. *Info › Hilfe & Diagnose › Diagnosebericht exportieren* führt in seiner Zeile `game patches` die Version von sys-patch und jedes ausgelassene Muster auf; `sd:/config/sys-patch/log.ini` enthält dasselbe. Prüfe, dass `config/sys-patch/config.ini` dieses System patcht (`patch_emummc=1` auf emuMMC) und keines davon ausschaltet; der Maintainer von sys-patch selbst sagt, dass 23.0.x kein neueres sys-patch als 1.6.2.3 braucht.
 - **Kein Neustart, seit sich die Patches geändert haben.** sys-patch patcht beim Booten.
-- **Ein Forwarder, den ein älteres PlayGuard erstellt hat.** Die Glocke und *Konsole › Forwarder* bieten an, die mit einem älteren Loader gebauten neu zu erstellen.
+- **Ein Forwarder, den ein älteres PlayGuard erstellt hat.** Die Glocke und *Sicherheit › Forwarder* bieten an, die mit einem älteren Loader gebauten neu zu erstellen.
 
 ### Die Glocke oder ein Tab zeigt ein bernsteinfarbenes Abzeichen
 

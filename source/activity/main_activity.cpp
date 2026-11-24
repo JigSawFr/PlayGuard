@@ -49,7 +49,7 @@ static void compact_sidebar(aurore::View* tab_frame)
     list->setPaddingTop(10);
     list->setPaddingBottom(10);
     for (aurore::View* v : list->getChildren()) {
-        if (dynamic_cast<aurore::SidebarItem*>(v)) v->setHeight(54);
+        if (dynamic_cast<aurore::SidebarItem*>(v)) v->setHeight(46);
         else v->setHeight(16);   // a separator: its line is drawn at mid-height
     }
 }
@@ -252,7 +252,7 @@ void MainActivity::update_notice_hint()
     static const std::pair<int, const char*> TABS[] = {
         { ui::tab::dashboard, "dashboard" }, { ui::tab::play_timer, "play_timer" }, { ui::tab::activity, "activity" },
         { ui::tab::security, "security" },   { ui::tab::history, "history" },       { ui::tab::console, "console" },
-        { ui::tab::preferences, "preferences" }, { ui::tab::about, "about" },
+        { ui::tab::boreale, "boreale" }, { ui::tab::preferences, "preferences" }, { ui::tab::about, "about" },
     };
     for (const auto& t : TABS)
         if (TabBadge* badge = TabBadge::of(sidebar->getItem(t.first))) badge->set_count(notices::tab_count(t.second));

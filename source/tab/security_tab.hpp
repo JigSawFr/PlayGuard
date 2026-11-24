@@ -35,6 +35,7 @@ class SecurityTab : public TabBase
     AURORE_BIND(aurore::DetailCell, temp,           "sc_temp");
     AURORE_BIND(aurore::DetailCell, hbmenu,         "sc_hbmenu");
     AURORE_BIND(aurore::DetailCell, hbmenu_lock,    "sc_hbmenu_lock");
+    AURORE_BIND(aurore::DetailCell, forwarders,     "sc_forwarders");
     AURORE_BIND(aurore::Header,     actions_header, "sc_actions_header");
     AURORE_BIND(aurore::DetailCell, set_pin,        "sc_set_pin");
     AURORE_BIND(aurore::DetailCell, pin_lock_cell,  "sc_pin_lock");

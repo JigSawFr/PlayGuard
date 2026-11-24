@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Boréale: what PlayGuard shares with the other Boréale homebrews: the
+     remote link (MQTT, Home Assistant: activity/sync_activity.hpp), the
+     optional sysmodules, among them the Boréale agent that keeps the link
+     going with PlayGuard closed (activity/modules_activity.hpp), and the
+     homebrews installed on the console (tab/boreale_tab). -->
+
+<aurore:Box
+    width="auto"
+    height="auto">
+
+    <ScrollView
+        width="auto"
+        height="auto"
+        grow="1.0">
+
+        <aurore:Box
+            width="auto"
+            height="auto"
+            axis="column"
+            alignItems="stretch"
+            paddingLeft="@style/aurore/tab_frame/content_padding_sides"
+            paddingRight="@style/aurore/tab_frame/content_padding_sides"
+            paddingTop="@style/aurore/tab_frame/content_padding_top_bottom"
+            paddingBottom="@style/aurore/tab_frame/content_padding_top_bottom">
+
+            <aurore:Header title="@i18n/playguard/hub/section_link" marginBottom="8"/>
+            <aurore:DetailCell id="bh_remote" title="@i18n/playguard/sync/title"/>
+            <aurore:DetailCell id="bh_modules" title="@i18n/playguard/modules/open"/>
+            <aurore:Header title="@i18n/playguard/hub/section_homebrews" marginTop="24" marginBottom="8"/>
+            <aurore:DetailCell id="bh_boreale" title="@i18n/playguard/about/boreale"/>
+
+        </aurore:Box>
+
+    </ScrollView>
+
+</aurore:Box>

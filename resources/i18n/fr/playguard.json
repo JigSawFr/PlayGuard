@@ -15,6 +15,7 @@
         "clock": "Horloge réseau",
         "security": "Sécurité",
         "history": "Historique",
+        "boreale": "Boréale",
         "console": "Console",
         "preferences": "Préférences",
         "about": "À propos"
@@ -208,6 +209,7 @@
         "profile_action_edit": "Modifier les limites…",
         "profile_action_rename": "Renommer…",
         "profile_edit_title": "Profil : {}",
+        "section_reliability": "Fiabilité",
         "section_bedtime": "Coucher",
         "bedtime_reset": "Jeu de nouveau permis à",
         "bedtime_note": "Tous les jours, ou par jour de la semaine. À l'heure du coucher, la console affiche l'alarme, et peut aussi suspendre le logiciel (voir « Quand le temps est écoulé »), jusqu'à ce que le jeu soit de nouveau permis. PlayGuard vérifie que la console indique la nouvelle heure, et remet les réglages précédents sinon.",
@@ -282,7 +284,7 @@
         "write_err": "Impossible d'appliquer la limite de temps de jeu",
         "removed": "Limite de temps de jeu supprimée.",
         "remove_err": "Impossible de supprimer la limite de temps de jeu",
-        "not_counting": "La console ne décompte pas le temps de jeu en ce moment. Causes probables : l'horloge a été reculée (le décompte reprendra plus tard), l'horloge réseau n'a jamais été réglée (Console › Horloge réseau), ou une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).",
+        "not_counting": "La console ne décompte pas le temps de jeu en ce moment. Causes probables : l'horloge a été reculée (le décompte reprendra plus tard), l'horloge réseau n'a jamais été réglée (Temps de jeu › Horloge réseau), ou une limite vient d'être écrite (lancez un jeu une minute, puis vérifiez).",
         "limit_note": "À la limite, la console affiche « temps écoulé », puis suspend le jeu ou se contente de prévenir, selon « Quand le temps est écoulé ».",
         "unsaved": "La progression non sauvegardée peut être perdue : laissez l'enfant sauvegarder d'abord.",
         "profile_already": "Le profil « {} » est déjà appliqué.",
@@ -505,7 +507,7 @@
             "timeout": "pas de réponse",
             "bad_reply": "réponse invalide"
         },
-        "start_off": "L'horloge réseau a {} d'écart (vérifiée avec {}). La limite de temps de jeu s'appuie dessus : voir Console › Horloge réseau.",
+        "start_off": "L'horloge réseau a {} d'écart (vérifiée avec {}). La limite de temps de jeu s'appuie dessus : voir Temps de jeu › Horloge réseau.",
         "guided_body": "L'horloge réseau est imprécise, et la limite de temps de jeu s'appuie dessus.\n\nMesurer l'heure avec {} maintenant ? (La console doit être connectée.) Le réglage de l'horloge vous sera ensuite proposé.",
         "guided_measure": "Mesurer maintenant",
         "guided_fine": "L'horloge réseau est précise : rien à faire.",
@@ -1135,6 +1137,10 @@
         "refresh_title": "Des forwarders faits avec un ancien chargeur",
         "refresh_detail": "{} : faits par un PlayGuard plus ancien. Refaits, ils lancent leur homebrew avec le chargeur de cette version."
     },
+    "hub": {
+        "section_link": "Lien et modules",
+        "section_homebrews": "Homebrews"
+    },
     "hbmenu": {
         "section": "Menu homebrew",
         "cell": "Verrouiller le menu homebrew",
@@ -1252,6 +1258,7 @@
         "credit_ui": "Interface",
         "credit_family": "Fait partie de",
         "section_support": "Soutenir PlayGuard",
+        "section_help": "Aide",
         "support_note": "PlayGuard est gratuit, libre et sans publicité. S'il aide votre famille, vous pouvez soutenir son développement : scannez un code avec votre téléphone (sélectionnez-le pour l'agrandir).",
         "whats_new_close": "Continuer",
         "boreale": "Homebrews Boréale"
@@ -1300,7 +1307,7 @@
         "forwarders_body": "Cette sauvegarde contient aussi {} forwarders qui ne sont plus sur le menu HOME : {}. Les remettre ?",
         "forwarders_put_back": "Les remettre",
         "forwarders_lock_title": "Le menu homebrew était verrouillé",
-        "forwarders_lock": "Il l'était quand cette sauvegarde a été faite. Reverrouillez-le depuis Console › Forwarders : ses vérifications passent d'abord."
+        "forwarders_lock": "Il l'était quand cette sauvegarde a été faite. Reverrouillez-le depuis Sécurité › Forwarders : ses vérifications passent d'abord."
     },
     "update": {
         "title": "Mise à jour disponible"
@@ -1553,7 +1560,7 @@
     },
     "sync": {
         "title": "Accès à distance",
-        "intro": "Relie cette console à un broker MQTT (l'application Mosquitto de Home Assistant, ou un autre) : Home Assistant affiche alors son état et son temps de jeu, et peut lui envoyer des ordres. Le lien fonctionne tant que PlayGuard est ouvert, ou en permanence avec l'agent facultatif (Console › Modules facultatifs). Les réglages du broker sont gardés dans {}, le reste dans {}.",
+        "intro": "Relie cette console à un broker MQTT (l'application Mosquitto de Home Assistant, ou un autre) : Home Assistant affiche alors son état et son temps de jeu, et peut lui envoyer des ordres. Le lien fonctionne tant que PlayGuard est ouvert, ou en permanence avec l'agent facultatif (Boréale › Modules facultatifs). Les réglages du broker sont gardés dans {}, le reste dans {}.",
         "section_status": "Lien",
         "status": "État",
         "sync_now": "Synchroniser maintenant",
@@ -1618,7 +1625,7 @@
         "status_agent": "L'agent {} tient le lien : PlayGuard lui passe ce qu'il lit et exécute les ordres qu'il lui transmet.",
         "status_agent_read_only": "Seul, l'agent ne change rien : PlayGuard était en mode lecture seule, ou le firmware a changé depuis le dernier lancement de PlayGuard.",
         "state_agent": "{} · par l'agent",
-        "state_agent_refused": "L'agent {} doit être mis à jour (Console › Modules facultatifs)",
+        "state_agent_refused": "L'agent {} doit être mis à jour (Boréale › Modules facultatifs)",
         "ask_body": "Un ordre est arrivé par le lien à distance : {}.\n\nL'exécuter sur cette console ?",
         "ask_confirm": "Exécuter",
         "done": "Ordre à distance exécuté : {}.",
@@ -2075,7 +2082,7 @@
         "remove": "La retirer",
         "removed": "Profil programmé retiré.",
         "soon": "Avec Home Assistant",
-        "soon_note": "PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul. Home Assistant le peut : Console › Accès à distance y relie la console, et une automatisation choisit le profil (son sélecteur Profil) depuis un agenda ou les vacances scolaires."
+        "soon_note": "PlayGuard ne tourne que lorsqu'il est ouvert, il ne peut donc pas changer de profil le bon jour tout seul. Home Assistant le peut : Boréale › Accès à distance y relie la console, et une automatisation choisit le profil (son sélecteur Profil) depuis un agenda ou les vacances scolaires."
     },
     "sigpatch": {
         "set_aside": "Mettre les sigpatches de côté",

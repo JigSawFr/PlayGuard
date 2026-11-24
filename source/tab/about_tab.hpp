@@ -1,7 +1,7 @@
 // AboutTab — the installed PlayGuard and help with it: version (Ⓐ opens its
 // release notes, SysNotesActivity; seven presses of a hidden Ⓨ on it turn the
 // developer tools on, at the end of Help & diagnostics), launch mode and data
-// folder; its updates (check now, every day, and how); a line to Help & diagnostics (HelpTab, on a screen of its own) and one to the Boréale homebrews installed (BorealeTab); the credits; how to
+// folder; its updates (check now, every day, how, sphaira's menu); Help (the first steps again, a line to Help & diagnostics (HelpTab, on a screen of its own)); one to the Boréale homebrews installed (BorealeTab); the credits; how to
 // support it (the funding links as QR codes, to scan with a phone); "Made in
 // France".
 // Copyright (C) 2026 JigSawFr, (C) 2026 Taylor.  GPLv3-or-later (see LICENSE).
@@ -30,8 +30,11 @@ class AboutTab : public TabBase
 
     AURORE_BIND(aurore::DetailCell,  version,          "ab_version");
     AURORE_BIND(aurore::DetailCell,  update_cell,      "ab_update");
+    AURORE_BIND(aurore::BooleanCell, update_daily,     "ab_update_daily");
+    AURORE_BIND(aurore::DetailCell,  update_via,       "ab_update_via");
+    AURORE_BIND(aurore::BooleanCell, sphaira_entry,    "ab_sphaira_entry");
+    AURORE_BIND(aurore::DetailCell,  first_steps,      "ab_first_steps");
     AURORE_BIND(aurore::DetailCell,  help,             "ab_help");
-    AURORE_BIND(aurore::DetailCell,  boreale,          "ab_boreale");
     AURORE_BIND(aurore::DetailCell,  credits,          "ab_credits");
     AURORE_BIND(aurore::Label,       support_note,     "ab_support_note");
     AURORE_BIND(aurore::Box,         funding,          "ab_funding");

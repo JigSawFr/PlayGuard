@@ -18,13 +18,13 @@ You know the PIN, but the previous owner's phone app is still linked (unlinking 
 
 ### The play timer blocks everything (0-minute limit) and the PIN is forgotten
 
-PlayGuard itself cannot start then. Install the optional recovery sysmodule **beforehand** (*Console › Optional modules*, or `playguard-rescue.zip` by hand); when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/rescue/README.md`](../sysmodule/rescue/README.md).
+PlayGuard itself cannot start then. Install the optional recovery sysmodule **beforehand** (*Boréale › Optional modules*, or `playguard-rescue.zip` by hand); when locked out, drop an empty `config/playguard/RESCUE` file on the SD card and boot — it unlocks the console so PlayGuard can open. See [`sysmodule/rescue/README.md`](../sysmodule/rescue/README.md).
 
 The module must follow PlayGuard's version: with each PlayGuard update, extract that release's `playguard-rescue.zip` again (or *Update* on the notification bell's *The recovery sysmodule is out of date*), then restart the console. An older module leaves a report PlayGuard cannot check: the recovery screen then offers nothing, says the module is older, and doing `RESCUE` again gives the same until it is updated.
 
 ### Homebrew menu locked
 
-*Console › Forwarders › Lock the homebrew menu* keeps the album and a game started with R from opening the homebrew menu. If PlayGuard's forwarder and the protected menu are both gone (deleted in System Settings, or on the other system: the lock is on the SD card, read by sysMMC and emuMMC both):
+*Security › Forwarders › Lock the homebrew menu* keeps the album and a game started with R from opening the homebrew menu. If PlayGuard's forwarder and the protected menu are both gone (deleted in System Settings, or on the other system: the lock is on the SD card, read by sysMMC and emuMMC both):
 
 - **From a computer:** delete `atmosphere/config/override_config.ini` on the SD card (or put back `config/playguard/override_config.ini.backup`, the file as it was), then restart the console.
 - **With the recovery sysmodule installed** (optional): drop an empty `config/playguard/RESCUE` file on the SD card and restart; the sysmodule lifts the lock at boot, and PlayGuard says so at its next start. An update of Atmosphère since it was locked lifts it the same way.
@@ -39,7 +39,7 @@ PlayGuard cannot help: it needs Atmosphère. Nintendo support's master-key proce
 
 *Today* says *The console is not counting play time right now* when it has not moved for about 90 s. The likely causes:
 
-- **The network clock was never set.** *Console › Network clock › Measure the time difference*, then set it ([network clock](features.md#network-clock)).
+- **The network clock was never set.** *Play timer › Network clock › Measure the time difference*, then set it ([network clock](features.md#network-clock)).
 - **The clock was set back.** After a jump back, the count stops until the clock passes the old time; nothing to do.
 - **A limit was just written.** Start a game for a minute, then check again.
 - **Parental controls are temporarily unlocked.** Play time may not be counted then: *Today › Turn back on* (or a tap on the header's pill).
@@ -75,15 +75,15 @@ The console runs a firmware newer than the newest one tested: PlayGuard checks w
 
 ### A protected forwarder shows error 2347-0100
 
-Its gate (`config/playguard/gate-….nro`) is no longer the file the forwarder was made with: it was changed or replaced on the SD card, so the forwarder does not start it. Open PlayGuard from its own forwarder: it writes the gate back at start; *Console › Forwarders › Install them all again* makes every forwarder again with it.
+Its gate (`config/playguard/gate-….nro`) is no longer the file the forwarder was made with: it was changed or replaced on the SD card, so the forwarder does not start it. Open PlayGuard from its own forwarder: it writes the gate back at start; *Security › Forwarders › Install them all again* makes every forwarder again with it.
 
 ### A protected forwarder closes at once ("an error occurred")
 
-Before any PlayGuard screen, with no error code (Atmosphère's report in `atmosphere/crash_reports/` names the `forwarder` module, result `2000-0000`): it was made by a PlayGuard whose gate was built without its assets, which the forwarder's loader refused. Update PlayGuard, then make it again: the bell and *Console › Forwarders* offer it for every forwarder made with an older loader.
+Before any PlayGuard screen, with no error code (Atmosphère's report in `atmosphere/crash_reports/` names the `forwarder` module, result `2000-0000`): it was made by a PlayGuard whose gate was built without its assets, which the forwarder's loader refused. Update PlayGuard, then make it again: the bell and *Security › Forwarders* offer it for every forwarder made with an older loader.
 
 ### A protected forwarder stays on its gate's screen after the PIN
 
-The PIN accepted, the screen with the homebrew's icon stays and nothing more happens: its gate drew that screen with a single buffer, and waited for ever to draw the next one. Update PlayGuard, then make it again: the bell and *Console › Forwarders* offer it for every forwarder made with an older gate.
+The PIN accepted, the screen with the homebrew's icon stays and nothing more happens: its gate drew that screen with a single buffer, and waited for ever to draw the next one. Update PlayGuard, then make it again: the bell and *Security › Forwarders* offer it for every forwarder made with an older gate.
 
 ### A forwarder shows "The software could not be started"
 
@@ -92,7 +92,7 @@ The console refused to start it: a signature check is still in place. In the ord
 - **sigpatch files beside sys-patch.** `.ips` files in `atmosphere/kip_patches/fs_patches`, `loader_patches` or `atmosphere/exefs_patches/es_patches` while sys-patch runs: two tools patching the same checks, the cause the sys-patch and sigpatch threads on GBAtemp give most. *Console › Game patches* warns of it, and Ⓐ there sets them aside (moved to `config/playguard/sigpatches-aside/`, never deleted; hekate's `bootloader/patches.ini` stays). Restart the console.
 - **A pattern sys-patch did not apply.** Forwarders need its fs and loader patches, every pattern it has for this firmware (`noncasigchk_17.0.0+`, `nocntchk_19.0.0+`, `noacidsigchk_10.0.0+`), not only one per module. *About › Help & diagnostics › Export a diagnostic report* lists, on its `game patches` line, sys-patch's version and each pattern left out; `sd:/config/sys-patch/log.ini` holds the same. Check that `config/sys-patch/config.ini` patches this system (`patch_emummc=1` on emuMMC) and turns none of them off; sys-patch's own maintainer says 23.0.x needs no newer sys-patch than 1.6.2.3.
 - **No restart since the patches changed.** sys-patch patches at boot.
-- **A forwarder made by an older PlayGuard.** The bell and *Console › Forwarders* offer to make again those built with an older loader.
+- **A forwarder made by an older PlayGuard.** The bell and *Security › Forwarders* offer to make again those built with an older loader.
 
 ### The bell or a tab shows an amber badge
 
